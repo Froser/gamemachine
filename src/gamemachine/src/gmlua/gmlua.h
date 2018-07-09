@@ -216,6 +216,12 @@ public:
 	GMLua(lua_State*);
 	~GMLua();
 
+	operator GMLuaCoreState*()
+	{
+		D(d);
+		return d->luaState;
+	}
+
 public:
 	GMLuaResult runFile(const char* file);
 	GMLuaResult runBuffer(const GMBuffer& buffer);
@@ -257,7 +263,18 @@ public:
 	*/
 	bool getTable(GMObject& obj, GMint index);
 
-public:
+	bool getVector(GMVec2& v);
+	void setVector(const GMVec2& v);
+
+	bool getVector(GMVec3& v);
+	void setVector(const GMVec3& v);
+
+	bool getVector(GMVec4& v);
+	void setVector(const GMVec4& v);
+
+	void setMatrix(const GMMat4& v);
+	bool getMatrix(GMMat4& v);
+
 	template <size_t _size> GMLuaStates call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable(&returns)[_size])
 	{
 		GMLuaStates result = callp(functionName, args, _size);
@@ -269,100 +286,6 @@ public:
 			}
 		}
 		return result;
-	}
-
-	operator lua_State*()
-	{
-		D(d);
-		return d->luaState;
-	}
-
-	template <typename T>
-	void setVector(const T& v)
-	{
-		D(d);
-		lua_newtable(L);
-		GMFloat4 f4;
-		v.loadFloat4(f4);
-		for (GMint i = 0; i < T::length(); i++)
-		{
-			lua_pushnumber(L, i);
-			lua_pushnumber(L, f4[i]);
-			GM_ASSERT(lua_istable(L, -3));
-			lua_settable(L, -3);
-		}
-	}
-
-	template <typename T>
-	bool getVector(T& v)
-	{
-		D(d);
-		GMint index = lua_gettop(L);
-		return getVector(v, index);
-	}
-
-	template <typename T>
-	bool getVector(T& v, GMint index)
-	{
-		D(d);
-		GMFloat4 f4;
-		v.loadFloat4(f4);
-		GM_ASSERT(lua_istable(L, index));
-		lua_pushnil(L);
-		while (lua_next(L, index))
-		{
-			POP_GUARD();
-			if (!lua_isinteger(L, -2))
-				return false;
-
-			GMint key = lua_tointeger(L, -2);
-			if (!lua_isnumber(L, -1))
-				return false;
-
-			f4[key] = lua_tonumber(L, -1);
-		}
-		return true;
-	}
-
-	void setMatrix(const GMMat4& v)
-	{
-		D(d);
-		lua_newtable(L);
-		for (GMint i = 0; i < GMMat4::length(); i++)
-		{
-			lua_pushnumber(L, i);
-			setVector(v[i]);
-			GM_ASSERT(lua_istable(L, -3));
-			lua_settable(L, -3);
-		}
-	}
-
-	template <typename T>
-	bool getMatrix(T& v)
-	{
-		D(d);
-		GMint index = lua_gettop(L);
-		return getMatrix(v, index);
-	}
-
-	template <typename T>
-	bool getMatrix(T& v, GMint index)
-	{
-		D(d);
-		GM_ASSERT(lua_istable(L, index));
-		lua_pushnil(L);
-		while (lua_next(L, index))
-		{
-			POP_GUARD();
-			if (!lua_isinteger(L, -2))
-				return false;
-
-			GMint key = lua_tointeger(L, -2);
-			bool isVector = getVector(v[key]);
-			if (!isVector)
-				return false;
-		}
-		return true;
 	}
 
 private:

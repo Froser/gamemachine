@@ -186,11 +186,12 @@ bool GMMultiLineTypoTextBuffer::XYtoCP(GMint x, GMint y, GMint* cp)
 	}
 
 	// r表示排版结果，最后为一个eof符号
+	// 认为字符是紧密排列的
 	const GMPoint pt = { x, y };
 	for (GMsize_t i = 0; i < r.size() - 1; ++i)
 	{
 		GMRect glyphRc = {
-			static_cast<GMint>(r[i].x),
+			static_cast<GMint>(r[i].x - r[i].bearingX),
 			static_cast<GMint>(r[i].y),
 			static_cast<GMint>(r[i].advance),
 			static_cast<GMint>(getLineHeight() + getLineSpacing())
@@ -767,7 +768,7 @@ void GMControlTextEdit::createBufferTypoEngineIfNotExist()
 void GMControlTextEdit::blinkCaret(GMint firstX, GMint caretX)
 {
 	D(d);
-	GMfloat time = GM.getGameMachineRunningStates().elapsedTime;
+	GMfloat time = GM.getRunningStates().elapsedTime;
 	if (time - d->lastBlink >= d->deltaBlink)
 	{
 		d->caretOn = !d->caretOn;
@@ -881,7 +882,7 @@ void GMControlTextEdit::selectAll()
 void GMControlTextEdit::resetCaretBlink()
 {
 	D(d);
-	d->lastBlink = GM.getGameMachineRunningStates().elapsedTime;
+	d->lastBlink = GM.getRunningStates().elapsedTime;
 	d->caretOn = true;
 }
 
@@ -1001,7 +1002,7 @@ void GMControlTextEdit::renderCaret(GMint firstX, GMint caretX)
 {
 	D(d);
 	GMRect rc = {
-		d->rcText.x - firstX + caretX - 1,
+		d->rcText.x + caretX - firstX - 1,
 		getCaretTop(),
 		2,
 		getCaretHeight()

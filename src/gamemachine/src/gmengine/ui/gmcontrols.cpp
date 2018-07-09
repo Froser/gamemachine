@@ -368,7 +368,7 @@ void GMControlScrollBar::render(GMfloat elapsed)
 	D(d);
 	if (d->arrowState != GMControlScrollBarArrowState::Clear)
 	{
-		GMfloat now = GM.getGameMachineRunningStates().elapsedTime;
+		GMfloat now = GM.getRunningStates().elapsedTime;
 		if (GM_inRect(d->rcUp, d->mousePt))
 		{
 			switch (d->arrowState)
@@ -770,7 +770,7 @@ bool GMControlScrollBar::handleMouseClick(GMSystemMouseEvent* event)
 	if (!hasFocus())
 		widget->requestFocus(this);
 
-	GMfloat nowElapsed = GM.getGameMachineRunningStates().elapsedTime;
+	GMfloat nowElapsed = GM.getRunningStates().elapsedTime;
 	if (GM_inRect(d->rcUp, d->mousePt))
 	{
 		if (window)

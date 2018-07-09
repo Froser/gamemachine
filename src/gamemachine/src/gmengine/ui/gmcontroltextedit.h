@@ -127,9 +127,9 @@ public:
 	inline GMRect expandStencilRect(const GMRect& rc)
 	{
 		GMRect r = {
-			rc.x - 2,
+			rc.x - 4,
 			rc.y - 2,
-			rc.width + 4,
+			rc.width + 8,
 			rc.height + 4
 		};
 		return r;

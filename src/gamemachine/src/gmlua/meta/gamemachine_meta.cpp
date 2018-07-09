@@ -15,7 +15,7 @@ namespace
 		GMGameMachineRunningStatesProxy()
 		{
 			D(d);
-			*d = GM.getGameMachineRunningStates();
+			*d = GM.getRunningStates();
 		}
 
 	protected:
@@ -40,7 +40,7 @@ namespace
 		return 0;
 	}
 
-	LUA_API int getGameMachineRunningStates(GMLuaCoreState* L)
+	LUA_API int getRunningStates(GMLuaCoreState* L)
 	{
 		GMGameMachineRunningStatesProxy r;
 		GMLua(L).setTable(r);
@@ -51,7 +51,7 @@ namespace
 	GMLuaReg g_meta[] = {
 		// {{BEGIN META DECLARATIONS}}
 		GM_LUA_DECLARATIONS(exit),
-		GM_LUA_DECLARATIONS(getGameMachineRunningStates),
+		GM_LUA_DECLARATIONS(getRunningStates),
 		// {{END META DECLARATIONS}}
 		{ 0, 0 }
 	};

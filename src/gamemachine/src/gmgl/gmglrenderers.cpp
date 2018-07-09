@@ -192,7 +192,7 @@ void GMGLRenderer::activateTextureTransform(GMModel* model, GMTextureType type)
 	};
 
 	if (model)
-		model->getShader().getTextureList().getTextureSampler(type).applyTexMode(GM.getGameMachineRunningStates().elapsedTime, applyCallback);
+		model->getShader().getTextureList().getTextureSampler(type).applyTexMode(GM.getRunningStates().elapsedTime, applyCallback);
 }
 
 GMint GMGLRenderer::activateTexture(GMModel* model, GMTextureType type)
@@ -284,7 +284,7 @@ ITexture* GMGLRenderer::getTexture(GMTextureSampler& frames)
 
 	// 如果frameCount > 1，说明是个动画，要根据Shader的间隔来选择合适的帧
 	// TODO
-	GMint elapsed = GM.getGameMachineRunningStates().elapsedTime * 1000;
+	GMint elapsed = GM.getRunningStates().elapsedTime * 1000;
 
 	return frames.getFrameByIndex((elapsed / frames.getAnimationMs()) % frames.getFrameCount());
 }

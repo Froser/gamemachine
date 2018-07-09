@@ -102,7 +102,7 @@ void GMBSPMove::applyJump(const GMVec3& speed)
 GMfloat GMBSPMove::now()
 {
 	D(d);
-	return GM.getGameMachineRunningStates().elapsedTime;
+	return GM.getRunningStates().elapsedTime;
 }
 
 void GMBSPMove::generateMovement()
@@ -246,7 +246,7 @@ bool GMBSPMove::slideMove(bool hasGravity)
 {
 	D(d);
 	GMBSPPhysicsWorld::Data& wd = d->world->physicsData();
-	GMfloat dt = GM.getGameMachineRunningStates().lastFrameElpased;
+	GMfloat dt = GM.getRunningStates().lastFrameElpased;
 	GMVec3 velocity = d->movementState.velocity;
 
 	GMint numbumps = 4, bumpcount;

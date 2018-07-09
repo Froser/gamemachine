@@ -724,7 +724,7 @@ void GMDx11Renderer::applyTextureAttribute(GMModel* model, ITexture* texture, GM
 			}
 		};
 
-		model->getShader().getTextureList().getTextureSampler(type).applyTexMode(GM.getGameMachineRunningStates().elapsedTime, applyCallback);
+		model->getShader().getTextureList().getTextureSampler(type).applyTexMode(GM.getRunningStates().elapsedTime, applyCallback);
 	}
 	else
 	{
@@ -914,7 +914,7 @@ ITexture* GMDx11Renderer::getTexture(GMTextureSampler& sampler)
 
 	// 如果frameCount > 1，说明是个动画，要根据Shader的间隔来选择合适的帧
 	// TODO
-	GMint elapsed = GM.getGameMachineRunningStates().elapsedTime * 1000;
+	GMint elapsed = GM.getRunningStates().elapsedTime * 1000;
 
 	return sampler.getFrameByIndex((elapsed / sampler.getAnimationMs()) % sampler.getFrameCount());
 }

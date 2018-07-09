@@ -12,6 +12,87 @@ struct __PopGuard							\
 	lua_State* m_L;							\
 } __guard(*this);
 
+#define POP_GUARD_(l) \
+struct __PopGuard							\
+{											\
+	__PopGuard(lua_State* __L) : m_L(__L) {}\
+	~__PopGuard() { lua_pop(m_L, 1); }		\
+	lua_State* m_L;							\
+} __guard(l);
+
+namespace
+{
+	template <typename T>
+	void setVector(const T& v, GMLuaCoreState* l)
+	{
+		lua_newtable(l);
+		GMFloat4 f4;
+		v.loadFloat4(f4);
+		for (GMint i = 0; i < T::length(); i++)
+		{
+			lua_pushnumber(l, i);
+			lua_pushnumber(l, f4[i]);
+			GM_ASSERT(lua_istable(l, -3));
+			lua_settable(l, -3);
+		}
+	}
+
+	template <typename T>
+	bool getVector(T& v, GMint index, GMLuaCoreState* l)
+	{
+		GMFloat4 f4;
+		v.loadFloat4(f4);
+		GM_ASSERT(lua_istable(l, index));
+		lua_pushnil(l);
+		while (lua_next(l, index))
+		{
+			POP_GUARD_(l);
+			if (!lua_isinteger(l, -2))
+				return false;
+
+			GMint key = lua_tointeger(l, -2);
+			if (!lua_isnumber(l, -1))
+				return false;
+
+			f4[key] = lua_tonumber(l, -1);
+		}
+		return true;
+	}
+
+	template <typename T>
+	bool getVector(T& v, GMLuaCoreState* l)
+	{
+		GMint index = lua_gettop(l);
+		return getVector(v, index, l);
+	}
+
+	template <typename T>
+	bool getMatrix(T& v, GMLuaCoreState* l)
+	{
+		GMint index = lua_gettop(l);
+		return getMatrix(v, index, l);
+	}
+
+	template <typename T>
+	bool getMatrix(T& v, GMint index, GMLuaCoreState* l)
+	{
+		GM_ASSERT(lua_istable(l, index));
+		lua_pushnil(l);
+		while (lua_next(l, index))
+		{
+			POP_GUARD_(l);
+			if (!lua_isinteger(l, -2))
+				return false;
+
+			GMint key = lua_tointeger(l, -2);
+			bool isVector = getVector(v[key], l);
+			if (!isVector)
+				return false;
+		}
+		return true;
+	}
+}
+
 void GMLuaFunctionRegister::setRegisterFunction(GMLuaCoreState *l, const GMString& modname, GMLuaCFunction openf, bool isGlobal)
 {
 	auto m = modname.toStdString();
@@ -34,7 +115,7 @@ GMLua::GMLua()
 GMLua::GMLua(lua_State* l)
 {
 	D(d);
-	d->luaState = luaL_newstate();
+	d->luaState = l;
 	d->isWeakLuaStatePtr = true;
 }
 
@@ -315,6 +396,54 @@ bool GMLua::getTable(GMObject& obj, GMint index)
 	}
 
 	return true;
+}
+
+bool GMLua::getVector(GMVec2& v)
+{
+	return ::getVector(v, *this);
+}
+
+void GMLua::setVector(const GMVec2& v)
+{
+	::setVector(v, *this);
+}
+
+bool GMLua::getVector(GMVec3& v)
+{
+	return ::getVector(v, *this);
+}
+
+void GMLua::setVector(const GMVec3& v)
+{
+	::setVector(v, *this);
+}
+
+bool GMLua::getVector(GMVec4& v)
+{
+	return ::getVector(v, *this);
+}
+
+void GMLua::setVector(const GMVec4& v)
+{
+	::setVector(v, *this);
+}
+
+void GMLua::setMatrix(const GMMat4& v)
+{
+	D(d);
+	lua_newtable(L);
+	for (GMint i = 0; i < GMMat4::length(); i++)
+	{
+		lua_pushnumber(L, i);
+		setVector(v[i]);
+		GM_ASSERT(lua_istable(L, -3));
+		lua_settable(L, -3);
+	}
+}
+
+bool GMLua::getMatrix(GMMat4& v)
+{
+	return ::getMatrix(v, *this);
 }
 
 void GMLua::push(const GMLuaVariable& var)

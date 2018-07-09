@@ -39,7 +39,7 @@ void GMDiscreteDynamicsWorld::simulate(GMGameObject* obj)
 	D(d);
 	D_BASE(db, Base);
 	GM_ASSERT(d->worldImpl);
-	d->worldImpl->stepSimulation(GM.getGameMachineRunningStates().lastFrameElpased);
+	d->worldImpl->stepSimulation(GM.getRunningStates().lastFrameElpased);
 	syncTransform();
 }
 

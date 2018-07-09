@@ -15,11 +15,35 @@ namespace
 		GMDebugger::instance().info(arg0);
 		return 0;
 	}
+
+	LUA_API int error(GMLuaCoreState* L)
+	{
+		const char* arg0 = GMArgumentHelper::getArgumentAsString(L, "error");
+		GMDebugger::instance().error(arg0);
+		return 0;
+	}
+
+	LUA_API int warning(GMLuaCoreState* L)
+	{
+		const char* arg0 = GMArgumentHelper::getArgumentAsString(L, "warning");
+		GMDebugger::instance().warning(arg0);
+		return 0;
+	}
+
+	LUA_API int debug(GMLuaCoreState* L)
+	{
+		const char* arg0 = GMArgumentHelper::getArgumentAsString(L, "debug");
+		GMDebugger::instance().debug(arg0);
+		return 0;
+	}
 	// {{END META FUNCTION}}
 
 	luaL_Reg g_meta[] = {
 		// {{BEGIN META DECLARATIONS}}
 		GM_LUA_DECLARATIONS(info),
+		GM_LUA_DECLARATIONS(error),
+		GM_LUA_DECLARATIONS(warning),
+		GM_LUA_DECLARATIONS(debug),
 		// {{END META DECLARATIONS}}
 		{ 0, 0 }
 	};

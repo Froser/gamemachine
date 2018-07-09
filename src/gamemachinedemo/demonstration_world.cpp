@@ -126,7 +126,7 @@ void DemoHandler::event(gm::GameMachineHandlerEvent evt)
 	case gm::GameMachineHandlerEvent::Render:
 	{
 		if (d->lbFPS)
-			d->lbFPS->setText(gm::GMString(L"当前FPS: ") + gm::GMString(GM.getGameMachineRunningStates().fps));
+			d->lbFPS->setText(gm::GMString(L"当前FPS: ") + gm::GMString(GM.getRunningStates().fps));
 
 		if (d->lbRendering)
 			d->lbRendering->setText(
@@ -668,7 +668,7 @@ DemostrationEntrance::~DemostrationEntrance()
 void DemostrationEntrance::onLoadShaders(const gm::IRenderContext* context)
 {
 	D(d);
-	auto& env = GM.getGameMachineRunningStates().renderEnvironment;
+	auto& env = GM.getRunningStates().renderEnvironment;
 
 	if (env == gm::GMRenderEnvironment::OpenGL)
 	{

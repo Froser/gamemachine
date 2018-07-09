@@ -923,7 +923,7 @@ void GMWidget::render(GMfloat elpasedTime)
 	D(d);
 	if (d->timeLastRefresh < s_timeRefresh)
 	{
-		d->timeLastRefresh = GM.getGameMachineRunningStates().elapsedTime;
+		d->timeLastRefresh = GM.getRunningStates().elapsedTime;
 		refresh();
 	}
 

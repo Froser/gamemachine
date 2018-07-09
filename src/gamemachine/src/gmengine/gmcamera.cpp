@@ -39,7 +39,7 @@ void GMFrustum::getPlanes(GMFrustumPlanes& planes)
 	const GMMat4& view = getViewMatrix();
 	GMMat4 clipMat = view * projection;
 
-	auto& runningState = GM.getGameMachineRunningStates();
+	auto& runningState = GM.getRunningStates();
 	GMVec4 f, n, left, right, top, bottom;
 
 	GetFrustumPlanesFromProjectionViewModelMatrix(
