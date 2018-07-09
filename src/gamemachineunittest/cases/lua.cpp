@@ -77,7 +77,6 @@ cases::Lua::Lua()
 {
 	m_obj.reset(new LuaObject());
 	auto lr = m_lua.runString(s_code);
-	lr = m_lua.runString(s_invoke);
 	GM_ASSERT(lr.state == gm::GMLuaStates::Ok);
 }
 
@@ -125,12 +124,16 @@ void cases::Lua::addToUnitTest(UnitTest& ut)
 	});
 
 	ut.addTestCase("C/C++调用语句，调用Lua方法", [&]() {
+		gm::GMLuaResult lr = m_lua.runString(s_invoke);
+		if (lr.state != gm::GMLuaStates::Ok)
+			return false;
+
 		auto dummy = m_lua.getGlobal("dummy").toString();
 		if (dummy != "gamemachine")
 			return false;
 
 		gm::GMVariant ret;
-		gm::GMLuaResult lr = m_lua.callProtected("dummy_function", {"hello "}, &ret, 1);
+		lr = m_lua.callProtected("dummy_function", {"hello "}, &ret, 1);
 		if (lr.state != gm::GMLuaStates::Ok)
 			return false;
 		return ret.toString() == "hello gamemachine";
