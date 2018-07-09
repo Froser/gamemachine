@@ -20,6 +20,13 @@ struct __PopGuard							\
 	lua_State* m_L;							\
 } __guard(l);
 
+#define CHECK(lr) \
+	if (lr.state != GMLuaStates::Ok)		\
+	{										\
+		lr.message = lua_tostring(L, -1);	\
+		return lr;							\
+	}
+
 namespace
 {
 	template <typename T>
@@ -40,8 +47,7 @@ namespace
 	template <typename T>
 	bool getVector(T& v, GMint index, GMLuaCoreState* l)
 	{
-		GMFloat4 f4;
-		v.loadFloat4(f4);
+		GMFloat4 f4(0, 0, 0, 0);
 		GM_ASSERT(lua_istable(l, index));
 		lua_pushnil(l);
 		while (lua_next(l, index))
@@ -54,8 +60,15 @@ namespace
 			if (!lua_isnumber(l, -1))
 				return false;
 
-			f4[key] = lua_tonumber(l, -1);
+			f4[key - 1] = lua_tonumber(l, -1);
+			// 防止越界
+			if (key > T::length())
+			{
+				lua_next(l, index);
+				break;
+			}
 		}
+		v.setFloat4(f4);
 		return true;
 	}
 
@@ -76,6 +89,7 @@ namespace
 	template <typename T>
 	bool getMatrix(T& v, GMint index, GMLuaCoreState* l)
 	{
+		GMVec4 v4[T::length()];
 		GM_ASSERT(lua_istable(l, index));
 		lua_pushnil(l);
 		while (lua_next(l, index))
@@ -85,10 +99,26 @@ namespace
 				return false;
 
 			GMint key = lua_tointeger(l, -2);
-			bool isVector = getVector(v[key], l);
+			bool isVector = getVector(v4[key - 1], l);
 			if (!isVector)
 				return false;
+
+			// 防止越界
+			if (key > T::length())
+			{
+				lua_next(l, index);
+				break;
+			}
 		}
+
+		GMFloat16 f16;
+		GMFloat4 f4[T::length()];
+		for (decltype(T::length()) i = 0; i < T::length(); ++i)
+		{
+			v4[i].loadFloat4(f4[i]);
+			f16[i] = f4[i];
+		}
+		v.setFloat16(f16);
 		return true;
 	}
 }
@@ -132,13 +162,10 @@ GMLuaResult GMLua::runFile(const char* file)
 	GM_ASSERT(L);
 	loadLibrary();
 	GMLuaStates s = static_cast<GMLuaStates>(luaL_loadfile(L, file));
-	if (s != GMLuaStates::Ok)
-	{
-		GMLuaResult lr = { s };
-		lr.message = lua_tostring(L, -1);
-		return lr;
-	}
-	GMLuaResult lr = { static_cast<GMLuaStates>(lua_pcall(L, 0, LUA_MULTRET, 0)) };
+	GMLuaResult lr = { s };
+	CHECK(lr);
+	lr = { static_cast<GMLuaStates>(lua_pcall(L, 0, LUA_MULTRET, 0)) };
+	CHECK(lr);
 	return lr;
 }
 
@@ -148,13 +175,10 @@ GMLuaResult GMLua::runBuffer(const GMBuffer& buffer)
 	GM_ASSERT(L);
 	loadLibrary();
 	GMLuaStates s = static_cast<GMLuaStates>(luaL_loadbuffer(L, (const char*)buffer.buffer, buffer.size, 0));
-	if (s != GMLuaStates::Ok)
-	{
-		GMLuaResult lr = { s };
-		lr.message = lua_tostring(L, -1);
-		return lr;
-	}
-	GMLuaResult lr = { static_cast<GMLuaStates>(lua_pcall(L, 0, LUA_MULTRET, 0)) };
+	GMLuaResult lr = { s };
+	CHECK(lr);
+	lr = { static_cast<GMLuaStates>(lua_pcall(L, 0, LUA_MULTRET, 0)) };
+	CHECK(lr);
 	return lr;
 }
 
@@ -164,18 +188,13 @@ GMLuaResult GMLua::runString(const GMString& string)
 	GM_ASSERT(L);
 	loadLibrary();
 	std::string stdstr = string.toStdString();
-	GMLuaStates s = static_cast<GMLuaStates>(luaL_loadstring(L, stdstr.c_str()));
-	if (s != GMLuaStates::Ok)
-	{
-		GMLuaResult lr = { s };
-		lr.message = lua_tostring(L, -1);
-		return lr;
-	}
-	GMLuaResult lr = { static_cast<GMLuaStates>(lua_pcall(L, 0, LUA_MULTRET, 0)) };
+	GMLuaStates s = static_cast<GMLuaStates>(luaL_dostring(L, stdstr.c_str()));
+	GMLuaResult lr = { s };
+	CHECK(lr);
 	return lr;
 }
 
-void GMLua::setGlobal(const char* name, const GMLuaVariable& var)
+void GMLua::setGlobal(const char* name, const GMVariant& var)
 {
 	D(d);
 	push(var);
@@ -194,7 +213,7 @@ bool GMLua::setGlobal(const char* name, GMObject& obj)
 	return true;
 }
 
-GMLuaVariable GMLua::getGlobal(const char* name)
+GMVariant GMLua::getGlobal(const char* name)
 {
 	D(d);
 	lua_getglobal(L, name);
@@ -216,43 +235,41 @@ bool GMLua::getGlobal(const char* name, GMObject& obj)
 	return getTable(obj);
 }
 
-GMLuaStates GMLua::call(const char* functionName, const std::initializer_list<GMLuaVariable>& args)
+GMLuaResult GMLua::callProtected(const char* functionName, const std::initializer_list<GMVariant>& args)
 {
+	D(d);
 	return callp(functionName, args, 0);
 }
 
-GMLuaStates GMLua::call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable* returns, GMint nRet)
-{
-	GMLuaStates result = callp(functionName, args, nRet);
-	if (result == GMLuaStates::Ok)
-	{
-		for (GMint i = 0; i < nRet; i++)
-		{
-			returns[i] = pop();
-		}
-	}
-	return result;
-}
-
-GMLuaStates GMLua::call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMObject* returns, GMint nRet)
-{
-	GMLuaStates result = callp(functionName, args, nRet);
-	if (result == GMLuaStates::Ok)
-	{
-		for (GMint i = 0; i < nRet; i++)
-		{
-			POP_GUARD();
-			if (!getTable(returns[i]))
-				return GMLuaStates::WrongType;
-		}
-	}
-	return result;
-}
-
-bool GMLua::invoke(const char* expr)
+GMLuaResult GMLua::callProtected(const char* functionName, const std::initializer_list<GMVariant>& args, GMVariant* returns, GMint nRet)
 {
 	D(d);
-	return luaL_dostring(L, expr);
+	GMLuaResult lr = callp(functionName, args, nRet);
+	CHECK(lr);
+	for (GMint i = 0; i < nRet; i++)
+	{
+		returns[i] = pop();
+	}
+	return lr;
+}
+
+GMLuaResult GMLua::callProtected(const char* functionName, const std::initializer_list<GMVariant>& args, GMObject* returns, GMint nRet)
+{
+	D(d);
+	GMLuaResult lr = callp(functionName, args, nRet);
+	CHECK(lr);
+	for (GMint i = 0; i < nRet; i++)
+	{
+		POP_GUARD();
+		if (!getTable(returns[i]))
+		{
+			lr.state = GMLuaStates::WrongType;
+			const char* errmsg = "cannot convert to GMObject";
+			lr.message = errmsg;
+			gm_error(L"GMLua (callProcted): " + GMString(errmsg));
+		}
+	}
+	return lr;
 }
 
 void GMLua::loadLibrary()
@@ -272,16 +289,7 @@ void GMLua::registerLibraries()
 	luaapi::registerLib(L);
 }
 
-void GMLua::callExceptionHandler(GMLuaStates state, const char* msg)
-{
-	D(d);
-	if (d->exceptionHandler)
-		d->exceptionHandler->onException(state, msg);
-	else
-		gm_error("LUA error: {0}, {1}", { GMString(static_cast<GMint>(state)), msg });
-}
-
-GMLuaStates GMLua::callp(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMint nRet)
+GMLuaResult GMLua::callp(const char* functionName, const std::initializer_list<GMVariant>& args, GMint nRet)
 {
 	D(d);
 	lua_getglobal(L, functionName);
@@ -291,14 +299,9 @@ GMLuaStates GMLua::callp(const char* functionName, const std::initializer_list<G
 	}
 
 	GM_ASSERT(args.size() < std::numeric_limits<GMuint>::max());
-	GMLuaStates result = (GMLuaStates)lua_pcall(L, (GMuint)args.size(), nRet, 0);
-	if (result != GMLuaStates::Ok)
-	{
-		const char* msg = lua_tostring(L, -1);
-		callExceptionHandler(result, msg);
-		lua_pop(L, 1);
-	}
-	return result;
+	GMLuaResult lr = { (GMLuaStates)lua_pcall(L, (GMuint)args.size(), nRet, 0) };
+	CHECK(lr);
+	return lr;
 }
 
 void GMLua::setTable(const GMObject& obj)
@@ -446,32 +449,34 @@ bool GMLua::getMatrix(GMMat4& v)
 	return ::getMatrix(v, *this);
 }
 
-void GMLua::push(const GMLuaVariable& var)
+void GMLua::push(const GMVariant& var)
 {
 	D(d);
-	switch (var.type)
+	if (var.isInt())
 	{
-	case GMLuaVariableType::Int:
-		lua_pushinteger(L, var.valInt);
-		break;
-	case GMLuaVariableType::Number:
-		lua_pushnumber(L, var.valFloat);
-		break;
-	case GMLuaVariableType::Boolean:
-		lua_pushboolean(L, var.valBoolean);
-		break;
-	case GMLuaVariableType::String:
-		{
-			std::string str = var.valPtrString->toStdString();
-			lua_pushstring(L, str.c_str());
-		}
-		break;
-	case GMLuaVariableType::Object:
-		setTable(*var.valPtrObject);
-		break;
-	default:
+		lua_pushinteger(L, var.toInt());
+	}
+	else if (var.isFloat())
+	{
+		lua_pushnumber(L, var.toFloat());
+	}
+	else if (var.isBool())
+	{
+		lua_pushboolean(L, var.toBool());
+	}
+	else if (var.isString())
+	{
+		std::string str = var.toString().toStdString();
+		lua_pushstring(L, str.c_str());
+	}
+	else if (var.isPointer())
+	{
+		setTable(* (GMObject*)var.toPointer());
+	}
+	else
+	{
+		gm_error(L"GMLua (push): variant type not supported");
 		GM_ASSERT(false);
-		break;
 	}
 }
 
@@ -537,7 +542,7 @@ void GMLua::push(const char* name, const GMObjectMember& member)
 	lua_settable(L, -3);
 }
 
-GMLuaVariable GMLua::pop()
+GMVariant GMLua::pop()
 {
 	D(d);
 	POP_GUARD();
@@ -548,7 +553,7 @@ GMLuaVariable GMLua::pop()
 	if (lua_isstring(L, -1))
 		return GMString(lua_tostring(L, -1));
 	if (lua_isboolean(L, -1))
-		return lua_toboolean(L, -1);
-	GM_ASSERT(false);
-	return 0;
+		return lua_toboolean(L, -1) ? true : false;
+	gm_error(L"GMLua (pop): variant type not supported");
+	return GMVariant();
 }

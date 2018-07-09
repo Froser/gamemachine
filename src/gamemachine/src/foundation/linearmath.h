@@ -152,7 +152,7 @@ inline bool FuzzyCompare(gm::GMfloat p1, gm::GMfloat p2, gm::GMfloat qualifier =
 #endif
 #define GMMATH_END_STRUCT };
 
-#define GMMATH_LEN(len) static gm::GMint length() { return (len); }
+#define GMMATH_LEN(len) constexpr static gm::GMint length() { return (len); }
 
 struct GMFloat4
 {

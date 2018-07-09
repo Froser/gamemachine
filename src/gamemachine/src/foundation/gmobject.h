@@ -261,12 +261,12 @@ using GMSlots = HashMap<GMSignal, Vector<GMCallbackTarget>, GMStringHashFunctor>
 
 #define GM_META(memberName) \
 { \
-	GM_STATIC_ASSERT(static_cast<GMMetaMemberType>( GMMetaMemberTypeGetter<decltype(data()-> memberName)>::Type ) != GMMetaMemberType::Invalid, "Invalid Meta type"); \
-	GMObject::data()->meta[#memberName] = { static_cast<GMMetaMemberType>( GMMetaMemberTypeGetter<decltype(data()-> memberName)>::Type ), sizeof(data()-> memberName), &data()->memberName }; \
+	GM_STATIC_ASSERT(static_cast<gm::GMMetaMemberType>( gm::GMMetaMemberTypeGetter<decltype(data()-> memberName)>::Type ) != gm::GMMetaMemberType::Invalid, "Invalid Meta type"); \
+	gm::GMObject::data()->meta[#memberName] = { static_cast<gm::GMMetaMemberType>( gm::GMMetaMemberTypeGetter<decltype(data()-> memberName)>::Type ), sizeof(data()-> memberName), &data()->memberName }; \
 }
 
 #define GM_META_WITH_TYPE(memberName, type) \
-	GMObject::data()->meta[#memberName] = { type, sizeof(data()-> memberName), &data()->memberName };
+	gm::GMObject::data()->meta[#memberName] = { type, sizeof(data()-> memberName), &data()->memberName };
 
 #define GM_END_META_MAP \
 	return true; }

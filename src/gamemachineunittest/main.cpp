@@ -6,6 +6,7 @@
 #include "cases/thread.h"
 #include "cases/linearmath.h"
 #include "cases/variant.h"
+#include "cases/lua.h"
 
 int main(int argc, char* argv)
 {
@@ -19,6 +20,7 @@ int main(int argc, char* argv)
 		new cases::LinearMath(),
 		// new cases::Thread(),
 		new cases::Variant(),
+		new cases::Lua(),
 	};
 
 	for (auto& c : caseArray)

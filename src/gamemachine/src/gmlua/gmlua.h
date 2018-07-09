@@ -53,157 +53,10 @@ struct GMLuaResult
 	GMString message;
 };
 
-GM_INTERFACE(ILuaExceptionHandler)
-{
-	virtual void onException(GMLuaStates state, const char* msg) = 0;
-};
-
-enum class GMLuaVariableType
-{
-	Int,
-	Number,
-	String,
-	Boolean,
-	Object
-};
-
-struct GMLuaVariable
-{
-	GMLuaVariableType type;
-	union
-	{
-		GMString* valPtrString;
-		GMObject* valPtrObject;
-		GMint64 valInt;
-		bool valBoolean;
-		GMfloat valFloat;
-	};
-
-	GMLuaVariable(const GMLuaVariable& v)
-	{
-		*this = v;
-	}
-
-	GMLuaVariable& operator=(const GMLuaVariable& v)
-	{
-		if (&v == this)
-			return *this;
-
-		if (v.type == GMLuaVariableType::String)
-		{
-			type = v.type;
-			valPtrString = new GMString(*v.valPtrString);
-		}
-		else
-		{
-			memcpy_s(this, sizeof(*this), &v, sizeof(v));
-		}
-		return *this;
-	}
-
-	GMLuaVariable(GMLuaVariable&& v) GM_NOEXCEPT
-	{
-		*this = std::move(v);
-	}
-
-	GMLuaVariable& operator=(GMLuaVariable&& v) GM_NOEXCEPT
-	{
-		if (&v == this)
-			return *this;
-
-		if (v.type == GMLuaVariableType::String)
-		{
-			delete valPtrString;
-			type = v.type;
-			valPtrString = v.valPtrString;
-			v.valPtrString = nullptr;
-		}
-		else if (v.type == GMLuaVariableType::Object)
-		{
-			type = v.type;
-			valPtrObject = v.valPtrObject;
-			v.valPtrObject = nullptr;
-		}
-		else
-		{
-			memcpy_s(this, sizeof(*this), &v, sizeof(v));
-		}
-
-		return *this;
-	}
-
-	GMLuaVariable()
-		: type(GMLuaVariableType::Int)
-		, valInt(0)
-	{
-	}
-
-	GMLuaVariable(GMint64 d)
-		: type(GMLuaVariableType::Int)
-		, valInt(d)
-	{
-	}
-
-	GMLuaVariable(GMint d)
-		: type(GMLuaVariableType::Int)
-		, valInt(d)
-	{
-	}
-
-	GMLuaVariable(GMfloat d)
-		: type(GMLuaVariableType::Number)
-		, valFloat(d)
-	{
-	}
-
-	explicit GMLuaVariable(bool d)
-		: type(GMLuaVariableType::Boolean)
-		, valBoolean(d)
-	{
-	}
-
-	GMLuaVariable(const char* str)
-		: type(GMLuaVariableType::String)
-		, valPtrString(new GMString(str))
-	{
-	}
-
-	GMLuaVariable(const GMwchar* str)
-		: type(GMLuaVariableType::String)
-		, valPtrString(new GMString(str))
-	{
-	}
-
-	GMLuaVariable(AUTORELEASE const GMString& str)
-		: type(GMLuaVariableType::String)
-		, valPtrString(new GMString(str))
-	{
-	}
-
-	GMLuaVariable(GMObject& obj)
-		: type(GMLuaVariableType::Object)
-		, valPtrObject(&obj)
-	{
-	}
-
-	operator GMObject*()
-	{
-		GM_ASSERT(type == GMLuaVariableType::Object);
-		return valPtrObject;
-	}
-
-	~GMLuaVariable()
-	{
-		if (type == GMLuaVariableType::String)
-			delete valPtrString;
-	}
-};
-
 GM_PRIVATE_OBJECT(GMLua)
 {
 	lua_State* luaState = nullptr;
 	bool isWeakLuaStatePtr = false;
-	ILuaExceptionHandler* exceptionHandler = nullptr;
 	bool libraryLoaded = false;
 };
 
@@ -225,16 +78,38 @@ public:
 public:
 	GMLuaResult runFile(const char* file);
 	GMLuaResult runBuffer(const GMBuffer& buffer);
+
+	//! 调用一个表达式。
+	/*!
+	在当前上下文中，调用一个表达式语句。
+	\param expr 所调用的表达式。
+	\return 是否调用成功。
+	*/
 	GMLuaResult runString(const GMString& string);
 
-	void setGlobal(const char* name, const GMLuaVariable& var);
+	void setGlobal(const char* name, const GMVariant& var);
 	bool setGlobal(const char* name, GMObject& obj);
-	GMLuaVariable getGlobal(const char* name);
+
+	//! 通过变量名获取一个全局变量。
+	/*!
+	  所获取的变量将会存入GMVariant结构。需要注意的是，它只能获取标量(int64, float, boolean, string)，无法获取向量、矩阵，认为它们在Lua中是以表的形式存在。<BR>
+	  如果要处理向量、矩阵，请使用getGlobal的另外一个版本。所获取的整形变量为int64类型，如果遇到无法获取的情况，将返回一个Unknown类型的GMVariant。
+	  \param name Lua全局对象名称。
+	*/
+	GMVariant getGlobal(const char* name);
+
+	//! 通过变量名获取一个全局变量。
+	/*!
+	  所获取的变量一定要是个表结构，它将寻找能够精确匹配上GMObject的Lua表对象，并将表中的值赋予GMObject。如果能精确匹配，返回true，否则返回false。
+	  \param name Lua全局对象名称。
+	  \param obj 需要赋值的对象。
+	  \return Lua中的全局对象是否能精确匹配GMObject。
+	*/
 	bool getGlobal(const char* name, GMObject& obj);
-	GMLuaStates call(const char* functionName, const std::initializer_list<GMLuaVariable>& args);
-	GMLuaStates call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable* returns, GMint nRet);
-	GMLuaStates call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMObject* returns, GMint nRet);
-	bool invoke(const char* expr);
+
+	GMLuaResult callProtected(const char* functionName, const std::initializer_list<GMVariant>& args);
+	GMLuaResult callProtected(const char* functionName, const std::initializer_list<GMVariant>& args, GMVariant* returns = nullptr, GMint nRet = 0);
+	GMLuaResult callProtected(const char* functionName, const std::initializer_list<GMVariant>& args, GMObject* returns = nullptr, GMint nRet = 0);
 
 	//! 将一个对象的成员压入Lua的虚拟堆栈。
 	/*!
@@ -251,6 +126,7 @@ public:
 	  \return 操作是否成功。
 	  \sa GMObject::registerMeta()
 	*/
+
 	bool getTable(GMObject& obj);
 
 	//! 从Lua虚拟堆栈的指定某一层堆栈中取出一个Table，并赋值给指定对象。
@@ -275,27 +151,19 @@ public:
 	void setMatrix(const GMMat4& v);
 	bool getMatrix(GMMat4& v);
 
-	template <size_t _size> GMLuaStates call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable(&returns)[_size])
-	{
-		GMLuaStates result = callp(functionName, args, _size);
-		if (result == GMLuaStates::Ok)
-		{
-			for (GMint i = 0; i < _size; i++)
-			{
-				returns[i] = pop();
-			}
-		}
-		return result;
-	}
-
 private:
 	void loadLibrary();
 	void registerLibraries();
-	void callExceptionHandler(GMLuaStates state, const char* msg);
-	GMLuaStates callp(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMint nRet);
-	void push(const GMLuaVariable& var);
+	GMLuaResult callp(const char* functionName, const std::initializer_list<GMVariant>& args, GMint nRet);
+	void push(const GMVariant& var);
 	void push(const char* name, const GMObjectMember& member);
-	GMLuaVariable pop();
+
+	//! 返回Lua的栈顶的变量，并弹出它。
+	/*!
+	  在调用此方法前，必须确认Lua栈顶是非空的。它将弹出Lua栈顶的值，并将其转化为一个GMVariant。需要注意的是，它并不能识别Vec2, Vec3, Vec4和Mat4，因为在Lua中，它们都是表(table)。
+	  \return Lua栈顶转化为GMVariant后的值。
+	*/
+	GMVariant pop();
 };
 
 #undef L
