@@ -256,15 +256,9 @@ void GMLua::loadLibrary()
 	if (!d->libraryLoaded)
 	{
 		luaL_openlibs(L);
-		registerLibraries();
+		luaapi::registerLib(this);
 		d->libraryLoaded = true;
 	}
-}
-
-void GMLua::registerLibraries()
-{
-	D(d);
-	luaapi::registerLib(this);
 }
 
 GMLuaResult GMLua::pcall(const char* functionName, const std::initializer_list<GMVariant>& args, GMint nRet)
@@ -292,7 +286,7 @@ void GMLua::pushTable(const GMObject& obj)
 	GM_ASSERT(meta);
 	for (const auto& member : *meta)
 	{
-		push(member.first.toStdString().c_str(), member.second);
+		setTable(member.first.toStdString().c_str(), member.second);
 	}
 }
 
@@ -476,59 +470,59 @@ void GMLua::push(const GMVariant& var)
 	}
 }
 
-void GMLua::push(const char* name, const GMObjectMember& member)
+void GMLua::setTable(const char* key, const GMObjectMember& value)
 {
 	D(d);
 	GM_CHECK_LUA_STACK_BALANCE(0);
-	lua_pushstring(L, name);
+	lua_pushstring(L, key);
 
-	switch (member.type)
+	switch (value.type)
 	{
 	case GMMetaMemberType::Int:
-		lua_pushinteger(L, *static_cast<GMint*>(member.ptr));
+		lua_pushinteger(L, *static_cast<GMint*>(value.ptr));
 		break;
 	case GMMetaMemberType::Float:
-		lua_pushnumber(L, *static_cast<GMfloat*>(member.ptr));
+		lua_pushnumber(L, *static_cast<GMfloat*>(value.ptr));
 		break;
 	case GMMetaMemberType::Boolean:
-		lua_pushboolean(L, *static_cast<bool*>(member.ptr));
+		lua_pushboolean(L, *static_cast<bool*>(value.ptr));
 		break;
 	case GMMetaMemberType::String:
 		{
-			std::string value = (static_cast<GMString*>(member.ptr))->toStdString();
-			lua_pushstring(L, value.c_str());
+			std::string s = (static_cast<GMString*>(value.ptr))->toStdString();
+			lua_pushstring(L, s.c_str());
 		}
 		break;
 	case GMMetaMemberType::Vector2:
 		{
-			GMVec2& vec2 = *static_cast<GMVec2*>(member.ptr);
+			GMVec2& vec2 = *static_cast<GMVec2*>(value.ptr);
 			pushVector(vec2);
 			GM_ASSERT(lua_istable(L, -1));
 		}
 		break;
 	case GMMetaMemberType::Vector3:
 		{
-			GMVec3& vec3 = *static_cast<GMVec3*>(member.ptr);
+			GMVec3& vec3 = *static_cast<GMVec3*>(value.ptr);
 			pushVector(vec3);
 			GM_ASSERT(lua_istable(L, -1));
 		}
 		break;
 	case GMMetaMemberType::Vector4:
 		{
-			GMVec4& vec4 = *static_cast<GMVec4*>(member.ptr);
+			GMVec4& vec4 = *static_cast<GMVec4*>(value.ptr);
 			pushVector(vec4);
 			GM_ASSERT(lua_istable(L, -1));
 		}
 		break;
 	case GMMetaMemberType::Matrix4x4:
 		{
-			GMMat4& mat= *static_cast<GMMat4*>(member.ptr);
+			GMMat4& mat= *static_cast<GMMat4*>(value.ptr);
 			pushMatrix(mat);
 			GM_ASSERT(lua_istable(L, -1));
 		}
 		break;
 	case GMMetaMemberType::Object:
-		pushTable(*static_cast<GMObject*>(member.ptr));
+		pushTable(*static_cast<GMObject*>(value.ptr));
 		break;
 	default:
 		GM_ASSERT(false);

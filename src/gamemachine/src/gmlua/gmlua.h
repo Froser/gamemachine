@@ -183,6 +183,7 @@ public:
 	  \return Lua栈顶转化为GMVariant后的值。
 	*/
 	GMVariant getTop();
+	void push(const GMVariant& var);
 
 public:
 	inline GMLuaCoreState* getLuaCoreState() GM_NOEXCEPT
@@ -193,10 +194,8 @@ public:
 
 private:
 	void loadLibrary();
-	void registerLibraries();
 	GMLuaResult pcall(const char* functionName, const std::initializer_list<GMVariant>& args, GMint nRet);
-	void push(const GMVariant& var);
-	void push(const char* name, const GMObjectMember& member);
+	void setTable(const char* key, const GMObjectMember& value);
 };
 
 #undef L
