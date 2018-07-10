@@ -64,7 +64,7 @@ namespace
 
 const char* GameMachine_Meta::Name = NAME;
 
-void GameMachine_Meta::registerFunctions(GMLuaCoreState* L)
+void GameMachine_Meta::registerFunctions(GMLua* L)
 {
 	setRegisterFunction(L, Name, regCallback, true);
 }

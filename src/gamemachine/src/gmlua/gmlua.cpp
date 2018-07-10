@@ -119,12 +119,13 @@ namespace
 	}
 }
 
-void GMLuaFunctionRegister::setRegisterFunction(GMLuaCoreState *l, const GMString& modname, GMLuaCFunction openf, bool isGlobal)
+void GMLuaFunctionRegister::setRegisterFunction(GMLua *l, const GMString& modname, GMLuaCFunction openf, bool isGlobal)
 {
-	GM_CHECK_LUA_STACK_BALANCE_(l, 0);
+	GMLuaCoreState* cl = l->getLuaCoreState();
+	GM_CHECK_LUA_STACK_BALANCE_(cl, 0);
 	auto m = modname.toStdString();
-	luaL_requiref(l, m.data(), openf, isGlobal ? 1 : 0);
-	lua_pop(l, 1);
+	luaL_requiref(cl, m.data(), openf, isGlobal ? 1 : 0);
+	lua_pop(cl, 1);
 }
 
 void GMLuaFunctionRegister::newLibrary(GMLuaCoreState *l, const GMLuaReg* functions)
@@ -191,14 +192,14 @@ GMLuaResult GMLua::runString(const GMString& string)
 	return lr;
 }
 
-void GMLua::setGlobal(const char* name, const GMVariant& var)
+void GMLua::setToGlobal(const char* name, const GMVariant& var)
 {
 	D(d);
 	push(var);
 	lua_setglobal(L, name);
 }
 
-bool GMLua::setGlobal(const char* name, GMObject& obj)
+bool GMLua::setToGlobal(const char* name, GMObject& obj)
 {
 	D(d);
 	const GMMeta* meta = obj.meta();
@@ -210,15 +211,15 @@ bool GMLua::setGlobal(const char* name, GMObject& obj)
 	return true;
 }
 
-GMVariant GMLua::getGlobal(const char* name)
+GMVariant GMLua::getFromGlobal(const char* name)
 {
 	D(d);
 	POP_GUARD();
 	lua_getglobal(L, name);
-	return pop();
+	return getTop();
 }
 
-bool GMLua::getGlobal(const char* name, GMObject& obj)
+bool GMLua::getFromGlobal(const char* name, GMObject& obj)
 {
 	D(d);
 	const GMMeta* meta = obj.meta();
@@ -244,7 +245,7 @@ GMLuaResult GMLua::protectedCall(const char* functionName, const std::initialize
 		if (returns[i].isObject())
 			popTable(*returns[i].toObject());
 		else
-			returns[i] = pop();
+			returns[i] = getTop();
 	}
 	return lr;
 }
@@ -263,7 +264,7 @@ void GMLua::loadLibrary()
 void GMLua::registerLibraries()
 {
 	D(d);
-	luaapi::registerLib(L);
+	luaapi::registerLib(this);
 }
 
 GMLuaResult GMLua::pcall(const char* functionName, const std::initializer_list<GMVariant>& args, GMint nRet)
@@ -538,7 +539,7 @@ void GMLua::push(const char* name, const GMObjectMember& member)
 	lua_settable(L, -3);
 }
 
-GMVariant GMLua::pop()
+GMVariant GMLua::getTop()
 {
 	D(d);
 	GM_CHECK_LUA_STACK_BALANCE(0);

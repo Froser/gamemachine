@@ -101,6 +101,7 @@ public:
 		return (T)toObject();
 	}
 
+	bool isInvalid() const { return m_type == Unknown; }
 	bool isInt() const { return m_type == I32; }
 	bool isInt64() const { return m_type == I64; }
 	bool isUInt() const { return m_type == UInt; }

@@ -9,7 +9,7 @@
 BEGIN_NS
 namespace luaapi
 {
-	void registerLib(lua_State* L)
+	void registerLib(GMLua* L)
 	{
 		// {{BEGIN META REGISTER}}
 		GameMachine_Meta().registerFunctions(L);

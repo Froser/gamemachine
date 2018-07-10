@@ -86,6 +86,33 @@ namespace
 		"  tb.str = i.str;"
 		"  return tb;"
 		"end";
+
+	std::string g_s;
+	LuaObject g_o;
+	GMVec2 g_v2;
+	GMVec3 g_v3;
+	GMVec4 g_v4;
+	bool g_b;
+	gm::GMfloat g_f;
+	GMMat4 g_m;
+
+	extern "C"
+	{
+		int dummyCFunc(gm::GMLuaCoreState* l)
+		{
+			int n = gm::luaapi::GMArgumentHelper::getArgumentsCount(l);
+			// pop顺序和调用顺序是反的
+			g_m = gm::luaapi::GMArgumentHelper::popArgumentAsMat4(l, "dummyCFunc").toMat4();
+			g_f = gm::luaapi::GMArgumentHelper::popArgument(l, "dummyCFunc").toFloat();
+			g_b = gm::luaapi::GMArgumentHelper::popArgument(l, "dummyCFunc").toBool();
+			g_v4 = gm::luaapi::GMArgumentHelper::popArgumentAsVec4(l, "dummyCFunc").toVec4();
+			g_v3 = gm::luaapi::GMArgumentHelper::popArgumentAsVec3(l, "dummyCFunc").toVec3();
+			g_v2 = gm::luaapi::GMArgumentHelper::popArgumentAsVec2(l, "dummyCFunc").toVec2();
+			gm::luaapi::GMArgumentHelper::popArgumentAsObject(l, g_o, "dummyCFunc");
+			g_s = gm::luaapi::GMArgumentHelper::popArgumentAsString(l, "dummyCFunc");
+			return 0;
+		}
+	}
 }
 
 cases::Lua::Lua()
@@ -97,28 +124,28 @@ cases::Lua::Lua()
 
 void cases::Lua::addToUnitTest(UnitTest& ut)
 {
-	ut.addTestCase("获取全局变量int64", [&]() {
-		auto value = m_lua.getGlobal("i");
+	ut.addTestCase("GMLua: 获取全局变量int64", [&]() {
+		auto value = m_lua.getFromGlobal("i");
 		return value.toInt64() == 5;
 	});
 
-	ut.addTestCase("获取全局变量float", [&]() {
-		auto value = m_lua.getGlobal("f");
+	ut.addTestCase("GMLua: 获取全局变量float", [&]() {
+		auto value = m_lua.getFromGlobal("f");
 		return FuzzyCompare(value.toFloat(), 1.2f);
 	});
 
-	ut.addTestCase("获取全局变量bool", [&]() {
-		auto value = m_lua.getGlobal("b");
+	ut.addTestCase("GMLua: 获取全局变量bool", [&]() {
+		auto value = m_lua.getFromGlobal("b");
 		return !value.toBool();
 	});
 
-	ut.addTestCase("获取全局变量string", [&]() {
-		auto value = m_lua.getGlobal("str");
+	ut.addTestCase("GMLua: 获取全局变量string", [&]() {
+		auto value = m_lua.getFromGlobal("str");
 		return value.toString() == "gamemachine";
 	});
 
-	ut.addTestCase("获取全局变量并赋值给GMObject", [&]() {
-		m_lua.getGlobal("meta", *m_obj);
+	ut.addTestCase("GMLua: 获取全局变量并赋值给GMObject", [&]() {
+		m_lua.getFromGlobal("meta", *m_obj);
 		LuaObject* obj = gm::gm_cast<LuaObject*>(m_obj.get());
 
 		bool bScalar =
@@ -138,12 +165,12 @@ void cases::Lua::addToUnitTest(UnitTest& ut)
 		return bScalar && bV2 && bV3 && bV4 && bM;
 	});
 
-	ut.addTestCase("C/C++调用语句，调用Lua方法，传入标量，获取标量", [&]() {
+	ut.addTestCase("GMLua: C/C++调用语句，调用Lua方法，传入标量，获取标量", [&]() {
 		gm::GMLuaResult lr = m_lua.runString(s_invoke);
 		if (lr.state != gm::GMLuaStates::Ok)
 			return false;
 
-		auto dummy = m_lua.getGlobal("dummy").toString();
+		auto dummy = m_lua.getFromGlobal("dummy").toString();
 		if (dummy != "gamemachine")
 			return false;
 
@@ -154,7 +181,7 @@ void cases::Lua::addToUnitTest(UnitTest& ut)
 		return ret.toString() == "hello gamemachine";
 	});
 
-	ut.addTestCase("C/C++调用语句，调用Lua方法，传入标量，获取对象", [&]() {
+	ut.addTestCase("GMLua: C/C++调用语句，调用Lua方法，传入标量，获取对象", [&]() {
 		gm::GMLuaResult lr = m_lua.runString(s_invoke2);
 		if (lr.state != gm::GMLuaStates::Ok)
 			return false;
@@ -167,7 +194,7 @@ void cases::Lua::addToUnitTest(UnitTest& ut)
 		return VECTOR4_EQUALS(ret.objectCast<LuaObject*>()->getv4(), 6, 7, 8, 14) && ret.objectCast<LuaObject*>()->geti() == 256;
 	});
 
-	ut.addTestCase("C/C++调用语句，调用Lua方法，传入对象，获取对象", [&]() {
+	ut.addTestCase("GMLua: C/C++调用语句，调用Lua方法，传入对象，获取对象", [&]() {
 		gm::GMLuaResult lr = m_lua.runString(s_invoke3);
 		if (lr.state != gm::GMLuaStates::Ok)
 			return false;
@@ -181,5 +208,48 @@ void cases::Lua::addToUnitTest(UnitTest& ut)
 		if (lr.state != gm::GMLuaStates::Ok)
 			return false;
 		return ret.objectCast<LuaObject*>()->getstr() == "Howdy!" && ret.objectCast<LuaObject*>()->geti() == 0 && ret.objectCast<LuaObject*>()->getb() == false; //...未赋值的部分为默认值
+	});
+
+	class DummyInterface : public gm::GMLuaFunctionRegister
+	{
+	public:
+		virtual void registerFunctions(gm::GMLua* l) override
+		{
+			setRegisterFunction(l, "UnitTest", regCallback, true);
+		}
+
+		static int regCallback(gm::GMLuaCoreState* l)
+		{
+			static gm::GMLuaReg r[] = {
+				{ "dummy", dummyCFunc },
+				{ 0 }
+			};
+			newLibrary(l, r);
+			return 1;
+		}
+	};
+
+	ut.addTestCase("GMLua: Lua调用C/C++方法，获取变量", [&]() {
+		DummyInterface d;
+		d.registerFunctions(&m_lua);
+		auto r = m_lua.runString(
+			"local o = {};"
+			"o.v4 = {1, 2, 3, 4};"
+			"UnitTest.dummy([[gamemachine]], o, {1, 2}, {3, 4, 5}, {6, 7, 8, 9}, true, 16.0, { {1, 2, 3, 4}, {1, 2, 3, 4}, {1, 2, 3, 4}, {1, 2, 3, 4} })");
+		if (r.state != gm::GMLuaStates::Ok)
+			return false;
+
+		return g_s == "gamemachine" 
+			&& VECTOR4_EQUALS(g_o.getv4(), 1, 2, 3, 4)
+			&& VECTOR2_EQUALS(g_v2, 1, 2)
+			&& VECTOR3_EQUALS(g_v3, 3, 4, 5)
+			&& VECTOR4_EQUALS(g_v4, 6, 7, 8, 9)
+			&& g_b
+			&& FuzzyCompare(g_f, 16.f)
+			&& VECTOR4_EQUALS(g_m[0], 1, 2, 3, 4)
+			&& VECTOR4_EQUALS(g_m[1], 1, 2, 3, 4)
+			&& VECTOR4_EQUALS(g_m[2], 1, 2, 3, 4)
+			&& VECTOR4_EQUALS(g_m[3], 1, 2, 3, 4)
+			;
 	});
 }

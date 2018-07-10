@@ -9,7 +9,7 @@ namespace luaapi
 	class GMDebugger_Meta : public GMLuaFunctionRegister
 	{
 	public:
-		virtual void registerFunctions(GMLuaCoreState* L) override;
+		virtual void registerFunctions(GMLua* L) override;
 
 	private:
 		static int regCallback(GMLuaCoreState *L);

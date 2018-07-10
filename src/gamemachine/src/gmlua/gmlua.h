@@ -17,20 +17,21 @@ struct __PopGuard							\
 	__PopGuard(lua_State* __L) : m_L(__L) {}\
 	~__PopGuard() { lua_pop(m_L, 1); }		\
 	lua_State* m_L;							\
-} __guard(*this);
+} __guard(this->getLuaCoreState());
 
 #define GM_LUA_DECLARATIONS(name) { #name, name }
 
 typedef luaL_Reg GMLuaReg;
 typedef lua_State GMLuaCoreState;
 typedef lua_CFunction GMLuaCFunction;
+class GMLua;
 
 struct GMLuaFunctionRegister
 {
-	virtual void registerFunctions(GMLuaCoreState*) = 0;
+	virtual void registerFunctions(GMLua*) = 0;
 
 protected:
-	void setRegisterFunction(GMLuaCoreState *l, const GMString& modname, GMLuaCFunction openf, bool isGlobal);
+	void setRegisterFunction(GMLua *l, const GMString& modname, GMLuaCFunction openf, bool isGlobal);
 	
 protected:
 	static void newLibrary(GMLuaCoreState *l, const GMLuaReg* functions);
@@ -115,8 +116,8 @@ public:
 	*/
 	GMLuaResult runString(const GMString& string);
 
-	void setGlobal(const char* name, const GMVariant& var);
-	bool setGlobal(const char* name, GMObject& obj);
+	void setToGlobal(const char* name, const GMVariant& var);
+	bool setToGlobal(const char* name, GMObject& obj);
 
 	//! 通过变量名获取一个全局变量。
 	/*!
@@ -124,7 +125,7 @@ public:
 	  如果要处理向量、矩阵，请使用getGlobal的另外一个版本。所获取的整形变量为int64类型，如果遇到无法获取的情况，将返回一个Unknown类型的GMVariant。
 	  \param name Lua全局对象名称。
 	*/
-	GMVariant getGlobal(const char* name);
+	GMVariant getFromGlobal(const char* name);
 
 	//! 通过变量名获取一个全局变量。
 	/*!
@@ -133,7 +134,7 @@ public:
 	  \param obj 需要赋值的对象。
 	  \return Lua中的全局对象是否能精确匹配GMObject。
 	*/
-	bool getGlobal(const char* name, GMObject& obj);
+	bool getFromGlobal(const char* name, GMObject& obj);
 
 	GMLuaResult protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args, GMVariant* returns = nullptr, GMint nRet = 0);
 
@@ -152,7 +153,6 @@ public:
 	  \return 操作是否成功。
 	  \sa GMObject::registerMeta()
 	*/
-
 	bool popTable(GMObject& obj);
 
 	//! 从Lua虚拟堆栈的指定某一层堆栈中取出一个Table，并赋值给指定对象。
@@ -177,6 +177,13 @@ public:
 	void pushMatrix(const GMMat4& v);
 	bool popMatrix(GMMat4& v);
 
+	//! 返回Lua的栈顶的变量。
+	/*!
+	  在调用此方法前，必须确认Lua栈顶是非空的。它将返回Lua栈顶的值但不弹出它，并将其转化为一个GMVariant。需要注意的是，它并不能识别Vec2, Vec3, Vec4和Mat4，因为在Lua中，它们都是表(table)。
+	  \return Lua栈顶转化为GMVariant后的值。
+	*/
+	GMVariant getTop();
+
 public:
 	inline GMLuaCoreState* getLuaCoreState() GM_NOEXCEPT
 	{
@@ -190,13 +197,6 @@ private:
 	GMLuaResult pcall(const char* functionName, const std::initializer_list<GMVariant>& args, GMint nRet);
 	void push(const GMVariant& var);
 	void push(const char* name, const GMObjectMember& member);
-
-	//! 返回Lua的栈顶的变量，并弹出它。
-	/*!
-	  在调用此方法前，必须确认Lua栈顶是非空的。它将弹出Lua栈顶的值，并将其转化为一个GMVariant。需要注意的是，它并不能识别Vec2, Vec3, Vec4和Mat4，因为在Lua中，它们都是表(table)。
-	  \return Lua栈顶转化为GMVariant后的值。
-	*/
-	GMVariant pop();
 };
 
 #undef L
