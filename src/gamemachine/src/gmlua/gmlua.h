@@ -25,6 +25,11 @@ typedef luaL_Reg GMLuaReg;
 typedef lua_State GMLuaCoreState;
 typedef lua_CFunction GMLuaCFunction;
 class GMLua;
+namespace luaapi
+{
+	struct GMArgumentHelper;
+	struct GMReturnValues;
+}
 
 struct GMLuaFunctionRegister
 {
@@ -46,16 +51,16 @@ class GMLuaStackBalanceCheck
 {
 public:
 	GMLuaStackBalanceCheck(GMLuaCoreState* l, GMint offset)
-		: m_l(l)
+		: m_L(l)
 		, m_offset(offset)
 	{
-		m_stack = lua_gettop(m_l);
+		m_stack = lua_gettop(m_L);
 	}
 
 	~GMLuaStackBalanceCheck()
 	{
 #if _DEBUG
-		auto currentTop = lua_gettop(m_l);
+		auto currentTop = lua_gettop(m_L);
 		GM_ASSERT(currentTop == m_stack + m_offset);
 #endif
 	}
@@ -63,7 +68,7 @@ public:
 private:
 	GMint m_stack;
 	GMint m_offset;
-	GMLuaCoreState* m_l;
+	GMLuaCoreState* m_L;
 };
 
 #else
@@ -98,6 +103,8 @@ GM_PRIVATE_OBJECT(GMLua)
 class GMLua : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMLua)
+	friend struct luaapi::GMArgumentHelper;
+	friend struct luaapi::GMReturnValues;
 
 public:
 	GMLua();
@@ -116,7 +123,19 @@ public:
 	*/
 	GMLuaResult runString(const GMString& string);
 
+	//! 将一个变量设置进Lua的全局环境。
+	/*!
+	  \param name Lua全局环境的变量名。
+	  \param var 待设置的变量。
+	*/
 	void setToGlobal(const char* name, const GMVariant& var);
+
+	//! 将一个变量设置进Lua的全局环境。
+	/*!
+	  此变量在Lua中为一个表(table)类型，里面的键、值由GMObject中的元对象决定。
+	  \param name Lua全局环境的变量名。
+	  \param obj 待设置的变量。
+	*/
 	bool setToGlobal(const char* name, GMObject& obj);
 
 	//! 通过变量名获取一个全局变量。
@@ -138,6 +157,8 @@ public:
 
 	GMLuaResult protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args, GMVariant* returns = nullptr, GMint nRet = 0);
 
+// 针对堆栈的操作，提供给友元
+private:
 	//! 将一个对象的成员压入Lua的虚拟堆栈。
 	/*!
 	  在Lua C函数被调用时，使用此方法，将返回一个Lua table。

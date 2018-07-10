@@ -23,6 +23,7 @@ public:
 		Quat,
 		Mat4,
 		String,
+		ObjectRef,
 		ObjectPointer,
 		Pointer,
 	};
@@ -58,6 +59,7 @@ public:
 	GMVariant(const GMString&);
 	GMVariant(const char*);
 	GMVariant(const GMwchar*);
+	GMVariant(GMObject&);
 	GMVariant(GMObject*);
 	GMVariant(void*);
 	~GMVariant();
@@ -114,7 +116,7 @@ public:
 	bool isQuat() const { return m_type == Quat; }
 	bool isMat4() const { return m_type == Mat4; }
 	bool isString() const { return m_type == String; }
-	bool isObject() const { return m_type == ObjectPointer; }
+	bool isObject() const { return m_type == ObjectRef || m_type == ObjectPointer; }
 
 private:
 	template <typename T> void makeOwned(const T& obj);

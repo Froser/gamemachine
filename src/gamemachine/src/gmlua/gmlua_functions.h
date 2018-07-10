@@ -28,6 +28,37 @@ namespace luaapi
 		static GMVariant popArgumentAsMat4(GMLuaCoreState* L, const char* invoker);
 		static bool popArgumentAsObject(GMLuaCoreState* L, REF GMObject& obj, const char* invoker);
 	};
+
+	struct GMReturnValues
+	{
+	public:
+		template <typename... VariantType>
+		GMReturnValues(GMLuaCoreState* L, VariantType&&... args)
+			: m_size (sizeof...(args))
+			, m_L(L)
+		{
+			pushArgument(std::forward<VariantType>(args)...);
+		}
+
+		operator GMint()
+		{
+			return static_cast<GMint>(m_size);
+		}
+
+	private:
+		template <typename... VariantType>
+		void pushArgument(const GMVariant& arg, VariantType&&... args)
+		{
+			pushArgument(arg);
+			pushArgument(std::forward<VariantType>(args)...);
+		}
+
+		void pushArgument(const GMVariant& arg);
+
+	private:
+		GMsize_t m_size = 0;
+		GMLua m_L;
+	};
 }
 
 END_NS

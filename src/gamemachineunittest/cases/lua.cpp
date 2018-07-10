@@ -112,6 +112,16 @@ namespace
 			g_s = gm::luaapi::GMArgumentHelper::popArgumentAsString(l, "dummyCFunc");
 			return 0;
 		}
+
+		int dummyMultiResults(gm::GMLuaCoreState* l)
+		{
+			return gm::luaapi::GMReturnValues(
+				l,
+				gm::GMVariant(1),
+				gm::GMVariant(true),
+				gm::GMVariant(L"GM")
+			);
+		}
 	}
 }
 
@@ -222,6 +232,7 @@ void cases::Lua::addToUnitTest(UnitTest& ut)
 		{
 			static gm::GMLuaReg r[] = {
 				{ "dummy", dummyCFunc },
+				{ "multi", dummyMultiResults },
 				{ 0 }
 			};
 			newLibrary(l, r);
@@ -251,5 +262,16 @@ void cases::Lua::addToUnitTest(UnitTest& ut)
 			&& VECTOR4_EQUALS(g_m[2], 1, 2, 3, 4)
 			&& VECTOR4_EQUALS(g_m[3], 1, 2, 3, 4)
 			;
+	});
+
+	ut.addTestCase("GMLua: Lua调用C/C++方法，获取多个返回值", [&]() {
+		auto r = m_lua.runString("g_i, g_b, g_s = UnitTest.multi();");
+		if (r.state != gm::GMLuaStates::Ok)
+			return false;
+
+		auto i = m_lua.getFromGlobal("g_i").toInt();
+		auto b = m_lua.getFromGlobal("g_b").toBool();
+		auto s = m_lua.getFromGlobal("g_s").toString();
+		return i == 1 && b && s == "GM";
 	});
 }

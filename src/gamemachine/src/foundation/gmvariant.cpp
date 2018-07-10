@@ -20,6 +20,7 @@ BEGIN_DEFINE_TYPE_ENUM_MAP()
 	DEFINE_TYPE_ENUM_MAP(GMuint, GMVariant::UInt)
 	DEFINE_TYPE_ENUM_MAP(GMfloat, GMVariant::Float)
 	DEFINE_TYPE_ENUM_MAP(bool, GMVariant::Boolean)
+	DEFINE_TYPE_ENUM_MAP(GMObject&, GMVariant::ObjectRef)
 	DEFINE_TYPE_ENUM_MAP(GMObject*, GMVariant::ObjectPointer)
 	DEFINE_TYPE_ENUM_MAP(void*, GMVariant::Pointer)
 	DEFINE_TYPE_ENUM_MAP(GMVec2, GMVariant::Vec2)
@@ -185,6 +186,12 @@ GMVariant::GMVariant(const GMwchar* s)
 {
 }
 
+GMVariant::GMVariant(GMObject& p)
+	: m_type(ObjectRef)
+{
+	m_data.p = &p;
+}
+
 GMVariant::GMVariant(GMObject* p)
 	: m_type(ObjectPointer)
 {
@@ -245,11 +252,21 @@ GMVariant& GMVariant::operator=(GMVariant&& rhs)
 
 GMint GMVariant::toInt() const
 {
+	if (m_type == I64)
+	{
+		// 窄化转型，检查是否越界
+		GMint64 i64 = toInt64();
+		GMint64 maxI64 = static_cast<GMint64>(std::numeric_limits<GMint>::max());
+		GM_ASSERT(i64 <= maxI64 || !"GMVariant (toInt): int64 to int32 convertion overflow.");
+		return static_cast<GMint>(i64);
+	}
 	return get<GMint>(&m_data.i32);
 }
 
 GMint64 GMVariant::toInt64() const
 {
+	if (m_type == I32)
+		return get<GMint>(&m_data.i32);
 	return get<GMint64>(&m_data.i64);
 }
 
@@ -265,6 +282,8 @@ GMfloat GMVariant::toFloat() const
 
 GMObject* GMVariant::toObject() const
 {
+	if (m_type == ObjectRef)
+		const_cast<GMVariant*>(this)->m_type = ObjectPointer;
 	return get<GMObject*>(&m_data.p);
 }
 

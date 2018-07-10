@@ -47,9 +47,7 @@ namespace
 	LUA_API int getRunningStates(GMLuaCoreState* L)
 	{
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".getRunningStates");
-		GMGameMachineRunningStatesProxy r;
-		GMLua(L).pushTable(r);
-		return 1;
+		return GMReturnValues (L, GMVariant(GMGameMachineRunningStatesProxy()));
 	}
 	// {{END META FUNCTION}}
 
