@@ -5,6 +5,7 @@
 BEGIN_NS
 
 class GMString;
+class GMObject;
 struct GMVariant
 {
 public:
@@ -22,6 +23,7 @@ public:
 		Quat,
 		Mat4,
 		String,
+		ObjectPointer,
 		Pointer,
 	};
 
@@ -56,6 +58,7 @@ public:
 	GMVariant(const GMString&);
 	GMVariant(const char*);
 	GMVariant(const GMwchar*);
+	GMVariant(GMObject*);
 	GMVariant(void*);
 	~GMVariant();
 
@@ -69,6 +72,7 @@ public:
 	GMint64 toInt64() const;
 	GMuint toUInt() const;
 	GMfloat toFloat() const;
+	GMObject* toObject() const;
 	void* toPointer() const;
 	bool toBool() const;
 
@@ -91,6 +95,12 @@ public:
 		return (T)toInt();
 	}
 
+	template <typename T>
+	T objectCast()
+	{
+		return (T)toObject();
+	}
+
 	bool isInt() const { return m_type == I32; }
 	bool isInt64() const { return m_type == I64; }
 	bool isUInt() const { return m_type == UInt; }
@@ -103,6 +113,7 @@ public:
 	bool isQuat() const { return m_type == Quat; }
 	bool isMat4() const { return m_type == Mat4; }
 	bool isString() const { return m_type == String; }
+	bool isObject() const { return m_type == ObjectPointer; }
 
 private:
 	template <typename T> void makeOwned(const T& obj);

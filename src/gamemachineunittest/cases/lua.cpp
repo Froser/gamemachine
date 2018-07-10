@@ -159,11 +159,12 @@ void cases::Lua::addToUnitTest(UnitTest& ut)
 		if (lr.state != gm::GMLuaStates::Ok)
 			return false;
 
-		LuaObject ret;
+		LuaObject retObj;
+		gm::GMVariant ret = &retObj;
 		lr = m_lua.protectedCall("dummy_function2", { 5 }, &ret, 1);
 		if (lr.state != gm::GMLuaStates::Ok)
 			return false;
-		return VECTOR4_EQUALS(ret.getv4(), 6, 7, 8, 14) && ret.geti() == 256;
+		return VECTOR4_EQUALS(ret.objectCast<LuaObject*>()->getv4(), 6, 7, 8, 14) && ret.objectCast<LuaObject*>()->geti() == 256;
 	});
 
 	ut.addTestCase("C/C++调用语句，调用Lua方法，传入对象，获取对象", [&]() {
@@ -173,10 +174,12 @@ void cases::Lua::addToUnitTest(UnitTest& ut)
 
 		LuaObject arg;
 		arg.setstr("Howdy!");
-		LuaObject ret;
+		LuaObject retObj;
+		gm::GMVariant ret = &retObj;
+
 		lr = m_lua.protectedCall("dummy_function3", { &arg }, &ret, 1);
 		if (lr.state != gm::GMLuaStates::Ok)
 			return false;
-		return ret.getstr() == "Howdy!" && ret.geti() == 0 && ret.getb() == false; //...未赋值的部分为默认值
+		return ret.objectCast<LuaObject*>()->getstr() == "Howdy!" && ret.objectCast<LuaObject*>()->geti() == 0 && ret.objectCast<LuaObject*>()->getb() == false; //...未赋值的部分为默认值
 	});
 }

@@ -20,6 +20,7 @@ BEGIN_DEFINE_TYPE_ENUM_MAP()
 	DEFINE_TYPE_ENUM_MAP(GMuint, GMVariant::UInt)
 	DEFINE_TYPE_ENUM_MAP(GMfloat, GMVariant::Float)
 	DEFINE_TYPE_ENUM_MAP(bool, GMVariant::Boolean)
+	DEFINE_TYPE_ENUM_MAP(GMObject*, GMVariant::ObjectPointer)
 	DEFINE_TYPE_ENUM_MAP(void*, GMVariant::Pointer)
 	DEFINE_TYPE_ENUM_MAP(GMVec2, GMVariant::Vec2)
 	DEFINE_TYPE_ENUM_MAP(GMVec3, GMVariant::Vec3)
@@ -184,6 +185,12 @@ GMVariant::GMVariant(const GMwchar* s)
 {
 }
 
+GMVariant::GMVariant(GMObject* p)
+	: m_type(ObjectPointer)
+{
+	m_data.p = p;
+}
+
 GMVariant::GMVariant(void* p)
 	: m_type(Pointer)
 {
@@ -254,6 +261,11 @@ GMuint GMVariant::toUInt() const
 GMfloat GMVariant::toFloat() const
 {
 	return get<GMfloat>(&m_data.f);
+}
+
+GMObject* GMVariant::toObject() const
+{
+	return get<GMObject*>(&m_data.p);
 }
 
 bool GMVariant::toBool() const

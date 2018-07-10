@@ -10,7 +10,7 @@ struct __PopGuard							\
 	__PopGuard(lua_State* __L) : m_L(__L) {}\
 	~__PopGuard() { lua_pop(m_L, 1); }		\
 	lua_State* m_L;							\
-} __guard(*this);
+} __guard(this->getLuaCoreState());
 
 #define POP_GUARD_(l) \
 struct __PopGuard							\
@@ -27,15 +27,12 @@ struct __PopGuard							\
 		return lr;							\
 	}
 
-// 检查栈是否平衡
-#define BEGIN_CHECK_STACK() auto __stack = lua_gettop(L);
-#define END_CHECK_STACK(offset) GM_ASSERT(lua_gettop(L) == __stack + offset)
-
 namespace
 {
 	template <typename T>
-	void setVector(const T& v, GMLuaCoreState* l)
+	void pushVector(const T& v, GMLuaCoreState* l)
 	{
+		GM_CHECK_LUA_STACK_BALANCE_(l, 1);
 		lua_newtable(l);
 		GMFloat4 f4;
 		v.loadFloat4(f4);
@@ -49,8 +46,9 @@ namespace
 	}
 
 	template <typename T>
-	bool getVector(T& v, GMint index, GMLuaCoreState* l)
+	bool popVector(T& v, GMint index, GMLuaCoreState* l)
 	{
+		GM_CHECK_LUA_STACK_BALANCE_(l, 0);
 		GMFloat4 f4(0, 0, 0, 0);
 		GM_ASSERT(lua_istable(l, index));
 		lua_pushnil(l);
@@ -77,23 +75,17 @@ namespace
 	}
 
 	template <typename T>
-	bool getVector(T& v, GMLuaCoreState* l)
+	bool popVector(T& v, GMLuaCoreState* l)
 	{
+		GM_CHECK_LUA_STACK_BALANCE_(l, 0);
 		GMint index = lua_gettop(l);
-		return getVector(v, index, l);
+		return popVector(v, index, l);
 	}
 
-	template <typename T>
-	bool getMatrix(T& v, GMLuaCoreState* l)
+	bool popMatrix(GMMat4& v, GMint index, GMLuaCoreState* l)
 	{
-		GMint index = lua_gettop(l);
-		return getMatrix(v, index, l);
-	}
-
-	template <typename T>
-	bool getMatrix(T& v, GMint index, GMLuaCoreState* l)
-	{
-		GMVec4 v4[T::length()];
+		GM_CHECK_LUA_STACK_BALANCE_(l, 0);
+		GMVec4 v4[GMMat4::length()];
 		GM_ASSERT(lua_istable(l, index));
 		lua_pushnil(l);
 		while (lua_next(l, index))
@@ -103,12 +95,12 @@ namespace
 				return false;
 
 			GMint key = lua_tointeger(l, -2);
-			bool isVector = getVector(v4[key - 1], l);
+			bool isVector = popVector(v4[key - 1], l);
 			if (!isVector)
 				return false;
 
 			// 防止越界
-			if (key > T::length())
+			if (key > GMMat4::length())
 			{
 				lua_next(l, index);
 				break;
@@ -116,8 +108,8 @@ namespace
 		}
 
 		GMFloat16 f16;
-		GMFloat4 f4[T::length()];
-		for (decltype(T::length()) i = 0; i < T::length(); ++i)
+		GMFloat4 f4[GMMat4::length()];
+		for (decltype(GMMat4::length()) i = 0; i < GMMat4::length(); ++i)
 		{
 			v4[i].loadFloat4(f4[i]);
 			f16[i] = f4[i];
@@ -129,6 +121,7 @@ namespace
 
 void GMLuaFunctionRegister::setRegisterFunction(GMLuaCoreState *l, const GMString& modname, GMLuaCFunction openf, bool isGlobal)
 {
+	GM_CHECK_LUA_STACK_BALANCE_(l, 0);
 	auto m = modname.toStdString();
 	luaL_requiref(l, m.data(), openf, isGlobal ? 1 : 0);
 	lua_pop(l, 1);
@@ -212,7 +205,7 @@ bool GMLua::setGlobal(const char* name, GMObject& obj)
 	if (!meta)
 		return false;
 	
-	setTable(obj);
+	pushTable(obj);
 	lua_setglobal(L, name);
 	return true;
 }
@@ -220,6 +213,7 @@ bool GMLua::setGlobal(const char* name, GMObject& obj)
 GMVariant GMLua::getGlobal(const char* name)
 {
 	D(d);
+	POP_GUARD();
 	lua_getglobal(L, name);
 	return pop();
 }
@@ -227,56 +221,31 @@ GMVariant GMLua::getGlobal(const char* name)
 bool GMLua::getGlobal(const char* name, GMObject& obj)
 {
 	D(d);
-	POP_GUARD();
 	const GMMeta* meta = obj.meta();
 	if (!meta)
 		return false;
 
+	POP_GUARD();
 	lua_getglobal(L, name);
 	if (!lua_istable(L, 1))
 		return false;
 
-	return getTable(obj);
-}
-
-GMLuaResult GMLua::protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args)
-{
-	D(d);
-	return pcall(functionName, args, 0);
+	return popTable(obj);
 }
 
 GMLuaResult GMLua::protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args, GMVariant* returns, GMint nRet)
 {
 	D(d);
-	BEGIN_CHECK_STACK();
+	GM_CHECK_LUA_STACK_BALANCE(nRet);
 	GMLuaResult lr = pcall(functionName, args, nRet);
 	CHECK(lr);
 	for (GMint i = 0; i < nRet; i++)
 	{
-		returns[i] = pop();
+		if (returns[i].isObject())
+			popTable(*returns[i].toObject());
+		else
+			returns[i] = pop();
 	}
-	END_CHECK_STACK(0);
-	return lr;
-}
-
-GMLuaResult GMLua::protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args, GMObject* returns, GMint nRet)
-{
-	D(d);
-	BEGIN_CHECK_STACK();
-	GMLuaResult lr = pcall(functionName, args, nRet);
-	CHECK(lr);
-	for (GMint i = 0; i < nRet; i++)
-	{
-		POP_GUARD();
-		if (!getTable(returns[i]))
-		{
-			lr.state = GMLuaStates::WrongType;
-			const char* errmsg = "cannot convert to GMObject";
-			lr.message = errmsg;
-			gm_error(L"GMLua (protectedCall): " + GMString(errmsg));
-		}
-	}
-	END_CHECK_STACK(0);
 	return lr;
 }
 
@@ -300,7 +269,7 @@ void GMLua::registerLibraries()
 GMLuaResult GMLua::pcall(const char* functionName, const std::initializer_list<GMVariant>& args, GMint nRet)
 {
 	D(d);
-	BEGIN_CHECK_STACK();
+	GM_CHECK_LUA_STACK_BALANCE(nRet);
 	lua_getglobal(L, functionName);
 	for (const auto& var : args)
 	{
@@ -310,13 +279,13 @@ GMLuaResult GMLua::pcall(const char* functionName, const std::initializer_list<G
 	GM_ASSERT(args.size() < std::numeric_limits<GMuint>::max());
 	GMLuaResult lr = { (GMLuaStates)lua_pcall(L, (GMuint)args.size(), nRet, 0) };
 	CHECK(lr);
-	END_CHECK_STACK(nRet);
 	return lr;
 }
 
-void GMLua::setTable(const GMObject& obj)
+void GMLua::pushTable(const GMObject& obj)
 {
 	D(d);
+	GM_CHECK_LUA_STACK_BALANCE(1);
 	lua_newtable(L);
 	auto meta = obj.meta();
 	GM_ASSERT(meta);
@@ -326,15 +295,17 @@ void GMLua::setTable(const GMObject& obj)
 	}
 }
 
-bool GMLua::getTable(GMObject& obj)
+bool GMLua::popTable(GMObject& obj)
 {
 	D(d);
-	return getTable(obj, lua_gettop(L));
+	GM_CHECK_LUA_STACK_BALANCE(0);
+	return popTable(obj, lua_gettop(L));
 }
 
-bool GMLua::getTable(GMObject& obj, GMint index)
+bool GMLua::popTable(GMObject& obj, GMint index)
 {
 	D(d);
+	GM_CHECK_LUA_STACK_BALANCE(0);
 	const GMMeta* meta = obj.meta();
 	if (!meta)
 		return false;
@@ -372,35 +343,35 @@ bool GMLua::getTable(GMObject& obj, GMint index)
 				case GMMetaMemberType::Vector2:
 					{
 						GMVec2& v = *static_cast<GMVec2*>(member.second.ptr);
-						if (!getVector(v))
+						if (!popVector(v))
 							return false;
 					}
 					break;
 				case GMMetaMemberType::Vector3:
 					{
 						GMVec3& v = *static_cast<GMVec3*>(member.second.ptr);
-						if (!getVector(v))
+						if (!popVector(v))
 							return false;
 					}
 					break;
 				case GMMetaMemberType::Vector4:
 					{
 						GMVec4& v = *static_cast<GMVec4*>(member.second.ptr);
-						if (!getVector(v))
+						if (!popVector(v))
 							return false;
 					}
 					break;
 				case GMMetaMemberType::Matrix4x4:
 					{
 						GMMat4& mat = *static_cast<GMMat4*>(member.second.ptr);
-						if (!getMatrix(mat))
+						if (!popMatrix(mat))
 							return false;
 					}
 					break;
 				case GMMetaMemberType::Object:
 					{
 						GMObject* obj = static_cast<GMObject*>(member.second.ptr);
-						if (!getTable(*obj))
+						if (!popTable(*obj))
 							return false;
 					}
 					break;
@@ -415,57 +386,67 @@ bool GMLua::getTable(GMObject& obj, GMint index)
 	return true;
 }
 
-bool GMLua::getVector(GMVec2& v)
-{
-	return ::getVector(v, *this);
-}
-
-void GMLua::setVector(const GMVec2& v)
-{
-	::setVector(v, *this);
-}
-
-bool GMLua::getVector(GMVec3& v)
-{
-	return ::getVector(v, *this);
-}
-
-void GMLua::setVector(const GMVec3& v)
-{
-	::setVector(v, *this);
-}
-
-bool GMLua::getVector(GMVec4& v)
-{
-	return ::getVector(v, *this);
-}
-
-void GMLua::setVector(const GMVec4& v)
-{
-	::setVector(v, *this);
-}
-
-void GMLua::setMatrix(const GMMat4& v)
+bool GMLua::popVector(GMVec2& v)
 {
 	D(d);
+	return ::popVector(v, d->luaState);
+}
+
+void GMLua::pushVector(const GMVec2& v)
+{
+	D(d);
+	::pushVector(v, d->luaState);
+}
+
+bool GMLua::popVector(GMVec3& v)
+{
+	D(d);
+	return ::popVector(v, d->luaState);
+}
+
+void GMLua::pushVector(const GMVec3& v)
+{
+	D(d);
+	::pushVector(v, d->luaState);
+}
+
+bool GMLua::popVector(GMVec4& v)
+{
+	D(d);
+	return ::popVector(v, d->luaState);
+}
+
+void GMLua::pushVector(const GMVec4& v)
+{
+	D(d);
+	::pushVector(v, d->luaState);
+}
+
+void GMLua::pushMatrix(const GMMat4& v)
+{
+	D(d);
+	GM_CHECK_LUA_STACK_BALANCE(1);
 	lua_newtable(L);
 	for (GMint i = 0; i < GMMat4::length(); i++)
 	{
 		lua_pushnumber(L, i);
-		setVector(v[i]);
+		pushVector(v[i]);
 		GM_ASSERT(lua_istable(L, -3));
 		lua_settable(L, -3);
 	}
 }
 
-bool GMLua::getMatrix(GMMat4& v)
+bool GMLua::popMatrix(GMMat4& v)
 {
-	return ::getMatrix(v, *this);
+	D(d);
+	GM_CHECK_LUA_STACK_BALANCE(0);
+	return ::popMatrix(v, lua_gettop(L), L);
 }
 
 void GMLua::push(const GMVariant& var)
 {
 	D(d);
+	GM_CHECK_LUA_STACK_BALANCE(1);
 	if (var.isInt())
 	{
 		lua_pushinteger(L, var.toInt());
@@ -483,9 +464,9 @@ void GMLua::push(const GMVariant& var)
 		std::string str = var.toString().toStdString();
 		lua_pushstring(L, str.c_str());
 	}
-	else if (var.isPointer())
+	else if (var.isObject())
 	{
-		setTable(* (GMObject*)var.toPointer());
+		pushTable(*var.toObject());
 	}
 	else
 	{
@@ -497,6 +478,7 @@ void GMLua::push(const GMVariant& var)
 void GMLua::push(const char* name, const GMObjectMember& member)
 {
 	D(d);
+	GM_CHECK_LUA_STACK_BALANCE(0);
 	lua_pushstring(L, name);
 
 	switch (member.type)
@@ -519,33 +501,33 @@ void GMLua::push(const char* name, const GMObjectMember& member)
 	case GMMetaMemberType::Vector2:
 		{
 			GMVec2& vec2 = *static_cast<GMVec2*>(member.ptr);
-			setVector(vec2);
+			pushVector(vec2);
 			GM_ASSERT(lua_istable(L, -1));
 		}
 		break;
 	case GMMetaMemberType::Vector3:
 		{
 			GMVec3& vec3 = *static_cast<GMVec3*>(member.ptr);
-			setVector(vec3);
+			pushVector(vec3);
 			GM_ASSERT(lua_istable(L, -1));
 		}
 		break;
 	case GMMetaMemberType::Vector4:
 		{
 			GMVec4& vec4 = *static_cast<GMVec4*>(member.ptr);
-			setVector(vec4);
+			pushVector(vec4);
 			GM_ASSERT(lua_istable(L, -1));
 		}
 		break;
 	case GMMetaMemberType::Matrix4x4:
 		{
 			GMMat4& mat= *static_cast<GMMat4*>(member.ptr);
-			setMatrix(mat);
+			pushMatrix(mat);
 			GM_ASSERT(lua_istable(L, -1));
 		}
 		break;
 	case GMMetaMemberType::Object:
-		setTable(*static_cast<GMObject*>(member.ptr));
+		pushTable(*static_cast<GMObject*>(member.ptr));
 		break;
 	default:
 		GM_ASSERT(false);
@@ -559,7 +541,7 @@ void GMLua::push(const char* name, const GMObjectMember& member)
 GMVariant GMLua::pop()
 {
 	D(d);
-	POP_GUARD();
+	GM_CHECK_LUA_STACK_BALANCE(0);
 	if (lua_isinteger(L, -1))
 		return lua_tointeger(L, -1);
 	if (lua_isnumber(L, -1))
@@ -568,6 +550,6 @@ GMVariant GMLua::pop()
 		return GMString(lua_tostring(L, -1));
 	if (lua_isboolean(L, -1))
 		return lua_toboolean(L, -1) ? true : false;
-	gm_error(L"GMLua (pop): variant type not supported");
+	gm_error(L"GMLua (pop): type not supported");
 	return GMVariant();
 }

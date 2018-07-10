@@ -18,7 +18,7 @@ const char* GMArgumentHelper::getArgumentAsString(GMLuaCoreState* L, const char*
 
 void GMArgumentHelper::getArgumentAsObject(GMLuaCoreState* L, REF GMObject& obj, const char* invoker)
 {
-	if (!GMLua(L).getTable(obj))
+	if (!GMLua(L).popTable(obj))
 		gm_error("GMLua (getArgumentAsObject): {0}: argument is not an object.", { invoker });
 }
 

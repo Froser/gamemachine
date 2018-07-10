@@ -36,6 +36,40 @@ protected:
 	static void newLibrary(GMLuaCoreState *l, const GMLuaReg* functions);
 };
 
+// 检查栈是否平衡
+#if _DEBUG
+#	define GM_CHECK_LUA_STACK_BALANCE(offset) gm::GMLuaStackBalanceCheck __balanceGuard(L, offset);
+#	define GM_CHECK_LUA_STACK_BALANCE_(l, offset) gm::GMLuaStackBalanceCheck __balanceGuard(l, offset);
+
+class GMLuaStackBalanceCheck
+{
+public:
+	GMLuaStackBalanceCheck(GMLuaCoreState* l, GMint offset)
+		: m_l(l)
+		, m_offset(offset)
+	{
+		m_stack = lua_gettop(m_l);
+	}
+
+	~GMLuaStackBalanceCheck()
+	{
+#if _DEBUG
+		auto currentTop = lua_gettop(m_l);
+		GM_ASSERT(currentTop == m_stack + m_offset);
+#endif
+	}
+
+private:
+	GMint m_stack;
+	GMint m_offset;
+	GMLuaCoreState* m_l;
+};
+
+#else
+#	define GM_CHECK_LUA_STACK_BALANCE(offset)
+#	define GM_CHECK_LUA_STACK_BALANCE_(l, offset)
+#endif
+
 enum class GMLuaStates
 {
 	WrongType = -1,
@@ -69,12 +103,6 @@ public:
 	GMLua(lua_State*);
 	~GMLua();
 
-	operator GMLuaCoreState*()
-	{
-		D(d);
-		return d->luaState;
-	}
-
 public:
 	GMLuaResult runFile(const char* file);
 	GMLuaResult runBuffer(const GMBuffer& buffer);
@@ -107,9 +135,7 @@ public:
 	*/
 	bool getGlobal(const char* name, GMObject& obj);
 
-	GMLuaResult protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args);
 	GMLuaResult protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args, GMVariant* returns = nullptr, GMint nRet = 0);
-	GMLuaResult protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args, GMObject* returns = nullptr, GMint nRet = 0);
 
 	//! 将一个对象的成员压入Lua的虚拟堆栈。
 	/*!
@@ -117,7 +143,7 @@ public:
 	  \param obj 待传入的对象。此对象必须要注册元对象。
 	  \sa GMObject::registerMeta()
 	*/
-	void setTable(const GMObject& obj);
+	void pushTable(const GMObject& obj);
 
 	//! 从Lua虚拟堆栈中取出一个Table，并赋值给指定对象。
 	/*!
@@ -127,7 +153,7 @@ public:
 	  \sa GMObject::registerMeta()
 	*/
 
-	bool getTable(GMObject& obj);
+	bool popTable(GMObject& obj);
 
 	//! 从Lua虚拟堆栈的指定某一层堆栈中取出一个Table，并赋值给指定对象。
 	/*!
@@ -137,19 +163,26 @@ public:
 	  \return 操作是否成功。
 	  \sa GMObject::registerMeta()
 	*/
-	bool getTable(GMObject& obj, GMint index);
+	bool popTable(GMObject& obj, GMint index);
 
-	bool getVector(GMVec2& v);
-	void setVector(const GMVec2& v);
+	bool popVector(GMVec2& v);
+	void pushVector(const GMVec2& v);
 
-	bool getVector(GMVec3& v);
-	void setVector(const GMVec3& v);
+	bool popVector(GMVec3& v);
+	void pushVector(const GMVec3& v);
 
-	bool getVector(GMVec4& v);
-	void setVector(const GMVec4& v);
+	bool popVector(GMVec4& v);
+	void pushVector(const GMVec4& v);
 
-	void setMatrix(const GMMat4& v);
-	bool getMatrix(GMMat4& v);
+	void pushMatrix(const GMMat4& v);
+	bool popMatrix(GMMat4& v);
+
+public:
+	inline GMLuaCoreState* getLuaCoreState() GM_NOEXCEPT
+	{
+		D(d);
+		return d->luaState;
+	}
 
 private:
 	void loadLibrary();

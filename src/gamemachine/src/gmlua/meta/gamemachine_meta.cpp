@@ -48,7 +48,7 @@ namespace
 	{
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".getRunningStates");
 		GMGameMachineRunningStatesProxy r;
-		GMLua(L).setTable(r);
+		GMLua(L).pushTable(r);
 		return 1;
 	}
 	// {{END META FUNCTION}}
