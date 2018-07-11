@@ -11,40 +11,40 @@ using namespace gm::luaapi;
 namespace
 {
 	// {{BEGIN META FUNCTION}}
-	LUA_API int info(GMLuaCoreState* L)
+	LUA_API GMLuaFunctionReturn info(GMLuaCoreState* L)
 	{
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".info");
 		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, "info");
 		GMDebugger::instance().info(arg0);
-		return 0;
+		return GMReturnValues();
 	}
 
-	LUA_API int error(GMLuaCoreState* L)
+	LUA_API GMLuaFunctionReturn error(GMLuaCoreState* L)
 	{
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".error");
 		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, "error");
 		GMDebugger::instance().error(arg0);
-		return 0;
+		return GMReturnValues();
 	}
 
-	LUA_API int warning(GMLuaCoreState* L)
+	LUA_API GMLuaFunctionReturn warning(GMLuaCoreState* L)
 	{
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".warning");
 		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, "warning");
 		GMDebugger::instance().warning(arg0);
-		return 0;
+		return GMReturnValues();
 	}
 
-	LUA_API int debug(GMLuaCoreState* L)
+	LUA_API GMLuaFunctionReturn debug(GMLuaCoreState* L)
 	{
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".debug");
 		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, "debug");
 		GMDebugger::instance().debug(arg0);
-		return 0;
+		return GMReturnValues();
 	}
 	// {{END META FUNCTION}}
 
-	luaL_Reg g_meta[] = {
+	GMLuaReg g_meta[] = {
 		// {{BEGIN META DECLARATIONS}}
 		GM_LUA_DECLARATIONS(info),
 		GM_LUA_DECLARATIONS(error),

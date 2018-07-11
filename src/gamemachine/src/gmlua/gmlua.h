@@ -24,6 +24,8 @@ struct __PopGuard							\
 typedef luaL_Reg GMLuaReg;
 typedef lua_State GMLuaCoreState;
 typedef lua_CFunction GMLuaCFunction;
+typedef GMint GMLuaFunctionReturn;
+
 class GMLua;
 namespace luaapi
 {
@@ -95,7 +97,7 @@ struct GMLuaResult
 
 GM_PRIVATE_OBJECT(GMLua)
 {
-	lua_State* luaState = nullptr;
+	GMLuaCoreState* luaState = nullptr;
 	bool isWeakLuaStatePtr = false;
 	bool libraryLoaded = false;
 };
@@ -108,7 +110,7 @@ class GMLua : public GMObject
 
 public:
 	GMLua();
-	GMLua(lua_State*);
+	GMLua(GMLuaCoreState*);
 	~GMLua();
 
 public:

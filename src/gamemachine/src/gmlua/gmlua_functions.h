@@ -40,6 +40,10 @@ namespace luaapi
 			pushArgument(std::forward<VariantType>(args)...);
 		}
 
+		GMReturnValues()
+			: m_size(0)
+		{}
+
 		operator GMint()
 		{
 			return static_cast<GMint>(m_size);

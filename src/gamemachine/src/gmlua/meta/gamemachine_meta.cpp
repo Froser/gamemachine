@@ -37,14 +37,14 @@ namespace
 	};
 
 	// {{BEGIN META FUNCTION}}
-	LUA_API int exit(GMLuaCoreState* L)
+	LUA_API GMLuaFunctionReturn exit(GMLuaCoreState* L)
 	{
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".exit");
 		GM.exit();
-		return 0;
+		return GMReturnValues();
 	}
 
-	LUA_API int getRunningStates(GMLuaCoreState* L)
+	LUA_API GMLuaFunctionReturn getRunningStates(GMLuaCoreState* L)
 	{
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".getRunningStates");
 		return GMReturnValues (L, GMVariant(GMGameMachineRunningStatesProxy()));
