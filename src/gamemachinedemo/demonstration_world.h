@@ -5,6 +5,7 @@
 #include <gm2dgameobject.h>
 #include <gmgl.h>
 #include <gmdemogameworld.h>
+#include <gmanimation.h>
 
 namespace gm
 {
@@ -93,6 +94,7 @@ GM_PRIVATE_OBJECT(DemonstrationWorld)
 	gm::GMWidget* mainWidget = nullptr;
 	gm::IWindow* mainWindow = nullptr;
 	gm::GMWidgetResourceManager* manager = nullptr;
+	gm::GMAnimation animation;
 };
 
 class DemonstrationWorld : public gm::GMGameWorld

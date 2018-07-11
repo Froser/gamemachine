@@ -75,6 +75,8 @@ set(SOURCES
 		gmengine/gmgbuffer.cpp
 		gmengine/gmmessage.h
 		gmengine/gmmessage.cpp
+		gmengine/gmanimation.h
+		gmengine/gmanimation.cpp
 		gmengine/gmenums.h
 		gmgl/gmglrenderers.h
 		gmgl/gmglrenderers.cpp
