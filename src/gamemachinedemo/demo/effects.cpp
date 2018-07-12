@@ -20,10 +20,9 @@ void Demo_Effects::init()
 	D_BASE(d, Base);
 	Base::init();
 
-	gm::GMWidget* widget = createDefaultWidget();
 	auto top = getClientAreaTop();
-
 	gm::GMControlButton* button = nullptr;
+	gm::GMWidget* widget = getWidget();
 
 	DECL_BUTTON(button, top, gm::GMFilterMode::None, 0, L"无效果");
 	DECL_BUTTON(button, top, gm::GMFilterMode::Inversion, 40, L"反色");

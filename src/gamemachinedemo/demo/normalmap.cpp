@@ -50,16 +50,27 @@ void Demo_NormalMap::init()
 	asDemoGameWorld(getDemoWorldReference())->addObject("texture", d->gameObject);
 
 	// 为这个对象创建动画
-	/*
-	gm::GMGameObjectKeyframe* kf = new gm::GMGameObjectKeyframe(
-		GetTranslationFromMatrix(d->gameObject->getTranslation()),
-		QuatToMatrix(Rotate(Identity<GMQuat>(), PI, (GMVec3(0, 0, 1)))),
-		2
-	);
+	GMFloat4 t4, s4;
+	GetTranslationFromMatrix(d->gameObject->getTranslation(), t4);
+	GetScalingFromMatrix(d->gameObject->getScaling(), s4);
+	GMVec4 t, s;
+	t.setFloat4(t4);
+	s.setFloat4(s4);
+
 	d->animation.setTargetObjects(d->gameObject);
-	d->animation.addKeyFrame(kf);
-	d->animation.play();
-	*/
+	d->animation.addKeyFrame(new gm::GMGameObjectKeyframe(
+		t,
+		s,
+		Rotate(Identity<GMQuat>(), PI / 2, (GMVec3(0, 0, 1))),
+		1.5f
+	));
+	d->animation.addKeyFrame(new gm::GMGameObjectKeyframe(
+		t,
+		s,
+		Rotate(Identity<GMQuat>(), PI, (GMVec3(0, 0, 1))),
+		3.f
+	));
+	d->animation.setPlayLoop(true);
 
 	gm::GMWidget* widget = createDefaultWidget();
 	auto top = getClientAreaTop();
@@ -87,18 +98,35 @@ void Demo_NormalMap::init()
 	);
 
 	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
-		//d->rotate = !d->rotate;
+		if (d->animation.isPlaying())
+			d->animation.pause();
+		else
+			d->animation.play();
 		emit(rotateStateChanged);
 	});
 
 	connect(*this, GM_SIGNAL(rotateStateChanged), [=](auto, auto) {
-		//if (d->rotate)
-		//	stateLabel->setText(L"状态：旋转中");
-		//else
-		//	stateLabel->setText(L"状态：已停止");
+		if (d->animation.isPlaying())
+			stateLabel->setText(L"状态：旋转中");
+		else
+			stateLabel->setText(L"状态：已停止");
 	});
 
 	widget->setSize(widget->getSize().width, top + 40);
+}
+
+void Demo_NormalMap::onActivate()
+{
+	D(d);
+	d->animation.play();
+	Base::onActivate();
+}
+
+void Demo_NormalMap::onDeactivate()
+{
+	D(d);
+	d->animation.pause();
+	Base::onDeactivate();
 }
 
 void Demo_NormalMap::event(gm::GameMachineHandlerEvent evt)
@@ -120,7 +148,6 @@ void Demo_NormalMap::event(gm::GameMachineHandlerEvent evt)
 	case gm::GameMachineHandlerEvent::Render:
 		d->animation.update();
 		//d->rotation = Rotate(Identity<GMQuat>(), d->angle, (GMVec3(0, 0, 1)));
-		d->gameObject->setRotation(d->rotation);
 		getDemoWorldReference()->renderScene();
 
 		break;

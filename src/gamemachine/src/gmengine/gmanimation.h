@@ -17,13 +17,14 @@ class GMAnimationKeyframe : public GMObject
 public:
 	GMAnimationKeyframe() = default;
 
-	virtual void begin(GMObject* object, GMfloat time) = 0;
+	virtual void beginFrame(GMObject* object, GMfloat timeStart) = 0;
+	virtual void endFrame(GMObject* object) = 0;
 
 	//! 关键帧处理方法，用于改变GMObject对象的状态。
 	/*!
 	  当当前关键帧为目标关键帧时，每当需要更新GMObject状态时，此方法被调用。
 	  \param object 希望执行动画的对象。
-	  \param time 当前动画执行的时间。
+	  \param time 当前动画执行的时间。从前一帧结束开始算起。
 	*/
 	virtual void update(GMObject* object, GMfloat time) = 0;
 
@@ -98,7 +99,7 @@ GM_PRIVATE_OBJECT(GMGameObjectKeyframe)
 	GMVec4 translation;
 	GMVec4 scaling;
 	GMQuat rotation;
-	GMfloat timeBegin;
+	GMfloat timeStart = 0;
 };
 
 class GMGameObjectKeyframe : public GMAnimationKeyframe
@@ -117,7 +118,8 @@ public:
 	);
 
 public:
-	virtual void begin(GMObject* object, GMfloat time) override;
+	virtual void beginFrame(GMObject* object, GMfloat timeStart) override;
+	virtual void endFrame(GMObject* object) override;
 	virtual void update(GMObject* object, GMfloat time) override;
 };
 END_NS

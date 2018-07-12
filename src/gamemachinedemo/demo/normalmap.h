@@ -7,7 +7,6 @@
 
 GM_PRIVATE_OBJECT(Demo_NormalMap)
 {
-	GMQuat rotation;
 	gm::GMGameObject* gameObject = nullptr;
 	gm::GMAnimation animation;
 };
@@ -24,6 +23,8 @@ public:
 public:
 	virtual void init() override;
 	virtual void event(gm::GameMachineHandlerEvent evt) override;
+	virtual void onActivate() override;
+	virtual void onDeactivate() override;
 
 protected:
 	const gm::GMString& getDescription() const

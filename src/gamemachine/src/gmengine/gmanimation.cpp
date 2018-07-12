@@ -50,7 +50,9 @@ void GMAnimation::update()
 	D(d);
 	if (d->isPlaying)
 	{
-		d->timeline += GM.getRunningStates().elapsedTime - d->timeLast;
+		auto now = GM.getRunningStates().elapsedTime;
+		d->timeline += now - d->timeLast;
+		d->timeLast = now;
 
 		// 目标关键帧，缓存当前迭代器，增加查找效率
 		GMAnimationKeyframe* currentKeyFrame = nullptr;
@@ -67,18 +69,29 @@ void GMAnimation::update()
 		if (d->keyframesIter == d->keyframes.cend())
 		{
 			// 最后一帧关键帧也播放完了
-			// ... 考虑是否重播
+			// 考虑是否重播
+			if (d->playLoop)
+			{
+				reset();
+				play();
+			}
 			return;
 		}
 
-		bool newFrameBegun = (currentKeyFrame != d->lastKeyframe);
-		if (newFrameBegun)
+		if (currentKeyFrame != d->lastKeyframe)
+		{
+			// 结束老的一帧，开始新的一帧
+			for (auto object : d->targetObjects)
+			{
+				if (d->lastKeyframe)
+					d->lastKeyframe->endFrame(object);
+				currentKeyFrame->beginFrame(object, d->timeline);
+			}
 			d->lastKeyframe = currentKeyFrame;
+		}
 
 		for (auto gameObject : d->targetObjects)
 		{
-			if (newFrameBegun)
-				currentKeyFrame->begin(gameObject, d->timeline);
 			currentKeyFrame->update(gameObject, d->timeline);
 		}
 	}
@@ -98,9 +111,10 @@ GMGameObjectKeyframe::GMGameObjectKeyframe(
 	setTime(timePoint);
 }
 
-void GMGameObjectKeyframe::begin(GMObject* object, GMfloat time)
+void GMGameObjectKeyframe::beginFrame(GMObject* object, GMfloat timeStart)
 {
 	D(d);
+	d->timeStart = timeStart;
 	GMGameObject* gameObj = gm_cast<GMGameObject*>(object);
 
 	GMFloat4 translation, scaling;
@@ -110,25 +124,28 @@ void GMGameObjectKeyframe::begin(GMObject* object, GMfloat time)
 	d->translationMap[gameObj].setFloat4(translation);
 	d->scalingMap[gameObj].setFloat4(scaling);
 	d->rotationMap[gameObj] = gameObj->getRotation();
-	d->timeBegin = time;
+}
+
+void GMGameObjectKeyframe::endFrame(GMObject* object)
+{
+	D(d);
+	// 去掉误差，把对象放到正确的位置
+	GMGameObject* gameObj = gm_cast<GMGameObject*>(object);
+	gameObj->beginUpdateTransform();
+	gameObj->setTranslation(Translate(getTranslation()));
+	gameObj->setScaling(Scale(getScaling()));
+	gameObj->setRotation(getRotation());
+	gameObj->endUpdateTransform();
 }
 
 void GMGameObjectKeyframe::update(GMObject* object, GMfloat time)
 {
 	D(d);
 	GMGameObject* gameObj = gm_cast<GMGameObject*>(object);
-	GMfloat percentage = (time - d->timeBegin) / (getTime() - d->timeBegin);
-
-	GMFloat4 translationStart, scalingStart;
-	GetTranslationFromMatrix(gameObj->getTranslation(), translationStart);
-	GetScalingFromMatrix(gameObj->getScaling(), scalingStart);
-	GMVec4 t, s;
-	t.loadFloat4(translationStart);
-	s.loadFloat4(scalingStart);
-	
+	GMfloat percentage = (time - d->timeStart) / (getTime() - d->timeStart);
 	gameObj->beginUpdateTransform();
-	gameObj->setTranslation(Translate(Lerp(t, d->translationMap[gameObj], percentage)));
-	gameObj->setScaling(Scale(Lerp(s, d->scalingMap[gameObj], percentage)));
-	gameObj->setRotation(Lerp(gameObj->getRotation(), d->rotationMap[gameObj], percentage));
+	gameObj->setTranslation(Translate(Lerp(d->translationMap[gameObj], getTranslation(), percentage)));
+	gameObj->setScaling(Scale(Lerp(d->scalingMap[gameObj], getScaling(), percentage)));
+	gameObj->setRotation(Lerp(d->rotationMap[gameObj], getRotation(), percentage));
 	gameObj->endUpdateTransform();
 }
