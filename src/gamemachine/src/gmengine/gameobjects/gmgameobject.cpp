@@ -9,7 +9,7 @@ GMGameObject::GMGameObject(GMAsset asset)
 	: GMGameObject()
 {
 	addModel(asset, true);
-	updateMatrix();
+	updateTransformMatrix();
 }
 
 void GMGameObject::addModel(GMAsset asset, bool replace)
@@ -88,6 +88,47 @@ const IRenderContext* GMGameObject::getContext()
 {
 	D(d);
 	return d->context;
+}
+
+void GMGameObject::updateTransformMatrix()
+{
+	D(d);
+	d->transformMatrix = d->scaling * QuatToMatrix(d->rotation) * d->translation;
+}
+
+void GMGameObject::setScaling(const GMMat4& scaling)
+{
+	D(d);
+	d->scaling = scaling;
+	if (d->autoUpdateTransformMatrix)
+		updateTransformMatrix();
+}
+
+void GMGameObject::setTranslation(const GMMat4& translation)
+{
+	D(d);
+	d->translation = translation;
+	if (d->autoUpdateTransformMatrix)
+		updateTransformMatrix();
+}
+
+void GMGameObject::setRotation(const GMQuat& rotation)
+{
+	D(d);
+	d->rotation = rotation;
+	if (d->autoUpdateTransformMatrix)
+		updateTransformMatrix();
+}
+
+void GMGameObject::beginUpdateTransform()
+{
+	setAutoUpdateTransformMatrix(false);
+}
+
+void GMGameObject::endUpdateTransform()
+{
+	setAutoUpdateTransformMatrix(true);
+	updateTransformMatrix();
 }
 
 void GMGameObject::drawModel(const IRenderContext* context, GMModel* model)

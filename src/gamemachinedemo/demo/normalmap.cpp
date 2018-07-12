@@ -49,6 +49,18 @@ void Demo_NormalMap::init()
 	d->gameObject = new gm::GMGameObject(quadAsset);
 	asDemoGameWorld(getDemoWorldReference())->addObject("texture", d->gameObject);
 
+	// 为这个对象创建动画
+	/*
+	gm::GMGameObjectKeyframe* kf = new gm::GMGameObjectKeyframe(
+		GetTranslationFromMatrix(d->gameObject->getTranslation()),
+		QuatToMatrix(Rotate(Identity<GMQuat>(), PI, (GMVec3(0, 0, 1)))),
+		2
+	);
+	d->animation.setTargetObjects(d->gameObject);
+	d->animation.addKeyFrame(kf);
+	d->animation.play();
+	*/
+
 	gm::GMWidget* widget = createDefaultWidget();
 	auto top = getClientAreaTop();
 
@@ -75,15 +87,15 @@ void Demo_NormalMap::init()
 	);
 
 	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
-		d->rotate = !d->rotate;
+		//d->rotate = !d->rotate;
 		emit(rotateStateChanged);
 	});
 
 	connect(*this, GM_SIGNAL(rotateStateChanged), [=](auto, auto) {
-		if (d->rotate)
-			stateLabel->setText(L"状态：旋转中");
-		else
-			stateLabel->setText(L"状态：已停止");
+		//if (d->rotate)
+		//	stateLabel->setText(L"状态：旋转中");
+		//else
+		//	stateLabel->setText(L"状态：已停止");
 	});
 
 	widget->setSize(widget->getSize().width, top + 40);
@@ -102,13 +114,12 @@ void Demo_NormalMap::event(gm::GameMachineHandlerEvent evt)
 		break;
 	case gm::GameMachineHandlerEvent::Simulate:
 	{
-		if (d->rotate)
-			d->angle += .01f;
 		getDemoWorldReference()->simulateGameWorld();
 		break;
 	}
 	case gm::GameMachineHandlerEvent::Render:
-		d->rotation = Rotate(Identity<GMQuat>(), d->angle, (GMVec3(0, 0, 1)));
+		d->animation.update();
+		//d->rotation = Rotate(Identity<GMQuat>(), d->angle, (GMVec3(0, 0, 1)));
 		d->gameObject->setRotation(d->rotation);
 		getDemoWorldReference()->renderScene();
 

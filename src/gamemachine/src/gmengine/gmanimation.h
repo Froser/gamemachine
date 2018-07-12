@@ -15,6 +15,10 @@ class GMAnimationKeyframe : public GMObject
 	GM_DECLARE_PROPERTY(Time, time, GMfloat);
 
 public:
+	GMAnimationKeyframe() = default;
+
+	virtual void begin(GMObject* object, GMfloat time) = 0;
+
 	//! 关键帧处理方法，用于改变GMObject对象的状态。
 	/*!
 	  当当前关键帧为目标关键帧时，每当需要更新GMObject状态时，此方法被调用。
@@ -36,33 +40,36 @@ GM_PRIVATE_OBJECT(GMAnimation)
 	bool isPlaying = false;
 	GMfloat timeline = 0;
 	GMfloat timeLast = 0;
-	Set<GMOwnedPtr<GMAnimationKeyframe>> keyframes;
-	Set<GMOwnedPtr<GMAnimationKeyframe>>::const_iterator keyframesIter;
+	Set<GMAnimationKeyframe*> keyframes;
+	Set<GMAnimationKeyframe*>::const_iterator keyframesIter;
 	Set<GMObject*> targetObjects;
+	GMAnimationKeyframe* lastKeyframe = nullptr;
 };
 
 class GMAnimation : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMAnimation)
+	GM_ALLOW_COPY_DATA(GMAnimation)
 	GM_DECLARE_PROPERTY(PlayLoop, playLoop, bool)
 
 public:
-	template <typename... GameObject>
-	GMAnimation(GameObject*... targetGameObjects)
+	template <typename... Objects>
+	GMAnimation(Objects... targetGameObjects)
 	{
-		D(d);
-		d->targetObjects = { targetGameObjects };
+		setTargetObjects(targetGameObjects...);
 	}
 
 	template <>
 	GMAnimation(void) = default;
 
+	~GMAnimation();
+
 public:
-	template <typename... GameObject>
-	void setTargetObjects(GameObject*... targetGameObjects)
+	template <typename... Object>
+	void setTargetObjects(Object*... targetGameObjects)
 	{
 		D(d);
-		d->targetObjects = { targetGameObjects };
+		d->targetObjects = { targetGameObjects... };
 	}
 
 	inline bool isPlaying() GM_NOEXCEPT
@@ -82,5 +89,36 @@ private:
 	void updatePercentage();
 };
 
+// Animations
+GM_PRIVATE_OBJECT(GMGameObjectKeyframe)
+{
+	Map<GMGameObject*, GMVec4> translationMap;
+	Map<GMGameObject*, GMVec4> scalingMap;
+	Map<GMGameObject*, GMQuat> rotationMap;
+	GMVec4 translation;
+	GMVec4 scaling;
+	GMQuat rotation;
+	GMfloat timeBegin;
+};
+
+class GMGameObjectKeyframe : public GMAnimationKeyframe
+{
+	GM_DECLARE_PRIVATE(GMGameObjectKeyframe)
+	GM_DECLARE_PROPERTY(Translation, translation, GMVec4)
+	GM_DECLARE_PROPERTY(Scaling, scaling, GMVec4)
+	GM_DECLARE_PROPERTY(Rotation, rotation, GMQuat)
+
+public:
+	GMGameObjectKeyframe(
+		const GMVec4& translation,
+		const GMVec4& scaling,
+		const GMQuat& rotation,
+		GMfloat timePoint
+	);
+
+public:
+	virtual void begin(GMObject* object, GMfloat time) override;
+	virtual void update(GMObject* object, GMfloat time) override;
+};
 END_NS
 #endif

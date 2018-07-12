@@ -19,6 +19,7 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	GMQuat rotation = Identity<GMQuat>();
 	GMMat4 transformMatrix = Identity<GMMat4>();
 	const IRenderContext* context = nullptr;
+	bool autoUpdateTransformMatrix = true;
 };
 
 struct GMAsset;
@@ -47,26 +48,57 @@ public:
 	virtual bool canDeferredRendering();
 	virtual const IRenderContext* getContext();
 
-private:
-	inline void updateMatrix()
-	{ 
-		D(d);
-		d->transformMatrix = d->scaling * QuatToMatrix(d->rotation) * d->translation;
-	}
-
 protected:
 	virtual void drawModel(const IRenderContext* context, GMModel* model);
 
 public:
-	virtual void setScaling(const GMMat4& scaling) { D(d); d->scaling = scaling; updateMatrix(); }
-	virtual void setTranslation(const GMMat4& translation) { D(d); d->translation = translation; updateMatrix(); }
-	virtual void setRotation(const GMQuat& rotation) { D(d); d->rotation = rotation; updateMatrix(); }
-	inline const GMMat4& getTransform() const { D(d); return d->transformMatrix; }
-	inline const GMMat4& getScaling() const { D(d); return d->scaling; }
-	inline const GMMat4& getTranslation() const { D(d); return d->translation; }
-	inline const GMQuat& getRotation() const { D(d); return d->rotation; }
-	inline GMPhysicsObject* getPhysicsObject() { D(d); return d->physics.get(); }
-	inline void setContext(const IRenderContext* context) { D(d); d->context = context; }
+	void updateTransformMatrix();
+	void setScaling(const GMMat4& scaling);
+	void setTranslation(const GMMat4& translation);
+	void setRotation(const GMQuat& rotation);
+	void beginUpdateTransform();
+	void endUpdateTransform();
+
+	inline const GMMat4& getTransform() const GM_NOEXCEPT
+	{
+		D(d);
+		return d->transformMatrix;
+	}
+
+	inline const GMMat4& getScaling() const GM_NOEXCEPT {
+		D(d);
+		return d->scaling;
+	}
+
+	inline const GMMat4& getTranslation() const GM_NOEXCEPT
+	{
+		D(d);
+		return d->translation;
+	}
+
+	inline const GMQuat& getRotation() const GM_NOEXCEPT {
+		D(d);
+		return d->rotation;
+	}
+
+	inline GMPhysicsObject* getPhysicsObject()
+	{
+		D(d);
+		return d->physics.get();
+	}
+
+	inline void setContext(const IRenderContext* context)
+	{
+		D(d);
+		d->context = context;
+	}
+
+private:
+	inline void setAutoUpdateTransformMatrix(bool autoUpdateTransformMatrix) GM_NOEXCEPT
+	{
+		D(d);
+		d->autoUpdateTransformMatrix = autoUpdateTransformMatrix;
+	}
 };
 
 // GMSkyObject

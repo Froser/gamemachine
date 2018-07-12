@@ -515,9 +515,11 @@ inline GMQuat Rotate(const GMQuat& Start, gm::GMfloat Angle, const GMVec3& Axis)
 
 inline GMMat4 Ortho(gm::GMfloat left, gm::GMfloat right, gm::GMfloat bottom, gm::GMfloat top, gm::GMfloat zNear, gm::GMfloat zFar);
 
-inline void GetTranslationFromMatrix(const GMMat4& M, OUT GMFloat4& F);
+inline void GetTranslationFromMatrix(const GMMat4& M, GMFloat4& F);
 
-inline void GetScalingFromMatrix(const GMMat4& M, OUT GMFloat4& F);
+inline void GetScalingFromMatrix(const GMMat4& M, GMFloat4& F);
+
+inline void GetTranslationAndScalingFromMatrix(const GMMat4& M, GMFloat4& T, GMFloat4& S);
 
 inline gm::GMfloat Length(const GMVec3& V);
 
