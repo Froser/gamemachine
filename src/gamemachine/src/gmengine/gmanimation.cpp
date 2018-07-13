@@ -39,10 +39,16 @@ void GMAnimation::pause()
 void GMAnimation::reset()
 {
 	D(d);
-	d->keyframesIter = d->keyframes.cbegin();
+	if (!d->keyframes.empty())
+		d->keyframesIter = d->keyframes.cbegin();
 	d->lastKeyframe = nullptr;
 	d->timeline = 0;
 	d->isPlaying = false;
+	for (auto object : d->targetObjects)
+	{
+		if (d->keyframesIter != d->keyframes.cend())
+			(*d->keyframesIter)->reset(object);
+	}
 }
 
 void GMAnimation::update()
@@ -75,6 +81,10 @@ void GMAnimation::update()
 				reset();
 				play();
 			}
+			else
+			{
+				pause();
+			}
 			return;
 		}
 
@@ -85,7 +95,7 @@ void GMAnimation::update()
 			{
 				if (d->lastKeyframe)
 					d->lastKeyframe->endFrame(object);
-				currentKeyFrame->beginFrame(object, d->timeline);
+				currentKeyFrame->beginFrame(object, d->lastKeyframe ? d->lastKeyframe->getTime() : 0);
 			}
 			d->lastKeyframe = currentKeyFrame;
 		}
@@ -109,6 +119,15 @@ GMGameObjectKeyframe::GMGameObjectKeyframe(
 	setScaling(scaling);
 	setRotation(rotation);
 	setTime(timePoint);
+}
+
+void GMGameObjectKeyframe::reset(GMObject* object)
+{
+	D(d);
+	GMGameObject* gameObj = gm_cast<GMGameObject*>(object);
+	gameObj->setTranslation(Translate(d->translationMap[gameObj]));
+	gameObj->setScaling(Scale(d->scalingMap[gameObj]));
+	gameObj->setRotation(d->rotationMap[gameObj]);
 }
 
 void GMGameObjectKeyframe::beginFrame(GMObject* object, GMfloat timeStart)

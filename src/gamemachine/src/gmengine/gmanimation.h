@@ -17,6 +17,7 @@ class GMAnimationKeyframe : public GMObject
 public:
 	GMAnimationKeyframe() = default;
 
+	virtual void reset(GMObject* object) = 0;
 	virtual void beginFrame(GMObject* object, GMfloat timeStart) = 0;
 	virtual void endFrame(GMObject* object) = 0;
 
@@ -118,6 +119,7 @@ public:
 	);
 
 public:
+	virtual void reset(GMObject* object) override;
 	virtual void beginFrame(GMObject* object, GMfloat timeStart) override;
 	virtual void endFrame(GMObject* object) override;
 	virtual void update(GMObject* object, GMfloat time) override;

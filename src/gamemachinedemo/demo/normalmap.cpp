@@ -57,18 +57,25 @@ void Demo_NormalMap::init()
 	t.setFloat4(t4);
 	s.setFloat4(s4);
 
+	GMQuat q = Identity<GMQuat>();
 	d->animation.setTargetObjects(d->gameObject);
 	d->animation.addKeyFrame(new gm::GMGameObjectKeyframe(
 		t,
 		s,
-		Rotate(Identity<GMQuat>(), PI / 2, (GMVec3(0, 0, 1))),
+		(q = Rotate(q, PI * 2 / 3 , (GMVec3(0, 0, 1)))),
 		1.5f
 	));
 	d->animation.addKeyFrame(new gm::GMGameObjectKeyframe(
 		t,
 		s,
-		Rotate(Identity<GMQuat>(), PI, (GMVec3(0, 0, 1))),
+		(q = Rotate(q, PI * 2 / 3, (GMVec3(0, 0, 1)))),
 		3.f
+	));
+	d->animation.addKeyFrame(new gm::GMGameObjectKeyframe(
+		t,
+		s,
+		(q = Rotate(q, PI * 2 / 3, (GMVec3(0, 0, 1)))),
+		4.5f
 	));
 	d->animation.setPlayLoop(true);
 
@@ -146,11 +153,11 @@ void Demo_NormalMap::event(gm::GameMachineHandlerEvent evt)
 		break;
 	}
 	case gm::GameMachineHandlerEvent::Render:
+	{
 		d->animation.update();
-		//d->rotation = Rotate(Identity<GMQuat>(), d->angle, (GMVec3(0, 0, 1)));
 		getDemoWorldReference()->renderScene();
-
 		break;
+	}
 	case gm::GameMachineHandlerEvent::Activate:
 	{
 		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
