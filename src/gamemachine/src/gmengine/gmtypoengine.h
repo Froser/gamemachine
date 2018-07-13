@@ -85,6 +85,7 @@ GM_INTERFACE(ITypoEngine)
 	virtual void setLineHeight(GMint) = 0;
 	virtual void createInstance(OUT ITypoEngine**) = 0;
 	virtual GMTypoResultInfo getResults() = 0;
+	virtual const GMTypoResultInfo getResults() const= 0;
 
 private:
 	virtual GMTypoResult getTypoResult(GMsize_t index) = 0;
@@ -175,6 +176,7 @@ public:
 	virtual void setLineHeight(GMint lineHeight) override;
 	virtual void createInstance(OUT ITypoEngine**) override;
 	virtual GMTypoResultInfo getResults() override;
+	virtual const GMTypoResultInfo getResults() const override;
 
 private:
 	virtual GMTypoResult getTypoResult(GMsize_t index) override;

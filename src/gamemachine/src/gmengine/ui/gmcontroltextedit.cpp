@@ -950,6 +950,13 @@ void GMControlTextEdit::handleMouseCaret(const GMPoint& pt, bool selectStart)
 		else
 			placeCaret(cp);
 
+		// 再次做一次微调，如果鼠标坐落在字符右半边区域，选中下一个字符。
+		decltype(auto) charResult = d->buffer->getTypoEngine()->getResults().results[cp];
+		auto diffFromLead = pt.x - d->rcText.x + xFirst - charResult.x;
+		// 如果超过了自身字符一半的宽度，认为是选择了下一个字符
+		if (diffFromLead > charResult.advance / 2)
+			placeCaret(cp + 1);
+
 		if (selectStart)
 			d->selectionStartCP = d->cp;
 		resetCaretBlink();
@@ -1312,6 +1319,13 @@ void GMControlTextArea::handleMouseCaret(const GMPoint& pt, bool selectStart)
 	if (d->buffer->XYtoCP(adjustedPt.x - db->rcText.x + xFirst, adjustedPt.y - db->rcText.y + yFirst, &cp))
 	{
 		placeCaret(cp, true);
+
+		// 再次做一次微调，如果鼠标坐落在字符右半边区域，选中下一个字符。
+		decltype(auto) charResult = d->buffer->getTypoEngine()->getResults().results[cp];
+		auto diffFromLead = pt.x - db->rcText.x + xFirst - charResult.x;
+		// 如果自身并不是本行最后一个字符，且超过了自身字符一半的宽度，认为是选择了下一个字符
+		if (d->buffer->findLastCPInOneLine(cp) != cp && diffFromLead > charResult.advance / 2)
+			placeCaret(cp + 1, true);
 
 		if (selectStart)
 			db->selectionStartCP = db->cp;

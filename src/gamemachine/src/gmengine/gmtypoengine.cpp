@@ -462,6 +462,11 @@ GMTypoResultInfo GMTypoEngine::getResults()
 	return r;
 }
 
+const GMTypoResultInfo GMTypoEngine::getResults() const
+{
+	return const_cast<GMTypoEngine*>(this)->getResults();
+}
+
 GMTypoTextBuffer::~GMTypoTextBuffer()
 {
 	D(d);
