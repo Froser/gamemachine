@@ -467,6 +467,40 @@ const GMTypoResultInfo GMTypoEngine::getResults() const
 	return const_cast<GMTypoEngine*>(this)->getResults();
 }
 
+GM_PRIVATE_OBJECT(GMTypoTextTransactionAtom)
+{
+	GMsize_t cp = 0;
+	GMsize_t length = 0;
+	GMString content;
+};
+
+class GMTypoTextTransactionAtom : public ITransactionAtom
+{
+	GM_DECLARE_PRIVATE(GMTypoTextTransactionAtom)
+
+public:
+	GMTypoTextTransactionAtom(GMsize_t cp, GMsize_t length, GMString content);
+
+	virtual void execute() override;
+	virtual void unexecute() override;
+};
+
+GMTypoTextTransactionAtom::GMTypoTextTransactionAtom(GMsize_t cp, GMsize_t length, GMString content)
+{
+	D(d);
+	d->cp = cp;
+	d->length = length;
+	d->content = std::move(content);
+}
+
+void GMTypoTextTransactionAtom::execute()
+{
+}
+
+void GMTypoTextTransactionAtom::unexecute()
+{
+}
+
 GMTypoTextBuffer::~GMTypoTextBuffer()
 {
 	D(d);
@@ -491,10 +525,13 @@ void GMTypoTextBuffer::setSize(const GMRect& rc)
 void GMTypoTextBuffer::setChar(GMsize_t pos, GMwchar ch)
 {
 	D(d);
-	d->buffer[pos] = ch;
 	if (ch == '\r')
 		return;
 
+	beginTransaction();
+	d->buffer[pos] = ch;
+	addTransactionAtom(pos, 1, ch);
+	endTransaction();
 	markDirty();
 }
 
@@ -507,6 +544,7 @@ bool GMTypoTextBuffer::insertChar(GMsize_t pos, GMwchar ch)
 	if (pos < 0)
 		return false;
 
+	beginTransaction();
 	if (pos == d->buffer.length())
 	{
 		d->buffer.append(ch);
@@ -518,6 +556,8 @@ bool GMTypoTextBuffer::insertChar(GMsize_t pos, GMwchar ch)
 		newStr.append(d->buffer.substr(pos, d->buffer.length() - pos));
 		d->buffer = std::move(newStr);
 	}
+	addTransactionAtom(pos, 1, ch);
+	endTransaction();
 	markDirty();
 	return true;
 }
@@ -725,4 +765,20 @@ void GMTypoTextBuffer::getNextItemPos(GMint cp, GMint* next)
 	}
 
 	*next = r.size() - 1;
+}
+
+void GMTypoTextBuffer::addTransactionAtom(GMsize_t cp, GMsize_t length, GMString content)
+{
+	getTransactionManager().addAtom(new GMTypoTextTransactionAtom(cp, length, std::move(content)));
+}
+
+void GMTypoTextBuffer::beginTransaction()
+{
+	getTransactionManager().beginTransaction();
+}
+
+void GMTypoTextBuffer::endTransaction()
+{
+	getTransactionManager().endTransaction();
+	getTransactionManager().commitTransaction();
 }

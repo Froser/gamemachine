@@ -2,6 +2,7 @@
 #define __GM_TYPO_H__
 #include <gmcommon.h>
 #include <gamemachine.h>
+#include <gmtransaction.h>
 
 BEGIN_NS
 
@@ -199,6 +200,7 @@ GM_PRIVATE_OBJECT(GMTypoTextBuffer)
 	bool dirty = false;
 	GMsize_t renderStart = 0;
 	GMsize_t renderEnd = 0;
+	GMTransactionManager transactionMgr;
 };
 
 class GMTypoTextBuffer : public GMObject
@@ -277,6 +279,16 @@ public:
 		return d->renderEnd;
 	}
 
+private:
+	inline GMTransactionManager& getTransactionManager() GM_NOEXCEPT
+	{
+		D(d);
+		return d->transactionMgr;
+	}
+
+	void addTransactionAtom(GMsize_t cp, GMsize_t length, GMString content);
+	void beginTransaction();
+	void endTransaction();
 };
 
 END_NS
