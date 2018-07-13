@@ -63,6 +63,7 @@ public:
 	virtual bool canHaveFocus() override;
 	virtual void setText(const GMString& text);
 	virtual void setPadding(GMint x, GMint y);
+	virtual void placeCaret(GMint cP, bool adjustVisibleCP = true);
 
 // 处理特殊按键
 protected:
@@ -83,7 +84,6 @@ protected:
 	virtual GMint getCaretTop();
 	virtual GMint getCaretHeight();
 	virtual void handleMouseCaret(const GMPoint& pt, bool selectStart);
-	virtual void placeCaret(GMint cP, bool adjustVisibleCP = true);
 	virtual void adjustInsertModeRect(REF GMRect& caretRc, GMint caretX);
 	virtual void moveFirstVisibleCp(GMint distance);
 
@@ -133,6 +133,12 @@ public:
 			rc.height + 4
 		};
 		return r;
+	}
+
+	inline void placeSelectionStart(GMint selectionStartCP)
+	{
+		D(d);
+		d->selectionStartCP = selectionStartCP;
 	}
 
 protected:

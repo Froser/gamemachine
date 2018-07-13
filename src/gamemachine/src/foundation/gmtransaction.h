@@ -33,7 +33,7 @@ GM_PRIVATE_OBJECT(GMTransactionManager)
 	GMint nest = 0;
 	List<GMOwnedPtr<GMTransaction>> transactions;
 	GMTransaction* currentTransaction = nullptr;
-	List<GMOwnedPtr<GMTransaction>>::iterator runningTransaction;
+	List<GMOwnedPtr<GMTransaction>>::const_iterator runningTransaction;
 };
 
 class GMTransactionManager : public GMObject
@@ -41,6 +41,7 @@ class GMTransactionManager : public GMObject
 	GM_DECLARE_PRIVATE(GMTransactionManager)
 
 public:
+	GMTransactionManager();
 	~GMTransactionManager();
 
 public:

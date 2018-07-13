@@ -18,6 +18,62 @@ GM_PRIVATE_OBJECT(GMMultiLineTypoTextBuffer)
 	GMint lineHeight = 0;
 };
 
+GM_PRIVATE_OBJECT(GMControlTextControlTransactionAtom)
+{
+	GMint cpStart = 0;
+	GMint cpEnd = 0;
+	GMint cpLastStart = 0;
+	GMint cpLastEnd = 0;
+	GMControlTextEdit* textEdit = nullptr;
+};
+
+class GMControlTextControlTransactionAtom : public ITransactionAtom
+{
+	GM_DECLARE_PRIVATE(GMControlTextControlTransactionAtom)
+
+public:
+	GMControlTextControlTransactionAtom(
+		GMControlTextEdit* textEdit,
+		GMint cpStart,
+		GMint cpEnd,
+		GMint cpLastStart,
+		GMint cpLastEnd
+	);
+
+	virtual void execute() override;
+	virtual void unexecute() override;
+};
+
+GMControlTextControlTransactionAtom::GMControlTextControlTransactionAtom(
+	GMControlTextEdit* textEdit,
+	GMint cpStart,
+	GMint cpEnd,
+	GMint cpLastStart,
+	GMint cpLastEnd
+)
+{
+	D(d);
+	d->textEdit = textEdit;
+	d->cpStart = cpStart;
+	d->cpEnd = cpEnd;
+	d->cpLastStart = cpLastStart;
+	d->cpLastEnd = cpLastEnd;
+}
+
+void GMControlTextControlTransactionAtom::execute()
+{
+	D(d);
+	d->textEdit->placeCaret(d->cpStart, true);
+	d->textEdit->placeSelectionStart(d->cpEnd);
+}
+
+void GMControlTextControlTransactionAtom::unexecute()
+{
+	D(d);
+	d->textEdit->placeCaret(d->cpLastStart, true);
+	d->textEdit->placeSelectionStart(d->cpLastEnd);
+}
+
 class GMMultiLineTypoTextBuffer : public GMTypoTextBuffer
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMMultiLineTypoTextBuffer, GMTypoTextBuffer)
@@ -574,7 +630,15 @@ bool GMControlTextEdit::onChar(GMSystemCharEvent* event)
 	case GMFunctionCharacter_Ctrl_U:
 	case GMFunctionCharacter_Ctrl_W:
 	case GMFunctionCharacter_Ctrl_Y:
+	{
+		//d->buffer->redo();
+		return true;
+	}
 	case GMFunctionCharacter_Ctrl_Z:
+	{
+		//d->buffer->undo();
+		return true;
+	}
 	case GMFunctionCharacter_Ctrl_LeftBracket:
 	case GMFunctionCharacter_Ctrl_RightBracket:
 	case GMFunctionCharacter_Ctrl_Dash:

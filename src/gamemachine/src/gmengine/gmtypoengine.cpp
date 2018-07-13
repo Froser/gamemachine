@@ -470,8 +470,9 @@ const GMTypoResultInfo GMTypoEngine::getResults() const
 GM_PRIVATE_OBJECT(GMTypoTextTransactionAtom)
 {
 	GMsize_t cp = 0;
-	GMsize_t length = 0;
-	GMString content;
+	GMString addedContent;
+	GMString removedContent;
+	GMTypoTextBuffer* buffer = nullptr;
 };
 
 class GMTypoTextTransactionAtom : public ITransactionAtom
@@ -479,26 +480,43 @@ class GMTypoTextTransactionAtom : public ITransactionAtom
 	GM_DECLARE_PRIVATE(GMTypoTextTransactionAtom)
 
 public:
-	GMTypoTextTransactionAtom(GMsize_t cp, GMsize_t length, GMString content);
+	GMTypoTextTransactionAtom(
+		GMTypoTextBuffer* buffer,
+		GMsize_t cp,
+		GMString addedContent,
+		GMString removedContent
+	);
 
 	virtual void execute() override;
 	virtual void unexecute() override;
 };
 
-GMTypoTextTransactionAtom::GMTypoTextTransactionAtom(GMsize_t cp, GMsize_t length, GMString content)
+GMTypoTextTransactionAtom::GMTypoTextTransactionAtom(
+	GMTypoTextBuffer* buffer,
+	GMsize_t cp,
+	GMString addedContent,
+	GMString removedContent
+)
 {
 	D(d);
+	d->buffer = buffer;
 	d->cp = cp;
-	d->length = length;
-	d->content = std::move(content);
+	d->addedContent = std::move(addedContent);
+	d->removedContent = std::move(removedContent);
 }
 
 void GMTypoTextTransactionAtom::execute()
 {
+	D(d);
+	d->buffer->removeChars(d->cp, d->cp + d->removedContent.length());
+	d->buffer->insertString(d->cp, d->addedContent);
 }
 
 void GMTypoTextTransactionAtom::unexecute()
 {
+	D(d);
+	d->buffer->removeChars(d->cp, d->cp + d->addedContent.length());
+	d->buffer->insertString(d->cp, d->removedContent);
 }
 
 GMTypoTextBuffer::~GMTypoTextBuffer()
@@ -528,10 +546,8 @@ void GMTypoTextBuffer::setChar(GMsize_t pos, GMwchar ch)
 	if (ch == '\r')
 		return;
 
-	beginTransaction();
+	d->transactionMgr.addAtom(new GMTypoTextTransactionAtom(this, pos, ch, d->buffer[pos]));
 	d->buffer[pos] = ch;
-	addTransactionAtom(pos, 1, ch);
-	endTransaction();
 	markDirty();
 }
 
@@ -544,7 +560,6 @@ bool GMTypoTextBuffer::insertChar(GMsize_t pos, GMwchar ch)
 	if (pos < 0)
 		return false;
 
-	beginTransaction();
 	if (pos == d->buffer.length())
 	{
 		d->buffer.append(ch);
@@ -556,8 +571,8 @@ bool GMTypoTextBuffer::insertChar(GMsize_t pos, GMwchar ch)
 		newStr.append(d->buffer.substr(pos, d->buffer.length() - pos));
 		d->buffer = std::move(newStr);
 	}
-	addTransactionAtom(pos, 1, ch);
-	endTransaction();
+
+	d->transactionMgr.addAtom(new GMTypoTextTransactionAtom(this, pos, ch, L""));
 	markDirty();
 	return true;
 }
@@ -567,6 +582,9 @@ bool GMTypoTextBuffer::insertString(GMsize_t pos, const GMString& str)
 	D(d);
 	if (pos < 0)
 		return false;
+
+	if (str.isEmpty())
+		return true;
 
 	if (pos == d->buffer.length())
 	{
@@ -579,6 +597,8 @@ bool GMTypoTextBuffer::insertString(GMsize_t pos, const GMString& str)
 		newStr.append(d->buffer.substr(pos, d->buffer.length() - pos));
 		d->buffer = std::move(newStr);
 	}
+
+	d->transactionMgr.addAtom(new GMTypoTextTransactionAtom(this, pos, str, L""));
 	markDirty();
 	return true;
 }
@@ -589,10 +609,13 @@ bool GMTypoTextBuffer::removeChar(GMsize_t pos)
 	if (pos < 0 || pos >= d->buffer.length())
 		return false;
 
+	GMwchar removedChar = d->buffer[pos];
 	GMString newStr = d->buffer.substr(0, pos);
 	if (pos + 1 < d->buffer.length())
 		newStr += d->buffer.substr(pos + 1, d->buffer.length() - pos - 1);
 	d->buffer = std::move(newStr);
+
+	d->transactionMgr.addAtom(new GMTypoTextTransactionAtom(this, pos, L"", removedChar));
 	markDirty();
 	return true;
 }
@@ -600,6 +623,9 @@ bool GMTypoTextBuffer::removeChar(GMsize_t pos)
 bool GMTypoTextBuffer::removeChars(GMsize_t startPos, GMsize_t endPos)
 {
 	D(d);
+	if (endPos == startPos)
+		return true;
+
 	if (startPos > endPos)
 	{
 		GM_SWAP(startPos, endPos);
@@ -614,10 +640,12 @@ bool GMTypoTextBuffer::removeChars(GMsize_t startPos, GMsize_t endPos)
 	if (startPos == endPos)
 		return false;
 
+	GMString removedChars = d->buffer.substr(startPos, endPos - startPos);
 	GMString newStrA = d->buffer.substr(0, startPos);
 	if (endPos < d->buffer.length())
 		newStrA.append(d->buffer.substr(endPos, d->buffer.length() - endPos));
 	d->buffer = std::move(newStrA);
+	d->transactionMgr.addAtom(new GMTypoTextTransactionAtom(this, startPos, L"", removedChars));
 	markDirty();
 	return true;
 }
@@ -765,20 +793,4 @@ void GMTypoTextBuffer::getNextItemPos(GMint cp, GMint* next)
 	}
 
 	*next = r.size() - 1;
-}
-
-void GMTypoTextBuffer::addTransactionAtom(GMsize_t cp, GMsize_t length, GMString content)
-{
-	getTransactionManager().addAtom(new GMTypoTextTransactionAtom(cp, length, std::move(content)));
-}
-
-void GMTypoTextBuffer::beginTransaction()
-{
-	getTransactionManager().beginTransaction();
-}
-
-void GMTypoTextBuffer::endTransaction()
-{
-	getTransactionManager().endTransaction();
-	getTransactionManager().commitTransaction();
 }

@@ -1,6 +1,8 @@
 ﻿#include "stdafx.h"
 #include "gmtransaction.h"
 
+constexpr GMTransaction* TransactionBeginTag = nullptr;
+
 void GMTransaction::clear()
 {
 	D(d);
@@ -31,6 +33,14 @@ void GMTransaction::unexecute()
 	{
 		(*iter)->unexecute();
 	}
+}
+
+GMTransactionManager::GMTransactionManager()
+{
+	D(d);
+	// 插入一个空白标记，表示链表的头
+	d->transactions.push_back(GMOwnedPtr<GMTransaction>(TransactionBeginTag));
+	d->runningTransaction = d->transactions.cbegin();
 }
 
 GMTransactionManager::~GMTransactionManager()
@@ -68,16 +78,16 @@ bool GMTransactionManager::commitTransaction()
 		return false;
 	}
 
-	if (d->runningTransaction != --d->transactions.end())
+	// 如果当前事务不是第一个，且不是指向最后一个，那么要干掉它后面所有的事务
+	if (d->runningTransaction->get() != TransactionBeginTag && d->runningTransaction != --d->transactions.end())
 	{
-		// 如果当前事务不是指向最后一个，那么要干掉它后面所有的事务
 		auto iter = d->runningTransaction;
 		++iter;
 		d->transactions.erase(iter, d->transactions.end());
 	}
 
 	d->transactions.push_back(GMOwnedPtr<GMTransaction>(d->currentTransaction));
-	d->runningTransaction = --d->transactions.end();
+	d->runningTransaction = --d->transactions.cend();
 	d->currentTransaction = nullptr;
 	return true;
 }
@@ -91,7 +101,7 @@ void GMTransactionManager::abortTransaction()
 void GMTransactionManager::addAtom(ITransactionAtom* atom)
 {
 	D(d);
-	GM_ASSERT(d->nest > 0);
+	// 如果外部没有调用beginTransaction，则不生效
 	if (d->nest <= 0)
 		return;
 
@@ -101,7 +111,7 @@ void GMTransactionManager::addAtom(ITransactionAtom* atom)
 bool GMTransactionManager::canUndo()
 {
 	D(d);
-	return !d->transactions.empty() && d->runningTransaction != d->transactions.begin();
+	return !d->transactions.empty() && d->runningTransaction->get() != TransactionBeginTag;
 }
 
 void GMTransactionManager::undo()
@@ -109,8 +119,8 @@ void GMTransactionManager::undo()
 	D(d);
 	if (canUndo())
 	{
-		--d->runningTransaction;
 		(*d->runningTransaction)->unexecute();
+		--d->runningTransaction;
 	}
 }
 
@@ -125,7 +135,7 @@ void GMTransactionManager::redo()
 	D(d);
 	if (canRedo())
 	{
-		(*d->runningTransaction)->execute();
 		++d->runningTransaction;
+		(*d->runningTransaction)->execute();
 	}
 }

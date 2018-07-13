@@ -278,17 +278,6 @@ public:
 		D(d);
 		return d->renderEnd;
 	}
-
-private:
-	inline GMTransactionManager& getTransactionManager() GM_NOEXCEPT
-	{
-		D(d);
-		return d->transactionMgr;
-	}
-
-	void addTransactionAtom(GMsize_t cp, GMsize_t length, GMString content);
-	void beginTransaction();
-	void endTransaction();
 };
 
 END_NS
