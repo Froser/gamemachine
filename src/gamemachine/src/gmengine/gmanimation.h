@@ -30,9 +30,18 @@ public:
 	virtual void update(GMObject* object, GMfloat time) = 0;
 
 public:
-	bool operator <(const GMAnimationKeyframe& rhs)
+	bool operator <(const GMAnimationKeyframe& rhs) const
 	{
 		return getTime() < rhs.getTime();
+	}
+};
+
+class GMAnimationKeyframeLess
+{
+public:
+	bool operator ()(const GMAnimationKeyframe* lhs, const GMAnimationKeyframe* rhs)
+	{
+		return *lhs < *rhs;
 	}
 };
 
@@ -42,8 +51,8 @@ GM_PRIVATE_OBJECT(GMAnimation)
 	bool isPlaying = false;
 	GMfloat timeline = 0;
 	GMfloat timeLast = 0;
-	Set<GMAnimationKeyframe*> keyframes;
-	Set<GMAnimationKeyframe*>::const_iterator keyframesIter;
+	Set<GMAnimationKeyframe*, GMAnimationKeyframeLess> keyframes;
+	Set<GMAnimationKeyframe*, GMAnimationKeyframeLess>::const_iterator keyframesIter;
 	Set<GMObject*> targetObjects;
 	GMAnimationKeyframe* lastKeyframe = nullptr;
 };

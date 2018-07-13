@@ -632,17 +632,7 @@ void DemostrationEntrance::event(gm::GameMachineHandlerEvent evt)
 			getWorld()->renderScene();
 			break;
 		case gm::GameMachineHandlerEvent::Activate:
-		{
-			/*
-			gm::IInput* inputManager = d->mainWindow->getInputMananger();
-			gm::IKeyboardState& kbState = inputManager->getKeyboardState();
-
-			if (kbState.keyTriggered('I'))
-				d->debugConfig.set(gm::GMDebugConfigs::RunProfile_Bool, !d->debugConfig.get(gm::GMDebugConfigs::RunProfile_Bool).toBool());
-
 			break;
-			*/
-		}
 		case gm::GameMachineHandlerEvent::Deactivate:
 			break;
 		case gm::GameMachineHandlerEvent::Terminate:
