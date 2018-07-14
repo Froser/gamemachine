@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmtransaction.h"
+#include "gmthread.h"
 
 constexpr GMTransaction* TransactionBeginTag = nullptr;
 
@@ -35,28 +36,30 @@ void GMTransaction::unexecute()
 	}
 }
 
-GMTransactionManager::GMTransactionManager()
-{
-	D(d);
-	// 插入一个空白标记，表示链表的头
-	d->transactions.push_back(GMOwnedPtr<GMTransaction>(TransactionBeginTag));
-	d->runningTransaction = d->transactions.cbegin();
-}
-
-GMTransactionManager::~GMTransactionManager()
-{
-	D(d);
-	GM_delete(d->currentTransaction);
-}
-
-void GMTransactionManager::beginTransaction()
+void GMTransactionManager::beginTransaction(GMTransactionContext* transactionContext)
 {
 	D(d);
 	if (d->nest == 0)
 	{
-		d->currentTransaction = new GMTransaction();
-		++d->nest;
+		if (!transactionContext)
+		{
+			// 没有指定事务上下文，可能是因为外层默认不需要开启事务
+			++d->nest;
+			return;
+		}
+
+		d->transactionContext = transactionContext;
+
+		// 如果是一个全新的事务，插入一个空白标记，表示链表的头
+		if (d->transactionContext && d->transactionContext->transactions.empty())
+		{
+			d->transactionContext->transactions.push_back(GMOwnedPtr<GMTransaction>(TransactionBeginTag));
+			d->transactionContext->runningTransaction = d->transactionContext->transactions.cbegin();
+		}
+
+		d->transactionContext->currentTransaction = new GMTransaction();
 	}
+	++d->nest;
 }
 
 void GMTransactionManager::endTransaction()
@@ -74,28 +77,36 @@ bool GMTransactionManager::commitTransaction()
 	D(d);
 	if (d->nest != 0)
 	{
-		gm_error("GMTransactionManager::commitTransaction: You need call endTransaction before commit.");
+		// 当前在嵌套层，则不提交事务
 		return false;
 	}
 
-	// 如果当前事务不是第一个，且不是指向最后一个，那么要干掉它后面所有的事务
-	if (d->runningTransaction->get() != TransactionBeginTag && d->runningTransaction != --d->transactions.end())
+	// 外部没有传入上下文，不提交
+	if (!d->transactionContext)
+		return false;
+
+	if (d->transactionContext->currentTransaction->isEmpty())
+		return true;
+
+	// 如果当前事务不是指向最后一个，那么要干掉它后面所有的事务
+	if (d->transactionContext->runningTransaction != --d->transactionContext->transactions.end())
 	{
-		auto iter = d->runningTransaction;
+		auto iter = d->transactionContext->runningTransaction;
 		++iter;
-		d->transactions.erase(iter, d->transactions.end());
+		d->transactionContext->transactions.erase(iter, d->transactionContext->transactions.end());
 	}
 
-	d->transactions.push_back(GMOwnedPtr<GMTransaction>(d->currentTransaction));
-	d->runningTransaction = --d->transactions.cend();
-	d->currentTransaction = nullptr;
+	d->transactionContext->transactions.push_back(GMOwnedPtr<GMTransaction>(d->transactionContext->currentTransaction));
+	d->transactionContext->runningTransaction = --d->transactionContext->transactions.cend();
+	d->transactionContext->currentTransaction = nullptr;
+	d->transactionContext = nullptr;
 	return true;
 }
 
 void GMTransactionManager::abortTransaction()
 {
 	D(d);
-	d->currentTransaction->clear();
+	d->transactionContext->currentTransaction->clear();
 }
 
 void GMTransactionManager::addAtom(ITransactionAtom* atom)
@@ -105,13 +116,17 @@ void GMTransactionManager::addAtom(ITransactionAtom* atom)
 	if (d->nest <= 0)
 		return;
 
-	d->currentTransaction->addAtom(atom);
+	// 外部没有传入上下文，不生效
+	if (!d->transactionContext)
+		return;
+
+	d->transactionContext->currentTransaction->addAtom(atom);
 }
 
 bool GMTransactionManager::canUndo()
 {
 	D(d);
-	return !d->transactions.empty() && d->runningTransaction->get() != TransactionBeginTag;
+	return !d->transactionContext->transactions.empty() && d->transactionContext->runningTransaction->get() != TransactionBeginTag;
 }
 
 void GMTransactionManager::undo()
@@ -119,15 +134,15 @@ void GMTransactionManager::undo()
 	D(d);
 	if (canUndo())
 	{
-		(*d->runningTransaction)->unexecute();
-		--d->runningTransaction;
+		(*d->transactionContext->runningTransaction)->unexecute();
+		--d->transactionContext->runningTransaction;
 	}
 }
 
 bool GMTransactionManager::canRedo()
 {
 	D(d);
-	return !d->transactions.empty() && d->runningTransaction != --d->transactions.end();
+	return !d->transactionContext->transactions.empty() && d->transactionContext->runningTransaction != --d->transactionContext->transactions.end();
 }
 
 void GMTransactionManager::redo()
@@ -135,7 +150,24 @@ void GMTransactionManager::redo()
 	D(d);
 	if (canRedo())
 	{
-		++d->runningTransaction;
-		(*d->runningTransaction)->execute();
+		++d->transactionContext->runningTransaction;
+		(*d->transactionContext->runningTransaction)->execute();
+	}
+}
+
+GMTransactionManager& GMTransactionManager::getTransactionManager()
+{
+	static HashMap<GMThreadId, GMOwnedPtr<GMTransactionManager>> s_managers;
+	auto tid = GMThread::getCurrentThreadId();
+	auto iter = s_managers.find(GMThread::getCurrentThreadId());
+	if (iter == s_managers.end())
+	{
+		GMTransactionManager* mgr = new GMTransactionManager();
+		s_managers[tid] = GMOwnedPtr<GMTransactionManager>(mgr);
+		return *mgr;
+	}
+	else
+	{
+		return *(iter->second.get());
 	}
 }

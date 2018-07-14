@@ -200,7 +200,6 @@ GM_PRIVATE_OBJECT(GMTypoTextBuffer)
 	bool dirty = false;
 	GMsize_t renderStart = 0;
 	GMsize_t renderEnd = 0;
-	GMTransactionManager transactionMgr;
 };
 
 class GMTypoTextBuffer : public GMObject

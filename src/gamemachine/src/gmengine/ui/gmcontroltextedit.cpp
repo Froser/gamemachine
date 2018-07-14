@@ -631,12 +631,12 @@ bool GMControlTextEdit::onChar(GMSystemCharEvent* event)
 	case GMFunctionCharacter_Ctrl_W:
 	case GMFunctionCharacter_Ctrl_Y:
 	{
-		//d->buffer->redo();
+		redo();
 		return true;
 	}
 	case GMFunctionCharacter_Ctrl_Z:
 	{
-		//d->buffer->undo();
+		undo();
 		return true;
 	}
 	case GMFunctionCharacter_Ctrl_LeftBracket:
@@ -816,6 +816,34 @@ const GMString& GMControlTextEdit::getText() GM_NOEXCEPT
 	return d->buffer->getBuffer();
 }
 
+bool GMControlTextEdit::canUndo() GM_NOEXCEPT
+{
+	D(d);
+	GMWeakTransaction st(&d->transactionContext);
+	return st.getManager()->canUndo();
+}
+
+void GMControlTextEdit::undo()
+{
+	D(d);
+	GMWeakTransaction st(&d->transactionContext);
+	st.getManager()->undo();
+}
+
+bool GMControlTextEdit::canRedo() GM_NOEXCEPT
+{
+	D(d);
+	GMWeakTransaction st(&d->transactionContext);
+	return st.getManager()->canRedo();
+}
+
+void GMControlTextEdit::redo()
+{
+	D(d);
+	GMWeakTransaction st(&d->transactionContext);
+	st.getManager()->redo();
+}
+
 void GMControlTextEdit::createBufferTypoEngineIfNotExist()
 {
 	D(d);
@@ -925,6 +953,7 @@ void GMControlTextEdit::moveCaret(bool next, bool newItem, bool select)
 void GMControlTextEdit::deleteSelectionText()
 {
 	D(d);
+	GMScopeTransaction st(&d->transactionContext);
 	GMint firstCp = Min(d->cp, d->selectionStartCP);
 	GMint lastCp = Max(d->cp, d->selectionStartCP);
 	placeCaret(firstCp);

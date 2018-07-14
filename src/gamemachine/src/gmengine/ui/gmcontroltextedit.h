@@ -2,6 +2,8 @@
 #define __GMCONTROLTEXTEDIT_H__
 #include <gmcommon.h>
 #include <gmcontrols.h>
+#include <gmtransaction.h>
+
 BEGIN_NS
 
 class GMTypoTextBuffer;
@@ -19,6 +21,7 @@ GM_PRIVATE_OBJECT(GMControlTextEdit)
 	GMStyle textStyle;
 	GMOwnedPtr<GMTypoTextBuffer> buffer;
 	GMOwnedPtr<GMControlBorder> borderControl;
+	GMTransactionContext transactionContext;
 	GMint borderWidth = 5;
 	GMfloat lastBlink = 0;
 	GMfloat deltaBlink = .5f;
@@ -77,6 +80,10 @@ protected:
 
 public:
 	const GMString& getText() GM_NOEXCEPT;
+	bool canUndo() GM_NOEXCEPT;
+	void undo();
+	bool canRedo() GM_NOEXCEPT;
+	void redo();
 
 protected:
 	virtual void renderCaret(GMint firstX, GMint caretX);
