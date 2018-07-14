@@ -998,6 +998,7 @@ void GMControlTextEdit::copyToClipboard()
 void GMControlTextEdit::pasteFromClipboard()
 {
 	D(d);
+	GMScopeTransaction(&d->transactionContext);
 	deleteSelectionText();
 	GMBuffer clipboardBuffer = GMClipboard::getData(GMClipboardMIME::UnicodeText);
 	GMString string(reinterpret_cast<GMwchar*>(clipboardBuffer.buffer));
@@ -1076,6 +1077,7 @@ void GMControlTextEdit::insertCharacter(GMwchar ch)
 	if (ch == '\r' || ch == '\n') //吞掉换行
 		return;
 
+	GMScopeTransaction(&d->transactionContext);
 	// 使光标出现在视线范围
 	placeCaret(d->cp, true);
 
