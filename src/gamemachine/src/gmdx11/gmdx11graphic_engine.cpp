@@ -188,7 +188,7 @@ void GMDx11GraphicEngine::initShaders(const IRenderContext* context)
 	// 读取着色器
 	if (!getShaderLoadCallback())
 	{
-		gm_error("You must specify a IShaderLoadCallback");
+		gm_error(gm_dbg_wrap("You must specify a IShaderLoadCallback"));
 		GM_ASSERT(false);
 		return;
 	}

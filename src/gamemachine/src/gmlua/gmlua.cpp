@@ -307,7 +307,7 @@ bool GMLua::popTable(GMObject& obj, GMint index)
 
 	if (!lua_istable(L, index))
 	{
-		gm_error("GMLua (getTable): lua object type is {0}. Table is expected.", { lua_typename(L, lua_type(L, index)) });
+		gm_error(gm_dbg_wrap("GMLua::popTable: lua object type is {0}. Table is expected."), lua_typename(L, lua_type(L, index)));
 		return false;
 	}
 
@@ -465,7 +465,7 @@ void GMLua::push(const GMVariant& var)
 	}
 	else
 	{
-		gm_error(L"GMLua (push): variant type not supported");
+		gm_error(gm_dbg_wrap("GMLua (push): variant type not supported"));
 		GM_ASSERT(false);
 	}
 }
@@ -545,6 +545,6 @@ GMVariant GMLua::getTop()
 		return GMString(lua_tostring(L, -1));
 	if (lua_isboolean(L, -1))
 		return lua_toboolean(L, -1) ? true : false;
-	gm_error(L"GMLua (pop): type not supported");
+	gm_error(gm_dbg_wrap("GMLua (pop): type not supported"));
 	return GMVariant();
 }

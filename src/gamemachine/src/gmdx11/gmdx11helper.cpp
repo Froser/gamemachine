@@ -49,12 +49,12 @@ IShaderProgram* GMDx11Helper::GMLoadDx11Shader(
 			void* ptr = errorMessage->GetBufferPointer();
 			size_t sz = errorMessage->GetBufferSize();
 			char* t = ((char*)ptr);
-			gm_error(L"Error in Buf: {0}", { t });
+			gm_error(gm_dbg_wrap("Error in Buf: {0}"), t);
 			GM_ASSERT(false);
 		}
 		else
 		{
-			gm_error(L"Cannot find shader file {0}", { path });
+			gm_error(gm_dbg_wrap("Cannot find shader file {0}"), path);
 			GM_ASSERT(false);
 		}
 		return nullptr;

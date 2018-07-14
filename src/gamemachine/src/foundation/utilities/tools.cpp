@@ -304,7 +304,7 @@ bool Bitset::init(GMint numberOfBits)
 	d->bits = new unsigned char[d->numBytes];
 	if (!d->bits)
 	{
-		gm_error(L"Unable to allocate space for a Bitset of {0} bits", { GMString(numberOfBits) });
+		gm_error(__FUNCTION__ L" Unable to allocate space for a Bitset of {0} bits", GMString(numberOfBits));
 		return false;
 	}
 

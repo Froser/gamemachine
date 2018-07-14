@@ -176,7 +176,7 @@ GMXInputWrapper::GMXInputWrapper()
 
 	if (!m_module)
 	{
-		gm_warning(L"cannot find xinput dll, xinput disabled.");
+		gm_warning(gm_dbg_wrap("cannot find xinput dll, xinput disabled."));
 		::FreeLibrary(m_module);
 		return;
 	}
@@ -190,7 +190,7 @@ DWORD GMXInputWrapper::XInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState)
 	if (m_xinputGetState)
 		return m_xinputGetState(dwUserIndex, pState);
 	else
-		gm_warning(L"cannot invoke XInputGetState");
+		gm_warning(gm_dbg_wrap("cannot invoke XInputGetState"));
 	return ERROR_DLL_INIT_FAILED;
 }
 
@@ -199,7 +199,7 @@ DWORD GMXInputWrapper::XInputSetState(DWORD dwUserIndex, XINPUT_VIBRATION* pVibr
 	if (m_xinputSetState)
 		return m_xinputSetState(dwUserIndex, pVibration);
 	else
-		gm_warning(L"cannot invoke XInputGetState");
+		gm_warning(gm_dbg_wrap("cannot invoke XInputGetState"));
 	return ERROR_DLL_INIT_FAILED;
 }
 

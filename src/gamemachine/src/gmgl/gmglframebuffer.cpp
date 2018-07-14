@@ -39,7 +39,7 @@ public:
 		{
 			format = GL_RGBA8;
 			GM_ASSERT(!"Unsupported format.");
-			gm_error("Unsupported format.");
+			gm_error(gm_dbg_wrap("Unsupported format."));
 		}
 
 		db->target = GL_TEXTURE_2D;
@@ -219,7 +219,7 @@ void GMGLFramebuffers::unbind()
 	if (currentFramebuffers != this)
 	{
 		GM_ASSERT(false);
-		gm_error("Cannot unbind framebuffer because current framebuffer isn't this framebuffer.");
+		gm_error(gm_dbg_wrap("Cannot unbind framebuffer because current framebuffer isn't this framebuffer."));
 	}
 	else
 	{
@@ -302,7 +302,7 @@ void GMGLFramebuffers::createFramebuffers()
 		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		if (status != GL_FRAMEBUFFER_COMPLETE)
 		{
-			gm_error("FB incomplete error, status: {0}\n", { GMString(static_cast<GMint>(status)) });
+			gm_error(gm_dbg_wrap("GMGLFramebuffers::createFramebuffers: FB incomplete error, status: {0}"), GMString(static_cast<GMint>(status)));
 			GM_ASSERT(false);
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			return;

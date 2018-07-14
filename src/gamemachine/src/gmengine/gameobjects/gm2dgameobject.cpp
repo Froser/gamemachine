@@ -120,7 +120,7 @@ void GMTextGameObject::setColor(const GMVec4& color)
 	D(d);
 	if (d->colorType != GMTextColorType::Plain)
 	{
-		gm_error("Please set color type to GMTextColorType::Plain before you set color. Otherwise it won't work.");
+		gm_error(gm_dbg_wrap("Please set color type to GMTextColorType::Plain before you set color. Otherwise it won't work."));
 		GM_ASSERT(false);
 	}
 

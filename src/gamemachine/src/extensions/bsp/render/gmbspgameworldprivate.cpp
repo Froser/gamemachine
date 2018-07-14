@@ -27,7 +27,7 @@ namespace
 	void import_info_player_deathmatch(const GMBSPEntity& entity, GMBSPGameWorld* world)
 	{
 		static bool created = false; //TODO
-		gm_info(L"found playerstart");
+		gm_info(gm_dbg_wrap("found playerstart"));
 
 		if (created)
 			return;

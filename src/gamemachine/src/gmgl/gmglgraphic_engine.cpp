@@ -31,15 +31,15 @@ extern "C"
 		{
 			if (severity == GL_DEBUG_SEVERITY_MEDIUM || severity == GL_DEBUG_SEVERITY_HIGH)
 			{
-				gm_error("GL CALLBACK: {0} type = {1}, severity = {2}, message = {3}\n",
-					{ (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
-					GMString(static_cast<GMint>(type)), GMString(static_cast<GMint>(severity)), message });
+				gm_error(gm_dbg_wrap("GL CALLBACK: {0} type = {1}, severity = {2}, message = {3}"),
+					(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+					GMString(static_cast<GMint>(type)), GMString(static_cast<GMint>(severity)), message);
 			}
 			else if (severity == GL_DEBUG_SEVERITY_LOW)
 			{
-				gm_warning("GL CALLBACK: {0} type = {1}, severity = {2}, message = {3}\n",
-				{ (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
-					GMString(static_cast<GMint>(type)), GMString(static_cast<GMint>(severity)), message });
+				gm_warning(gm_dbg_wrap("GL CALLBACK: {0} type = {1}, severity = {2}, message = {3}"),
+				(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+					GMString(static_cast<GMint>(type)), GMString(static_cast<GMint>(severity)), message);
 			}
 		}
 	}
@@ -76,7 +76,7 @@ void GMGLGraphicEngine::installShaders()
 	D_BASE(d, Base);
 	if (!getShaderLoadCallback())
 	{
-		gm_error("You must specify a IShaderLoadCallback");
+		gm_error(gm_dbg_wrap("You must specify a IShaderLoadCallback"));
 		GM_ASSERT(false);
 		return;
 	}
@@ -327,7 +327,7 @@ void GMGLUtility::blendFunc(
 			break;
 		default:
 			ops[i] = GL_FUNC_ADD;
-			gm_error(L"Invalid blend op.");
+			gm_error(gm_dbg_wrap("Invalid blend op."));
 		}
 	}
 	glBlendEquationSeparate(ops[0], ops[1]);

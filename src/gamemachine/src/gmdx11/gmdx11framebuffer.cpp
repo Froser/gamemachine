@@ -103,7 +103,7 @@ void GMDx11FramebufferTexture::init()
 	{
 		format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		GM_ASSERT(!"Unsupported format.");
-		gm_error("Unsupported format.");
+		gm_error(gm_dbg_wrap("Unsupported format."));
 	}
 
 	const GMWindowStates& windowStates = db->context->getWindow()->getWindowStates();
@@ -302,7 +302,7 @@ void GMDx11Framebuffers::unbind()
 	if (currentFramebuffers != this)
 	{
 		GM_ASSERT(false);
-		gm_error("Cannot unbind framebuffer because current framebuffer isn't this framebuffer.");
+		gm_error(gm_dbg_wrap("Cannot unbind framebuffer because current framebuffer isn't this framebuffer."));
 	}
 	else
 	{

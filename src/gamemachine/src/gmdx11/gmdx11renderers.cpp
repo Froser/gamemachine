@@ -132,7 +132,7 @@ namespace
 		else
 		{
 			GM_ASSERT(false);
-			gm_error(L"Invalid blend op");
+			gm_error(gm_dbg_wrap("Invalid blend op"));
 			blendOp = D3D11_BLEND_OP_ADD;
 		}
 		return blendOp;
@@ -1113,7 +1113,7 @@ void GMDx11Renderer_Filter::setHDR(IShaderProgram* shaderProgram)
 	else
 	{
 		GM_ASSERT(false);
-		gm_warning("Invalid tonemapping.");
+		gm_warning(gm_dbg_wrap("Invalid tonemapping."));
 	}
 }
 

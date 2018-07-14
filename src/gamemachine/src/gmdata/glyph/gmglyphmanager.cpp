@@ -89,7 +89,7 @@ GMFontHandle GMGlyphManager::addFontByFullName(const GMString& fontFullName)
 		d->fonts.push_back(font);
 		return d->fonts.size() - 1;
 	}
-	gm_error(L"warning: load font failed.");
+	gm_error(gm_dbg_wrap("load font failed."));
 	return GMInvalidFontHandle;
 }
 
@@ -156,7 +156,7 @@ const GMGlyphInfo& GMGlyphManager::createChar(GMwchar c, GMFontSizePt fontSize, 
 		d->cursor_u = 0;
 		if (d->cursor_v + bitmapGlyph->bitmap.rows > CANVAS_HEIGHT)
 		{
-			gm_error(L"no texture space for glyph!");
+			gm_error(gm_dbg_wrap("no texture space for glyph!"));
 			GM_ASSERT(false);
 			// 释放资源
 			FT_Done_Glyph(glyph);

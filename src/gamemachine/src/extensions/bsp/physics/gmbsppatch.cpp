@@ -452,7 +452,7 @@ namespace
 		}
 
 		// should never happen
-		gm_warning(L"WARNING: gridPlane unresolvable\n");
+		gm_warning(gm_dbg_wrap("WARNING: gridPlane unresolvable"));
 		return -1;
 	}
 
@@ -514,7 +514,7 @@ namespace
 
 		}
 
-		gm_error(L"edgePlaneNum: bad k");
+		gm_error(gm_dbg_wrap("edgePlaneNum: bad k"));
 		return -1;
 	}
 
@@ -566,7 +566,7 @@ namespace
 			numPoints = 3;
 			break;
 		default:
-			gm_error(L"setBorderInward: bad parameter");
+			gm_error(gm_dbg_wrap("setBorderInward: bad parameter"));
 			numPoints = 0;
 			break;
 		}
@@ -605,7 +605,7 @@ namespace
 			else
 			{
 				// bisecting side border
-				gm_error(L"WARNING: setBorderInward: mixed plane sides");
+				gm_error(gm_dbg_wrap("WARNING: setBorderInward: mixed plane sides"));
 				facet->borderInward[k] = false;
 			}
 		}
@@ -634,7 +634,7 @@ namespace
 			}
 		}
 		if (x == -1)
-			gm_error(L"baseWindingForPlane: no axis found");
+			gm_error(gm_dbg_wrap("baseWindingForPlane: no axis found"));
 
 		// 找到向上轴，openGL、Dx中y坐标轴表示向上
 		vup = Zero<GMVec3>();
@@ -871,7 +871,7 @@ namespace
 
 				if (i == facet->numBorders)
 				{
-					if (facet->numBorders > 4 + 6 + 16) gm_error(L"ERROR: too many bevels\n");
+					if (facet->numBorders > 4 + 6 + 16) gm_error(gm_dbg_wrap("ERROR: too many bevels"));
 					facet->borderPlanes[facet->numBorders] = findPlane(context, plane, &flipped);
 					facet->borderNoAdjust[facet->numBorders] = 0;
 					facet->borderInward[facet->numBorders] = flipped;
@@ -949,14 +949,14 @@ namespace
 					if (i == facet->numBorders)
 					{
 						if (facet->numBorders > 4 + 6 + 16)
-							gm_error(L"ERROR: too many bevels\n");
+							gm_error(gm_dbg_wrap("ERROR: too many bevels"));
 
 						facet->borderPlanes[facet->numBorders] = findPlane(context, plane, &flipped);
 
 						for (k = 0; k < facet->numBorders; k++)
 						{
-							if (facet->borderPlanes[facet->numBorders] ==
-								facet->borderPlanes[k]) gm_warning(L"WARNING: bevel plane already used\n");
+							if (facet->borderPlanes[facet->numBorders] == facet->borderPlanes[k])
+								gm_warning(gm_dbg_wrap("WARNING: bevel plane already used"));
 						}
 
 						facet->borderNoAdjust[facet->numBorders] = 0;
@@ -968,7 +968,7 @@ namespace
 
 						if (!chopWindingInPlace(w2, newplane, 0.1f))
 						{
-							gm_warning(L"WARNING: addFacetBevels... invalid bevel");
+							gm_warning(gm_dbg_wrap("WARNING: addFacetBevels... invalid bevel"));
 							continue;
 						}
 						//
@@ -1211,14 +1211,14 @@ void GMBSPPatch::generatePatchCollide(GMint index, GMint width, GMint height, co
 
 	if (width <= 2 || height <= 2 || !points)
 	{
-		gm_error(L"generatePatchFacets: bad parameters.");
+		gm_error(gm_dbg_wrap("generatePatchFacets: bad parameters."));
 	}
 
 	if (!(width & 1) || !(height & 1))
-		gm_error(L"generatePatchFacets: even sizes are invalid for quadratic meshes");
+		gm_error(gm_dbg_wrap("generatePatchFacets: even sizes are invalid for quadratic meshes"));
 
 	if (width > MAX_GRID_SIZE || height > MAX_GRID_SIZE)
-		gm_error(L"generatePatchFacets: source is > MAX_GRID_SIZE");
+		gm_error(gm_dbg_wrap("generatePatchFacets: source is > MAX_GRID_SIZE"));
 
 	// build a grid
 	grid.width = width;

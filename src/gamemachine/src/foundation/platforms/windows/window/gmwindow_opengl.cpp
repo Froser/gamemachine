@@ -234,14 +234,14 @@ void GMWindow_OpenGL::dispose()
 	if (d->hRC)
 	{
 		if (!wglDeleteContext(d->hRC))
-			gm_error(L"release Rendering Context failed.");
+			gm_error(gm_dbg_wrap("release Rendering Context failed."));
 
 		d->hRC = 0;
 	}
 
 	if (d->hDC && !::ReleaseDC(wnd, d->hDC))
 	{
-		gm_error(L"release of Device Context failed.");
+		gm_error(gm_dbg_wrap("release of Device Context failed."));
 		d->hDC = 0;
 	}
 }

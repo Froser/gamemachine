@@ -50,19 +50,42 @@ public:
 		return nullptr;
 	}
 
-public:
-	void info(const GMString& string, const std::initializer_list<GMString>& arguments = {});
-	void warning(const GMString& string, const std::initializer_list<GMString>& arguments = {});
-	void debug(const GMString& string, const std::initializer_list<GMString>& arguments = {});
-	void error(const GMString& string, const std::initializer_list<GMString>& arguments = {});
-
 private:
+	void info(const GMString& string, const std::initializer_list<GMString>& arguments);
+	void warning(const GMString& string, const std::initializer_list<GMString>& arguments);
+	void debug(const GMString& string, const std::initializer_list<GMString>& arguments);
+	void error(const GMString& string, const std::initializer_list<GMString>& arguments);
 	void print(
 		GMString string,
 		const GMString& prefix,
 		IDebugOutput::Method method,
 		const std::initializer_list<GMString>& arguments
 	);
+
+public:
+	template <typename... T>
+	void info(const GMString& string, T... args)
+	{
+		info(string, { args... } );
+	}
+
+	template <typename... T>
+	void error(const GMString& string, T... args)
+	{
+		error(string, { args... });
+	}
+
+	template <typename... T>
+	void warning(const GMString& string, T... args)
+	{
+		warning(string, { args... });
+	}
+
+	template <typename... T>
+	void debug(const GMString& string, T... args)
+	{
+		debug(string, { args... });
+	}
 };
 
 // debug macros:
@@ -70,6 +93,12 @@ private:
 #define gm_error gm::GMDebugger::instance().error
 #define gm_warning gm::GMDebugger::instance().warning
 #define gm_debug gm::GMDebugger::instance().debug
+
+#if _DEBUG
+#define gm_dbg_wrap(str) __FILE__ ": " __FUNCTION__ ": " ##str
+#else
+#define gm_dbg_wrap(str) __FUNCTION__ ": " ##str
+#endif
 
 // hooks
 typedef GMsize_t CallbackType;

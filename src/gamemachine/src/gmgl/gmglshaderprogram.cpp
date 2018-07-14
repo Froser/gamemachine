@@ -174,8 +174,8 @@ void GMGLShaderProgram::load()
 				iter++;
 			} while (iter.hasNextLine());
 
-			gm_error("Shader source: \n{0}", { report });
-			gm_error("Shader compilation failed: {0}", { log });
+			gm_error(gm_dbg_wrap("GMGLShaderProgram::load: Shader source: \n{0}"), report);
+			gm_error(gm_dbg_wrap("GMGLShaderProgram::load: Shader compilation failed: {0}"), log);
 			GM_ASSERT(false);
 			GMMessage crashMsg(GameMachineMessageType::CrashDown);
 			GM.postMessage(crashMsg);
@@ -283,7 +283,7 @@ void GMGLShaderProgram::expandInclude(const GMString& workingDir, const GMString
 	}
 	else
 	{
-		gm_warning("GL shader '{0}' not found, use empty file instead!", { include });
+		gm_warning(gm_dbg_wrap("GMGLShaderProgram::expandInclude: GL shader '{0}' not found, use empty file instead!"), include);
 	}
 }
 

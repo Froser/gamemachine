@@ -62,7 +62,7 @@ namespace
 		}
 
 		GM_ASSERT(false);
-		gm_error("wrong surfaceparm {0}", { p });
+		gm_error(gm_dbg_wrap("wrong surfaceparm {0}"), p);
 		return 0;
 	}
 
@@ -77,16 +77,16 @@ namespace
 		if (p == L"GMS_DST_COLOR")
 			return GMS_BlendFunc::ONE;
 
-		gm_warning("Unknown blendFunc {0} treated as GMS_ZERO", { p });
+		gm_warning(gm_dbg_wrap("Unknown blendFunc {0} treated as GMS_ZERO"), p);
 		return GMS_BlendFunc::ZERO;
 	}
 
 	void loadImage(const GMString& filename, const GMBuffer* buf, OUT GMImage** image)
 	{
 		if (GMImageReader::load(buf->buffer, buf->size, image))
-			gm_info(L"loaded texture {0} from shader", { filename });
+			gm_info(gm_dbg_wrap("loaded texture {0} from shader"), filename);
 		else
-			gm_error(L"texture {0} not found", { filename });
+			gm_error(gm_dbg_wrap("texture {0} not found"), filename);
 	}
 
 	void readTernaryFloatsFromString(const char* str, GMfloat vec[3])
@@ -138,7 +138,7 @@ ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const GMString& name)
 		GMBuffer buf;
 		if (!GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Textures, name, &buf, &fn))
 		{
-			gm_warning(L"file {0} not found.", { fn });
+			gm_warning(gm_dbg_wrap("file {0} not found."), fn);
 			return nullptr;
 		}
 
@@ -198,7 +198,7 @@ void GMBSPShaderLoader::parse(const char* buffer)
 	TiXmlDocument* doc = new TiXmlDocument();
 	if (doc->Parse(buffer) != 0)
 	{
-		gm_error("xml load error at {0}: {1}", { GMString(doc->ErrorRow()), doc->ErrorDesc() });
+		gm_error(gm_dbg_wrap("xml load error at {0}: {1}"), GMString(doc->ErrorRow()), doc->ErrorDesc());
 		delete doc;
 		return;
 	}
@@ -210,7 +210,7 @@ void GMBSPShaderLoader::parse(const char* buffer)
 	{
 		TiXmlElement* elem = it;
 		if (!GMString::stringEquals(elem->Value(), "item"))
-			gm_warning(L"First node must be 'item'.");
+			gm_warning(gm_dbg_wrap("First node must be 'item'."));
 
 		const char* name = elem->Attribute("name");
 		const char* ref = elem->Attribute("ref");
@@ -285,7 +285,7 @@ void GMBSPShaderLoader::parse_cull(GMShader& shader, TiXmlElement* elem)
 	else if (GMString::stringEquals(text, "cull"))
 		shader.setCull(GMS_Cull::CULL);
 	else
-		gm_error("wrong cull param {0}", { text });
+		gm_error(gm_dbg_wrap("wrong cull param {0}"), text);
 }
 
 void GMBSPShaderLoader::parse_blendFunc(GMShader& shader, TiXmlElement* elem)
@@ -388,11 +388,11 @@ void GMBSPShaderLoader::parse_map_fromLightmap(GMShader& shader, TiXmlElement* e
 			if (tex)
 			{
 				sampler->addFrame(tex);
-				gm_info(L"found map from lightmap {0}", { GMString(d->lightmapId) });
+				gm_info(gm_dbg_wrap("found map from lightmap {0}"), GMString(d->lightmapId));
 			}
 			else
 			{
-				gm_error(L"lightmap not found: {1}", { GMString(d->lightmapId) });
+				gm_error(gm_dbg_wrap("lightmap not found: {1}"), GMString(d->lightmapId));
 			}
 		}
 	}
@@ -425,7 +425,7 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, TiXmlElement* elem)
 	const char* type = elem->Attribute("type");
 	if (!type)
 	{
-		gm_error(L"light type missing.");
+		gm_error(gm_dbg_wrap("light type missing."));
 		return;
 	}
 
@@ -435,7 +435,7 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, TiXmlElement* elem)
 	const char* color = elem->Attribute("color");
 	if (!color)
 	{
-		gm_error(L"light color missing.");
+		gm_error(gm_dbg_wrap("light color missing."));
 		return;
 	}
 
@@ -449,7 +449,7 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, TiXmlElement* elem)
 		const char* position = elem->Attribute("position");
 		if (!position)
 		{
-			gm_error(L"specular light position missing.");
+			gm_error(gm_dbg_wrap("specular light position missing."));
 			return;
 		}
 		GMScanner s(color);
@@ -543,7 +543,7 @@ void GMBSPShaderLoader::parse_map_tcMod(GMShader& shader, TiXmlElement* elem)
 			if (tcModNum == MAX_TEX_MOD)
 			{
 				if (!type.isEmpty())
-					gm_warning(L"warning: you have tcMods more than {0}, please increase MAX_TEX_MOD", { GMString(MAX_TEX_MOD) });
+					gm_warning(gm_dbg_wrap("warning: you have tcMods more than {0}, please increase MAX_TEX_MOD"), GMString(MAX_TEX_MOD));
 				break;
 			}
 			currentMod = &shader.getTextureList().getTextureSampler(GMTextureType::Ambient).getTexMod(tcModNum);
