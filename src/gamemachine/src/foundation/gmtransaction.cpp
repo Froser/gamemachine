@@ -16,6 +16,20 @@ void GMTransaction::addAtom(AUTORELEASE ITransactionAtom* atom)
 	d->atoms.push_back(GMOwnedPtr<ITransactionAtom>(atom));
 }
 
+bool GMTransaction::removeAtom(ITransactionAtom* atom)
+{
+	D(d);
+	for (auto iter = d->atoms.cbegin(); iter != d->atoms.cend(); ++iter)
+	{
+		if ((*iter).get() == atom)
+		{
+			iter = d->atoms.erase(iter);
+			return true;
+		}
+	}
+	return false;
+}
+
 void GMTransaction::execute()
 {
 	D(d);
@@ -109,18 +123,33 @@ void GMTransactionManager::abortTransaction()
 	d->transactionContext->currentTransaction->clear();
 }
 
-void GMTransactionManager::addAtom(ITransactionAtom* atom)
+ITransactionAtom* GMTransactionManager::addAtom(ITransactionAtom* atom)
 {
 	D(d);
 	// 如果外部没有调用beginTransaction，则不生效
 	if (d->nest <= 0)
-		return;
+		return nullptr;
 
 	// 外部没有传入上下文，不生效
 	if (!d->transactionContext)
-		return;
+		return nullptr;
 
 	d->transactionContext->currentTransaction->addAtom(atom);
+	return atom;
+}
+
+bool GMTransactionManager::removeAtom(ITransactionAtom* atom)
+{
+	D(d);
+	// 如果外部没有调用beginTransaction，则不生效
+	if (d->nest <= 0)
+		return false;
+
+	// 外部没有传入上下文，不生效
+	if (!d->transactionContext)
+		return false;
+
+	return d->transactionContext->currentTransaction->removeAtom(atom);
 }
 
 bool GMTransactionManager::canUndo()

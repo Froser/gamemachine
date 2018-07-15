@@ -98,7 +98,7 @@ protected:
 	void createBufferTypoEngineIfNotExist();
 	void blinkCaret(GMint firstX, GMint caretX);
 	void moveCaret(bool next, bool newItem, bool select);
-	void deleteSelectionText();
+	bool deleteSelectionText();
 	void selectAll();
 	void resetCaretBlink();
 	void copyToClipboard();

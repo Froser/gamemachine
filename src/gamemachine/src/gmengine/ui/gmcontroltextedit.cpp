@@ -754,20 +754,33 @@ bool GMControlTextEdit::onKey_HomeEnd(GMSystemKeyEvent* event)
 bool GMControlTextEdit::onKey_Delete(GMSystemKeyEvent* event)
 {
 	D(d);
+	GMScopeTransaction st(&d->transactionContext);
+	GMint firstCp = Min(d->cp, d->selectionStartCP);
+	GMint lastCp = Max(d->cp, d->selectionStartCP);
+	ITransactionAtom* atom = st.getManager()->addAtom(new GMControlTextControlTransactionAtom(this, firstCp, firstCp, d->cp, d->selectionStartCP));
 	if (d->cp != d->selectionStartCP)
 	{
 		// 删除一个选区
-		deleteSelectionText();
-		emit(textChanged);
+		if (deleteSelectionText())
+		{
+			emit(textChanged);
+		}
+		else
+		{
+			st.getManager()->removeAtom(atom);
+		}
 	}
 	else
 	{
 		// 要考虑删除\r\n的情况，如果删除的是\r，且之后为\n，则一并删除
-
 		if (d->buffer->removeChar(d->cp))
 		{
 			d->buffer->analyze(d->cp);
 			emit(textChanged);
+		}
+		else
+		{
+			st.getManager()->removeAtom(atom);
 		}
 	}
 	resetCaretBlink();
@@ -950,19 +963,29 @@ void GMControlTextEdit::moveCaret(bool next, bool newItem, bool select)
 	resetCaretBlink();
 }
 
-void GMControlTextEdit::deleteSelectionText()
+bool GMControlTextEdit::deleteSelectionText()
 {
 	D(d);
 	GMScopeTransaction st(&d->transactionContext);
 	GMint firstCp = Min(d->cp, d->selectionStartCP);
 	GMint lastCp = Max(d->cp, d->selectionStartCP);
-	placeCaret(firstCp);
-	d->selectionStartCP = d->cp;
-	if (d->buffer->removeChars(firstCp, lastCp))
+	if (firstCp < lastCp)
 	{
-		moveFirstVisibleCp(lastCp - firstCp);
-		d->buffer->analyze(firstCp);
+		ITransactionAtom* atom = st.getManager()->addAtom(new GMControlTextControlTransactionAtom(this, firstCp, firstCp, d->cp, d->selectionStartCP));
+		placeCaret(firstCp);
+		d->selectionStartCP = d->cp;
+		if (d->buffer->removeChars(firstCp, lastCp))
+		{
+			moveFirstVisibleCp(lastCp - firstCp);
+			d->buffer->analyze(firstCp);
+			return true;
+		}
+		else
+		{
+			st.getManager()->removeAtom(atom);
+		}
 	}
+	return false;
 }
 
 void GMControlTextEdit::selectAll()
@@ -998,7 +1021,7 @@ void GMControlTextEdit::copyToClipboard()
 void GMControlTextEdit::pasteFromClipboard()
 {
 	D(d);
-	GMScopeTransaction(&d->transactionContext);
+	GMScopeTransaction st(&d->transactionContext);
 	deleteSelectionText();
 	GMBuffer clipboardBuffer = GMClipboard::getData(GMClipboardMIME::UnicodeText);
 	GMString string(reinterpret_cast<GMwchar*>(clipboardBuffer.buffer));
@@ -1077,7 +1100,10 @@ void GMControlTextEdit::insertCharacter(GMwchar ch)
 	if (ch == '\r' || ch == '\n') //吞掉换行
 		return;
 
-	GMScopeTransaction(&d->transactionContext);
+	GMScopeTransaction st(&d->transactionContext);
+	GMint minCP = Min(d->cp, d->selectionStartCP);
+	st.getManager()->addAtom(new GMControlTextControlTransactionAtom(this, minCP + 1, minCP + 1, d->cp, d->selectionStartCP));
+
 	// 使光标出现在视线范围
 	placeCaret(d->cp, true);
 

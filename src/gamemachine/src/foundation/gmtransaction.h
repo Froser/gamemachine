@@ -24,6 +24,7 @@ public:
 public:
 	void clear();
 	void addAtom(AUTORELEASE ITransactionAtom* atom);
+	bool removeAtom(ITransactionAtom* atom);
 	void execute();
 	void unexecute();
 
@@ -67,7 +68,8 @@ public:
 	void endTransaction();
 	bool commitTransaction();
 	void abortTransaction();
-	void addAtom(AUTORELEASE ITransactionAtom* atom);
+	ITransactionAtom* addAtom(AUTORELEASE ITransactionAtom* atom);
+	bool removeAtom(ITransactionAtom* atom);
 
 public:
 	bool canUndo();
