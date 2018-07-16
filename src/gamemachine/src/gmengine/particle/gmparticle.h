@@ -3,7 +3,7 @@
 #include <gmcommon.h>
 BEGIN_NS
 
-enum class GMEmitterType
+enum class GMParticleEmitterType
 {
 	Gravity,
 	Radius,
@@ -40,7 +40,7 @@ GM_PRIVATE_OBJECT(GMParticleDescription)
 	GMint particleCount; //!< 粒子数目
 	GMfloat emitRate; //!< 每秒发射速率
 	GMfloat duration; //!< 发射时间
-	GMEmitterType emitterType = GMEmitterType::Gravity;
+	GMParticleEmitterType emitterType = GMParticleEmitterType::Gravity;
 	GMParticleMotionMode motionMode = GMParticleMotionMode::Free;
 	GMfloat life = 0;
 	GMfloat lifeV = 0;
@@ -78,7 +78,7 @@ class GMParticleDescription : public GMObject
 	GM_DECLARE_PROPERTY(ParticleCount, particleCount, GMint)
 	GM_DECLARE_PROPERTY(EmitRate, emitRate, GMfloat)
 	GM_DECLARE_PROPERTY(Duration, duration, GMfloat)
-	GM_DECLARE_PROPERTY(EmitterType, emitterType, GMEmitterType)
+	GM_DECLARE_PROPERTY(EmitterType, emitterType, GMParticleEmitterType)
 	GM_DECLARE_PROPERTY(MotionMode, motionMode, GMParticleMotionMode)
 	GM_DECLARE_PROPERTY(Life, life, GMfloat)
 	GM_DECLARE_PROPERTY(LifeV, lifeV, GMfloat)
@@ -157,8 +157,36 @@ public:
 	GMParticle() = default;
 };
 
+GM_PRIVATE_OBJECT(GMParticleEmitter)
+{
+	GMVec3 emitPosition = Zero<GMVec3>();
+	GMVec3 emitPositionV = Zero<GMVec3>();
+	GMVec3 emitAngle = Zero<GMVec3>();
+	GMVec3 emitAngleV = Zero<GMVec3>();
+	GMVec3 emitSpeed = Zero<GMVec3>();
+	GMVec3 emitSpeedV = Zero<GMVec3>();
+	GMint particleCount = 0;
+	GMfloat emitRate = 0;
+	GMfloat duration = 0;
+	GMOwnedPtr<GMParticleEffect> effect;
+};
+
 class GMParticleEmitter : public GMObject
 {
+	GM_DECLARE_PRIVATE(GMParticleEmitter)
+	GM_DECLARE_PROPERTY(EmitPosition, emitPosition, GMVec3)
+	GM_DECLARE_PROPERTY(EmitPositionV, emitPositionV, GMVec3)
+	GM_DECLARE_PROPERTY(EmitAngle, emitAngle, GMVec3)
+	GM_DECLARE_PROPERTY(EmitAngleV, emitAngleV, GMVec3)
+	GM_DECLARE_PROPERTY(EmitSpeed, emitSpeed, GMVec3)
+	GM_DECLARE_PROPERTY(EmitSpeedV, emitSpeedV, GMVec3)
+	GM_DECLARE_PROPERTY(ParticleCount, particleCount, GMint)
+	GM_DECLARE_PROPERTY(EmitRate, emitRate, GMfloat)
+	GM_DECLARE_PROPERTY(Duration, duration, GMfloat)
+
+public:
+	void setDescription(const GMParticleDescription& desc);
+	void setParticleEffect(GMParticleEffect* effect);
 };
 
 GM_PRIVATE_OBJECT(GMParticleEffect)
@@ -201,6 +229,8 @@ class GMParticleEffect : public GMObject
 	GM_DECLARE_PROPERTY(EndSpin, endSpin, GMfloat)
 	GM_DECLARE_PROPERTY(EndSpinV, endSpinV, GMfloat)
 	GM_DECLARE_PROPERTY(MotionMode, motionMode, GMParticleMotionMode)
+	GM_DECLARE_PROPERTY(GravityMode, gravityMode, GMParticleGravityMode)
+	GM_DECLARE_PROPERTY(RadiusMode, radiusMode, GMParticleRadiusMode)
 
 public:
 	void setParticleDescription(const GMParticleDescription& desc);
@@ -220,6 +250,18 @@ class GMParticleSystem : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMParticleSystem)
 
+public:
+	GMParticleSystem();
+
+public:
+	void setDescription(const GMParticleDescription& desc);
+
+public:
+	inline void setTexture(ITexture* texture) GM_NOEXCEPT
+	{
+		D(d);
+		d->texture = texture;
+	}
 };
 
 GM_PRIVATE_OBJECT(GMParticlePool)
