@@ -923,6 +923,15 @@ void GMControlTextEdit::placeCaret(GMint cp, bool adjustVisibleCP)
 	}
 }
 
+void GMControlTextEdit::placeSelectionStart(GMint selectionStartCP)
+{
+	D(d);
+	GM_ASSERT(selectionStartCP >= 0);
+	if (selectionStartCP > d->buffer->getLength())
+		selectionStartCP = d->buffer->getLength();
+	d->selectionStartCP = selectionStartCP;
+}
+
 void GMControlTextEdit::adjustInsertModeRect(REF GMRect& caretRc, GMint caretX)
 {
 	D(d);
@@ -1102,7 +1111,6 @@ void GMControlTextEdit::insertCharacter(GMwchar ch)
 
 	GMScopeTransaction st(&d->transactionContext);
 	GMint minCP = Min(d->cp, d->selectionStartCP);
-	st.getManager()->addAtom(new GMControlTextControlTransactionAtom(this, minCP + 1, minCP + 1, d->cp, d->selectionStartCP));
 
 	// 使光标出现在视线范围
 	placeCaret(d->cp, true);
@@ -1112,6 +1120,7 @@ void GMControlTextEdit::insertCharacter(GMwchar ch)
 
 	if (!d->insertMode && d->cp < d->buffer->getLength())
 	{
+		st.getManager()->addAtom(new GMControlTextControlTransactionAtom(this, minCP + 1, minCP + 1, d->cp, d->selectionStartCP));
 		d->buffer->setChar(d->cp, ch);
 		placeCaret(d->cp + 1);
 		d->selectionStartCP = d->cp;
@@ -1120,6 +1129,7 @@ void GMControlTextEdit::insertCharacter(GMwchar ch)
 	{
 		if (d->buffer->insertChar(d->cp, ch))
 		{
+			st.getManager()->addAtom(new GMControlTextControlTransactionAtom(this, minCP + 1, minCP + 1, d->cp, d->selectionStartCP));
 			placeCaret(d->cp + 1);
 			d->selectionStartCP = d->cp;
 		}
@@ -1379,6 +1389,9 @@ void GMControlTextArea::pasteFromClipboard()
 void GMControlTextArea::insertCharacter(GMwchar ch)
 {
 	D_BASE(d, Base);
+	GMScopeTransaction st(&d->transactionContext);
+	GMint minCP = Min(d->cp, d->selectionStartCP);
+
 	// 使光标出现在视线范围
 	placeCaret(d->cp, true);
 
@@ -1388,6 +1401,7 @@ void GMControlTextArea::insertCharacter(GMwchar ch)
 	if (!d->insertMode && d->cp < d->buffer->getLength())
 	{
 		d->buffer->setChar(d->cp, ch);
+		st.getManager()->addAtom(new GMControlTextControlTransactionAtom(this, minCP + 1, minCP + 1, d->cp, d->selectionStartCP));
 		placeCaret(d->cp + 1, false);
 		d->selectionStartCP = d->cp;
 	}
@@ -1395,6 +1409,7 @@ void GMControlTextArea::insertCharacter(GMwchar ch)
 	{
 		if (d->buffer->insertChar(d->cp, ch))
 		{
+			st.getManager()->addAtom(new GMControlTextControlTransactionAtom(this, minCP + 1, minCP + 1, d->cp, d->selectionStartCP));
 			placeCaret(d->cp + 1, false);
 			d->selectionStartCP = d->cp;
 		}

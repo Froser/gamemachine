@@ -67,6 +67,7 @@ public:
 	virtual void setText(const GMString& text);
 	virtual void setPadding(GMint x, GMint y);
 	virtual void placeCaret(GMint cP, bool adjustVisibleCP = true);
+	virtual void placeSelectionStart(GMint selectionStartCP);
 
 // 处理特殊按键
 protected:
@@ -140,12 +141,6 @@ public:
 			rc.height + 4
 		};
 		return r;
-	}
-
-	inline void placeSelectionStart(GMint selectionStartCP)
-	{
-		D(d);
-		d->selectionStartCP = selectionStartCP;
 	}
 
 protected:
