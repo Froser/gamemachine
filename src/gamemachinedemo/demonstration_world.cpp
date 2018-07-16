@@ -43,7 +43,7 @@ namespace
 		world->addDemo(L"PBR: 演示PBR渲染。", new Demo_PBR(world));
 		world->addDemo(L"PBR: 演示同时通过Phong模型和PBR模型渲染。", new Demo_Phong_PBR(world));
 		world->addDemo(L"UI控件: 演示使用GameMachine提供的UI控件。", new Demo_Controls(world));
-		world->addDemo(L"LUA: 执行Lua脚本。", new Demo_Lua(world));
+		// world->addDemo(L"LUA: 执行Lua脚本。", new Demo_Lua(world));
 		world->init();
 	}
 }
