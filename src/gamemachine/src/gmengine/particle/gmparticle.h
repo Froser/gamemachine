@@ -157,6 +157,7 @@ public:
 	GMParticle() = default;
 };
 
+class GMParticleEffect;
 GM_PRIVATE_OBJECT(GMParticleEmitter)
 {
 	GMVec3 emitPosition = Zero<GMVec3>();

@@ -195,20 +195,20 @@ bool GMBSPShaderLoader::findItem(const GMString& name, GMint lightmapId, REF GMS
 void GMBSPShaderLoader::parse(const char* buffer)
 {
 	D(d);
-	TiXmlDocument* doc = new TiXmlDocument();
+	GMXMLDocument* doc = new GMXMLDocument();
 	if (doc->Parse(buffer) != 0)
 	{
-		gm_error(gm_dbg_wrap("xml load error at {0}: {1}"), GMString(doc->ErrorRow()), doc->ErrorDesc());
+		gm_error(gm_dbg_wrap("{0}"), GMString(doc->ErrorStr()));
 		delete doc;
 		return;
 	}
 
 	d->shaderDocs.push_back(doc);
-	TiXmlElement* root = doc->RootElement();
-	TiXmlElement* it = root->FirstChildElement();
+	GMXMLElement* root = doc->RootElement();
+	GMXMLElement* it = root->FirstChildElement();
 	for (; it; it = it->NextSiblingElement())
 	{
-		TiXmlElement* elem = it;
+		GMXMLElement* elem = it;
 		if (!GMString::stringEquals(elem->Value(), "item"))
 			gm_warning(gm_dbg_wrap("First node must be 'item'."));
 
@@ -217,7 +217,7 @@ void GMBSPShaderLoader::parse(const char* buffer)
 		// 使用ref，可以引用另外一个item
 		if (ref)
 		{
-			for (TiXmlElement* it = root->FirstChildElement(); it; it = it->NextSiblingElement())
+			for (GMXMLElement* it = root->FirstChildElement(); it; it = it->NextSiblingElement())
 			{
 				if (GMString::stringEquals(ref, it->Attribute("name")))
 				{
@@ -231,7 +231,7 @@ void GMBSPShaderLoader::parse(const char* buffer)
 	}
 }
 
-void GMBSPShaderLoader::parseItem(TiXmlElement* elem, GMint lightmapId, REF GMShader* shaderPtr)
+void GMBSPShaderLoader::parseItem(GMXMLElement* elem, GMint lightmapId, REF GMShader* shaderPtr)
 {
 	D(d);
 	if (!shaderPtr)
@@ -243,7 +243,7 @@ void GMBSPShaderLoader::parseItem(TiXmlElement* elem, GMint lightmapId, REF GMSh
 
 	GMShader& shader = *shaderPtr;
 	shader.getMaterial().ks = shader.getMaterial().kd = GMVec3(0);
-	for (TiXmlElement* it = elem->FirstChildElement(); it; it = it->NextSiblingElement())
+	for (GMXMLElement* it = elem->FirstChildElement(); it; it = it->NextSiblingElement())
 	{
 		BEGIN_PARSE(surfaceparm); // surfaceparm一定要在最先
 		PARSE(cull);
@@ -272,12 +272,12 @@ void GMBSPShaderLoader::parseEnd()
 	d->lightmapId = -1;
 }
 
-void GMBSPShaderLoader::parse_surfaceparm(GMShader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_surfaceparm(GMShader& shader, GMXMLElement* elem)
 {
 	shader.setSurfaceFlag(shader.getSurfaceFlag() | parseSurfaceParm(elem->GetText()));
 }
 
-void GMBSPShaderLoader::parse_cull(GMShader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_cull(GMShader& shader, GMXMLElement* elem)
 {
 	const char* text = elem->GetText();
 	if (GMString::stringEquals(text, "none"))
@@ -288,7 +288,7 @@ void GMBSPShaderLoader::parse_cull(GMShader& shader, TiXmlElement* elem)
 		gm_error(gm_dbg_wrap("wrong cull param {0}"), text);
 }
 
-void GMBSPShaderLoader::parse_blendFunc(GMShader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_blendFunc(GMShader& shader, GMXMLElement* elem)
 {
 	const char* b = elem->GetText();
 	if (b)
@@ -307,14 +307,14 @@ void GMBSPShaderLoader::parse_blendFunc(GMShader& shader, TiXmlElement* elem)
 	}
 }
 
-void GMBSPShaderLoader::parse_animMap(GMShader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_animMap(GMShader& shader, GMXMLElement* elem)
 {
 	D(d);
 	GMTextureSampler* sampler = &shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
 	GMint ms = GMString::parseInt(elem->Attribute("ms"));
 	sampler->setAnimationMs(ms);
 
-	for (TiXmlElement* it = elem->FirstChildElement(); it; it = it->NextSiblingElement())
+	for (GMXMLElement* it = elem->FirstChildElement(); it; it = it->NextSiblingElement())
 	{
 		BEGIN_PARSE(src);
 		END_PARSE;
@@ -322,7 +322,7 @@ void GMBSPShaderLoader::parse_animMap(GMShader& shader, TiXmlElement* elem)
 	parse_map_tcMod(shader, elem);
 }
 
-void GMBSPShaderLoader::parse_src(GMShader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_src(GMShader& shader, GMXMLElement* elem)
 {
 	D(d);
 	GMTextureSampler* sampler = &shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
@@ -331,7 +331,7 @@ void GMBSPShaderLoader::parse_src(GMShader& shader, TiXmlElement* elem)
 		sampler->addFrame(texture);
 }
 
-void GMBSPShaderLoader::parse_clampmap(GMShader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_clampmap(GMShader& shader, GMXMLElement* elem)
 {
 	D(d);
 	GMTextureSampler* sampler = &shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
@@ -350,7 +350,7 @@ void GMBSPShaderLoader::parse_clampmap(GMShader& shader, TiXmlElement* elem)
 	}
 }
 
-void GMBSPShaderLoader::parse_map(GMShader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_map(GMShader& shader, GMXMLElement* elem)
 {
 	D(d);
 	GMTextureSampler* sampler = &shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
@@ -368,7 +368,7 @@ void GMBSPShaderLoader::parse_map(GMShader& shader, TiXmlElement* elem)
 	}
 }
 
-void GMBSPShaderLoader::parse_map_fromLightmap(GMShader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_map_fromLightmap(GMShader& shader, GMXMLElement* elem)
 {
 	D(d);
 	// from "lightmap"
@@ -398,7 +398,7 @@ void GMBSPShaderLoader::parse_map_fromLightmap(GMShader& shader, TiXmlElement* e
 	}
 }
 
-void GMBSPShaderLoader::parse_normalmap(GMShader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_normalmap(GMShader& shader, GMXMLElement* elem)
 {
 	GMTextureSampler* sampler = &shader.getTextureList().getTextureSampler(GMTextureType::NormalMap);
 	ITexture* texture = addTextureToTextureContainer(elem->GetText());
@@ -410,16 +410,16 @@ void GMBSPShaderLoader::parse_normalmap(GMShader& shader, TiXmlElement* elem)
 	}
 }
 
-void GMBSPShaderLoader::parse_lights(GMShader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_lights(GMShader& shader, GMXMLElement* elem)
 {
-	for (TiXmlElement* it = elem->FirstChildElement(); it; it = it->NextSiblingElement())
+	for (GMXMLElement* it = elem->FirstChildElement(); it; it = it->NextSiblingElement())
 	{
 		BEGIN_PARSE(light);
 		END_PARSE;
 	}
 }
 
-void GMBSPShaderLoader::parse_light(GMShader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_light(GMShader& shader, GMXMLElement* elem)
 {
 	D(d);
 	const char* type = elem->Attribute("type");
@@ -503,7 +503,7 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, TiXmlElement* elem)
 	d->world->getContext()->getEngine()->addLight(light);
 }
 
-void GMBSPShaderLoader::parse_map_tcMod(GMShader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_map_tcMod(GMShader& shader, GMXMLElement* elem)
 {
 	D(d);
 	// tcMod <type> <...>

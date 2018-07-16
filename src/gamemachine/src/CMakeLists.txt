@@ -37,6 +37,10 @@ set(SOURCES
 		gmdata/gamepackage/gmgamepackage.cpp
 		gmdata/gamepackage/gmgamepackagehandler.h
 		gmdata/gamepackage/gmgamepackagehandler.cpp
+		gmdata/xml/tinyxml2/tinyxml2.h
+		gmdata/xml/tinyxml2/tinyxml2.cpp
+		gmdata/xml/gmxml.h
+		gmdata/xml/gmxml.cpp
 		gmdata/gmimage.h
 		gmdata/gmimage.cpp
 		gmdata/gmimagebuffer.h
@@ -115,12 +119,6 @@ set(SOURCES
 		gmphysics/gmbullethelper.cpp
 		gmphysics/gmbulletincludes.h
 		gmphysics/gmbulletforward.h
-		foundation/utilities/tinyxml/tinystr.cpp
-		foundation/utilities/tinyxml/tinystr.h
-		foundation/utilities/tinyxml/tinyxml.cpp
-		foundation/utilities/tinyxml/tinyxml.h
-		foundation/utilities/tinyxml/tinyxmlerror.cpp
-		foundation/utilities/tinyxml/tinyxmlparser.cpp
 		foundation/utilities/tools.h
 		foundation/utilities/tools.cpp
 		foundation/utilities/utilities.h

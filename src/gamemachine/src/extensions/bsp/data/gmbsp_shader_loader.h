@@ -2,9 +2,7 @@
 #define __BSP_SHADER_LOADER_H__
 #include <gmcommon.h>
 #include "gmbsp_render.h"
-
-class TiXmlElement;
-class TiXmlDocument;
+#include <gmxml.h>
 
 BEGIN_NS
 // 解析一些纹理配置，如天空、特效、动画等，并加入世界
@@ -15,8 +13,8 @@ GM_PRIVATE_OBJECT(GMBSPShaderLoader)
 	GMString directory;
 	GMBSPGameWorld* world;
 	GMBSPRenderData* bspRender;
-	Map<GMString, TiXmlElement*> items;
-	AlignedVector<TiXmlDocument*> shaderDocs;
+	Map<GMString, GMXMLElement*> items;
+	AlignedVector<GMXMLDocument*> shaderDocs;
 
 	// 纹理编号，从TEXTURE_INDEX_AMBIENT开始
 	GMint lightmapId;
@@ -40,23 +38,23 @@ public:
 private:
 	ITexture* addTextureToTextureContainer(const GMString& name);
 	void parse(const char* buffer);
-	void parseItem(TiXmlElement* elem, GMint lightmapId, REF GMShader* shaderPtr);
+	void parseItem(GMXMLElement* elem, GMint lightmapId, REF GMShader* shaderPtr);
 	void parseStart();
 	void parseEnd();
 
 private:
-	void parse_surfaceparm(GMShader& shader, TiXmlElement* elem);
-	void parse_cull(GMShader& shader, TiXmlElement* elem);
-	void parse_blendFunc(GMShader& shader, TiXmlElement* elem);
-	void parse_animMap(GMShader& shader, TiXmlElement* elem);
-	void parse_src(GMShader& shader, TiXmlElement* elem);
-	void parse_clampmap(GMShader& shader, TiXmlElement* elem);
-	void parse_map(GMShader& shader, TiXmlElement* elem);
-	void parse_map_tcMod(GMShader& shader, TiXmlElement* elem);
-	void parse_map_fromLightmap(GMShader& shader, TiXmlElement* elem);
-	void parse_normalmap(GMShader& shader, TiXmlElement* elem);
-	void parse_lights(GMShader& shader, TiXmlElement* elem);
-	void parse_light(GMShader& shader, TiXmlElement* elem);
+	void parse_surfaceparm(GMShader& shader, GMXMLElement* elem);
+	void parse_cull(GMShader& shader, GMXMLElement* elem);
+	void parse_blendFunc(GMShader& shader, GMXMLElement* elem);
+	void parse_animMap(GMShader& shader, GMXMLElement* elem);
+	void parse_src(GMShader& shader, GMXMLElement* elem);
+	void parse_clampmap(GMShader& shader, GMXMLElement* elem);
+	void parse_map(GMShader& shader, GMXMLElement* elem);
+	void parse_map_tcMod(GMShader& shader, GMXMLElement* elem);
+	void parse_map_fromLightmap(GMShader& shader, GMXMLElement* elem);
+	void parse_normalmap(GMShader& shader, GMXMLElement* elem);
+	void parse_lights(GMShader& shader, GMXMLElement* elem);
+	void parse_light(GMShader& shader, GMXMLElement* elem);
 
 private:
 	void createSky(GMShader& shader);
