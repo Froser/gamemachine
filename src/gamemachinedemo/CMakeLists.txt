@@ -49,6 +49,8 @@ set(SOURCES
 		demo/controls.cpp
 		demo/lua.h
 		demo/lua.cpp
+		demo/particle.h
+		demo/particle.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)

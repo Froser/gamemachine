@@ -67,6 +67,8 @@ set(SOURCES
 		gmengine/gameobjects/gm2dgameobject.cpp
 		gmengine/particle/gmparticle.h
 		gmengine/particle/gmparticle.cpp
+		gmengine/particle/gmparticleeffects.h
+		gmengine/particle/gmparticleeffects.cpp
 		gmengine/ui/gmwidget.h
 		gmengine/ui/gmwidget.cpp
 		gmengine/ui/gmwindow.h

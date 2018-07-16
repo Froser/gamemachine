@@ -98,13 +98,6 @@ class GMParticleDescription : public GMObject
 	GM_DECLARE_PROPERTY(RadiusMode, radiusMode, GMParticleRadiusMode)
 };
 
-class GMParticleManager : public GMObject
-{
-public:
-
-};
-
-
 GM_PRIVATE_OBJECT(GMParticle)
 {
 	GMVec3 position = Zero<GMVec4>();
@@ -188,6 +181,13 @@ class GMParticleEmitter : public GMObject
 public:
 	void setDescription(const GMParticleDescription& desc);
 	void setParticleEffect(GMParticleEffect* effect);
+
+public:
+	inline GMParticleEffect* getEffect() GM_NOEXCEPT
+	{
+		D(d);
+		return d->effect;
+	}
 };
 
 GM_PRIVATE_OBJECT(GMParticleEffect)
@@ -256,12 +256,19 @@ public:
 
 public:
 	void setDescription(const GMParticleDescription& desc);
+	void render(IRenderContext* context);
 
 public:
 	inline void setTexture(ITexture* texture) GM_NOEXCEPT
 	{
 		D(d);
 		d->texture = texture;
+	}
+
+	inline GMParticleEmitter* getEmitter() GM_NOEXCEPT
+	{
+		D(d);
+		return d->emitter.get();
 	}
 };
 
@@ -279,6 +286,25 @@ public:
 	void init(GMsize_t count);
 	void free();
 	GMParticle* alloc();
+};
+
+GM_PRIVATE_OBJECT(GMParticleSystemManager)
+{
+	IRenderContext* context;
+	Vector<GMOwnedPtr<GMParticleSystem>> particleSystems;
+};
+
+class GMParticleSystemManager : public GMObject
+{
+	GM_DECLARE_PRIVATE(GMParticleSystemManager)
+
+public:
+	GMParticleSystemManager(IRenderContext* context);
+
+public:
+	void addParticleSystem(AUTORELEASE GMParticleSystem* ps);
+	void render();
+	void update(GMfloat dt);
 };
 
 END_NS

@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmparticle.h"
+#include "gmparticleeffects.h"
 
 GMParticleSystem::GMParticleSystem()
 {
@@ -12,6 +13,12 @@ void GMParticleSystem::setDescription(const GMParticleDescription& desc)
 	D(d);
 	GM_ASSERT(d->emitter);
 	d->emitter->setDescription(desc);
+}
+
+void GMParticleSystem::render(IRenderContext* context)
+{
+	D(d);
+
 }
 
 void GMParticleEmitter::setDescription(const GMParticleDescription& desc)
@@ -32,11 +39,12 @@ void GMParticleEmitter::setDescription(const GMParticleDescription& desc)
 	GMParticleEffect* eff = nullptr;
 	if (desc.getEmitterType() == GMParticleEmitterType::Gravity)
 	{
-
+		eff = new GMGravityParticleEffect();
 	}
 	else
 	{
 		GM_ASSERT(desc.getEmitterType() == GMParticleEmitterType::Radius);
+		eff = new GMRadialParticleEffect();
 	}
 	setParticleEffect(eff);
 }
@@ -92,4 +100,30 @@ void GMParticleEffect::setParticleDescription(const GMParticleDescription& desc)
 	setMotionMode(desc.getMotionMode());
 	setGravityMode(desc.getGravityMode());
 	setRadiusMode(desc.getRadiusMode());
+}
+
+GMParticleSystemManager::GMParticleSystemManager(IRenderContext* context)
+{
+	D(d);
+	d->context = context;
+}
+
+void GMParticleSystemManager::addParticleSystem(AUTORELEASE GMParticleSystem* ps)
+{
+	D(d);
+	d->particleSystems.push_back(GMOwnedPtr<GMParticleSystem>(ps));
+}
+
+void GMParticleSystemManager::render()
+{
+	D(d);
+	for (decltype(auto) ps : d->particleSystems)
+	{
+		ps->render(d->context);
+	}
+}
+
+void GMParticleSystemManager::update(GMfloat dt)
+{
+	// TODO 考虑成异步
 }
