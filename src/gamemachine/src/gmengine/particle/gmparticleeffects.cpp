@@ -1,18 +1,18 @@
 ﻿#include "stdafx.h"
 #include "gmparticleeffects.h"
 
-void GMGravityParticleEffect::init(GMParticleEmitter* emitter, GMParticle* particle)
+void GMGravityParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle* particle)
 {
-	GMParticleEffect::init(emitter, particle);
+	GMParticleEffect::initParticle(emitter, particle);
 }
 
 void GMGravityParticleEffect::update(GMParticleEmitter* emitter, GMfloat dt)
 {
 }
 
-void GMRadialParticleEffect::init(GMParticleEmitter* emitter, GMParticle* particle)
+void GMRadialParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle* particle)
 {
-	GMParticleEffect::init(emitter, particle);
+	GMParticleEffect::initParticle(emitter, particle);
 }
 
 void GMRadialParticleEffect::update(GMParticleEmitter* emitter, GMfloat dt)

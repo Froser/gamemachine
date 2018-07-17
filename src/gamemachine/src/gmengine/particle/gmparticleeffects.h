@@ -7,14 +7,14 @@ BEGIN_NS
 class GMGravityParticleEffect : public GMParticleEffect
 {
 public:
-	virtual void init(GMParticleEmitter* emitter, GMParticle* particle) override;
+	virtual void initParticle(GMParticleEmitter* emitter, GMParticle* particle) override;
 	virtual void update(GMParticleEmitter* emitter, GMfloat dt) override;
 };
 
 class GMRadialParticleEffect : public GMParticleEffect
 {
 public:
-	virtual void init(GMParticleEmitter* emitter, GMParticle* particle) override;
+	virtual void initParticle(GMParticleEmitter* emitter, GMParticle* particle) override;
 	virtual void update(GMParticleEmitter* emitter, GMfloat dt) override;
 };
 

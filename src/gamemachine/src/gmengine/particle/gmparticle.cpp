@@ -283,13 +283,43 @@ void GMParticleEmitter::setDescription(const GMParticleDescription& desc)
 		GM_ASSERT(desc.getEmitterType() == GMParticleEmitterType::Radius);
 		eff = new GMRadialParticleEffect();
 	}
+
+	eff->setParticleDescription(desc);
 	setParticleEffect(eff);
+}
+
+void GMParticleEmitter::addParticle()
+{
+	D(d);
+	if (d->particles.size() < static_cast<GMsize_t>(getParticleCount()))
+	{
+		GMParticle* particle = nullptr; //TODO 分配空间
+		if (particle)
+		{
+			d->particles.push_back(particle);
+			d->effect->initParticle(this, particle);
+		}
+	}
+}
+
+void GMParticleEmitter::emitParticles(GMfloat dt)
+{
 }
 
 void GMParticleEmitter::setParticleEffect(GMParticleEffect* effect)
 {
 	D(d);
 	d->effect.reset(effect);
+}
+
+void GMParticleEmitter::update(GMfloat dt)
+{
+	D(d);
+	if (d->canEmit)
+	{
+		emitParticles(dt);
+		d->effect->update(this, dt);
+	}
 }
 
 void GMParticlePool::init(GMsize_t count)
@@ -339,7 +369,7 @@ void GMParticleEffect::setParticleDescription(const GMParticleDescription& desc)
 	setRadiusMode(desc.getRadiusMode());
 }
 
-void GMParticleEffect::init(GMParticleEmitter* emitter, GMParticle* particle)
+void GMParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle* particle)
 {
 
 }

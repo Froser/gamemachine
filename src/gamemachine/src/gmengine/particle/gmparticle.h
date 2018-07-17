@@ -200,6 +200,8 @@ GM_PRIVATE_OBJECT(GMParticleEmitter)
 	GMfloat emitRate = 0;
 	GMfloat duration = 0;
 	GMOwnedPtr<GMParticleEffect> effect;
+	List<GMParticle*> particles;
+	bool canEmit = true;
 };
 
 class GMParticleEmitter : public GMObject
@@ -218,6 +220,9 @@ class GMParticleEmitter : public GMObject
 public:
 	void setDescription(const GMParticleDescription& desc);
 	void setParticleEffect(GMParticleEffect* effect);
+	void addParticle();
+	void emitParticles(GMfloat dt);
+	void update(GMfloat dt);
 
 public:
 	inline GMParticleEffect* getEffect() GM_NOEXCEPT
@@ -274,7 +279,7 @@ public:
 	void setParticleDescription(const GMParticleDescription& desc);
 
 public:
-	virtual void init(GMParticleEmitter* emitter, GMParticle* particle);
+	virtual void initParticle(GMParticleEmitter* emitter, GMParticle* particle);
 	virtual void update(GMParticleEmitter* emitter, GMfloat dt) = 0;
 };
 

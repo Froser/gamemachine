@@ -28,4 +28,5 @@ void Demo_Particle::init()
 	psFire->getEmitter()->setEmitPosition(GMVec3(0, 0, 0));
 	psFire->getEmitter()->getEffect()->setMotionMode(gm::GMParticleMotionMode::Relative);
 
+	d->particleSystemManager->addParticleSystem(psFire);
 }
