@@ -94,19 +94,21 @@ GMString GMDefaultGamePackageHandler::pathRoot(GMPackageIndex index)
 	switch (index)
 	{
 	case GMPackageIndex::Maps:
-		return d->packagePath + "maps/";
+		return d->packagePath + L"maps/";
 	case GMPackageIndex::Shaders:
-		return d->packagePath + "shaders/";
+		return d->packagePath + L"shaders/";
 	case GMPackageIndex::TexShaders:
-		return d->packagePath + "texshaders/";
+		return d->packagePath + L"texshaders/";
 	case GMPackageIndex::Textures:
-		return d->packagePath + "textures/";
+		return d->packagePath + L"textures/";
 	case GMPackageIndex::Models:
-		return d->packagePath + "models/";
+		return d->packagePath + L"models/";
 	case GMPackageIndex::Audio:
-		return d->packagePath + "audio/";
+		return d->packagePath + L"audio/";
+	case GMPackageIndex::Particle:
+		return d->packagePath + L"particles/";
 	case GMPackageIndex::Scripts:
-		return d->packagePath + "scripts/";
+		return d->packagePath + L"scripts/";
 	default:
 		GM_ASSERT(false);
 		break;
@@ -321,6 +323,8 @@ GMString GMZipGamePackageHandler::pathRoot(GMPackageIndex index)
 		return L"models/";
 	case GMPackageIndex::Audio:
 		return L"audio/";
+	case GMPackageIndex::Particle:
+		return L"particles/";
 	case GMPackageIndex::Scripts:
 		return L"scripts/";
 	default:

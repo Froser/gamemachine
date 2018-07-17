@@ -23,6 +23,7 @@ enum class GMPackageIndex
 	Textures, //!< 纹理类型，存放在"资源包/textures"下
 	Models, //!< 模型类型，存放在"资源包/models"下
 	Audio, //!< 声音文件类型，存放在"资源包/audio"下
+	Particle, //!< 粒子文件类型，存放在"资源包/particles"下
 	Scripts, //!< 脚本类型，存放在"资源包/scripts"下
 };
 

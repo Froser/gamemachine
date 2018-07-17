@@ -3,12 +3,12 @@
 #include "foundation/vector.h"
 #include <string>
 #include "foundation/utilities/tools.h"
-#include "foundation/utilities/tinyxml/tinyxml.h"
 #include "extensions/bsp/render/gmbspgameworld.h"
 #include "gmdata/imagereader/gmimagereader.h"
 #include "gmdata/gamepackage/gmgamepackage.h"
 #include "gmengine/gameobjects/gmgameobject.h"
 #include "foundation/gamemachine.h"
+#include "gmdata/xml/gmxml.h"
 
 #define BEGIN_PARSE(name) if ( GMString::stringEquals(it->Value(), #name) ) parse_##name(shader, it)
 #define PARSE(name) else if ( GMString::stringEquals(it->Value(), #name) ) parse_##name(shader, it)

@@ -15,18 +15,52 @@ enum class GMParticleMotionMode
 	Relative
 };
 
-struct GMParticleGravityMode
+GM_PRIVATE_OBJECT(GMParticleGravityMode)
 {
-	GMVec3 initialVelocity = Zero<GMVec3>();
-	GMVec3 radialAcceleration = Zero<GMVec3>();
-} gravityMode;
+	GMVec3 gravity = Zero<GMVec3>();
+	GMfloat tangentialAcceleration = 0;
+	GMfloat tangentialAccelerationV = 0;
+	GMfloat radialAcceleration = 0;
+	GMfloat radialAccelerationV = 0;
+};
 
-struct GMParticleRadiusMode
+GM_PRIVATE_OBJECT(GMParticleRadiusMode)
 {
-	GMfloat angel = 0;
-	GMfloat degressPerSecond = 0;
-	GMfloat radius = 0;
-	GMfloat deltaRadius = 0;
+	GMfloat beginRadius = 0;
+	GMfloat beginRadiusV = 0;
+	GMfloat endRadius = 0;
+	GMfloat endRadiusV = 0;
+	GMfloat spinPerSecond = 0;
+	GMfloat spinPerSecondV = 0;
+};
+
+class GMParticleGravityMode : public GMObject
+{
+	GM_DECLARE_PRIVATE(GMParticleGravityMode)
+	GM_ALLOW_COPY_DATA(GMParticleGravityMode)
+	GM_DECLARE_PROPERTY(Gravity, gravity, GMVec3)
+	GM_DECLARE_PROPERTY(TangentialAcceleration, tangentialAcceleration, GMfloat)
+	GM_DECLARE_PROPERTY(TangentialAccelerationV, tangentialAccelerationV, GMfloat)
+	GM_DECLARE_PROPERTY(RadialAcceleration, radialAcceleration, GMfloat)
+	GM_DECLARE_PROPERTY(RadialAccelerationV, radialAccelerationV, GMfloat)
+
+public:
+	GMParticleGravityMode() = default;
+};
+
+class GMParticleRadiusMode : public GMObject
+{
+	GM_DECLARE_PRIVATE(GMParticleRadiusMode)
+	GM_ALLOW_COPY_DATA(GMParticleRadiusMode)
+	GM_DECLARE_PROPERTY(BeginRadius, beginRadius, GMfloat)
+	GM_DECLARE_PROPERTY(BeginRadiusV, beginRadiusV, GMfloat)
+	GM_DECLARE_PROPERTY(EndRadius, endRadius, GMfloat)
+	GM_DECLARE_PROPERTY(EndRadiusV, endRadiusV, GMfloat)
+	GM_DECLARE_PROPERTY(SpinPerSecond, spinPerSecond, GMfloat)
+	GM_DECLARE_PROPERTY(SpinPerSecondV, spinPerSecondV, GMfloat)
+
+public:
+	GMParticleRadiusMode() = default;
 };
 
 GM_PRIVATE_OBJECT(GMParticleDescription)
@@ -96,6 +130,9 @@ class GMParticleDescription : public GMObject
 	GM_DECLARE_PROPERTY(EndSpinV, endSpinV, GMfloat)
 	GM_DECLARE_PROPERTY(GravityMode, gravityMode, GMParticleGravityMode)
 	GM_DECLARE_PROPERTY(RadiusMode, radiusMode, GMParticleRadiusMode)
+
+public:
+	GMParticleDescription() = default;
 };
 
 GM_PRIVATE_OBJECT(GMParticle)
@@ -186,7 +223,7 @@ public:
 	inline GMParticleEffect* getEffect() GM_NOEXCEPT
 	{
 		D(d);
-		return d->effect;
+		return d->effect.get();
 	}
 };
 
@@ -256,7 +293,7 @@ public:
 
 public:
 	void setDescription(const GMParticleDescription& desc);
-	void render(IRenderContext* context);
+	void render(const IRenderContext* context);
 
 public:
 	inline void setTexture(ITexture* texture) GM_NOEXCEPT
@@ -270,6 +307,9 @@ public:
 		D(d);
 		return d->emitter.get();
 	}
+
+public:
+	static GMParticleDescription createParticleDescriptionFromCocos2DPlist(const GMString& content);
 };
 
 GM_PRIVATE_OBJECT(GMParticlePool)
@@ -290,7 +330,7 @@ public:
 
 GM_PRIVATE_OBJECT(GMParticleSystemManager)
 {
-	IRenderContext* context;
+	const IRenderContext* context;
 	Vector<GMOwnedPtr<GMParticleSystem>> particleSystems;
 };
 
@@ -299,7 +339,7 @@ class GMParticleSystemManager : public GMObject
 	GM_DECLARE_PRIVATE(GMParticleSystemManager)
 
 public:
-	GMParticleSystemManager(IRenderContext* context);
+	GMParticleSystemManager(const IRenderContext* context);
 
 public:
 	void addParticleSystem(AUTORELEASE GMParticleSystem* ps);

@@ -10,7 +10,7 @@
 GM_PRIVATE_OBJECT(Demo_Particle)
 {
 	gm::GMFilterMode::Mode mode = gm::GMFilterMode::None;
-	gm::GMParticleSystemManager particleSystemManager;
+	gm::GMOwnedPtr<gm::GMParticleSystemManager> particleSystemManager;
 };
 
 class Demo_Particle : public DemoHandler

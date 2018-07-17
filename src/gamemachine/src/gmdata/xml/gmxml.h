@@ -12,5 +12,12 @@ typedef tinyxml2::XMLComment GMXMLComment;
 typedef tinyxml2::XMLText GMXMLText;
 typedef tinyxml2::XMLDeclaration GMXMLDeclaration;
 
+class GMXML
+{
+public:
+	static bool parseXML(const GMString& content, GMObject& object);
+	static bool parsePlist(const GMString& content, GMObject& object);
+};
+
 END_NS
 #endif
