@@ -293,7 +293,7 @@ public:
 	GMControlLabel(GMWidget* widget) : Base(widget) { initStyles(widget); }
 
 public:
-	virtual void render(GMfloat elapsed) override;
+	virtual void render(GMDuration elapsed) override;
 	virtual void refresh() override;
 	virtual GMStyle& getStyle(Base::StyleType style) override;
 
@@ -350,7 +350,7 @@ public:
 	virtual bool canHaveFocus() override;
 	virtual bool onKeyDown(GMSystemKeyEvent* event);
 	virtual bool onKeyUp(GMSystemKeyEvent* event);
-	virtual void render(GMfloat elapsed) override;
+	virtual void render(GMDuration elapsed) override;
 
 private:
 	bool handleMousePressOrDblClick(const GMPoint& pt);
@@ -375,7 +375,7 @@ public:
 	GMControlBorder(GMWidget* widget) : Base(widget) { initStyles(widget); }
 
 public:
-	virtual void render(GMfloat elapsed) override;
+	virtual void render(GMDuration elapsed) override;
 	virtual bool containsPoint(const GMPoint& point) override;
 
 private:
@@ -470,7 +470,7 @@ protected:
 	virtual bool onCaptureChanged(GMSystemCaptureChangedEvent* event) override;
 
 public:
-	virtual void render(GMfloat elapsed) override;
+	virtual void render(GMDuration elapsed) override;
 	virtual bool handleMouse(GMSystemMouseEvent* event) override;
 
 private:

@@ -167,6 +167,7 @@ GM_STATIC_ASSERT_SIZE(DWORD, 4);
 BEGIN_NS
 // 基本数据类型
 typedef float GMfloat;
+typedef GMfloat GMDuration;
 typedef int GMint;
 typedef unsigned int GMuint;
 typedef short GMshort;

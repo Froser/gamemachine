@@ -3,6 +3,9 @@
 #include <gmcommon.h>
 BEGIN_NS
 
+class GMParticleSystem;
+class GMParticleSystemManager;
+
 enum class GMParticleEmitterType
 {
 	Gravity,
@@ -139,6 +142,7 @@ GM_PRIVATE_OBJECT(GMParticle)
 {
 	GMVec3 position = Zero<GMVec4>();
 	GMVec3 startPosition = Zero<GMVec4>();
+	GMVec3 changePosition = Zero<GMVec4>();
 	GMVec3 velocity = Zero<GMVec4>();
 	GMVec4 color = Zero<GMVec4>();
 	GMVec4 deltaColor = Zero<GMVec4>();
@@ -171,6 +175,7 @@ class GMParticle : public GMObject
 	GM_ALLOW_COPY_DATA(GMParticle)
 	GM_DECLARE_PROPERTY(Position, position, GMVec3)
 	GM_DECLARE_PROPERTY(StartPosition, startPosition, GMVec3)
+	GM_DECLARE_PROPERTY(ChangePosition, startPosition, GMVec3)
 	GM_DECLARE_PROPERTY(Velocity, velocity, GMVec3)
 	GM_DECLARE_PROPERTY(Color, color, GMVec4)
 	GM_DECLARE_PROPERTY(DeltaColor, deltaColor, GMVec4)
@@ -197,11 +202,14 @@ GM_PRIVATE_OBJECT(GMParticleEmitter)
 	GMVec3 emitSpeed = Zero<GMVec3>();
 	GMVec3 emitSpeedV = Zero<GMVec3>();
 	GMint particleCount = 0;
-	GMfloat emitRate = 0;
-	GMfloat duration = 0;
+	GMDuration emitRate = 0;
+	GMDuration duration = 0;
 	GMOwnedPtr<GMParticleEffect> effect;
 	List<GMParticle*> particles;
 	bool canEmit = true;
+	GMParticleSystem* system = nullptr;
+	GMDuration emitCounter = 0;
+	GMDuration elapsed = 0;
 };
 
 class GMParticleEmitter : public GMObject
@@ -218,11 +226,16 @@ class GMParticleEmitter : public GMObject
 	GM_DECLARE_PROPERTY(Duration, duration, GMfloat)
 
 public:
+	GMParticleEmitter(GMParticleSystem* system);
+
+public:
 	void setDescription(const GMParticleDescription& desc);
 	void setParticleEffect(GMParticleEffect* effect);
 	void addParticle();
-	void emitParticles(GMfloat dt);
-	void update(GMfloat dt);
+	void emitParticles(GMDuration dt);
+	void update(GMDuration dt);
+	void startEmit();
+	void stopEmit();
 
 public:
 	inline GMParticleEffect* getEffect() GM_NOEXCEPT
@@ -280,24 +293,27 @@ public:
 
 public:
 	virtual void initParticle(GMParticleEmitter* emitter, GMParticle* particle);
-	virtual void update(GMParticleEmitter* emitter, GMfloat dt) = 0;
+	virtual void update(GMParticleEmitter* emitter, GMDuration dt) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMParticleSystem)
 {
 	GMOwnedPtr<GMParticleEmitter> emitter;
 	ITexture* texture = nullptr;
+	GMParticleSystemManager* manager = nullptr;
 };
 
 class GMParticleSystem : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMParticleSystem)
+	GM_FRIEND_CLASS(GMParticleSystemManager)
 
 public:
 	GMParticleSystem();
 
 public:
 	void setDescription(const GMParticleDescription& desc);
+	void update(GMDuration dt);
 	void render(const IRenderContext* context);
 
 public:
@@ -311,6 +327,19 @@ public:
 	{
 		D(d);
 		return d->emitter.get();
+	}
+
+	inline GMParticleSystemManager* getParticleSystemManager() GM_NOEXCEPT
+	{
+		D(d);
+		return d->manager;
+	}
+
+private:
+	inline void setParticleSystemManager(GMParticleSystemManager* manager) GM_NOEXCEPT
+	{
+		D(d);
+		d->manager = manager;
 	}
 
 public:
@@ -337,6 +366,7 @@ GM_PRIVATE_OBJECT(GMParticleSystemManager)
 {
 	const IRenderContext* context;
 	Vector<GMOwnedPtr<GMParticleSystem>> particleSystems;
+	GMParticlePool pool;
 };
 
 class GMParticleSystemManager : public GMObject
@@ -349,7 +379,14 @@ public:
 public:
 	void addParticleSystem(AUTORELEASE GMParticleSystem* ps);
 	void render();
-	void update(GMfloat dt);
+	void update(GMDuration dt);
+
+public:
+	inline GMParticlePool& getPool() GM_NOEXCEPT
+	{
+		D(d);
+		return d->pool;
+	}
 };
 
 END_NS

@@ -78,7 +78,7 @@ GMStyle& GMControl::getStyle(StyleType style)
 	return s_style;
 }
 
-void GMControlLabel::render(GMfloat elapsed)
+void GMControlLabel::render(GMDuration elapsed)
 {
 	if (!getVisible())
 		return;
@@ -211,7 +211,7 @@ bool GMControlButton::onKeyUp(GMSystemKeyEvent* event)
 	return false;
 }
 
-void GMControlButton::render(GMfloat elapsed)
+void GMControlButton::render(GMDuration elapsed)
 {
 	if (!getVisible())
 		return;
@@ -332,7 +332,7 @@ void GMControlButton::initStyles(GMWidget* widget)
 	d->fillStyle.setFontColor(GMControlState::MouseOver, GMVec4(0, 0, 0, 1.f));
 }
 
-void GMControlBorder::render(GMfloat elapsed)
+void GMControlBorder::render(GMDuration elapsed)
 {
 	if (!getVisible())
 		return;
@@ -363,7 +363,7 @@ bool GMControlScrollBar::handleMouse(GMSystemMouseEvent* event)
 	return Base::handleMouse(event);
 }
 
-void GMControlScrollBar::render(GMfloat elapsed)
+void GMControlScrollBar::render(GMDuration elapsed)
 {
 	D(d);
 	if (d->arrowState != GMControlScrollBarArrowState::Clear)

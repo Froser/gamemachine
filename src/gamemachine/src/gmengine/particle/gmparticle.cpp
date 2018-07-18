@@ -2,6 +2,46 @@
 #include "gmparticle.h"
 #include "gmparticleeffects.h"
 #include <gmxml.h>
+#include <random>
+
+#define Z 0
+
+namespace
+{
+	template <typename Engine>
+	class Random
+	{
+	public:
+		template<typename T>
+		static inline T random_real(T min, T max)
+		{
+			std::uniform_real_distribution<T> dist(min, max);
+			auto &mt = getEngine();
+			return dist(mt);
+		}
+
+		template<typename T>
+		static inline T random_int(T min, T max)
+		{
+			std::uniform_int_distribution<T> dist(min, max);
+			auto &mt = getEngine();
+			return dist(mt);
+		}
+
+	private:
+		static Engine& getEngine();
+	};
+
+	template <typename Engine>
+	Engine& Random<Engine>::getEngine()
+	{
+		static std::random_device seed_gen;
+		static Engine engine(seed_gen());
+		return engine;
+	}
+
+	using RandomMt19937 = Random<std::mt19937>;
+}
 
 GM_PRIVATE_OBJECT(GMCocos2DParticleDescriptionProxy)
 {
@@ -9,7 +49,7 @@ GM_PRIVATE_OBJECT(GMCocos2DParticleDescriptionProxy)
 	GMfloat angleVariance = 0;
 	GMfloat speed = 0;
 	GMfloat speedVariance = 0;
-	GMfloat duration = 0;
+	GMDuration duration = 0;
 	GMParticleEmitterType emitterType = GMParticleEmitterType::Gravity;
 	GMfloat maxParticles = 0;
 	GMfloat sourcePositionx = 0;
@@ -171,7 +211,7 @@ public:
 GMParticleSystem::GMParticleSystem()
 {
 	D(d);
-	d->emitter.reset(new GMParticleEmitter());
+	d->emitter.reset(new GMParticleEmitter(this));
 }
 
 void GMParticleSystem::setDescription(const GMParticleDescription& desc)
@@ -181,10 +221,15 @@ void GMParticleSystem::setDescription(const GMParticleDescription& desc)
 	d->emitter->setDescription(desc);
 }
 
+void GMParticleSystem::update(GMDuration dt)
+{
+	D(d);
+	d->emitter->update(dt);
+}
+
 void GMParticleSystem::render(const IRenderContext* context)
 {
 	D(d);
-
 }
 
 GMParticleDescription GMParticleSystem::createParticleDescriptionFromCocos2DPlist(const GMString& content)
@@ -204,8 +249,8 @@ GMParticleDescription GMParticleSystem::createParticleDescriptionFromCocos2DPlis
 
 	desc.setEmitterType(proxy.getEmitterType());
 	desc.setParticleCount(proxy.getMaxParticles());
-	desc.setEmitterPosition(GMVec3(proxy.getSourcePositionx(), proxy.getSourcePositiony(), 0));
-	desc.setEmitterPositionV(GMVec3(proxy.getSourcePositionVariancex(), proxy.getSourcePositionVariancey(), 0));
+	desc.setEmitterPosition(GMVec3(proxy.getSourcePositionx(), proxy.getSourcePositiony(), Z));
+	desc.setEmitterPositionV(GMVec3(proxy.getSourcePositionVariancex(), proxy.getSourcePositionVariancey(), Z));
 	desc.setEmitRate(proxy.getMaxParticles() / proxy.getParticleLifespan());
 
 	// 粒子属性
@@ -243,7 +288,7 @@ GMParticleDescription GMParticleSystem::createParticleDescriptionFromCocos2DPlis
 	desc.setEndSizeV(proxy.getFinishParticleSizeVariance());
 
 	desc.setMotionMode(proxy.getPositionType());
-	desc.getGravityMode().setGravity(GMVec3(proxy.getGravityx(), proxy.getGravityy(), 0));
+	desc.getGravityMode().setGravity(GMVec3(proxy.getGravityx(), proxy.getGravityy(), Z));
 	desc.getGravityMode().setRadialAcceleration(proxy.getRadialAcceleration());
 	desc.getGravityMode().setRadialAccelerationV(proxy.getRadialAccelVariance());
 	desc.getGravityMode().setTangentialAcceleration(proxy.getTangentialAcceleration());
@@ -256,6 +301,12 @@ GMParticleDescription GMParticleSystem::createParticleDescriptionFromCocos2DPlis
 	desc.getRadiusMode().setSpinPerSecond(proxy.getRotatePerSecond());
 	desc.getRadiusMode().setSpinPerSecondV(proxy.getRotatePerSecondVariance());
 	return desc;
+}
+
+GMParticleEmitter::GMParticleEmitter(GMParticleSystem* system)
+{
+	D(d);
+	d->system = system;
 }
 
 void GMParticleEmitter::setDescription(const GMParticleDescription& desc)
@@ -293,7 +344,8 @@ void GMParticleEmitter::addParticle()
 	D(d);
 	if (d->particles.size() < static_cast<GMsize_t>(getParticleCount()))
 	{
-		GMParticle* particle = nullptr; //TODO 分配空间
+		GMParticlePool& pool = d->system->getParticleSystemManager()->getPool();
+		GMParticle* particle = pool.alloc();
 		if (particle)
 		{
 			d->particles.push_back(particle);
@@ -302,8 +354,29 @@ void GMParticleEmitter::addParticle()
 	}
 }
 
-void GMParticleEmitter::emitParticles(GMfloat dt)
+void GMParticleEmitter::emitParticles(GMDuration dt)
 {
+	D(d);
+	GMfloat dtEmit = 1.f / d->emitRate;
+	if (d->particles.size() < static_cast<GMsize_t>(d->particleCount))
+	{
+		d->emitCounter += dt;
+	}
+
+	while (d->particles.size() < static_cast<GMsize_t>(d->particleCount) && d->emitCounter > 0)
+	{
+		// 发射待发射的粒子
+		addParticle();
+		d->emitCounter -= dtEmit;
+	}
+
+	d->elapsed += dt;
+	// 如果duration是个负数，表示永远发射
+	if (d->duration >= 0 && d->duration < d->elapsed)
+	{
+		d->elapsed = 0;
+		stopEmit();
+	}
 }
 
 void GMParticleEmitter::setParticleEffect(GMParticleEffect* effect)
@@ -312,7 +385,7 @@ void GMParticleEmitter::setParticleEffect(GMParticleEffect* effect)
 	d->effect.reset(effect);
 }
 
-void GMParticleEmitter::update(GMfloat dt)
+void GMParticleEmitter::update(GMDuration dt)
 {
 	D(d);
 	if (d->canEmit)
@@ -320,6 +393,21 @@ void GMParticleEmitter::update(GMfloat dt)
 		emitParticles(dt);
 		d->effect->update(this, dt);
 	}
+}
+
+void GMParticleEmitter::startEmit()
+{
+	D(d);
+	d->canEmit = true;
+}
+
+void GMParticleEmitter::stopEmit()
+{
+	D(d);
+	d->canEmit = false;
+
+	// TODO
+	// 释放未发射粒子
 }
 
 void GMParticlePool::init(GMsize_t count)
@@ -371,18 +459,33 @@ void GMParticleEffect::setParticleDescription(const GMParticleDescription& desc)
 
 void GMParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle* particle)
 {
+	D(d);
+	GMVec3 randomPos(RandomMt19937::random_real(-1, 1), RandomMt19937::random_real(-1, 1), RandomMt19937::random_real(-1, 1));
+	particle->setPosition(emitter->getEmitPosition() + emitter->getEmitPositionV() * randomPos);
 
+	particle->setStartPosition(emitter->getEmitPosition());
+	particle->setChangePosition(particle->getPosition());
+	particle->setRemainingLife(Max(.1f, getLife() + getLifeV() * RandomMt19937::random_real(-1, 1)));
+
+	GMVec4 randomBeginColor(RandomMt19937::random_real(-1, 1), RandomMt19937::random_real(-1, 1), RandomMt19937::random_real(-1, 1), RandomMt19937::random_real(-1, 1));
+	GMVec4 randomEndColor(RandomMt19937::random_real(-1, 1), RandomMt19937::random_real(-1, 1), RandomMt19937::random_real(-1, 1), RandomMt19937::random_real(-1, 1));
+
+	GMVec4 beginColor, endColor;
+	beginColor = Clamp(getBeginColor() + getBeginColorV() * randomBeginColor, 0, 1);
+	endColor = Clamp(getEndColor() + getEndColorV() * randomEndColor, 0, 1);
 }
 
 GMParticleSystemManager::GMParticleSystemManager(const IRenderContext* context)
 {
 	D(d);
 	d->context = context;
+	d->pool.init(1024); //事先分配若干个粒子
 }
 
 void GMParticleSystemManager::addParticleSystem(AUTORELEASE GMParticleSystem* ps)
 {
 	D(d);
+	ps->setParticleSystemManager(this);
 	d->particleSystems.push_back(GMOwnedPtr<GMParticleSystem>(ps));
 }
 
@@ -395,7 +498,12 @@ void GMParticleSystemManager::render()
 	}
 }
 
-void GMParticleSystemManager::update(GMfloat dt)
+void GMParticleSystemManager::update(GMDuration dt)
 {
 	// TODO 考虑成异步
+	D(d);
+	for (decltype(auto) system : d->particleSystems)
+	{
+		system->update(dt);
+	}
 }

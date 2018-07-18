@@ -54,8 +54,8 @@ class GMWidget;
 struct GMGameMachineRunningStates
 {
 	// 每一帧更新的内容
-	GMfloat lastFrameElpased = 0; //!< 上一帧渲染锁花费的时间，单位是秒。
-	GMfloat elapsedTime = 0; //!< 程序运行到现在为止的时间，单位是秒。
+	GMDuration lastFrameElpased = 0; //!< 上一帧渲染锁花费的时间，单位是秒。
+	GMDuration elapsedTime = 0; //!< 程序运行到现在为止的时间，单位是秒。
 	GMfloat fps = 0; //!< 程序当前的帧率。
 	bool crashDown = false; //!< 程序是否已崩溃。当遇到不可恢复的错误时，此项为true。
 

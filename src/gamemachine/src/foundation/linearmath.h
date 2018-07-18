@@ -65,6 +65,12 @@ inline gm::GMint Round(gm::GMfloat d)
 	return d >= 0.0 ? static_cast<gm::GMint>(d + 0.5) : static_cast<gm::GMint>(d - static_cast<gm::GMint>(d - 1) + 0.5) + static_cast<gm::GMint>(d - 1);
 }
 
+template <typename T>
+inline T Clamp(T v, T minv, T maxv)
+{
+	return (Min(Max(v, minv), maxv));
+}
+
 template<typename genType>
 constexpr genType Radians(genType degrees)
 {
@@ -471,6 +477,8 @@ inline GMVec4 operator*(const GMVec4& V, const GMMat4& M);
 
 inline GMVec3 operator*(const GMVec3& V1, const GMVec3& V2);
 
+inline GMVec4 operator*(const GMVec4& V1, const GMVec4& V2);
+
 inline GMVec4 operator*(const GMVec4& V, const GMQuat& Q);
 
 inline GMVec3 operator*(const GMVec3& V, const GMQuat& Q);
@@ -575,6 +583,30 @@ inline void CopyToArray(const GMVec4& V, gm::GMfloat* array);
 
 template <typename T>
 inline gm::GMfloat* ValuePointer(const T& data);
+
+inline GMVec2 Clamp(const GMVec2& v, gm::GMfloat minv, gm::GMfloat maxv)
+{
+	GMVec2 r;
+	r.setX(Clamp(v.getX(), minv, maxv));
+	r.setY(Clamp(v.getY(), minv, maxv));
+}
+
+inline GMVec3 Clamp(const GMVec3& v, gm::GMfloat minv, gm::GMfloat maxv)
+{
+	GMVec3 r;
+	r.setX(Clamp(v.getX(), minv, maxv));
+	r.setY(Clamp(v.getY(), minv, maxv));
+	r.setZ(Clamp(v.getZ(), minv, maxv));
+}
+
+inline GMVec4 Clamp(const GMVec4& v, gm::GMfloat minv, gm::GMfloat maxv)
+{
+	GMVec4 r;
+	r.setX(Clamp(v.getX(), minv, maxv));
+	r.setY(Clamp(v.getY(), minv, maxv));
+	r.setZ(Clamp(v.getZ(), minv, maxv));
+	r.setW(Clamp(v.getW(), minv, maxv));
+}
 
 #include "linearmath.inl"
 

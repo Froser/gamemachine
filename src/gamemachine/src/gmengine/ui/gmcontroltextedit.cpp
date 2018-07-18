@@ -378,7 +378,7 @@ void GMControlTextEditBorder::initStyles(GMWidget* widget)
 	d->borderStyle.setTextureColor(GMControlState::Normal, GMVec4(1.f, 1.f, 1.f, 1.f));
 }
 
-void GMControlTextEdit::render(GMfloat elapsed)
+void GMControlTextEdit::render(GMDuration elapsed)
 {
 	D(d);
 	if (!getVisible())
@@ -1200,7 +1200,7 @@ GMControlTextArea::GMControlTextArea(GMWidget* widget)
 	createBufferTypoEngineIfNotExist();
 }
 
-void GMControlTextArea::render(GMfloat elapsed)
+void GMControlTextArea::render(GMDuration elapsed)
 {
 	D(d);
 	D_BASE(db, Base);

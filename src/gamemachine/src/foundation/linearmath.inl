@@ -457,6 +457,17 @@ inline GMVec3 operator*(const GMVec3& V1, const GMVec3& V2)
 	return R;
 }
 
+inline GMVec4 operator*(const GMVec4& V1, const GMVec4& V2)
+{
+	GMVec4 R;
+#if GM_USE_DX11
+	R.v_ = DirectX::operator*(V1.v_, V2.v_);
+#else
+	R.v_ = V1.v_ * V2.v_;
+#endif
+	return R;
+}
+
 inline GMVec4 operator*(const GMVec4& V, const GMMat4& M)
 {
 	GMVec4 R;

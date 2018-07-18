@@ -50,7 +50,7 @@ public:
 	~GMControlTextEdit();
 
 public:
-	virtual void render(GMfloat elapsed) override;
+	virtual void render(GMDuration elapsed) override;
 	virtual void setSize(GMint width, GMint height) override;
 	virtual void setPosition(GMint x, GMint y) override;
 	virtual GMStyle& getStyle(GMControl::StyleType style) override;
@@ -168,7 +168,7 @@ public:
 	GMControlTextArea(GMWidget* widget);
 
 public:
-	virtual void render(GMfloat elapsed) override;
+	virtual void render(GMDuration elapsed) override;
 	virtual void pasteFromClipboard() override;
 	virtual void insertCharacter(GMwchar ch) override;
 	virtual void setSize(GMint width, GMint height) override;

@@ -8,14 +8,14 @@ class GMGravityParticleEffect : public GMParticleEffect
 {
 public:
 	virtual void initParticle(GMParticleEmitter* emitter, GMParticle* particle) override;
-	virtual void update(GMParticleEmitter* emitter, GMfloat dt) override;
+	virtual void update(GMParticleEmitter* emitter, GMDuration dt) override;
 };
 
 class GMRadialParticleEffect : public GMParticleEffect
 {
 public:
 	virtual void initParticle(GMParticleEmitter* emitter, GMParticle* particle) override;
-	virtual void update(GMParticleEmitter* emitter, GMfloat dt) override;
+	virtual void update(GMParticleEmitter* emitter, GMDuration dt) override;
 };
 
 
