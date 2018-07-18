@@ -460,15 +460,15 @@ void GMParticleEffect::setParticleDescription(const GMParticleDescription& desc)
 void GMParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle* particle)
 {
 	D(d);
-	GMVec3 randomPos(RandomMt19937::random_real(-1, 1), RandomMt19937::random_real(-1, 1), RandomMt19937::random_real(-1, 1));
+	GMVec3 randomPos(RandomMt19937::random_real(-1.f, 1.f), RandomMt19937::random_real(-1.f, 1.f), RandomMt19937::random_real(-1.f, 1.f));
 	particle->setPosition(emitter->getEmitPosition() + emitter->getEmitPositionV() * randomPos);
 
 	particle->setStartPosition(emitter->getEmitPosition());
 	particle->setChangePosition(particle->getPosition());
-	particle->setRemainingLife(Max(.1f, getLife() + getLifeV() * RandomMt19937::random_real(-1, 1)));
+	particle->setRemainingLife(Max(.1f, getLife() + getLifeV() * RandomMt19937::random_real(-1.f, 1.f)));
 
-	GMVec4 randomBeginColor(RandomMt19937::random_real(-1, 1), RandomMt19937::random_real(-1, 1), RandomMt19937::random_real(-1, 1), RandomMt19937::random_real(-1, 1));
-	GMVec4 randomEndColor(RandomMt19937::random_real(-1, 1), RandomMt19937::random_real(-1, 1), RandomMt19937::random_real(-1, 1), RandomMt19937::random_real(-1, 1));
+	GMVec4 randomBeginColor(RandomMt19937::random_real(-1.f, 1.f), RandomMt19937::random_real(-1.f, 1.f), RandomMt19937::random_real(-1.f, 1.f), RandomMt19937::random_real(-1.f, 1.f));
+	GMVec4 randomEndColor(RandomMt19937::random_real(-1.f, 1.f), RandomMt19937::random_real(-1.f, 1.f), RandomMt19937::random_real(-1.f, 1.f), RandomMt19937::random_real(-1.f, 1.f));
 
 	GMVec4 beginColor, endColor;
 	beginColor = Clamp(getBeginColor() + getBeginColorV() * randomBeginColor, 0, 1);
