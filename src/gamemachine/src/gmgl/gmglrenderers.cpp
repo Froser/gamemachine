@@ -56,6 +56,8 @@ namespace
 			return "GM_Text";
 		case GMModelType::CubeMap:
 			return "GM_CubeMap";
+		case GMModelType::Particle:
+			return "GM_Particle";
 		default:
 			GM_ASSERT(false);
 			return "GM_Model2D";

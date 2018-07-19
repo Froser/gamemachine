@@ -198,6 +198,8 @@ IRenderer* GMGLGraphicEngine::getRenderer(GMModelType objectType)
 		return newRenderer<GMGLRenderer_Filter>(d->renderer_filter, db->context);
 	case GMModelType::LightPassQuad:
 		return newRenderer<GMGLRenderer_LightPass>(d->renderer_lightPass, db->context);
+	case GMModelType::Particle:
+		return newRenderer<GMGLRenderer_Particle>(d->renderer_particle, db->context);
 	default:
 		GM_ASSERT(false);
 		return nullptr;

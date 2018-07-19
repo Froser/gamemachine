@@ -3,6 +3,7 @@
 #include "gmparticleeffects.h"
 #include <gmxml.h>
 #include <random>
+#include "foundation/gamemachine.h"
 
 #define Z 0
 
@@ -41,6 +42,103 @@ namespace
 	}
 
 	using RandomMt19937 = Random<std::mt19937>;
+
+	GMMat4& getTransformMatrix(const IRenderContext* context)
+	{
+		static GMMat4 mat = Ortho(
+			0,
+			context->getWindow()->getWindowRect().width,
+			context->getWindow()->getWindowRect().height,
+			0,
+			-1,
+			1
+		);
+		return mat;
+	}
+
+	void update4Vertex(
+		GMVertex* vertex,
+		const GMVec3& centerPt,
+		const GMVec2& halfExtents,
+		const GMVec4& color,
+		GMfloat rotationRad,
+		const GMVec3& rotationAxis,
+		const IRenderContext* context,
+		GMfloat z = 0
+	)
+	{
+		constexpr GMfloat texcoord[4][2] =
+		{
+			{ 0, 1 },
+			{ 0, 0 },
+			{ 1, 1 },
+			{ 1, 0 },
+		};
+
+		const GMfloat x = halfExtents.getX(), y = halfExtents.getY();
+		GMQuat q = Rotate(rotationRad, rotationAxis);
+		GMVec4 raw[4] = {
+			GMVec4(centerPt.getX() - x, centerPt.getY() - y, z, 1),
+			GMVec4(centerPt.getX() - x, centerPt.getY() + y, z, 1),
+			GMVec4(centerPt.getX() + x, centerPt.getY() - y, z, 1),
+			GMVec4(centerPt.getX() + x, centerPt.getY() + y, z, 1),
+		};
+
+		GMMat4 transformMatrix = getTransformMatrix(context);
+		GMVec4 transformed[4] = {
+			raw[0] * q * transformMatrix,
+			raw[1] * q * transformMatrix,
+			raw[2] * q * transformMatrix,
+			raw[3] * q * transformMatrix,
+		};
+
+		// 排列方式：
+		// 2 4
+		// 1 3
+		const GMfloat vertices[4][3] = {
+			{ transformed[0].getX(), transformed[0].getY(), transformed[0].getZ() },
+			{ transformed[1].getX(), transformed[1].getY(), transformed[1].getZ() },
+			{ transformed[2].getX(), transformed[2].getY(), transformed[2].getZ() },
+			{ transformed[3].getX(), transformed[3].getY(), transformed[3].getZ() },
+		};
+
+		vertex[0] = {
+			{ vertices[0][0], vertices[0][1], vertices[0][2] }, //position
+			{ 0, -1.f, 0 }, //normal
+			{ texcoord[0][0], texcoord[0][1] }, //texcoord
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ color.getX(), color.getY(), color.getZ(), color.getW() }
+		},
+		vertex[1] = {
+			{ vertices[1][0], vertices[1][1], vertices[1][2] }, //position
+			{ 0, -1.f, 0 }, //normal
+			{ texcoord[1][0], texcoord[1][1] }, //texcoord
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ color.getX(), color.getY(), color.getZ(), color.getW() }
+		},
+		vertex[2] = {
+			{ vertices[2][0], vertices[2][1], vertices[2][2] }, //position
+			{ 0, -1.f, 0 }, //normal
+			{ texcoord[2][0], texcoord[2][1] }, //texcoord
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ color.getX(), color.getY(), color.getZ(), color.getW() }
+		},
+		vertex[3] = {
+			{ vertices[3][0], vertices[3][1], vertices[3][2] }, //position
+			{ 0, -1.f, 0 }, //normal
+			{ texcoord[3][0], texcoord[3][1] }, //texcoord
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ color.getX(), color.getY(), color.getZ(), color.getW() }
+		};
+	}
 }
 
 GM_PRIVATE_OBJECT(GMCocos2DParticleDescriptionProxy)
@@ -230,6 +328,71 @@ void GMParticleSystem::update(GMDuration dt)
 void GMParticleSystem::render(const IRenderContext* context)
 {
 	D(d);
+	if (!d->particleObject)
+	{
+		d->particleObject.reset(createGameObject(context));
+	}
+
+	if (d->particleObject)
+	{
+		// 开始更新粒子数据
+		auto dataProxy = d->particleModel->getModelDataProxy();
+		dataProxy->beginUpdateBuffer();
+		void* dataPtr = dataProxy->getBuffer();
+		updateData(context, dataPtr);
+		dataProxy->endUpdateBuffer();
+	}
+
+	GM_ASSERT(d->particleObject);
+	d->particleObject->draw();
+}
+
+GMGameObject* GMParticleSystem::createGameObject(const IRenderContext* context)
+{
+	D(d);
+	GMGameObject* object = new GMGameObject();
+	d->particleModel.reset(new GMModel());
+	d->particleModel->setUsageHint(GMUsageHint::DynamicDraw);
+	d->particleModel->setType(GMModelType::Particle);
+
+	d->particleModel->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
+	GMMesh* mesh = new GMMesh(d->particleModel.get());
+	
+	// 使用strip拓扑，一次性填充所有的矩形
+	GMsize_t total = getEmitter()->getParticleCount();
+	for (GMsize_t i = 0; i < total; ++i)
+	{
+		mesh->vertex(GMVertex());
+	}
+
+	// 获取剩下
+	GM.createModelDataProxyAndTransfer(context, d->particleModel.get());
+	object->setContext(context);
+	object->addModel(GMAssets::createIsolatedAsset(GMAssetType::Model, d->particleModel.get()));
+	return object;
+}
+
+void GMParticleSystem::updateData(const IRenderContext* context, void* dataPtr)
+{
+	D(d);
+	GMVertex* vPtr = reinterpret_cast<GMVertex*>(dataPtr);
+	constexpr GMsize_t szVertex = sizeof(GMVertex);
+	auto& particles = d->emitter->getParticles();
+	// 一个粒子有4个顶点
+	for (auto particle : particles)
+	{
+		GMfloat he = particle->getSize() / 2.f;
+		update4Vertex(
+			vPtr,
+			particle->getPosition(),
+			he,
+			particle->getColor(),
+			particle->getRotation(),
+			GMVec3(0, 0, 1),
+			context
+		);
+		vPtr += 4;
+	}
 }
 
 GMParticleDescription GMParticleSystem::createParticleDescriptionFromCocos2DPlist(const GMString& content)
@@ -432,6 +595,12 @@ GMParticle* GMParticlePool::alloc()
 	return d->particlePool[d->index++].get();
 }
 
+GMsize_t GMParticlePool::getCapacity() GM_NOEXCEPT
+{
+	D(d);
+	return d->particlePool.size();
+}
+
 void GMParticleEffect::setParticleDescription(const GMParticleDescription& desc)
 {
 	setLife(desc.getLife());
@@ -473,6 +642,18 @@ void GMParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle* part
 	GMVec4 beginColor, endColor;
 	beginColor = Clamp(getBeginColor() + getBeginColorV() * randomBeginColor, 0, 1);
 	endColor = Clamp(getEndColor() + getEndColorV() * randomEndColor, 0, 1);
+
+	GMfloat remainingLifeRev = 1.f / (particle->getRemainingLife());
+	particle->setColor(beginColor);
+	particle->setDeltaColor((endColor - beginColor) * remainingLifeRev);
+
+	GMfloat beginSize = Max(0, getBeginSize() + getBeginSizeV() * RandomMt19937::random_real(-1.f, 1.f));
+	GMfloat endSize = Max(0, getEndSize() + getEndSize() * RandomMt19937::random_real(-1.f, 1.f));
+
+	GMfloat beginSpin = Radians(Max(0, getBeginSpin() + getBeginSpinV() * RandomMt19937::random_real(-1.f, 1.f)));
+	GMfloat endSpin = Radians(Max(0, getEndSpin() + getEndSpin() * RandomMt19937::random_real(-1.f, 1.f)));
+	particle->setRotation(beginSpin);
+	particle->setDeltaRotation((endSpin - beginSpin) * remainingLifeRev);
 }
 
 GMParticleSystemManager::GMParticleSystemManager(const IRenderContext* context)

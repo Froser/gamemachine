@@ -8,6 +8,63 @@ void GMGravityParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticl
 
 void GMGravityParticleEffect::update(GMParticleEmitter* emitter, GMDuration dt)
 {
+	D(d);
+	auto& particles = emitter->getParticles();
+	// TODO 可以变成异步
+	for (auto iter = particles.begin(); iter != particles.end();)
+	{
+		GMParticle* particle = *iter;
+		particle->setRemainingLife(particle->getRemainingLife() - dt);
+		if (particle->getRemainingLife() > 0)
+		{
+			GMVec3 offset = Zero<GMVec3>();
+			GMVec3 radial = Zero<GMVec3>();
+			GMVec3 tangential = Zero<GMVec3>();
+
+			// 径向加速度
+			if (!FuzzyCompare(particle->getChangePosition().getX(), 0)
+				|| !FuzzyCompare(particle->getChangePosition().getY(), 0)
+				|| !FuzzyCompare(particle->getChangePosition().getZ(), 0))
+			{
+				radial = Normalize(particle->getGravityModeData().initialVelocity);
+			}
+			tangential = radial;
+			radial *= particle->getGravityModeData().radialAcceleration;
+
+			// 切向加速度，这里只考虑了2D情况
+			GMfloat y = tangential.getX();
+			tangential.setX(-tangential.getY());
+			tangential.setY(y);
+			tangential *= particle->getGravityModeData().tangentialAcceleration;
+
+			// 计算合力
+			offset = (radial + tangential + getGravityMode().getGravity()) * dt;
+			
+			// 移动粒子
+			particle->getGravityModeData().initialVelocity += offset;
+			particle->setChangePosition(particle->getChangePosition() + particle->getGravityModeData().initialVelocity * dt);
+
+			particle->setColor(particle->getColor() + particle->getDeltaColor() * dt);
+			particle->setSize(Max(0, particle->getSize() + particle->getDeltaSize() * dt));
+			particle->setRotation(particle->getRotation() + particle->getDeltaRotation() * dt);
+
+			if (getMotionMode() == GMParticleMotionMode::Relative)
+			{
+				// 跟随发射器
+				particle->setPosition(particle->getChangePosition() + emitter->getEmitPosition() - particle->getStartPosition());
+			}
+			else
+			{
+				particle->setPosition(particle->getChangePosition());
+			}
+			++iter;
+		}
+		else
+		{
+			// TODO 移除粒子
+			iter = particles.erase(iter);
+		}
+	}
 }
 
 void GMRadialParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle* particle)

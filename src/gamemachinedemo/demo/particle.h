@@ -20,6 +20,7 @@ class Demo_Particle : public DemoHandler
 public:
 	using Base::Base;
 	virtual void init() override;
+	virtual void event(gm::GameMachineHandlerEvent evt) override;
 
 protected:
 	const gm::GMString& getDescription() const

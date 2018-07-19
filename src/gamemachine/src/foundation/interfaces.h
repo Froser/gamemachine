@@ -111,6 +111,7 @@ enum class GMModelType
 	CubeMap, //! 表示一个立方体贴图。
 	Filter, //! 表示一个滤镜，通常是一个四边形模型，在帧缓存中获取纹理来绘制。
 	LightPassQuad, //! 表示一个光照传递模型。
+	Particle, //! 表示一个粒子模型。
 	CustomStart, //! 自定义模型类型。将自定义的类型放在此类型后面，匹配自定义的着色器程序。
 };
 

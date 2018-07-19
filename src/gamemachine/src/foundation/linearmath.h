@@ -589,6 +589,7 @@ inline GMVec2 Clamp(const GMVec2& v, gm::GMfloat minv, gm::GMfloat maxv)
 	GMVec2 r;
 	r.setX(Clamp(v.getX(), minv, maxv));
 	r.setY(Clamp(v.getY(), minv, maxv));
+	return r;
 }
 
 inline GMVec3 Clamp(const GMVec3& v, gm::GMfloat minv, gm::GMfloat maxv)
@@ -597,6 +598,7 @@ inline GMVec3 Clamp(const GMVec3& v, gm::GMfloat minv, gm::GMfloat maxv)
 	r.setX(Clamp(v.getX(), minv, maxv));
 	r.setY(Clamp(v.getY(), minv, maxv));
 	r.setZ(Clamp(v.getZ(), minv, maxv));
+	return r;
 }
 
 inline GMVec4 Clamp(const GMVec4& v, gm::GMfloat minv, gm::GMfloat maxv)
@@ -606,6 +608,7 @@ inline GMVec4 Clamp(const GMVec4& v, gm::GMfloat minv, gm::GMfloat maxv)
 	r.setY(Clamp(v.getY(), minv, maxv));
 	r.setZ(Clamp(v.getZ(), minv, maxv));
 	r.setW(Clamp(v.getW(), minv, maxv));
+	return r;
 }
 
 #include "linearmath.inl"

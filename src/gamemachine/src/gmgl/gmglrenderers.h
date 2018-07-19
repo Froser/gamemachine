@@ -165,5 +165,11 @@ protected:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 };
 
+class GMGLRenderer_Particle : public GMGLRenderer_2D
+{
+public:
+	using GMGLRenderer_2D::GMGLRenderer_2D;
+};
+
 END_NS
 #endif

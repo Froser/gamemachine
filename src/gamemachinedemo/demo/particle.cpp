@@ -30,3 +30,17 @@ void Demo_Particle::init()
 
 	d->particleSystemManager->addParticleSystem(psFire);
 }
+
+void Demo_Particle::event(gm::GameMachineHandlerEvent evt)
+{
+	D(d);
+	switch (evt)
+	{
+	case gm::GameMachineHandlerEvent::Simulate:
+		d->particleSystemManager->update(GM.getRunningStates().lastFrameElpased);
+		break;
+	case gm::GameMachineHandlerEvent::Render:
+		d->particleSystemManager->render();
+		break;
+	}
+}

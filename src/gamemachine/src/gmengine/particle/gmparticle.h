@@ -1,6 +1,7 @@
 ﻿#ifndef __GMPARTICLE_H__
 #define __GMPARTICLE_H__
 #include <gmcommon.h>
+#include <gmgameobject.h>
 BEGIN_NS
 
 class GMParticleSystem;
@@ -149,13 +150,13 @@ GM_PRIVATE_OBJECT(GMParticle)
 	GMfloat size = 0;
 	GMfloat currentSize = 0;
 	GMfloat deltaSize = 0;
-	GMQuat rotation = Identity<GMQuat>();
-	GMQuat deltaRotation = Identity<GMQuat>();
+	GMfloat rotation = 0;
+	GMfloat deltaRotation = 0;
 	GMfloat remainingLife = 0;
 	
 	struct GravityModeData
 	{
-		GMVec2  initialVelocity;
+		GMVec3 initialVelocity;
 		GMfloat radialAcceleration;
 		GMfloat tangentialAcceleration;
 	} gravityModeData;
@@ -182,8 +183,8 @@ class GMParticle : public GMObject
 	GM_DECLARE_PROPERTY(Size, size, GMfloat)
 	GM_DECLARE_PROPERTY(CurrentSize, currentSize, GMfloat)
 	GM_DECLARE_PROPERTY(DeltaSize, deltaSize, GMfloat)
-	GM_DECLARE_PROPERTY(Rotation, rotation, GMQuat)
-	GM_DECLARE_PROPERTY(DeltaRotation, deltaRotation, GMQuat)
+	GM_DECLARE_PROPERTY(Rotation, rotation, GMfloat)
+	GM_DECLARE_PROPERTY(DeltaRotation, deltaRotation, GMfloat)
 	GM_DECLARE_PROPERTY(RemainingLife, remainingLife, GMfloat)
 	GM_DECLARE_PROPERTY(GravityModeData, gravityModeData, GM_PRIVATE_NAME(GMParticle)::GravityModeData)
 	GM_DECLARE_PROPERTY(RadiusModeData, radiusModeData, GM_PRIVATE_NAME(GMParticle)::RadiusModeData)
@@ -243,6 +244,12 @@ public:
 		D(d);
 		return d->effect.get();
 	}
+
+	List<GMParticle*>& getParticles() GM_NOEXCEPT
+	{
+		D(d);
+		return d->particles;
+	}
 };
 
 GM_PRIVATE_OBJECT(GMParticleEffect)
@@ -301,6 +308,8 @@ GM_PRIVATE_OBJECT(GMParticleSystem)
 	GMOwnedPtr<GMParticleEmitter> emitter;
 	ITexture* texture = nullptr;
 	GMParticleSystemManager* manager = nullptr;
+	GMOwnedPtr<GMGameObject> particleObject;
+	GMOwnedPtr<GMModel> particleModel;
 };
 
 class GMParticleSystem : public GMObject
@@ -336,6 +345,10 @@ public:
 	}
 
 private:
+	GMGameObject* createGameObject(const IRenderContext* context);
+	void updateData(const IRenderContext* context, void* dataPtr);
+
+private:
 	inline void setParticleSystemManager(GMParticleSystemManager* manager) GM_NOEXCEPT
 	{
 		D(d);
@@ -360,6 +373,7 @@ public:
 	void init(GMsize_t count);
 	void free();
 	GMParticle* alloc();
+	GMsize_t getCapacity() GM_NOEXCEPT;
 };
 
 GM_PRIVATE_OBJECT(GMParticleSystemManager)

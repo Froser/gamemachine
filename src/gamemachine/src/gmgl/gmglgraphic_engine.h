@@ -47,6 +47,7 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	GMOwnedPtr<IRenderer> renderer_filter;
 	GMOwnedPtr<IRenderer> renderer_lightPass;
 	GMOwnedPtr<IRenderer> renderer_3d_shadow;
+	GMOwnedPtr<IRenderer> renderer_particle;
 
 	ITexture* cubeMap = nullptr;
 	GMGLLightContext lightContext;
