@@ -71,8 +71,8 @@ GM_PRIVATE_OBJECT(GMParticleDescription)
 {
 	GMVec3 emitterPosition = Zero<GMVec3>(); //<! 发射器位置
 	GMVec3 emitterPositionV = Zero<GMVec3>();
-	GMVec3 emitterEmitAngle = Zero<GMVec3>(); //!< 发射器发射角度
-	GMVec3 emitterEmitAngleV = Zero<GMVec3>();
+	GMfloat emitterEmitAngle = 0; //!< 发射器发射角度
+	GMfloat emitterEmitAngleV = 0;
 	GMfloat emitterEmitSpeed = 0; //!< 发射器发射速率
 	GMfloat emitterEmitSpeedV = 0;
 	GMint particleCount; //!< 粒子数目
@@ -109,8 +109,8 @@ class GMParticleDescription : public GMObject
 
 	GM_DECLARE_PROPERTY(EmitterPosition, emitterPosition, GMVec3)
 	GM_DECLARE_PROPERTY(EmitterPositionV, emitterPositionV, GMVec3)
-	GM_DECLARE_PROPERTY(EmitterEmitAngle, emitterEmitAngle, GMVec3)
-	GM_DECLARE_PROPERTY(EmitterEmitAngleV, emitterEmitAngleV, GMVec3)
+	GM_DECLARE_PROPERTY(EmitterEmitAngle, emitterEmitAngle, GMfloat)
+	GM_DECLARE_PROPERTY(EmitterEmitAngleV, emitterEmitAngleV, GMfloat)
 	GM_DECLARE_PROPERTY(EmitterEmitSpeed, emitterEmitSpeed, GMfloat)
 	GM_DECLARE_PROPERTY(EmitterEmitSpeedV, emitterEmitSpeedV, GMfloat)
 	GM_DECLARE_PROPERTY(ParticleCount, particleCount, GMint)
@@ -176,7 +176,7 @@ class GMParticle : public GMObject
 	GM_ALLOW_COPY_DATA(GMParticle)
 	GM_DECLARE_PROPERTY(Position, position, GMVec3)
 	GM_DECLARE_PROPERTY(StartPosition, startPosition, GMVec3)
-	GM_DECLARE_PROPERTY(ChangePosition, startPosition, GMVec3)
+	GM_DECLARE_PROPERTY(ChangePosition, changePosition, GMVec3)
 	GM_DECLARE_PROPERTY(Velocity, velocity, GMVec3)
 	GM_DECLARE_PROPERTY(Color, color, GMVec4)
 	GM_DECLARE_PROPERTY(DeltaColor, deltaColor, GMVec4)
@@ -198,10 +198,10 @@ GM_PRIVATE_OBJECT(GMParticleEmitter)
 {
 	GMVec3 emitPosition = Zero<GMVec3>();
 	GMVec3 emitPositionV = Zero<GMVec3>();
-	GMVec3 emitAngle = Zero<GMVec3>();
-	GMVec3 emitAngleV = Zero<GMVec3>();
-	GMVec3 emitSpeed = Zero<GMVec3>();
-	GMVec3 emitSpeedV = Zero<GMVec3>();
+	GMfloat emitAngle = 0;
+	GMfloat emitAngleV = 0;
+	GMfloat emitSpeed = 0;
+	GMfloat emitSpeedV = 0;
 	GMint particleCount = 0;
 	GMDuration emitRate = 0;
 	GMDuration duration = 0;
@@ -218,10 +218,10 @@ class GMParticleEmitter : public GMObject
 	GM_DECLARE_PRIVATE(GMParticleEmitter)
 	GM_DECLARE_PROPERTY(EmitPosition, emitPosition, GMVec3)
 	GM_DECLARE_PROPERTY(EmitPositionV, emitPositionV, GMVec3)
-	GM_DECLARE_PROPERTY(EmitAngle, emitAngle, GMVec3)
-	GM_DECLARE_PROPERTY(EmitAngleV, emitAngleV, GMVec3)
-	GM_DECLARE_PROPERTY(EmitSpeed, emitSpeed, GMVec3)
-	GM_DECLARE_PROPERTY(EmitSpeedV, emitSpeedV, GMVec3)
+	GM_DECLARE_PROPERTY(EmitAngle, emitAngle, GMfloat)
+	GM_DECLARE_PROPERTY(EmitAngleV, emitAngleV, GMfloat)
+	GM_DECLARE_PROPERTY(EmitSpeed, emitSpeed, GMfloat)
+	GM_DECLARE_PROPERTY(EmitSpeedV, emitSpeedV, GMfloat)
 	GM_DECLARE_PROPERTY(ParticleCount, particleCount, GMint)
 	GM_DECLARE_PROPERTY(EmitRate, emitRate, GMfloat)
 	GM_DECLARE_PROPERTY(Duration, duration, GMfloat)

@@ -9,43 +9,9 @@
 
 namespace
 {
-	template <typename Engine>
-	class Random
+	GMMat4 getTransformMatrix(const IRenderContext* context)
 	{
-	public:
-		template<typename T>
-		static inline T random_real(T min, T max)
-		{
-			std::uniform_real_distribution<T> dist(min, max);
-			auto &mt = getEngine();
-			return dist(mt);
-		}
-
-		template<typename T>
-		static inline T random_int(T min, T max)
-		{
-			std::uniform_int_distribution<T> dist(min, max);
-			auto &mt = getEngine();
-			return dist(mt);
-		}
-
-	private:
-		static Engine& getEngine();
-	};
-
-	template <typename Engine>
-	Engine& Random<Engine>::getEngine()
-	{
-		static std::random_device seed_gen;
-		static Engine engine(seed_gen());
-		return engine;
-	}
-
-	using RandomMt19937 = Random<std::mt19937>;
-
-	GMMat4& getTransformMatrix(const IRenderContext* context)
-	{
-		static GMMat4 mat = Ortho(
+		GMMat4 mat = Ortho(
 			0,
 			context->getWindow()->getWindowRect().width,
 			context->getWindow()->getWindowRect().height,
@@ -56,14 +22,14 @@ namespace
 		return mat;
 	}
 
-	void update4Vertex(
+	void update4Vertices(
 		GMVertex* vertex,
 		const GMVec3& centerPt,
 		const GMVec2& halfExtents,
 		const GMVec4& color,
 		GMfloat rotationRad,
 		const GMVec3& rotationAxis,
-		const IRenderContext* context,
+		const GMMat4& transformMatrix,
 		GMfloat z = 0
 	)
 	{
@@ -84,7 +50,6 @@ namespace
 			GMVec4(centerPt.getX() + x, centerPt.getY() + y, z, 1),
 		};
 
-		GMMat4 transformMatrix = getTransformMatrix(context);
 		GMVec4 transformed[4] = {
 			raw[0] * q * transformMatrix,
 			raw[1] * q * transformMatrix,
@@ -362,6 +327,10 @@ GMGameObject* GMParticleSystem::createGameObject(const IRenderContext* context)
 	GMsize_t total = getEmitter()->getParticleCount();
 	for (GMsize_t i = 0; i < total; ++i)
 	{
+		// 一个particle由4个定点组成
+		mesh->vertex(GMVertex());
+		mesh->vertex(GMVertex());
+		mesh->vertex(GMVertex());
 		mesh->vertex(GMVertex());
 	}
 
@@ -378,18 +347,19 @@ void GMParticleSystem::updateData(const IRenderContext* context, void* dataPtr)
 	GMVertex* vPtr = reinterpret_cast<GMVertex*>(dataPtr);
 	constexpr GMsize_t szVertex = sizeof(GMVertex);
 	auto& particles = d->emitter->getParticles();
+	GMMat4 transformMatrix = getTransformMatrix(context);
 	// 一个粒子有4个顶点
 	for (auto particle : particles)
 	{
 		GMfloat he = particle->getSize() / 2.f;
-		update4Vertex(
+		update4Vertices(
 			vPtr,
 			particle->getPosition(),
 			he,
 			particle->getColor(),
 			particle->getRotation(),
 			GMVec3(0, 0, 1),
-			context
+			transformMatrix
 		);
 		vPtr += 4;
 	}
@@ -629,15 +599,15 @@ void GMParticleEffect::setParticleDescription(const GMParticleDescription& desc)
 void GMParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle* particle)
 {
 	D(d);
-	GMVec3 randomPos(RandomMt19937::random_real(-1.f, 1.f), RandomMt19937::random_real(-1.f, 1.f), RandomMt19937::random_real(-1.f, 1.f));
+	GMVec3 randomPos(GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f));
 	particle->setPosition(emitter->getEmitPosition() + emitter->getEmitPositionV() * randomPos);
 
 	particle->setStartPosition(emitter->getEmitPosition());
 	particle->setChangePosition(particle->getPosition());
-	particle->setRemainingLife(Max(.1f, getLife() + getLifeV() * RandomMt19937::random_real(-1.f, 1.f)));
+	particle->setRemainingLife(Max(.1f, getLife() + getLifeV() * GMRandomMt19937::random_real(-1.f, 1.f)));
 
-	GMVec4 randomBeginColor(RandomMt19937::random_real(-1.f, 1.f), RandomMt19937::random_real(-1.f, 1.f), RandomMt19937::random_real(-1.f, 1.f), RandomMt19937::random_real(-1.f, 1.f));
-	GMVec4 randomEndColor(RandomMt19937::random_real(-1.f, 1.f), RandomMt19937::random_real(-1.f, 1.f), RandomMt19937::random_real(-1.f, 1.f), RandomMt19937::random_real(-1.f, 1.f));
+	GMVec4 randomBeginColor(GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f));
+	GMVec4 randomEndColor(GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f));
 
 	GMVec4 beginColor, endColor;
 	beginColor = Clamp(getBeginColor() + getBeginColorV() * randomBeginColor, 0, 1);
@@ -647,11 +617,11 @@ void GMParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle* part
 	particle->setColor(beginColor);
 	particle->setDeltaColor((endColor - beginColor) * remainingLifeRev);
 
-	GMfloat beginSize = Max(0, getBeginSize() + getBeginSizeV() * RandomMt19937::random_real(-1.f, 1.f));
-	GMfloat endSize = Max(0, getEndSize() + getEndSize() * RandomMt19937::random_real(-1.f, 1.f));
+	GMfloat beginSize = Max(0, getBeginSize() + getBeginSizeV() * GMRandomMt19937::random_real(-1.f, 1.f));
+	GMfloat endSize = Max(0, getEndSize() + getEndSize() * GMRandomMt19937::random_real(-1.f, 1.f));
 
-	GMfloat beginSpin = Radians(Max(0, getBeginSpin() + getBeginSpinV() * RandomMt19937::random_real(-1.f, 1.f)));
-	GMfloat endSpin = Radians(Max(0, getEndSpin() + getEndSpin() * RandomMt19937::random_real(-1.f, 1.f)));
+	GMfloat beginSpin = Radians(Max(0, getBeginSpin() + getBeginSpinV() * GMRandomMt19937::random_real(-1.f, 1.f)));
+	GMfloat endSpin = Radians(Max(0, getEndSpin() + getEndSpin() * GMRandomMt19937::random_real(-1.f, 1.f)));
 	particle->setRotation(beginSpin);
 	particle->setDeltaRotation((endSpin - beginSpin) * remainingLifeRev);
 }

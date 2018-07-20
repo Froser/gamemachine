@@ -4,6 +4,7 @@
 #include <linearmath.h>
 #include "../vector.h"
 #include <time.h>
+#include <random>
 BEGIN_NS
 
 // 此类包含了各种实用工具
@@ -349,5 +350,40 @@ struct GMClipboard
 	static void setData(GMClipboardMIME mime, const GMBuffer& buffer);
 	static GMBuffer getData(GMClipboardMIME mime);
 };
+
+template <typename Engine>
+class GMRandom
+{
+public:
+	template<typename T>
+	static inline T random_real(T min, T max)
+	{
+		std::uniform_real_distribution<T> dist(min, max);
+		auto &mt = getEngine();
+		return dist(mt);
+	}
+
+	template<typename T>
+	static inline T random_int(T min, T max)
+	{
+		std::uniform_int_distribution<T> dist(min, max);
+		auto &mt = getEngine();
+		return dist(mt);
+	}
+
+private:
+	static Engine& getEngine();
+};
+
+template <typename Engine>
+Engine& GMRandom<Engine>::getEngine()
+{
+	static std::random_device seed_gen;
+	static Engine engine(seed_gen());
+	return engine;
+}
+
+using GMRandomMt19937 = GMRandom<std::mt19937>;
+
 END_NS
 #endif

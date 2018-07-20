@@ -25,7 +25,7 @@ void Demo_Particle::init()
 
 	gm::GMParticleSystem* psFire = new gm::GMParticleSystem();
 	psFire->setDescription(gm::GMParticleSystem::createParticleDescriptionFromCocos2DPlist(gm::GMString((const char*)buf.buffer)));
-	psFire->getEmitter()->setEmitPosition(GMVec3(0, 0, 0));
+	psFire->getEmitter()->setEmitPosition(GMVec3(800, 600, 0));
 	psFire->getEmitter()->getEffect()->setMotionMode(gm::GMParticleMotionMode::Relative);
 
 	d->particleSystemManager->addParticleSystem(psFire);

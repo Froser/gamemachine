@@ -4,6 +4,15 @@
 void GMGravityParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle* particle)
 {
 	GMParticleEffect::initParticle(emitter, particle);
+
+	GMfloat particleSpeed = emitter->getEmitSpeed() + emitter->getEmitSpeedV() * GMRandomMt19937::random_real(-1.f, 1.f);
+	GMfloat angle = emitter->getEmitAngle() + emitter->getEmitAngleV() * GMRandomMt19937::random_real(-1.f, 1.f);
+
+	// TODO 目前只考虑二维的，之后会要指定一个方向向量
+	GMVec3 particleDirection = GMVec3(Cos(Radians(angle)), Sin(Radians(angle)), 0);
+	particle->getGravityModeData().initialVelocity = particleDirection * particleSpeed;
+	particle->getGravityModeData().tangentialAcceleration = getGravityMode().getTangentialAcceleration() + getGravityMode().getTangentialAccelerationV() * GMRandomMt19937::random_real(-1.f, 1.f);
+	particle->getGravityModeData().radialAcceleration = getGravityMode().getRadialAcceleration() + getGravityMode().getRadialAccelerationV() * GMRandomMt19937::random_real(-1.f, 1.f);
 }
 
 void GMGravityParticleEffect::update(GMParticleEmitter* emitter, GMDuration dt)
