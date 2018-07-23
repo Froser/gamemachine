@@ -22,7 +22,7 @@ namespace
 		return mat;
 	}
 
-	void update4Vertices(
+	void update6Vertices(
 		GMVertex* vertex,
 		const GMVec3& centerPt,
 		const GMVec2& halfExtents,
@@ -58,8 +58,9 @@ namespace
 		};
 
 		// 排列方式：
-		// 2 4
-		// 1 3
+		// 1   | 1 3
+		// 0 2 |   2
+		// (0, 1, 2), (2, 1, 3)
 		const GMfloat vertices[4][3] = {
 			{ transformed[0].getX(), transformed[0].getY(), transformed[0].getZ() },
 			{ transformed[1].getX(), transformed[1].getY(), transformed[1].getZ() },
@@ -75,7 +76,7 @@ namespace
 			{ 0 },
 			{ 0 },
 			{ color.getX(), color.getY(), color.getZ(), color.getW() }
-		},
+		};
 		vertex[1] = {
 			{ vertices[1][0], vertices[1][1], vertices[1][2] }, //position
 			{ 0, -1.f, 0 }, //normal
@@ -84,7 +85,7 @@ namespace
 			{ 0 },
 			{ 0 },
 			{ color.getX(), color.getY(), color.getZ(), color.getW() }
-		},
+		};
 		vertex[2] = {
 			{ vertices[2][0], vertices[2][1], vertices[2][2] }, //position
 			{ 0, -1.f, 0 }, //normal
@@ -93,8 +94,26 @@ namespace
 			{ 0 },
 			{ 0 },
 			{ color.getX(), color.getY(), color.getZ(), color.getW() }
-		},
+		};
 		vertex[3] = {
+			{ vertices[2][0], vertices[2][1], vertices[2][2] }, //position
+			{ 0, -1.f, 0 }, //normal
+			{ texcoord[2][0], texcoord[2][1] }, //texcoord
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ color.getX(), color.getY(), color.getZ(), color.getW() }
+		};
+		vertex[4] = {
+			{ vertices[1][0], vertices[1][1], vertices[1][2] }, //position
+			{ 0, -1.f, 0 }, //normal
+			{ texcoord[1][0], texcoord[1][1] }, //texcoord
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ color.getX(), color.getY(), color.getZ(), color.getW() }
+		};
+		vertex[5] = {
 			{ vertices[3][0], vertices[3][1], vertices[3][2] }, //position
 			{ 0, -1.f, 0 }, //normal
 			{ texcoord[3][0], texcoord[3][1] }, //texcoord
@@ -320,14 +339,16 @@ GMGameObject* GMParticleSystem::createGameObject(const IRenderContext* context)
 	d->particleModel->setUsageHint(GMUsageHint::DynamicDraw);
 	d->particleModel->setType(GMModelType::Particle);
 
-	d->particleModel->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
+	d->particleModel->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
 	GMMesh* mesh = new GMMesh(d->particleModel.get());
 	
-	// 使用strip拓扑，一次性填充所有的矩形
+	// 使用triangles拓扑，一次性填充所有的矩形
 	GMsize_t total = getEmitter()->getParticleCount();
 	for (GMsize_t i = 0; i < total; ++i)
 	{
-		// 一个particle由4个定点组成
+		// 一个particle由6个定点组成
+		mesh->vertex(GMVertex());
+		mesh->vertex(GMVertex());
 		mesh->vertex(GMVertex());
 		mesh->vertex(GMVertex());
 		mesh->vertex(GMVertex());
@@ -348,11 +369,11 @@ void GMParticleSystem::updateData(const IRenderContext* context, void* dataPtr)
 	constexpr GMsize_t szVertex = sizeof(GMVertex);
 	auto& particles = d->emitter->getParticles();
 	GMMat4 transformMatrix = getTransformMatrix(context);
-	// 一个粒子有4个顶点
+	// 一个粒子有6个顶点，2个三角形
 	for (auto particle : particles)
 	{
 		GMfloat he = particle->getSize() / 2.f;
-		update4Vertices(
+		update6Vertices(
 			vPtr,
 			particle->getPosition(),
 			he,
@@ -361,7 +382,7 @@ void GMParticleSystem::updateData(const IRenderContext* context, void* dataPtr)
 			GMVec3(0, 0, 1),
 			transformMatrix
 		);
-		vPtr += 4;
+		vPtr += 6;
 	}
 }
 
@@ -619,6 +640,8 @@ void GMParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle* part
 
 	GMfloat beginSize = Max(0, getBeginSize() + getBeginSizeV() * GMRandomMt19937::random_real(-1.f, 1.f));
 	GMfloat endSize = Max(0, getEndSize() + getEndSize() * GMRandomMt19937::random_real(-1.f, 1.f));
+	particle->setSize(beginSize);
+	particle->setDeltaSize((endSize - beginSize) / particle->getRemainingLife());
 
 	GMfloat beginSpin = Radians(Max(0, getBeginSpin() + getBeginSpinV() * GMRandomMt19937::random_real(-1.f, 1.f)));
 	GMfloat endSpin = Radians(Max(0, getEndSpin() + getEndSpin() * GMRandomMt19937::random_real(-1.f, 1.f)));
