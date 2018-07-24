@@ -337,9 +337,19 @@ void GMGLRenderer::applyShader(GMModel* model)
 {
 	prepareBlend(model);
 	prepareFrontFace(model);
+	prepareCull(model);
 	prepareDepth(model);
 	prepareLine(model);
 	prepareDebug(model);
+}
+
+void GMGLRenderer::prepareCull(GMModel* model)
+{
+	const GMShader& shader = model->getShader();
+	if (shader.getCull() == GMS_Cull::CULL)
+		glEnable(GL_CULL_FACE);
+	else
+		glDisable(GL_CULL_FACE);
 }
 
 void GMGLRenderer::prepareFrontFace(GMModel* model)

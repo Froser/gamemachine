@@ -218,6 +218,8 @@ IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
 		return newRenderer<GMDx11Renderer_Filter>(d->renderer_filter, db->context);
 	case GMModelType::LightPassQuad:
 		return newRenderer<GMDx11Renderer_Deferred_3D_LightPass>(d->renderer_deferred_3d_lightpass, db->context);
+	case GMModelType::Particle:
+		return newRenderer<GMDx11Renderer_Particle>(d->renderer_particle, db->context);
 	default:
 		GM_ASSERT(false);
 		return nullptr;

@@ -3,6 +3,7 @@
 #include <linearmath.h>
 #include "assert.h"
 #include "foundation/vector.h"
+#include <zlib.h>
 
 //GMClock
 GMClock::GMClock()
@@ -410,4 +411,120 @@ GMString GMConvertion::toUnixString(const GMString& string)
 GMString GMConvertion::toWin32String(const GMString& string)
 {
 	return toUnixString(string).replace(L"\n", L"\r\n");
+}
+
+GMBuffer GMConvertion::fromBase64(const GMBuffer& base64)
+{
+	GMuint buf = 0;
+	GMint nbits = 0;
+	GMBuffer tmp;
+	tmp.size = (base64.size * 3) / 4;
+	tmp.buffer = new GMbyte[tmp.size];
+	tmp.needRelease = true;
+
+	GMsize_t offset = 0;
+	for (GMsize_t i = 0; i < base64.size; ++i) {
+		GMint ch = base64.buffer[i];
+		GMint d;
+
+		if (ch >= 'A' && ch <= 'Z')
+			d = ch - 'A';
+		else if (ch >= 'a' && ch <= 'z')
+			d = ch - 'a' + 26;
+		else if (ch >= '0' && ch <= '9')
+			d = ch - '0' + 52;
+		else if (ch == '+')
+			d = 62;
+		else if (ch == '/')
+			d = 63;
+		else
+			d = -1;
+
+		if (d != -1) {
+			buf = (buf << 6) | d;
+			nbits += 6;
+			if (nbits >= 8) {
+				nbits -= 8;
+				tmp.buffer[offset++] = buf >> nbits;
+				buf &= (1 << nbits) - 1;
+			}
+		}
+	}
+
+	tmp.size = offset;
+	return std::move(tmp);
+}
+
+GMZip::ErrorCode GMZip::inflateMemory(const GMBuffer& buf, REF GMBuffer& out, REF GMsize_t& outSize, GMsize_t sizeHint)
+{
+	GMsize_t sizeIncFactor = 1;
+	out.buffer = new GMbyte[sizeHint];
+	out.size = sizeHint;
+	out.needRelease = true;
+	z_stream stream;
+	stream.zalloc = (alloc_func)0;
+	stream.zfree = (free_func)0;
+	stream.opaque = (voidpf)0;
+	stream.next_in = buf.buffer;
+	stream.avail_in = buf.size;
+	stream.next_out = out.buffer;
+	stream.avail_out = sizeHint;
+	GMint err = Z_OK;
+	if ((err = inflateInit2(&stream, 15 + 32)) != Z_OK)
+	{
+		gm_error(gm_dbg_wrap("inflate error. error code: {0}"), GMString(err));
+		return translateError(err);
+	}
+
+	while (true)
+	{
+		err = inflate(&stream, Z_NO_FLUSH);
+		if (err == Z_STREAM_END)
+			break;
+
+		switch (err)
+		{
+		case Z_NEED_DICT:
+			err = Z_DATA_ERROR;
+		case Z_DATA_ERROR:
+		case Z_MEM_ERROR:
+		case Z_STREAM_ERROR:
+			inflateEnd(&stream);
+			return translateError(err);
+		}
+
+
+		if (err != Z_STREAM_END)
+		{
+			// 内存不够的情况，重新生成一段数据
+			delete[] out.buffer;
+			GMsize_t newSize = sizeHint * (++sizeIncFactor);
+			out.buffer = new GMbyte[sizeHint];
+			out.size = sizeHint;
+			stream.next_out = out.buffer + sizeHint;
+			stream.avail_out = sizeHint;
+			sizeHint *= sizeIncFactor;
+		}
+	}
+
+	outSize = sizeHint - stream.avail_out;
+	return translateError(inflateEnd(&stream));
+}
+
+GMZip::ErrorCode GMZip::translateError(GMint err)
+{
+	switch (err)
+	{
+	case Z_OK:
+		return Ok;
+	case Z_MEM_ERROR:
+		return MemoryError;
+	case Z_VERSION_ERROR:
+		return VersionError;
+	case Z_DATA_ERROR:
+		return DataError;
+	case Z_STREAM_ERROR:
+		return StreamError;
+	}
+	return UnknownError;
 }

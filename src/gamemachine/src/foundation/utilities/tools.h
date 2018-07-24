@@ -324,7 +324,6 @@ struct GMAtomic
 	static void decrease(GMuint* n);
 };
 
-// Unit conversion
 struct GMConvertion
 {
 	static GMfloat pointToInch(GMint pt);
@@ -334,6 +333,7 @@ struct GMConvertion
 	static GMString toUnixString(const GMString& string);
 	static GMString toWin32String(const GMString& string);
 	static GMString toCurrentEnvironmentString(const GMString& string);
+	static GMBuffer fromBase64(const GMBuffer& base64);
 };
 
 enum class GMClipboardMIME
@@ -384,6 +384,25 @@ Engine& GMRandom<Engine>::getEngine()
 }
 
 using GMRandomMt19937 = GMRandom<std::mt19937>;
+
+class GMZip
+{
+public:
+	enum ErrorCode
+	{
+		Ok,
+		MemoryError,
+		VersionError,
+		DataError,
+		StreamError,
+		UnknownError,
+	};
+
+	static ErrorCode inflateMemory(const GMBuffer& buf, REF GMBuffer& out, REF GMsize_t& outSize, GMsize_t sizeHint);
+
+private:
+	static ErrorCode translateError(GMint);
+};
 
 END_NS
 #endif

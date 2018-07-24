@@ -230,5 +230,17 @@ protected:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 };
 
+class GMDx11Renderer_Particle : public GMDx11Renderer
+{
+public:
+	using GMDx11Renderer::GMDx11Renderer;
+
+protected:
+	virtual const char* getTechniqueName() override
+	{
+		return "GMTech_Particle";
+	}
+};
+
 END_NS
 #endif

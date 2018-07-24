@@ -4,6 +4,7 @@
 #include <gmxml.h>
 #include <random>
 #include "foundation/gamemachine.h"
+#include <zlib.h>
 
 #define Z 0
 
@@ -14,8 +15,8 @@ namespace
 		GMMat4 mat = Ortho(
 			0,
 			context->getWindow()->getWindowRect().width,
-			context->getWindow()->getWindowRect().height,
 			0,
+			context->getWindow()->getWindowRect().height,
 			-1,
 			1
 		);
@@ -177,6 +178,7 @@ GM_PRIVATE_OBJECT(GMCocos2DParticleDescriptionProxy)
 	GMfloat maxRadiusVariance = 0;
 	GMfloat rotatePerSecond = 0;
 	GMfloat rotatePerSecondVariance = 0;
+	GMString textureImageData;
 };
 
 class GMCocos2DParticleDescriptionProxy : public GMObject
@@ -232,6 +234,7 @@ class GMCocos2DParticleDescriptionProxy : public GMObject
 	GM_DECLARE_PROPERTY(MaxRadiusVariance, maxRadiusVariance, GMfloat)
 	GM_DECLARE_PROPERTY(RotatePerSecond, rotatePerSecond, GMfloat)
 	GM_DECLARE_PROPERTY(RotatePerSecondVariance, rotatePerSecondVariance, GMfloat)
+	GM_DECLARE_PROPERTY(TextureImageData, textureImageData, GMString)
 
 public:
 	virtual bool registerMeta() override
@@ -286,6 +289,7 @@ public:
 		GM_META(maxRadiusVariance)
 		GM_META(rotatePerSecond)
 		GM_META(rotatePerSecondVariance)
+		GM_META(textureImageData)
 		return true;
 	}
 };
@@ -301,6 +305,7 @@ void GMParticleSystem::setDescription(const GMParticleDescription& desc)
 	D(d);
 	GM_ASSERT(d->emitter);
 	d->emitter->setDescription(desc);
+	d->textureBuffer = desc.getTextureImageData();
 }
 
 void GMParticleSystem::update(GMDuration dt)
@@ -315,6 +320,20 @@ void GMParticleSystem::render(const IRenderContext* context)
 	if (!d->particleObject)
 	{
 		d->particleObject.reset(createGameObject(context));
+
+		// 获取并设置纹理
+		GMImage* image = nullptr;
+		GMImageReader::load(d->textureBuffer.buffer, d->textureBuffer.size, &image);
+		if (image)
+		{
+			ITexture* texture = nullptr;
+			GM.getFactory()->createTexture(context, image, &texture);
+			GM_delete(image);
+			GM_ASSERT(!d->particleObject->getModels().empty());
+			GMModel* model = d->particleObject->getModels()[0];
+			model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(texture);
+			d->texture.reset(texture);
+		}
 	}
 
 	if (d->particleObject)
@@ -336,6 +355,9 @@ GMGameObject* GMParticleSystem::createGameObject(const IRenderContext* context)
 	D(d);
 	GMGameObject* object = new GMGameObject();
 	d->particleModel.reset(new GMModel());
+	d->particleModel->getShader().setBlend(true);
+	d->particleModel->getShader().setBlendFactorSource(GMS_BlendFunc::SRC_ALPHA);
+	d->particleModel->getShader().setBlendFactorDest(GMS_BlendFunc::ONE);
 	d->particleModel->setUsageHint(GMUsageHint::DynamicDraw);
 	d->particleModel->setType(GMModelType::Particle);
 
@@ -454,6 +476,22 @@ GMParticleDescription GMParticleSystem::createParticleDescriptionFromCocos2DPlis
 	desc.getRadiusMode().setEndRadiusV(proxy.getMinRadiusVariance());
 	desc.getRadiusMode().setSpinPerSecond(proxy.getRotatePerSecond());
 	desc.getRadiusMode().setSpinPerSecondV(proxy.getRotatePerSecondVariance());
+
+	GMBuffer buf;
+	std::string imageData = proxy.getTextureImageData().toStdString();
+	buf.buffer = (GMbyte*)(imageData.data());
+	buf.size = imageData.length() + 1; // \0
+
+	// Cocos2D 的纹理数据压缩过了，所以要解压
+	enum
+	{
+		TextureSizeHint = 1024 * 64
+	};
+	auto base64Decoded = GMConvertion::fromBase64(buf);
+	GMBuffer inflated;
+	GMsize_t imgSize;
+	if (GMZip::inflateMemory(base64Decoded, inflated, imgSize, TextureSizeHint) == GMZip::Ok)
+		desc.setTextureImageData(inflated);
 	return desc;
 }
 

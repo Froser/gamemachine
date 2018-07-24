@@ -100,6 +100,8 @@ GM_PRIVATE_OBJECT(GMParticleDescription)
 
 	GMParticleGravityMode gravityMode;
 	GMParticleRadiusMode radiusMode;
+
+	GMBuffer textureImageData;
 };
 
 class GMParticleDescription : public GMObject
@@ -134,6 +136,7 @@ class GMParticleDescription : public GMObject
 	GM_DECLARE_PROPERTY(EndSpinV, endSpinV, GMfloat)
 	GM_DECLARE_PROPERTY(GravityMode, gravityMode, GMParticleGravityMode)
 	GM_DECLARE_PROPERTY(RadiusMode, radiusMode, GMParticleRadiusMode)
+	GM_DECLARE_PROPERTY(TextureImageData, textureImageData, GMBuffer)
 
 public:
 	GMParticleDescription() = default;
@@ -306,10 +309,11 @@ public:
 GM_PRIVATE_OBJECT(GMParticleSystem)
 {
 	GMOwnedPtr<GMParticleEmitter> emitter;
-	ITexture* texture = nullptr;
 	GMParticleSystemManager* manager = nullptr;
 	GMOwnedPtr<GMGameObject> particleObject;
 	GMOwnedPtr<GMModel> particleModel;
+	GMBuffer textureBuffer;
+	GMOwnedPtr<ITexture> texture;
 };
 
 class GMParticleSystem : public GMObject
@@ -326,10 +330,10 @@ public:
 	void render(const IRenderContext* context);
 
 public:
-	inline void setTexture(ITexture* texture) GM_NOEXCEPT
+	inline void setTexture(AUTORELEASE ITexture* texture) GM_NOEXCEPT
 	{
 		D(d);
-		d->texture = texture;
+		d->texture.reset(texture);
 	}
 
 	inline GMParticleEmitter* getEmitter() GM_NOEXCEPT

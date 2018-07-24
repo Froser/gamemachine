@@ -54,6 +54,7 @@ protected:
 	void applyShader(GMModel* model);
 	void prepareBlend(GMModel* model);
 	void prepareFrontFace(GMModel* model);
+	void prepareCull(GMModel* model);
 	void prepareDepth(GMModel* model);
 	void prepareLine(GMModel* model);
 	void prepareDebug(GMModel* model);

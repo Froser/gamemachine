@@ -8,6 +8,7 @@
 #include "text.vert"
 #include "cubemap.vert"
 #include "shadow.vert"
+#include "particle.vert"
 
 void main(void)
 {

@@ -12,6 +12,4 @@ void GM_Particle()
     {
         _frag_color = vec4(0, 0, 0, 0);
     }
-
-    _frag_color = vec4(1, 1, 1, 1);
 }

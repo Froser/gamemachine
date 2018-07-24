@@ -42,6 +42,7 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMOwnedPtr<IRenderer> renderer_deferred_3d;
 	GMOwnedPtr<IRenderer> renderer_deferred_3d_lightpass;
 	GMOwnedPtr<IRenderer> renderer_3d_shadow;
+	GMOwnedPtr<IRenderer> renderer_particle;
 };
 
 class GMDx11GraphicEngine : public GMGraphicEngine

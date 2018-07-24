@@ -419,12 +419,14 @@ struct GMBuffer
 	GMBuffer& operator =(GMBuffer&& rhs) GM_NOEXCEPT;
 	GMBuffer& operator =(const GMBuffer& rhs);
 
+public:
 	void convertToStringBuffer();
 	void convertToStringBufferW();
 	void swap(GMBuffer& rhs);
 
+public:
 	GMbyte* buffer = nullptr;
-	GMuint size = 0;
+	GMsize_t size = 0;
 	bool needRelease = false; // 表示是否需要手动释放
 };
 

@@ -10,6 +10,7 @@
 #include "text.frag"
 #include "cubemap.frag"
 #include "shadow.frag"
+#include "particle.frag"
 
 void main(void)
 {

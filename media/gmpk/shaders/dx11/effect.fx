@@ -1057,6 +1057,21 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
 }
 
 //--------------------------------------------------------------------------------------
+// Particle
+//--------------------------------------------------------------------------------------
+VS_OUTPUT VS_Particle(VS_INPUT input)
+{
+    return VS_3D(input);
+}
+
+float4 PS_Particle(PS_INPUT input) : SV_TARGET
+{
+    float4 result = GM_AmbientTextureAttribute.Sample(GM_AmbientTexture, GM_AmbientSampler, input.Texcoord);
+    result *= input.Color;
+    return result;
+}
+
+//--------------------------------------------------------------------------------------
 // Shadow
 //--------------------------------------------------------------------------------------
 VS_OUTPUT VS_Shadow( VS_INPUT input )
@@ -1373,6 +1388,18 @@ technique11 GMTech_3D_Shadow
     pass P0
     {
         SetVertexShader(CompileShader(vs_5_0,VS_Shadow()));
+        SetRasterizerState(GM_RasterizerState);
+        SetDepthStencilState(GM_DepthStencilState, 1);
+        SetBlendState(GM_BlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+    }
+}
+
+technique11 GMTech_Particle
+{
+    pass P0
+    {
+        SetVertexShader(CompileShader(vs_5_0,VS_Particle()));
+        SetPixelShader(CompileShader(ps_5_0,PS_Particle()));
         SetRasterizerState(GM_RasterizerState);
         SetDepthStencilState(GM_DepthStencilState, 1);
         SetBlendState(GM_BlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
