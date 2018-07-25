@@ -11,7 +11,7 @@ void Demo_Particle::init()
 
 	// 创建对象
 	getDemoWorldReference().reset(new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext()));
-	d->particleSystemManager.reset(new gm::GMParticleSystemManager(getDemoWorldReference()->getContext()));
+	d->particleSystemManager.reset(new gm::GMParticleSystemManager(getDemoWorldReference()->getContext(), 128));
 
 	gm::GMControlButton* button = nullptr;
 	gm::GMWidget* widget = createDefaultWidget();
@@ -25,7 +25,6 @@ void Demo_Particle::init()
 
 	gm::GMParticleSystem* psFire = new gm::GMParticleSystem();
 	psFire->setDescription(gm::GMParticleSystem::createParticleDescriptionFromCocos2DPlist(gm::GMString((const char*)buf.buffer)));
-	psFire->getEmitter()->setParticleCount(20);
 	psFire->getEmitter()->setEmitPosition(GMVec3(800, 600, 0));
 	psFire->getEmitter()->getEffect()->setMotionMode(gm::GMParticleMotionMode::Relative);
 

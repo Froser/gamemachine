@@ -7,6 +7,16 @@ BEGIN_NS
 class GMParticleSystem;
 class GMParticleSystemManager;
 
+GM_INTERFACE(IParticleModel)
+{
+	virtual void render(const IRenderContext* context) = 0;
+};
+
+enum class GMParticleModelType
+{
+	Particle2D,
+};
+
 enum class GMParticleEmitterType
 {
 	Gravity,
@@ -102,6 +112,7 @@ GM_PRIVATE_OBJECT(GMParticleDescription)
 	GMParticleRadiusMode radiusMode;
 
 	GMBuffer textureImageData;
+	GMParticleModelType particleModelType = GMParticleModelType::Particle2D;
 };
 
 class GMParticleDescription : public GMObject
@@ -137,6 +148,7 @@ class GMParticleDescription : public GMObject
 	GM_DECLARE_PROPERTY(GravityMode, gravityMode, GMParticleGravityMode)
 	GM_DECLARE_PROPERTY(RadiusMode, radiusMode, GMParticleRadiusMode)
 	GM_DECLARE_PROPERTY(TextureImageData, textureImageData, GMBuffer)
+	GM_DECLARE_PROPERTY(ParticleModelType, particleModelType, GMParticleModelType)
 
 public:
 	GMParticleDescription() = default;
@@ -248,10 +260,16 @@ public:
 		return d->effect.get();
 	}
 
-	List<GMParticle*>& getParticles() GM_NOEXCEPT
+	inline List<GMParticle*>& getParticles() GM_NOEXCEPT
 	{
 		D(d);
 		return d->particles;
+	}
+
+	inline GMParticleSystem* getParticleSystem() GM_NOEXCEPT
+	{
+		D(d);
+		return d->system;
 	}
 };
 
@@ -310,10 +328,9 @@ GM_PRIVATE_OBJECT(GMParticleSystem)
 {
 	GMOwnedPtr<GMParticleEmitter> emitter;
 	GMParticleSystemManager* manager = nullptr;
-	GMOwnedPtr<GMGameObject> particleObject;
-	GMOwnedPtr<GMModel> particleModel;
-	GMBuffer textureBuffer;
 	GMOwnedPtr<ITexture> texture;
+	GMBuffer textureBuffer;
+	GMOwnedPtr<IParticleModel> particleModel;
 };
 
 class GMParticleSystem : public GMObject
@@ -330,10 +347,19 @@ public:
 	void render(const IRenderContext* context);
 
 public:
+	virtual IParticleModel* createParticleModel(const GMParticleDescription& desc);
+
+public:
 	inline void setTexture(AUTORELEASE ITexture* texture) GM_NOEXCEPT
 	{
 		D(d);
 		d->texture.reset(texture);
+	}
+
+	inline ITexture* getTexture() GM_NOEXCEPT
+	{
+		D(d);
+		return d->texture.get();
 	}
 
 	inline GMParticleEmitter* getEmitter() GM_NOEXCEPT
@@ -346,6 +372,18 @@ public:
 	{
 		D(d);
 		return d->manager;
+	}
+
+	inline const GMBuffer& getTextureBuffer() GM_NOEXCEPT
+	{
+		D(d);
+		return d->textureBuffer;
+	}
+
+	inline void setParticleModel(AUTORELEASE IParticleModel* particleModel) GM_NOEXCEPT
+	{
+		D(d);
+		d->particleModel.reset(particleModel);
 	}
 
 private:
@@ -366,7 +404,9 @@ public:
 GM_PRIVATE_OBJECT(GMParticlePool)
 {
 	Vector<GMOwnedPtr<GMParticle>> particlePool;
+	Vector<GMParticle*> unused;
 	GMsize_t index = 0;
+	GMsize_t capacity = 0;
 };
 
 class GMParticlePool : public GMObject
@@ -375,9 +415,13 @@ class GMParticlePool : public GMObject
 
 public:
 	void init(GMsize_t count);
-	void free();
+	void freeAll();
 	GMParticle* alloc();
+	void free(GMParticle* particle);
 	GMsize_t getCapacity() GM_NOEXCEPT;
+
+private:
+	void expand(GMsize_t size);
 };
 
 GM_PRIVATE_OBJECT(GMParticleSystemManager)
@@ -392,7 +436,7 @@ class GMParticleSystemManager : public GMObject
 	GM_DECLARE_PRIVATE(GMParticleSystemManager)
 
 public:
-	GMParticleSystemManager(const IRenderContext* context);
+	GMParticleSystemManager(const IRenderContext* context, GMsize_t particleCountHint = 128);
 
 public:
 	void addParticleSystem(AUTORELEASE GMParticleSystem* ps);

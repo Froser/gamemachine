@@ -70,7 +70,8 @@ void GMGravityParticleEffect::update(GMParticleEmitter* emitter, GMDuration dt)
 		}
 		else
 		{
-			// TODO 移除粒子
+			GMParticlePool& pool = emitter->getParticleSystem()->getParticleSystemManager()->getPool();
+			pool.free(*iter);
 			iter = particles.erase(iter);
 		}
 	}

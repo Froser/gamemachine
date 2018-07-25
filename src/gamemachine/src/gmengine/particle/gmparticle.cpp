@@ -22,7 +22,36 @@ namespace
 		);
 		return mat;
 	}
+}
 
+GM_PRIVATE_OBJECT(GMParticleModel_2D)
+{
+	GMOwnedPtr<GMGameObject> particleObject;
+	GMOwnedPtr<GMModel> particleModel;
+	GMParticleSystem* system = nullptr;
+};
+
+//! 表示一个2D粒子，是一个四边形
+class GMParticleModel_2D : public GMObject, public IParticleModel
+{
+	GM_DECLARE_PRIVATE(GMParticleModel_2D)
+
+public:
+	GMParticleModel_2D(GMParticleSystem* system);
+
+public:
+	virtual void render(const IRenderContext* context) override;
+
+private:
+	GMGameObject* createGameObject(
+		const IRenderContext* context
+	);
+
+	void updateData(
+		const IRenderContext* context,
+		void* dataPtr
+	);
+	
 	void update6Vertices(
 		GMVertex* vertex,
 		const GMVec3& centerPt,
@@ -32,98 +61,216 @@ namespace
 		const GMVec3& rotationAxis,
 		const GMMat4& transformMatrix,
 		GMfloat z = 0
-	)
+	);
+};
+
+GMParticleModel_2D::GMParticleModel_2D(GMParticleSystem* system)
+{
+	D(d);
+	d->system = system;
+}
+
+void GMParticleModel_2D::render(const IRenderContext* context)
+{
+	D(d);
+	if (!d->particleObject)
 	{
-		constexpr GMfloat texcoord[4][2] =
+		d->particleObject.reset(createGameObject(context));
+
+		if (!d->system->getTexture())
 		{
-			{ 0, 1 },
-			{ 0, 0 },
-			{ 1, 1 },
-			{ 1, 0 },
-		};
-
-		const GMfloat x = halfExtents.getX(), y = halfExtents.getY();
-		GMQuat q = Rotate(rotationRad, rotationAxis);
-		GMVec4 raw[4] = {
-			GMVec4(centerPt.getX() - x, centerPt.getY() - y, z, 1),
-			GMVec4(centerPt.getX() - x, centerPt.getY() + y, z, 1),
-			GMVec4(centerPt.getX() + x, centerPt.getY() - y, z, 1),
-			GMVec4(centerPt.getX() + x, centerPt.getY() + y, z, 1),
-		};
-
-		GMVec4 transformed[4] = {
-			raw[0] * q * transformMatrix,
-			raw[1] * q * transformMatrix,
-			raw[2] * q * transformMatrix,
-			raw[3] * q * transformMatrix,
-		};
-
-		// 排列方式：
-		// 1   | 1 3
-		// 0 2 |   2
-		// (0, 1, 2), (2, 1, 3)
-		const GMfloat vertices[4][3] = {
-			{ transformed[0].getX(), transformed[0].getY(), transformed[0].getZ() },
-			{ transformed[1].getX(), transformed[1].getY(), transformed[1].getZ() },
-			{ transformed[2].getX(), transformed[2].getY(), transformed[2].getZ() },
-			{ transformed[3].getX(), transformed[3].getY(), transformed[3].getZ() },
-		};
-
-		vertex[0] = {
-			{ vertices[0][0], vertices[0][1], vertices[0][2] }, //position
-			{ 0, -1.f, 0 }, //normal
-			{ texcoord[0][0], texcoord[0][1] }, //texcoord
-			{ 0 },
-			{ 0 },
-			{ 0 },
-			{ color.getX(), color.getY(), color.getZ(), color.getW() }
-		};
-		vertex[1] = {
-			{ vertices[1][0], vertices[1][1], vertices[1][2] }, //position
-			{ 0, -1.f, 0 }, //normal
-			{ texcoord[1][0], texcoord[1][1] }, //texcoord
-			{ 0 },
-			{ 0 },
-			{ 0 },
-			{ color.getX(), color.getY(), color.getZ(), color.getW() }
-		};
-		vertex[2] = {
-			{ vertices[2][0], vertices[2][1], vertices[2][2] }, //position
-			{ 0, -1.f, 0 }, //normal
-			{ texcoord[2][0], texcoord[2][1] }, //texcoord
-			{ 0 },
-			{ 0 },
-			{ 0 },
-			{ color.getX(), color.getY(), color.getZ(), color.getW() }
-		};
-		vertex[3] = {
-			{ vertices[2][0], vertices[2][1], vertices[2][2] }, //position
-			{ 0, -1.f, 0 }, //normal
-			{ texcoord[2][0], texcoord[2][1] }, //texcoord
-			{ 0 },
-			{ 0 },
-			{ 0 },
-			{ color.getX(), color.getY(), color.getZ(), color.getW() }
-		};
-		vertex[4] = {
-			{ vertices[1][0], vertices[1][1], vertices[1][2] }, //position
-			{ 0, -1.f, 0 }, //normal
-			{ texcoord[1][0], texcoord[1][1] }, //texcoord
-			{ 0 },
-			{ 0 },
-			{ 0 },
-			{ color.getX(), color.getY(), color.getZ(), color.getW() }
-		};
-		vertex[5] = {
-			{ vertices[3][0], vertices[3][1], vertices[3][2] }, //position
-			{ 0, -1.f, 0 }, //normal
-			{ texcoord[3][0], texcoord[3][1] }, //texcoord
-			{ 0 },
-			{ 0 },
-			{ 0 },
-			{ color.getX(), color.getY(), color.getZ(), color.getW() }
-		};
+			// 获取并设置纹理
+			GMImage* image = nullptr;
+			auto& buffer = d->system->getTextureBuffer();
+			if (buffer.buffer)
+			{
+				GMImageReader::load(buffer.buffer, buffer.size, &image);
+				if (image)
+				{
+					ITexture* texture = nullptr;
+					GM.getFactory()->createTexture(context, image, &texture);
+					GM_delete(image);
+					GM_ASSERT(!d->particleObject->getModels().empty());
+					GMModel* model = d->particleObject->getModels()[0];
+					model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(texture);
+					d->system->setTexture(texture);
+				}
+			}
+		}
 	}
+
+	if (d->particleObject)
+	{
+		// 开始更新粒子数据
+		auto dataProxy = d->particleModel->getModelDataProxy();
+		dataProxy->beginUpdateBuffer();
+		void* dataPtr = dataProxy->getBuffer();
+		updateData(context, dataPtr);
+		dataProxy->endUpdateBuffer();
+	}
+
+	GM_ASSERT(d->particleObject);
+	d->particleObject->draw();
+}
+
+void GMParticleModel_2D::updateData(const IRenderContext* context, void* dataPtr)
+{
+	D(d);
+	GMVertex* vPtr = reinterpret_cast<GMVertex*>(dataPtr);
+	constexpr GMsize_t szVertex = sizeof(GMVertex);
+	auto& particles = d->system->getEmitter()->getParticles();
+	GMMat4 transformMatrix = getTransformMatrix(context);
+	// 一个粒子有6个顶点，2个三角形
+	for (auto particle : particles)
+	{
+		GMfloat he = particle->getSize() / 2.f;
+		update6Vertices(
+			vPtr,
+			particle->getPosition(),
+			he,
+			particle->getColor(),
+			particle->getRotation(),
+			GMVec3(0, 0, 1),
+			transformMatrix
+		);
+		vPtr += 6;
+	}
+}
+GMGameObject* GMParticleModel_2D::createGameObject(
+	const IRenderContext* context
+)
+{
+	D(d);
+	GMGameObject* object = new GMGameObject();
+	d->particleModel.reset(new GMModel());
+	d->particleModel->getShader().setBlend(true);
+	d->particleModel->getShader().setBlendFactorSource(GMS_BlendFunc::SRC_ALPHA);
+	d->particleModel->getShader().setBlendFactorDest(GMS_BlendFunc::ONE);
+	d->particleModel->setUsageHint(GMUsageHint::DynamicDraw);
+	d->particleModel->setType(GMModelType::Particle);
+
+	d->particleModel->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
+	GMMesh* mesh = new GMMesh(d->particleModel.get());
+
+	// 使用triangles拓扑，一次性填充所有的矩形
+	GMsize_t total = d->system->getEmitter()->getParticleCount();
+	for (GMsize_t i = 0; i < total; ++i)
+	{
+		// 一个particle由6个定点组成
+		mesh->vertex(GMVertex());
+		mesh->vertex(GMVertex());
+		mesh->vertex(GMVertex());
+		mesh->vertex(GMVertex());
+		mesh->vertex(GMVertex());
+		mesh->vertex(GMVertex());
+	}
+
+	GM.createModelDataProxyAndTransfer(context, d->particleModel.get());
+	object->setContext(context);
+	object->addModel(GMAssets::createIsolatedAsset(GMAssetType::Model, d->particleModel.get()));
+	return object;
+}
+
+void GMParticleModel_2D::update6Vertices(
+	GMVertex* vertex,
+	const GMVec3& centerPt,
+	const GMVec2& halfExtents,
+	const GMVec4& color,
+	GMfloat rotationRad,
+	const GMVec3& rotationAxis,
+	const GMMat4& transformMatrix,
+	GMfloat z
+)
+{
+	constexpr GMfloat texcoord[4][2] =
+	{
+		{ 0, 1 },
+		{ 0, 0 },
+		{ 1, 1 },
+		{ 1, 0 },
+	};
+
+	const GMfloat x = halfExtents.getX(), y = halfExtents.getY();
+	GMQuat q = Rotate(rotationRad, rotationAxis);
+	GMVec4 raw[4] = {
+		GMVec4(centerPt.getX() - x, centerPt.getY() - y, z, 1),
+		GMVec4(centerPt.getX() - x, centerPt.getY() + y, z, 1),
+		GMVec4(centerPt.getX() + x, centerPt.getY() - y, z, 1),
+		GMVec4(centerPt.getX() + x, centerPt.getY() + y, z, 1),
+	};
+
+	GMVec4 transformed[4] = {
+		raw[0] * q * transformMatrix,
+		raw[1] * q * transformMatrix,
+		raw[2] * q * transformMatrix,
+		raw[3] * q * transformMatrix,
+	};
+
+	// 排列方式：
+	// 1   | 1 3
+	// 0 2 |   2
+	// (0, 1, 2), (2, 1, 3)
+	const GMfloat vertices[4][3] = {
+		{ transformed[0].getX(), transformed[0].getY(), transformed[0].getZ() },
+		{ transformed[1].getX(), transformed[1].getY(), transformed[1].getZ() },
+		{ transformed[2].getX(), transformed[2].getY(), transformed[2].getZ() },
+		{ transformed[3].getX(), transformed[3].getY(), transformed[3].getZ() },
+	};
+
+	vertex[0] = {
+		{ vertices[0][0], vertices[0][1], vertices[0][2] }, //position
+		{ 0, -1.f, 0 }, //normal
+		{ texcoord[0][0], texcoord[0][1] }, //texcoord
+		{ 0 },
+		{ 0 },
+		{ 0 },
+		{ color.getX(), color.getY(), color.getZ(), color.getW() }
+	};
+	vertex[1] = {
+		{ vertices[1][0], vertices[1][1], vertices[1][2] }, //position
+		{ 0, -1.f, 0 }, //normal
+		{ texcoord[1][0], texcoord[1][1] }, //texcoord
+		{ 0 },
+		{ 0 },
+		{ 0 },
+		{ color.getX(), color.getY(), color.getZ(), color.getW() }
+	};
+	vertex[2] = {
+		{ vertices[2][0], vertices[2][1], vertices[2][2] }, //position
+		{ 0, -1.f, 0 }, //normal
+		{ texcoord[2][0], texcoord[2][1] }, //texcoord
+		{ 0 },
+		{ 0 },
+		{ 0 },
+		{ color.getX(), color.getY(), color.getZ(), color.getW() }
+	};
+	vertex[3] = {
+		{ vertices[2][0], vertices[2][1], vertices[2][2] }, //position
+		{ 0, -1.f, 0 }, //normal
+		{ texcoord[2][0], texcoord[2][1] }, //texcoord
+		{ 0 },
+		{ 0 },
+		{ 0 },
+		{ color.getX(), color.getY(), color.getZ(), color.getW() }
+	};
+	vertex[4] = {
+		{ vertices[1][0], vertices[1][1], vertices[1][2] }, //position
+		{ 0, -1.f, 0 }, //normal
+		{ texcoord[1][0], texcoord[1][1] }, //texcoord
+		{ 0 },
+		{ 0 },
+		{ 0 },
+		{ color.getX(), color.getY(), color.getZ(), color.getW() }
+	};
+	vertex[5] = {
+		{ vertices[3][0], vertices[3][1], vertices[3][2] }, //position
+		{ 0, -1.f, 0 }, //normal
+		{ texcoord[3][0], texcoord[3][1] }, //texcoord
+		{ 0 },
+		{ 0 },
+		{ 0 },
+		{ color.getX(), color.getY(), color.getZ(), color.getW() }
+	};
 }
 
 GM_PRIVATE_OBJECT(GMCocos2DParticleDescriptionProxy)
@@ -306,6 +453,7 @@ void GMParticleSystem::setDescription(const GMParticleDescription& desc)
 	GM_ASSERT(d->emitter);
 	d->emitter->setDescription(desc);
 	d->textureBuffer = desc.getTextureImageData();
+	setParticleModel(createParticleModel(desc));
 }
 
 void GMParticleSystem::update(GMDuration dt)
@@ -317,94 +465,21 @@ void GMParticleSystem::update(GMDuration dt)
 void GMParticleSystem::render(const IRenderContext* context)
 {
 	D(d);
-	if (!d->particleObject)
-	{
-		d->particleObject.reset(createGameObject(context));
-
-		// 获取并设置纹理
-		GMImage* image = nullptr;
-		GMImageReader::load(d->textureBuffer.buffer, d->textureBuffer.size, &image);
-		if (image)
-		{
-			ITexture* texture = nullptr;
-			GM.getFactory()->createTexture(context, image, &texture);
-			GM_delete(image);
-			GM_ASSERT(!d->particleObject->getModels().empty());
-			GMModel* model = d->particleObject->getModels()[0];
-			model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(texture);
-			d->texture.reset(texture);
-		}
-	}
-
-	if (d->particleObject)
-	{
-		// 开始更新粒子数据
-		auto dataProxy = d->particleModel->getModelDataProxy();
-		dataProxy->beginUpdateBuffer();
-		void* dataPtr = dataProxy->getBuffer();
-		updateData(context, dataPtr);
-		dataProxy->endUpdateBuffer();
-	}
-
-	GM_ASSERT(d->particleObject);
-	d->particleObject->draw();
+	GM_ASSERT(d->particleModel);
+	d->particleModel->render(context);
 }
 
-GMGameObject* GMParticleSystem::createGameObject(const IRenderContext* context)
+IParticleModel* GMParticleSystem::createParticleModel(const GMParticleDescription& desc)
 {
 	D(d);
-	GMGameObject* object = new GMGameObject();
-	d->particleModel.reset(new GMModel());
-	d->particleModel->getShader().setBlend(true);
-	d->particleModel->getShader().setBlendFactorSource(GMS_BlendFunc::SRC_ALPHA);
-	d->particleModel->getShader().setBlendFactorDest(GMS_BlendFunc::ONE);
-	d->particleModel->setUsageHint(GMUsageHint::DynamicDraw);
-	d->particleModel->setType(GMModelType::Particle);
-
-	d->particleModel->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
-	GMMesh* mesh = new GMMesh(d->particleModel.get());
-	
-	// 使用triangles拓扑，一次性填充所有的矩形
-	GMsize_t total = getEmitter()->getParticleCount();
-	for (GMsize_t i = 0; i < total; ++i)
+	switch (desc.getParticleModelType())
 	{
-		// 一个particle由6个定点组成
-		mesh->vertex(GMVertex());
-		mesh->vertex(GMVertex());
-		mesh->vertex(GMVertex());
-		mesh->vertex(GMVertex());
-		mesh->vertex(GMVertex());
-		mesh->vertex(GMVertex());
-	}
-
-	// 获取剩下
-	GM.createModelDataProxyAndTransfer(context, d->particleModel.get());
-	object->setContext(context);
-	object->addModel(GMAssets::createIsolatedAsset(GMAssetType::Model, d->particleModel.get()));
-	return object;
-}
-
-void GMParticleSystem::updateData(const IRenderContext* context, void* dataPtr)
-{
-	D(d);
-	GMVertex* vPtr = reinterpret_cast<GMVertex*>(dataPtr);
-	constexpr GMsize_t szVertex = sizeof(GMVertex);
-	auto& particles = d->emitter->getParticles();
-	GMMat4 transformMatrix = getTransformMatrix(context);
-	// 一个粒子有6个顶点，2个三角形
-	for (auto particle : particles)
-	{
-		GMfloat he = particle->getSize() / 2.f;
-		update6Vertices(
-			vPtr,
-			particle->getPosition(),
-			he,
-			particle->getColor(),
-			particle->getRotation(),
-			GMVec3(0, 0, 1),
-			transformMatrix
-		);
-		vPtr += 6;
+	case GMParticleModelType::Particle2D:
+		return new GMParticleModel_2D(this);
+	default:
+		GM_ASSERT(false);
+		gm_error(gm_dbg_wrap("Undefined particle model type."));
+		return new GMParticleModel_2D(this);
 	}
 }
 
@@ -492,6 +567,9 @@ GMParticleDescription GMParticleSystem::createParticleDescriptionFromCocos2DPlis
 	GMsize_t imgSize;
 	if (GMZip::inflateMemory(base64Decoded, inflated, imgSize, TextureSizeHint) == GMZip::Ok)
 		desc.setTextureImageData(inflated);
+
+	// Cocos2D 使用二维游戏对象渲染粒子
+	desc.setParticleModelType(GMParticleModelType::Particle2D);
 	return desc;
 }
 
@@ -598,21 +676,29 @@ void GMParticleEmitter::stopEmit()
 	D(d);
 	d->canEmit = false;
 
-	// TODO
-	// 释放未发射粒子
+	auto& pool = getParticleSystem()->getParticleSystemManager()->getPool();
+	for (auto particle : d->particles)
+	{
+		pool.free(particle);
+	}
+	d->particles.clear();
 }
 
 void GMParticlePool::init(GMsize_t count)
 {
 	D(d);
+	d->capacity = count;
 	d->particlePool.reserve(count);
+	d->unused.reserve(count);
 	for (GMsize_t i = 0; i < count; ++i)
 	{
-		d->particlePool.emplace_back(GMOwnedPtr<GMParticle>(new GMParticle()));
+		GMParticle* p = new GMParticle();
+		d->particlePool.emplace_back(GMOwnedPtr<GMParticle>(p));
+		d->unused.push_back(p);
 	}
 }
 
-void GMParticlePool::free()
+void GMParticlePool::freeAll()
 {
 	D(d);
 	GMClearSTLContainer(d->particlePool);
@@ -621,13 +707,39 @@ void GMParticlePool::free()
 GMParticle* GMParticlePool::alloc()
 {
 	D(d);
-	return d->particlePool[d->index++].get();
+	if (d->index < d->unused.size())
+		return d->unused[d->index++];
+
+	expand(d->capacity);
+	return d->unused[d->index++];
+}
+
+void GMParticlePool::free(GMParticle* particle)
+{
+	D(d);
+	d->unused[--d->index] = particle;
 }
 
 GMsize_t GMParticlePool::getCapacity() GM_NOEXCEPT
 {
 	D(d);
 	return d->particlePool.size();
+}
+
+void GMParticlePool::expand(GMsize_t size)
+{
+	D(d);
+	GMsize_t currentSize = d->particlePool.size();
+	GMsize_t targetSize = currentSize + d->capacity;
+	d->particlePool.resize(targetSize);
+	d->unused.resize(targetSize);
+	for (GMsize_t i = currentSize; i < targetSize; ++i)
+	{
+		GMParticle* p = new GMParticle();
+		d->particlePool[i] = GMOwnedPtr<GMParticle>(p);
+		d->unused[i] = p;
+	}
+	d->capacity = targetSize;
 }
 
 void GMParticleEffect::setParticleDescription(const GMParticleDescription& desc)
@@ -687,11 +799,12 @@ void GMParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle* part
 	particle->setDeltaRotation((endSpin - beginSpin) * remainingLifeRev);
 }
 
-GMParticleSystemManager::GMParticleSystemManager(const IRenderContext* context)
+GMParticleSystemManager::GMParticleSystemManager(const IRenderContext* context, GMsize_t particleCountHint)
 {
 	D(d);
 	d->context = context;
-	d->pool.init(1024); //事先分配若干个粒子
+	//事先分配若干个粒子
+	d->pool.init(particleCountHint); 
 }
 
 void GMParticleSystemManager::addParticleSystem(AUTORELEASE GMParticleSystem* ps)
