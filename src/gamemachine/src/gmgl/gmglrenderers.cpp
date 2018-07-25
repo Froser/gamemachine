@@ -408,15 +408,12 @@ void GMGLRenderer::prepareBlend(GMModel* model)
 			glDisable(GL_BLEND);
 		}
 	}
-
-	if (shader.getBlend())
-		glDepthMask(GL_FALSE);
 }
 
 void GMGLRenderer::prepareDepth(GMModel* model)
 {
 	const GMShader& shader = model->getShader();
-	if (shader.getNoDepthTest())
+	if (shader.getNoDepthTest() || shader.getBlend())
 		glDisable(GL_DEPTH_TEST); // glDepthMask(GL_FALSE);
 	else
 		glEnable(GL_DEPTH_TEST); // glDepthMask(GL_TRUE);
