@@ -70,7 +70,8 @@ namespace glm
 		return dot(left, left);
 	}
 
-	inline vec3 safeNormalize(const vec3& vec, const vec3& n = vec3(1, 0, 0))
+	template <typename T>
+	inline T safeNormalize(const T& vec)
 	{
 		gm::GMfloat l2 = glm::length2(vec);
 		if (l2 >= FLT_EPSILON*FLT_EPSILON)
@@ -79,7 +80,7 @@ namespace glm
 		}
 		else
 		{
-			return n;
+			return T(0);
 		}
 	}
 
@@ -556,7 +557,7 @@ inline GMVec3 Normalize(const GMVec3& V)
 #if GM_USE_DX11
 	R.v_ = DirectX::XMVector3Normalize(V.v_);
 #else
-	R.v_ = glm::normalize(V.v_);
+	R.v_ = glm::safeNormalize(V.v_);
 #endif
 	return R;
 }
@@ -567,7 +568,7 @@ inline GMVec4 Normalize(const GMVec4& V)
 #if GM_USE_DX11
 	R.v_ = DirectX::XMVector4Normalize(V.v_);
 #else
-	R.v_ = glm::normalize(V.v_);
+	R.v_ = glm::safeNormalize(V.v_);
 #endif
 	return R;
 }
@@ -603,26 +604,6 @@ inline GMVec3 FastNormalize(const GMVec3& V)
 	R.v_ = DirectX::XMVector3Normalize(V.v_);
 #else
 	R.v_ = glm::fastNormalize(V.v_);
-#endif
-	return R;
-}
-
-inline GMVec3 SafeNormalize(const GMVec3& V, const GMVec3& Default)
-{
-	GMVec3 R;
-#if GM_USE_DX11
-	gm::GMfloat len = Length(V);
-	if (len >= FLT_EPSILON * FLT_EPSILON)
-	{
-		gm::GMfloat sl = Sqrt(len);
-		return V * (1.f / sl);
-	}
-	else
-	{
-		return Default;
-	}
-#else
-	R.v_ = glm::safeNormalize(V.v_, Default.v_);
 #endif
 	return R;
 }

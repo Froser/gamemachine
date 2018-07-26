@@ -11,7 +11,7 @@ void GMGravityParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticl
 	// TODO 目前只考虑二维的，之后会要指定一个方向向量
 	GMVec3 particleDirection = GMVec3(Cos(Radians(angle)), Sin(Radians(angle)), 0);
 
-	// 由于在正交视图中，y轴向上，因此初速度方向应该乘上一个负数
+	// Cocos2D Y轴向下，正交视图Y轴向上，所以乘以-1
 	particle->getGravityModeData().initialVelocity = -particleDirection * particleSpeed;
 	particle->getGravityModeData().tangentialAcceleration = getGravityMode().getTangentialAcceleration() + getGravityMode().getTangentialAccelerationV() * GMRandomMt19937::random_real(-1.f, 1.f);
 	particle->getGravityModeData().radialAcceleration = getGravityMode().getRadialAcceleration() + getGravityMode().getRadialAccelerationV() * GMRandomMt19937::random_real(-1.f, 1.f);
@@ -50,6 +50,8 @@ void GMGravityParticleEffect::update(GMParticleEmitter* emitter, GMDuration dt)
 
 			// 计算合力
 			offset = (radial + tangential + getGravityMode().getGravity()) * dt;
+			// Cocos2D Y轴向下，正交视图Y轴向上，所以乘以-1
+			offset.setY(-offset.getY());
 			
 			// 移动粒子
 			particle->getGravityModeData().initialVelocity += offset;

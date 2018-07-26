@@ -504,8 +504,6 @@ inline GMQuat Normalize(const GMQuat& Q);
 
 inline GMVec3 FastNormalize(const GMVec3& V);
 
-inline GMVec3 SafeNormalize(const GMVec3& V, const GMVec3& Default = GMVec3(1, 0, 0));
-
 inline GMVec3 MakeVector3(const gm::GMfloat* f);
 
 inline GMVec3 MakeVector3(const GMVec4& V);

@@ -497,10 +497,10 @@ void cases::LinearMath::addToUnitTest(UnitTest& ut)
 		return VECTOR3_FUZZY_EQUALS(R, 1 / len, 2 / len, 3 / len);
 	});
 
-	ut.addTestCase("SafeNormalize(GMVec3)", []() {
+	ut.addTestCase("Normalize(GMVec3) while Len=0", []() {
 		GMVec3 V(0, 0, 0);
-		GMVec3 R = SafeNormalize(V, GMVec3(0, 1, 0));
-		bool B1 = VECTOR3_EQUALS(R, 0, 1, 0);
+		GMVec3 R = Normalize(V);
+		bool B1 = VECTOR3_EQUALS(R, 0, 0, 0);
 
 		V = GMVec3(1, 2, 3);
 		R = Normalize(V);

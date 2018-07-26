@@ -29,8 +29,20 @@ void Demo_Particle::init()
 	psRadius->getEmitter()->setEmitPosition(GMVec3(800, 300, 0));
 	psRadius->getEmitter()->getEffect()->setMotionMode(gm::GMParticleMotionMode::Relative);
 
+	gm::GMParticleSystem* psStar = nullptr;
+	gm::GMToolUtil::createCocos2DParticleSystem(L"star.plist", &psStar);
+	psStar->getEmitter()->setEmitPosition(GMVec3(400, 600, 0));
+	psStar->getEmitter()->getEffect()->setMotionMode(gm::GMParticleMotionMode::Relative);
+
+	gm::GMParticleSystem* psLeaves = nullptr;
+	gm::GMToolUtil::createCocos2DParticleSystem(L"fallenLeaves.plist", &psLeaves);
+	psLeaves->getEmitter()->setEmitPosition(GMVec3(600, 0, 0));
+	psLeaves->getEmitter()->getEffect()->setMotionMode(gm::GMParticleMotionMode::Relative);
+
 	d->particleSystemManager->addParticleSystem(psFire);
 	d->particleSystemManager->addParticleSystem(psRadius);
+	d->particleSystemManager->addParticleSystem(psStar);
+	d->particleSystemManager->addParticleSystem(psLeaves);
 }
 
 void Demo_Particle::event(gm::GameMachineHandlerEvent evt)
