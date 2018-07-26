@@ -53,11 +53,17 @@ namespace
 			{
 				if (plistType == "real")
 				{
-					*static_cast<GMfloat*>(member.second.ptr) = GMString::parseFloat(plistValue);
+					if (member.second.type == GMMetaMemberType::Float)
+						*static_cast<GMfloat*>(member.second.ptr) = GMString::parseFloat(plistValue);
+					else if (member.second.type == GMMetaMemberType::Int)
+						*static_cast<GMint*>(member.second.ptr) = static_cast<GMint>(GMString::parseFloat(plistValue));
 				}
 				else if (plistType == "integer")
 				{
-					*static_cast<GMint*>(member.second.ptr) = GMString::parseInt(plistValue);
+					if (member.second.type == GMMetaMemberType::Float)
+						*static_cast<GMfloat*>(member.second.ptr) = static_cast<GMfloat>(GMString::parseInt(plistValue));
+					else if (member.second.type == GMMetaMemberType::Int)
+						*static_cast<GMint*>(member.second.ptr) = GMString::parseInt(plistValue);
 				}
 				else if (plistType == "string")
 				{

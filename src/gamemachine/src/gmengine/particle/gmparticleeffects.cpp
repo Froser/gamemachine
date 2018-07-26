@@ -64,6 +64,7 @@ void GMGravityParticleEffect::update(GMParticleEmitter* emitter, GMDuration dt)
 			}
 			else
 			{
+				GM_ASSERT(getMotionMode() == GMParticleMotionMode::Free);
 				particle->setPosition(particle->getChangePosition());
 			}
 			++iter;
@@ -80,8 +81,57 @@ void GMGravityParticleEffect::update(GMParticleEmitter* emitter, GMDuration dt)
 void GMRadialParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle* particle)
 {
 	GMParticleEffect::initParticle(emitter, particle);
+
+	// TODO 同样要考虑3维的情况
+	GMfloat beginRadius = getRadiusMode().getBeginRadius() + getRadiusMode().getBeginRadiusV() * GMRandomMt19937::random_real(-1.f, 1.f);
+	GMfloat endRadius = getRadiusMode().getEndRadius() + getRadiusMode().getEndRadiusV() * GMRandomMt19937::random_real(-1.f, 1.f);
+
+	particle->getRadiusModeData().radius = beginRadius;
+	particle->getRadiusModeData().delatRadius = (endRadius - beginRadius) / particle->getRemainingLife();
+
+	particle->getRadiusModeData().angle = emitter->getEmitAngle() + emitter->getEmitAngleV() * GMRandomMt19937::random_real(-1.f, 1.f);
+	particle->getRadiusModeData().degressPerSecond = Radians(getRadiusMode().getSpinPerSecond() + getRadiusMode().getSpinPerSecondV() * GMRandomMt19937::random_real(-1.f, 1.f));
 }
 
 void GMRadialParticleEffect::update(GMParticleEmitter* emitter, GMDuration dt)
 {
+	auto& particles = emitter->getParticles();
+	// TODO 可以变成异步
+	for (auto iter = particles.begin(); iter != particles.end();)
+	{
+		GMParticle* particle = *iter;
+		particle->setRemainingLife(particle->getRemainingLife() - dt);
+		if (particle->getRemainingLife() > 0)
+		{
+			particle->getRadiusModeData().angle += particle->getRadiusModeData().degressPerSecond * dt;
+			particle->getRadiusModeData().radius += particle->getRadiusModeData().delatRadius * dt;
+
+			GMVec3 changePosition = particle->getChangePosition();
+			changePosition.setX(Cos(particle->getRadiusModeData().angle) * particle->getRadiusModeData().radius);
+			changePosition.setY(Sin(particle->getRadiusModeData().angle) * particle->getRadiusModeData().radius);
+			particle->setChangePosition(changePosition);
+
+			if (getMotionMode() == GMParticleMotionMode::Relative)
+			{
+				// 跟随发射器
+				particle->setPosition(particle->getChangePosition() + particle->getStartPosition());
+			}
+			else
+			{
+				GM_ASSERT(getMotionMode() == GMParticleMotionMode::Free);
+				particle->setPosition(particle->getChangePosition() + emitter->getEmitPosition());
+			}
+
+			particle->setColor(particle->getColor() + particle->getDeltaColor() * dt);
+			particle->setSize(Max(0, particle->getSize() + particle->getDeltaSize() * dt));
+			particle->setRotation(particle->getRotation() + particle->getDeltaRotation() * dt);
+			++iter;
+		}
+		else
+		{
+			GMParticlePool& pool = emitter->getParticleSystem()->getParticleSystemManager()->getPool();
+			pool.free(*iter);
+			iter = particles.erase(iter);
+		}
+	}
 }

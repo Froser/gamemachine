@@ -326,6 +326,7 @@ GM_PRIVATE_OBJECT(GMCocos2DParticleDescriptionProxy)
 	GMfloat rotatePerSecond = 0;
 	GMfloat rotatePerSecondVariance = 0;
 	GMString textureImageData;
+	GMString textureFileName;
 };
 
 class GMCocos2DParticleDescriptionProxy : public GMObject
@@ -382,6 +383,7 @@ class GMCocos2DParticleDescriptionProxy : public GMObject
 	GM_DECLARE_PROPERTY(RotatePerSecond, rotatePerSecond, GMfloat)
 	GM_DECLARE_PROPERTY(RotatePerSecondVariance, rotatePerSecondVariance, GMfloat)
 	GM_DECLARE_PROPERTY(TextureImageData, textureImageData, GMString)
+	GM_DECLARE_PROPERTY(TextureFileName, textureFileName, GMString)
 
 public:
 	virtual bool registerMeta() override
@@ -437,6 +439,7 @@ public:
 		GM_META(rotatePerSecond)
 		GM_META(rotatePerSecondVariance)
 		GM_META(textureImageData)
+		GM_META(textureFileName)
 		return true;
 	}
 };
@@ -554,19 +557,30 @@ GMParticleDescription GMParticleSystem::createParticleDescriptionFromCocos2DPlis
 
 	GMBuffer buf;
 	std::string imageData = proxy.getTextureImageData().toStdString();
-	buf.buffer = (GMbyte*)(imageData.data());
-	buf.size = imageData.length() + 1; // \0
 
-	// Cocos2D 的纹理数据压缩过了，所以要解压
-	enum
+	// 如果存在Base64形式的粒子纹理，优先处理
+	if (!imageData.empty())
 	{
-		TextureSizeHint = 1024 * 64
-	};
-	auto base64Decoded = GMConvertion::fromBase64(buf);
-	GMBuffer inflated;
-	GMsize_t imgSize;
-	if (GMZip::inflateMemory(base64Decoded, inflated, imgSize, TextureSizeHint) == GMZip::Ok)
-		desc.setTextureImageData(inflated);
+		buf.buffer = (GMbyte*)(imageData.data());
+		buf.size = imageData.length() + 1; // \0
+
+		// Cocos2D 的纹理数据压缩过了，所以要解压
+		enum
+		{
+			TextureSizeHint = 1024 * 64
+		};
+		auto base64Decoded = GMConvertion::fromBase64(buf);
+		GMBuffer inflated;
+		GMsize_t imgSize;
+		if (GMZip::inflateMemory(base64Decoded, inflated, imgSize, TextureSizeHint) == GMZip::Ok)
+			desc.setTextureImageData(std::move(inflated));
+	}
+	else if (!proxy.getTextureFileName().isEmpty())
+	{
+		GMBuffer buf;
+		if (GM.getGamePackageManager()->readFile(GMPackageIndex::Particle, proxy.getTextureFileName(), &buf))
+			desc.setTextureImageData(std::move(buf));
+	}
 
 	// Cocos2D 使用二维游戏对象渲染粒子
 	desc.setParticleModelType(GMParticleModelType::Particle2D);

@@ -7,6 +7,7 @@ BEGIN_NS
 class GMModel;
 class GMShader;
 class GMGameObject;
+class GMParticleSystem;
 
 GM_INTERFACE(IPrimitiveCreatorShaderCallback)
 {
@@ -71,6 +72,8 @@ struct GMToolUtil
 		OUT ITexture** metallicRoughnessAoTexture,
 		OUT ITexture** normalTexture
 	);
+
+	static void createCocos2DParticleSystem(const GMString& filename, OUT GMParticleSystem** particleSystem);
 };
 
 END_NS

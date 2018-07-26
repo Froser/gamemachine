@@ -69,7 +69,7 @@ bool GMDefaultGamePackageHandler::readFileFromPath(const GMString& path, REF GMB
 	}
 	else
 	{
-		gm_warning(__FUNCTION__ L"cannot read file from path: {0}", path);
+		gm_warning(gm_dbg_wrap("cannot read file from path: {0}"), path);
 	}
 	return false;
 }
@@ -172,7 +172,7 @@ bool GMZipGamePackageHandler::readFileFromPath(const GMString& path, REF GMBuffe
 		return true;
 	}
 
-	gm_warning(__FUNCTION__ L"cannot find path {0} ", GMString(path));
+	gm_warning(gm_dbg_wrap("cannot find path {0} "), GMString(path));
 	return false;
 }
 

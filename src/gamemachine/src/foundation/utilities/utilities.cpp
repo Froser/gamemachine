@@ -3,6 +3,7 @@
 #include "foundation/gamemachine.h"
 #include "gmengine/gmgameworld.h"
 #include "gmdata/gmimagebuffer.h"
+#include "gmengine/particle/gmparticle.h"
 
 const GMVec3& GMPrimitiveCreator::one3()
 {
@@ -617,4 +618,17 @@ Failed:
 	GM_delete(roughnessImg);
 	GM_delete(aoImg);
 	return false;
+}
+
+void GMToolUtil::createCocos2DParticleSystem(const GMString& filename, OUT GMParticleSystem** particleSystem)
+{
+	if (particleSystem)
+	{
+		GMBuffer buf;
+		GM.getGamePackageManager()->readFile(GMPackageIndex::Particle, filename, &buf);
+		buf.convertToStringBuffer();
+
+		*particleSystem = new GMParticleSystem();
+		(*particleSystem)->setDescription(GMParticleSystem::createParticleDescriptionFromCocos2DPlist(gm::GMString((const char*)buf.buffer)));
+	}
 }

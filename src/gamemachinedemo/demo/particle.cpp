@@ -19,16 +19,18 @@ void Demo_Particle::init()
 	auto top = getClientAreaTop();
 	widget->setSize(widget->getSize().width, top + 40);
 
-	gm::GMBuffer buf;
-	GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Particle, "fire1.plist", &buf);
-	buf.convertToStringBuffer();
-
-	gm::GMParticleSystem* psFire = new gm::GMParticleSystem();
-	psFire->setDescription(gm::GMParticleSystem::createParticleDescriptionFromCocos2DPlist(gm::GMString((const char*)buf.buffer)));
+	gm::GMParticleSystem* psFire = nullptr;
+	gm::GMToolUtil::createCocos2DParticleSystem(L"fire1.plist", &psFire);
 	psFire->getEmitter()->setEmitPosition(GMVec3(800, 600, 0));
 	psFire->getEmitter()->getEffect()->setMotionMode(gm::GMParticleMotionMode::Relative);
 
+	gm::GMParticleSystem* psRadius = nullptr;
+	gm::GMToolUtil::createCocos2DParticleSystem(L"radius1.plist", &psRadius);
+	psRadius->getEmitter()->setEmitPosition(GMVec3(800, 300, 0));
+	psRadius->getEmitter()->getEffect()->setMotionMode(gm::GMParticleMotionMode::Relative);
+
 	d->particleSystemManager->addParticleSystem(psFire);
+	d->particleSystemManager->addParticleSystem(psRadius);
 }
 
 void Demo_Particle::event(gm::GameMachineHandlerEvent evt)

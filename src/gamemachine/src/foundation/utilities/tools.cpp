@@ -489,6 +489,7 @@ GMZip::ErrorCode GMZip::inflateMemory(const GMBuffer& buf, REF GMBuffer& out, RE
 		case Z_DATA_ERROR:
 		case Z_MEM_ERROR:
 		case Z_STREAM_ERROR:
+		case Z_BUF_ERROR:
 			inflateEnd(&stream);
 			return translateError(err);
 		}

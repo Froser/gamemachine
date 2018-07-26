@@ -6,6 +6,8 @@ BEGIN_NS
 
 class GMParticleSystem;
 class GMParticleSystemManager;
+class GMParticleEmitter;
+class GMParticle;
 
 GM_INTERFACE(IParticleModel)
 {
@@ -278,7 +280,6 @@ GM_PRIVATE_OBJECT(GMParticleEffect)
 	GMParticleMotionMode motionMode = GMParticleMotionMode::Free;
 	GMParticleGravityMode gravityMode;
 	GMParticleRadiusMode radiusMode;
-
 	GMfloat life = 0;
 	GMfloat lifeV = 0;
 	GMVec4 beginColor = 0;
