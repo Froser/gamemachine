@@ -24,13 +24,13 @@ void GM_Model3D()
     vertex.Normal_World_N = normalize(inverse_transpose_model_matrix * _normal.xyz);
 
     mat3 normalEyeTransform = mat3(GM_ViewMatrix) * inverse_transpose_model_matrix;
-    vec3 normal_World_N = normalEyeTransform * _normal.xyz;
-    vertex.Normal_Eye_N = normalize( normal_World_N );
+    vec3 normal_Eye_N = normalize(normalEyeTransform * _normal.xyz);
+    vertex.Normal_Eye_N = normal_Eye_N;
 
     GMTangentSpace tangentSpace;
     if (GM_IsTangentSpaceInvalid(_tangent.xyz, _bitangent.xyz))
     {
-        tangentSpace = GM_CalculateTangentSpaceRuntime(vertex.WorldPos, _uv, normal_World_N, GM_NormalMapTextureAttribute.Texture);
+        tangentSpace = GM_CalculateTangentSpaceRuntime(vertex.WorldPos, _uv, vertex.Normal_World_N, GM_NormalMapTextureAttribute.Texture);
     }
     else
     {

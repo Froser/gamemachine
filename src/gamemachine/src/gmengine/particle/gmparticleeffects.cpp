@@ -10,7 +10,9 @@ void GMGravityParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticl
 
 	// TODO 目前只考虑二维的，之后会要指定一个方向向量
 	GMVec3 particleDirection = GMVec3(Cos(Radians(angle)), Sin(Radians(angle)), 0);
-	particle->getGravityModeData().initialVelocity = particleDirection * particleSpeed;
+
+	// 由于在正交视图中，y轴向上，因此初速度方向应该乘上一个负数
+	particle->getGravityModeData().initialVelocity = -particleDirection * particleSpeed;
 	particle->getGravityModeData().tangentialAcceleration = getGravityMode().getTangentialAcceleration() + getGravityMode().getTangentialAccelerationV() * GMRandomMt19937::random_real(-1.f, 1.f);
 	particle->getGravityModeData().radialAcceleration = getGravityMode().getRadialAcceleration() + getGravityMode().getRadialAccelerationV() * GMRandomMt19937::random_real(-1.f, 1.f);
 }
@@ -40,7 +42,7 @@ void GMGravityParticleEffect::update(GMParticleEmitter* emitter, GMDuration dt)
 			tangential = radial;
 			radial *= particle->getGravityModeData().radialAcceleration;
 
-			// 切向加速度，这里只考虑了2D情况
+			// TODO 切向加速度，这里只考虑了2D情况
 			GMfloat y = tangential.getX();
 			tangential.setX(-tangential.getY());
 			tangential.setY(y);

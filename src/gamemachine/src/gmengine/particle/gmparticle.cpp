@@ -10,13 +10,13 @@
 
 namespace
 {
-	GMMat4 getTransformMatrix(const IRenderContext* context)
+	GMMat4 get2DTransformMatrix(const IRenderContext* context)
 	{
 		GMMat4 mat = Ortho(
 			0,
 			context->getWindow()->getWindowRect().width,
-			0,
 			context->getWindow()->getWindowRect().height,
+			0,
 			-1,
 			1
 		);
@@ -119,7 +119,7 @@ void GMParticleModel_2D::updateData(const IRenderContext* context, void* dataPtr
 	GMVertex* vPtr = reinterpret_cast<GMVertex*>(dataPtr);
 	constexpr GMsize_t szVertex = sizeof(GMVertex);
 	auto& particles = d->system->getEmitter()->getParticles();
-	GMMat4 transformMatrix = getTransformMatrix(context);
+	GMMat4 transformMatrix = get2DTransformMatrix(context);
 	// 一个粒子有6个顶点，2个三角形
 	for (auto particle : particles)
 	{
@@ -143,6 +143,7 @@ GMGameObject* GMParticleModel_2D::createGameObject(
 	D(d);
 	GMGameObject* object = new GMGameObject();
 	d->particleModel.reset(new GMModel());
+	d->particleModel->getShader().setCull(GMS_Cull::NONE);
 	d->particleModel->getShader().setBlend(true);
 	d->particleModel->getShader().setBlendFactorSource(GMS_BlendFunc::SRC_ALPHA);
 	d->particleModel->getShader().setBlendFactorDest(GMS_BlendFunc::ONE);

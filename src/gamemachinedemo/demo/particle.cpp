@@ -36,6 +36,7 @@ void Demo_Particle::init()
 void Demo_Particle::event(gm::GameMachineHandlerEvent evt)
 {
 	D(d);
+	Base::event(evt);
 	switch (evt)
 	{
 	case gm::GameMachineHandlerEvent::Simulate:

@@ -1066,6 +1066,21 @@ VS_OUTPUT VS_Particle(VS_INPUT input)
 
 float4 PS_Particle(PS_INPUT input) : SV_TARGET
 {
+    /// Start Debug Option
+    if (GM_Debug_Normal == GM_Debug_Normal_WorldSpace)
+    {
+        float3x3 inverseTransposeModelMatrix = ToFloat3x3(GM_InverseTransposeModelMatrix);
+        float3x3 transform_Normal_Eye = mul(inverseTransposeModelMatrix, ToFloat3x3(GM_ViewMatrix));
+        return GM_NormalToTexture(normalize(mul(input.Normal, inverseTransposeModelMatrix)).xyz);
+    }
+    else if (GM_Debug_Normal == GM_Debug_Normal_EyeSpace)
+    {
+        float3x3 inverseTransposeModelMatrix = ToFloat3x3(GM_InverseTransposeModelMatrix);
+        float3x3 transform_Normal_Eye = mul(inverseTransposeModelMatrix, ToFloat3x3(GM_ViewMatrix));
+        return GM_NormalToTexture(normalize(mul(input.Normal, transform_Normal_Eye)).xyz);
+    }
+    /// End Debug Option
+
     float4 result = GM_AmbientTextureAttribute.Sample(GM_AmbientTexture, GM_AmbientSampler, input.Texcoord);
     result *= input.Color;
     return result;
