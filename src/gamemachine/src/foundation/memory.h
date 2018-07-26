@@ -80,5 +80,8 @@ public:
 	virtual ~GMAlignmentObject() {}
 };
 
+#define GM_ALIGNED_STRUCT_FROM(name, from) GM_ALIGNED_16(struct) name : public from
+#define GM_ALIGNED_STRUCT(name) GM_ALIGNED_STRUCT_FROM(name, gm::GMAlignmentObject)
+
 END_NS
 #endif

@@ -8,6 +8,7 @@
 // 如果使用DirectX，则不使用glm
 #define GLM_FORCE_INLINE
 #define GLM_ENABLE_EXPERIMENTAL
+#include <gmmemory.h>
 #include <glm/glm.hpp>
 #include <glm/common.hpp>
 #include <glm/gtc/matrix_transform.hpp>

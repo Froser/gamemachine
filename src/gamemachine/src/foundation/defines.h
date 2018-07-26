@@ -99,6 +99,7 @@ void GMClearSTLContainer(T& c)
 #	define GM_NOVTABLE
 #endif
 
+// 定义对齐结构体
 #define GM_ALIGNED_16(t) t __declspec(align(16))
 
 #if GM_LIB

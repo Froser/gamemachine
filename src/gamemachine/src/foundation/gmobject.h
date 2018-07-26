@@ -23,10 +23,6 @@ struct IVirtualFunctionObject
 	virtual ~IVirtualFunctionObject() = default;
 };
 
-// 定义对齐结构体
-#define GM_ALIGNED_STRUCT_FROM(name, from) GM_ALIGNED_16(struct) name : public from
-#define GM_ALIGNED_STRUCT(name) GM_ALIGNED_STRUCT_FROM(name, gm::GMAlignmentObject)
-
 // 对象存储
 template <typename T>
 GM_ALIGNED_STRUCT(GMObjectPrivateBase)
