@@ -31,7 +31,9 @@ namespace
 			GM_META_WITH_TYPE(renderEnvironment, GMMetaMemberType::Int);
 			GM_META(farZ);
 			GM_META(nearZ);
-			GM_META_WITH_TYPE(endiannessMode, GMMetaMemberType::Int);
+			GM_META_WITH_TYPE(systemInfo.endiannessMode, GMMetaMemberType::Int);
+			GM_META_WITH_TYPE(systemInfo.numberOfProcessors, GMMetaMemberType::Int);
+			GM_META_WITH_TYPE(systemInfo.processorArchitecture, GMMetaMemberType::Int);
 			return true;
 		}
 	};

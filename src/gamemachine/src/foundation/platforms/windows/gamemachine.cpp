@@ -5,6 +5,15 @@
 
 namespace
 {
+	GMEndiannessMode getMachineEndianness()
+	{
+		long int i = 1;
+		const char *p = (const char *)&i;
+		if (p[0] == 1)
+			return GMEndiannessMode::LittleEndian;
+		return GMEndiannessMode::BigEndian;
+	}
+
 	GMKey translateKey(GMWParam wParam)
 	{
 		static HashMap<GMWParam, GMKey> s_keyMap;
@@ -351,4 +360,39 @@ void GameMachine::translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lP
 	}
 
 	*event = newSystemEvent;
+}
+
+void GameMachine::initSystemInfo()
+{
+	D(d);
+	static bool inited = false;
+	if (!inited)
+	{
+		d->states.systemInfo.endiannessMode = getMachineEndianness();
+		
+		SYSTEM_INFO sysInfo;
+		::GetSystemInfo(&sysInfo);
+		d->states.systemInfo.numberOfProcessors = sysInfo.dwNumberOfProcessors;
+
+		switch (sysInfo.wProcessorArchitecture)
+		{
+		case PROCESSOR_ARCHITECTURE_AMD64:
+			d->states.systemInfo.processorArchitecture = GMProcessorArchitecture::AMD64;
+			break;
+		case PROCESSOR_ARCHITECTURE_ARM:
+			d->states.systemInfo.processorArchitecture = GMProcessorArchitecture::ARM;
+			break;
+		case PROCESSOR_ARCHITECTURE_IA64:
+			d->states.systemInfo.processorArchitecture = GMProcessorArchitecture::IA64;
+			break;
+		case PROCESSOR_ARCHITECTURE_INTEL:
+			d->states.systemInfo.processorArchitecture = GMProcessorArchitecture::Intel;
+			break;
+		case PROCESSOR_ARCHITECTURE_UNKNOWN:
+		default:
+			d->states.systemInfo.processorArchitecture = GMProcessorArchitecture::Unknown;
+			break;
+		}
+		inited = true;
+	}
 }

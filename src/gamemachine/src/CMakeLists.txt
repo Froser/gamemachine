@@ -69,6 +69,8 @@ set(SOURCES
 		gmengine/particle/gmparticle.cpp
 		gmengine/particle/gmparticleeffects.h
 		gmengine/particle/gmparticleeffects.cpp
+		gmengine/particle/gmparticlemodel.h
+		gmengine/particle/gmparticlemodel.cpp
 		gmengine/ui/gmwidget.h
 		gmengine/ui/gmwidget.cpp
 		gmengine/ui/gmwindow.h
@@ -152,6 +154,8 @@ set(SOURCES
 		foundation/gmstring.cpp
 		foundation/gmtransaction.h
 		foundation/gmtransaction.cpp
+		foundation/gmasync.h
+		foundation/gmasync.cpp
 		gmlua/gmlua.h
 		gmlua/gmlua.cpp
 		gmlua/gmlua_functions.h

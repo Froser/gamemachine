@@ -19,6 +19,7 @@ class Demo_Particle : public DemoHandler
 
 public:
 	using Base::Base;
+	virtual void setLookAt() override;
 	virtual void init() override;
 	virtual void event(gm::GameMachineHandlerEvent evt) override;
 

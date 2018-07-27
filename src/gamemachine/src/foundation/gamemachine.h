@@ -36,6 +36,15 @@ enum class GMEndiannessMode
 	BigEndian = 1,    //!< 大端模式，数据的高字节保存在内存的低地址
 };
 
+enum class GMProcessorArchitecture
+{
+	AMD64,
+	ARM,
+	IA64,
+	Intel,
+	Unknown,
+};
+
 /*! \def GM
     \brief 表示当前GameMachine运行实例。
 
@@ -46,6 +55,13 @@ enum class GMEndiannessMode
 
 class GMWidget;
 
+struct GMSystemInfo
+{
+	GMEndiannessMode endiannessMode = GMEndiannessMode::Unknown;
+	GMint numberOfProcessors = 0;
+	GMProcessorArchitecture processorArchitecture;
+};
+
 //! 程序运行时的各种状态。
 /*!
   包含窗口、帧耗时等状态。状态将在每一帧结束之前更新。
@@ -53,6 +69,8 @@ class GMWidget;
 */
 struct GMGameMachineRunningStates
 {
+	GMSystemInfo systemInfo;
+
 	// 每一帧更新的内容
 	GMDuration lastFrameElpased = 0; //!< 上一帧渲染锁花费的时间，单位是秒。
 	GMDuration elapsedTime = 0; //!< 程序运行到现在为止的时间，单位是秒。
@@ -66,8 +84,6 @@ struct GMGameMachineRunningStates
 	// 永远不要更改以下2个值，它采用DirectX标准透视矩阵
 	GMfloat farZ = 1.f; //!< 远平面的Z坐标。
 	GMfloat nearZ = 0; //!< 近平面的Z坐标。
-
-	GMEndiannessMode endiannessMode = GMEndiannessMode::Unknown;
 };
 
 GM_PRIVATE_OBJECT(GameMachine)
@@ -168,13 +184,6 @@ public:
 	*/
 	void createModelDataProxyAndTransfer(const IRenderContext* context, GMModel* model);
 
-	//! 获取当前机器的大小端模式。
-	/*!
-	  此方法会将返回值保存起来，下一次调用的时候，直接返回其保存值。
-	  \return 当前机器大小端模式。
-	*/
-	GMEndiannessMode getMachineEndianness();
-
 	//! 发送一条GameMachine的消息。
 	/*!
 	  发送一条GameMachine的消息。发送消息之后，此消息将会在下一轮消息循环时被执行。
@@ -238,6 +247,7 @@ public:
 	GM_META_METHOD void exit();
 
 private:
+	void initSystemInfo();
 	void runEventLoop();
 	bool renderFrame();
 	template <typename T, typename U> void registerManager(T* newObject, OUT U** manager);

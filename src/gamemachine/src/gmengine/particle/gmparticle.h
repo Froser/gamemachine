@@ -223,7 +223,7 @@ GM_PRIVATE_OBJECT(GMParticleEmitter)
 	GMDuration emitRate = 0;
 	GMDuration duration = 0;
 	GMOwnedPtr<GMParticleEffect> effect;
-	List<GMParticle*> particles;
+	Vector<GMParticle*> particles;
 	bool canEmit = true;
 	GMParticleSystem* system = nullptr;
 	GMDuration emitCounter = 0;
@@ -262,7 +262,7 @@ public:
 		return d->effect.get();
 	}
 
-	inline List<GMParticle*>& getParticles() GM_NOEXCEPT
+	inline Vector<GMParticle*>& getParticles() GM_NOEXCEPT
 	{
 		D(d);
 		return d->particles;

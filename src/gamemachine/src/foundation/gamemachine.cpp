@@ -31,7 +31,6 @@ namespace
 
 GameMachine::GameMachine()
 {
-	getMachineEndianness();
 	updateGameMachineRunningStates();
 }
 
@@ -42,6 +41,7 @@ void GameMachine::init(
 )
 {
 	D(d);
+	initSystemInfo();
 	addWindow(mainWindow);
 	d->mainWindow = mainWindow;
 
@@ -83,21 +83,6 @@ void GameMachine::createModelDataProxyAndTransfer(const IRenderContext* context,
 		}
 		modelDataProxy->transfer();
 	}
-}
-
-GMEndiannessMode GameMachine::getMachineEndianness()
-{
-	D(d);
-	if (d->states.endiannessMode == GMEndiannessMode::Unknown)
-	{
-		long int i = 1;
-		const char *p = (const char *)&i;
-		if (p[0] == 1)
-			d->states.endiannessMode = GMEndiannessMode::LittleEndian;
-		else
-			d->states.endiannessMode = GMEndiannessMode::BigEndian;
-	}
-	return d->states.endiannessMode;
 }
 
 void GameMachine::startGameMachine()

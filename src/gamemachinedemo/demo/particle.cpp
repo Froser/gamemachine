@@ -7,10 +7,10 @@ void Demo_Particle::init()
 {
 	D(d);
 	D_BASE(db, Base);
+	getDemoWorldReference().reset(new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext()));
 	Base::init();
 
 	// 创建对象
-	getDemoWorldReference().reset(new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext()));
 	d->particleSystemManager.reset(new gm::GMParticleSystemManager(getDemoWorldReference()->getContext(), 128));
 
 	gm::GMControlButton* button = nullptr;
@@ -43,6 +43,15 @@ void Demo_Particle::init()
 	d->particleSystemManager->addParticleSystem(psRadius);
 	d->particleSystemManager->addParticleSystem(psStar);
 	d->particleSystemManager->addParticleSystem(psLeaves);
+}
+
+
+void Demo_Particle::setLookAt()
+{
+	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
+	gm::IWindow* window = getDemoWorldReference()->getContext()->getWindow();
+	gm::GMRect rc = window->getWindowRect();
+	camera.setOrtho(0, rc.width, rc.height, 0, 0, 100);
 }
 
 void Demo_Particle::event(gm::GameMachineHandlerEvent evt)
