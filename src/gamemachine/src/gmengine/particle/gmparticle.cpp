@@ -230,7 +230,8 @@ GMParticleDescription GMParticleSystem::createParticleDescriptionFromCocos2DPlis
 	GMParticleDescription desc;
 
 	// 粒子发射器属性
-	desc.setEmitterEmitAngle(proxy.getAngle());
+	// Cocos2D的发射角度，方向向量为(-1, 0, 0)，GameMachine采用(0, 1, 0)，因此要加上90度。
+	desc.setEmitterEmitAngle(proxy.getAngle() + 90);
 	desc.setEmitterEmitAngleV(proxy.getAngleVariance());
 
 	desc.setEmitterEmitSpeed(proxy.getSpeed());

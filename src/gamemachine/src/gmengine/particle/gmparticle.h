@@ -294,6 +294,7 @@ GM_PRIVATE_OBJECT(GMParticleEffect)
 	GMfloat beginSpinV = 0;
 	GMfloat endSpin = 0;
 	GMfloat endSpinV = 0;
+	GMVec3 rotationAxis = GMVec3(0, 0, 1);
 };
 
 class GMParticleEffect : public GMObject
@@ -316,6 +317,7 @@ class GMParticleEffect : public GMObject
 	GM_DECLARE_PROPERTY(MotionMode, motionMode, GMParticleMotionMode)
 	GM_DECLARE_PROPERTY(GravityMode, gravityMode, GMParticleGravityMode)
 	GM_DECLARE_PROPERTY(RadiusMode, radiusMode, GMParticleRadiusMode)
+	GM_DECLARE_PROPERTY(RotationAxis, rotationAxis, GMVec3)
 
 public:
 	void setParticleDescription(const GMParticleDescription& desc);

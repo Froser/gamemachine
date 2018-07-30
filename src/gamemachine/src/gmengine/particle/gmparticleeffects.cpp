@@ -1,5 +1,12 @@
 ﻿#include "stdafx.h"
 #include "gmparticleeffects.h"
+#include "foundation/gmasync.h"
+#include "foundation/gamemachine.h"
+
+namespace
+{
+	const GMVec4 s_rotateStartVector = GMVec4(0, 1, 0, 1);
+}
 
 void GMGravityParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle* particle)
 {
@@ -8,11 +15,10 @@ void GMGravityParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticl
 	GMfloat particleSpeed = emitter->getEmitSpeed() + emitter->getEmitSpeedV() * GMRandomMt19937::random_real(-1.f, 1.f);
 	GMfloat angle = emitter->getEmitAngle() + emitter->getEmitAngleV() * GMRandomMt19937::random_real(-1.f, 1.f);
 
-	// TODO 目前只考虑二维的，之后会要指定一个方向向量
-	GMVec3 particleDirection = GMVec3(Cos(Radians(angle)), Sin(Radians(angle)), 0);
-
+	// Cocos2D 角度0rad从x=-1开始算起
 	// Cocos2D Y轴向下，正交视图Y轴向上，所以乘以-1
-	particle->getGravityModeData().initialVelocity = -particleDirection * particleSpeed;
+	GMQuat rotationQuat = Rotate(Radians(angle), getRotationAxis());
+	particle->getGravityModeData().initialVelocity = Inhomogeneous(-s_rotateStartVector * rotationQuat) * particleSpeed;
 	particle->getGravityModeData().tangentialAcceleration = getGravityMode().getTangentialAcceleration() + getGravityMode().getTangentialAccelerationV() * GMRandomMt19937::random_real(-1.f, 1.f);
 	particle->getGravityModeData().radialAcceleration = getGravityMode().getRadialAcceleration() + getGravityMode().getRadialAccelerationV() * GMRandomMt19937::random_real(-1.f, 1.f);
 }
@@ -21,7 +27,6 @@ void GMGravityParticleEffect::update(GMParticleEmitter* emitter, GMDuration dt)
 {
 	D(d);
 	auto& particles = emitter->getParticles();
-	// TODO 可以变成异步
 	for (auto iter = particles.begin(); iter != particles.end();)
 	{
 		GMParticle* particle = *iter;
@@ -42,7 +47,6 @@ void GMGravityParticleEffect::update(GMParticleEmitter* emitter, GMDuration dt)
 			tangential = radial;
 			radial *= particle->getGravityModeData().radialAcceleration;
 
-			// TODO 切向加速度，这里只考虑了2D情况
 			GMfloat y = tangential.getX();
 			tangential.setX(-tangential.getY());
 			tangential.setY(y);
@@ -86,7 +90,6 @@ void GMRadialParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle
 {
 	GMParticleEffect::initParticle(emitter, particle);
 
-	// TODO 同样要考虑3维的情况
 	GMfloat beginRadius = getRadiusMode().getBeginRadius() + getRadiusMode().getBeginRadiusV() * GMRandomMt19937::random_real(-1.f, 1.f);
 	GMfloat endRadius = getRadiusMode().getEndRadius() + getRadiusMode().getEndRadiusV() * GMRandomMt19937::random_real(-1.f, 1.f);
 
@@ -100,7 +103,6 @@ void GMRadialParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle
 void GMRadialParticleEffect::update(GMParticleEmitter* emitter, GMDuration dt)
 {
 	auto& particles = emitter->getParticles();
-	// TODO 可以变成异步
 	for (auto iter = particles.begin(); iter != particles.end();)
 	{
 		GMParticle* particle = *iter;
@@ -110,9 +112,9 @@ void GMRadialParticleEffect::update(GMParticleEmitter* emitter, GMDuration dt)
 			particle->getRadiusModeData().angle += particle->getRadiusModeData().degressPerSecond * dt;
 			particle->getRadiusModeData().radius += particle->getRadiusModeData().delatRadius * dt;
 
+			GMQuat rotationQuat = Rotate(particle->getRadiusModeData().angle, getRotationAxis());
 			GMVec3 changePosition = particle->getChangePosition();
-			changePosition.setX(Cos(particle->getRadiusModeData().angle) * particle->getRadiusModeData().radius);
-			changePosition.setY(Sin(particle->getRadiusModeData().angle) * particle->getRadiusModeData().radius);
+			changePosition = s_rotateStartVector * rotationQuat * particle->getRadiusModeData().radius;
 			particle->setChangePosition(changePosition);
 
 			if (getMotionMode() == GMParticleMotionMode::Relative)
