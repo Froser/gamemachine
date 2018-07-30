@@ -54,9 +54,10 @@ class GMModelReader
 public:
 	enum ModelType
 	{
-		ModelType_AUTO,
+		Auto,
 		ModelType_Begin,
-		ModelType_Obj = ModelType_Begin,
+		Object = ModelType_Begin,
+		Md5Mesh,
 		ModelType_End,
 	};
 

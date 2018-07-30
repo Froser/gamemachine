@@ -20,6 +20,7 @@
 #include "demo/controls.h"
 #include "demo/lua.h"
 #include "demo/particle.h"
+#include "demo/md5mesh.h"
 
 #if GM_USE_DX11
 #include <gmdx11helper.h>
@@ -45,6 +46,7 @@ namespace
 		world->addDemo(L"PBR: 演示同时通过Phong模型和PBR模型渲染。", new Demo_Phong_PBR(world));
 		world->addDemo(L"UI控件: 演示使用GameMachine提供的UI控件。", new Demo_Controls(world));
 		world->addDemo(L"粒子系统: 渲染一个粒子系统。", new Demo_Particle(world));
+		world->addDemo(L"MD5: 渲染MD5骨骼动画。", new Demo_MD5Mesh(world));
 		// world->addDemo(L"LUA: 执行Lua脚本。", new Demo_Lua(world));
 		world->init();
 	}

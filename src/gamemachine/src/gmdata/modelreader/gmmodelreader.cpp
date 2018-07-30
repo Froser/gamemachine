@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmmodelreader.h"
 #include "gmmodelreader_obj.h"
+#include "gmmodelreader_md5mesh.h"
 #include "gmdata/gamepackage/gmgamepackage.h"
 #include "foundation/gamemachine.h"
 
@@ -9,14 +10,15 @@ class GMModelReaderContainer : public GMObject
 public:
 	GMModelReaderContainer()
 	{
-		m_readers[GMModelReader::ModelType_Obj] = new GMModelReader_Obj();
+		m_readers[GMModelReader::Object] = new GMModelReader_Obj();
+		m_readers[GMModelReader::Md5Mesh] = new GMModelReader_MD5Mesh();
 	}
 
 	~GMModelReaderContainer()
 	{
 		for (auto iter = m_readers.begin(); iter != m_readers.end(); iter++)
 		{
-			delete iter->second;
+			GM_delete(iter->second);
 		}
 	}
 
@@ -48,7 +50,7 @@ GMModelReader::ModelType GMModelReader::test(const GMBuffer& buffer)
 
 bool GMModelReader::load(const GMModelLoadSettings& settings, OUT GMModels** models)
 {
-	return load(settings, ModelType_AUTO, models);
+	return load(settings, Auto, models);
 }
 
 bool GMModelReader::load(const GMModelLoadSettings& settings, ModelType type, OUT GMModels** models)
@@ -59,7 +61,7 @@ bool GMModelReader::load(const GMModelLoadSettings& settings, ModelType type, OU
 	else
 		GM.getGamePackageManager()->readFileFromPath(settings.filename, &buffer);
 
-	if (type == ModelType_AUTO)
+	if (type == Auto)
 		type = test(buffer);
 
 	if (type == ModelType_End)

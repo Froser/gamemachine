@@ -51,6 +51,8 @@ set(SOURCES
 		demo/lua.cpp
 		demo/particle.h
 		demo/particle.cpp
+		demo/md5mesh.h
+		demo/md5mesh.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)
