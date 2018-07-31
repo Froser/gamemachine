@@ -57,7 +57,7 @@ public:
 		Auto,
 		ModelType_Begin,
 		Object = ModelType_Begin,
-		Md5Mesh,
+		GMMd5,
 		ModelType_End,
 	};
 

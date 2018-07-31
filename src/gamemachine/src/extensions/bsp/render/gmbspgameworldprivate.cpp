@@ -41,13 +41,13 @@ namespace
 			GMScanner s(value.c_str());
 			if (e->key == L"origin")
 			{
-				s.nextFloat(&origin[0]);
-				s.nextFloat(&origin[1]);
-				s.nextFloat(&origin[2]);
+				s.nextFloat(origin[0]);
+				s.nextFloat(origin[1]);
+				s.nextFloat(origin[2]);
 			}
 			else if (e->key == L"angle")
 			{
-				s.nextFloat(&yaw);
+				s.nextFloat(yaw);
 			}
 		}
 

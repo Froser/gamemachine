@@ -2,167 +2,34 @@
 #include "gmmodelreader_md5mesh.h"
 #include "foundation/utilities/tools.h"
 
-namespace
-{
-	inline bool slashPredicate(GMwchar c)
-	{
-		return c == L'/';
-	}
-
-	bool isNotReturn(char p)
-	{
-		return p != '\r' && p != '\n';
-	}
-
-	bool isNotReturn(GMwchar p)
-	{
-		return p != L'\r' && p != L'\n';
-	}
-
-	template <typename CharType>
-	class StringReader
-	{
-	public:
-		StringReader(const CharType* string)
-			: m_p(string)
-		{
-		}
-
-		bool readLine(GMString& line)
-		{
-			line.clear();
-			GMint offset = 0;
-			while (isNotReturn(*m_p))
-			{
-				if (!*m_p)
-					return false;
-				line += *(m_p++);
-			}
-
-			m_p++;
-			return true;
-		}
-
-	private:
-		const CharType* m_p;
-	};
-
-	GMVec3 parseVector3(GMScanner& s)
-	{
-		// 解析(x,y,z)，并返回一个三维向量
-		static GMVec3 s_defaultVec(0, 0, 0);
-		GMVec3 result;
-		GMString symbol;
-		s.next(symbol);
-		if (symbol != L"(")
-		{
-			GM_ASSERT(false);
-			gm_error(gm_dbg_wrap("Wrong vector format."));
-			return s_defaultVec;
-		}
-
-		GMfloat x, y, z;
-		if (s.nextFloat(&x) && s.nextFloat(&y) && s.nextFloat(&z))
-		{
-			result = GMVec3(x, y, z);
-		}
-		else
-		{
-			GM_ASSERT(false);
-			gm_error(gm_dbg_wrap("Wrong vector format."));
-			return s_defaultVec;
-		}
-
-		s.next(symbol);
-		if (symbol != L")")
-		{
-			GM_ASSERT(false);
-			gm_error(gm_dbg_wrap("Wrong vector format."));
-			return s_defaultVec;
-		}
-
-		return result;
-	}
-
-	GMVec2 parseVector2(GMScanner& s)
-	{
-		// 解析(x,y)，并返回一个二维向量
-		static GMVec2 s_defaultVec(0, 0);
-		GMVec2 result;
-		GMString symbol;
-		s.next(symbol);
-		if (symbol != L"(")
-		{
-			GM_ASSERT(false);
-			gm_error(gm_dbg_wrap("Wrong vector format."));
-			return s_defaultVec;
-		}
-
-		GMfloat x, y;
-		if (s.nextFloat(&x) && s.nextFloat(&y))
-		{
-			result = GMVec2(x, y);
-		}
-		else
-		{
-			GM_ASSERT(false);
-			gm_error(gm_dbg_wrap("Wrong vector format."));
-			return s_defaultVec;
-		}
-
-		s.next(symbol);
-		if (symbol != L")")
-		{
-			GM_ASSERT(false);
-			gm_error(gm_dbg_wrap("Wrong vector format."));
-			return s_defaultVec;
-		}
-
-		return result;
-	}
-}
-
 // Handlers
-#define BEGIN_DECLARE_HANDLER(tag, reader, scanner) \
-struct Handler_##tag : IMd5MeshHandler										\
-{																			\
-	virtual bool canHandle(const GMString& t) override						\
-	{																		\
-		return t == #tag;													\
-	}																		\
-	virtual bool handle(GMModelReader_MD5Mesh* reader, GMScanner& scanner) {
-
-#define END_DECLARE_HANDLER() }};
-
-#define NEW_HANDLER(tag) GMOwnedPtr<IMd5MeshHandler>(new Handler_##tag())
-
-BEGIN_DECLARE_HANDLER(MD5Version, reader, scanner)
+BEGIN_DECLARE_MD5_HANDLER(MD5Version, reader, scanner, GMModelReader_MD5Mesh*)
 	GMint version;
-	scanner.nextInt(&version);
+	scanner.nextInt(version);
 	reader->setMD5Version(version);
 	return true;
-END_DECLARE_HANDLER()
+END_DECLARE_MD5_HANDLER()
 
-BEGIN_DECLARE_HANDLER(commandline, reader, scanner)
+BEGIN_DECLARE_MD5_HANDLER(commandline, reader, scanner, GMModelReader_MD5Mesh*)
 	GMString content;
 	scanner.next(content);
 	reader->setCommandline(content);
 	return true;
-END_DECLARE_HANDLER()
+END_DECLARE_MD5_HANDLER()
 
-BEGIN_DECLARE_HANDLER(numJoints, reader, scanner)
+BEGIN_DECLARE_MD5_HANDLER(numJoints, reader, scanner, GMModelReader_MD5Mesh*)
 	GMint numJoints;
-	scanner.nextInt(&numJoints);
+	scanner.nextInt(numJoints);
 	reader->setNumJoints(numJoints);
 	return true;
-END_DECLARE_HANDLER()
+END_DECLARE_MD5_HANDLER()
 
-BEGIN_DECLARE_HANDLER(numMeshes, reader, scanner)
+BEGIN_DECLARE_MD5_HANDLER(numMeshes, reader, scanner, GMModelReader_MD5Mesh*)
 	GMint numMeshes;
-	scanner.nextInt(&numMeshes);
+	scanner.nextInt(numMeshes);
 	reader->setNumMeshes(numMeshes);
 	return true;
-END_DECLARE_HANDLER()
+END_DECLARE_MD5_HANDLER()
 
 /*
 joints {
@@ -170,7 +37,7 @@ joints {
 ...
 }
 */
-BEGIN_DECLARE_HANDLER(joints, reader, scanner)
+BEGIN_DECLARE_MD5_HANDLER(joints, reader, scanner, GMModelReader_MD5Mesh*)
 	GMString content;
 	scanner.next(content);
 	if (content != L"{")
@@ -179,9 +46,9 @@ BEGIN_DECLARE_HANDLER(joints, reader, scanner)
 	GM_ASSERT(nextHandler);
 	reader->setNextHandler(nextHandler);
 	return true;
-END_DECLARE_HANDLER()
+END_DECLARE_MD5_HANDLER()
 
-BEGIN_DECLARE_HANDLER(joints_inner, reader, scanner)
+BEGIN_DECLARE_MD5_HANDLER(joints_inner, reader, scanner, GMModelReader_MD5Mesh*)
 	GMString content;
 	scanner.next(content);
 	if (content == L"}")
@@ -199,9 +66,9 @@ BEGIN_DECLARE_HANDLER(joints_inner, reader, scanner)
 		// <string:name> <int:parentIndex> ( <vec3:position> ) ( <vec3:orientation> )
 		GMModelReader_MD5Mesh_Joint joint;
 		joint.name = content;
-		scanner.nextInt(&joint.parentIndex);
-		joint.position = parseVector3(scanner);
-		joint.orientation = parseVector3(scanner);
+		scanner.nextInt(joint.parentIndex);
+		joint.position = GMMD5VectorParser::parseVector3(scanner);
+		joint.orientation = GMMD5VectorParser::parseVector3(scanner);
 
 		scanner.next(content);
 		if (content == "//")
@@ -212,7 +79,7 @@ BEGIN_DECLARE_HANDLER(joints_inner, reader, scanner)
 		reader->addJoint(joint);
 	}
 	return true;
-END_DECLARE_HANDLER()
+END_DECLARE_MD5_HANDLER()
 
 /*
 mesh {
@@ -233,8 +100,9 @@ struct Handler_mesh_inner : IMd5MeshHandler
 		return tag == L"mesh_inner";
 	}
 
-	virtual bool handle(GMModelReader_MD5Mesh* reader, GMScanner& scanner) override
+	virtual bool handle(GMModelReader_MD5* r, GMScanner& scanner) override
 	{
+		GMModelReader_MD5Mesh* reader = gm_cast<GMModelReader_MD5Mesh*>(r);
 		GMString content;
 		scanner.next(content);
 
@@ -246,7 +114,7 @@ struct Handler_mesh_inner : IMd5MeshHandler
 		else if (content == L"numverts")
 		{
 			GMint n;
-			scanner.nextInt(&n);
+			scanner.nextInt(n);
 			m_cacheMesh->numVertices = n;
 		}
 		else if (content == L"")
@@ -266,35 +134,35 @@ struct Handler_mesh_inner : IMd5MeshHandler
 			// vert <int:vertexIndex> ( <vec2:texCoords> ) <int:startWeight> <int:weightCount>
 			GMint i;
 			GMModelReader_MD5Mesh_Vertex v;
-			scanner.nextInt(&i);
+			scanner.nextInt(i);
 			v.vertexIndex = i;
-			v.texCoords = parseVector2(scanner);
-			scanner.nextInt(&i);
+			v.texCoords = GMMD5VectorParser::parseVector2(scanner);
+			scanner.nextInt(i);
 			v.startWeight = i;
-			scanner.nextInt(&i);
+			scanner.nextInt(i);
 			v.weightCount = i;
 			m_cacheMesh->vertices.push_back(std::move(v));
 		}
 		else if (content == L"numtris")
 		{
 			GMint n;
-			scanner.nextInt(&n);
+			scanner.nextInt(n);
 			m_cacheMesh->numTriangles = n;
 		}
 		else if (content == L"tri")
 		{
 			// tri <int:triangleIndex> <int:vertIndex0> <int:vertIndex1> <int:vertIndex2>
 			GMint indices[4];
-			scanner.nextInt(&indices[0]);
-			scanner.nextInt(&indices[1]);
-			scanner.nextInt(&indices[2]);
-			scanner.nextInt(&indices[3]);
+			scanner.nextInt(indices[0]);
+			scanner.nextInt(indices[1]);
+			scanner.nextInt(indices[2]);
+			scanner.nextInt(indices[3]);
 			m_cacheMesh->triangleIndices.push_back(GMVec4(indices[0], indices[1], indices[2], indices[3]));
 		}
 		else if (content == L"numweights")
 		{
 			GMint n;
-			scanner.nextInt(&n);
+			scanner.nextInt(n);
 			m_cacheMesh->numWeights = n;
 		}
 		else if (content == L"weight")
@@ -303,13 +171,13 @@ struct Handler_mesh_inner : IMd5MeshHandler
 			GMModelReader_MD5Mesh_Weight weight;
 			GMint i;
 			GMfloat f;
-			scanner.nextInt(&i);
+			scanner.nextInt(i);
 			weight.weightIndex = i;
-			scanner.nextInt(&i);
+			scanner.nextInt(i);
 			weight.jointIndex = i;
-			scanner.nextFloat(&f);
+			scanner.nextFloat(f);
 			weight.weightBias = f;
-			weight.weightPosition = parseVector3(scanner);
+			weight.weightPosition = GMMD5VectorParser::parseVector3(scanner);
 			m_cacheMesh->weights.push_back(std::move(weight));
 		}
 
@@ -325,7 +193,7 @@ private:
 	GMOwnedPtr<GMModelReader_MD5Mesh_Mesh> m_cacheMesh;
 };
 
-BEGIN_DECLARE_HANDLER(mesh, reader, scanner)
+BEGIN_DECLARE_MD5_HANDLER(mesh, reader, scanner, GMModelReader_MD5Mesh*)
 	GMString content;
 	scanner.next(content);
 	if (content != L"{")
@@ -335,7 +203,7 @@ BEGIN_DECLARE_HANDLER(mesh, reader, scanner)
 	nextHandler->reset();
 	reader->setNextHandler(nextHandler);
 	return true;
-END_DECLARE_HANDLER()
+END_DECLARE_MD5_HANDLER()
 
 //////////////////////////////////////////////////////////////////////////
 bool GMModelReader_MD5Mesh::load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT GMModels** models)
@@ -385,17 +253,17 @@ bool GMModelReader_MD5Mesh::test(const GMBuffer& buffer)
 
 Vector<GMOwnedPtr<IMd5MeshHandler>>& GMModelReader_MD5Mesh::getHandlers()
 {
-	static Vector<GMOwnedPtr<IMd5MeshHandler>> handlers;
-	if (handlers.empty())
+	D(d);
+	if (d->handlers.empty())
 	{
-		handlers.push_back(NEW_HANDLER(MD5Version));
-		handlers.push_back(NEW_HANDLER(commandline));
-		handlers.push_back(NEW_HANDLER(numJoints));
-		handlers.push_back(NEW_HANDLER(numMeshes));
-		handlers.push_back(NEW_HANDLER(joints));
-		handlers.push_back(NEW_HANDLER(joints_inner));
-		handlers.push_back(NEW_HANDLER(mesh));
-		handlers.push_back(NEW_HANDLER(mesh_inner));
+		d->handlers.push_back(NEW_MD5_HANDLER(MD5Version));
+		d->handlers.push_back(NEW_MD5_HANDLER(commandline));
+		d->handlers.push_back(NEW_MD5_HANDLER(numJoints));
+		d->handlers.push_back(NEW_MD5_HANDLER(numMeshes));
+		d->handlers.push_back(NEW_MD5_HANDLER(joints));
+		d->handlers.push_back(NEW_MD5_HANDLER(joints_inner));
+		d->handlers.push_back(NEW_MD5_HANDLER(mesh));
+		d->handlers.push_back(NEW_MD5_HANDLER(mesh_inner));
 	}
-	return handlers;
+	return d->handlers;
 }

@@ -34,8 +34,11 @@ set(SOURCES
 		gmdata/modelreader/gmmodelreader_obj.h
 		gmdata/modelreader/gmmodelreader_obj.cpp
 		gmdata/modelreader/gmmodelreader_md5.h
+		gmdata/modelreader/gmmodelreader_md5.cpp
 		gmdata/modelreader/gmmodelreader_md5mesh.h
 		gmdata/modelreader/gmmodelreader_md5mesh.cpp
+		gmdata/modelreader/gmmodelreader_md5anim.h
+		gmdata/modelreader/gmmodelreader_md5anim.cpp
 		gmdata/gamepackage/gmgamepackage.h
 		gmdata/gamepackage/gmgamepackage.cpp
 		gmdata/gamepackage/gmgamepackagehandler.h

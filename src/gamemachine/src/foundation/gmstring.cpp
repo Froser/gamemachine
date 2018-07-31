@@ -353,7 +353,7 @@ GMScanner::GMScanner(const GMString& line, bool skipSame, CharPredicate predicat
 	d->valid = !!d->p;
 }
 
-void GMScanner::next(GMString& out)
+void GMScanner::next(REF GMString& out)
 {
 	D_STR(d);
 	out = L"";
@@ -385,7 +385,7 @@ void GMScanner::next(GMString& out)
 	} while (*d->p && !d->predicate(*d->p));
 }
 
-void GMScanner::nextToTheEnd(GMString& out)
+void GMScanner::nextToTheEnd(REF GMString& ref)
 {
 	D_STR(d);
 	if (!d->valid)
@@ -394,11 +394,11 @@ void GMScanner::nextToTheEnd(GMString& out)
 	while (*d->p)
 	{
 		d->p++;
-		out += *d->p;
+		ref += *d->p;
 	}
 }
 
-bool GMScanner::nextFloat(GMfloat* out)
+bool GMScanner::nextFloat(REF GMfloat& ref)
 {
 	D_STR(d);
 	if (!d->valid)
@@ -409,11 +409,11 @@ bool GMScanner::nextFloat(GMfloat* out)
 	if (command.isEmpty())
 		return false;
 
-	*out = GMString::parseFloat(command);
+	ref = GMString::parseFloat(command);
 	return true;
 }
 
-bool GMScanner::nextInt(GMint* out)
+bool GMScanner::nextInt(REF GMint& ref)
 {
 	D_STR(d);
 	if (!d->valid)
@@ -423,6 +423,6 @@ bool GMScanner::nextInt(GMint* out)
 	next(command);
 	if (command.isEmpty())
 		return false;
-	*out = GMString::parseInt(command);
+	ref = GMString::parseInt(command);
 	return true;
 }

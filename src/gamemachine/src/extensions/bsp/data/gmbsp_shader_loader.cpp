@@ -95,7 +95,7 @@ namespace
 		GMfloat f;
 		for (GMint i = 0; i < 3; i++)
 		{
-			s.nextFloat(&f);
+			s.nextFloat(f);
 			vec[i] = f;
 		}
 	}
@@ -526,14 +526,14 @@ void GMBSPShaderLoader::parse_map_tcMod(GMShader& shader, GMXMLElement* elem)
 			if (type == L"scroll")
 			{
 				currentMod->type = GMS_TextureModType::SCROLL;
-				s.nextFloat(&currentMod->p1);
-				s.nextFloat(&currentMod->p2);
+				s.nextFloat(currentMod->p1);
+				s.nextFloat(currentMod->p2);
 			}
 			else if (type == L"scale")
 			{
 				currentMod->type = GMS_TextureModType::SCALE;
-				s.nextFloat(&currentMod->p1);
-				s.nextFloat(&currentMod->p2);
+				s.nextFloat(currentMod->p1);
+				s.nextFloat(currentMod->p2);
 			}
 			
 			s.next(type);

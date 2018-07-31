@@ -488,10 +488,10 @@ public:
 	explicit GMScanner(const GMString& line, bool skipSame, CharPredicate predicate);
 
 public:
-	void next(GMString& out);
-	void nextToTheEnd(GMString& out);
-	bool nextFloat(GMfloat* out);
-	bool nextInt(GMint* out);
+	void next(REF GMString& ref);
+	void nextToTheEnd(REF GMString& ref);
+	bool nextFloat(REF GMfloat& ref);
+	bool nextInt(REF GMint& ref);
 };
 
 END_NS

@@ -22,7 +22,7 @@ GM_PRIVATE_OBJECT(GMModelReader_MD5Mesh)
 
 class GMModelReader_MD5Mesh : public GMModelReader_MD5
 {
-	GM_DECLARE_PRIVATE(GMModelReader_MD5Mesh)
+	GM_DECLARE_PRIVATE_AND_BASE(GMModelReader_MD5Mesh, GMModelReader_MD5)
 	GM_DECLARE_PROPERTY(MD5Version, MD5Version, GMint)
 	GM_DECLARE_PROPERTY(Commandline, commandline, GMString)
 	GM_DECLARE_PROPERTY(NumJoints, numJoints, GMint)

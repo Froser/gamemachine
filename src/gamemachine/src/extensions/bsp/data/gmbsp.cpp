@@ -400,9 +400,9 @@ void GMBSP::parseEntities()
 		if (gridSize)
 		{
 			GMScanner s(gridSize);
-			s.nextFloat(&d->lightVols.lightVolSize[0]);
-			s.nextFloat(&d->lightVols.lightVolSize[1]);
-			s.nextFloat(&d->lightVols.lightVolSize[2]);
+			s.nextFloat(d->lightVols.lightVolSize[0]);
+			s.nextFloat(d->lightVols.lightVolSize[1]);
+			s.nextFloat(d->lightVols.lightVolSize[2]);
 			gm_info(gm_dbg_wrap("gridSize reseted to {0}, {1}, {2}"), GMString(d->lightVols.lightVolSize[0]), GMString(d->lightVols.lightVolSize[1]), GMString(d->lightVols.lightVolSize[2]));
 		}
 	}
@@ -483,9 +483,9 @@ bool GMBSP::parseEntity(OUT GMBSPEntity** entity)
 		{
 			std::string origin = e->value.toStdString();
 			GMScanner s(origin.c_str());
-			s.nextFloat(&result->origin[0]); // x
-			s.nextFloat(&result->origin[1]); // z
-			s.nextFloat(&result->origin[2]); // y
+			s.nextFloat(result->origin[0]); // x
+			s.nextFloat(result->origin[1]); // z
+			s.nextFloat(result->origin[2]); // y
 			GM_SWAP(result->origin[1], result->origin[2]);
 			result->origin[2] = -result->origin[2];
 		}

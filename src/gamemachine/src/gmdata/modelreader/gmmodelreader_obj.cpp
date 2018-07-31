@@ -24,35 +24,35 @@ namespace
 	{
 		return p != L'\r' && p != L'\n';
 	}
-}
 
-template <typename CharType>
-class StringReader
-{
-public:
-	StringReader(const CharType* string)
-		: m_p(string)
+	template <typename CharType>
+	class StringReader
 	{
-	}
-
-	bool readLine(GMString& line)
-	{
-		line.clear();
-		GMint offset = 0;
-		while (isNotReturn(*m_p))
+	public:
+		StringReader(const CharType* string)
+			: m_p(string)
 		{
-			if (!*m_p)
-				return false;
-			line += *(m_p++);
 		}
 
-		m_p++;
-		return true;
-	}
+		bool readLine(GMString& line)
+		{
+			line.clear();
+			GMint offset = 0;
+			while (isNotReturn(*m_p))
+			{
+				if (!*m_p)
+					return false;
+				line += *(m_p++);
+			}
 
-private:
-	const CharType* m_p;
-};
+			m_p++;
+			return true;
+		}
+
+	private:
+		const CharType* m_p;
+	};
+}
 
 template <GMint D, typename T>
 static void pushBackData(GMScanner& scanner, AlignedVector<T>& container)
@@ -62,7 +62,7 @@ static void pushBackData(GMScanner& scanner, AlignedVector<T>& container)
 	GMFloat4 f4;
 	for (GMint i = 0; i < D; i++)
 	{
-		scanner.nextFloat(&f);
+		scanner.nextFloat(f);
 		f4[i] = f;
 	}
 	data.setFloat4(f4);
@@ -192,9 +192,9 @@ void GMModelReader_Obj::appendFace(GMScanner& scanner)
 
 		GMint v = INVALID, t = INVALID, n = INVALID;
 		GMScanner faceScanner(face, false, slashPredicate);
-		faceScanner.nextInt(&v);
-		faceScanner.nextInt(&t);
-		faceScanner.nextInt(&n);
+		faceScanner.nextInt(v);
+		faceScanner.nextInt(t);
+		faceScanner.nextInt(n);
 
 		if (verticesCount >= 3)
 		{
@@ -288,28 +288,28 @@ void GMModelReader_Obj::loadMaterial(const GMModelLoadSettings& settings, const 
 		else if (token == L"Ns")
 		{
 			GM_ASSERT(material);
-			s.nextFloat(&material->ns);
+			s.nextFloat(material->ns);
 		}
 		else if (token == L"Kd")
 		{
 			GM_ASSERT(material);
-			s.nextFloat(&material->kd[0]);
-			s.nextFloat(&material->kd[1]);
-			s.nextFloat(&material->kd[2]);
+			s.nextFloat(material->kd[0]);
+			s.nextFloat(material->kd[1]);
+			s.nextFloat(material->kd[2]);
 		}
 		else if (token == L"Ka")
 		{
 			GM_ASSERT(material);
-			s.nextFloat(&material->ka[0]);
-			s.nextFloat(&material->ka[1]);
-			s.nextFloat(&material->ka[2]);
+			s.nextFloat(material->ka[0]);
+			s.nextFloat(material->ka[1]);
+			s.nextFloat(material->ka[2]);
 		}
 		else if (token == L"Ks")
 		{
 			GM_ASSERT(material);
-			s.nextFloat(&material->ks[0]);
-			s.nextFloat(&material->ks[1]);
-			s.nextFloat(&material->ks[2]);
+			s.nextFloat(material->ks[0]);
+			s.nextFloat(material->ks[1]);
+			s.nextFloat(material->ks[2]);
 		}
 	}
 }

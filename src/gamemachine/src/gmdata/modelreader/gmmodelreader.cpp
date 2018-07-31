@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmmodelreader.h"
 #include "gmmodelreader_obj.h"
-#include "gmmodelreader_md5mesh.h"
+#include "gmmodelreader_md5.h"
 #include "gmdata/gamepackage/gmgamepackage.h"
 #include "foundation/gamemachine.h"
 
@@ -11,7 +11,7 @@ public:
 	GMModelReaderContainer()
 	{
 		m_readers[GMModelReader::Object] = new GMModelReader_Obj();
-		m_readers[GMModelReader::Md5Mesh] = new GMModelReader_MD5Mesh();
+		m_readers[GMModelReader::GMMd5] = new GMModelReader_MD5();
 	}
 
 	~GMModelReaderContainer()
