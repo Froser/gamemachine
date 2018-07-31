@@ -18,6 +18,7 @@ GMGameObject* GMParticleModel_2D::createGameObject(
 	d->particleModel.reset(new GMModel());
 	d->particleModel->getShader().setCull(GMS_Cull::NONE);
 	d->particleModel->getShader().setBlend(true);
+	d->particleModel->getShader().setNoDepthTest(true);
 	d->particleModel->getShader().setBlendFactorSource(GMS_BlendFunc::SRC_ALPHA);
 	d->particleModel->getShader().setBlendFactorDest(GMS_BlendFunc::ONE);
 	d->particleModel->setUsageHint(GMUsageHint::DynamicDraw);

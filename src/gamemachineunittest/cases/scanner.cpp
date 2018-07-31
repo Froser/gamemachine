@@ -30,8 +30,8 @@ void cases::Scanner::addToUnitTest(UnitTest& ut)
 		gm::GMint number;
 		gm::GMfloat number2;
 		scanner.next(strOut);
-		scanner.nextInt(&number);
-		scanner.nextFloat(&number2);
+		scanner.nextInt(number);
+		scanner.nextFloat(number2);
 		scanner.next(strOut2);
 
 		return strOut == L"game" &&

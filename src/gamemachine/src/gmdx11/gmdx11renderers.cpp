@@ -886,7 +886,7 @@ void GMDx11Renderer::prepareDepthStencil(GMModel* model)
 		d->depthStencilStates = gm_makeOwnedPtr<GMDx11DepthStencilStates>(getContext());
 	
 	// 指定需要深度测试，或者没有混合的情况下，开启深度测试
-	bool depthEnabled = !model->getShader().getNoDepthTest() && !model->getShader().getBlend();
+	bool depthEnabled = !model->getShader().getNoDepthTest();
 	GM_DX_HR(d->depthStencil->SetDepthStencilState(
 		0,
 		d->depthStencilStates->getDepthStencilState(

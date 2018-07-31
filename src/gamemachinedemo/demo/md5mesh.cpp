@@ -16,7 +16,7 @@ void Demo_MD5Mesh::init()
 	gm::GMWidget* widget = createDefaultWidget();
 	widget->setSize(widget->getSize().width, getClientAreaTop() + 40);
 
-	gm::GMModelReader::load(gm::GMModelLoadSettings(L"boblampclean/boblampclean.md5mesh", L"boblampclean.md5mesh"), gm::GMModelReader::Auto, nullptr);
+	gm::GMModelReader::load(gm::GMModelLoadSettings(L"boblampclean/boblampclean.gmmd5", L"boblampclean.gmmd5"), gm::GMModelReader::Auto, nullptr);
 }
 
 void Demo_MD5Mesh::event(gm::GameMachineHandlerEvent evt)

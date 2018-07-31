@@ -413,7 +413,7 @@ void GMGLRenderer::prepareBlend(GMModel* model)
 void GMGLRenderer::prepareDepth(GMModel* model)
 {
 	const GMShader& shader = model->getShader();
-	if (shader.getNoDepthTest() || shader.getBlend())
+	if (shader.getNoDepthTest())
 		glDisable(GL_DEPTH_TEST); // glDepthMask(GL_FALSE);
 	else
 		glEnable(GL_DEPTH_TEST); // glDepthMask(GL_TRUE);
@@ -530,9 +530,6 @@ void GMGLRenderer_3D::beforeDraw(GMModel* model)
 void GMGLRenderer_3D::afterDraw(GMModel* model)
 {
 	D(d);
-	if (model->getShader().getBlend())
-		glDepthMask(GL_TRUE);
-
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
 	{
 		deactivateTexture((GMTextureType)type);
