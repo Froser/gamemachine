@@ -34,7 +34,7 @@ public:
 GM_PRIVATE_OBJECT(GMDx11GlyphManager)
 {
 	GMComPtr<ID3D11DeviceContext> deviceContext;
-	GMScopePtr<GMDx11GlyphTexture> texture;
+	GMScopedPtr<GMDx11GlyphTexture> texture;
 };
 
 class GMDx11GlyphManager : public GMGlyphManager

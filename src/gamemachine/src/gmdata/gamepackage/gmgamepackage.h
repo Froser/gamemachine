@@ -41,7 +41,7 @@ GM_INTERFACE(IGamePackageHandler)
 GM_PRIVATE_OBJECT(GMGamePackage)
 {
 	GMString packagePath;
-	GMScopePtr<IGamePackageHandler> handler;
+	GMScopedPtr<IGamePackageHandler> handler;
 };
 
 class GMBSPGameWorld;

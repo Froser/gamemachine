@@ -28,7 +28,7 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMComPtr<ID3D11DepthStencilView> depthStencilView;
 	GMComPtr<ID3D11Texture2D> depthStencilTexture;
 	GMComPtr<ID3D11RenderTargetView> renderTargetView;
-	GMScopePtr<IShaderProgram> shaderProgram;
+	GMScopedPtr<IShaderProgram> shaderProgram;
 	GMDx11CubeMapState cubemapState;
 
 	bool ready = false;

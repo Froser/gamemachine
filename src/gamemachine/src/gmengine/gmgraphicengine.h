@@ -201,7 +201,7 @@ GM_PRIVATE_OBJECT(GMGraphicEngine)
 	IFramebuffers* defaultFramebuffers = nullptr;
 	IFramebuffers* filterFramebuffers = nullptr;
 	GMGameObject* filterQuad = nullptr;
-	GMScopePtr<GMModel> filterQuadModel;
+	GMScopedPtr<GMModel> filterQuadModel;
 	GMFramebuffersStack framebufferStack;
 	IGBuffer* gBuffer = nullptr;
 	GMRenderConfig renderConfig;

@@ -185,7 +185,7 @@ GM_PRIVATE_OBJECT(GMModel)
 {
 	GMUsageHint hint = GMUsageHint::StaticDraw;
 	GMMeshes meshes;
-	GMScopePtr<GMModelDataProxy> modelDataProxy;
+	GMScopedPtr<GMModelDataProxy> modelDataProxy;
 	GMShader shader;
 	GMModelBuffer* modelBuffer = nullptr;
 	GMModelDrawMode drawMode = GMModelDrawMode::Vertex;

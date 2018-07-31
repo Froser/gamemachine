@@ -10,7 +10,7 @@ BEGIN_NS
 // 此类包含了各种实用工具
 // GMScopePtr:
 template <typename T, typename DeleteFunc = std::default_delete<T>>
-using GMScopePtr = GMOwnedPtr<T, DeleteFunc>;
+using GMScopedPtr = GMOwnedPtr<T, DeleteFunc>;
 
 //GMClock
 GM_PRIVATE_OBJECT(GMClock)

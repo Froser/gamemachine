@@ -96,7 +96,7 @@ bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buff
 	init();
 
 	buffer.convertToStringBuffer();
-	GMString text((char*)buffer.buffer);
+	GMString text(reinterpret_cast<char*>(buffer.buffer));
 	StringReader<GMwchar> sr(text.c_str());
 	d->models = new GMModels();
 

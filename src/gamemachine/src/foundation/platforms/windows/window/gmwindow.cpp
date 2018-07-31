@@ -38,7 +38,7 @@ namespace
 			LRESULT lRes = 0;
 			GMSystemEvent* sysEvent = nullptr;
 			GM.translateSystemEvent(uMsg, wParam, lParam, &sysEvent);
-			GMScopePtr<GMSystemEvent> guard(sysEvent);
+			GMScopedPtr<GMSystemEvent> guard(sysEvent);
 			if (!pGMWindow->handleSystemEvent(sysEvent, lRes))
 				return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
 		}
