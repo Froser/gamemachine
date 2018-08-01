@@ -1,6 +1,8 @@
 ﻿#include "stdafx.h"
 #include "gmmodelreader_md5.h"
 #include "gmmodelreader_md5mesh.h"
+#include "foundation/gamemachine.h"
+#include "gmmodelreader_md5anim.h"
 
 namespace
 {
@@ -112,6 +114,7 @@ bool GMModelReader_MD5::load(const GMModelLoadSettings& settings, GMBuffer& buff
 {
 	D(d);
 	static GMModelReader_MD5Mesh s_meshReader;
+	static GMModelReader_MD5Anim s_animReader;
 
 	buffer.convertToStringBuffer();
 	GMString text = GMString(reinterpret_cast<char*>(buffer.buffer));
@@ -133,6 +136,21 @@ bool GMModelReader_MD5::load(const GMModelLoadSettings& settings, GMBuffer& buff
 	}
 
 	// 已经获得了mesh和anim文件，开始解析
+	{
+		GMString filename = settings.directory + "/" + d->meshFile;
+		GMBuffer meshBuffer;
+		GM.getGamePackageManager()->readFile(GMPackageIndex::Models, filename, &meshBuffer);
+		GM_ASSERT(s_meshReader.test(meshBuffer));
+		s_meshReader.load(GMModelLoadSettings(filename, settings.directory), meshBuffer, nullptr);
+	}
+
+	{
+		GMString filename = settings.directory + "/" + d->animFile;
+		GMBuffer meshBuffer;
+		GM.getGamePackageManager()->readFile(GMPackageIndex::Models, filename, &meshBuffer);
+		GM_ASSERT(s_animReader.test(meshBuffer));
+		s_animReader.load(GMModelLoadSettings(filename, settings.directory), meshBuffer, nullptr);
+	}
 
 	return true;
 }
@@ -140,11 +158,11 @@ bool GMModelReader_MD5::load(const GMModelLoadSettings& settings, GMBuffer& buff
 bool GMModelReader_MD5::test(const GMBuffer& buffer)
 {
 	// 使用GameMachine的一种MD5格式，其实里面就是索引了mesh和anim文件
-	if (buffer.size > 12)
+	if (buffer.size > 14)
 	{
-		char head[13] = { 0 };
-		GMString::stringCopyN(head, 13, reinterpret_cast<const char*>(buffer.buffer), 12);
-		if (GMString::stringEquals(head, "GMMD5Version"))
+		char head[15] = { 0 };
+		GMString::stringCopyN(head, 15, reinterpret_cast<const char*>(buffer.buffer), 14);
+		if (GMString::stringEquals(head, "GMMD5Version 0"))
 			return true;
 	}
 

@@ -4,6 +4,7 @@
 #include "gmmodelreader.h"
 
 #define BEGIN_DECLARE_MD5_HANDLER(tag, reader, scanner, cast) \
+namespace {\
 struct Handler_##tag : IMd5MeshHandler										\
 {																			\
 	virtual bool canHandle(const GMString& t) override						\
@@ -13,7 +14,7 @@ struct Handler_##tag : IMd5MeshHandler										\
 	virtual bool handle(GMModelReader_MD5* _reader, GMScanner& scanner) {	\
 		cast reader = gm_cast<cast>(_reader);
 
-#define END_DECLARE_MD5_HANDLER() }};
+#define END_DECLARE_MD5_HANDLER() }}; }
 
 #define NEW_MD5_HANDLER(tag) GMOwnedPtr<IMd5MeshHandler>(new Handler_##tag())
 
@@ -115,6 +116,14 @@ GM_ALIGNED_STRUCT(GMModelReader_MD5Mesh_Mesh)
 	Vector<GMVec4> triangleIndices;
 	GMint numWeights;
 	Vector<GMModelReader_MD5Mesh_Weight> weights;
+};
+
+GM_ALIGNED_STRUCT(GMModelReader_MD5Anim_Hierarchy)
+{
+	GMString jointName;
+	GMint parentIndex;
+	GMint flags;
+	GMint startIndex;
 };
 
 GM_PRIVATE_OBJECT(GMModelReader_MD5)

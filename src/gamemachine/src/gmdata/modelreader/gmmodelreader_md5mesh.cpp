@@ -240,11 +240,11 @@ bool GMModelReader_MD5Mesh::load(const GMModelLoadSettings& settings, GMBuffer& 
 
 bool GMModelReader_MD5Mesh::test(const GMBuffer& buffer)
 {
-	if (buffer.size > 10)
+	if (buffer.size > 13)
 	{
-		char head[11] = { 0 };
-		GMString::stringCopyN(head, 11, reinterpret_cast<const char*>(buffer.buffer), 10);
-		if (GMString::stringEquals(head, "MD5Version"))
+		char head[14] = { 0 };
+		GMString::stringCopyN(head, 14, reinterpret_cast<const char*>(buffer.buffer), 13);
+		if (GMString::stringEquals(head, "MD5Version 10"))
 			return true;
 	}
 
