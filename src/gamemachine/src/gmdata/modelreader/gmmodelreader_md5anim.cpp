@@ -168,7 +168,7 @@ BEGIN_DECLARE_MD5_HANDLER(baseframe_inner, reader, scanner, GMModelReader_MD5Ani
 		// ( vec3:position ) ( vec3:orientation )
 		GMModelReader_MD5Anim_Baseframe baseframe;
 		baseframe.position = GMMD5VectorParser::parseVector3(scanner);
-		baseframe.orientation = GMMD5VectorParser::parseVector3(scanner);
+		baseframe.orientation = GMMD5VectorParser::parseQuatFromVector3(scanner);
 		reader->addBaseframe(std::move(baseframe));
 	}
 	return true;

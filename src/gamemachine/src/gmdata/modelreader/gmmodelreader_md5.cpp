@@ -6,7 +6,7 @@
 
 namespace
 {
-	GMString removeQuote(const GMString& string)
+	GMString removeQuotes(const GMString& string)
 	{
 		bool bLQ = !string.isEmpty() && string[0] == '"';
 		bool bRQ = !string.isEmpty() && string[string.length() - 1] == '"';
@@ -24,14 +24,14 @@ END_DECLARE_MD5_HANDLER()
 BEGIN_DECLARE_MD5_HANDLER(md5mesh, reader, scanner, GMModelReader_MD5*)
 	GMString content;
 	scanner.next(content);
-	reader->setMeshFile(removeQuote(content));
+	reader->setMeshFile(removeQuotes(content));
 	return true;
 END_DECLARE_MD5_HANDLER()
 
 BEGIN_DECLARE_MD5_HANDLER(md5anim, reader, scanner, GMModelReader_MD5*)
 	GMString content;
 	scanner.next(content);
-	reader->setAnimFile(removeQuote(content));
+	reader->setAnimFile(removeQuotes(content));
 	return true;
 END_DECLARE_MD5_HANDLER()
 
@@ -109,6 +109,23 @@ GMVec2 GMMD5VectorParser::parseVector2(GMScanner& s)
 	return result;
 }
 
+GMQuat GMMD5VectorParser::parseQuatFromVector3(GMScanner& s)
+{
+	GMVec3 quat3 = parseVector3(s);
+	// 根据四元数模为1，计算出四元数的w
+	GMfloat t = 1.0f - (quat3.getX() * quat3.getX()) - (quat3.getY() * quat3.getY()) - (quat3.getZ() * quat3.getZ());
+	GMfloat w;
+	if (t < 0.0f)
+	{
+		w = 0.0f;
+	}
+	else
+	{
+		w = -Sqrt(t);
+	}
+
+	return GMQuat(quat3.getX(), quat3.getY(), quat3.getZ(), w);
+}
 
 bool GMModelReader_MD5::load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT GMModels** models)
 {

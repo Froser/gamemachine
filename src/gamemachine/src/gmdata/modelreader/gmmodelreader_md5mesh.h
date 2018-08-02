@@ -55,6 +55,18 @@ public:
 		D(d);
 		d->meshes.push_back(std::move(mesh));
 	}
+
+	void initJoints(GMint num)
+	{
+		D(d);
+		d->joints.reserve(num);
+	}
+
+	void initMeshes(GMint num)
+	{
+		D(d);
+		d->meshes.reserve(num);
+	}
 };
 
 END_NS

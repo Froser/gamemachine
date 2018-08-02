@@ -71,6 +71,7 @@ struct GMMD5VectorParser
 {
 	static GMVec3 parseVector3(GMScanner& s);
 	static GMVec2 parseVector2(GMScanner& s);
+	static GMQuat parseQuatFromVector3(GMScanner& s);
 };
 
 class GMModelReader_MD5;
@@ -87,13 +88,12 @@ GM_ALIGNED_STRUCT(GMModelReader_MD5Mesh_Joint)
 	GMString name;
 	GMint parentIndex;
 	GMVec3 position;
-	GMVec3 orientation;
+	GMQuat orientation;
 	GMString annotation;
 };
 
 GM_ALIGNED_STRUCT(GMModelReader_MD5Mesh_Vertex)
 {
-	GMint vertexIndex;
 	GMVec2 texCoords;
 	GMint startWeight;
 	GMint weightCount;
@@ -101,7 +101,6 @@ GM_ALIGNED_STRUCT(GMModelReader_MD5Mesh_Vertex)
 
 GM_ALIGNED_STRUCT(GMModelReader_MD5Mesh_Weight)
 {
-	GMint weightIndex;
 	GMint jointIndex;
 	GMfloat weightBias;
 	GMVec3 weightPosition;
@@ -113,7 +112,7 @@ GM_ALIGNED_STRUCT(GMModelReader_MD5Mesh_Mesh)
 	GMint numVertices;
 	Vector<GMModelReader_MD5Mesh_Vertex> vertices;
 	GMint numTriangles;
-	Vector<GMVec4> triangleIndices;
+	Vector<GMVec3> triangleIndices;
 	GMint numWeights;
 	Vector<GMModelReader_MD5Mesh_Weight> weights;
 };
@@ -136,7 +135,7 @@ GM_ALIGNED_STRUCT(GMModelReader_MD5Anim_Bound)
 GM_ALIGNED_STRUCT(GMModelReader_MD5Anim_Baseframe)
 {
 	GMVec3 position;
-	GMVec3 orientation;
+	GMQuat orientation;
 };
 
 GM_ALIGNED_STRUCT(GMModelReader_MD5Anim_Frame)

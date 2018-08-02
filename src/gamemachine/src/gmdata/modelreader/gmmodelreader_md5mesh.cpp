@@ -21,6 +21,7 @@ BEGIN_DECLARE_MD5_HANDLER(numJoints, reader, scanner, GMModelReader_MD5Mesh*)
 	GMint numJoints;
 	scanner.nextInt(numJoints);
 	reader->setNumJoints(numJoints);
+	reader->initJoints(numJoints);
 	return true;
 END_DECLARE_MD5_HANDLER()
 
@@ -28,6 +29,7 @@ BEGIN_DECLARE_MD5_HANDLER(numMeshes, reader, scanner, GMModelReader_MD5Mesh*)
 	GMint numMeshes;
 	scanner.nextInt(numMeshes);
 	reader->setNumMeshes(numMeshes);
+	reader->initMeshes(numMeshes);
 	return true;
 END_DECLARE_MD5_HANDLER()
 
@@ -68,7 +70,7 @@ BEGIN_DECLARE_MD5_HANDLER(joints_inner, reader, scanner, GMModelReader_MD5Mesh*)
 		joint.name = content;
 		scanner.nextInt(joint.parentIndex);
 		joint.position = GMMD5VectorParser::parseVector3(scanner);
-		joint.orientation = GMMD5VectorParser::parseVector3(scanner);
+		joint.orientation = GMMD5VectorParser::parseQuatFromVector3(scanner);
 
 		scanner.next(content);
 		if (content == "//")
@@ -116,6 +118,7 @@ struct Handler_mesh_inner : IMd5MeshHandler
 			GMint n;
 			scanner.nextInt(n);
 			m_cacheMesh->numVertices = n;
+			m_cacheMesh->vertices.resize(n);
 		}
 		else if (content == L"")
 		{
@@ -132,53 +135,53 @@ struct Handler_mesh_inner : IMd5MeshHandler
 		else if (content == L"vert")
 		{
 			// vert <int:vertexIndex> ( <vec2:texCoords> ) <int:startWeight> <int:weightCount>
-			GMint i;
+			GMint index, i;
 			GMModelReader_MD5Mesh_Vertex v;
-			scanner.nextInt(i);
-			v.vertexIndex = i;
+			scanner.nextInt(index);
 			v.texCoords = GMMD5VectorParser::parseVector2(scanner);
 			scanner.nextInt(i);
 			v.startWeight = i;
 			scanner.nextInt(i);
 			v.weightCount = i;
-			m_cacheMesh->vertices.push_back(std::move(v));
+			m_cacheMesh->vertices[index] = std::move(v);
 		}
 		else if (content == L"numtris")
 		{
 			GMint n;
 			scanner.nextInt(n);
 			m_cacheMesh->numTriangles = n;
+			m_cacheMesh->triangleIndices.resize(n);
 		}
 		else if (content == L"tri")
 		{
 			// tri <int:triangleIndex> <int:vertIndex0> <int:vertIndex1> <int:vertIndex2>
-			GMint indices[4];
+			GMint index, indices[3];
+			scanner.nextInt(index);
 			scanner.nextInt(indices[0]);
 			scanner.nextInt(indices[1]);
 			scanner.nextInt(indices[2]);
-			scanner.nextInt(indices[3]);
-			m_cacheMesh->triangleIndices.push_back(GMVec4(indices[0], indices[1], indices[2], indices[3]));
+			m_cacheMesh->triangleIndices[index] = GMVec3(indices[0], indices[1], indices[2]);
 		}
 		else if (content == L"numweights")
 		{
 			GMint n;
 			scanner.nextInt(n);
 			m_cacheMesh->numWeights = n;
+			m_cacheMesh->weights.resize(n);
 		}
 		else if (content == L"weight")
 		{
 			// weight <int:weightIndex> <int:jointIndex> <float:weightBias> ( <vec3:weightPosition> )
 			GMModelReader_MD5Mesh_Weight weight;
-			GMint i;
+			GMint index, i;
 			GMfloat f;
-			scanner.nextInt(i);
-			weight.weightIndex = i;
+			scanner.nextInt(index);
 			scanner.nextInt(i);
 			weight.jointIndex = i;
 			scanner.nextFloat(f);
 			weight.weightBias = f;
 			weight.weightPosition = GMMD5VectorParser::parseVector3(scanner);
-			m_cacheMesh->weights.push_back(std::move(weight));
+			m_cacheMesh->weights[index] = std::move(weight);
 		}
 
 		return true;
