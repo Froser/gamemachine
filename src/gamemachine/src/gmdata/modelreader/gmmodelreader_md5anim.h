@@ -15,6 +15,9 @@ GM_PRIVATE_OBJECT(GMModelReader_MD5Anim)
 	GMint frameRate;
 	GMint numAnimatedComponents;
 	GMModelReader_MD5Anim_Hierarchy hierarchy;
+	Vector<GMModelReader_MD5Anim_Bound> bounds;
+	Vector<GMModelReader_MD5Anim_Baseframe> baseframes;
+	Vector<GMModelReader_MD5Anim_Frame> frames;
 };
 
 class GMModelReader_MD5Anim : public GMModelReader_MD5
@@ -32,6 +35,10 @@ public:
 	virtual bool load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT GMModels** models) override;
 	virtual bool test(const GMBuffer& buffer) override;
 	virtual Vector<GMOwnedPtr<IMd5MeshHandler>>& getHandlers() override;
+	void addBound(GMModelReader_MD5Anim_Bound&& bounds);
+	void addBaseframe(GMModelReader_MD5Anim_Baseframe&& baseframe);
+	void initFrames(GMint num);
+	void setFrame(GMint index, GMModelReader_MD5Anim_Frame&& frame);
 
 public:
 	inline void setNextHandler(IMd5MeshHandler* handler) GM_NOEXCEPT

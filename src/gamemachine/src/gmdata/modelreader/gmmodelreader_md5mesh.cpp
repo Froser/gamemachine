@@ -76,7 +76,7 @@ BEGIN_DECLARE_MD5_HANDLER(joints_inner, reader, scanner, GMModelReader_MD5Mesh*)
 			scanner.next(joint.annotation);
 		}
 
-		reader->addJoint(joint);
+		reader->addJoint(std::move(joint));
 	}
 	return true;
 END_DECLARE_MD5_HANDLER()
@@ -125,7 +125,7 @@ struct Handler_mesh_inner : IMd5MeshHandler
 		else if (content == L"}")
 		{
 			if (m_cacheMesh)
-				reader->addMesh(*m_cacheMesh);
+				reader->addMesh(std::move(*m_cacheMesh));
 			reader->setNextHandler(nullptr);
 			return true;
 		}

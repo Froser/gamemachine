@@ -124,6 +124,24 @@ GM_ALIGNED_STRUCT(GMModelReader_MD5Anim_Hierarchy)
 	GMint parentIndex;
 	GMint flags;
 	GMint startIndex;
+	GMString annotation;
+};
+
+GM_ALIGNED_STRUCT(GMModelReader_MD5Anim_Bound)
+{
+	GMVec3 boundMin;
+	GMVec3 boundMax;
+};
+
+GM_ALIGNED_STRUCT(GMModelReader_MD5Anim_Baseframe)
+{
+	GMVec3 position;
+	GMVec3 orientation;
+};
+
+GM_ALIGNED_STRUCT(GMModelReader_MD5Anim_Frame)
+{
+	Vector<GMfloat> frameData;
 };
 
 GM_PRIVATE_OBJECT(GMModelReader_MD5)

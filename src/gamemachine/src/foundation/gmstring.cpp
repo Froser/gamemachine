@@ -426,3 +426,11 @@ bool GMScanner::nextInt(REF GMint& ref)
 	ref = GMString::parseInt(command);
 	return true;
 }
+
+void GMScanner::peek(REF GMString& ref)
+{
+	D_STR(d);
+	const GMwchar* t = d->p;
+	next(ref);
+	d->p = t;
+}

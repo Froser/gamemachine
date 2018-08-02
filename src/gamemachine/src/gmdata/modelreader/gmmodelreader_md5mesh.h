@@ -44,16 +44,16 @@ public:
 		d->nextHandler = handler;
 	}
 
-	void addJoint(const GMModelReader_MD5Mesh_Joint& joint)
+	void addJoint(GMModelReader_MD5Mesh_Joint&& joint)
 	{
 		D(d);
-		d->joints.push_back(joint);
+		d->joints.push_back(std::move(joint));
 	}
 
-	void addMesh(const GMModelReader_MD5Mesh_Mesh& mesh)
+	void addMesh(GMModelReader_MD5Mesh_Mesh&& mesh)
 	{
 		D(d);
-		d->meshes.push_back(mesh);
+		d->meshes.push_back(std::move(mesh));
 	}
 };
 

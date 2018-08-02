@@ -492,6 +492,7 @@ public:
 	void nextToTheEnd(REF GMString& ref);
 	bool nextFloat(REF GMfloat& ref);
 	bool nextInt(REF GMint& ref);
+	void peek(REF GMString& ref);
 };
 
 END_NS
