@@ -49,7 +49,7 @@ enum class GameMachineHandlerEvent
 {
 	FrameStart,
 	FrameEnd,
-	Simulate,
+	Update,
 	Render,
 	Activate,
 	Deactivate,

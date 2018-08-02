@@ -56,7 +56,7 @@ void GMSpriteGameObject::look(GMfloat pitch, GMfloat yaw)
 	d->state.lookAt = FastNormalize(lookAt * qYaw);
 }
 
-void GMSpriteGameObject::simulate()
+void GMSpriteGameObject::update(GMDuration dt)
 {
 	D(d);
 	GMVec3 direction(0), rate(0), moveSpeed(0), jumpSpeed(0);
@@ -95,11 +95,7 @@ void GMSpriteGameObject::simulate()
 		GMPhysicsWorld* world = getWorld()->getPhysicsWorld();
 		world->applyJump(getPhysicsObject(), args);
 	}
-}
 
-void GMSpriteGameObject::updateAfterSimulate()
-{
-	D(d);
 	GMFloat4 f4_position;
 	GetTranslationFromMatrix(getPhysicsObject()->getMotionStates().transform, f4_position);
 	d->state.position.setFloat4(f4_position);

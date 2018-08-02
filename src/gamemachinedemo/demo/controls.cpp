@@ -24,8 +24,8 @@ void Demo_Controls::event(gm::GameMachineHandlerEvent evt)
 		break;
 	case gm::GameMachineHandlerEvent::FrameEnd:
 		break;
-	case gm::GameMachineHandlerEvent::Simulate:
-		getDemoWorldReference()->simulateGameWorld();
+	case gm::GameMachineHandlerEvent::Update:
+		getDemoWorldReference()->updateGameWorld(GM.getRunningStates().lastFrameElpased);
 		break;
 	case gm::GameMachineHandlerEvent::Render:
 		getDemoWorldReference()->renderScene();

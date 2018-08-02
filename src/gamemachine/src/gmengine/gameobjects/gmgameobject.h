@@ -43,8 +43,7 @@ public:
 	virtual void onAppendingObjectToWorld() {}
 	virtual void onRemovingObjectFromWorld() {}
 	virtual void draw();
-	virtual void updateAfterSimulate() {}
-	virtual void simulate() {}
+	virtual void update(GMDuration dt) {}
 	virtual bool canDeferredRendering();
 	virtual const IRenderContext* getContext();
 

@@ -71,7 +71,7 @@ void Demo_Lua::event(gm::GameMachineHandlerEvent evt)
 		break;
 	case gm::GameMachineHandlerEvent::FrameEnd:
 		break;
-	case gm::GameMachineHandlerEvent::Simulate:
+	case gm::GameMachineHandlerEvent::Update:
 		break;
 	case gm::GameMachineHandlerEvent::Render:
 		getDemoWorldReference()->renderScene();

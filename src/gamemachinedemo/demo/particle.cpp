@@ -60,7 +60,7 @@ void Demo_Particle::event(gm::GameMachineHandlerEvent evt)
 	Base::event(evt);
 	switch (evt)
 	{
-	case gm::GameMachineHandlerEvent::Simulate:
+	case gm::GameMachineHandlerEvent::Update:
 		d->particleSystemManager->update(GM.getRunningStates().lastFrameElpased);
 		break;
 	case gm::GameMachineHandlerEvent::Render:

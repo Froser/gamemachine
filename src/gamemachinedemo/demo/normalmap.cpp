@@ -146,9 +146,9 @@ void Demo_NormalMap::event(gm::GameMachineHandlerEvent evt)
 		break;
 	case gm::GameMachineHandlerEvent::FrameEnd:
 		break;
-	case gm::GameMachineHandlerEvent::Simulate:
+	case gm::GameMachineHandlerEvent::Update:
 	{
-		getDemoWorldReference()->simulateGameWorld();
+		getDemoWorldReference()->updateGameWorld(GM.getRunningStates().lastFrameElpased);
 		break;
 	}
 	case gm::GameMachineHandlerEvent::Render:

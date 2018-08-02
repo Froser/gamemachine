@@ -75,11 +75,11 @@ const IRenderContext* GMGameWorld::getContext()
 	return d->context;
 }
 
-void GMGameWorld::simulateGameWorld()
+void GMGameWorld::updateGameWorld(GMDuration dt)
 {
 	D(d);
 	auto phyw = getPhysicsWorld();
-	simulateGameObjects(phyw, d->gameObjects);
+	updateGameObjects(dt, phyw, d->gameObjects);
 }
 
 void GMGameWorld::clearRenderList()
@@ -89,14 +89,13 @@ void GMGameWorld::clearRenderList()
 	d->renderList.forward.clear();
 }
 
-void GMGameWorld::simulateGameObjects(GMPhysicsWorld* phyw, const Set<GMOwnedPtr<GMGameObject>>& gameObjects)
+void GMGameWorld::updateGameObjects(GMDuration dt, GMPhysicsWorld* phyw, const Set<GMOwnedPtr<GMGameObject>>& gameObjects)
 {
 	for (decltype(auto) gameObject : gameObjects)
 	{
-		gameObject->simulate();
+		gameObject->update(dt);
 		if (phyw)
-			phyw->simulate(gameObject.get());
-		gameObject->updateAfterSimulate();
+			phyw->update(dt, gameObject.get());
 	}
 }
 

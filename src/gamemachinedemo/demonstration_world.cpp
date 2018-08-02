@@ -630,7 +630,7 @@ void DemostrationEntrance::event(gm::GameMachineHandlerEvent evt)
 		case gm::GameMachineHandlerEvent::FrameEnd:
 			getWorld()->switchDemo();
 			break;
-		case gm::GameMachineHandlerEvent::Simulate:
+		case gm::GameMachineHandlerEvent::Update:
 			break;
 		case gm::GameMachineHandlerEvent::Render:
 			getWorld()->renderScene();

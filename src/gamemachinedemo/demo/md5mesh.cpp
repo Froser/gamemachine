@@ -16,7 +16,7 @@ void Demo_MD5Mesh::init()
 	gm::GMWidget* widget = createDefaultWidget();
 	widget->setSize(widget->getSize().width, getClientAreaTop() + 40);
 
-	gm::GMModelReader::load(gm::GMModelLoadSettings(L"boblampclean/boblampclean.gmmd5", L"boblampclean.gmmd5"), gm::GMModelReader::Auto, nullptr);
+	gm::GMModelReader::load(gm::GMModelLoadSettings(L"boblampclean/boblampclean.gmmd5", L"boblampclean"), gm::GMModelReader::Auto, nullptr);
 }
 
 void Demo_MD5Mesh::event(gm::GameMachineHandlerEvent evt)
@@ -30,8 +30,8 @@ void Demo_MD5Mesh::event(gm::GameMachineHandlerEvent evt)
 		break;
 	case gm::GameMachineHandlerEvent::FrameEnd:
 		break;
-	case gm::GameMachineHandlerEvent::Simulate:
-		getDemoWorldReference()->simulateGameWorld();
+	case gm::GameMachineHandlerEvent::Update:
+		getDemoWorldReference()->updateGameWorld(GM.getRunningStates().lastFrameElpased);
 		break;
 	case gm::GameMachineHandlerEvent::Render:
 		getDemoWorldReference()->renderScene();

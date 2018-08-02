@@ -112,9 +112,9 @@ void Demo_Collision::event(gm::GameMachineHandlerEvent evt)
 		break;
 	case gm::GameMachineHandlerEvent::FrameEnd:
 		break;
-	case gm::GameMachineHandlerEvent::Simulate:
+	case gm::GameMachineHandlerEvent::Update:
 	{
-		getDemoWorldReference()->getPhysicsWorld()->simulate(nullptr);
+		getDemoWorldReference()->getPhysicsWorld()->update(GM.getRunningStates().lastFrameElpased, nullptr);
 		const gm::GMMotionStates& states = d->firstPhyObj->getMotionStates(); // Get current motion states
 		break;
 	}

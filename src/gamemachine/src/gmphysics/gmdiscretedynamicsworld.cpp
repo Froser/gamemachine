@@ -34,12 +34,12 @@ GMDiscreteDynamicsWorld::~GMDiscreteDynamicsWorld()
 	GM_delete(d->bulletRigidPool);
 }
 
-void GMDiscreteDynamicsWorld::simulate(GMGameObject* obj)
+void GMDiscreteDynamicsWorld::update(GMDuration dt, GMGameObject* obj)
 {
 	D(d);
 	D_BASE(db, Base);
 	GM_ASSERT(d->worldImpl);
-	d->worldImpl->stepSimulation(GM.getRunningStates().lastFrameElpased);
+	d->worldImpl->stepSimulation(dt);
 	syncTransform();
 }
 

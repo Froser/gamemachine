@@ -41,7 +41,7 @@ public:
 	GMPhysicsRayTestResult rayTest(const GMVec3& rayFromWorld, const GMVec3& rayToWorld);
 
 public:
-	virtual void simulate(GMGameObject* obj) override;
+	virtual void update(GMDuration dt, GMGameObject* obj) override;
 
 private:
 	void syncTransform();

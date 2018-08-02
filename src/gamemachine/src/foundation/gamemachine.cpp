@@ -210,7 +210,7 @@ void GameMachine::handlerEvents()
 		else
 			handler->event(GameMachineHandlerEvent::Deactivate);
 
-		handler->event(GameMachineHandlerEvent::Simulate);
+		handler->event(GameMachineHandlerEvent::Update);
 		handler->event(GameMachineHandlerEvent::Render);
 		window->msgProc(s_frameUpdateMsg);
 	});

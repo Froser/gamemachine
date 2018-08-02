@@ -56,7 +56,7 @@ public:
 
 public:
 	void addObjectAndInit(AUTORELEASE GMGameObject* obj);
-	void simulateGameWorld();
+	void updateGameWorld(GMDuration dt);
 	void clearRenderList();
 	void addToRenderList(GMGameObject* object);
 	inline GMAssets& getAssets() { D(d); return d->assets; }
@@ -69,7 +69,7 @@ protected:
 	}
 
 private:
-	void simulateGameObjects(GMPhysicsWorld* phyw, const Set<GMOwnedPtr<GMGameObject>>& gameObjects);
+	void updateGameObjects(GMDuration dt, GMPhysicsWorld* phyw, const Set<GMOwnedPtr<GMGameObject>>& gameObjects);
 
 	// GMPhysicsWorld
 private:

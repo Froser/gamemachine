@@ -47,8 +47,7 @@ public:
 	GMSpriteGameObject(GMfloat radius, const GMVec3& position = Zero<GMVec3>());
 
 public:
-	virtual void simulate() override;
-	virtual void updateAfterSimulate() override;
+	virtual void update(GMDuration dt) override;
 
 public:
 	//! 表示精灵对象执行一个动作。

@@ -18,16 +18,16 @@ GMBSPMove::GMBSPMove(GMBSPPhysicsWorld* world, GMPhysicsObject* obj)
 	d->trace = &world->physicsData().trace;
 }
 
-void GMBSPMove::move()
+void GMBSPMove::move(GMDuration dt)
 {
 	D(d);
 	generateMovement();
 	groundTrace();
 	processCommand();
 	if (d->movementState.walking)
-		walkMove();
+		walkMove(dt);
 	else
-		airMove();
+		airMove(dt);
 }
 
 void GMBSPMove::processCommand()
@@ -172,26 +172,26 @@ void GMBSPMove::groundTrace()
 	d->movementState.walking = true;
 }
 
-void GMBSPMove::walkMove()
+void GMBSPMove::walkMove(GMDuration dt)
 {
 	D(d);
 	if (d->movementState.velocity == Zero<GMVec3>())
 		return;
 
-	stepSlideMove(false);
+	stepSlideMove(dt, false);
 }
 
-void GMBSPMove::airMove()
+void GMBSPMove::airMove(GMDuration dt)
 {
-	stepSlideMove(true);
+	stepSlideMove(dt, true);
 }
 
-void GMBSPMove::stepSlideMove(bool hasGravity)
+void GMBSPMove::stepSlideMove(GMDuration dt, bool hasGravity)
 {
 	D(d);
 	GMVec3 startOrigin = d->movementState.origin;
 	GMVec3 startVelocity = d->movementState.velocity;
-	if (!slideMove(hasGravity))
+	if (!slideMove(dt, hasGravity))
 	{
 		synchronizeMotionStates();
 		return;
@@ -218,7 +218,7 @@ void GMBSPMove::stepSlideMove(bool hasGravity)
 	d->movementState.origin = t.endpos;
 	d->movementState.velocity = startVelocity;
 
-	slideMove(hasGravity);
+	slideMove(dt, hasGravity);
 
 	// 走下来
 	GMfloat stepSize = t.endpos.getY() - startOrigin.getY();
@@ -242,11 +242,10 @@ void GMBSPMove::stepSlideMove(bool hasGravity)
 	synchronizeMotionStates();
 }
 
-bool GMBSPMove::slideMove(bool hasGravity)
+bool GMBSPMove::slideMove(GMDuration dt, bool hasGravity)
 {
 	D(d);
 	GMBSPPhysicsWorld::Data& wd = d->world->physicsData();
-	GMDuration dt = GM.getRunningStates().lastFrameElpased;
 	GMVec3 velocity = d->movementState.velocity;
 
 	GMint numbumps = 4, bumpcount;

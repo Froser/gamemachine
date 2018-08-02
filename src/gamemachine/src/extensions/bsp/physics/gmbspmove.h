@@ -56,7 +56,7 @@ class GMBSPMove : public GMObject
 
 public:
 	GMBSPMove(GMBSPPhysicsWorld* world, GMPhysicsObject* obj);
-	void move();
+	void move(GMDuration dt);
 	void applyMove(const GMPhysicsMoveArgs& args);
 	void applyJump(const GMVec3& speed);
 
@@ -69,10 +69,10 @@ private:
 	void processJump();
 	void composeVelocityWithGravity();
 	GMVec3 decomposeVelocity(const GMVec3& v);
-	void walkMove();
-	void airMove();
-	void stepSlideMove(bool hasGravity);
-	bool slideMove(bool hasGravity);
+	void walkMove(GMDuration dt);
+	void airMove(GMDuration dt);
+	void stepSlideMove(GMDuration dt, bool hasGravity);
+	bool slideMove(GMDuration dt, bool hasGravity);
 	void synchronizeMotionStates();
 	void clipVelocity(const GMVec3& in, const GMVec3& normal, GMVec3& out, GMfloat overbounce);
 };
