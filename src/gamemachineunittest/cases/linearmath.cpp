@@ -185,6 +185,10 @@ void cases::LinearMath::addToUnitTest(UnitTest& ut)
 		return VECTOR4_EQUALS(V, 7, 5, 3, 1);
 	});
 
+	ut.addTestCase("GMQuat * GMQuat", []() {
+		GMQuat Q = Rotate(-PI / 3, GMVec3(1, 0, 0)) * Rotate(PI / 6, GMVec3(0, 1, 0));
+		return VECTOR4_FUZZY_EQUALS(Q, -0.4829f, 0.2241f, 0.1294f, 0.8365f);
+	});
 
 	// *
 	ut.addTestCase("GMVec3 * GMVec3", []() {

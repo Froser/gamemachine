@@ -112,7 +112,7 @@ GM_ALIGNED_STRUCT(GMModelReader_MD5Mesh_Mesh)
 	GMint numVertices;
 	Vector<GMModelReader_MD5Mesh_Vertex> vertices;
 	GMint numTriangles;
-	Vector<GMVec3> triangleIndices;
+	Vector<Array<GMint, 3>> triangleIndices;
 	GMint numWeights;
 	Vector<GMModelReader_MD5Mesh_Weight> weights;
 };

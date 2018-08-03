@@ -502,6 +502,17 @@ inline GMVec3 operator*(const GMVec3& V, const GMQuat& Q)
 	return R;
 }
 
+inline GMQuat operator*(const GMQuat& V, const GMQuat& Q)
+{
+	GMQuat R;
+#if GM_USE_DX11
+	R.v_ = DirectX::XMQuaternionMultiply(V.v_, Q.v_);
+#else
+	R.v_ = Q.v_ * V.v_;
+#endif
+	return R;
+}
+
 inline GMMat4 QuatToMatrix(const GMQuat& quat)
 {
 	GMMat4 mat;

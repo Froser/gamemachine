@@ -67,6 +67,9 @@ public:
 		D(d);
 		d->meshes.reserve(num);
 	}
+
+private:
+	void buildModel(OUT GMModels** ppModels);
 };
 
 END_NS

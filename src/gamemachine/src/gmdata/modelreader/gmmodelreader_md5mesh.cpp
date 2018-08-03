@@ -160,7 +160,7 @@ struct Handler_mesh_inner : IMd5MeshHandler
 			scanner.nextInt(indices[0]);
 			scanner.nextInt(indices[1]);
 			scanner.nextInt(indices[2]);
-			m_cacheMesh->triangleIndices[index] = GMVec3(indices[0], indices[1], indices[2]);
+			m_cacheMesh->triangleIndices[index] = { indices[0], indices[1], indices[2] };
 		}
 		else if (content == L"numweights")
 		{
@@ -238,6 +238,8 @@ bool GMModelReader_MD5Mesh::load(const GMModelLoadSettings& settings, GMBuffer& 
 				return false;
 		}
 	}
+
+	buildModel(models);
 	return true;
 }
 
@@ -269,4 +271,79 @@ Vector<GMOwnedPtr<IMd5MeshHandler>>& GMModelReader_MD5Mesh::getHandlers()
 		d->handlers.push_back(NEW_MD5_HANDLER(mesh_inner));
 	}
 	return d->handlers;
+}
+
+void GMModelReader_MD5Mesh::buildModel(OUT GMModels** ppModels)
+{
+	D(d);
+	if (!ppModels)
+		return;
+	
+	GMModels* models = new GMModels();
+	*ppModels = models;
+
+	GMModel* model = new GMModel();
+	model->setUsageHint(GMUsageHint::DynamicDraw);
+	models->push_back(model);
+
+	// 临时结构，用于缓存顶点、法线
+	struct Vertex
+	{
+		GMVec3 position = Zero<GMVec3>();
+		GMVec3 normal = Zero<GMVec3>();
+	};
+
+	for (const auto& mesh : d->meshes)
+	{
+		GMMesh* m = new GMMesh(model);
+		Vector<Vertex> vertices;
+		vertices.reserve(mesh.vertices.size());
+		for (const auto& vert : mesh.vertices)
+		{
+			Vertex vertex;
+			GMVec3 pos = Zero<GMVec3>();
+			// 每个顶点的坐标由结点的权重累计计算得到
+			for (GMint i = 0; i < vert.weightCount; ++i)
+			{
+				const auto& weight = mesh.weights[vert.startWeight + i];
+				const auto& joint = d->joints[weight.jointIndex];
+				GMVec3 rotationPos = weight.weightPosition * joint.orientation;
+				pos += (joint.position + rotationPos) * weight.weightBias;
+			}
+			vertex.position = pos;
+			vertices.push_back(vertex);
+		}
+
+		for (const auto& triIdx : mesh.triangleIndices)
+		{
+			GMVec3 v0 = vertices[triIdx[0]].position;
+			GMVec3 v1 = vertices[triIdx[1]].position;
+			GMVec3 v2 = vertices[triIdx[2]].position;
+			GMVec3 normal = Cross(v1 - v0, v2 - v0);
+
+			// 计算法线
+			vertices[triIdx[0]].normal += normal;
+			vertices[triIdx[1]].normal += normal;
+			vertices[triIdx[2]].normal += normal;
+		}
+
+		// normalize所有法线，并且加上bias
+		for (GMsize_t i = 0; i < mesh.vertices.size(); ++i)
+		{
+			vertices[i].normal = Normalize(vertices[i].normal);
+		}
+
+		// 组装Vertex
+		for (const auto& triIdx : mesh.triangleIndices)
+		{
+			for (GMint i = 0; i < 3; ++i)
+			{
+				GMVertex v = { 0 };
+				const Vertex& vertexTemp = vertices[triIdx[i]];
+				v.positions = { vertexTemp.position.getX(), vertexTemp.position.getY(), vertexTemp.position.getZ() };
+				v.normals = { vertexTemp.normal.getX(), vertexTemp.normal.getY(), vertexTemp.normal.getZ() };
+				m->vertex(v);
+			}
+		}
+	}
 }

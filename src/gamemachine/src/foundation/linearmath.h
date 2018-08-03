@@ -484,6 +484,15 @@ inline GMVec4 operator*(const GMVec4& V, const GMQuat& Q);
 
 inline GMVec3 operator*(const GMVec3& V, const GMQuat& Q);
 
+//! 计算四元数相乘的结果
+/*!
+	返回Q*V，表示先进行V变换，再进行Q变换。
+	\param V 先进行的变换。
+	\param Q 后进行的变换。
+	\return 变换后的四元数。
+*/
+inline GMQuat operator*(const GMQuat& V, const GMQuat& Q);
+
 inline GMMat4 QuatToMatrix(const GMQuat& quat);
 
 inline GMMat4 LookAt(const GMVec3& position, const GMVec3& center, const GMVec3& up);
