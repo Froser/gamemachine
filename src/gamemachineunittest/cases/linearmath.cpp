@@ -187,7 +187,7 @@ void cases::LinearMath::addToUnitTest(UnitTest& ut)
 
 	ut.addTestCase("GMQuat * GMQuat", []() {
 		GMQuat Q = Rotate(-PI / 3, GMVec3(1, 0, 0)) * Rotate(PI / 6, GMVec3(0, 1, 0));
-		return VECTOR4_FUZZY_EQUALS(Q, -0.4829f, 0.2241f, 0.1294f, 0.8365f);
+		return VECTOR4_FUZZY_EQUALS(Q, -0.482962f, 0.224143f, 0.129409f, 0.836516f);
 	});
 
 	// *
