@@ -23,6 +23,7 @@ public:
 		ImageType_JPG = ImageType_Begin,
 		ImageType_PNG,
 		ImageType_BMP,
+		ImageType_TGA, // TGA头无magic number，放在最后解析
 		ImageType_End,
 	};
 

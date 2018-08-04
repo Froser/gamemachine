@@ -4,6 +4,7 @@
 #include <map>
 #include "gmimagereader_png.h"
 #include "gmimagereader_jpg.h"
+#include "gmimagereader_tga.h"
 #include "foundation/vector.h"
 
 class GMImageReaderContainer
@@ -14,6 +15,7 @@ public:
 		m_readers[GMImageReader::ImageType_BMP] = new GMImageReader_BMP();
 		m_readers[GMImageReader::ImageType_PNG] = new GMImageReader_PNG();
 		m_readers[GMImageReader::ImageType_JPG] = new GMImageReader_JPG();
+		m_readers[GMImageReader::ImageType_TGA] = new GMImageReader_TGA();
 	}
 
 	~GMImageReaderContainer()

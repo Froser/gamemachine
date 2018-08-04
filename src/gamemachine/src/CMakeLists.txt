@@ -29,6 +29,8 @@ set(SOURCES
 		gmdata/imagereader/gmimagereader_jpg.cpp
 		gmdata/imagereader/gmimagereader_png.h
 		gmdata/imagereader/gmimagereader_png.cpp
+		gmdata/imagereader/gmimagereader_tga.h
+		gmdata/imagereader/gmimagereader_tga.cpp
 		gmdata/modelreader/gmmodelreader.h
 		gmdata/modelreader/gmmodelreader.cpp
 		gmdata/modelreader/gmmodelreader_obj.h
