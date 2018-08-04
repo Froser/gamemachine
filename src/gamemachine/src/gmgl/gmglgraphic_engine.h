@@ -12,7 +12,7 @@ BEGIN_NS
 class Camera;
 class GMGameWorld;
 class GameLight;
-struct IRenderer;
+struct ITechnique;
 
 extern "C"
 {
@@ -41,13 +41,13 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	GMOwnedPtr<GMGLShaderProgram> filterShaderProgram;
 
 	// 渲染器
-	GMOwnedPtr<IRenderer> renderer_2d;
-	GMOwnedPtr<IRenderer> renderer_3d;
-	GMOwnedPtr<IRenderer> renderer_cubeMap;
-	GMOwnedPtr<IRenderer> renderer_filter;
-	GMOwnedPtr<IRenderer> renderer_lightPass;
-	GMOwnedPtr<IRenderer> renderer_3d_shadow;
-	GMOwnedPtr<IRenderer> renderer_particle;
+	GMOwnedPtr<ITechnique> technique_2d;
+	GMOwnedPtr<ITechnique> technique_3d;
+	GMOwnedPtr<ITechnique> technique_cubeMap;
+	GMOwnedPtr<ITechnique> technique_filter;
+	GMOwnedPtr<ITechnique> technique_lightPass;
+	GMOwnedPtr<ITechnique> technique_3d_shadow;
+	GMOwnedPtr<ITechnique> technique_particle;
 
 	ITexture* cubeMap = nullptr;
 	GMGLLightContext lightContext;
@@ -67,7 +67,7 @@ public:
 	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type) override;
 	virtual bool event(const GMMessage& e) override { return false; }
 	virtual IFramebuffers* getDefaultFramebuffers() override;
-	virtual IRenderer* getRenderer(GMModelType objectType) override;
+	virtual ITechnique* getTechnique(GMModelType objectType) override;
 	virtual GMGlyphManager* getGlyphManager() override;
 
 public:
@@ -90,7 +90,7 @@ public:
 	}
 
 public:
-	void activateLights(IRenderer* renderer);
+	void activateLights(ITechnique* technique);
 	void shaderProgramChanged(IShaderProgram* program);
 
 private:

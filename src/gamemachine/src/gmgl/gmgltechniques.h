@@ -15,7 +15,7 @@ private:
 	GMfloat m_gamma = 0.f;
 };
 
-GM_PRIVATE_OBJECT(GMGLRenderer)
+GM_PRIVATE_OBJECT(GMGLTechnique)
 {
 	const IRenderContext* context = nullptr;
 	GMGLGraphicEngine* engine = nullptr;
@@ -26,12 +26,12 @@ GM_PRIVATE_OBJECT(GMGLRenderer)
 	GMGammaHelper gammaHelper;
 };
 
-class GMGLRenderer : public GMObject, public IRenderer
+class GMGLTechnique : public GMObject, public ITechnique
 {
-	GM_DECLARE_PRIVATE(GMGLRenderer)
+	GM_DECLARE_PRIVATE(GMGLTechnique)
 
 public:
-	GMGLRenderer(const IRenderContext* context);
+	GMGLTechnique(const IRenderContext* context);
 
 	virtual void draw(GMModel* model) override;
 	virtual IShaderProgram* getShaderProgram() = 0;
@@ -63,19 +63,19 @@ public:
 	static void dirtyShadowMapAttributes();
 };
 
-GM_PRIVATE_OBJECT(GMGLRenderer_3D)
+GM_PRIVATE_OBJECT(GMGLTechnique_3D)
 {
 	GMRenderMode renderMode = GMRenderMode::Forward;
 	ITexture* whiteTexture = nullptr;
 };
 
-class GMGLRenderer_3D : public GMGLRenderer
+class GMGLTechnique_3D : public GMGLTechnique
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMGLRenderer_3D, GMGLRenderer)
+	GM_DECLARE_PRIVATE_AND_BASE(GMGLTechnique_3D, GMGLTechnique)
 
 public:
-	using GMGLRenderer::GMGLRenderer;
-	~GMGLRenderer_3D();
+	using GMGLTechnique::GMGLTechnique;
+	~GMGLTechnique_3D();
 
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
@@ -92,19 +92,19 @@ private:
 	ITexture* getWhiteTexture();
 };
 
-class GMGLRenderer_2D : public GMGLRenderer_3D
+class GMGLTechnique_2D : public GMGLTechnique_3D
 {
 public:
-	using GMGLRenderer_3D::GMGLRenderer_3D;
+	using GMGLTechnique_3D::GMGLTechnique_3D;
 
 public:
 	virtual void beforeDraw(GMModel* model) override;
 };
 
-class GMGLRenderer_CubeMap : public GMGLRenderer_3D
+class GMGLTechnique_CubeMap : public GMGLTechnique_3D
 {
 public:
-	using GMGLRenderer_3D::GMGLRenderer_3D;
+	using GMGLTechnique_3D::GMGLTechnique_3D;
 
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
@@ -113,7 +113,7 @@ public:
 	virtual void afterDraw(GMModel* model) override;
 };
 
-GM_PRIVATE_OBJECT(GMGLRenderer_Filter)
+GM_PRIVATE_OBJECT(GMGLTechnique_Filter)
 {
 	struct HDRState
 	{
@@ -123,12 +123,12 @@ GM_PRIVATE_OBJECT(GMGLRenderer_Filter)
 	HDRState state;
 };
 
-class GMGLRenderer_Filter : public GMGLRenderer
+class GMGLTechnique_Filter : public GMGLTechnique
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMGLRenderer_Filter, GMGLRenderer)
+	GM_DECLARE_PRIVATE_AND_BASE(GMGLTechnique_Filter, GMGLTechnique)
 
 public:
-	using GMGLRenderer::GMGLRenderer;
+	using GMGLTechnique::GMGLTechnique;
 
 private:
 	virtual void beforeDraw(GMModel* model) override;
@@ -144,10 +144,10 @@ private:
 	void setHDR(IShaderProgram* shaderProgram);
 };
 
-class GMGLRenderer_LightPass : public GMGLRenderer
+class GMGLTechnique_LightPass : public GMGLTechnique
 {
 public:
-	using GMGLRenderer::GMGLRenderer;
+	using GMGLTechnique::GMGLTechnique;
 
 protected:
 	virtual IShaderProgram* getShaderProgram() override;
@@ -157,19 +157,19 @@ protected:
 	virtual void endModel() override;
 };
 
-class GMGLRenderer_3D_Shadow : public GMGLRenderer_3D
+class GMGLTechnique_3D_Shadow : public GMGLTechnique_3D
 {
 public:
-	using GMGLRenderer_3D::GMGLRenderer_3D;
+	using GMGLTechnique_3D::GMGLTechnique_3D;
 
 protected:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 };
 
-class GMGLRenderer_Particle : public GMGLRenderer_2D
+class GMGLTechnique_Particle : public GMGLTechnique_2D
 {
 public:
-	using GMGLRenderer_2D::GMGLRenderer_2D;
+	using GMGLTechnique_2D::GMGLTechnique_2D;
 };
 
 END_NS

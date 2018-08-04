@@ -6,7 +6,7 @@
 BEGIN_NS
 
 class GMGLGraphicEngine;
-struct IRenderer;
+struct ITechnique;
 GM_PRIVATE_OBJECT(GMGLModelDataProxy)
 {
 	GMGLGraphicEngine* engine = nullptr;

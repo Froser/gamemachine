@@ -36,7 +36,7 @@ struct IGamePackageHandler;
 struct IDebugOutput;
 struct IAudioPlayer;
 struct IGraphicEngine;
-struct IRenderer;
+struct ITechnique;
 struct IInput;
 struct IWindow;
 struct IRenderContext;
@@ -299,7 +299,7 @@ GM_INTERFACE(ILight)
 	virtual void setLightColor(GMfloat color[4]) = 0;
 	virtual const GMfloat* getLightPosition() const = 0;
 	virtual const GMfloat* getLightColor() const = 0;
-	virtual void activateLight(GMuint, IRenderer*) = 0;
+	virtual void activateLight(GMuint, ITechnique*) = 0;
 };
 
 struct GMStencilOptions
@@ -463,14 +463,14 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	  \param objectType 模型类型。
 	  \return 模型类型对应的渲染器。
 	*/
-	virtual IRenderer* getRenderer(GMModelType modelType) = 0;
+	virtual ITechnique* getTechnique(GMModelType modelType) = 0;
 
 	virtual GMGlyphManager* getGlyphManager() = 0;
 
 	virtual GMCamera& getCamera() = 0;
 };
 
-GM_INTERFACE(IRenderer)
+GM_INTERFACE(ITechnique)
 {
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) = 0;
 	virtual void endModel() = 0;

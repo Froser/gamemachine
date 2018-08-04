@@ -137,10 +137,10 @@ void GMGameObject::drawModel(const IRenderContext* context, GMModel* model)
 	if (model->getShader().getDiscard())
 		return;
 
-	IRenderer* renderer = engine->getRenderer(model->getType());
-	renderer->beginModel(model, this);
-	renderer->draw(model);
-	renderer->endModel();
+	ITechnique* technique = engine->getTechnique(model->getType());
+	technique->beginModel(model, this);
+	technique->draw(model);
+	technique->endModel();
 }
 
 GMCubeMapGameObject::GMCubeMapGameObject(ITexture* texture)

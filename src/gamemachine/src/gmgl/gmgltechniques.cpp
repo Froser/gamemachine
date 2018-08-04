@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include <GL/glew.h>
-#include "gmglrenderers.h"
+#include "gmgltechniques.h"
 #include "gmgl/gmglgraphic_engine.h"
 #include "gmgl/shader_constants.h"
 #include "gmgl/gmgltexture.h"
@@ -127,7 +127,7 @@ void GMGammaHelper::setGamma(GMGraphicEngine* engine, IShaderProgram* shaderProg
 	}
 }
 
-GMGLRenderer::GMGLRenderer(const IRenderContext* context)
+GMGLTechnique::GMGLTechnique(const IRenderContext* context)
 {
 	D(d);
 	d->context = context;
@@ -135,7 +135,7 @@ GMGLRenderer::GMGLRenderer(const IRenderContext* context)
 	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
 }
 
-void GMGLRenderer::draw(GMModel* model)
+void GMGLTechnique::draw(GMModel* model)
 {
 	D(d);
 	glBindVertexArray(model->getModelBuffer()->getMeshBuffer().arrayId);
@@ -152,7 +152,7 @@ void GMGLRenderer::draw(GMModel* model)
 	glBindVertexArray(0);
 }
 
-void GMGLRenderer::activateTextureTransform(GMModel* model, GMTextureType type)
+void GMGLTechnique::activateTextureTransform(GMModel* model, GMTextureType type)
 {
 	static const std::string u_scrolls_affix = (GMString(".") + GM_VariablesDesc.TextureAttributes.OffsetX).toStdString();
 	static const std::string u_scrollt_affix = (GMString(".") + GM_VariablesDesc.TextureAttributes.OffsetY).toStdString();
@@ -197,7 +197,7 @@ void GMGLRenderer::activateTextureTransform(GMModel* model, GMTextureType type)
 		model->getShader().getTextureList().getTextureSampler(type).applyTexMode(GM.getRunningStates().elapsedTime, applyCallback);
 }
 
-GMint GMGLRenderer::activateTexture(GMModel* model, GMTextureType type)
+GMint GMGLTechnique::activateTexture(GMModel* model, GMTextureType type)
 {
 	static const std::string u_tex_enabled = std::string(".") + GM_VariablesDesc.TextureAttributes.Enabled;
 	static const std::string u_tex_texture = std::string(".") + GM_VariablesDesc.TextureAttributes.Texture;
@@ -217,7 +217,7 @@ GMint GMGLRenderer::activateTexture(GMModel* model, GMTextureType type)
 	return texId;
 }
 
-void GMGLRenderer::deactivateTexture(GMTextureType type)
+void GMGLTechnique::deactivateTexture(GMTextureType type)
 {
 	static const std::string u_tex_enabled = (GMString(".") + GM_VariablesDesc.TextureAttributes.Enabled).toStdString();
 	GMint texId = getTextureID(type);
@@ -230,7 +230,7 @@ void GMGLRenderer::deactivateTexture(GMTextureType type)
 	shaderProgram->setInt(u, 0);
 }
 
-GMint GMGLRenderer::getTextureID(GMTextureType type)
+GMint GMGLTechnique::getTextureID(GMTextureType type)
 {
 	switch (type)
 	{
@@ -254,7 +254,7 @@ GMint GMGLRenderer::getTextureID(GMTextureType type)
 	}
 }
 
-bool GMGLRenderer::drawTexture(GMModel* model, GMTextureType type)
+bool GMGLTechnique::drawTexture(GMModel* model, GMTextureType type)
 {
 	D(d);
 	if (d->engine->isNeedDiscardTexture(model, type))
@@ -276,7 +276,7 @@ bool GMGLRenderer::drawTexture(GMModel* model, GMTextureType type)
 	return false;
 }
 
-ITexture* GMGLRenderer::getTexture(GMTextureSampler& frames)
+ITexture* GMGLTechnique::getTexture(GMTextureSampler& frames)
 {
 	if (frames.getFrameCount() == 0)
 		return nullptr;
@@ -291,7 +291,7 @@ ITexture* GMGLRenderer::getTexture(GMTextureSampler& frames)
 	return frames.getFrameByIndex((elapsed / frames.getAnimationMs()) % frames.getFrameCount());
 }
 
-void GMGLRenderer::updateCameraMatrices(IShaderProgram* shaderProgram)
+void GMGLTechnique::updateCameraMatrices(IShaderProgram* shaderProgram)
 {
 	D(d);
 	GMCamera& camera = d->engine->getCamera();
@@ -312,7 +312,7 @@ void GMGLRenderer::updateCameraMatrices(IShaderProgram* shaderProgram)
 	}
 }
 
-void GMGLRenderer::prepareScreenInfo(IShaderProgram* shaderProgram)
+void GMGLTechnique::prepareScreenInfo(IShaderProgram* shaderProgram)
 {
 	D(d);
 	static std::string s_multisampling = std::string(GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo) + "." + GM_VariablesDesc.ScreenInfoAttributes.Multisampling;
@@ -328,12 +328,12 @@ void GMGLRenderer::prepareScreenInfo(IShaderProgram* shaderProgram)
 	}
 }
 
-void GMGLRenderer::dirtyShadowMapAttributes()
+void GMGLTechnique::dirtyShadowMapAttributes()
 {
 	g_shadowDirty = true;
 }
 
-void GMGLRenderer::applyShader(GMModel* model)
+void GMGLTechnique::applyShader(GMModel* model)
 {
 	prepareBlend(model);
 	prepareFrontFace(model);
@@ -343,7 +343,7 @@ void GMGLRenderer::applyShader(GMModel* model)
 	prepareDebug(model);
 }
 
-void GMGLRenderer::prepareCull(GMModel* model)
+void GMGLTechnique::prepareCull(GMModel* model)
 {
 	const GMShader& shader = model->getShader();
 	if (shader.getCull() == GMS_Cull::CULL)
@@ -352,7 +352,7 @@ void GMGLRenderer::prepareCull(GMModel* model)
 		glDisable(GL_CULL_FACE);
 }
 
-void GMGLRenderer::prepareFrontFace(GMModel* model)
+void GMGLTechnique::prepareFrontFace(GMModel* model)
 {
 	const GMShader& shader = model->getShader();
 	if (shader.getFrontFace() == GMS_FrontFace::CLOCKWISE)
@@ -361,7 +361,7 @@ void GMGLRenderer::prepareFrontFace(GMModel* model)
 		glFrontFace(GL_CCW);
 }
 
-void GMGLRenderer::prepareBlend(GMModel* model)
+void GMGLTechnique::prepareBlend(GMModel* model)
 {
 	D(d);
 	bool blend = false;
@@ -410,7 +410,7 @@ void GMGLRenderer::prepareBlend(GMModel* model)
 	}
 }
 
-void GMGLRenderer::prepareDepth(GMModel* model)
+void GMGLTechnique::prepareDepth(GMModel* model)
 {
 	const GMShader& shader = model->getShader();
 	if (shader.getNoDepthTest())
@@ -419,13 +419,13 @@ void GMGLRenderer::prepareDepth(GMModel* model)
 		glEnable(GL_DEPTH_TEST); // glDepthMask(GL_TRUE);
 }
 
-void GMGLRenderer::prepareLine(GMModel* model)
+void GMGLTechnique::prepareLine(GMModel* model)
 {
 	const GMShader& shader = model->getShader();
 	glLineWidth(shader.getLineWidth());
 }
 
-void GMGLRenderer::prepareDebug(GMModel* model)
+void GMGLTechnique::prepareDebug(GMModel* model)
 {
 	D(d);
 	GMint mode = d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonNormalMode).toInt();
@@ -433,16 +433,16 @@ void GMGLRenderer::prepareDebug(GMModel* model)
 }
 
 //////////////////////////////////////////////////////////////////////////
-GMGLRenderer_3D::~GMGLRenderer_3D()
+GMGLTechnique_3D::~GMGLTechnique_3D()
 {
 	D(d);
 	GM_delete(d->whiteTexture);
 }
 
-void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
+void GMGLTechnique_3D::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
-	D_BASE(db, GMGLRenderer);
+	D_BASE(db, GMGLTechnique);
 	auto shaderProgram = getShaderProgram();
 	shaderProgram->useProgram();
 	updateCameraMatrices(shaderProgram);
@@ -487,10 +487,10 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	db->gammaHelper.setGamma(db->engine, shaderProgram);
 }
 
-void GMGLRenderer_3D::beforeDraw(GMModel* model)
+void GMGLTechnique_3D::beforeDraw(GMModel* model)
 {
 	D(d);
-	D_BASE(db, GMGLRenderer);
+	D_BASE(db, GMGLTechnique);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	// 材质
@@ -527,7 +527,7 @@ void GMGLRenderer_3D::beforeDraw(GMModel* model)
 	drawDebug();
 }
 
-void GMGLRenderer_3D::afterDraw(GMModel* model)
+void GMGLTechnique_3D::afterDraw(GMModel* model)
 {
 	D(d);
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
@@ -536,7 +536,7 @@ void GMGLRenderer_3D::afterDraw(GMModel* model)
 	}
 }
 
-IShaderProgram* GMGLRenderer_3D::getShaderProgram()
+IShaderProgram* GMGLTechnique_3D::getShaderProgram()
 {
 	D_BASE(d, Base);
 	GMGeometryPassingState s = d->engine->getGBuffer()->getGeometryPassingState();
@@ -546,11 +546,11 @@ IShaderProgram* GMGLRenderer_3D::getShaderProgram()
 	return d->engine->getShaderProgram(GMShaderProgramType::ForwardShaderProgram);
 }
 
-void GMGLRenderer_3D::endModel()
+void GMGLTechnique_3D::endModel()
 {
 }
 
-void GMGLRenderer_3D::activateMaterial(const GMShader& shader)
+void GMGLTechnique_3D::activateMaterial(const GMShader& shader)
 {
 	D(d);
 	auto shaderProgram = getShaderProgram();
@@ -570,7 +570,7 @@ void GMGLRenderer_3D::activateMaterial(const GMShader& shader)
 	shaderProgram->setVec3(GMSHADER_MATERIAL_F0.c_str(), ValuePointer(material.f0));
 }
 
-void GMGLRenderer_3D::drawDebug()
+void GMGLTechnique_3D::drawDebug()
 {
 	D(d);
 	D_BASE(db, Base);
@@ -578,7 +578,7 @@ void GMGLRenderer_3D::drawDebug()
 	shaderProgram->setInt(GMSHADER_DEBUG_DRAW_NORMAL, db->debugConfig.get(GMDebugConfigs::DrawPolygonNormalMode).toInt());
 }
 
-ITexture* GMGLRenderer_3D::getWhiteTexture()
+ITexture* GMGLTechnique_3D::getWhiteTexture()
 {
 	D(d);
 	D_BASE(db, Base);
@@ -588,7 +588,7 @@ ITexture* GMGLRenderer_3D::getWhiteTexture()
 }
 
 //////////////////////////////////////////////////////////////////////////
-void GMGLRenderer_2D::beforeDraw(GMModel* model)
+void GMGLTechnique_2D::beforeDraw(GMModel* model)
 {
 	D(d);
 	// 应用Shader
@@ -609,7 +609,7 @@ void GMGLRenderer_2D::beforeDraw(GMModel* model)
 }
 
 //////////////////////////////////////////////////////////////////////////
-void GMGLRenderer_CubeMap::beginModel(GMModel* model, const GMGameObject* parent)
+void GMGLTechnique_CubeMap::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	IShaderProgram* shaderProgram = getShaderProgram();
 	shaderProgram->useProgram();
@@ -617,11 +617,11 @@ void GMGLRenderer_CubeMap::beginModel(GMModel* model, const GMGameObject* parent
 	shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));
 }
 
-void GMGLRenderer_CubeMap::endModel()
+void GMGLTechnique_CubeMap::endModel()
 {
 }
 
-void GMGLRenderer_CubeMap::beforeDraw(GMModel* model)
+void GMGLTechnique_CubeMap::beforeDraw(GMModel* model)
 {
 	D(d);
 	D_BASE(db, Base);
@@ -643,11 +643,11 @@ void GMGLRenderer_CubeMap::beforeDraw(GMModel* model)
 	}
 }
 
-void GMGLRenderer_CubeMap::afterDraw(GMModel* model)
+void GMGLTechnique_CubeMap::afterDraw(GMModel* model)
 {
 }
 
-void GMGLRenderer_Filter::beforeDraw(GMModel* model)
+void GMGLTechnique_Filter::beforeDraw(GMModel* model)
 {
 	applyShader(model);
 	GMTextureSampler& sampler = model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient);
@@ -658,11 +658,11 @@ void GMGLRenderer_Filter::beforeDraw(GMModel* model)
 	texture->useTexture(texId);
 }
 
-void GMGLRenderer_Filter::afterDraw(GMModel* model)
+void GMGLTechnique_Filter::afterDraw(GMModel* model)
 {
 }
 
-void GMGLRenderer_Filter::beginModel(GMModel* model, const GMGameObject* parent)
+void GMGLTechnique_Filter::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
 	D_BASE(db, Base);
@@ -686,24 +686,24 @@ void GMGLRenderer_Filter::beginModel(GMModel* model, const GMGameObject* parent)
 	}
 }
 
-void GMGLRenderer_Filter::setHDR(IShaderProgram* shaderProgram)
+void GMGLTechnique_Filter::setHDR(IShaderProgram* shaderProgram)
 {
 	D(d);
 	shaderProgram->setBool(GM_VariablesDesc.HDR.HDR, true);
 	shaderProgram->setInt(GM_VariablesDesc.HDR.ToneMapping, d->state.toneMapping);
 }
 
-void GMGLRenderer_Filter::endModel()
+void GMGLTechnique_Filter::endModel()
 {
 }
 
-IShaderProgram* GMGLRenderer_Filter::getShaderProgram()
+IShaderProgram* GMGLTechnique_Filter::getShaderProgram()
 {
-	D_BASE(db, GMGLRenderer);
+	D_BASE(db, GMGLTechnique);
 	return db->engine->getShaderProgram(GMShaderProgramType::FilterShaderProgram);
 }
 
-GMint GMGLRenderer_Filter::activateTexture(GMModel* model, GMTextureType type)
+GMint GMGLTechnique_Filter::activateTexture(GMModel* model, GMTextureType type)
 {
 	D(d);
 	D_BASE(db, Base);
@@ -716,19 +716,19 @@ GMint GMGLRenderer_Filter::activateTexture(GMModel* model, GMTextureType type)
 	return texId;
 }
 
-IShaderProgram* GMGLRenderer_LightPass::getShaderProgram()
+IShaderProgram* GMGLTechnique_LightPass::getShaderProgram()
 {
-	D_BASE(db, GMGLRenderer);
+	D_BASE(db, GMGLTechnique);
 	return db->engine->getShaderProgram(GMShaderProgramType::DeferredLightPassShaderProgram);
 }
 
-void GMGLRenderer_LightPass::endModel()
+void GMGLTechnique_LightPass::endModel()
 {
 }
 
-void GMGLRenderer_LightPass::beginModel(GMModel* model, const GMGameObject* parent)
+void GMGLTechnique_LightPass::beginModel(GMModel* model, const GMGameObject* parent)
 {
-	D_BASE(d, GMGLRenderer);
+	D_BASE(d, GMGLTechnique);
 	IShaderProgram* shaderProgram = getShaderProgram();
 	shaderProgram->useProgram();
 	updateCameraMatrices(shaderProgram);
@@ -748,13 +748,13 @@ void GMGLRenderer_LightPass::beginModel(GMModel* model, const GMGameObject* pare
 	d->gammaHelper.setGamma(d->engine, shaderProgram);
 }
 
-void GMGLRenderer_LightPass::afterDraw(GMModel* model)
+void GMGLTechnique_LightPass::afterDraw(GMModel* model)
 {
 }
 
-void GMGLRenderer_LightPass::beforeDraw(GMModel* model)
+void GMGLTechnique_LightPass::beforeDraw(GMModel* model)
 {
-	D_BASE(d, GMGLRenderer);
+	D_BASE(d, GMGLTechnique);
 	IShaderProgram* shaderProgram = getShaderProgram();
 	d->engine->activateLights(this);
 	IGBuffer* gBuffer = d->engine->getGBuffer();
@@ -779,7 +779,7 @@ void GMGLRenderer_LightPass::beforeDraw(GMModel* model)
 	}
 }
 
-void GMGLRenderer_3D_Shadow::beginModel(GMModel* model, const GMGameObject* parent)
+void GMGLTechnique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D_BASE(d, Base);
 	IShaderProgram* shaderProgram = getShaderProgram();

@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmgllight.h"
-#include "gmglrenderers.h"
+#include "gmgltechniques.h"
 #include "shader_constants.h"
 
 template <GMuint i>
@@ -67,14 +67,14 @@ const GMfloat* GMGLLight::getLightColor() const
 	return d->color;
 }
 
-void GMGLLight::activateLight(GMuint index, IRenderer* renderer)
+void GMGLLight::activateLight(GMuint index, ITechnique* technique)
 {
 	static char light_Position[GMGL_MAX_UNIFORM_NAME_LEN];
 	static char light_Color[GMGL_MAX_UNIFORM_NAME_LEN];
 	static char light_Type[GMGL_MAX_UNIFORM_NAME_LEN];
 
-	GMGLRenderer* glRenderer = gm_cast<GMGLRenderer*>(renderer);
-	IShaderProgram* shaderProgram = glRenderer->getShaderProgram();
+	GMGLTechnique* glTechnique = gm_cast<GMGLTechnique*>(technique);
+	IShaderProgram* shaderProgram = glTechnique->getShaderProgram();
 	const char* strIndex = number(index);
 
 	combineUniform(light_Position, "GM_lights[", strIndex, "].LightColor");

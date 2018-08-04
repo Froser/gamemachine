@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "gmdx11renderers.h"
+#include "gmdx11techniques.h"
 #include "gmdata/gmmodel.h"
 #include <gmgameobject.h>
 #include <gmdx11helper.h>
@@ -297,7 +297,7 @@ private:
 };
 END_NS
 
-GMDx11EffectVariableBank& GMDx11Renderer::getVarBank()
+GMDx11EffectVariableBank& GMDx11Technique::getVarBank()
 {
 	D(d);
 	if (!d->bank)
@@ -305,7 +305,7 @@ GMDx11EffectVariableBank& GMDx11Renderer::getVarBank()
 	return *d->bank;
 }
 
-ITexture* GMDx11Renderer::getWhiteTexture()
+ITexture* GMDx11Technique::getWhiteTexture()
 {
 	D(d);
 	D_BASE(db, Base);
@@ -473,7 +473,7 @@ private:
 
 END_NS
 
-GMDx11Renderer::GMDx11Renderer(const IRenderContext* context)
+GMDx11Technique::GMDx11Technique(const IRenderContext* context)
 {
 	D(d);
 	d->context = context;
@@ -489,7 +489,7 @@ GMDx11Renderer::GMDx11Renderer(const IRenderContext* context)
 	getVarBank().init(d->effect);
 }
 
-void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
+void GMDx11Technique::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
@@ -507,7 +507,7 @@ void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 		));
 	}
 
-	// Renderer决定自己的顶点Layout
+	// Technique决定自己的顶点Layout
 	d->deviceContext->IASetInputLayout(d->inputLayout);
 	d->deviceContext->IASetPrimitiveTopology(getMode(model->getPrimitiveTopologyMode()));
 	
@@ -549,17 +549,17 @@ void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 	setGamma(shaderProgram);
 }
 
-void GMDx11Renderer::endModel()
+void GMDx11Technique::endModel()
 {
 }
 
-const IRenderContext* GMDx11Renderer::getContext()
+const IRenderContext* GMDx11Technique::getContext()
 {
 	D(d);
 	return d->context;
 }
 
-void GMDx11Renderer::prepareScreenInfo()
+void GMDx11Technique::prepareScreenInfo()
 {
 	D(d);
 	// 如果屏幕更改了，需要通知此处重新设置着色器
@@ -582,7 +582,7 @@ void GMDx11Renderer::prepareScreenInfo()
 	}
 }
 
-void GMDx11Renderer::prepareTextures(GMModel* model)
+void GMDx11Technique::prepareTextures(GMModel* model)
 {
 	D(d);
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
@@ -618,12 +618,12 @@ void GMDx11Renderer::prepareTextures(GMModel* model)
 	const GMDx11CubeMapState& cubeMapState = getEngine()->getCubeMapState();
 	if (cubeMapState.hasCubeMap)
 	{
-		GM_ASSERT(cubeMapState.model && cubeMapState.cubeMapRenderer);
-		cubeMapState.cubeMapRenderer->prepareTextures(cubeMapState.model);
+		GM_ASSERT(cubeMapState.model && cubeMapState.cubeMapTechnique);
+		cubeMapState.cubeMapTechnique->prepareTextures(cubeMapState.model);
 	}
 }
 
-void GMDx11Renderer::applyTextureAttribute(GMModel* model, ITexture* texture, GMTextureType type)
+void GMDx11Technique::applyTextureAttribute(GMModel* model, ITexture* texture, GMTextureType type)
 {
 	D(d);
 	const char* textureName = nullptr;
@@ -733,7 +733,7 @@ void GMDx11Renderer::applyTextureAttribute(GMModel* model, ITexture* texture, GM
 	}
 }
 
-void GMDx11Renderer::prepareBuffer(GMModel* model)
+void GMDx11Technique::prepareBuffer(GMModel* model)
 {
 	D(d);
 	GMuint stride = sizeof(GMVertex);
@@ -753,13 +753,13 @@ void GMDx11Renderer::prepareBuffer(GMModel* model)
 	}
 }
 
-void GMDx11Renderer::prepareLights()
+void GMDx11Technique::prepareLights()
 {
 	D(d);
 	getEngine()->activateLights(this);
 }
 
-void GMDx11Renderer::prepareRasterizer(GMModel* model)
+void GMDx11Technique::prepareRasterizer(GMModel* model)
 {
 	D(d);
 	const GMWindowStates& windowStates = d->context->getWindow()->getWindowStates();
@@ -779,7 +779,7 @@ void GMDx11Renderer::prepareRasterizer(GMModel* model)
 	));
 }
 
-void GMDx11Renderer::prepareMaterials(GMModel* model)
+void GMDx11Technique::prepareMaterials(GMModel* model)
 {
 	D(d);
 	GMDx11EffectVariableBank& bank = getVarBank();
@@ -797,7 +797,7 @@ void GMDx11Renderer::prepareMaterials(GMModel* model)
 	shaderProgram->setInt(GM_VariablesDesc.IlluminationModel, (GMint)illuminationModel);
 }
 
-void GMDx11Renderer::prepareBlend(GMModel* model)
+void GMDx11Technique::prepareBlend(GMModel* model)
 {
 	D(d);
 	if (!d->blend)
@@ -873,7 +873,7 @@ void GMDx11Renderer::prepareBlend(GMModel* model)
 	}
 }
 
-void GMDx11Renderer::prepareDepthStencil(GMModel* model)
+void GMDx11Technique::prepareDepthStencil(GMModel* model)
 {
 	D(d);
 	if (!d->depthStencil)
@@ -896,7 +896,7 @@ void GMDx11Renderer::prepareDepthStencil(GMModel* model)
 	));
 }
 
-void GMDx11Renderer::prepareDebug(GMModel* model)
+void GMDx11Technique::prepareDebug(GMModel* model)
 {
 	D(d);
 	GMint mode = d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonNormalMode).toInt();
@@ -905,7 +905,7 @@ void GMDx11Renderer::prepareDebug(GMModel* model)
 	shaderProgram->setInt(GM_VariablesDesc.Debug.Normal, mode);
 }
 
-ITexture* GMDx11Renderer::getTexture(GMTextureSampler& sampler)
+ITexture* GMDx11Technique::getTexture(GMTextureSampler& sampler)
 {
 	D(d);
 	if (sampler.getFrameCount() == 0)
@@ -921,7 +921,7 @@ ITexture* GMDx11Renderer::getTexture(GMTextureSampler& sampler)
 	return sampler.getFrameByIndex((elapsed / sampler.getAnimationMs()) % sampler.getFrameCount());
 }
 
-void GMDx11Renderer::setGamma(IShaderProgram* shaderProgram)
+void GMDx11Technique::setGamma(IShaderProgram* shaderProgram)
 {
 	D(d);
 	bool needGammaCorrection = getEngine()->needGammaCorrection();
@@ -935,7 +935,7 @@ void GMDx11Renderer::setGamma(IShaderProgram* shaderProgram)
 	}
 }
 
-void GMDx11Renderer::draw(GMModel* model)
+void GMDx11Technique::draw(GMModel* model)
 {
 	D(d);
 	prepareScreenInfo();
@@ -950,7 +950,7 @@ void GMDx11Renderer::draw(GMModel* model)
 	passAllAndDraw(model);
 }
 
-void GMDx11Renderer::passAllAndDraw(GMModel* model)
+void GMDx11Technique::passAllAndDraw(GMModel* model)
 {
 	D(d);
 	D3DX11_TECHNIQUE_DESC techDesc;
@@ -968,7 +968,7 @@ void GMDx11Renderer::passAllAndDraw(GMModel* model)
 	}
 }
 
-ID3DX11EffectTechnique* GMDx11Renderer::getTechnique()
+ID3DX11EffectTechnique* GMDx11Technique::getTechnique()
 {
 	D(d);
 	if (!d->technique)
@@ -984,7 +984,7 @@ ID3DX11EffectTechnique* GMDx11Renderer::getTechnique()
 	return d->technique;
 }
 
-void GMDx11Renderer_2D::prepareTextures(GMModel* model)
+void GMDx11Technique_2D::prepareTextures(GMModel* model)
 {
 	D(d);
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
@@ -1001,7 +1001,7 @@ void GMDx11Renderer_2D::prepareTextures(GMModel* model)
 	}
 }
 
-void GMDx11Renderer_CubeMap::prepareTextures(GMModel* model)
+void GMDx11Technique_CubeMap::prepareTextures(GMModel* model)
 {
 	GMTextureSampler& sampler = model->getShader().getTextureList().getTextureSampler(GMTextureType::CubeMap);
 	// 写入纹理属性，如是否绘制，偏移等
@@ -1015,19 +1015,19 @@ void GMDx11Renderer_CubeMap::prepareTextures(GMModel* model)
 		if (cubeMapState.model != model)
 		{
 			cubeMapState.hasCubeMap = true;
-			cubeMapState.cubeMapRenderer = this;
+			cubeMapState.cubeMapTechnique = this;
 			cubeMapState.model = model;
 		}
 	}
 }
 
-GMDx11Renderer_Filter::GMDx11Renderer_Filter(const IRenderContext* context)
-	: GMDx11Renderer(context)
+GMDx11Technique_Filter::GMDx11Technique_Filter(const IRenderContext* context)
+	: GMDx11Technique(context)
 {
 	setHDR(getEngine()->getShaderProgram());
 }
 
-void GMDx11Renderer_Filter::draw(GMModel* model)
+void GMDx11Technique_Filter::draw(GMModel* model)
 {
 	D(d);
 	prepareScreenInfo();
@@ -1038,7 +1038,7 @@ void GMDx11Renderer_Filter::draw(GMModel* model)
 	passAllAndDraw(model);
 }
 
-void GMDx11Renderer_Filter::passAllAndDraw(GMModel* model)
+void GMDx11Technique_Filter::passAllAndDraw(GMModel* model)
 {
 	D_BASE(d, Base);
 	const GMWindowStates& windowStates = d->context->getWindow()->getWindowStates();
@@ -1068,10 +1068,10 @@ void GMDx11Renderer_Filter::passAllAndDraw(GMModel* model)
 	}
 }
 
-void GMDx11Renderer_Filter::beginModel(GMModel* model, const GMGameObject* parent)
+void GMDx11Technique_Filter::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
-	GMDx11Renderer::beginModel(model, parent);
+	GMDx11Technique::beginModel(model, parent);
 
 	GMDx11EffectVariableBank& bank = getVarBank();
 	ID3DX11EffectScalarVariable* kernelDeltaX = bank.KernelDeltaX();
@@ -1103,7 +1103,7 @@ void GMDx11Renderer_Filter::beginModel(GMModel* model, const GMGameObject* paren
 	}
 }
 
-void GMDx11Renderer_Filter::setHDR(IShaderProgram* shaderProgram)
+void GMDx11Technique_Filter::setHDR(IShaderProgram* shaderProgram)
 {
 	D(d);
 	shaderProgram->setBool(GM_VariablesDesc.HDR.HDR, true);
@@ -1119,7 +1119,7 @@ void GMDx11Renderer_Filter::setHDR(IShaderProgram* shaderProgram)
 	}
 }
 
-void GMDx11Renderer_Deferred_3D::passAllAndDraw(GMModel* model)
+void GMDx11Technique_Deferred_3D::passAllAndDraw(GMModel* model)
 {
 	D(d);
 	D3DX11_TECHNIQUE_DESC techDesc;
@@ -1143,7 +1143,7 @@ void GMDx11Renderer_Deferred_3D::passAllAndDraw(GMModel* model)
 	}
 }
 
-void GMDx11Renderer_Deferred_3D_LightPass::passAllAndDraw(GMModel* model)
+void GMDx11Technique_Deferred_3D_LightPass::passAllAndDraw(GMModel* model)
 {
 	D(d);
 	D3DX11_TECHNIQUE_DESC techDesc;
@@ -1160,7 +1160,7 @@ void GMDx11Renderer_Deferred_3D_LightPass::passAllAndDraw(GMModel* model)
 	}
 }
 
-void GMDx11Renderer_Deferred_3D_LightPass::prepareTextures(GMModel* model)
+void GMDx11Technique_Deferred_3D_LightPass::prepareTextures(GMModel* model)
 {
 	D(d);
 	GMDx11GBuffer* gbuffer = gm_cast<GMDx11GBuffer*>(getEngine()->getGBuffer());
@@ -1169,12 +1169,12 @@ void GMDx11Renderer_Deferred_3D_LightPass::prepareTextures(GMModel* model)
 	const GMDx11CubeMapState& cubeMapState = getEngine()->getCubeMapState();
 	if (cubeMapState.hasCubeMap)
 	{
-		GM_ASSERT(cubeMapState.model && cubeMapState.cubeMapRenderer);
-		cubeMapState.cubeMapRenderer->prepareTextures(cubeMapState.model);
+		GM_ASSERT(cubeMapState.model && cubeMapState.cubeMapTechnique);
+		cubeMapState.cubeMapTechnique->prepareTextures(cubeMapState.model);
 	}
 }
 
-void GMDx11Renderer_3D_Shadow::beginModel(GMModel* model, const GMGameObject* parent)
+void GMDx11Technique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
 	const GMWindowStates& windowStates = d->context->getWindow()->getWindowStates();
@@ -1193,7 +1193,7 @@ void GMDx11Renderer_3D_Shadow::beginModel(GMModel* model, const GMGameObject* pa
 		));
 	}
 
-	// Renderer决定自己的顶点Layout
+	// Technique决定自己的顶点Layout
 	d->deviceContext->IASetInputLayout(d->inputLayout);
 	d->deviceContext->IASetPrimitiveTopology(getMode(model->getPrimitiveTopologyMode()));
 

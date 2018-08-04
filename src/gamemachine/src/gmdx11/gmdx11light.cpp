@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmdx11light.h"
-#include "gmdx11renderers.h"
+#include "gmdx11techniques.h"
 
 void GMDx11Light::setLightPosition(GMfloat position[3])
 {
@@ -32,19 +32,19 @@ const GMfloat* GMDx11Light::getLightColor() const
 	return d->color;
 }
 
-void GMDx11Light::activateLight(GMuint index, IRenderer* renderer)
+void GMDx11Light::activateLight(GMuint index, ITechnique* technique)
 {
 	D(d);
 	if (!d->effect)
 	{
-		GMDx11Renderer* dxRenderer = gm_cast<GMDx11Renderer*>(renderer);
-		d->effect = dxRenderer->getEffect();
+		GMDx11Technique* dxTechnique = gm_cast<GMDx11Technique*>(technique);
+		d->effect = dxTechnique->getEffect();
 		GM_ASSERT(d->effect);
 	}
 
 #if _DEBUG
-	GMDx11Renderer* dxRenderer = gm_cast<GMDx11Renderer*>(renderer);
-	GM_ASSERT(d->effect == dxRenderer->getEffect());
+	GMDx11Technique* dxTechnique = gm_cast<GMDx11Technique*>(technique);
+	GM_ASSERT(d->effect == dxTechnique->getEffect());
 #endif
 
 	if (!d->lightAttributes)

@@ -94,8 +94,8 @@ set(SOURCES
 		gmengine/gmanimation.h
 		gmengine/gmanimation.cpp
 		gmengine/gmenums.h
-		gmgl/gmglrenderers.h
-		gmgl/gmglrenderers.cpp
+		gmgl/gmgltechniques.h
+		gmgl/gmgltechniques.cpp
 		gmgl/gmglfactory.h
 		gmgl/gmglfactory.cpp
 		gmgl/gmglgbuffer.h
@@ -224,8 +224,8 @@ set(WIN32_DX11_SOURCES
 		gmdx11/gmdx11modeldataproxy.cpp
 		gmdx11/gmdx11helper.h
 		gmdx11/gmdx11helper.cpp
-		gmdx11/gmdx11renderers.h
-		gmdx11/gmdx11renderers.cpp
+		gmdx11/gmdx11techniques.h
+		gmdx11/gmdx11techniques.cpp
 		gmdx11/gmdx11texture.h
 		gmdx11/gmdx11texture.cpp
 		gmdx11/gmdx11shaderprogram.h

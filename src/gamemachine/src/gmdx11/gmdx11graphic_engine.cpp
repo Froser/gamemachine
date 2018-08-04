@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include <gamemachine.h>
 #include "gmdx11graphic_engine.h"
-#include "gmdx11renderers.h"
+#include "gmdx11techniques.h"
 #include <gmdx11framebuffer.h>
 #include "foundation/utilities/utilities.h"
 #include "gmengine/gameobjects/gmgameobject.h"
@@ -37,14 +37,14 @@ void GMDx11GraphicEngine::update(GMUpdateDataType type)
 	{
 		GMDx11CubeMapState& state = getCubeMapState();
 		state.hasCubeMap = false;
-		state.cubeMapRenderer = nullptr;
+		state.cubeMapTechnique = nullptr;
 		state.model = nullptr;
 		break;
 	}
 	}
 }
 
-void GMDx11GraphicEngine::activateLights(IRenderer* renderer)
+void GMDx11GraphicEngine::activateLights(ITechnique* technique)
 {
 	D(d);
 	if (d->lightDirty)
@@ -58,7 +58,7 @@ void GMDx11GraphicEngine::activateLights(IRenderer* renderer)
 
 		for (GMuint i = 0; i < (GMuint)lightCount; ++i)
 		{
-			lights[i]->activateLight(i, renderer);
+			lights[i]->activateLight(i, technique);
 		}
 		d->lightDirty = false;
 	}
@@ -196,30 +196,30 @@ void GMDx11GraphicEngine::initShaders(const IRenderContext* context)
 	getShaderLoadCallback()->onLoadShaders(context);
 }
 
-IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
+ITechnique* GMDx11GraphicEngine::getTechnique(GMModelType objectType)
 {
 	D(d);
 	D_BASE(db, Base);
 	switch (objectType)
 	{
 	case GMModelType::Model2D:
-		return newRenderer<GMDx11Renderer_2D>(d->renderer_2d, db->context);
+		return newTechnique<GMDx11Technique_2D>(d->technique_2d, db->context);
 	case GMModelType::Text:
-		return newRenderer<GMDx11Renderer_Text>(d->renderer_text, db->context);
+		return newTechnique<GMDx11Technique_Text>(d->technique_text, db->context);
 	case GMModelType::Model3D:
 		if (isDrawingShadow())
-			return newRenderer<GMDx11Renderer_3D_Shadow>(d->renderer_3d_shadow, db->context);
+			return newTechnique<GMDx11Technique_3D_Shadow>(d->technique_3d_shadow, db->context);
 		if (getGBuffer()->getGeometryPassingState() != GMGeometryPassingState::Done)
-			return newRenderer<GMDx11Renderer_Deferred_3D>(d->renderer_deferred_3d, db->context);
-		return newRenderer<GMDx11Renderer_3D>(d->renderer_3d, db->context);
+			return newTechnique<GMDx11Technique_Deferred_3D>(d->technique_deferred_3d, db->context);
+		return newTechnique<GMDx11Technique_3D>(d->technique_3d, db->context);
 	case GMModelType::CubeMap:
-		return newRenderer<GMDx11Renderer_CubeMap>(d->renderer_cubemap, db->context);
+		return newTechnique<GMDx11Technique_CubeMap>(d->technique_cubemap, db->context);
 	case GMModelType::Filter:
-		return newRenderer<GMDx11Renderer_Filter>(d->renderer_filter, db->context);
+		return newTechnique<GMDx11Technique_Filter>(d->technique_filter, db->context);
 	case GMModelType::LightPassQuad:
-		return newRenderer<GMDx11Renderer_Deferred_3D_LightPass>(d->renderer_deferred_3d_lightpass, db->context);
+		return newTechnique<GMDx11Technique_Deferred_3D_LightPass>(d->technique_deferred_3d_lightpass, db->context);
 	case GMModelType::Particle:
-		return newRenderer<GMDx11Renderer_Particle>(d->renderer_particle, db->context);
+		return newTechnique<GMDx11Technique_Particle>(d->technique_particle, db->context);
 	default:
 		GM_ASSERT(false);
 		return nullptr;

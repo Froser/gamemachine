@@ -7,7 +7,7 @@
 BEGIN_NS
 
 template <typename T>
-IRenderer* newRenderer(GMOwnedPtr<IRenderer>& ptr, const IRenderContext* context)
+ITechnique* newTechnique(GMOwnedPtr<ITechnique>& ptr, const IRenderContext* context)
 {
 	if (!ptr)
 		ptr = gm_makeOwnedPtr<T>(context);

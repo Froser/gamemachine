@@ -6,7 +6,7 @@
 #include "gmdata/gmmodel.h"
 #include "gmgltexture.h"
 #include "gmglmodeldataproxy.h"
-#include "gmglrenderers.h"
+#include "gmgltechniques.h"
 #include "foundation/gamemachine.h"
 #include "foundation/gmconfigs.h"
 #include "foundation/gmprofile.h"
@@ -126,15 +126,15 @@ void GMGLGraphicEngine::createShadowFramebuffers(OUT IFramebuffers** framebuffer
 	GM_ASSERT(succeed);
 }
 
-void GMGLGraphicEngine::activateLights(IRenderer* renderer)
+void GMGLGraphicEngine::activateLights(ITechnique* technique)
 {
 	D(d);
 	D_BASE(db, Base);
 	// 有2种情况，需要更新着色器。
 	// 1. 使用中的着色器更换时
 	// 2. 使用中的着色器未更换，但是光照信息改变
-	GMGLRenderer* glRenderer = gm_cast<GMGLRenderer*>(renderer);
-	IShaderProgram* shaderProgram = glRenderer->getShaderProgram();
+	GMGLTechnique* glTechnique = gm_cast<GMGLTechnique*>(technique);
+	IShaderProgram* shaderProgram = glTechnique->getShaderProgram();
 	if (shaderProgram != d->lightContext.shaderProgram || d->lightContext.lightDirty)
 	{
 		const Vector<ILight*>& lights = db->lights;
@@ -145,7 +145,7 @@ void GMGLGraphicEngine::activateLights(IRenderer* renderer)
 
 		for (GMuint i = 0; i < (GMuint)lightCount; ++i)
 		{
-			lights[i]->activateLight(i, renderer);
+			lights[i]->activateLight(i, technique);
 		}
 		d->lightContext.shaderProgram = shaderProgram;
 		d->lightContext.lightDirty = false;
@@ -154,7 +154,7 @@ void GMGLGraphicEngine::activateLights(IRenderer* renderer)
 
 void GMGLGraphicEngine::shaderProgramChanged(IShaderProgram* program)
 {
-	GMGLRenderer::dirtyShadowMapAttributes();
+	GMGLTechnique::dirtyShadowMapAttributes();
 }
 
 void GMGLGraphicEngine::update(GMUpdateDataType type)
@@ -178,7 +178,7 @@ void GMGLGraphicEngine::update(GMUpdateDataType type)
 	}
 }
 
-IRenderer* GMGLGraphicEngine::getRenderer(GMModelType objectType)
+ITechnique* GMGLGraphicEngine::getTechnique(GMModelType objectType)
 {
 	D(d);
 	D_BASE(db, Base);
@@ -187,19 +187,19 @@ IRenderer* GMGLGraphicEngine::getRenderer(GMModelType objectType)
 	{
 	case GMModelType::Model2D:
 	case GMModelType::Text:
-		return newRenderer<GMGLRenderer_2D>(d->renderer_2d, db->context);
+		return newTechnique<GMGLTechnique_2D>(d->technique_2d, db->context);
 	case GMModelType::Model3D:
 		if (db->isDrawingShadow)
-			return newRenderer<GMGLRenderer_3D_Shadow>(d->renderer_3d_shadow, db->context);
-		return newRenderer<GMGLRenderer_3D>(d->renderer_3d, db->context);
+			return newTechnique<GMGLTechnique_3D_Shadow>(d->technique_3d_shadow, db->context);
+		return newTechnique<GMGLTechnique_3D>(d->technique_3d, db->context);
 	case GMModelType::CubeMap:
-		return newRenderer<GMGLRenderer_CubeMap>(d->renderer_cubeMap, db->context);
+		return newTechnique<GMGLTechnique_CubeMap>(d->technique_cubeMap, db->context);
 	case GMModelType::Filter:
-		return newRenderer<GMGLRenderer_Filter>(d->renderer_filter, db->context);
+		return newTechnique<GMGLTechnique_Filter>(d->technique_filter, db->context);
 	case GMModelType::LightPassQuad:
-		return newRenderer<GMGLRenderer_LightPass>(d->renderer_lightPass, db->context);
+		return newTechnique<GMGLTechnique_LightPass>(d->technique_lightPass, db->context);
 	case GMModelType::Particle:
-		return newRenderer<GMGLRenderer_Particle>(d->renderer_particle, db->context);
+		return newTechnique<GMGLTechnique_Particle>(d->technique_particle, db->context);
 	default:
 		GM_ASSERT(false);
 		return nullptr;

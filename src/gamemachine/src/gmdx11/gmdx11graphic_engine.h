@@ -8,13 +8,13 @@
 #include <gmgraphicengine.h>
 BEGIN_NS
 
-class GMDx11Renderer_CubeMap;
+class GMDx11Technique_CubeMap;
 struct GMMVPMatrix;
 
 struct GMDx11CubeMapState
 {
 	bool hasCubeMap = false;
-	GMDx11Renderer_CubeMap* cubeMapRenderer = nullptr;
+	GMDx11Technique_CubeMap* cubeMapTechnique = nullptr;
 	GMModel* model = nullptr;
 };
 
@@ -34,15 +34,15 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	bool ready = false;
 	bool lightDirty = true;
 
-	GMOwnedPtr<IRenderer> renderer_3d;
-	GMOwnedPtr<IRenderer> renderer_2d;
-	GMOwnedPtr<IRenderer> renderer_text;
-	GMOwnedPtr<IRenderer> renderer_cubemap;
-	GMOwnedPtr<IRenderer> renderer_filter;
-	GMOwnedPtr<IRenderer> renderer_deferred_3d;
-	GMOwnedPtr<IRenderer> renderer_deferred_3d_lightpass;
-	GMOwnedPtr<IRenderer> renderer_3d_shadow;
-	GMOwnedPtr<IRenderer> renderer_particle;
+	GMOwnedPtr<ITechnique> technique_3d;
+	GMOwnedPtr<ITechnique> technique_2d;
+	GMOwnedPtr<ITechnique> technique_text;
+	GMOwnedPtr<ITechnique> technique_cubemap;
+	GMOwnedPtr<ITechnique> technique_filter;
+	GMOwnedPtr<ITechnique> technique_deferred_3d;
+	GMOwnedPtr<ITechnique> technique_deferred_3d_lightpass;
+	GMOwnedPtr<ITechnique> technique_3d_shadow;
+	GMOwnedPtr<ITechnique> technique_particle;
 };
 
 class GMDx11GraphicEngine : public GMGraphicEngine
@@ -59,7 +59,7 @@ public:
 	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type = GMShaderProgramType::DefaultShaderProgram) override;
 	virtual bool event(const GMMessage& e) override;
 	virtual IFramebuffers* getDefaultFramebuffers() override;
-	virtual IRenderer* getRenderer(GMModelType objectType) override;
+	virtual ITechnique* getTechnique(GMModelType objectType) override;
 	virtual GMGlyphManager* getGlyphManager() override;
 
 public:
@@ -68,7 +68,7 @@ public:
 	virtual void createShadowFramebuffers(OUT IFramebuffers** framebuffers) override;
 
 public:
-	virtual void activateLights(IRenderer* renderer);
+	virtual void activateLights(ITechnique* technique);
 
 public:
 	inline GMDx11CubeMapState& getCubeMapState()
