@@ -556,103 +556,36 @@ bool GMImageReader_TGA::load(const GMbyte* data, GMsize_t size, OUT GMImage** im
 		return false;
 	}
 
-	/*
-	//Create struct
-	struct jpeg_compress_struct cinfo;
-
-	//Create an error handler
-	jpeg_error_mgr jerr;
-
-	//point the compression object to the error handler
-	cinfo.err = jpeg_std_error(&jerr);
-
-	//Create compress
-	jpeg_create_compress(&cinfo);
-
-	//read targa
-	cjpeg_source_ptr source_mgr = jinit_read_targa(&cinfo);
-	source_mgr->buffer = (JSAMPARRAY)data;
-
-	(*source_mgr->start_input) (&cinfo, source_mgr);
-
-	//Specify the data source
-
-	//get the number of color channels
-	int channels = cinfo.num_components;
-
-	imgData.mip[0].width = cinfo.image_width;
-	imgData.mip[0].height = cinfo.image_height;
+	// 图像深度/8得到每个像素的字节数，这里认为1个通道就占一个字节，因此通道数即图像深度/8
+	int channels = tga.hdr.depth / 8;
+	imgData.mip[0].width = tga.hdr.width;
+	imgData.mip[0].height = tga.hdr.height;
 	imgData.format = GMImageFormat::RGBA;
 	imgData.internalFormat = GMImageInternalFormat::RGBA8;
 
-	GMuint bufferSize = cinfo.image_width * cinfo.image_height * GMImageReader::DefaultChannels;
+	GMuint bufferSize = tga.hdr.width * tga.hdr.height * GMImageReader::DefaultChannels;
 	imgData.mip[0].data = new GMbyte[bufferSize];
 	imgData.size = bufferSize;
-
-	//Extract the pixel data
-	GMbyte** rowPtr = nullptr;
-	int rowsRead = 0;
-	if (channels == 3)
+	
+	if (channels == 4)
 	{
-		//If channel number is 3, we have to make up a 4-channel image data
-		size_t bytesSize = cinfo.image_width * cinfo.image_height * channels;
-		GMbyte* tempData = new GMbyte[bytesSize];
-		rowPtr = new GMbyte*[cinfo.image_height];
-		for (GMuint i = 0; i < cinfo.image_height; ++i)
-			rowPtr[i] = &(tempData[i * cinfo.image_width * 3]);
-
-		while (cinfo.output_scanline < cinfo.output_height)
+		imgData.channels = channels;
+		// tga数据和我们所定义的图像坐标是颠倒的
+		GMsize_t rowBytes = tga.hdr.width * channels;
+		for (GMint i = tga.hdr.height - 1; i >= 0; --i)
 		{
-			//read in this row
-			rowsRead += jpeg_read_scanlines(&cinfo, &rowPtr[rowsRead], cinfo.output_height - rowsRead);
+			GMsize_t destOffset = rowBytes * (tga.hdr.height - i - 1);
+			GMsize_t srcOffset = rowBytes * i;
+			memcpy_s(imgData.mip[0].data + destOffset, rowBytes, tgaData.img_data + srcOffset, rowBytes);
 		}
-
-		GMuint dataPtr = 0;
-		for (GMuint i = 0; i < bytesSize; ++i, ++dataPtr)
-		{
-			imgData.mip[0].data[dataPtr] = tempData[i];
-			if ((i + 1) % 3 == 0)
-			{
-				imgData.mip[0].data[++dataPtr] = 0xFF; //ALPHA
-			}
-		}
-
-		GM_delete_array(tempData);
 	}
 	else
 	{
-		rowPtr = new GMbyte*[cinfo.image_height];
-		for (GMuint i = 0; i < cinfo.image_height; ++i)
-			rowPtr[i] = &(imgData.mip[0].data[i * cinfo.image_width * channels]);
-
-		while (cinfo.output_scanline < cinfo.output_height)
-		{
-			//read in this row
-			rowsRead += jpeg_read_scanlines(&cinfo, &rowPtr[rowsRead], cinfo.output_height - rowsRead);
-		}
-
-		imgData.channels = channels;
-		if (channels == GMImageReader::DefaultChannels)
-		{
-			imgData.format = GMImageFormat::RGBA;
-			imgData.internalFormat = GMImageInternalFormat::RGBA8;
-		}
-		else if (channels == 1)
-		{
-			imgData.format = GMImageFormat::RED;
-			imgData.internalFormat = GMImageInternalFormat::RED8;
-		}
-		else
-		{
-			GM_ASSERT(false);
-		}
+		gm_error(gm_dbg_wrap("GameMachine do not support non-alpha tga format."));
+		GM_ASSERT(false);
+		return false;
 	}
-	//release memory used by jpeg
-	jpeg_destroy_compress(&cinfo);
 
-	//delete row pointers
-	GM_delete_array(rowPtr);
-	*/
 	return true;
 }
 
