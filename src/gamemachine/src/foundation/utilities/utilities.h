@@ -52,6 +52,8 @@ struct GMToolUtil
 	*/
 	static void createTexture(const IRenderContext* context, const GMString& filename, OUT ITexture** texture, REF GMint* width = nullptr, REF GMint* height = nullptr);
 
+	static void createTextureFromFullPath(const IRenderContext* context, const GMString& filename, OUT ITexture** texture, REF GMint* width = nullptr, REF GMint* height = nullptr);
+
 	//! 将一个纹理添加到一个模型中。
 	/*!
 	  此方法会将模型添加到纹理动画列表的第1帧中。

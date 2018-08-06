@@ -18,7 +18,11 @@ void Demo_MD5Mesh::init()
 	widget->setSize(widget->getSize().width, getClientAreaTop() + 40);
 
 	gm::GMModels* boblampcleanModel = nullptr;
-	gm::GMModelReader::load(gm::GMModelLoadSettings(L"boblampclean/boblampclean.gmmd5", L"boblampclean"), gm::GMModelReader::Auto, &boblampcleanModel);
+	gm::GMModelReader::load(
+		gm::GMModelLoadSettings(L"boblampclean/boblampclean.gmmd5", L"boblampclean", gm::GMModelPathType::Relative, db->parentDemonstrationWorld->getContext()), 
+		gm::GMModelReader::Auto,
+		&boblampcleanModel
+	);
 	
 	auto boblampcleanAsset = gm::GMAssets::createIsolatedAsset(gm::GMAssetType::Models, boblampcleanModel);
 	d->boblampclean = new gm::GMGameObject(boblampcleanAsset);

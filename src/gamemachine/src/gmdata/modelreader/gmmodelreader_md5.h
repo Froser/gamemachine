@@ -165,6 +165,9 @@ public:
 
 public:
 	IMd5MeshHandler* findHandler(const GMString& tag);
+
+public:
+	static GMString removeQuotes(const GMString& string);
 };
 
 END_NS

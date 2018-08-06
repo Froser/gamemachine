@@ -37,15 +37,17 @@ enum class GMModelPathType
 */
 struct GMModelLoadSettings
 {
-	GMModelLoadSettings(const GMString& filename_, const GMString& directory_, GMModelPathType type_ = GMModelPathType::Relative)
+	GMModelLoadSettings(const GMString& filename_, const GMString& directory_, GMModelPathType type_ = GMModelPathType::Relative, const IRenderContext* context_ = nullptr)
 		: filename(filename_)
 		, directory(directory_)
 		, type(type_)
+		, context(context_)
 	{
 	}
 
 	const GMString filename; //!< 需要被读取的模型文件
 	const GMString directory; //!< 模型所在目录
+	const IRenderContext* context;
 	GMModelPathType type; //!< 目录路径参考类型
 };
 

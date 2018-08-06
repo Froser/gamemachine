@@ -529,6 +529,26 @@ void GMToolUtil::createTexture(const IRenderContext* context, const GMString& fi
 	GM_delete(img);
 }
 
+void GMToolUtil::createTextureFromFullPath(const IRenderContext* context, const GMString& filename, OUT ITexture** texture, REF GMint* width, REF GMint* height)
+{
+	GMImage* img = nullptr;
+	GMBuffer buf;
+	GM.getGamePackageManager()->readFileFromPath(filename, &buf);
+	GMImageReader::load(buf.buffer, buf.size, &img);
+	GM_ASSERT(img);
+
+	GM.getFactory()->createTexture(context, img, texture);
+	GM_ASSERT(texture);
+
+	if (width)
+		*width = img->getWidth();
+
+	if (height)
+		*height = img->getHeight();
+
+	GM_delete(img);
+}
+
 void GMToolUtil::addTextureToShader(GMShader& shader, ITexture* texture, GMTextureType type)
 {
 	auto& frames = shader.getTextureList().getTextureSampler(type);

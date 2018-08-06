@@ -26,7 +26,7 @@ void Demo_Texture::init()
 			shader.getMaterial().ks = GMVec3(0);
 
 			gm::ITexture* tex = nullptr;
-			gm::GMToolUtil::createTexture(world->getContext(), "tga.tga", &tex);
+			gm::GMToolUtil::createTexture(world->getContext(), "gamemachine.png", &tex);
 			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::Diffuse);
 			world->getAssets().insertAsset(gm::GMAssetType::Texture, tex);
 		}

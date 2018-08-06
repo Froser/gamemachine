@@ -1,6 +1,9 @@
 ﻿#include "stdafx.h"
 #include "gmmodelreader_md5mesh.h"
 #include "foundation/utilities/tools.h"
+#include "foundation/gamemachine.h"
+#include "../gamepackage/gmgamepackage.h"
+#include "foundation/utilities/utilities.h"
 
 // Handlers
 BEGIN_DECLARE_MD5_HANDLER(MD5Version, reader, scanner, GMModelReader_MD5Mesh*)
@@ -111,7 +114,7 @@ struct Handler_mesh_inner : IMd5MeshHandler
 		if (content == L"shader")
 		{
 			scanner.next(content);
-			m_cacheMesh->shader = content;
+			m_cacheMesh->shader = GMModelReader_MD5::removeQuotes(content);
 		}
 		else if (content == L"numverts")
 		{
@@ -239,7 +242,7 @@ bool GMModelReader_MD5Mesh::load(const GMModelLoadSettings& settings, GMBuffer& 
 		}
 	}
 
-	buildModel(models);
+	buildModel(settings, models);
 	return true;
 }
 
@@ -273,7 +276,7 @@ Vector<GMOwnedPtr<IMd5MeshHandler>>& GMModelReader_MD5Mesh::getHandlers()
 	return d->handlers;
 }
 
-void GMModelReader_MD5Mesh::buildModel(OUT GMModels** ppModels)
+void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, OUT GMModels** ppModels)
 {
 	D(d);
 	if (!ppModels)
@@ -281,10 +284,6 @@ void GMModelReader_MD5Mesh::buildModel(OUT GMModels** ppModels)
 	
 	GMModels* models = new GMModels();
 	*ppModels = models;
-
-	GMModel* model = new GMModel();
-	model->setUsageHint(GMUsageHint::DynamicDraw);
-	models->push_back(model);
 
 	// 临时结构，用于缓存顶点、法线
 	struct Vertex
@@ -295,7 +294,26 @@ void GMModelReader_MD5Mesh::buildModel(OUT GMModels** ppModels)
 
 	for (const auto& mesh : d->meshes)
 	{
+		GMModel* model = new GMModel();
+		model->setUsageHint(GMUsageHint::DynamicDraw);
+		models->push_back(model);
+
 		GMMesh* m = new GMMesh(model);
+		GMAsset asset = d->shaders[mesh.shader];
+		if (!asset.asset)
+		{
+			ITexture* tex = nullptr;
+			GMString imgPath = GMPath::fullname(GM.getGamePackageManager()->pathOf(GMPackageIndex::Models, settings.directory), mesh.shader);
+			GMToolUtil::createTextureFromFullPath(settings.context, imgPath, &tex);
+			if (tex)
+			{
+				// TODO 需要释放GMAsset
+				asset = GMAssets::createIsolatedAsset(GMAssetType::Texture, &tex);
+				d->shaders[mesh.shader] = asset;
+				GMToolUtil::addTextureToShader(model->getShader(), tex, GMTextureType::Ambient);
+			}
+		}
+
 		Vector<Vertex> vertices;
 		vertices.reserve(mesh.vertices.size());
 		for (const auto& vert : mesh.vertices)

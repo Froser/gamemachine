@@ -4,16 +4,6 @@
 #include "foundation/gamemachine.h"
 #include "gmmodelreader_md5anim.h"
 
-namespace
-{
-	GMString removeQuotes(const GMString& string)
-	{
-		bool bLQ = !string.isEmpty() && string[0] == '"';
-		bool bRQ = !string.isEmpty() && string[string.length() - 1] == '"';
-		return string.substr(bLQ ? 1 : 0, bRQ ? string.length() - 2 : string.length() - 1);
-	}
-}
-
 BEGIN_DECLARE_MD5_HANDLER(GMMD5Version, reader, scanner, GMModelReader_MD5*)
 	GMint version;
 	scanner.nextInt(version);
@@ -24,14 +14,14 @@ END_DECLARE_MD5_HANDLER()
 BEGIN_DECLARE_MD5_HANDLER(md5mesh, reader, scanner, GMModelReader_MD5*)
 	GMString content;
 	scanner.next(content);
-	reader->setMeshFile(removeQuotes(content));
+	reader->setMeshFile(GMModelReader_MD5::removeQuotes(content));
 	return true;
 END_DECLARE_MD5_HANDLER()
 
 BEGIN_DECLARE_MD5_HANDLER(md5anim, reader, scanner, GMModelReader_MD5*)
 	GMString content;
 	scanner.next(content);
-	reader->setAnimFile(removeQuotes(content));
+	reader->setAnimFile(GMModelReader_MD5::removeQuotes(content));
 	return true;
 END_DECLARE_MD5_HANDLER()
 
@@ -207,4 +197,11 @@ IMd5MeshHandler* GMModelReader_MD5::findHandler(const GMString& tag)
 			return handler.get();
 	}
 	return nullptr;
+}
+
+GMString GMModelReader_MD5::removeQuotes(const GMString& string)
+{
+	bool bLQ = !string.isEmpty() && string[0] == '"';
+	bool bRQ = !string.isEmpty() && string[string.length() - 1] == '"';
+	return string.substr(bLQ ? 1 : 0, bRQ ? string.length() - 2 : string.length() - 1);
 }

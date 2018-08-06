@@ -18,6 +18,7 @@ GM_PRIVATE_OBJECT(GMModelReader_MD5Mesh)
 	GMint numWeights;
 	Vector<GMModelReader_MD5Mesh_Joint> joints;
 	Vector<GMModelReader_MD5Mesh_Mesh> meshes;
+	HashMap<GMString, GMAsset, GMStringHashFunctor> shaders;
 };
 
 class GMModelReader_MD5Mesh : public GMModelReader_MD5
@@ -69,7 +70,7 @@ public:
 	}
 
 private:
-	void buildModel(OUT GMModels** ppModels);
+	void buildModel(const GMModelLoadSettings& settings, OUT GMModels** ppModels);
 };
 
 END_NS
