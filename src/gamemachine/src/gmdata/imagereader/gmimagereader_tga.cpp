@@ -562,6 +562,7 @@ bool GMImageReader_TGA::load(const GMbyte* data, GMsize_t size, OUT GMImage** im
 	imgData.mip[0].height = tga.hdr.height;
 	imgData.format = GMImageFormat::RGBA;
 	imgData.internalFormat = GMImageInternalFormat::RGBA8;
+	imgData.channels = GMImageReader::DefaultChannels;
 
 	GMuint bufferSize = tga.hdr.width * tga.hdr.height * GMImageReader::DefaultChannels;
 	imgData.mip[0].data = new GMbyte[bufferSize];
@@ -569,7 +570,6 @@ bool GMImageReader_TGA::load(const GMbyte* data, GMsize_t size, OUT GMImage** im
 	
 	if (channels == 4)
 	{
-		imgData.channels = channels;
 		// tga数据和我们所定义的图像坐标是颠倒的
 		GMsize_t rowBytes = tga.hdr.width * channels;
 		for (GMint i = tga.hdr.height - 1; i >= 0; --i)
@@ -579,9 +579,32 @@ bool GMImageReader_TGA::load(const GMbyte* data, GMsize_t size, OUT GMImage** im
 			memcpy_s(imgData.mip[0].data + destOffset, rowBytes, tgaData.img_data + srcOffset, rowBytes);
 		}
 	}
+	else if (channels == 3)
+	{
+		GMsize_t rowBytes = tga.hdr.width * channels;
+		for (GMint i = tga.hdr.height - 1; i >= 0; --i)
+		{
+			GMsize_t destOffset = rowBytes * (tga.hdr.height - i - 1);
+			GMsize_t srcOffset = rowBytes * i;
+			GMsize_t ptr = 0;
+			for (GMsize_t j = 0; j < rowBytes; ++ptr)
+			{
+				// 逐个字节拷贝，补上一个alpha
+				if ((ptr + 1) % 4)
+				{
+					*(imgData.mip[0].data + destOffset + ptr) = *(tgaData.img_data + srcOffset + j);
+					++j;
+				}
+				else
+				{
+					*(imgData.mip[0].data + destOffset + ptr) = 0xFF;
+				}
+			}
+		}
+	}
 	else
 	{
-		gm_error(gm_dbg_wrap("GameMachine do not support non-alpha tga format."));
+		gm_error(gm_dbg_wrap("GameMachine do not support non-rgb or non-rgba tga format."));
 		GM_ASSERT(false);
 		return false;
 	}

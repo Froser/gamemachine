@@ -290,6 +290,7 @@ void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, OUT 
 	{
 		GMVec3 position = Zero<GMVec3>();
 		GMVec3 normal = Zero<GMVec3>();
+		GMVec2 texcoord = Zero<GMVec2>();
 	};
 
 	for (const auto& mesh : d->meshes)
@@ -329,6 +330,7 @@ void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, OUT 
 				pos += (joint.position + rotationPos) * weight.weightBias;
 			}
 			vertex.position = pos;
+			vertex.texcoord = vert.texCoords;
 			vertices.push_back(vertex);
 		}
 
@@ -360,6 +362,7 @@ void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, OUT 
 				const Vertex& vertexTemp = vertices[triIdx[i]];
 				v.positions = { vertexTemp.position.getX(), vertexTemp.position.getY(), vertexTemp.position.getZ() };
 				v.normals = { vertexTemp.normal.getX(), vertexTemp.normal.getY(), vertexTemp.normal.getZ() };
+				v.texcoords = { vertexTemp.texcoord.getX(), vertexTemp.texcoord.getY() };
 				m->vertex(v);
 			}
 		}
