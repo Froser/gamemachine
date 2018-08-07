@@ -29,12 +29,12 @@ class GMModelReader_MD5Anim : public GMModelReader_MD5
 	GM_DECLARE_PROPERTY(NumJoints, numJoints, GMint)
 	GM_DECLARE_PROPERTY(FrameRate, frameRate, GMint)
 	GM_DECLARE_PROPERTY(NumAnimatedComponents, numAnimatedComponents, GMint)
-	GM_DECLARE_PROPERTY(Hierarchy, hierarchy, GMModelReader_MD5Anim_Hierarchy)
 
 public:
 	virtual bool load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT GMModels** models) override;
 	virtual bool test(const GMBuffer& buffer) override;
 	virtual Vector<GMOwnedPtr<IMd5MeshHandler>>& getHandlers() override;
+	void addJointToHierarchy(GMModelReader_MD5Anim_Joint&& joint);
 	void addBound(GMModelReader_MD5Anim_Bound&& bounds);
 	void addBaseframe(GMModelReader_MD5Anim_Baseframe&& baseframe);
 	void initFrames(GMint num);
@@ -46,6 +46,9 @@ public:
 		D(d);
 		d->nextHandler = handler;
 	}
+
+private:
+	void buildModel(GMModels* models);
 };
 
 END_NS

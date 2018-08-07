@@ -6,6 +6,7 @@
 #include <gmimage.h>
 #include <gmshader.h>
 #include <atomic>
+#include <gmskeleton.h>
 
 struct ID3D11Buffer;
 
@@ -185,7 +186,7 @@ GM_PRIVATE_OBJECT(GMModel)
 {
 	GMUsageHint hint = GMUsageHint::StaticDraw;
 	GMMeshes meshes;
-	GMScopedPtr<GMModelDataProxy> modelDataProxy;
+	GMOwnedPtr<GMModelDataProxy> modelDataProxy;
 	GMShader shader;
 	GMModelBuffer* modelBuffer = nullptr;
 	GMModelDrawMode drawMode = GMModelDrawMode::Vertex;
@@ -237,19 +238,13 @@ public:
 		d->modelDataProxy.reset(modelDataProxy);
 	}
 
-	inline GMModelDataProxy* getModelDataProxy()
+	inline GMModelDataProxy* getModelDataProxy() GM_NOEXCEPT
 	{
 		D(d);
 		return d->modelDataProxy.get();
 	}
 
-	inline void addMesh(GMMesh* mesh)
-	{
-		D(d);
-		d->meshes.push_back(mesh);
-	}
-
-	inline GMMeshes& getMeshes()
+	inline GMMeshes& getMeshes() GM_NOEXCEPT
 	{
 		D(d);
 		return d->meshes;
@@ -261,21 +256,35 @@ public:
 	  然而，如果此模型如果与其他模型共享一份顶点数据，那么此模型不需要传输顶点数据到显卡，因为数据已经存在。
 	  \sa GMModelDataProxy()
 	*/
-	inline bool isNeedTransfer() { D(d); return d->needTransfer; }
+	inline bool isNeedTransfer() GM_NOEXCEPT { D(d); return d->needTransfer; }
 
 	//! 表示此模型不再需要将顶点数据传输到显卡了。
 	/*!
 	  当使用了已经传输过的顶点数据，或者顶点数据传输完成时调用此方法。
 	*/
-	inline void doNotTransferAnymore() { D(d); d->needTransfer = false; }
+	inline void doNotTransferAnymore() GM_NOEXCEPT
+	{
+		D(d);
+		d->needTransfer = false;
+	}
 
 	// 绘制方式
-	void setUsageHint(GMUsageHint hint) { D(d); d->hint = hint; }
-	GMUsageHint getUsageHint() { D(d); return d->hint; }
+	void setUsageHint(GMUsageHint hint) GM_NOEXCEPT
+	{
+		D(d);
+		d->hint = hint;
+	}
+
+	GMUsageHint getUsageHint()
+	{
+		D(d);
+		return d->hint;
+	}
 
 	void setModelBuffer(AUTORELEASE GMModelBuffer* mb);
 	GMModelBuffer* getModelBuffer();
 	void releaseModelBuffer();
+	void addMesh(GMMesh* mesh);
 };
 
 #define GM_DEFINE_VERTEX_DATA(name) \
@@ -284,7 +293,48 @@ public:
 #define GM_DEFINE_VERTEX_PROPERTY(name) \
 	inline auto& name() { D(d); return d->name; }
 
-typedef Vector<GMModel*> GMModels;
+
+GM_PRIVATE_OBJECT(GMModels)
+{
+	Vector<GMModel*> models;
+	GMOwnedPtr<GMSkeleton> skeleton;
+};
+
+class GMModels : public GMObject
+{
+	GM_DECLARE_PRIVATE(GMModels)
+	GM_DECLARE_PROPERTY(Models, models, Vector<GMModel*>)
+
+public:
+	void push_back(GMModel* model);
+	void swap(GMModels* models);
+
+public:
+	inline bool isEmpty() GM_NOEXCEPT
+	{
+		D(d);
+		return d->models.empty();
+	}
+
+	inline GMSkeleton* getSkeleton() GM_NOEXCEPT
+	{
+		D(d);
+		return d->skeleton.get();
+	}
+
+	void setSkeleton(AUTORELEASE GMSkeleton* skeleton)
+	{
+		D(d);
+		d->skeleton.reset(skeleton);
+	}
+
+	GMModel* operator[](GMsize_t i)
+	{
+		D(d);
+		return d->models[i];
+	}
+};
+
 typedef Vector<GMVertex> GMVertices;
 typedef Vector<GMuint> GMIndices;
 

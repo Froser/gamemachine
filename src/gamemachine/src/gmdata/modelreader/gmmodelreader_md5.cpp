@@ -156,7 +156,7 @@ bool GMModelReader_MD5::load(const GMModelLoadSettings& settings, GMBuffer& buff
 		GMBuffer meshBuffer;
 		GM.getGamePackageManager()->readFile(GMPackageIndex::Models, filename, &meshBuffer);
 		GM_ASSERT(s_animReader.test(meshBuffer));
-		s_animReader.load(GMModelLoadSettings(filename, settings.directory, settings.type, settings.context), meshBuffer, nullptr);
+		s_animReader.load(GMModelLoadSettings(filename, settings.directory, settings.type, settings.context), meshBuffer, models);
 	}
 
 	return true;

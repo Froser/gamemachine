@@ -8,6 +8,19 @@
 #define TO_VEC3(i) GMVec3((i)[0], (i)[1], (i)[2])
 #define TO_VEC2(i) GMVec2((i)[0], (i)[1])
 
+void GMModels::push_back(GMModel* model)
+{
+	D(d);
+	d->models.push_back(model);
+}
+
+void GMModels::swap(GMModels* models)
+{
+	D(d);
+	D_OF(d_rhs, models);
+	d->models.swap(d_rhs->models);
+}
+
 const IRenderContext* GMModelDataProxy::getContext()
 {
 	D(d);
@@ -115,6 +128,12 @@ void GMModel::releaseModelBuffer()
 	{
 		d->modelBuffer->releaseRef();
 	}
+}
+
+void GMModel::addMesh(GMMesh* mesh)
+{
+	D(d);
+	d->meshes.push_back(mesh);
 }
 
 GMModelBuffer::GMModelBuffer()

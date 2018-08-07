@@ -68,7 +68,7 @@ GMBSPSkyGameObject::GMBSPSkyGameObject(const GMShader& shader, const GMVec3& min
 GMBSPSkyGameObject::~GMBSPSkyGameObject()
 {
 	D(d);
-	GM_delete(getModels());
+	GM_delete(getModels().getModels());
 }
 
 void GMBSPSkyGameObject::createSkyBox(OUT GMModel** obj)

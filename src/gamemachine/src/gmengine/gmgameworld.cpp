@@ -11,7 +11,7 @@ namespace
 	bool needBlend(GMGameObject* object)
 	{
 		GMModels& models = object->getModels();
-		for (auto& model : models)
+		for (auto& model : models.getModels())
 		{
 			if (model->getShader().getBlend())
 				return true;
@@ -34,7 +34,7 @@ void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
 	obj->onAppendingObjectToWorld();
 	d->gameObjects.insert(GMOwnedPtr<GMGameObject>(obj));
 	GMModels& models = obj->getModels();
-	for (auto& model : models)
+	for (auto& model : models.getModels())
 	{
 		GM.createModelDataProxyAndTransfer(d->context, model);
 	}

@@ -1,6 +1,17 @@
 ﻿#include "stdafx.h"
 #include "gmmodelreader_md5anim.h"
 
+namespace
+{
+	GMSkeletonJoint baseframeToSkeletonJoint(const GMBaseFrame& baseframe)
+	{
+		GMSkeletonJoint joint;
+		joint.setOrientation(baseframe.orientation);
+		joint.setPosition(baseframe.position);
+		return joint;
+	}
+}
+
 // Handlers
 BEGIN_DECLARE_MD5_HANDLER(MD5Version, reader, scanner, GMModelReader_MD5Anim*)
 	GMint version;
@@ -77,17 +88,18 @@ BEGIN_DECLARE_MD5_HANDLER(hierarchy_inner, reader, scanner, GMModelReader_MD5Ani
 	else
 	{
 		// <string:jointName> <int:parentIndex> <int:flags> <int:startIndex> //
-		GMModelReader_MD5Anim_Hierarchy hierarchy;
-		hierarchy.jointName = content;
-		scanner.nextInt(hierarchy.parentIndex);
-		scanner.nextInt(hierarchy.flags);
-		scanner.nextInt(hierarchy.startIndex);
-		reader->setHierarchy(std::move(hierarchy));
+		GMModelReader_MD5Anim_Joint joint;
+
+		joint.jointName = content;
+		scanner.nextInt(joint.parentIndex);
+		scanner.nextInt(joint.flags);
+		scanner.nextInt(joint.startIndex);
 		scanner.next(content);
 		if (content == "//")
 		{
-			scanner.next(hierarchy.annotation);
+			scanner.next(joint.annotation);
 		}
+		reader->addJointToHierarchy(std::move(joint));
 	}
 	return true;
 END_DECLARE_MD5_HANDLER()
@@ -285,6 +297,20 @@ bool GMModelReader_MD5Anim::load(const GMModelLoadSettings& settings, GMBuffer& 
 				return false;
 		}
 	}
+
+	GMModels* targetModel = nullptr;
+	if (*models)
+	{
+		// 如果从外部传入了一个新建好的GMModels
+		targetModel = *models;
+	}
+	else
+	{
+		targetModel = new GMModels();
+		if (models)
+			*models = targetModel;
+	}
+	buildModel(targetModel);
 	return true;
 }
 
@@ -324,6 +350,12 @@ Vector<GMOwnedPtr<IMd5MeshHandler>>& GMModelReader_MD5Anim::getHandlers()
 	return d->handlers;
 }
 
+void GMModelReader_MD5Anim::addJointToHierarchy(GMModelReader_MD5Anim_Joint&& joint)
+{
+	D(d);
+	d->hierarchy.joints.push_back(std::move(joint));
+}
+
 void GMModelReader_MD5Anim::addBound(GMModelReader_MD5Anim_Bound&& bounds)
 {
 	D(d);
@@ -346,4 +378,66 @@ void GMModelReader_MD5Anim::setFrame(GMint index, GMModelReader_MD5Anim_Frame&& 
 {
 	D(d);
 	d->frames[index] = std::move(frame);
+}
+
+void GMModelReader_MD5Anim::buildModel(GMModels* models)
+{
+	if (!models)
+		return;
+
+	D(d);
+	// 标记(flags)
+	enum
+	{
+		Pos_X = 1 << 0,
+		Pos_Y = 1 << 1,
+		Pos_Z = 1 << 2,
+		Ori_X = 1 << 3,
+		Ori_Y = 1 << 4,
+		Ori_Z = 1 << 5,
+	};
+
+	// 开始构造GMSkeleton结构
+	GMSkeleton* skeleton = new GMSkeleton();
+	models->setSkeleton(skeleton);
+
+	for (auto frame : d->frames)
+	{
+		// hierarchy和baseframe是一一对应的
+		for (GMsize_t i = 0; i < d->hierarchy.joints.size(); ++i)
+		{
+			GMsize_t j = 0;
+			auto& joint = d->hierarchy.joints[i];
+			GMFrameSkeletons frameSkeletons;
+			GMSkeletonJoint animatedJoint = baseframeToSkeletonJoint(d->baseframes[i]);
+
+			// Set parent TODO
+			//animatedJoint
+
+			if (joint.flags & 1) // Pos.x
+			{
+				animatedJoint.getPosition().setX(frame.frameData[joint.startIndex + j++]);
+			}
+			if (joint.flags & 2) // Pos.y
+			{
+				animatedJoint.getPosition().setY(frame.frameData[joint.startIndex + j++]);
+			}
+			if (joint.flags & 4) // Pos.x
+			{
+				animatedJoint.getPosition().setZ(frame.frameData[joint.startIndex + j++]);
+			}
+			if (joint.flags & 8) // Orient.x
+			{
+				animatedJoint.getPosition().setX(frame.frameData[joint.startIndex + j++]);
+			}
+			if (joint.flags & 16) // Orient.y
+			{
+				animatedJoint.getPosition().setY(frame.frameData[joint.startIndex + j++]);
+			}
+			if (joint.flags & 32) // Orient.z
+			{
+				animatedJoint.getPosition().setZ(frame.frameData[joint.startIndex + j++]);
+			}
+		}
+	}
 }

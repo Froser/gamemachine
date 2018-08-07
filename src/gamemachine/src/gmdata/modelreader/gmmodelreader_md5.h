@@ -117,7 +117,7 @@ GM_ALIGNED_STRUCT(GMModelReader_MD5Mesh_Mesh)
 	Vector<GMModelReader_MD5Mesh_Weight> weights;
 };
 
-GM_ALIGNED_STRUCT(GMModelReader_MD5Anim_Hierarchy)
+GM_ALIGNED_STRUCT(GMModelReader_MD5Anim_Joint)
 {
 	GMString jointName;
 	GMint parentIndex;
@@ -126,17 +126,18 @@ GM_ALIGNED_STRUCT(GMModelReader_MD5Anim_Hierarchy)
 	GMString annotation;
 };
 
+GM_ALIGNED_STRUCT(GMModelReader_MD5Anim_Hierarchy)
+{
+	Vector<GMModelReader_MD5Anim_Joint> joints;
+};
+
 GM_ALIGNED_STRUCT(GMModelReader_MD5Anim_Bound)
 {
 	GMVec3 boundMin;
 	GMVec3 boundMax;
 };
 
-GM_ALIGNED_STRUCT(GMModelReader_MD5Anim_Baseframe)
-{
-	GMVec3 position;
-	GMQuat orientation;
-};
+typedef GMBaseFrame GMModelReader_MD5Anim_Baseframe;
 
 GM_ALIGNED_STRUCT(GMModelReader_MD5Anim_Frame)
 {

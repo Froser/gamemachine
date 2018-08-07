@@ -20,11 +20,11 @@ void GMGameObject::addModel(GMAsset asset, bool replace)
 	{
 		if (replace)
 		{
-			d->models.swap(*models);
+			d->models.swap(models);
 		}
 		else
 		{
-			for (decltype(auto) model : *models)
+			for (decltype(auto) model : models->getModels())
 			{
 				d->models.push_back(model);
 			}
@@ -66,8 +66,8 @@ void GMGameObject::setPhysicsObject(AUTORELEASE GMPhysicsObject* phyObj)
 
 void GMGameObject::draw()
 {
-	GMModels models = getModels();
-	for (decltype(auto) model : models)
+	const GMModels& models = getModels();
+	for (decltype(auto) model : models.getModels())
 	{
 		drawModel(getContext(), model);
 	}
@@ -76,7 +76,7 @@ void GMGameObject::draw()
 bool GMGameObject::canDeferredRendering()
 {
 	D(d);
-	for (decltype(auto) model : d->models)
+	for (decltype(auto) model : d->models.getModels())
 	{
 		if (model->getShader().getBlend() == true)
 			return false;
@@ -150,7 +150,7 @@ GMCubeMapGameObject::GMCubeMapGameObject(ITexture* texture)
 
 GMCubeMapGameObject::~GMCubeMapGameObject()
 {
-	GM_delete(getModels());
+	GM_delete(getModels().getModels());
 }
 
 void GMCubeMapGameObject::deactivate()

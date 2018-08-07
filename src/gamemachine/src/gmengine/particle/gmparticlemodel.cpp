@@ -167,7 +167,7 @@ void GMParticleModel_2D::render(const IRenderContext* context)
 					ITexture* texture = nullptr;
 					GM.getFactory()->createTexture(context, image, &texture);
 					GM_delete(image);
-					GM_ASSERT(!d->particleObject->getModels().empty());
+					GM_ASSERT(!d->particleObject->getModels().isEmpty());
 					GMModel* model = d->particleObject->getModels()[0];
 					model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(texture);
 					d->system->setTexture(texture);

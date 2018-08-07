@@ -55,6 +55,8 @@ set(SOURCES
 		gmdata/gmimagebuffer.cpp
 		gmdata/gmmodel.h
 		gmdata/gmmodel.cpp
+		gmdata/gmskeleton.h
+		gmdata/gmskeleton.cpp
 		gmdata/gmshader.h
 		gmdata/gmshader.cpp
 		gmengine/gmgraphicengine.h
