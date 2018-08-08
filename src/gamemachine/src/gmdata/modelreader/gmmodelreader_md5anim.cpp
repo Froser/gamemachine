@@ -298,6 +298,10 @@ bool GMModelReader_MD5Anim::load(const GMModelLoadSettings& settings, GMBuffer& 
 		}
 	}
 
+	GM_ASSERT(d->numJoints == d->hierarchy.joints.size());
+	GM_ASSERT(d->numJoints == d->baseframes.size());
+	GM_ASSERT(d->numFrames == d->frames.size());
+
 	GMModels* targetModel = nullptr;
 	if (*models)
 	{
@@ -400,44 +404,59 @@ void GMModelReader_MD5Anim::buildModel(GMModels* models)
 	// 开始构造GMSkeleton结构
 	GMSkeleton* skeleton = new GMSkeleton();
 	models->setSkeleton(skeleton);
+	skeleton->getAnimatedSkeleton().getJoints().assign(d->numJoints, GMSkeletonJoint());
+	skeleton->setFrameRate(d->frameRate);
 
 	for (auto frame : d->frames)
 	{
+		GMFrameSkeleton frameSkeleton;
+
 		// hierarchy和baseframe是一一对应的
 		for (GMsize_t i = 0; i < d->hierarchy.joints.size(); ++i)
 		{
 			GMsize_t j = 0;
 			auto& joint = d->hierarchy.joints[i];
-			GMFrameSkeletons frameSkeletons;
 			GMSkeletonJoint animatedJoint = baseframeToSkeletonJoint(d->baseframes[i]);
+			animatedJoint.setParentIndex(joint.parentIndex);
 
-			// Set parent TODO
-			//animatedJoint
-
-			if (joint.flags & 1) // Pos.x
+			if (joint.flags & Pos_X) // Pos.x
 			{
 				animatedJoint.getPosition().setX(frame.frameData[joint.startIndex + j++]);
 			}
-			if (joint.flags & 2) // Pos.y
+			if (joint.flags & Pos_Y) // Pos.y
 			{
 				animatedJoint.getPosition().setY(frame.frameData[joint.startIndex + j++]);
 			}
-			if (joint.flags & 4) // Pos.x
+			if (joint.flags & Pos_Z) // Pos.x
 			{
 				animatedJoint.getPosition().setZ(frame.frameData[joint.startIndex + j++]);
 			}
-			if (joint.flags & 8) // Orient.x
+			if (joint.flags & Ori_X) // Orient.x
 			{
-				animatedJoint.getPosition().setX(frame.frameData[joint.startIndex + j++]);
+				animatedJoint.getOrientation().setX(frame.frameData[joint.startIndex + j++]);
 			}
-			if (joint.flags & 16) // Orient.y
+			if (joint.flags & Ori_Y) // Orient.y
 			{
-				animatedJoint.getPosition().setY(frame.frameData[joint.startIndex + j++]);
+				animatedJoint.getOrientation().setY(frame.frameData[joint.startIndex + j++]);
 			}
-			if (joint.flags & 32) // Orient.z
+			if (joint.flags & Ori_Z) // Orient.z
 			{
-				animatedJoint.getPosition().setZ(frame.frameData[joint.startIndex + j++]);
+				animatedJoint.getOrientation().setZ(frame.frameData[joint.startIndex + j++]);
 			}
+
+			GMVec3 quat3(animatedJoint.getOrientation().getX(), animatedJoint.getOrientation().getY(), animatedJoint.getOrientation().getZ());
+			animatedJoint.getOrientation().setW(GMMD5VectorParser::calcQuatWFromVector3(quat3));
+
+			if (joint.parentIndex != GMSkeletonJoint::RootIndex)
+			{
+				GMSkeletonJoint& parent = frameSkeleton.getJoints()[animatedJoint.getParentIndex()];
+				GMVec3 rotatePosition = animatedJoint.getPosition() * parent.getOrientation();
+				animatedJoint.setPosition(parent.getPosition() + rotatePosition);
+				animatedJoint.setOrientation(Normalize(animatedJoint.getOrientation() * parent.getOrientation()));
+			}
+			frameSkeleton.getJoints().push_back(std::move(animatedJoint));
 		}
+		skeleton->getSkeletons().push_back(std::move(frameSkeleton));
 	}
+	GM_ASSERT(skeleton->getSkeletons().size() == static_cast<GMsize_t>(d->numFrames));
 }

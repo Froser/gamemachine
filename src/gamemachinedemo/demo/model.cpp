@@ -58,7 +58,7 @@ void Demo_Model::init()
 	gm::GMModels* models = new gm::GMModels();
 	gm::GMModelReader::load(loadSettings, &models);
 
-	for (auto& model : *models)
+	for (auto& model : models->getModels())
 	{
 		model->getShader().getMaterial().refractivity = 0.658f;
 		model->getShader().getMaterial().ka = model->getShader().getMaterial().kd = model->getShader().getMaterial().ks = GMVec3(0);

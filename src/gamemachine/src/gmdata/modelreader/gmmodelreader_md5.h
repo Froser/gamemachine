@@ -72,6 +72,7 @@ struct GMMD5VectorParser
 	static GMVec3 parseVector3(GMScanner& s);
 	static GMVec2 parseVector2(GMScanner& s);
 	static GMQuat parseQuatFromVector3(GMScanner& s);
+	static GMfloat calcQuatWFromVector3(GMVec3& v3);
 };
 
 class GMModelReader_MD5;

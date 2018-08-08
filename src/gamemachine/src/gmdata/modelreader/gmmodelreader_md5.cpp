@@ -4,6 +4,27 @@
 #include "foundation/gamemachine.h"
 #include "gmmodelreader_md5anim.h"
 
+namespace
+{
+	template <typename T>
+	GMfloat calcQuatW(const T& v3)
+	{
+		// 根据四元数模为1，计算出四元数的w
+		GMfloat t = 1.0f - (v3.getX() * v3.getX()) - (v3.getY() * v3.getY()) - (v3.getZ() * v3.getZ());
+		GMfloat w;
+		if (t < 0.0f)
+		{
+			w = 0.0f;
+		}
+		else
+		{
+			w = -Sqrt(t);
+		}
+
+		return w;
+	}
+}
+
 BEGIN_DECLARE_MD5_HANDLER(GMMD5Version, reader, scanner, GMModelReader_MD5*)
 	GMint version;
 	scanner.nextInt(version);
@@ -102,19 +123,12 @@ GMVec2 GMMD5VectorParser::parseVector2(GMScanner& s)
 GMQuat GMMD5VectorParser::parseQuatFromVector3(GMScanner& s)
 {
 	GMVec3 quat3 = parseVector3(s);
-	// 根据四元数模为1，计算出四元数的w
-	GMfloat t = 1.0f - (quat3.getX() * quat3.getX()) - (quat3.getY() * quat3.getY()) - (quat3.getZ() * quat3.getZ());
-	GMfloat w;
-	if (t < 0.0f)
-	{
-		w = 0.0f;
-	}
-	else
-	{
-		w = -Sqrt(t);
-	}
+	return GMQuat(quat3.getX(), quat3.getY(), quat3.getZ(), calcQuatW(quat3));
+}
 
-	return GMQuat(quat3.getX(), quat3.getY(), quat3.getZ(), w);
+GMfloat GMMD5VectorParser::calcQuatWFromVector3(GMVec3& v3)
+{
+	return calcQuatW(v3);
 }
 
 bool GMModelReader_MD5::load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT GMModels** models)

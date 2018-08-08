@@ -59,6 +59,7 @@ inline gm::GMfloat Log(gm::GMfloat x) { return logf(x); }
 inline gm::GMfloat Pow(gm::GMfloat x, gm::GMfloat y) { return powf(x, y); }
 inline gm::GMfloat Fmod(gm::GMfloat x, gm::GMfloat y) { return fmodf(x, y); }
 inline gm::GMfloat Floor(gm::GMfloat x) { return floor(x); }
+inline gm::GMfloat Ceil(gm::GMfloat x) { return ceil(x); }
 inline gm::GMfloat Min(gm::GMfloat x, gm::GMfloat y) { return x < y ? x : y; }
 inline gm::GMfloat Max(gm::GMfloat x, gm::GMfloat y) { return x > y ? x : y; }
 inline gm::GMint Round(gm::GMfloat d)

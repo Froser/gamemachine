@@ -18,7 +18,9 @@ void GMModels::swap(GMModels* models)
 {
 	D(d);
 	D_OF(d_rhs, models);
+	using std::swap;
 	d->models.swap(d_rhs->models);
+	d->skeleton.swap(d_rhs->skeleton);
 }
 
 const IRenderContext* GMModelDataProxy::getContext()

@@ -12,10 +12,9 @@ GM_ALIGNED_STRUCT(GMBaseFrame)
 class GMSkeletonJoint;
 GM_PRIVATE_OBJECT(GMSkeletonJoint)
 {
-	GMVec3 position;
-	GMQuat orientation;
-	GMSkeletonJoint* parent;
-	Vector<GMSkeletonJoint*> children;
+	GMint parentIndex = -1;
+	GMVec3 position = Zero<GMVec3>();
+	GMQuat orientation = Identity<GMQuat>();
 };
 
 class GMSkeletonJoint : public GMObject
@@ -24,56 +23,60 @@ class GMSkeletonJoint : public GMObject
 	GM_ALLOW_COPY_DATA(GMSkeletonJoint)
 	GM_DECLARE_PROPERTY(Position, position, GMVec3)
 	GM_DECLARE_PROPERTY(Orientation, orientation, GMQuat)
+	GM_DECLARE_PROPERTY(ParentIndex, parentIndex, GMint)
 
 public:
 	enum
 	{
-		RootId = -1,
+		RootIndex = -1,
 	};
 
 public:
 	GMSkeletonJoint() = default;
-	~GMSkeletonJoint();
-
-private:
-	void removeAll();
-	void removeJoint(GMSkeletonJoint* joint);
-
-public:
-	inline const Vector<GMSkeletonJoint*>& getChildren() GM_NOEXCEPT
-	{
-		D(d);
-		return d->children;
-	}
 };
 
 //> 每一帧所有的关节状态
-typedef Vector<GMSkeletonJoint> GMFrameSkeleton;
+GM_PRIVATE_OBJECT(GMFrameSkeleton)
+{
+	Vector<GMSkeletonJoint> joints;
+};
+
+class GMFrameSkeleton : public GMObject
+{
+	GM_DECLARE_PRIVATE(GMFrameSkeleton)
+	GM_ALLOW_COPY_DATA(GMFrameSkeleton)
+	GM_DECLARE_PROPERTY(Joints, joints, Vector<GMSkeletonJoint>)
+
+public:
+	GMFrameSkeleton() = default;
+};
 
 //> 所有帧的关节状态
-typedef Vector<GMFrameSkeleton> GMFrameSkeletons;
+class GMFrameSkeletons : public Vector<GMFrameSkeleton>
+{
+public:
+	inline GMsize_t getNumFrames() GM_NOEXCEPT
+	{
+		return size();
+	}
+};
 
 GM_PRIVATE_OBJECT(GMSkeleton)
 {
-	GMOwnedPtr<GMSkeletonJoint> rootJoint;
-	GMBaseFrame baseframe;
-	GMFrameSkeletons frameSkeletons;
+	GMFrameSkeletons skeletons;
+	GMFrameSkeleton animatedSkeleton;
+	GMfloat frameRate = 60;
 };
 
 class GMSkeleton : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMSkeleton)
-	GM_DECLARE_PROPERTY(Baseframe, baseframe, GMBaseFrame)
+	GM_DECLARE_PROPERTY(Skeletons, skeletons, GMFrameSkeletons)
+	GM_DECLARE_PROPERTY(AnimatedSkeleton, animatedSkeleton, GMFrameSkeleton)
+	GM_DECLARE_PROPERTY(FrameRate, frameRate, GMfloat)
 
 public:
-	void setRootJoint(const GMSkeletonJoint& joint);
-
-public:
-	inline GMSkeletonJoint* getRootJoint() GM_NOEXCEPT
-	{
-		D(d);
-		return d->rootJoint.get();
-	}
+	void interpolateSkeletons(GMint frame0, GMint frame1, GMfloat p);
 };
 
 END_NS
