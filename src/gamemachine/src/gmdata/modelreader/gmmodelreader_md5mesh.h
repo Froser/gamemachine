@@ -70,7 +70,8 @@ public:
 	}
 
 private:
-	void buildModel(const GMModelLoadSettings& settings, OUT GMModels** ppModels);
+	void buildModel(const GMModelLoadSettings& settings, GMModels* models);
+	void swapAll(GMModels* models);
 };
 
 END_NS

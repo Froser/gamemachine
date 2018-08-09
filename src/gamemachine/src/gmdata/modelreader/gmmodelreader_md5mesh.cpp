@@ -4,6 +4,7 @@
 #include "foundation/gamemachine.h"
 #include "../gamepackage/gmgamepackage.h"
 #include "foundation/utilities/utilities.h"
+#include "../gmskeleton.h"
 
 // Handlers
 BEGIN_DECLARE_MD5_HANDLER(MD5Version, reader, scanner, GMModelReader_MD5Mesh*)
@@ -242,7 +243,19 @@ bool GMModelReader_MD5Mesh::load(const GMModelLoadSettings& settings, GMBuffer& 
 		}
 	}
 
-	buildModel(settings, models);
+	GMModels* targetModel = nullptr;
+	if (*models)
+	{
+		// 如果从外部传入了一个新建好的GMModels
+		targetModel = *models;
+	}
+	else
+	{
+		targetModel = new GMModels();
+		if (models)
+			*models = targetModel;
+	}
+	buildModel(settings, targetModel);
 	return true;
 }
 
@@ -276,15 +289,12 @@ Vector<GMOwnedPtr<IMd5MeshHandler>>& GMModelReader_MD5Mesh::getHandlers()
 	return d->handlers;
 }
 
-void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, OUT GMModels** ppModels)
+void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, GMModels* models)
 {
 	D(d);
-	if (!ppModels)
+	if (!models)
 		return;
 	
-	GMModels* models = new GMModels();
-	*ppModels = models;
-
 	// 临时结构，用于缓存顶点、法线
 	struct Vertex
 	{
@@ -293,11 +303,12 @@ void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, OUT 
 		GMVec2 texcoord = Zero<GMVec2>();
 	};
 
-	for (const auto& mesh : d->meshes)
+	for (auto& mesh : d->meshes)
 	{
 		GMModel* model = new GMModel();
 		model->setUsageHint(GMUsageHint::DynamicDraw);
 		models->push_back(model);
+		mesh.targetModel = model;
 
 		GMMesh* m = new GMMesh(model);
 		GMAsset asset = d->shaders[mesh.shader];
@@ -351,6 +362,17 @@ void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, OUT 
 		for (GMsize_t i = 0; i < mesh.vertices.size(); ++i)
 		{
 			vertices[i].normal = Normalize(vertices[i].normal);
+
+			// 计算绑定姿势，将法线换算到关节空间，用于动画时的法线计算
+			auto& vert = mesh.vertices[i];
+			GMVec3 normalTmp = Zero<GMVec3>();
+			for (GMint j = 0; j < vert.weightCount; ++j)
+			{
+				const auto& weight = mesh.weights[vert.startWeight + j];
+				const auto& joint = d->joints[weight.jointIndex];
+				normalTmp += (vertices[i].normal * joint.orientation) * weight.weightBias;
+			}
+			vert.normal = normalTmp;
 		}
 
 		// 组装Vertex
@@ -367,4 +389,20 @@ void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, OUT 
 			}
 		}
 	}
+
+	swapAll(models);
+}
+
+void GMModelReader_MD5Mesh::swapAll(GMModels* models)
+{
+	// 将mesh数据交换到Model中
+	D(d);
+	GMSkeleton* skeleton = nullptr;
+	if (!(skeleton = models->getSkeleton()))
+	{
+		skeleton = new GMSkeleton();
+		models->setSkeleton(skeleton);
+	}
+
+	skeleton->getMeshes().swap(d->meshes);
 }

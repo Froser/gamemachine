@@ -3,6 +3,34 @@
 #include <gmcommon.h>
 BEGIN_NS
 
+
+GM_ALIGNED_STRUCT(GMSkeletonVertex)
+{
+	GMVec2 texCoords = Zero<GMVec2>();
+	GMVec3 normal = Zero<GMVec3>(); //< 相对于关节结点的法线
+	GMint startWeight;
+	GMint weightCount;
+};
+
+GM_ALIGNED_STRUCT(GMSkeletonWeight)
+{
+	GMint jointIndex;
+	GMfloat weightBias;
+	GMVec3 weightPosition;
+};
+
+GM_ALIGNED_STRUCT(GMSkeletonMesh)
+{
+	GMString shader;
+	GMint numVertices;
+	GMint numTriangles;
+	GMint numWeights;
+	Vector<Array<GMint, 3>> triangleIndices;
+	Vector<GMSkeletonVertex> vertices;
+	Vector<GMSkeletonWeight> weights;
+	GMModel* targetModel = nullptr;
+};
+
 GM_ALIGNED_STRUCT(GMBaseFrame)
 {
 	GMVec3 position;
@@ -65,6 +93,7 @@ GM_PRIVATE_OBJECT(GMSkeleton)
 {
 	GMFrameSkeletons skeletons;
 	GMFrameSkeleton animatedSkeleton;
+	Vector<GMSkeletonMesh> meshes;
 	GMfloat frameRate = 60;
 };
 
@@ -74,6 +103,7 @@ class GMSkeleton : public GMObject
 	GM_DECLARE_PROPERTY(Skeletons, skeletons, GMFrameSkeletons)
 	GM_DECLARE_PROPERTY(AnimatedSkeleton, animatedSkeleton, GMFrameSkeleton)
 	GM_DECLARE_PROPERTY(FrameRate, frameRate, GMfloat)
+	GM_DECLARE_PROPERTY(Meshes, meshes, Vector<GMSkeletonMesh>)
 
 public:
 	void interpolateSkeletons(GMint frame0, GMint frame1, GMfloat p);

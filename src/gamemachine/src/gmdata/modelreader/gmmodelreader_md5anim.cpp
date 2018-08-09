@@ -401,9 +401,12 @@ void GMModelReader_MD5Anim::buildModel(GMModels* models)
 		Ori_Z = 1 << 5,
 	};
 
-	// 开始构造GMSkeleton结构
-	GMSkeleton* skeleton = new GMSkeleton();
-	models->setSkeleton(skeleton);
+	GMSkeleton* skeleton = nullptr;
+	if (!(skeleton = models->getSkeleton()))
+	{
+		skeleton = new GMSkeleton();
+		models->setSkeleton(skeleton);
+	}
 	skeleton->getAnimatedSkeleton().getJoints().assign(d->numJoints, GMSkeletonJoint());
 	skeleton->setFrameRate(d->frameRate);
 

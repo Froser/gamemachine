@@ -93,30 +93,9 @@ GM_ALIGNED_STRUCT(GMModelReader_MD5Mesh_Joint)
 	GMString annotation;
 };
 
-GM_ALIGNED_STRUCT(GMModelReader_MD5Mesh_Vertex)
-{
-	GMVec2 texCoords;
-	GMint startWeight;
-	GMint weightCount;
-};
-
-GM_ALIGNED_STRUCT(GMModelReader_MD5Mesh_Weight)
-{
-	GMint jointIndex;
-	GMfloat weightBias;
-	GMVec3 weightPosition;
-};
-
-GM_ALIGNED_STRUCT(GMModelReader_MD5Mesh_Mesh)
-{
-	GMString shader;
-	GMint numVertices;
-	Vector<GMModelReader_MD5Mesh_Vertex> vertices;
-	GMint numTriangles;
-	Vector<Array<GMint, 3>> triangleIndices;
-	GMint numWeights;
-	Vector<GMModelReader_MD5Mesh_Weight> weights;
-};
+typedef GMSkeletonVertex GMModelReader_MD5Mesh_Vertex;
+typedef GMSkeletonWeight GMModelReader_MD5Mesh_Weight;
+typedef GMSkeletonMesh GMModelReader_MD5Mesh_Mesh;
 
 GM_ALIGNED_STRUCT(GMModelReader_MD5Anim_Joint)
 {

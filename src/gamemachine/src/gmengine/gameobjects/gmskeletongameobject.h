@@ -24,6 +24,7 @@ public:
 private:
 	void initAnimation();
 	void getAdjacentTwoFrames(GMDuration dt, REF GMint& frame0, REF GMint& frame1, REF GMfloat& interpolate);
+	void updateMesh(GMSkeletonMesh& mesh, const GMFrameSkeleton& frameSkeleton);
 };
 
 END_NS
