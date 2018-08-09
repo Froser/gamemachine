@@ -372,7 +372,7 @@ void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, GMMo
 				const auto& joint = d->joints[weight.jointIndex];
 				normalTmp += (vertices[i].normal * joint.orientation) * weight.weightBias;
 			}
-			vert.normal = normalTmp;
+			vert.normal = Normalize(normalTmp);
 		}
 
 		// 组装Vertex

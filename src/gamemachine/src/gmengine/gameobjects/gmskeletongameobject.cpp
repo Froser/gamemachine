@@ -9,9 +9,19 @@ void GMSkeletonGameObject::update(GMDuration dt)
 	if (skeleton)
 	{
 		initAnimation();
+
 		GMint frame0 = 0, frame1 = 0;
 		GMfloat interpolate = 0;
-		getAdjacentTwoFrames(dt, frame0, frame1, interpolate);
+		if (d->frame == AutoPlayFrame)
+		{
+			getAdjacentTwoFrames(dt, frame0, frame1, interpolate);
+		}
+		else
+		{
+			frame0 = d->frame;
+			frame1 = d->frame + 1;
+			interpolate = d->frameInterpolate;
+		}
 		skeleton->interpolateSkeletons(frame0, frame1, interpolate);
 
 		const GMFrameSkeleton& frameSkeleton = skeleton->getAnimatedSkeleton();
@@ -20,6 +30,17 @@ void GMSkeletonGameObject::update(GMDuration dt)
 			updateMesh(mesh, frameSkeleton);
 		}
 	}
+}
+
+GMint GMSkeletonGameObject::getFramesCount()
+{
+	D(d);
+	GMModels& models = getModels();
+	auto skeleton = models.getSkeleton();
+	if (skeleton)
+		return skeleton->getSkeletons().getNumFrames();
+
+	return 0;
 }
 
 void GMSkeletonGameObject::initAnimation()
