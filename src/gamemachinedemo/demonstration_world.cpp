@@ -506,7 +506,7 @@ void DemonstrationWorld::init()
 
 	d->manager->registerWidget(d->mainWidget);
 	d->mainWidget->setPosition(10, 60);
-	d->mainWidget->setSize(500, 600);
+	d->mainWidget->setSize(500, 650);
 	d->mainWidget->setTitle(L"GameMachine - 展示菜单");
 	d->mainWidget->setTitleVisible(true);
 	d->mainWidget->setKeyboardInput(true);

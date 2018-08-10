@@ -118,7 +118,7 @@ struct GMModelBufferData
 GM_PRIVATE_OBJECT(GMModelBuffer)
 {
 	GMModelBufferData buffer = { 0 };
-	std::atomic<GMint> ref;
+	GMAtomic<GMint> ref;
 	GMModelDataProxy* modelDataProxy = nullptr;
 };
 

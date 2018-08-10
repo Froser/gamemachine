@@ -5,6 +5,7 @@
 #include "../vector.h"
 #include <time.h>
 #include <random>
+#include <atomic>
 BEGIN_NS
 
 // 此类包含了各种实用工具
@@ -318,11 +319,8 @@ public:
 };
 
 // Atomic
-struct GMAtomic
-{
-	static void increase(GMuint* n);
-	static void decrease(GMuint* n);
-};
+template <typename T>
+using GMAtomic = std::atomic<T>;
 
 struct GMConvertion
 {

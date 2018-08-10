@@ -5,6 +5,8 @@
 #include "../gamepackage/gmgamepackage.h"
 #include "foundation/utilities/utilities.h"
 #include "../gmskeleton.h"
+#include "foundation/gmasync.h"
+#include "foundation/gamemachine.h"
 
 // Handlers
 BEGIN_DECLARE_MD5_HANDLER(MD5Version, reader, scanner, GMModelReader_MD5Mesh*)
@@ -295,6 +297,7 @@ void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, GMMo
 	if (!models)
 		return;
 	
+	static GMint numberOfProcessors = GM.getRunningStates().systemInfo.numberOfProcessors;
 	// 临时结构，用于缓存顶点、法线
 	struct Vertex
 	{
@@ -307,6 +310,7 @@ void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, GMMo
 	{
 		GMModel* model = new GMModel();
 		model->setUsageHint(GMUsageHint::DynamicDraw);
+		model->getShader().setFrontFace(GMS_FrontFace::COUNTER_CLOCKWISE); //MD5采用OpenGL右手坐标系，因此向前方向是逆时针的
 		models->push_back(model);
 		mesh.targetModel = model;
 
@@ -327,53 +331,68 @@ void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, GMMo
 		}
 
 		Vector<Vertex> vertices;
-		vertices.reserve(mesh.vertices.size());
-		for (const auto& vert : mesh.vertices)
-		{
-			Vertex vertex;
-			GMVec3 pos = Zero<GMVec3>();
-			// 每个顶点的坐标由结点的权重累计计算得到
-			for (GMint i = 0; i < vert.weightCount; ++i)
-			{
-				const auto& weight = mesh.weights[vert.startWeight + i];
-				const auto& joint = d->joints[weight.jointIndex];
-				GMVec3 rotationPos = weight.weightPosition * joint.orientation;
-				pos += (joint.position + rotationPos) * weight.weightBias;
+		vertices.resize(mesh.vertices.size());
+		GMAsync::blockedAsync(
+			GMAsync::Async,
+			numberOfProcessors,
+			mesh.vertices.begin(),
+			mesh.vertices.end(),
+			[&vertices, &mesh, &d](auto begin, auto end) {
+				GMint index = begin - mesh.vertices.begin();
+				for (auto iter = begin; iter != end; ++iter)
+				{
+					auto& vert = *iter;
+					Vertex vertex;
+					GMVec3 pos = Zero<GMVec3>();
+					// 每个顶点的坐标由结点的权重累计计算得到
+					for (GMint i = 0; i < vert.weightCount; ++i)
+					{
+						const auto& weight = mesh.weights[vert.startWeight + i];
+						const auto& joint = d->joints[weight.jointIndex];
+						GMVec3 rotationPos = weight.weightPosition * joint.orientation;
+						pos += (joint.position + rotationPos) * weight.weightBias;
+					}
+					vertex.position = pos;
+					vertex.texcoord = vert.texCoords;
+					vertices[index++] = vertex;
+				}
 			}
-			vertex.position = pos;
-			vertex.texcoord = vert.texCoords;
-			vertices.push_back(vertex);
-		}
+		);
 
-		for (const auto& triIdx : mesh.triangleIndices)
-		{
-			GMVec3 v0 = vertices[triIdx[0]].position;
-			GMVec3 v1 = vertices[triIdx[1]].position;
-			GMVec3 v2 = vertices[triIdx[2]].position;
-			GMVec3 normal = Cross(v1 - v0, v2 - v0);
+		GMAsync::blockedAsync(
+			GMAsync::Async,
+			numberOfProcessors,
+			mesh.triangleIndices.begin(),
+			mesh.triangleIndices.end(),
+			[&vertices](auto begin, auto end) {
+				for (auto iter = begin; iter != end; ++iter)
+				{
+					const auto& triIdx = *iter;
+					GMVec3 v0 = vertices[triIdx[0]].position;
+					GMVec3 v1 = vertices[triIdx[1]].position;
+					GMVec3 v2 = vertices[triIdx[2]].position;
+					GMVec3 normal = Cross(v2 - v0, v1 - v0);
 
-			// 计算法线
-			vertices[triIdx[0]].normal += normal;
-			vertices[triIdx[1]].normal += normal;
-			vertices[triIdx[2]].normal += normal;
-		}
-
-		// normalize所有法线，并且加上bias
-		for (GMsize_t i = 0; i < mesh.vertices.size(); ++i)
-		{
-			vertices[i].normal = Normalize(vertices[i].normal);
-
-			// 计算绑定姿势，将法线换算到关节空间，用于动画时的法线计算
-			auto& vert = mesh.vertices[i];
-			GMVec3 normalTmp = Zero<GMVec3>();
-			for (GMint j = 0; j < vert.weightCount; ++j)
-			{
-				const auto& weight = mesh.weights[vert.startWeight + j];
-				const auto& joint = d->joints[weight.jointIndex];
-				normalTmp += (vertices[i].normal * joint.orientation) * weight.weightBias;
+					// 计算法线
+					vertices[triIdx[0]].normal += normal;
+					vertices[triIdx[1]].normal += normal;
+					vertices[triIdx[2]].normal += normal;
+				}
 			}
-			vert.normal = Normalize(normalTmp);
-		}
+		);
+
+		GMAsync::blockedAsync(
+			GMAsync::Async,
+			numberOfProcessors,
+			vertices.begin(),
+			vertices.end(),
+			[](auto begin, auto end) {
+				for (auto iter = begin; iter != end; ++iter)
+				{
+					iter->normal = Normalize(iter->normal);
+				}
+			}
+		);
 
 		// 组装Vertex
 		for (const auto& triIdx : mesh.triangleIndices)

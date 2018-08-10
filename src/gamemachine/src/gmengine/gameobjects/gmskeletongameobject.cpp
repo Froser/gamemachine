@@ -1,5 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmskeletongameobject.h"
+#include "foundation/gmasync.h"
+#include "foundation/gamemachine.h"
 
 void GMSkeletonGameObject::update(GMDuration dt)
 {
@@ -91,6 +93,8 @@ void GMSkeletonGameObject::getAdjacentTwoFrames(GMDuration dt, REF GMint& frame0
 
 void GMSkeletonGameObject::updateMesh(GMSkeletonMesh& mesh, const GMFrameSkeleton& frameSkeleton)
 {
+	static GMint numberOfProcessors = GM.getRunningStates().systemInfo.numberOfProcessors;
+
 	GMModel* model = mesh.targetModel;
 	GM_ASSERT(model);
 	if (model->getUsageHint() == GMUsageHint::StaticDraw)
@@ -114,24 +118,67 @@ void GMSkeletonGameObject::updateMesh(GMSkeletonMesh& mesh, const GMFrameSkeleto
 		GMVertex* modelVertices = static_cast<GMVertex*>(modelDataProxy->getBuffer());
 
 		Vector<Vertex> vertices;
-		vertices.reserve(mesh.vertices.size());
-		for (const auto& vert : mesh.vertices)
-		{
-			Vertex vertex;
-			// 每个顶点的坐标由结点的权重累计计算得到
-			for (GMint i = 0; i < vert.weightCount; ++i)
-			{
-				const auto& weight = mesh.weights[vert.startWeight + i];
-				const auto& joint = frameSkeleton.getJoints()[weight.jointIndex];
-				GMVec3 rotationPos = weight.weightPosition * joint.getOrientation();
-				vertex.position += (joint.getPosition() + rotationPos) * weight.weightBias;
-				vertex.normal += vert.normal * joint.getOrientation() * weight.weightBias;
+		vertices.resize(mesh.vertices.size());
+		GMAsync::blockedAsync(
+			GMAsync::Async,
+			numberOfProcessors,
+			mesh.vertices.begin(),
+			mesh.vertices.end(),
+			[&vertices, &mesh, &frameSkeleton](auto begin, auto end) {
+				GMint index = begin - mesh.vertices.begin();
+				for (auto iter = begin; iter != end; ++iter)
+				{
+					auto& vert = *iter;
+					Vertex vertex;
+					GMVec3 pos = Zero<GMVec3>();
+					// 每个顶点的坐标由结点的权重累计计算得到
+					for (GMint i = 0; i < vert.weightCount; ++i)
+					{
+						const auto& weight = mesh.weights[vert.startWeight + i];
+						const auto& joint = frameSkeleton.getJoints()[weight.jointIndex];
+						GMVec3 rotationPos = weight.weightPosition * joint.getOrientation();
+						vertex.position += (joint.getPosition() + rotationPos) * weight.weightBias;
+					}
+					vertex.texcoord = vert.texCoords;
+					vertices[index++] = vertex;
+				}
 			}
-			vertex.normal = Normalize(vertex.normal);
-			vertex.texcoord = vert.texCoords;
-			
-			vertices.push_back(vertex);
-		}
+		);
+
+		GMAsync::blockedAsync(
+			GMAsync::Async,
+			numberOfProcessors,
+			mesh.triangleIndices.begin(),
+			mesh.triangleIndices.end(),
+			[&vertices](auto begin, auto end) {
+				for (auto iter = begin; iter != end; ++iter)
+				{
+					const auto& triIdx = *iter;
+					GMVec3 v0 = vertices[triIdx[0]].position;
+					GMVec3 v1 = vertices[triIdx[1]].position;
+					GMVec3 v2 = vertices[triIdx[2]].position;
+					GMVec3 normal = Cross(v2 - v0, v1 - v0);
+
+					// 计算法线
+					vertices[triIdx[0]].normal += normal;
+					vertices[triIdx[1]].normal += normal;
+					vertices[triIdx[2]].normal += normal;
+				}
+			}
+		);
+
+		GMAsync::blockedAsync(
+			GMAsync::Async,
+			numberOfProcessors,
+			vertices.begin(),
+			vertices.end(),
+			[](auto begin, auto end) {
+				for (auto iter = begin; iter != end; ++iter)
+				{
+					iter->normal = Normalize(iter->normal);
+				}
+			}
+		);
 
 		// 组装Vertex
 		GMint vertexIndex = 0;

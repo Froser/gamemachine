@@ -7,7 +7,6 @@ BEGIN_NS
 GM_ALIGNED_STRUCT(GMSkeletonVertex)
 {
 	GMVec2 texCoords = Zero<GMVec2>();
-	GMVec3 normal = Zero<GMVec3>(); //< 相对于关节结点的法线
 	GMint startWeight;
 	GMint weightCount;
 };

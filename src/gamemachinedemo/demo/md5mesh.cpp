@@ -33,6 +33,33 @@ void Demo_MD5Mesh::init()
 	asDemoGameWorld(getDemoWorldReference())->addObject("boblampclean", d->boblampclean);
 }
 
+void Demo_MD5Mesh::setDefaultLights()
+{
+	D(d);
+	if (isInited())
+	{
+		{
+			gm::ILight* directLight = nullptr;
+			GM.getFactory()->createLight(gm::GMLightType::Direct, &directLight);
+			GM_ASSERT(directLight);
+			gm::GMfloat lightPos[] = { 1, 0, -3 };
+			directLight->setLightPosition(lightPos);
+			gm::GMfloat color[] = { .1f, .1f, .1f };
+			directLight->setLightColor(color);
+			getDemonstrationWorld()->getContext()->getEngine()->addLight(directLight);
+		}
+
+		{
+			gm::ILight* ambientLight = nullptr;
+			GM.getFactory()->createLight(gm::GMLightType::Ambient, &ambientLight);
+			GM_ASSERT(ambientLight);
+			gm::GMfloat color[] = { .7f, .7f, .7f };
+			ambientLight->setLightColor(color);
+			getDemonstrationWorld()->getContext()->getEngine()->addLight(ambientLight);
+		}
+	}
+}
+
 void Demo_MD5Mesh::event(gm::GameMachineHandlerEvent evt)
 {
 	D_BASE(db, Base);

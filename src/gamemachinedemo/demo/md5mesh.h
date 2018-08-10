@@ -20,6 +20,7 @@ public:
 
 	virtual void init() override;
 	virtual void Demo_MD5Mesh::event(gm::GameMachineHandlerEvent evt) override;
+	virtual void setDefaultLights() override;
 
 protected:
 	const gm::GMString& getDescription() const
