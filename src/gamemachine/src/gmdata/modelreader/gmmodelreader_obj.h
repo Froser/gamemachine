@@ -4,7 +4,6 @@
 #include "gmmodelreader.h"
 #include <linearmath.h>
 #include <map>
-#include "foundation/vector.h"
 #include <gmgameobject.h>
 
 BEGIN_NS

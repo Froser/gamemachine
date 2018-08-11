@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmbsppatch.h"
 #include "gmbspphysicsstructs.h"
-#include "foundation/vector.h"
 
 #define SUBDIVIDE_DISTANCE 16	//4	// never more than this units away from curve
 // Epsilons

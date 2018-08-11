@@ -45,7 +45,8 @@ public:
 		return reinterpret_cast<pointer>(gmAlignedAlloc(sizeof(value_type) * n, Alignment));
 	}
 	void construct(pointer ptr, const value_type & value) { new (ptr) value_type(value); }
-	void deallocate(pointer ptr) {
+	void deallocate(pointer ptr, GMsize_t)
+	{
 		gmAlignedFree(reinterpret_cast<void *>(ptr));
 	}
 	void destroy(pointer ptr) { ptr->~value_type(); }
@@ -82,6 +83,9 @@ public:
 
 #define GM_ALIGNED_STRUCT_FROM(name, from) GM_ALIGNED_16(struct) name : public from
 #define GM_ALIGNED_STRUCT(name) GM_ALIGNED_STRUCT_FROM(name, gm::GMAlignmentObject)
+
+template <typename T>
+using AlignedVector = Vector<T, AlignedAllocator<T, 16>>;
 
 END_NS
 #endif

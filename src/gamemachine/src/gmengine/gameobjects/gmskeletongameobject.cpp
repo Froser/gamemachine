@@ -117,7 +117,7 @@ void GMSkeletonGameObject::updateMesh(GMSkeletonMesh& mesh, const GMFrameSkeleto
 		modelDataProxy->beginUpdateBuffer(GMModelBufferType::VertexBuffer);
 		GMVertex* modelVertices = static_cast<GMVertex*>(modelDataProxy->getBuffer());
 
-		Vector<Vertex> vertices;
+		AlignedVector<Vertex> vertices;
 		vertices.resize(mesh.vertices.size());
 		GMAsync::blockedAsync(
 			GMAsync::Async,

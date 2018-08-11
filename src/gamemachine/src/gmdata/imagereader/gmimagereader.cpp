@@ -5,7 +5,6 @@
 #include "gmimagereader_png.h"
 #include "gmimagereader_jpg.h"
 #include "gmimagereader_tga.h"
-#include "foundation/vector.h"
 
 class GMImageReaderContainer
 {

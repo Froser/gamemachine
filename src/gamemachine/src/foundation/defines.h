@@ -30,8 +30,8 @@ using Multimap = std::multimap<T1, T2, Cmp>;
 template <typename T, typename Cmp = std::less<T> >
 using Set = std::set<T, Cmp>;
 
-template <typename T>
-using Vector = std::vector<T>;
+template <typename T, typename Alloc = std::allocator<T>>
+using Vector = std::vector<T, Alloc>;
 
 template <typename T>
 using Queue = std::queue<T>;

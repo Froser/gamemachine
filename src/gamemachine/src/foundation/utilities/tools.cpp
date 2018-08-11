@@ -2,7 +2,6 @@
 #include "tools.h"
 #include <linearmath.h>
 #include "assert.h"
-#include "foundation/vector.h"
 #include <zlib.h>
 
 //GMClock

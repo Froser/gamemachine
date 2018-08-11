@@ -147,7 +147,6 @@ set(SOURCES
 		foundation/assert.cpp
 		foundation/gmconfigs.h
 		foundation/gmconfigs.cpp
-		foundation/vector.h
 		foundation/memory.h
 		foundation/memory.cpp
 		foundation/linearmath.h

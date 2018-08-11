@@ -2,7 +2,6 @@
 #define __UTILITIES_H__
 #include <gmcommon.h>
 #include <linearmath.h>
-#include "../vector.h"
 #include <time.h>
 #include <random>
 #include <atomic>

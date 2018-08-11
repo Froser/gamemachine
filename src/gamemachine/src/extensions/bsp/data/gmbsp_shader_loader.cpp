@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "gmbsp_shader_loader.h"
-#include "foundation/vector.h"
 #include <string>
 #include "foundation/utilities/tools.h"
 #include "extensions/bsp/render/gmbspgameworld.h"
