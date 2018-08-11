@@ -7,21 +7,28 @@
 
 BEGIN_NS
 
-#define GM_USE_PLACEMENT_NEW 1
-#define GM_ALLOW_ARRAY_COPY_OP
 #define GM_USE_MEMCPY 0
 
-#ifdef GM_USE_PLACEMENT_NEW
-#	include <new>
-#endif
+#include <new>
+#include <xutility>
 
 template <typename T>
 class AlignedVectorIteratorBase
 {
 public:
+	AlignedVectorIteratorBase()
+		: m_ptr(nullptr) //invalid pointer
+	{
+	}
+
 	AlignedVectorIteratorBase(typename T::value_type* ptr)
 		: m_ptr(ptr)
 	{
+	}
+
+	AlignedVectorIteratorBase(const AlignedVectorIteratorBase& other)
+	{
+		*this = other;
 	}
 
 	typename T::value_type& operator ++()
@@ -37,6 +44,23 @@ public:
 		return elem;
 	}
 
+	typename T::value_type& operator +=(GMptrdiff step)
+	{
+		m_ptr += step;
+		T::value_type& elem = *m_ptr;
+		return elem;
+	}
+
+	typename T::value_type& operator +(GMptrdiff step)
+	{
+		return *(m_ptr + step);
+	}
+
+	GMptrdiff operator-(AlignedVectorIteratorBase& other)
+	{
+		return other.m_ptr - m_ptr;
+	}
+
 	bool operator ==(const AlignedVectorIteratorBase& other)
 	{
 		return m_ptr == other.m_ptr;
@@ -45,6 +69,17 @@ public:
 	bool operator !=(const AlignedVectorIteratorBase& other)
 	{
 		return m_ptr != other.m_ptr;
+	}
+
+	T::value_type& operator->()
+	{
+		return *m_ptr;
+	}
+
+	AlignedVectorIteratorBase& operator=(const AlignedVectorIteratorBase& other)
+	{
+		m_ptr = other.m_ptr;
+		return *this;
 	}
 
 protected:
@@ -57,7 +92,7 @@ class AlignVectorIterator : public AlignedVectorIteratorBase<T>
 	typedef AlignedVectorIteratorBase<T> Base;
 
 public:
-	AlignVectorIterator(typename T::value_type* ptr) : Base(ptr) {}
+	using Base::Base;
 
 	typename T::value_type& operator *()
 	{
@@ -71,7 +106,7 @@ class AlignVectorConstIterator : public AlignedVectorIteratorBase<T>
 	typedef AlignedVectorIteratorBase<T> Base;
 
 public:
-	AlignVectorConstIterator(typename T::value_type* ptr) : Base(ptr) {}
+	using Base::Base;
 
 	const typename T::value_type& operator *()
 	{
@@ -87,17 +122,12 @@ public:
 	typedef AlignVectorConstIterator<AlignedVector> const_iterator;
 	typedef T value_type;
 
-#ifdef GM_ALLOW_ARRAY_COPY_OP
 public:
-	AlignedVector<T>& operator=(const AlignedVector<T> &other)
+	AlignedVector<value_type>& operator=(const AlignedVector<value_type> &other)
 	{
 		copyFromArray(other);
 		return *this;
 	}
-#else//GM_ALLOW_ARRAY_COPY_OP
-private:
-	AlignedVector<T>& operator=(const AlignedVector<T> &other);
-#endif//GM_ALLOW_ARRAY_COPY_OP
 
 protected:
 	GMint allocSize(GMint size)
@@ -105,15 +135,13 @@ protected:
 		return (size ? size * 2 : 1);
 	}
 
-	void copy(GMint start, GMint end, T* dest) const
+	void copy(GMint start, GMint end, value_type* dest) const
 	{
 		GMint i;
 		for (i = start; i < end; ++i)
-#ifdef GM_USE_PLACEMENT_NEW
-			new (&dest[i]) T(m_data[i]);
-#else
-			dest[i] = m_data[i];
-#endif //GM_USE_PLACEMENT_NEW
+		{
+			new (&dest[i]) value_type(m_data[i]);
+		}
 	}
 
 	void init()
@@ -128,7 +156,7 @@ protected:
 		GMint i;
 		for (i = first; i < last; i++)
 		{
-			m_data[i].~T();
+			m_data[i].~value_type();
 		}
 	}
 
@@ -181,33 +209,33 @@ public:
 		return m_size == 0;
 	}
 
-	const T& at(GMuint n) const
+	const value_type& at(GMuint n) const
 	{
 		GM_ASSERT(n >= 0);
 		GM_ASSERT(n < size());
 		return m_data[n];
 	}
 
-	T& at(GMuint n)
+	value_type& at(GMuint n)
 	{
 		GM_ASSERT(n >= 0);
 		GM_ASSERT(n < size());
 		return m_data[n];
 	}
 
-	T* data()
+	value_type* data()
 	{
 		return m_data;
 	}
 
-	const T& operator[](GMuint n) const
+	const value_type& operator[](GMuint n) const
 	{
 		GM_ASSERT(n >= 0);
 		GM_ASSERT(n < size());
 		return m_data[n];
 	}
 
-	T& operator[](GMuint n)
+	value_type& operator[](GMuint n)
 	{
 		GM_ASSERT(n >= 0);
 		GM_ASSERT(n < size());
@@ -225,22 +253,31 @@ public:
 	{
 		GM_ASSERT(m_size > 0);
 		m_size--;
-		m_data[m_size].~T();
+		m_data[m_size].~value_type();
 	}
 
-	T& back()
+	void assign(GMsize_t count, const value_type& val)
+	{
+		clear();
+		for (GMsize_t i = 0; i < count; ++i)
+		{
+			push_back(val);
+		}
+	}
+
+	value_type& back()
 	{
 		GM_ASSERT(m_size > 0);
 		return m_data[m_size - 1];
 	}
 
-	T& front()
+	value_type& front()
 	{
 		GM_ASSERT(m_size > 0);
 		return *m_data;
 	}
 
-	iterator find(const T& target)
+	iterator find(const value_type& target)
 	{
 		iterator iter = begin(), e = end();
 		while (iter != e)
@@ -269,14 +306,14 @@ public:
 		m_size = newsize;
 	}
 
-	void resize(GMuint newsize, const T& fillData = T())
+	void resize(GMuint newsize, const value_type& fillData = value_type())
 	{
 		GMuint curSize = size();
 		if (newsize < curSize)
 		{
 			for (GMuint i = newsize; i < curSize; i++)
 			{
-				m_data[i].~T();
+				m_data[i].~value_type();
 			}
 		}
 		else
@@ -285,18 +322,16 @@ public:
 			{
 				reserve(newsize);
 			}
-#ifdef GM_USE_PLACEMENT_NEW
 			for (GMuint i = curSize; i < newsize; i++)
 			{
-				new (&m_data[i]) T(fillData);
+				new (&m_data[i]) value_type(fillData);
 			}
-#endif //GM_USE_PLACEMENT_NEW
 		}
 
 		m_size = newsize;
 	}
 
-	T& expandNonInitializing()
+	value_type& expandNonInitializing()
 	{
 		GMuint sz = size();
 		if (sz == capacity())
@@ -308,7 +343,7 @@ public:
 		return m_data[sz];
 	}
 
-	T& expand(const T& fillValue = T())
+	value_type& expand(const value_type& fillValue = value_type())
 	{
 		GMuint sz = size();
 		if (sz == capacity())
@@ -316,33 +351,41 @@ public:
 			reserve(allocSize(size()));
 		}
 		m_size++;
-#ifdef GM_USE_PLACEMENT_NEW
-		new (&m_data[sz]) T(fillValue); //use the in-place new (not really allocating heap memory)
-#endif
+		new (&m_data[sz]) value_type(fillValue); //use the in-place new (not really allocating heap memory)
 		return m_data[sz];
 	}
 
-	void push_back(const T& _Val)
+	void push_back(const value_type& _Val)
 	{
 		GMuint sz = size();
-		T __Val; // 重新分配空间的时候，如果_Val来自于自身，有可能会被销毁，这个时候应该拷贝一次
+		value_type __Val; // 重新分配空间的时候，如果_Val来自于自身，有可能会被销毁，这个时候应该拷贝一次
 		if (sz == capacity())
 		{
 			__Val = _Val;
 			reserve(allocSize(size()));
-#ifdef GM_USE_PLACEMENT_NEW
-			new (&m_data[m_size]) T(__Val);
-#else
-			m_data[size()] = __Val;
-#endif //GM_USE_PLACEMENT_NEW
+			new (&m_data[m_size]) value_type(std::move(__Val));
 		}
 		else
 		{
-#ifdef GM_USE_PLACEMENT_NEW
-			new (&m_data[m_size]) T(_Val);
-#else
-			m_data[size()] = _Val;
-#endif //GM_USE_PLACEMENT_NEW
+			new (&m_data[m_size]) value_type(_Val);
+		}
+
+		m_size++;
+	}
+
+	void push_back(value_type&& _Val)
+	{
+		GMuint sz = size();
+		value_type __Val; // 重新分配空间的时候，如果_Val来自于自身，有可能会被销毁，这个时候应该拷贝一次
+		if (sz == capacity())
+		{
+			__Val = std::move(_Val);
+			reserve(allocSize(size()));
+			new (&m_data[m_size]) value_type(std::move(__Val));
+		}
+		else
+		{
+			new (&m_data[m_size]) value_type(std::move(_Val));
 		}
 
 		m_size++;
@@ -382,7 +425,7 @@ public:
 	{	// determine new minimum length of allocated storage
 		if (capacity() < _Count)
 		{	// not enough room, reallocate
-			T*	s = (T*)allocate(_Count);
+			value_type* s = (value_type*)allocate(_Count);
 			GM_ASSERT(s);
 			if (s == 0)
 			{
@@ -407,7 +450,7 @@ public:
 		//  lo is the lower index, hi is the upper index
 		//  of the region of array a that is to be sorted
 		GMint i = lo, j = hi;
-		T x = m_data[(lo + hi) / 2];
+		value_type x = m_data[(lo + hi) / 2];
 
 		//  partition
 		do
@@ -477,15 +520,23 @@ public:
 	void swap(GMint index0, GMint index1)
 	{
 #ifdef GM_USE_MEMCPY
-		char	temp[sizeof(T)];
-		memcpy(temp, &m_data[index0], sizeof(T));
-		memcpy(&m_data[index0], &m_data[index1], sizeof(T));
-		memcpy(&m_data[index1], temp, sizeof(T));
+		char	temp[sizeof(value_type)];
+		memcpy(temp, &m_data[index0], sizeof(value_type));
+		memcpy(&m_data[index0], &m_data[index1], sizeof(value_type));
+		memcpy(&m_data[index1], temp, sizeof(value_type));
 #else
-		T temp = m_data[index0];
+		value_type temp = m_data[index0];
 		m_data[index0] = m_data[index1];
 		m_data[index1] = temp;
-#endif //GM_USE_PLACEMENT_NEW
+#endif
+	}
+
+	void swap(AlignedVector<value_type>& rhs)
+	{
+		GM_SWAP(m_data, rhs.m_data);
+		GM_SWAP(m_ownsMemory, rhs.m_ownsMemory);
+		GM_SWAP(m_capacity, rhs.m_capacity);
+		GM_SWAP(m_size, rhs.m_size);
 	}
 
 	template <typename L>
@@ -511,7 +562,7 @@ public:
 		}
 	}
 
-	GMint findBinarySearch(const T& key) const
+	GMint findBinarySearch(const value_type& key) const
 	{
 		GMint first = 0;
 		GMint last = size() - 1;
@@ -530,7 +581,7 @@ public:
 	}
 
 
-	GMint findLinearSearch(const T& key) const
+	GMint findLinearSearch(const value_type& key) const
 	{
 		GMint index = size();
 		GMint i;
@@ -546,7 +597,7 @@ public:
 		return index;
 	}
 
-	GMint findLinearSearch2(const T& key) const
+	GMint findLinearSearch2(const value_type& key) const
 	{
 		GMint index = -1;
 		GMint i;
@@ -562,7 +613,7 @@ public:
 		return index;
 	}
 
-	void remove(const T& key)
+	void remove(const value_type& key)
 	{
 
 		GMint findIndex = findLinearSearch(key);
@@ -590,12 +641,22 @@ public:
 	}
 
 private:
-	AlignedAllocator<T, 16>	m_allocator;
+	AlignedAllocator<value_type, 16>	m_allocator;
 	GMint m_size;
 	GMint m_capacity;
-	T* m_data;
+	value_type* m_data;
 	bool m_ownsMemory;
 };
 
 END_NS
+
+namespace std
+{
+	template <typename T>
+	struct iterator_traits<gm::AlignVectorIterator<T>>
+	{
+		typedef random_access_iterator_tag iterator_category;
+	};
+}
+
 #endif

@@ -15,9 +15,9 @@ GM_PRIVATE_OBJECT(GMModelReader_MD5Anim)
 	GMint frameRate;
 	GMint numAnimatedComponents;
 	GMModelReader_MD5Anim_Hierarchy hierarchy;
-	Vector<GMModelReader_MD5Anim_Bound> bounds;
-	Vector<GMModelReader_MD5Anim_Baseframe> baseframes;
-	Vector<GMModelReader_MD5Anim_Frame> frames;
+	AlignedVector<GMModelReader_MD5Anim_Bound> bounds;
+	AlignedVector<GMModelReader_MD5Anim_Baseframe> baseframes;
+	AlignedVector<GMModelReader_MD5Anim_Frame> frames;
 };
 
 class GMModelReader_MD5Anim : public GMModelReader_MD5

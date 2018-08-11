@@ -16,8 +16,8 @@ GM_PRIVATE_OBJECT(GMModelReader_MD5Mesh)
 	GMint numJoints;
 	GMint numMeshes;
 	GMint numWeights;
-	Vector<GMModelReader_MD5Mesh_Joint> joints;
-	Vector<GMModelReader_MD5Mesh_Mesh> meshes;
+	AlignedVector<GMModelReader_MD5Mesh_Joint> joints;
+	AlignedVector<GMModelReader_MD5Mesh_Mesh> meshes;
 	HashMap<GMString, GMAsset, GMStringHashFunctor> shaders;
 };
 

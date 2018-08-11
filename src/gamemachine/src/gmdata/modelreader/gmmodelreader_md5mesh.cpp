@@ -330,7 +330,7 @@ void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, GMMo
 			}
 		}
 
-		Vector<Vertex> vertices;
+		AlignedVector<Vertex> vertices;
 		vertices.resize(mesh.vertices.size());
 		GMAsync::blockedAsync(
 			GMAsync::Async,

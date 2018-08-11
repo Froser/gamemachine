@@ -24,9 +24,9 @@ GM_ALIGNED_STRUCT(GMSkeletonMesh)
 	GMint numVertices;
 	GMint numTriangles;
 	GMint numWeights;
-	Vector<Array<GMint, 3>> triangleIndices;
-	Vector<GMSkeletonVertex> vertices;
-	Vector<GMSkeletonWeight> weights;
+	AlignedVector<Array<GMint, 3>> triangleIndices;
+	AlignedVector<GMSkeletonVertex> vertices;
+	AlignedVector<GMSkeletonWeight> weights;
 	GMModel* targetModel = nullptr;
 };
 
@@ -65,21 +65,21 @@ public:
 //> 每一帧所有的关节状态
 GM_PRIVATE_OBJECT(GMFrameSkeleton)
 {
-	Vector<GMSkeletonJoint> joints;
+	AlignedVector<GMSkeletonJoint> joints;
 };
 
 class GMFrameSkeleton : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMFrameSkeleton)
 	GM_ALLOW_COPY_DATA(GMFrameSkeleton)
-	GM_DECLARE_PROPERTY(Joints, joints, Vector<GMSkeletonJoint>)
+	GM_DECLARE_PROPERTY(Joints, joints, AlignedVector<GMSkeletonJoint>)
 
 public:
 	GMFrameSkeleton() = default;
 };
 
 //> 所有帧的关节状态
-class GMFrameSkeletons : public Vector<GMFrameSkeleton>
+class GMFrameSkeletons : public AlignedVector<GMFrameSkeleton>
 {
 public:
 	inline GMsize_t getNumFrames() GM_NOEXCEPT
@@ -92,7 +92,7 @@ GM_PRIVATE_OBJECT(GMSkeleton)
 {
 	GMFrameSkeletons skeletons;
 	GMFrameSkeleton animatedSkeleton;
-	Vector<GMSkeletonMesh> meshes;
+	AlignedVector<GMSkeletonMesh> meshes;
 	GMfloat frameRate = 60;
 };
 
@@ -102,7 +102,7 @@ class GMSkeleton : public GMObject
 	GM_DECLARE_PROPERTY(Skeletons, skeletons, GMFrameSkeletons)
 	GM_DECLARE_PROPERTY(AnimatedSkeleton, animatedSkeleton, GMFrameSkeleton)
 	GM_DECLARE_PROPERTY(FrameRate, frameRate, GMfloat)
-	GM_DECLARE_PROPERTY(Meshes, meshes, Vector<GMSkeletonMesh>)
+	GM_DECLARE_PROPERTY(Meshes, meshes, AlignedVector<GMSkeletonMesh>)
 
 public:
 	void interpolateSkeletons(GMint frame0, GMint frame1, GMfloat p);
