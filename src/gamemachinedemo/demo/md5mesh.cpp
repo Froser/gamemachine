@@ -13,10 +13,37 @@ void Demo_MD5Mesh::init()
 
 	Base::init();
 
-	auto top = getClientAreaTop();
-	gm::GMControlButton* button = nullptr;
 	gm::GMWidget* widget = createDefaultWidget();
-	widget->setSize(widget->getSize().width, getClientAreaTop() + 40);
+	auto top = getClientAreaTop();
+
+	gm::GMControlButton* button = nullptr;
+	widget->addButton(
+		L"切换绘制皮肤",
+		10,
+		top,
+		250,
+		30,
+		false,
+		&button
+	);
+	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		d->boblampclean->setDrawSkin(!d->boblampclean->getDrawSkin());
+	});
+
+	widget->addButton(
+		L"切换骨骼",
+		10,
+		top += 40,
+		250,
+		30,
+		false,
+		&button
+	);
+	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		d->boblampclean->setDrawSkeleton(!d->boblampclean->getDrawSkeleton());
+	});
+
+	widget->setSize(widget->getSize().width, top + 40);
 
 	gm::GMModels* boblampcleanModel = nullptr;
 	gm::GMModelReader::load(

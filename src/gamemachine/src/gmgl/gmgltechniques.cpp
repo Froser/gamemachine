@@ -37,7 +37,7 @@ namespace
 		case GMTopologyMode::Triangles:
 			return GL_TRIANGLES;
 		case GMTopologyMode::Lines:
-			return GL_LINE_LOOP;
+			return GL_LINES;
 		default:
 			GM_ASSERT(false);
 			return GL_TRIANGLES;

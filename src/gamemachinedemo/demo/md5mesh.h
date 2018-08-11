@@ -6,9 +6,14 @@
 #include "demonstration_world.h"
 #include "texture.h"
 
+namespace gm
+{
+	class GMSkeletonGameObject;
+}
+
 GM_PRIVATE_OBJECT(Demo_MD5Mesh)
 {
-	gm::GMGameObject* boblampclean = nullptr;
+	gm::GMSkeletonGameObject* boblampclean = nullptr;
 };
 
 class Demo_MD5Mesh : public DemoHandler

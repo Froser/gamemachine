@@ -31,7 +31,20 @@ void GMSkeletonGameObject::update(GMDuration dt)
 		{
 			updateMesh(mesh, frameSkeleton);
 		}
+
+		if (d->drawSkeleton)
+			updateSkeleton();
 	}
+}
+
+void GMSkeletonGameObject::draw()
+{
+	D(d);
+	if (d->drawSkin)
+		GMGameObject::draw();
+
+	if (d->drawSkeleton && d->skeletonObject)
+		d->skeletonObject->draw();
 }
 
 GMint GMSkeletonGameObject::getFramesCount()
@@ -43,6 +56,31 @@ GMint GMSkeletonGameObject::getFramesCount()
 		return skeleton->getSkeletons().getNumFrames();
 
 	return 0;
+}
+
+void GMSkeletonGameObject::createSkeletonObject()
+{
+	D(d);
+	GMModels& models = getModels();
+	auto skeleton = models.getSkeleton();
+	if (skeleton && d->drawSkeleton && !d->skeletonObject)
+	{
+		// 创建连接骨骼的线条
+		// TODO 释放Asset
+		GMModel* skeletonModel = new GMModel();
+		skeletonModel->getShader().setNoDepthTest(true);
+		skeletonModel->getShader().setCull(GMS_Cull::NONE);
+		skeletonModel->setPrimitiveTopologyMode(GMTopologyMode::Lines);
+		skeletonModel->setUsageHint(GMUsageHint::DynamicDraw);
+
+		GMMesh* mesh = new GMMesh(skeletonModel);
+		initSkeletonMesh(mesh);
+		GM.createModelDataProxyAndTransfer(getContext(), skeletonModel);
+
+		GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, skeletonModel);
+		d->skeletonObject.reset(new GMGameObject(asset));
+		d->skeletonObject->setContext(getContext());
+	}
 }
 
 void GMSkeletonGameObject::initAnimation()
@@ -196,5 +234,82 @@ void GMSkeletonGameObject::updateMesh(GMSkeletonMesh& mesh, const GMFrameSkeleto
 		}
 
 		modelDataProxy->endUpdateBuffer();
+	}
+}
+
+void GMSkeletonGameObject::updateSkeleton()
+{
+	D(d);
+	GMModels& models = getModels();
+	auto skeleton = models.getSkeleton();
+	if (!skeleton)
+		return;
+
+	if (!d->drawSkeleton)
+		return;
+
+	if (!d->skeletonObject)
+		createSkeletonObject();
+
+	if (!d->skeletonObject)
+		return;
+
+	if (d->skeletonObject->getModels().getModels().size() != 1)
+		return;
+
+	const GMVec4& sc = getSkeletonColor();
+	Array<GMfloat, 4> color;
+	CopyToArray(sc, &color[0]);
+
+	GMModel* skeletonModel = d->skeletonObject->getModels().getModels().front();
+	GMModelDataProxy* modelDataProxy = skeletonModel->getModelDataProxy();
+	modelDataProxy->beginUpdateBuffer(GMModelBufferType::VertexBuffer);
+	GMVertex* const vertices = static_cast<GMVertex*>(modelDataProxy->getBuffer());
+	GMVertex* verticesPtr = vertices;
+	auto& joints = skeleton->getAnimatedSkeleton().getJoints();
+	for (auto& joint : joints)
+	{
+		const auto& parentId = joint.getParentIndex();
+		if (parentId == GMSkeletonJoint::RootIndex)
+			continue;
+
+		GMVertex* vertex0 = verticesPtr++;
+		GMVertex* vertex1 = verticesPtr++;
+		const GMVec3& p0 = joint.getPosition();
+		const GMVec3& p1 = joints[parentId].getPosition();
+		vertex0->positions = { p0.getX(), p0.getY(), p0.getZ() };
+		vertex0->color = color;
+		vertex1->positions = { p1.getX(), p1.getY(), p1.getZ() };
+		vertex1->color = color;
+	}
+	modelDataProxy->endUpdateBuffer();
+
+	// 同步变换
+	d->skeletonObject->beginUpdateTransform();
+	d->skeletonObject->setTranslation(getTranslation());
+	d->skeletonObject->setRotation(getRotation());
+	d->skeletonObject->setScaling(getScaling());
+	d->skeletonObject->endUpdateTransform();
+}
+
+void GMSkeletonGameObject::initSkeletonMesh(GMMesh* mesh)
+{
+	D(d);
+	// 找到所有joint，连接成线
+	GMModels& models = getModels();
+	auto skeleton = models.getSkeleton();
+	if (!skeleton)
+		return;
+
+	auto& joints = skeleton->getAnimatedSkeleton().getJoints();
+	for (auto& joint : joints)
+	{
+		const auto& parentId = joint.getParentIndex();
+		if (parentId == GMSkeletonJoint::RootIndex)
+			continue;
+
+		// 每个关节绑定2个顶点，绘制出一条直线
+		mesh->vertex(GMVertex());
+		mesh->vertex(GMVertex());
 	}
 }

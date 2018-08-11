@@ -54,7 +54,7 @@ namespace
 		case GMTopologyMode::Triangles:
 			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		case GMTopologyMode::Lines:
-			return D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
+			return D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
 		default:
 			GM_ASSERT(false);
 			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
