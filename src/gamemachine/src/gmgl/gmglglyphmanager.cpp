@@ -58,17 +58,15 @@ GMGLGlyphManager::GMGLGlyphManager(const IRenderContext* context)
 	D(d);
 	d->cursor_u = d->cursor_v = 0;
 	d->maxHeight = 0;
-	d->texture = new GMGLGlyphTexture();
-	d->texture->init();
+	d->texture = GMAsset(GMAssetType::Texture, new GMGLGlyphTexture());
+	d->texture.getTexture()->init();
 }
 
 GMGLGlyphManager::~GMGLGlyphManager()
 {
-	D(d);
-	GM_delete(d->texture);
 }
 
-ITexture* GMGLGlyphManager::glyphTexture()
+GMTextureAsset GMGLGlyphManager::glyphTexture()
 {
 	D(d);
 	return d->texture;
@@ -78,7 +76,7 @@ void GMGLGlyphManager::updateTexture(const GMGlyphBitmap& bitmapGlyph, const GMG
 {
 	D(d);
 	// 创建纹理
-	glBindTexture(GL_TEXTURE_2D, d->texture->getTextureId());
+	glBindTexture(GL_TEXTURE_2D, d->texture.get<GMGLGlyphTexture*>()->getTextureId());
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // 使用一个字节保存，必须设置对齐为1
 	glTexSubImage2D(GL_TEXTURE_2D,
 		0,

@@ -39,9 +39,9 @@ void Demo_PBR::init()
 		gm::GMShader& shader = sphere->getShader();
 		shader.setIlluminationModel(gm::GMIlluminationModel::CookTorranceBRDF);
 
-		gm::ITexture* albedo = nullptr;
-		gm::ITexture* metallicRoughnessAO = nullptr;
-		gm::ITexture* normal = nullptr;
+		gm::GMTextureAsset albedo;
+		gm::GMTextureAsset metallicRoughnessAO;
+		gm::GMTextureAsset normal;
 
 		gm::GMToolUtil::createPBRTextures(
 			getDemoWorldReference()->getContext(),
@@ -50,18 +50,18 @@ void Demo_PBR::init()
 			"pbr/roughness.png",
 			"",
 			"pbr/normal.png",
-			&albedo,
-			&metallicRoughnessAO,
-			&normal
+			albedo,
+			metallicRoughnessAO,
+			normal
 		);
 
-		getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Texture, albedo));
+		getDemoWorldReference()->getAssets().addAsset(albedo);
 		gm::GMToolUtil::addTextureToShader(shader, albedo, gm::GMTextureType::Albedo);
 
-		getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Texture, normal));
+		getDemoWorldReference()->getAssets().addAsset(normal);
 		gm::GMToolUtil::addTextureToShader(shader, normal, gm::GMTextureType::NormalMap);
 
-		getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Texture, metallicRoughnessAO));
+		getDemoWorldReference()->getAssets().addAsset(metallicRoughnessAO);
 		gm::GMToolUtil::addTextureToShader(shader, metallicRoughnessAO, gm::GMTextureType::MetallicRoughnessAO);
 
 		gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, sphere));

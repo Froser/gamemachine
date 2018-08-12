@@ -5,6 +5,7 @@
 #include <gmassets.h>
 #include <gmgameobject.h>
 #include <gmgameworld.h>
+#include "gmphysicsshape.h"
 namespace
 {
 	void collisionShape2TriangleMesh(

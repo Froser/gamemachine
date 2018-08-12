@@ -34,7 +34,7 @@ public:
 GM_PRIVATE_OBJECT(GMDx11GlyphManager)
 {
 	GMComPtr<ID3D11DeviceContext> deviceContext;
-	GMScopedPtr<GMDx11GlyphTexture> texture;
+	GMAsset texture;
 };
 
 class GMDx11GlyphManager : public GMGlyphManager
@@ -45,7 +45,7 @@ public:
 	using GMGlyphManager::GMGlyphManager;
 
 public:
-	virtual ITexture* glyphTexture() override;
+	virtual GMTextureAsset glyphTexture() override;
 	virtual void updateTexture(const GMGlyphBitmap& bitmapGlyph, const GMGlyphInfo& glyphInfo) override;
 };
 

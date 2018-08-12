@@ -1,15 +1,22 @@
 ﻿#include "stdafx.h"
 #include "gmassets.h"
+#include "gmdata/gmmodel.h"
+#include "gmphysics/gmphysicsshape.h"
 
 namespace
 {
 	static GMAsset s_invalidAsset;
 }
 
+GM_DEFINE_ASSET_GETTER(ITexture*, getTexture, GMAssetType::Texture);
+GM_DEFINE_ASSET_GETTER(GMModel*, getModel, GMAssetType::Model);
+GM_DEFINE_ASSET_GETTER(GMModels*, getModels, GMAssetType::Models);
+GM_DEFINE_ASSET_GETTER(GMPhysicsShape*, getPhysicsShape, GMAssetType::PhysicsShape);
+
 GMAsset::GMAsset()
 {
 	D(d);
-	d->ref = new GMAtomic<GMint>(1);
+	d->ref = new GMAtomic<GMlong>(1);
 }
 
 GMAsset::GMAsset(GMAssetType type, void* asset)

@@ -2,9 +2,13 @@
 #define __GMASSETS_H__
 #include <gmcommon.h>
 #include <set>
-#include <gmmodel.h>
-#include <gmphysicsshape.h>
+#include <gmtools.h>
 BEGIN_NS
+
+struct ITexture;
+class GMModel;
+class GMModels;
+class GMPhysicsShape;
 
 // 默认的一些资产路径
 #define GM_ASSET_TEXTURES	GMString(L"/textures/")
@@ -24,18 +28,19 @@ enum class GMAssetType
 	PhysicsShape, //!< 物理形状类型
 };
 
-// 使用一种（多叉）树状结构，保存游戏中的资产
-// 资产的根节点叫作root
-#define GM_ASSET_GETTER(retType, funcName, predictType)		\
-	retType funcName() {									\
-		if (getType() == predictType)						\
-			return static_cast<retType>(getAsset());		\
-		return nullptr;										\
+#define GM_DECLARE_ASSET_GETTER(retType, funcName) \
+	retType funcName();
+
+#define GM_DEFINE_ASSET_GETTER(retType, funcName, predictType)		\
+	retType GMAsset::funcName() {									\
+		if (getType() == predictType)								\
+			return static_cast<retType>(getAsset());				\
+		return nullptr;												\
 	}
 
 GM_PRIVATE_OBJECT(GMAsset)
 {
-	GMAtomic<GMint>* ref = nullptr;
+	GMAtomic<GMlong>* ref = nullptr;
 	GMAssetType type = GMAssetType::None;
 	void* asset = nullptr;
 };
@@ -44,10 +49,10 @@ class GMAsset
 {
 	GM_DECLARE_PRIVATE_NGO(GMAsset)
 	GM_DECLARE_PROPERTY(Type, type, GMAssetType)
-	GM_ASSET_GETTER(ITexture*, getTexture, GMAssetType::Texture);
-	GM_ASSET_GETTER(GMModel*, getModel, GMAssetType::Model);
-	GM_ASSET_GETTER(GMModels*, getModels, GMAssetType::Models);
-	GM_ASSET_GETTER(GMPhysicsShape*, getPhysicsShape, GMAssetType::PhysicsShape);
+	GM_DECLARE_ASSET_GETTER(ITexture*, getTexture);
+	GM_DECLARE_ASSET_GETTER(GMModel*, getModel);
+	GM_DECLARE_ASSET_GETTER(GMModels*, getModels);
+	GM_DECLARE_ASSET_GETTER(GMPhysicsShape*, getPhysicsShape);
 
 public:
 	GMAsset();
@@ -72,15 +77,26 @@ public:
 		return !d->asset;
 	}
 
+	template <typename T>
+	T get()
+	{
+		return static_cast<T>(getAsset());
+	}
+
 private:
 	void addRef();
 	void release();
 	void removeData();
 };
 
-inline bool operator ==(const GMAsset& a, const GMAsset& b)
+inline bool operator ==(const GMAsset& a, const GMAsset& b) GM_NOEXCEPT
 {
 	return a.getType() == b.getType() && a.getAsset() == b.getAsset();
+}
+
+inline bool operator !=(const GMAsset& a, const GMAsset& b) GM_NOEXCEPT
+{
+	return !(a == b);
 }
 
 GM_PRIVATE_OBJECT(GMAssets)
@@ -103,6 +119,10 @@ public:
 	GMAsset getAsset(GMsize_t index);
 	GMAsset getAsset(const GMString& name);
 };
+
+typedef GMAsset GMModelAsset;
+typedef GMAsset GMModelsAsset;
+typedef GMAsset GMTextureAsset;
 
 END_NS
 #endif

@@ -84,7 +84,7 @@ GM_PRIVATE_OBJECT(GMTextGameObject)
 	bool center = false;
 	bool newline = true;
 	GMsize_t length = 0;
-	ITexture* texture = nullptr;
+	GMAsset texture;
 	ITypoEngine* typoEngine = nullptr;
 	bool insetTypoEngine = true;
 	GMFontHandle font = 0;
@@ -153,7 +153,7 @@ GM_PRIVATE_OBJECT(GMSprite2DGameObject)
 {
 	GMModel* model = nullptr;
 	GMAsset modelAsset;
-	ITexture* texture = nullptr;
+	GMAsset texture;
 	GMRect textureRc;
 	GMint texHeight = 0;
 	GMint texWidth = 0;
@@ -181,7 +181,7 @@ public:
 
 public:
 	void setDepth(GMfloat depth);
-	void setTexture(ITexture* tex);
+	void setTexture(GMAsset tex);
 	void setTextureSize(GMint width, GMint height);
 	void setTextureRect(const GMRect& rect);
 

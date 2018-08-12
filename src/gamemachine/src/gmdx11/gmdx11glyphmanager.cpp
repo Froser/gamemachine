@@ -8,16 +8,16 @@
 #include "gmdxincludes.h"
 #include "gmdx11helper.h"
 
-ITexture* GMDx11GlyphManager::glyphTexture()
+GMTextureAsset GMDx11GlyphManager::glyphTexture()
 {
 	D(d);
 	D_BASE(db, Base);
-	if (!d->texture)
+	if (d->texture.isEmpty())
 	{
-		d->texture.reset(new GMDx11GlyphTexture(db->context));
-		d->texture->init();
+		d->texture = GMAsset(GMAssetType::Texture, new GMDx11GlyphTexture(db->context));
+		d->texture.getTexture()->init();
 	}
-	return d->texture.get();
+	return d->texture;
 }
 
 void GMDx11GlyphManager::updateTexture(const GMGlyphBitmap& bitmapGlyph, const GMGlyphInfo& glyphInfo)
@@ -30,7 +30,7 @@ void GMDx11GlyphManager::updateTexture(const GMGlyphBitmap& bitmapGlyph, const G
 		GM_ASSERT(d->deviceContext);
 	}
 
-	if (!d->texture)
+	if (d->texture.isEmpty())
 		glyphTexture();
 
 	D3D11_BOX box = {
@@ -42,8 +42,9 @@ void GMDx11GlyphManager::updateTexture(const GMGlyphBitmap& bitmapGlyph, const G
 		1 //back
 	};
 	
+	GMDx11GlyphTexture* texture = d->texture.get<GMDx11GlyphTexture*>();
 	d->deviceContext->UpdateSubresource(
-		d->texture->getD3D11Texture(),
+		texture->getD3D11Texture(),
 		0,
 		&box,
 		bitmapGlyph.buffer,

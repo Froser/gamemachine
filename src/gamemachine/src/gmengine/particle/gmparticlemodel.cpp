@@ -169,7 +169,7 @@ void GMParticleModel_2D::render(const IRenderContext* context)
 					GM_delete(image);
 					GM_ASSERT(!d->particleObject->getModels().isEmpty());
 					GMModel* model = d->particleObject->getModels()[0];
-					model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(texture);
+					model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(GMAsset(GMAssetType::Texture, texture));
 					d->system->setTexture(texture);
 				}
 			}

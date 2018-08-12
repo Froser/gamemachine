@@ -1,35 +1,39 @@
 ﻿#include "stdafx.h"
 #include "gmshader.h"
 
-GMS_TextureMod& GMTextureSampler::getTexMod(GMsize_t index)
+GMS_TextureTransform& GMTextureSampler::getTextureTransform(GMsize_t index)
 {
 	D(d);
-	return d->texMod[index];
+	return d->texTransform[index];
 }
 
-void GMTextureSampler::setTexMod(GMsize_t index, const GMS_TextureMod& mod)
+void GMTextureSampler::setTextureTransform(GMsize_t index, const GMS_TextureTransform& trans)
 {
 	D(d);
-	d->texMod[index] = mod;
+	d->texTransform[index] = trans;
 }
 
 ITexture* GMTextureSampler::getFrameByIndex(GMsize_t frameIndex)
 {
 	D(d);
-	return d->frames[frameIndex];
+	GM_ASSERT(!d->frames[frameIndex].isEmpty());
+	GM_ASSERT(d->frames[frameIndex].getType() == GMAssetType::Texture);
+	return d->frames[frameIndex].getTexture();
 }
 
-GMsize_t GMTextureSampler::addFrame(ITexture* oneFrame)
+GMsize_t GMTextureSampler::addFrame(GMTextureAsset texture)
 {
 	D(d);
-	d->frames[d->frameCount] = oneFrame;
+	GM_ASSERT(texture.getType() == GMAssetType::Texture);
+	d->frames[d->frameCount] = texture;
 	++d->frameCount;
 	return d->frameCount;
 }
 
-bool GMTextureSampler::setTexture(GMsize_t frameIndex, ITexture* texture)
+bool GMTextureSampler::setTexture(GMsize_t frameIndex, GMTextureAsset texture)
 {
 	D(d);
+	GM_ASSERT(texture.getType() == GMAssetType::Texture);
 	if (frameIndex >= d->frameCount)
 		return false;
 
@@ -46,9 +50,9 @@ GMTextureSampler& GMTextureSampler::operator=(const GMTextureSampler& rhs)
 	{
 		d->frames[i] = rhs_d->frames[i];
 	}
-	for (GMint i = 0; i < MAX_TEX_MOD; i++)
+	for (GMint i = 0; i < MAX_TEX_TRANS; i++)
 	{
-		d->texMod[i] = rhs_d->texMod[i];
+		d->texTransform[i] = rhs_d->texTransform[i];
 	}
 	return *this;
 }
@@ -56,8 +60,8 @@ GMTextureSampler& GMTextureSampler::operator=(const GMTextureSampler& rhs)
 void GMTextureSampler::applyTexMode(GMfloat timeSeconds, std::function<void(GMS_TextureTransformType, Pair<GMfloat, GMfloat>&&)> callback)
 {
 	GMuint n = 0;
-	const GMS_TextureMod& tc = getTexMod(n);
-	while (n < MAX_TEX_MOD && tc.type != GMS_TextureTransformType::NoTextureTransform)
+	const GMS_TextureTransform& tc = getTextureTransform(n);
+	while (n < MAX_TEX_TRANS && tc.type != GMS_TextureTransformType::NoTextureTransform)
 	{
 		switch (tc.type)
 		{

@@ -403,7 +403,7 @@ void GMSprite2DGameObject::setDepth(GMfloat depth)
 	}
 }
 
-void GMSprite2DGameObject::setTexture(ITexture* tex)
+void GMSprite2DGameObject::setTexture(GMAsset tex)
 {
 	D(d);
 	if (d->texture != tex)

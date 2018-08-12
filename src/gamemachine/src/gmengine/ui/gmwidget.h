@@ -1,6 +1,7 @@
 ﻿#ifndef __GMCANVAS_H__
 #define __GMCANVAS_H__
 #include <gmcommon.h>
+#include <gmassets.h>
 BEGIN_NS
 
 class GMControl;
@@ -92,7 +93,7 @@ struct GMTextureArea
 
 struct GMCanvasTextureInfo
 {
-	GMOwnedPtr<ITexture> texture;
+	GMAsset texture;
 	GMint width = 0;
 	GMint height = 0;
 };
@@ -131,7 +132,7 @@ public:
 public:
 	ITypoEngine* getTypoEngine();
 	const GMCanvasTextureInfo& getTexture(TextureType type);
-	void addTexture(TextureType type, ITexture* texture, GMint width, GMint height);
+	void addTexture(TextureType type, GMAsset texture, GMint width, GMint height);
 
 	virtual const IRenderContext* getContext()
 	{

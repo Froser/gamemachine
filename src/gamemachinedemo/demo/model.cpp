@@ -44,10 +44,8 @@ void Demo_Model::init()
 
 	// 创建对象
 	getDemoWorldReference().reset(new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext()));
-
-	gm::ITexture* texture = nullptr;
-	gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "bnp.png", &texture);
-	getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Texture, texture));
+	gm::GMTextureAsset texture = gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "bnp.png");
+	getDemoWorldReference()->getAssets().addAsset(texture);
 
 	gm::GMGamePackage& pk = *GM.getGamePackageManager();
 	gm::GMModelLoadSettings loadSettings(

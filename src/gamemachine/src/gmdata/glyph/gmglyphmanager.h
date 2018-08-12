@@ -2,6 +2,7 @@
 #define __GLYPHMANAGER_H__
 #include <gmcommon.h>
 #include <map>
+#include <gmassets.h>
 
 BEGIN_NS
 
@@ -68,7 +69,7 @@ public:
 	GMFontHandle addFontByFullName(const GMString& fontFullName);
 
 public:
-	virtual ITexture* glyphTexture() = 0;
+	virtual GMTextureAsset glyphTexture() = 0;
 
 public:
 	inline GMFontHandle getSimHei()

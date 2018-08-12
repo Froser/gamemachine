@@ -53,7 +53,7 @@ namespace
 
 	bool operator <(const GMCanvasTextureInfo& lhs, const GMCanvasTextureInfo& rhs)
 	{
-		return lhs.texture < rhs.texture;
+		return lhs.texture.getAsset() < rhs.texture.getAsset();
 	}
 }
 
@@ -164,14 +164,14 @@ GMWidgetResourceManager::GMWidgetResourceManager(const IRenderContext* context)
 	d->borderObject->setContext(context);
 
 	GM.getFactory()->createWhiteTexture(context, &d->whiteTexture);
-	addTexture(GMWidgetResourceManager::WhiteTexture, d->whiteTexture, 1, 1);
+	addTexture(GMWidgetResourceManager::WhiteTexture, GMAsset(GMAssetType::Texture, d->whiteTexture), 1, 1);
 }
 
-void GMWidgetResourceManager::addTexture(TextureType type, ITexture* texture, GMint width, GMint height)
+void GMWidgetResourceManager::addTexture(TextureType type, GMAsset texture, GMint width, GMint height)
 {
 	D(d);
 	GMCanvasTextureInfo texInfo;
-	texInfo.texture.reset(texture);
+	texInfo.texture = texture;
 	texInfo.width = width;
 	texInfo.height = height;
 
@@ -548,7 +548,7 @@ void GMWidget::drawSprite(
 	GMSprite2DGameObject* spriteObject = d->manager->getSpriteObject();
 	spriteObject->setDepth(depth);
 	spriteObject->setGeometry(targetRc);
-	spriteObject->setTexture(texInfo.texture.get());
+	spriteObject->setTexture(texInfo.texture);
 	spriteObject->setTextureRect(textureRc);
 	spriteObject->setTextureSize(texInfo.width, texInfo.height);
 	spriteObject->setColor(style.getTextureColor().getCurrent());
@@ -577,7 +577,7 @@ void GMWidget::drawRect(
 	GMSprite2DGameObject* spriteObject = isOpaque ? d->manager->getOpaqueSpriteObject() : d->manager->getSpriteObject();
 	spriteObject->setDepth(depth);
 	spriteObject->setGeometry(targetRc);
-	spriteObject->setTexture(texInfo.texture.get());
+	spriteObject->setTexture(texInfo.texture);
 	spriteObject->setTextureRect(textureRc);
 	spriteObject->setTextureSize(texInfo.width, texInfo.height);
 	spriteObject->setColor(bkColor);
@@ -605,7 +605,7 @@ void GMWidget::drawBorder(
 	GMBorder2DGameObject* borderObject = d->manager->getBorderObject();
 	borderObject->setDepth(depth);
 	borderObject->setGeometry(targetRc);
-	borderObject->setTexture(texInfo.texture.get());
+	borderObject->setTexture(texInfo.texture);
 	borderObject->setTextureRect(textureRc);
 	borderObject->setTextureSize(texInfo.width, texInfo.height);
 	borderObject->setColor(style.getTextureColor().getCurrent());

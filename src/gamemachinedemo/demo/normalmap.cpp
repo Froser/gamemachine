@@ -32,11 +32,10 @@ void Demo_NormalMap::init()
 			shader.getMaterial().shininess = 20;
 
 			auto pk = gm::GameMachine::instance().getGamePackageManager();
-			gm::ITexture* tex = nullptr;
-			gm::GMToolUtil::createTexture(world->getContext(), "bnp.png", &tex);
+			gm::GMTextureAsset tex = gm::GMToolUtil::createTexture(world->getContext(), "bnp.png");
 			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::NormalMap);
 			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::Diffuse);
-			world->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Texture, tex));
+			world->getAssets().addAsset(tex);
 		}
 	} cb(asDemoGameWorld(getDemoWorldReference()));
 

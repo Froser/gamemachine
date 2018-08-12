@@ -565,10 +565,8 @@ bool GMBSPGameWorld::setMaterialTexture(T& face, REF GMShader& shader)
 		if (asset.isEmpty())
 			return false;
 
-		ITexture* texture = asset.getTexture();
-		GM_ASSERT(texture);
 		shader.getMaterial().ks = shader.getMaterial().kd = GMVec3(0);
-		shader.getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(texture);
+		shader.getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(asset);
 	}
 	return true;
 }
@@ -584,7 +582,7 @@ void GMBSPGameWorld::setMaterialLightmap(GMint lightmapid, REF GMShader& shader)
 	else
 		id = lightmapid >= 0 ? lightmapid : WHITE_LIGHTMAP;
 
-	ITexture* texture = getAssets().getAsset(GM_ASSET_LIGHTMAPS + std::to_string(id)).getTexture();
+	GMAsset texture = getAssets().getAsset(GM_ASSET_LIGHTMAPS + std::to_string(id));
 	shader.getTextureList().getTextureSampler(GMTextureType::Lightmap).addFrame(texture);
 }
 

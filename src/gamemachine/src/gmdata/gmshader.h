@@ -4,15 +4,16 @@
 #include <gmenums.h>
 #include <linearmath.h>
 #include <gmtools.h>
+#include <gmassets.h>
 BEGIN_NS
 
 enum
 {
 	MAX_ANIMATION_FRAME = 16,
-	MAX_TEX_MOD = 3,
+	MAX_TEX_TRANS = 3,
 };
 
-GM_ALIGNED_STRUCT(GMS_TextureMod)
+GM_ALIGNED_STRUCT(GMS_TextureTransform)
 {
 	GMS_TextureTransformType type = GMS_TextureTransformType::NoTextureTransform;
 	GMfloat p1 = 0;
@@ -21,8 +22,8 @@ GM_ALIGNED_STRUCT(GMS_TextureMod)
 
 GM_PRIVATE_OBJECT(GMTextureSampler)
 {
-	Array<ITexture*, MAX_ANIMATION_FRAME> frames = { 0 }; // 每个texture由TEXTURE_INDEX_MAX个纹理动画组成。静态纹理的纹理动画数量为1
-	Array<GMS_TextureMod, MAX_TEX_MOD> texMod;
+	Array<GMTextureAsset, MAX_ANIMATION_FRAME> frames; // 每个texture由TEXTURE_INDEX_MAX个纹理动画组成。静态纹理的纹理动画数量为1
+	Array<GMS_TextureTransform, MAX_TEX_TRANS> texTransform;
 	GMsize_t frameCount = 0;
 	GMint animationMs = 1; //每一帧动画间隔 (ms)
 	GMS_TextureFilter magFilter = GMS_TextureFilter::Linear;
@@ -48,11 +49,11 @@ public:
 	GMTextureSampler(const GMTextureSampler&) = delete;
 
 public:
-	GMS_TextureMod& getTexMod(GMsize_t index);
-	void setTexMod(GMsize_t index, const GMS_TextureMod& mod);
+	GMS_TextureTransform& getTextureTransform(GMsize_t index);
+	void setTextureTransform(GMsize_t index, const GMS_TextureTransform& mod);
 	ITexture* getFrameByIndex(GMsize_t frameIndex);
-	GMsize_t addFrame(ITexture* oneFrame);
-	bool setTexture(GMsize_t frameIndex, ITexture* texture);
+	GMsize_t addFrame(GMTextureAsset texture);
+	bool setTexture(GMsize_t frameIndex, GMTextureAsset texture);
 	void applyTexMode(GMfloat timeSeconds, std::function<void(GMS_TextureTransformType, Pair<GMfloat, GMfloat>&&)> callback);
 	GMTextureSampler& operator=(const GMTextureSampler& rhs);
 };

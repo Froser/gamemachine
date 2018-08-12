@@ -220,7 +220,7 @@ void GMCubeMapGameObject::createCubeMap(ITexture* texture)
 
 	GMModel* model = new GMModel();
 	model->setType(GMModelType::CubeMap);
-	model->getShader().getTextureList().getTextureSampler(GMTextureType::CubeMap).addFrame(texture);
+	model->getShader().getTextureList().getTextureSampler(GMTextureType::CubeMap).addFrame(GMAsset(GMAssetType::Texture, texture));
 	GMMesh* mesh = new GMMesh(model);
 	for (GMuint i = 0; i < 12; i++)
 	{

@@ -509,7 +509,7 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 	*obj = model;
 }
 
-void GMToolUtil::createTexture(const IRenderContext* context, const GMString& filename, OUT ITexture** texture, REF GMint* width, REF GMint* height)
+GMTextureAsset GMToolUtil::createTexture(const IRenderContext* context, const GMString& filename, REF GMint* width, REF GMint* height)
 {
 	GMImage* img = nullptr;
 	GMBuffer buf;
@@ -517,7 +517,8 @@ void GMToolUtil::createTexture(const IRenderContext* context, const GMString& fi
 	GMImageReader::load(buf.buffer, buf.size, &img);
 	GM_ASSERT(img);
 
-	GM.getFactory()->createTexture(context, img, texture);
+	ITexture* texture = nullptr;
+	GM.getFactory()->createTexture(context, img, &texture);
 	GM_ASSERT(texture);
 
 	if (width)
@@ -527,6 +528,7 @@ void GMToolUtil::createTexture(const IRenderContext* context, const GMString& fi
 		*height = img->getHeight();
 
 	GM_delete(img);
+	return GMAsset(GMAssetType::Texture, texture);
 }
 
 void GMToolUtil::createTextureFromFullPath(const IRenderContext* context, const GMString& filename, OUT ITexture** texture, REF GMint* width, REF GMint* height)
@@ -552,6 +554,13 @@ void GMToolUtil::createTextureFromFullPath(const IRenderContext* context, const 
 void GMToolUtil::addTextureToShader(GMShader& shader, ITexture* texture, GMTextureType type)
 {
 	auto& frames = shader.getTextureList().getTextureSampler(type);
+	frames.addFrame(GMAsset(GMAssetType::Texture, texture));
+}
+
+void GMToolUtil::addTextureToShader(GMShader& shader, GMAsset texture, GMTextureType type)
+{
+	GM_ASSERT(texture.getType() == GMAssetType::Texture);
+	auto& frames = shader.getTextureList().getTextureSampler(type);
 	frames.addFrame(texture);
 }
 
@@ -562,16 +571,16 @@ bool GMToolUtil::createPBRTextures(
 	const GMString& roughnessPath,
 	const GMString& aoPath,
 	const GMString& normalPath,
-	OUT ITexture** albedoTexture,
-	OUT ITexture** metallicRoughnessAoTexture,
-	OUT ITexture** normalTexture
+	REF GMTextureAsset& albedoTexture,
+	REF GMTextureAsset& metallicRoughnessAoTexture,
+	REF GMTextureAsset& normalTexture
 )
 {
 	bool useWhiteAO = aoPath.isEmpty();
 
-	GMToolUtil::createTexture(context, albedoPath, albedoTexture);
-	GMToolUtil::createTexture(context, normalPath, normalTexture);
-	if (!albedoTexture || !metallicRoughnessAoTexture)
+	albedoTexture = GMToolUtil::createTexture(context, albedoPath);
+	normalTexture = GMToolUtil::createTexture(context, normalPath);
+	if (albedoTexture.isEmpty() || normalPath.isEmpty())
 		return false;
 
 	GMBuffer metallicBuf, roughnessBuf, aoBuf;
@@ -626,7 +635,10 @@ bool GMToolUtil::createPBRTextures(
 			data.mip[0].data[p + 3] = 0xFF;
 		}
 
-		GM.getFactory()->createTexture(context, &combinedImage, metallicRoughnessAoTexture);
+		ITexture* coreMetallicRoughnessAoTexture = nullptr;
+		GM.getFactory()->createTexture(context, &combinedImage, &coreMetallicRoughnessAoTexture);
+		metallicRoughnessAoTexture = GMAsset(GMAssetType::Texture, coreMetallicRoughnessAoTexture);
+
 		GM_delete(metallicImg);
 		GM_delete(roughnessImg);
 		GM_delete(aoImg);

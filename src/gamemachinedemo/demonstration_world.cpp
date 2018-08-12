@@ -478,12 +478,11 @@ void DemonstrationWorld::init()
 
 	// 创建画布
 	d->manager = new gm::GMWidgetResourceManager(getContext());
-	gm::ITexture* texture = nullptr;
 	gm::GMint width, height;
-	gm::GMToolUtil::createTexture(getContext(), "skin.png", &texture, &width, &height);
+	gm::GMTextureAsset texture = gm::GMToolUtil::createTexture(getContext(), "skin.png", &width, &height);
 	d->manager->addTexture(gm::GMWidgetResourceManager::Skin, texture, width, height);
 
-	gm::GMToolUtil::createTexture(getContext(), "border.png", &texture, &width, &height);
+	texture = gm::GMToolUtil::createTexture(getContext(), "border.png", &width, &height);
 	d->manager->addTexture(gm::GMWidgetResourceManager::Border, texture, width, height);
 
 	d->mainWidget = new gm::GMWidget(d->manager);

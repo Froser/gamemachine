@@ -40,17 +40,16 @@ struct GMPrimitiveCreator
 */
 struct GMToolUtil
 {
-	//! 创建一个纹理，它来源于某路径。
+	//! 创建一个纹理，它来源于某路径。返回一个该纹理的资产。
 	/*!
 	  此方法封装了纹理读取和添加纹理等方法。请在调用前确认GMGamePackage已经初始化。
 	  \param context 当前绘制环境上下文。
 	  \param filename 需要读取纹理的路径。它是一个相对于纹理目录的相对路径。
-	  \param texture 得到的纹理将通过此指针返回。
 	  \param width 纹理首层的宽度。可以为空。
 	  \param height 纹理首层的高度。可以为空。
 	  \sa GMGamePackage
 	*/
-	static void createTexture(const IRenderContext* context, const GMString& filename, OUT ITexture** texture, REF GMint* width = nullptr, REF GMint* height = nullptr);
+	static GMTextureAsset createTexture(const IRenderContext* context, const GMString& filename, REF GMint* width = nullptr, REF GMint* height = nullptr);
 
 	static void createTextureFromFullPath(const IRenderContext* context, const GMString& filename, OUT ITexture** texture, REF GMint* width = nullptr, REF GMint* height = nullptr);
 
@@ -63,6 +62,15 @@ struct GMToolUtil
 	*/
 	static void addTextureToShader(gm::GMShader& shader, ITexture* texture, GMTextureType type);
 
+	//! 将一个纹理添加到一个模型中。
+	/*!
+	  此方法会将模型添加到纹理动画列表的第1帧中。
+	  \param shader 目标模型的着色器设置。
+	  \param texture 待添加纹理资产，它必须是纹理类型。
+	  \param type 纹理类型。
+	*/
+	static void addTextureToShader(gm::GMShader& shader, GMAsset texture, GMTextureType type);
+
 	static bool createPBRTextures(
 		const IRenderContext* context,
 		const GMString& albedoPath,
@@ -70,9 +78,9 @@ struct GMToolUtil
 		const GMString& roughnessPath,
 		const GMString& aoPath,
 		const GMString& normalPath,
-		OUT ITexture** albedoTexture,
-		OUT ITexture** metallicRoughnessAoTexture,
-		OUT ITexture** normalTexture
+		REF GMTextureAsset& albedoTexture,
+		REF GMTextureAsset& metallicRoughnessAoTexture,
+		REF GMTextureAsset& normalTexture
 	);
 
 	static void createCocos2DParticleSystem(const GMString& filename, OUT GMParticleSystem** particleSystem);

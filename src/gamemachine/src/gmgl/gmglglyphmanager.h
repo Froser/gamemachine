@@ -9,7 +9,7 @@ GM_PRIVATE_OBJECT(GMGLGlyphManager)
 {
 	GMint cursor_u, cursor_v;
 	GMfloat maxHeight;
-	GMGLGlyphTexture* texture;
+	GMTextureAsset texture;
 };
 
 class GMGLGlyphManager : public GMGlyphManager
@@ -21,7 +21,7 @@ public:
 	~GMGLGlyphManager();
 
 public:
-	virtual ITexture* glyphTexture() override;
+	virtual GMTextureAsset glyphTexture() override;
 
 protected:
 	void updateTexture(const GMGlyphBitmap& bitmapGlyph, const GMGlyphInfo& glyphInfo) override;

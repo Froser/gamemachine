@@ -36,9 +36,9 @@ void Demo_Phong_PBR::init()
 		gm::GMPrimitiveCreator::createSphere(1.0f, 64, 64, &sphere);
 		gm::GMShader& shader = sphere->getShader();
 		shader.setIlluminationModel(gm::GMIlluminationModel::CookTorranceBRDF);
-		gm::ITexture* albedo = nullptr;
-		gm::ITexture* metallicRoughnessAO = nullptr;
-		gm::ITexture* normal = nullptr;
+		gm::GMTextureAsset albedo;
+		gm::GMTextureAsset metallicRoughnessAO;
+		gm::GMTextureAsset normal;
 		gm::GMToolUtil::createPBRTextures(
 			getDemoWorldReference()->getContext(),
 			"pbr/albedo.png",
@@ -46,18 +46,18 @@ void Demo_Phong_PBR::init()
 			"pbr/roughness.png",
 			"",
 			"pbr/normal.png",
-			&albedo,
-			&metallicRoughnessAO,
-			&normal
+			albedo,
+			metallicRoughnessAO,
+			normal
 		);
 
-		getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Texture, albedo));
+		getDemoWorldReference()->getAssets().addAsset(albedo);
 		gm::GMToolUtil::addTextureToShader(shader, albedo, gm::GMTextureType::Albedo);
 
-		getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Texture, normal));
+		getDemoWorldReference()->getAssets().addAsset(normal);
 		gm::GMToolUtil::addTextureToShader(shader, normal, gm::GMTextureType::NormalMap);
 
-		getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Texture, metallicRoughnessAO));
+		getDemoWorldReference()->getAssets().addAsset(metallicRoughnessAO);
 		gm::GMToolUtil::addTextureToShader(shader, metallicRoughnessAO, gm::GMTextureType::MetallicRoughnessAO);
 
 		gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, sphere));
@@ -75,15 +75,13 @@ void Demo_Phong_PBR::init()
 		shader.getMaterial().kd = GMVec3(0.05f);
 		shader.getMaterial().shininess = 99;
 
-		gm::ITexture* diffuse = nullptr;
-		gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "pbr/albedo.png", &diffuse);
-		gm::ITexture* normal = nullptr;
-		gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "pbr/normal.png", &normal);
+		gm::GMTextureAsset albedo = gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "pbr/albedo.png");
+		gm::GMTextureAsset normal = gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "pbr/normal.png");
 
-		getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Texture, diffuse));
-		gm::GMToolUtil::addTextureToShader(shader, diffuse, gm::GMTextureType::Diffuse);
+		getDemoWorldReference()->getAssets().addAsset(albedo);
+		gm::GMToolUtil::addTextureToShader(shader, albedo, gm::GMTextureType::Diffuse);
 
-		getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Texture, normal));
+		getDemoWorldReference()->getAssets().addAsset(normal);
 		gm::GMToolUtil::addTextureToShader(shader, normal, gm::GMTextureType::NormalMap);
 
 		gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, sphere));
