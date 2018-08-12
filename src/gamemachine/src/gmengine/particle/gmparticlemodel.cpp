@@ -16,11 +16,11 @@ GMGameObject* GMParticleModel_2D::createGameObject(
 	D(d);
 	GMGameObject* object = new GMGameObject();
 	d->particleModel.reset(new GMModel());
-	d->particleModel->getShader().setCull(GMS_Cull::NONE);
+	d->particleModel->getShader().setCull(GMS_Cull::None);
 	d->particleModel->getShader().setBlend(true);
 	d->particleModel->getShader().setNoDepthTest(true);
-	d->particleModel->getShader().setBlendFactorSource(GMS_BlendFunc::SRC_ALPHA);
-	d->particleModel->getShader().setBlendFactorDest(GMS_BlendFunc::ONE);
+	d->particleModel->getShader().setBlendFactorSource(GMS_BlendFunc::SourceAlpha);
+	d->particleModel->getShader().setBlendFactorDest(GMS_BlendFunc::One);
 	d->particleModel->setUsageHint(GMUsageHint::DynamicDraw);
 	d->particleModel->setType(GMModelType::Particle);
 

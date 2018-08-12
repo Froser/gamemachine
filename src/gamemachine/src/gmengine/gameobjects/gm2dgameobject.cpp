@@ -65,14 +65,14 @@ void GM2DGameObjectBase::setShader(GMShader& shader)
 {
 	GMGlyphManager* glyphManager = getContext()->getEngine()->getGlyphManager();
 	auto& frame = shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
-	frame.setMinFilter(GMS_TextureFilter::LINEAR);
-	frame.setMagFilter(GMS_TextureFilter::LINEAR);
+	frame.setMinFilter(GMS_TextureFilter::Linear);
+	frame.setMagFilter(GMS_TextureFilter::Linear);
 	frame.addFrame(glyphManager->glyphTexture());
 	shader.setNoDepthTest(true);
-	shader.setCull(GMS_Cull::NONE);
+	shader.setCull(GMS_Cull::None);
 	shader.setBlend(true);
-	shader.setBlendFactorSource(GMS_BlendFunc::SRC_ALPHA);
-	shader.setBlendFactorDest(GMS_BlendFunc::ONE_MINUS_SRC_ALPHA);
+	shader.setBlendFactorSource(GMS_BlendFunc::SourceAlpha);
+	shader.setBlendFactorDest(GMS_BlendFunc::OneMinusSourceAlpha);
 }
 
 GMTextGameObject::GMTextGameObject(const GMRect& renderRc)

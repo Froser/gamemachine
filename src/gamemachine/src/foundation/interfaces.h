@@ -407,12 +407,12 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	  \sa drawObjects(), endBlend()
 	*/
 	virtual void beginBlend(
-		GMS_BlendFunc sfactorRGB = GMS_BlendFunc::ONE,
-		GMS_BlendFunc dfactorRGB = GMS_BlendFunc::ONE,
-		GMS_BlendOp opRGB = GMS_BlendOp::ADD,
-		GMS_BlendFunc sfactorAlpha = GMS_BlendFunc::ONE,
-		GMS_BlendFunc dfactorAlpha = GMS_BlendFunc::ONE,
-		GMS_BlendOp opAlpha = GMS_BlendOp::ADD
+		GMS_BlendFunc sfactorRGB = GMS_BlendFunc::One,
+		GMS_BlendFunc dfactorRGB = GMS_BlendFunc::One,
+		GMS_BlendOp opRGB = GMS_BlendOp::Add,
+		GMS_BlendFunc sfactorAlpha = GMS_BlendFunc::One,
+		GMS_BlendFunc dfactorAlpha = GMS_BlendFunc::One,
+		GMS_BlendOp opAlpha = GMS_BlendOp::Add
 	) = 0;
 
 	//! 结束融合绘制。

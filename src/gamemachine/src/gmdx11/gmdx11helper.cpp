@@ -109,10 +109,10 @@ const D3D11_SAMPLER_DESC& GMDx11Helper::GMGetDx11DefaultSamplerDesc()
 D3D11_FILTER GMDx11Helper::GMGetDx11Filter(GMS_TextureFilter min, GMS_TextureFilter mag)
 {
 	//TODO 缺少mip过滤
-	if (min == GMS_TextureFilter::LINEAR && mag == GMS_TextureFilter::LINEAR)
+	if (min == GMS_TextureFilter::Linear && mag == GMS_TextureFilter::Linear)
 		return D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 
-	if (min == GMS_TextureFilter::NEAREST && mag == GMS_TextureFilter::NEAREST)
+	if (min == GMS_TextureFilter::Nearest && mag == GMS_TextureFilter::Nearest)
 		return D3D11_FILTER_MIN_MAG_MIP_POINT;
 
 	//TODO

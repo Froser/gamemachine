@@ -168,35 +168,35 @@ void GMGLTexture::bindSampler(GMTextureSampler* sampler)
 		glBindTexture(d->target, d->id);
 		// Apply params
 		glTexParameteri(d->target, GL_TEXTURE_MIN_FILTER,
-			sampler->getMinFilter() == GMS_TextureFilter::LINEAR ? GL_LINEAR :
-			sampler->getMinFilter() == GMS_TextureFilter::NEAREST ? GL_NEAREST :
-			sampler->getMinFilter() == GMS_TextureFilter::LINEAR_MIPMAP_LINEAR ? GL_LINEAR_MIPMAP_LINEAR :
-			sampler->getMinFilter() == GMS_TextureFilter::NEAREST_MIPMAP_LINEAR ? GL_NEAREST_MIPMAP_LINEAR :
-			sampler->getMinFilter() == GMS_TextureFilter::LINEAR_MIPMAP_NEAREST ? GL_LINEAR_MIPMAP_NEAREST :
-			sampler->getMinFilter() == GMS_TextureFilter::NEAREST_MIPMAP_NEAREST ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR
+			sampler->getMinFilter() == GMS_TextureFilter::Linear ? GL_LINEAR :
+			sampler->getMinFilter() == GMS_TextureFilter::Nearest ? GL_NEAREST :
+			sampler->getMinFilter() == GMS_TextureFilter::LinearMipmapLinear ? GL_LINEAR_MIPMAP_LINEAR :
+			sampler->getMinFilter() == GMS_TextureFilter::NearestMipmapNearest ? GL_NEAREST_MIPMAP_LINEAR :
+			sampler->getMinFilter() == GMS_TextureFilter::LinearMipmapNearest ? GL_LINEAR_MIPMAP_NEAREST :
+			sampler->getMinFilter() == GMS_TextureFilter::NearestMipmapNearest ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR
 		);
 
 		glTexParameteri(d->target, GL_TEXTURE_MAG_FILTER,
-			sampler->getMagFilter() == GMS_TextureFilter::LINEAR ? GL_LINEAR :
-			sampler->getMagFilter() == GMS_TextureFilter::NEAREST ? GL_NEAREST :
-			sampler->getMagFilter() == GMS_TextureFilter::LINEAR_MIPMAP_LINEAR ? GL_LINEAR_MIPMAP_LINEAR :
-			sampler->getMagFilter() == GMS_TextureFilter::NEAREST_MIPMAP_LINEAR ? GL_NEAREST_MIPMAP_LINEAR :
-			sampler->getMagFilter() == GMS_TextureFilter::LINEAR_MIPMAP_NEAREST ? GL_LINEAR_MIPMAP_NEAREST :
-			sampler->getMagFilter() == GMS_TextureFilter::NEAREST_MIPMAP_NEAREST ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR
+			sampler->getMagFilter() == GMS_TextureFilter::Linear ? GL_LINEAR :
+			sampler->getMagFilter() == GMS_TextureFilter::Nearest ? GL_NEAREST :
+			sampler->getMagFilter() == GMS_TextureFilter::LinearMipmapLinear ? GL_LINEAR_MIPMAP_LINEAR :
+			sampler->getMagFilter() == GMS_TextureFilter::NearestMipmapNearest ? GL_NEAREST_MIPMAP_LINEAR :
+			sampler->getMagFilter() == GMS_TextureFilter::LinearMipmapNearest ? GL_LINEAR_MIPMAP_NEAREST :
+			sampler->getMagFilter() == GMS_TextureFilter::NearestMipmapNearest ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR
 		);
 
 		glTexParameteri(d->target, GL_TEXTURE_WRAP_S,
-			sampler->getWrapS() == GMS_Wrap::REPEAT ? GL_REPEAT :
-			sampler->getWrapS() == GMS_Wrap::CLAMP_TO_EDGE ? GL_CLAMP_TO_EDGE :
-			sampler->getWrapS() == GMS_Wrap::CLAMP_TO_BORDER ? GL_CLAMP_TO_BORDER :
-			sampler->getWrapS() == GMS_Wrap::MIRRORED_REPEAT ? GL_MIRRORED_REPEAT : GL_REPEAT
+			sampler->getWrapS() == GMS_Wrap::Repeat ? GL_REPEAT :
+			sampler->getWrapS() == GMS_Wrap::ClampToEdge ? GL_CLAMP_TO_EDGE :
+			sampler->getWrapS() == GMS_Wrap::ClampToBorder ? GL_CLAMP_TO_BORDER :
+			sampler->getWrapS() == GMS_Wrap::MirroredRepeat ? GL_MIRRORED_REPEAT : GL_REPEAT
 		);
 
 		glTexParameteri(d->target, GL_TEXTURE_WRAP_T,
-			sampler->getWrapT() == GMS_Wrap::REPEAT ? GL_REPEAT :
-			sampler->getWrapT() == GMS_Wrap::CLAMP_TO_EDGE ? GL_CLAMP_TO_EDGE :
-			sampler->getWrapT() == GMS_Wrap::CLAMP_TO_BORDER ? GL_CLAMP_TO_BORDER :
-			sampler->getWrapT() == GMS_Wrap::MIRRORED_REPEAT ? GL_MIRRORED_REPEAT : GL_REPEAT
+			sampler->getWrapT() == GMS_Wrap::Repeat ? GL_REPEAT :
+			sampler->getWrapT() == GMS_Wrap::ClampToEdge ? GL_CLAMP_TO_EDGE :
+			sampler->getWrapT() == GMS_Wrap::ClampToBorder ? GL_CLAMP_TO_BORDER :
+			sampler->getWrapT() == GMS_Wrap::MirroredRepeat ? GL_MIRRORED_REPEAT : GL_REPEAT
 		);
 
 		if (d->target == GL_TEXTURE_CUBE_MAP)

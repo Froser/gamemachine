@@ -14,7 +14,7 @@ enum
 
 GM_ALIGNED_STRUCT(GMS_TextureMod)
 {
-	GMS_TextureModType type = GMS_TextureModType::NO_TEXTURE_MOD;
+	GMS_TextureTransformType type = GMS_TextureTransformType::NoTextureTransform;
 	GMfloat p1 = 0;
 	GMfloat p2 = 0;
 };
@@ -25,10 +25,10 @@ GM_PRIVATE_OBJECT(GMTextureSampler)
 	Array<GMS_TextureMod, MAX_TEX_MOD> texMod;
 	GMsize_t frameCount = 0;
 	GMint animationMs = 1; //每一帧动画间隔 (ms)
-	GMS_TextureFilter magFilter = GMS_TextureFilter::LINEAR;
-	GMS_TextureFilter minFilter = GMS_TextureFilter::LINEAR_MIPMAP_LINEAR;
-	GMS_Wrap wrapS = GMS_Wrap::REPEAT;
-	GMS_Wrap wrapT = GMS_Wrap::REPEAT;
+	GMS_TextureFilter magFilter = GMS_TextureFilter::Linear;
+	GMS_TextureFilter minFilter = GMS_TextureFilter::LinearMipmapLinear;
+	GMS_Wrap wrapS = GMS_Wrap::Repeat;
+	GMS_Wrap wrapT = GMS_Wrap::Repeat;
 };
 
 class GMTextureSampler : public GMObject
@@ -53,7 +53,7 @@ public:
 	ITexture* getFrameByIndex(GMsize_t frameIndex);
 	GMsize_t addFrame(ITexture* oneFrame);
 	bool setTexture(GMsize_t frameIndex, ITexture* texture);
-	void applyTexMode(GMfloat timeSeconds, std::function<void(GMS_TextureModType, Pair<GMfloat, GMfloat>&&)> callback);
+	void applyTexMode(GMfloat timeSeconds, std::function<void(GMS_TextureTransformType, Pair<GMfloat, GMfloat>&&)> callback);
 	GMTextureSampler& operator=(const GMTextureSampler& rhs);
 };
 
@@ -189,15 +189,15 @@ GM_PRIVATE_OBJECT(GMShader)
 {
 	GMIlluminationModel illuminationModel = GMIlluminationModel::Phong;
 	GMuint surfaceFlag = 0;
-	GMS_Cull cull = GMS_Cull::CULL;
+	GMS_Cull cull = GMS_Cull::Cull;
 	GMS_FrontFace frontFace = GMS_FrontFace::CLOCKWISE;
-	GMS_BlendFunc blendFactorSrcRGB = GMS_BlendFunc::ZERO;
-	GMS_BlendFunc blendFactorDestRGB = GMS_BlendFunc::ZERO;
-	GMS_BlendFunc blendFactorSrcAlpha = GMS_BlendFunc::ZERO;
-	GMS_BlendFunc blendFactorDestAlpha = GMS_BlendFunc::ZERO;
-	GMS_BlendOp blendOpRGB = GMS_BlendOp::ADD;
-	GMS_BlendOp blendOpAlpha = GMS_BlendOp::ADD;
-	GMS_VertexColorOp vertexColorOp = GMS_VertexColorOp::NO_VERTEX_COLOR;
+	GMS_BlendFunc blendFactorSrcRGB = GMS_BlendFunc::Zero;
+	GMS_BlendFunc blendFactorDestRGB = GMS_BlendFunc::Zero;
+	GMS_BlendFunc blendFactorSrcAlpha = GMS_BlendFunc::Zero;
+	GMS_BlendFunc blendFactorDestAlpha = GMS_BlendFunc::Zero;
+	GMS_BlendOp blendOpRGB = GMS_BlendOp::Add;
+	GMS_BlendOp blendOpAlpha = GMS_BlendOp::Add;
+	GMS_VertexColorOp vertexColorOp = GMS_VertexColorOp::DoNotUseVertexColor;
 	bool blend = false;
 	bool discard = false;
 	bool noDepthTest = false;

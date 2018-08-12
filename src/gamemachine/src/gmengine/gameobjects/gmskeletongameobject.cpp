@@ -70,8 +70,8 @@ void GMSkeletonGameObject::createSkeletonBonesObject()
 		// TODO 释放Asset
 		GMModel* skeletonModel = new GMModel();
 		skeletonModel->getShader().setNoDepthTest(true);
-		skeletonModel->getShader().setCull(GMS_Cull::NONE);
-		skeletonModel->getShader().setVertexColorOp(GMS_VertexColorOp::REPLACE);
+		skeletonModel->getShader().setCull(GMS_Cull::None);
+		skeletonModel->getShader().setVertexColorOp(GMS_VertexColorOp::Replace);
 		skeletonModel->setPrimitiveTopologyMode(GMTopologyMode::Lines);
 		skeletonModel->setUsageHint(GMUsageHint::DynamicDraw);
 

@@ -81,7 +81,7 @@ bool GMGameObject::canDeferredRendering()
 		if (model->getShader().getBlend() == true)
 			return false;
 
-		if (model->getShader().getVertexColorOp() == GMS_VertexColorOp::REPLACE)
+		if (model->getShader().getVertexColorOp() == GMS_VertexColorOp::Replace)
 			return false;
 	}
 	return true;

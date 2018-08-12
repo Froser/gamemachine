@@ -26,13 +26,13 @@ namespace
 	{
 		switch (wrapMode)
 		{
-		case GMS_Wrap::CLAMP_TO_BORDER:
+		case GMS_Wrap::ClampToBorder:
 			return D3D11_TEXTURE_ADDRESS_BORDER;
-		case GMS_Wrap::CLAMP_TO_EDGE:
+		case GMS_Wrap::ClampToEdge:
 			return D3D11_TEXTURE_ADDRESS_CLAMP;
-		case GMS_Wrap::REPEAT:
+		case GMS_Wrap::Repeat:
 			return D3D11_TEXTURE_ADDRESS_WRAP;
-		case GMS_Wrap::MIRRORED_REPEAT:
+		case GMS_Wrap::MirroredRepeat:
 			return D3D11_TEXTURE_ADDRESS_MIRROR;
 		default:
 			GM_ASSERT(false);

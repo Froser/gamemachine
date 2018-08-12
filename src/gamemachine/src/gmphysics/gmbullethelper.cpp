@@ -66,7 +66,7 @@ namespace
 		collisionShape2TriangleMesh(shape, origin, vertexPositions, vertexNormals, indices);
 
 		GMMesh* body = new GMMesh(out);
-		out->getShader().setCull(GMS_Cull::NONE);
+		out->getShader().setCull(GMS_Cull::None);
 		GMint faceCount = indices.size() / 3;
 		for (GMint i = 0; i < faceCount; ++i)
 		{

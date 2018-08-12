@@ -176,13 +176,13 @@ void GMGLTechnique::activateTextureTransform(GMModel* model, GMTextureType type)
 	shaderProgram->setFloat(u_scales, 1.f);
 	shaderProgram->setFloat(u_scalet, 1.f);
 
-	auto applyCallback = [&](GMS_TextureModType type, Pair<GMfloat, GMfloat>&& args) {
-		if (type == GMS_TextureModType::SCALE)
+	auto applyCallback = [&](GMS_TextureTransformType type, Pair<GMfloat, GMfloat>&& args) {
+		if (type == GMS_TextureTransformType::Scale)
 		{
 			shaderProgram->setFloat(u_scales, args.first);
 			shaderProgram->setFloat(u_scalet, args.second);
 		}
-		else if (type == GMS_TextureModType::SCROLL)
+		else if (type == GMS_TextureTransformType::Scroll)
 		{
 			shaderProgram->setFloat(u_scrolls, args.first);
 			shaderProgram->setFloat(u_scrollt, args.second);
@@ -346,7 +346,7 @@ void GMGLTechnique::applyShader(GMModel* model)
 void GMGLTechnique::prepareCull(GMModel* model)
 {
 	const GMShader& shader = model->getShader();
-	if (shader.getCull() == GMS_Cull::CULL)
+	if (shader.getCull() == GMS_Cull::Cull)
 		glEnable(GL_CULL_FACE);
 	else
 		glDisable(GL_CULL_FACE);

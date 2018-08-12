@@ -276,34 +276,34 @@ void GMGLUtility::blendFunc(
 	{
 		switch (gms_factors[i])
 		{
-		case GMS_BlendFunc::ZERO:
+		case GMS_BlendFunc::Zero:
 			factors[i] = GL_ZERO;
 			break;
-		case GMS_BlendFunc::ONE:
+		case GMS_BlendFunc::One:
 			factors[i] = GL_ONE;
 			break;
-		case GMS_BlendFunc::SRC_COLOR:
+		case GMS_BlendFunc::SourceColor:
 			factors[i] = GL_SRC_COLOR;
 			break;
-		case GMS_BlendFunc::DST_COLOR:
+		case GMS_BlendFunc::DestColor:
 			factors[i] = GL_DST_COLOR;
 			break;
-		case GMS_BlendFunc::SRC_ALPHA:
+		case GMS_BlendFunc::SourceAlpha:
 			factors[i] = GL_SRC_ALPHA;
 			break;
-		case GMS_BlendFunc::DST_ALPHA:
+		case GMS_BlendFunc::DestAlpha:
 			factors[i] = GL_DST_ALPHA;
 			break;
-		case GMS_BlendFunc::ONE_MINUS_SRC_ALPHA:
+		case GMS_BlendFunc::OneMinusSourceAlpha:
 			factors[i] = GL_ONE_MINUS_SRC_ALPHA;
 			break;
-		case GMS_BlendFunc::ONE_MINUS_DST_COLOR:
+		case GMS_BlendFunc::OneMinusDestColor:
 			factors[i] = GL_ONE_MINUS_DST_COLOR;
 			break;
-		case GMS_BlendFunc::ONE_MINUS_SRC_COLOR:
+		case GMS_BlendFunc::OneMinusSourceColor:
 			factors[i] = GL_ONE_MINUS_SRC_COLOR;
 			break;
-		case GMS_BlendFunc::ONE_MINUS_DST_ALPHA:
+		case GMS_BlendFunc::OneMinusDestAlpha:
 			factors[i] = GL_ONE_MINUS_DST_ALPHA;
 			break;
 		default:
@@ -318,13 +318,13 @@ void GMGLUtility::blendFunc(
 	{
 		switch (gms_ops[i])
 		{
-		case GMS_BlendOp::ADD:
+		case GMS_BlendOp::Add:
 			ops[i] = GL_FUNC_ADD;
 			break;
-		case GMS_BlendOp::SUBSTRACT:
+		case GMS_BlendOp::Substract:
 			ops[i] = GL_FUNC_SUBTRACT;
 			break;
-		case GMS_BlendOp::REVERSE_SUBSTRACT:
+		case GMS_BlendOp::ReverseSubstract:
 			ops[i] = GL_FUNC_REVERSE_SUBTRACT;
 			break;
 		default:

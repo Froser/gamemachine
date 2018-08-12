@@ -68,16 +68,16 @@ namespace
 	GMS_BlendFunc parseBlendFunc(const GMString& p)
 	{
 		if (p == L"GMS_ZERO")
-			return GMS_BlendFunc::ZERO;
+			return GMS_BlendFunc::Zero;
 
 		if (p == L"GMS_ONE")
-			return GMS_BlendFunc::ONE;
+			return GMS_BlendFunc::One;
 
 		if (p == L"GMS_DST_COLOR")
-			return GMS_BlendFunc::ONE;
+			return GMS_BlendFunc::One;
 
 		gm_warning(gm_dbg_wrap("Unknown blendFunc {0} treated as GMS_ZERO"), p);
-		return GMS_BlendFunc::ZERO;
+		return GMS_BlendFunc::Zero;
 	}
 
 	void loadImage(const GMString& filename, const GMBuffer* buf, OUT GMImage** image)
@@ -280,9 +280,9 @@ void GMBSPShaderLoader::parse_cull(GMShader& shader, GMXMLElement* elem)
 {
 	const char* text = elem->GetText();
 	if (GMString::stringEquals(text, "none"))
-		shader.setCull(GMS_Cull::NONE);
+		shader.setCull(GMS_Cull::None);
 	else if (GMString::stringEquals(text, "cull"))
-		shader.setCull(GMS_Cull::CULL);
+		shader.setCull(GMS_Cull::Cull);
 	else
 		gm_error(gm_dbg_wrap("wrong cull param {0}"), text);
 }
@@ -338,8 +338,8 @@ void GMBSPShaderLoader::parse_clampmap(GMShader& shader, GMXMLElement* elem)
 	if (texture)
 	{
 		// TODO: GL_CLAMP
-		sampler->setWrapS(GMS_Wrap::MIRRORED_REPEAT);
-		sampler->setWrapT(GMS_Wrap::MIRRORED_REPEAT);
+		sampler->setWrapS(GMS_Wrap::MirroredRepeat);
+		sampler->setWrapT(GMS_Wrap::MirroredRepeat);
 		sampler->addFrame(texture);
 		parse_map_tcMod(shader, elem);
 	}
@@ -356,8 +356,8 @@ void GMBSPShaderLoader::parse_map(GMShader& shader, GMXMLElement* elem)
 	ITexture* texture = addTextureToTextureContainer(elem->GetText());
 	if (texture)
 	{
-		sampler->setWrapS(GMS_Wrap::REPEAT);
-		sampler->setWrapT(GMS_Wrap::REPEAT);
+		sampler->setWrapS(GMS_Wrap::Repeat);
+		sampler->setWrapT(GMS_Wrap::Repeat);
 		sampler->addFrame(texture);
 		parse_map_tcMod(shader, elem);
 	}
@@ -403,8 +403,8 @@ void GMBSPShaderLoader::parse_normalmap(GMShader& shader, GMXMLElement* elem)
 	ITexture* texture = addTextureToTextureContainer(elem->GetText());
 	if (texture)
 	{
-		sampler->setWrapS(GMS_Wrap::REPEAT);
-		sampler->setWrapT(GMS_Wrap::REPEAT);
+		sampler->setWrapS(GMS_Wrap::Repeat);
+		sampler->setWrapT(GMS_Wrap::Repeat);
 		sampler->addFrame(texture);
 	}
 }
@@ -508,7 +508,7 @@ void GMBSPShaderLoader::parse_map_tcMod(GMShader& shader, GMXMLElement* elem)
 	// tcMod <type> <...>
 	const char* tcMod = elem->Attribute("tcMod");
 	GMuint tcModNum = 0;
-	while (tcModNum < MAX_TEX_MOD && shader.getTextureList().getTextureSampler(GMTextureType::Ambient).getTexMod(tcModNum).type != GMS_TextureModType::NO_TEXTURE_MOD)
+	while (tcModNum < MAX_TEX_MOD && shader.getTextureList().getTextureSampler(GMTextureType::Ambient).getTexMod(tcModNum).type != GMS_TextureTransformType::NoTextureTransform)
 	{
 		tcModNum++;
 	}
@@ -524,13 +524,13 @@ void GMBSPShaderLoader::parse_map_tcMod(GMShader& shader, GMXMLElement* elem)
 		{
 			if (type == L"scroll")
 			{
-				currentMod->type = GMS_TextureModType::SCROLL;
+				currentMod->type = GMS_TextureTransformType::Scroll;
 				s.nextFloat(currentMod->p1);
 				s.nextFloat(currentMod->p2);
 			}
 			else if (type == L"scale")
 			{
-				currentMod->type = GMS_TextureModType::SCALE;
+				currentMod->type = GMS_TextureTransformType::Scale;
 				s.nextFloat(currentMod->p1);
 				s.nextFloat(currentMod->p2);
 			}
@@ -559,7 +559,7 @@ void GMBSPShaderLoader::createSky(GMShader& shader)
 	{
 		GMShader skyShader = shader;
 		skyShader.setDiscard(false);
-		skyShader.setCull(GMS_Cull::NONE);
+		skyShader.setCull(GMS_Cull::None);
 		skyShader.setBlend(false);
 
 		GMBSPSkyGameObject* sky = new GMBSPSkyGameObject(skyShader, MakeVector3(d->bspRender->boundMin), MakeVector3(d->bspRender->boundMax));

@@ -71,7 +71,7 @@ namespace
 	{
 		D3D11_RASTERIZER_DESC desc = {
 			isSolid ? D3D11_FILL_SOLID : D3D11_FILL_WIREFRAME,
-			cull == GMS_Cull::CULL ? D3D11_CULL_BACK : D3D11_CULL_NONE,
+			cull == GMS_Cull::Cull ? D3D11_CULL_BACK : D3D11_CULL_NONE,
 			frontFace == GMS_FrontFace::CLOCKWISE ? FALSE : TRUE,
 			0,
 			0.f,
@@ -88,25 +88,25 @@ namespace
 	{
 		switch (blendFunc)
 		{
-		case (GMS_BlendFunc::ZERO):
+		case (GMS_BlendFunc::Zero):
 			return D3D11_BLEND_ZERO;
-		case (GMS_BlendFunc::ONE):
+		case (GMS_BlendFunc::One):
 			return D3D11_BLEND_ONE;
-		case (GMS_BlendFunc::SRC_COLOR):
+		case (GMS_BlendFunc::SourceColor):
 			return D3D11_BLEND_SRC_COLOR;
-		case (GMS_BlendFunc::DST_COLOR):
+		case (GMS_BlendFunc::DestColor):
 			return D3D11_BLEND_DEST_COLOR;
-		case (GMS_BlendFunc::SRC_ALPHA):
+		case (GMS_BlendFunc::SourceAlpha):
 			return D3D11_BLEND_SRC_ALPHA;
-		case (GMS_BlendFunc::DST_ALPHA):
+		case (GMS_BlendFunc::DestAlpha):
 			return D3D11_BLEND_DEST_ALPHA;
-		case (GMS_BlendFunc::ONE_MINUS_SRC_ALPHA):
+		case (GMS_BlendFunc::OneMinusSourceAlpha):
 			return D3D11_BLEND_INV_SRC_ALPHA;
-		case (GMS_BlendFunc::ONE_MINUS_DST_ALPHA):
+		case (GMS_BlendFunc::OneMinusDestAlpha):
 			return D3D11_BLEND_INV_DEST_ALPHA;
-		case (GMS_BlendFunc::ONE_MINUS_SRC_COLOR):
+		case (GMS_BlendFunc::OneMinusSourceColor):
 			return D3D11_BLEND_INV_SRC_COLOR;
-		case (GMS_BlendFunc::ONE_MINUS_DST_COLOR):
+		case (GMS_BlendFunc::OneMinusDestColor):
 			return D3D11_BLEND_INV_DEST_COLOR;
 		default:
 			GM_ASSERT(false);
@@ -117,15 +117,15 @@ namespace
 	inline D3D11_BLEND_OP toDx11BlendOp(GMS_BlendOp op)
 	{
 		D3D11_BLEND_OP blendOp = D3D11_BLEND_OP_ADD;
-		if (op == GMS_BlendOp::ADD)
+		if (op == GMS_BlendOp::Add)
 		{
 			blendOp = D3D11_BLEND_OP_ADD;
 		}
-		else if (op == GMS_BlendOp::SUBSTRACT)
+		else if (op == GMS_BlendOp::Substract)
 		{
 			blendOp = D3D11_BLEND_OP_SUBTRACT;
 		}
-		else if (op == GMS_BlendOp::REVERSE_SUBSTRACT)
+		else if (op == GMS_BlendOp::ReverseSubstract)
 		{
 			blendOp = D3D11_BLEND_OP_REV_SUBTRACT;
 		}
@@ -406,12 +406,12 @@ public:
 	{
 		return getBlendState(
 			false,
-			GMS_BlendFunc::ONE,
-			GMS_BlendFunc::ONE,
-			GMS_BlendOp::ADD,
-			GMS_BlendFunc::ONE,
-			GMS_BlendFunc::ONE,
-			GMS_BlendOp::ADD
+			GMS_BlendFunc::One,
+			GMS_BlendFunc::One,
+			GMS_BlendOp::Add,
+			GMS_BlendFunc::One,
+			GMS_BlendFunc::One,
+			GMS_BlendOp::Add
 		);
 	}
 
@@ -426,12 +426,12 @@ private:
 	const IRenderContext* context = nullptr;
 	GMDx11GraphicEngine* engine = nullptr;
 	GMComPtr<ID3D11BlendState> states[2]
-		[(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC]	// Source RGB
-		[(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC]	// Dest RGB
-		[(GMuint)GMS_BlendOp::MAX_OF_BLEND_OP]		// Op RGB
-		[(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC]	// Source Alpha
-		[(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC]	// Dest Alpha
-		[(GMuint)GMS_BlendOp::MAX_OF_BLEND_OP]		// Op Alpha
+		[(GMuint)GMS_BlendFunc::MaxOfBlendFunc]	// Source RGB
+		[(GMuint)GMS_BlendFunc::MaxOfBlendFunc]	// Dest RGB
+		[(GMuint)GMS_BlendOp::MaxOfBlendOp]		// Op RGB
+		[(GMuint)GMS_BlendFunc::MaxOfBlendFunc]	// Source Alpha
+		[(GMuint)GMS_BlendFunc::MaxOfBlendFunc]	// Dest Alpha
+		[(GMuint)GMS_BlendOp::MaxOfBlendOp]		// Op Alpha
 	;
 };
 
@@ -707,13 +707,13 @@ void GMDx11Technique::applyTextureAttribute(GMModel* model, ITexture* texture, G
 		GM_DX_HR(bank->scaleX->SetFloat(1.f));
 		GM_DX_HR(bank->scaleY->SetFloat(1.f));
 
-		auto applyCallback = [&](GMS_TextureModType type, Pair<GMfloat, GMfloat>&& args) {
-			if (type == GMS_TextureModType::SCALE)
+		auto applyCallback = [&](GMS_TextureTransformType type, Pair<GMfloat, GMfloat>&& args) {
+			if (type == GMS_TextureTransformType::Scale)
 			{
 				GM_DX_HR(bank->scaleX->SetFloat(args.first));
 				GM_DX_HR(bank->scaleY->SetFloat(args.second));
 			}
-			else if (type == GMS_TextureModType::SCROLL)
+			else if (type == GMS_TextureTransformType::Scroll)
 			{
 				GM_DX_HR(bank->offsetX->SetFloat(args.first));
 				GM_DX_HR(bank->offsetY->SetFloat(args.second));

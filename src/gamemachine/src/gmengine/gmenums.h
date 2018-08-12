@@ -13,17 +13,17 @@ BEGIN_NS
 */
 enum class GMS_BlendFunc
 {
-	ZERO = 0, //!< RGBA融混参数均为0
-	ONE, //!< RGBA融混参数均为1
-	SRC_COLOR, //!< RGBA融混参数分别为源的RGBA值，相当于OpenGL中的GL_SRC_COLOR
-	DST_COLOR, //!< RGBA融混参数分别为目标的RGBA值，相当于OpenGL中的GL_DST_COLOR
-	SRC_ALPHA, //!< RGBA融混参数都为源的Alpha值，相当于OpenGL中的GL_SRC_ALPHA
-	DST_ALPHA, //!< RGBA融混参数都为目标的Alpha值，相当于OpenGL中的GL_DST_ALPHA
-	ONE_MINUS_SRC_ALPHA, //!< RGBA融混参数为源的(1-Alpha)值，相当于OpenGL中的GL_ONE_MINUS_SRC_ALPHA
-	ONE_MINUS_DST_ALPHA, //!< RGBA融混参数都为目标的(1-Alpha)值，相当于OpenGL中的GL_ONE_MINUS_DST_ALPHA
-	ONE_MINUS_SRC_COLOR, //!< RGBA融混参数分别为目标的(1,1,1,1)-(RGBA)值，相当于OpenGL中的GL_ONE_MINUS_SRC_ALPHA
-	ONE_MINUS_DST_COLOR, //!< RGBA融混参数分别为目标的(1,1,1,1)-(RGBA)值，相当于OpenGL中的GL_ONE_MINUS_DST_ALPHA
-	MAX_OF_BLEND_FUNC,
+	Zero = 0, //!< RGBA融混参数均为0
+	One, //!< RGBA融混参数均为1
+	SourceColor, //!< RGBA融混参数分别为源的RGBA值，相当于OpenGL中的GL_SRC_COLOR
+	DestColor, //!< RGBA融混参数分别为目标的RGBA值，相当于OpenGL中的GL_DST_COLOR
+	SourceAlpha, //!< RGBA融混参数都为源的Alpha值，相当于OpenGL中的GL_SRC_ALPHA
+	DestAlpha, //!< RGBA融混参数都为目标的Alpha值，相当于OpenGL中的GL_DST_ALPHA
+	OneMinusSourceAlpha, //!< RGBA融混参数为源的(1-Alpha)值，相当于OpenGL中的GL_ONE_MINUS_SRC_ALPHA
+	OneMinusDestAlpha, //!< RGBA融混参数都为目标的(1-Alpha)值，相当于OpenGL中的GL_ONE_MINUS_DST_ALPHA
+	OneMinusSourceColor, //!< RGBA融混参数分别为目标的(1,1,1,1)-(RGBA)值，相当于OpenGL中的GL_ONE_MINUS_SRC_ALPHA
+	OneMinusDestColor, //!< RGBA融混参数分别为目标的(1,1,1,1)-(RGBA)值，相当于OpenGL中的GL_ONE_MINUS_DST_ALPHA
+	MaxOfBlendFunc,
 };
 
 //! 融混运算
@@ -32,10 +32,10 @@ enum class GMS_BlendFunc
 */
 enum class GMS_BlendOp
 {
-	ADD,
-	SUBSTRACT,
-	REVERSE_SUBSTRACT,
-	MAX_OF_BLEND_OP,
+	Add,
+	Substract,
+	ReverseSubstract,
+	MaxOfBlendOp,
 };
 
 //! 是否进行面剔除的枚举
@@ -44,8 +44,8 @@ enum class GMS_BlendOp
 */
 enum class GMS_Cull
 {
-	CULL = 0, //!< 绘制时进行面剔除
-	NONE, //!< 绘制时禁用面剔除
+	Cull = 0, //!< 绘制时进行面剔除
+	None, //!< 绘制时禁用面剔除
 };
 
 //! 多边形正方向枚举
@@ -64,12 +64,12 @@ enum class GMS_FrontFace
 */
 enum class GMS_TextureFilter
 {
-	LINEAR = 0, //!< 双线性过滤，相当于OpenGL的GL_LINEAR
-	NEAREST, //!< 最近邻过滤，相当于OpenGL的GL_NEAREST
-	LINEAR_MIPMAP_LINEAR, //!< 三线性过滤（使用MIP贴图级别之间插值的双线性过滤），相当于OpenGL的GL_LINEAR_MIPMAP_LINEAR
-	NEAREST_MIPMAP_LINEAR, //!< 使用MIP贴图级别之间插值的最近邻过滤，相当于OpenGL的GL_NEAREST_MIPMAP_LINEAR
-	LINEAR_MIPMAP_NEAREST, //!< 使用MIP贴图的双线性过滤，相当于OpenGL的GL_LINEAR_MIPMAP_NEAREST
-	NEAREST_MIPMAP_NEAREST, //!< 使用MIP贴图的最近邻过滤，相当于OpenGL的GL_NEAREST_MIPMAP_NEAREST
+	Linear = 0, //!< 双线性过滤，相当于OpenGL的GL_LINEAR
+	Nearest, //!< 最近邻过滤，相当于OpenGL的GL_NEAREST
+	LinearMipmapLinear, //!< 三线性过滤（使用MIP贴图级别之间插值的双线性过滤），相当于OpenGL的GL_LINEAR_MIPMAP_LINEAR
+	NearestMipmapLinear, //!< 使用MIP贴图级别之间插值的最近邻过滤，相当于OpenGL的GL_NEAREST_MIPMAP_LINEAR
+	LinearMipmapNearest, //!< 使用MIP贴图的双线性过滤，相当于OpenGL的GL_LINEAR_MIPMAP_NEAREST
+	NearestMipmapNearest, //!< 使用MIP贴图的最近邻过滤，相当于OpenGL的GL_NEAREST_MIPMAP_NEAREST
 };
 
 //! 纹理的环绕方式
@@ -78,10 +78,10 @@ enum class GMS_TextureFilter
 */
 enum class GMS_Wrap
 {
-	REPEAT = 0, //!< 重复环绕，相当于忽略掉纹理坐标的整数部分，相当于GL_REPEAT
-	CLAMP_TO_EDGE, //!< 超出纹理坐标的纹理取纹理的边的像素，相当于GL_CLAMP_TO_EDGE
-	CLAMP_TO_BORDER, //!< 超出纹理坐标的纹理取纹理的角的像素，相当于GL_CLAMP_TO_BORDER
-	MIRRORED_REPEAT, //!< 镜像环绕，相当于将纹理坐标1.1变成0.9，相当于GL_MIRRORED_REPEAT
+	Repeat = 0, //!< 重复环绕，相当于忽略掉纹理坐标的整数部分，相当于GL_REPEAT
+	ClampToEdge, //!< 超出纹理坐标的纹理取纹理的边的像素，相当于GL_CLAMP_TO_EDGE
+	ClampToBorder, //!< 超出纹理坐标的纹理取纹理的角的像素，相当于GL_CLAMP_TO_BORDER
+	MirroredRepeat, //!< 镜像环绕，相当于将纹理坐标1.1变成0.9，相当于GL_MIRRORED_REPEAT
 };
 
 //! 纹理变换方式
@@ -89,20 +89,20 @@ enum class GMS_Wrap
   指定纹理变换方式，可以在绘制时对纹理进行仿射变换。
   \sa GMS_TextureMod
 */
-enum class GMS_TextureModType
+enum class GMS_TextureTransformType
 {
-	NO_TEXTURE_MOD = 0, //!< 不使用纹理变换
-	SCROLL, //!< 纹理在绘制时发生位移
-	SCALE, //!< 纹理在绘制时发生拉伸
+	NoTextureTransform = 0, //!< 不使用纹理变换
+	Scroll, //!< 纹理在绘制时发生位移
+	Scale, //!< 纹理在绘制时发生拉伸
 };
 
 //! 设置在Model3D的模型下，光照结果与颜色顶点数据的计算方式
 enum class GMS_VertexColorOp
 {
-	NO_VERTEX_COLOR = 0, //!< 不使用颜色顶点数据
-	REPLACE, //!< 用此颜色代替计算出来的颜色，将跳过光照计算阶段，直接使用此颜色
-	MULTIPLY, //!< 与颜色顶点数据相乘
-	ADD, //!< 与颜色顶点数据相加
+	DoNotUseVertexColor = 0, //!< 不使用颜色顶点数据
+	Replace, //!< 用此颜色代替计算出来的颜色，将跳过光照计算阶段，直接使用此颜色
+	Multiply, //!< 与颜色顶点数据相乘
+	Add, //!< 与颜色顶点数据相加
 };
 
 END_NS
