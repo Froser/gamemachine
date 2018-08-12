@@ -141,6 +141,7 @@ struct GMShaderVariablesDesc
 
 	// 模型
 	const char* IlluminationModel;
+	const char* ColorVertexOp;
 
 	// 调试
 	const GMShaderVariableDebugDesc Debug;

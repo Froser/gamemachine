@@ -2,6 +2,7 @@
 #include "gmskeletongameobject.h"
 #include "foundation/gmasync.h"
 #include "foundation/gamemachine.h"
+#include "gmengine/gmgameworld.h"
 
 void GMSkeletonGameObject::update(GMDuration dt)
 {
@@ -32,7 +33,7 @@ void GMSkeletonGameObject::update(GMDuration dt)
 			updateMesh(mesh, frameSkeleton);
 		}
 
-		if (d->drawSkeleton)
+		if (d->drawBones)
 			updateSkeleton();
 	}
 }
@@ -43,8 +44,8 @@ void GMSkeletonGameObject::draw()
 	if (d->drawSkin)
 		GMGameObject::draw();
 
-	if (d->drawSkeleton && d->skeletonObject)
-		d->skeletonObject->draw();
+	if (d->drawBones && d->skeletonBonesObject)
+		d->skeletonBonesObject->draw();
 }
 
 GMint GMSkeletonGameObject::getFramesCount()
@@ -58,28 +59,46 @@ GMint GMSkeletonGameObject::getFramesCount()
 	return 0;
 }
 
-void GMSkeletonGameObject::createSkeletonObject()
+void GMSkeletonGameObject::createSkeletonBonesObject()
 {
 	D(d);
 	GMModels& models = getModels();
 	auto skeleton = models.getSkeleton();
-	if (skeleton && d->drawSkeleton && !d->skeletonObject)
+	if (skeleton && d->drawBones && !d->skeletonBonesObject)
 	{
 		// 创建连接骨骼的线条
 		// TODO 释放Asset
 		GMModel* skeletonModel = new GMModel();
 		skeletonModel->getShader().setNoDepthTest(true);
 		skeletonModel->getShader().setCull(GMS_Cull::NONE);
+		skeletonModel->getShader().setVertexColorOp(GMS_VertexColorOp::REPLACE);
 		skeletonModel->setPrimitiveTopologyMode(GMTopologyMode::Lines);
 		skeletonModel->setUsageHint(GMUsageHint::DynamicDraw);
 
 		GMMesh* mesh = new GMMesh(skeletonModel);
-		initSkeletonMesh(mesh);
+		initSkeletonBonesMesh(mesh);
 		GM.createModelDataProxyAndTransfer(getContext(), skeletonModel);
+		GM_ASSERT(getWorld());
 
 		GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, skeletonModel);
-		d->skeletonObject.reset(new GMGameObject(asset));
-		d->skeletonObject->setContext(getContext());
+		d->skeletonBonesObject.reset(new GMGameObject(asset));
+		d->skeletonBonesObject->setContext(getContext());
+		getWorld()->addToRenderList(d->skeletonBonesObject.get());
+	}
+}
+
+void GMSkeletonGameObject::setDrawBones(bool b)
+{
+	D(d);
+	d->drawBones = b;
+
+	if (d->skeletonBonesObject)
+	{
+		auto& models = d->skeletonBonesObject->getModels().getModels();
+		for (auto model : models)
+		{
+			model->getShader().setDiscard(!b);
+		}
 	}
 }
 
@@ -245,23 +264,23 @@ void GMSkeletonGameObject::updateSkeleton()
 	if (!skeleton)
 		return;
 
-	if (!d->drawSkeleton)
+	if (!d->drawBones)
 		return;
 
-	if (!d->skeletonObject)
-		createSkeletonObject();
+	if (!d->skeletonBonesObject)
+		createSkeletonBonesObject();
 
-	if (!d->skeletonObject)
+	if (!d->skeletonBonesObject)
 		return;
 
-	if (d->skeletonObject->getModels().getModels().size() != 1)
+	if (d->skeletonBonesObject->getModels().getModels().size() != 1)
 		return;
 
 	const GMVec4& sc = getSkeletonColor();
 	Array<GMfloat, 4> color;
 	CopyToArray(sc, &color[0]);
 
-	GMModel* skeletonModel = d->skeletonObject->getModels().getModels().front();
+	GMModel* skeletonModel = d->skeletonBonesObject->getModels().getModels().front();
 	GMModelDataProxy* modelDataProxy = skeletonModel->getModelDataProxy();
 	modelDataProxy->beginUpdateBuffer(GMModelBufferType::VertexBuffer);
 	GMVertex* const vertices = static_cast<GMVertex*>(modelDataProxy->getBuffer());
@@ -285,14 +304,14 @@ void GMSkeletonGameObject::updateSkeleton()
 	modelDataProxy->endUpdateBuffer();
 
 	// 同步变换
-	d->skeletonObject->beginUpdateTransform();
-	d->skeletonObject->setTranslation(getTranslation());
-	d->skeletonObject->setRotation(getRotation());
-	d->skeletonObject->setScaling(getScaling());
-	d->skeletonObject->endUpdateTransform();
+	d->skeletonBonesObject->beginUpdateTransform();
+	d->skeletonBonesObject->setTranslation(getTranslation());
+	d->skeletonBonesObject->setRotation(getRotation());
+	d->skeletonBonesObject->setScaling(getScaling());
+	d->skeletonBonesObject->endUpdateTransform();
 }
 
-void GMSkeletonGameObject::initSkeletonMesh(GMMesh* mesh)
+void GMSkeletonGameObject::initSkeletonBonesMesh(GMMesh* mesh)
 {
 	D(d);
 	// 找到所有joint，连接成线

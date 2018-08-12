@@ -197,6 +197,7 @@ GM_PRIVATE_OBJECT(GMShader)
 	GMS_BlendFunc blendFactorDestAlpha = GMS_BlendFunc::ZERO;
 	GMS_BlendOp blendOpRGB = GMS_BlendOp::ADD;
 	GMS_BlendOp blendOpAlpha = GMS_BlendOp::ADD;
+	GMS_VertexColorOp vertexColorOp = GMS_VertexColorOp::NO_VERTEX_COLOR;
 	bool blend = false;
 	bool discard = false;
 	bool noDepthTest = false;
@@ -233,6 +234,7 @@ public:
 	GM_DECLARE_PROPERTY(LineColor, lineColor, GMVec3);
 	GM_DECLARE_PROPERTY(Material, material, GMMaterial);
 	GM_DECLARE_PROPERTY(IlluminationModel, illuminationModel, GMIlluminationModel);
+	GM_DECLARE_PROPERTY(VertexColorOp, vertexColorOp, GMS_VertexColorOp)
 
 public:
 	inline void setBlendFactorSource(GMS_BlendFunc func)

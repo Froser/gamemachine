@@ -497,6 +497,7 @@ void GMGLTechnique_3D::beforeDraw(GMModel* model)
 	activateMaterial(model->getShader());
 
 	// 应用Shader
+	getShaderProgram()->setInt(GM_VariablesDesc.ColorVertexOp, static_cast<GMint>(model->getShader().getVertexColorOp()));
 	applyShader(model);
 	
 	// 设置光照模型

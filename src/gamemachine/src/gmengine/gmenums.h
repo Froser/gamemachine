@@ -96,5 +96,14 @@ enum class GMS_TextureModType
 	SCALE, //!< 纹理在绘制时发生拉伸
 };
 
+//! 设置在Model3D的模型下，光照结果与颜色顶点数据的计算方式
+enum class GMS_VertexColorOp
+{
+	NO_VERTEX_COLOR = 0, //!< 不使用颜色顶点数据
+	REPLACE, //!< 用此颜色代替计算出来的颜色，将跳过光照计算阶段，直接使用此颜色
+	MULTIPLY, //!< 与颜色顶点数据相乘
+	ADD, //!< 与颜色顶点数据相加
+};
+
 END_NS
 #endif

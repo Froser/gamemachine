@@ -107,6 +107,8 @@ public:
 	using GMDx11Technique::GMDx11Technique;
 
 protected:
+	void draw(GMModel* model);
+
 	virtual const char* getTechniqueName() override
 	{
 		return "GMTech_3D";

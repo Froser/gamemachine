@@ -13,9 +13,9 @@ GM_PRIVATE_OBJECT(GMSkeletonGameObject)
 	GMDuration frameDuration = 0;
 	GMint frame = AutoPlayFrame;
 	GMint frameInterpolate = 0;
-	GMOwnedPtr<GMGameObject> skeletonObject;
+	GMOwnedPtr<GMGameObject> skeletonBonesObject;
 	bool drawSkin = true;
-	bool drawSkeleton = true;
+	bool drawBones = true;
 	GMVec4 skeletonColor = GMVec4(0, 1, 0, 1);
 };
 
@@ -23,7 +23,6 @@ class GMSkeletonGameObject : public GMGameObject
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMSkeletonGameObject, GMGameObject)
 	GM_DECLARE_PROPERTY(SkeletonColor, skeletonColor, GMVec4)
-	GM_DECLARE_PROPERTY(DrawSkeleton, drawSkeleton, bool)
 	GM_DECLARE_PROPERTY(DrawSkin, drawSkin, bool)
 
 public:
@@ -36,7 +35,8 @@ public:
 
 public:
 	GMint getFramesCount();
-	void createSkeletonObject();
+	void createSkeletonBonesObject();
+	void setDrawBones(bool b);
 
 public:
 	inline void setFrame(GMint frame, GMint frameInterpolate) GM_NOEXCEPT
@@ -46,12 +46,18 @@ public:
 		d->frameInterpolate = frameInterpolate;
 	}
 
+	inline bool getDrawBones() GM_NOEXCEPT
+	{
+		D(d);
+		return d->drawBones;
+	}
+
 private:
 	void initAnimation();
 	void getAdjacentTwoFrames(GMDuration dt, REF GMint& frame0, REF GMint& frame1, REF GMfloat& interpolate);
 	void updateMesh(GMSkeletonMesh& mesh, const GMFrameSkeleton& frameSkeleton);
 	void updateSkeleton();
-	void initSkeletonMesh(GMMesh* mesh);
+	void initSkeletonBonesMesh(GMMesh* mesh);
 };
 
 END_NS

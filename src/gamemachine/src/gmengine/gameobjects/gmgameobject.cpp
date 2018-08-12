@@ -80,6 +80,9 @@ bool GMGameObject::canDeferredRendering()
 	{
 		if (model->getShader().getBlend() == true)
 			return false;
+
+		if (model->getShader().getVertexColorOp() == GMS_VertexColorOp::REPLACE)
+			return false;
 	}
 	return true;
 }

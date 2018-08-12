@@ -984,6 +984,14 @@ ID3DX11EffectTechnique* GMDx11Technique::getTechnique()
 	return d->technique;
 }
 
+void GMDx11Technique_3D::draw(GMModel* model)
+{
+	D(d);
+	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
+	shaderProgram->setInt(GM_VariablesDesc.ColorVertexOp, static_cast<GMint>(model->getShader().getVertexColorOp()));
+	GMDx11Technique::draw(model);
+}
+
 void GMDx11Technique_2D::prepareTextures(GMModel* model)
 {
 	D(d);

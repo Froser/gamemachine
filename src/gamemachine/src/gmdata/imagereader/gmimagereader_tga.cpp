@@ -1,8 +1,5 @@
 ﻿#include "stdafx.h"
 #include "gmimagereader_tga.h"
-#include <iostream>
-#include <fstream>
-#include <GL/glew.h>
 #include "foundation/utilities/tools.h"
 
 namespace {

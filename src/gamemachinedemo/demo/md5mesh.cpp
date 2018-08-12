@@ -40,7 +40,7 @@ void Demo_MD5Mesh::init()
 		&button
 	);
 	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
-		d->boblampclean->setDrawSkeleton(!d->boblampclean->getDrawSkeleton());
+		d->boblampclean->setDrawBones(!d->boblampclean->getDrawBones());
 	});
 
 	widget->setSize(widget->getSize().width, top + 40);
