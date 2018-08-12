@@ -46,9 +46,6 @@ void GMSkeletonGameObject::draw()
 	D(d);
 	if (d->drawSkin)
 		GMGameObject::draw();
-
-	if (d->drawBones && d->skeletonBonesObject)
-		d->skeletonBonesObject->draw();
 }
 
 GMint GMSkeletonGameObject::getFramesCount()
