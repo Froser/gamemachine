@@ -16,6 +16,7 @@ GM_PRIVATE_OBJECT(GMSkeletonGameObject)
 	GMOwnedPtr<GMGameObject> skeletonBonesObject;
 	bool drawSkin = true;
 	bool drawBones = true;
+	bool playing = true;
 	GMVec4 skeletonColor = GMVec4(0, 1, 0, 1);
 };
 
@@ -37,6 +38,9 @@ public:
 	GMint getFramesCount();
 	void createSkeletonBonesObject();
 	void setDrawBones(bool b);
+	void play();
+	void pause();
+	void reset(bool update);
 
 public:
 	inline void setFrame(GMint frame, GMint frameInterpolate) GM_NOEXCEPT
@@ -50,6 +54,12 @@ public:
 	{
 		D(d);
 		return d->drawBones;
+	}
+
+	inline bool isPlaying() GM_NOEXCEPT
+	{
+		D(d);
+		return d->playing;
 	}
 
 private:

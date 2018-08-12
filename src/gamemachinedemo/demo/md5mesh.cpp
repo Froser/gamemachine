@@ -43,6 +43,35 @@ void Demo_MD5Mesh::init()
 		d->boblampclean->setDrawBones(!d->boblampclean->getDrawBones());
 	});
 
+	widget->addButton(
+		L"播放/暂停动画",
+		10,
+		top += 40,
+		250,
+		30,
+		false,
+		&button
+	);
+	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		if (d->boblampclean->isPlaying())
+			d->boblampclean->pause();
+		else
+			d->boblampclean->play();
+	});
+
+	widget->addButton(
+		L"重置动画",
+		10,
+		top += 40,
+		250,
+		30,
+		false,
+		&button
+	);
+	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		d->boblampclean->reset(true);
+	});
+
 	widget->setSize(widget->getSize().width, top + 40);
 
 	gm::GMModels* boblampcleanModel = nullptr;

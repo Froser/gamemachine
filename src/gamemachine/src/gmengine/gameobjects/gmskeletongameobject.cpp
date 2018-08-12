@@ -7,34 +7,37 @@
 void GMSkeletonGameObject::update(GMDuration dt)
 {
 	D(d);
-	GMModels& models = getModels();
-	auto skeleton = models.getSkeleton();
-	if (skeleton)
+	if (d->playing)
 	{
-		initAnimation();
-
-		GMint frame0 = 0, frame1 = 0;
-		GMfloat interpolate = 0;
-		if (d->frame == AutoPlayFrame)
+		GMModels& models = getModels();
+		auto skeleton = models.getSkeleton();
+		if (skeleton)
 		{
-			getAdjacentTwoFrames(dt, frame0, frame1, interpolate);
-		}
-		else
-		{
-			frame0 = d->frame;
-			frame1 = d->frame + 1;
-			interpolate = d->frameInterpolate;
-		}
-		skeleton->interpolateSkeletons(frame0, frame1, interpolate);
+			initAnimation();
 
-		const GMFrameSkeleton& frameSkeleton = skeleton->getAnimatedSkeleton();
-		for (auto& mesh : models.getSkeleton()->getMeshes())
-		{
-			updateMesh(mesh, frameSkeleton);
-		}
+			GMint frame0 = 0, frame1 = 0;
+			GMfloat interpolate = 0;
+			if (d->frame == AutoPlayFrame)
+			{
+				getAdjacentTwoFrames(dt, frame0, frame1, interpolate);
+			}
+			else
+			{
+				frame0 = d->frame;
+				frame1 = d->frame + 1;
+				interpolate = d->frameInterpolate;
+			}
+			skeleton->interpolateSkeletons(frame0, frame1, interpolate);
 
-		if (d->drawBones)
-			updateSkeleton();
+			const GMFrameSkeleton& frameSkeleton = skeleton->getAnimatedSkeleton();
+			for (auto& mesh : models.getSkeleton()->getMeshes())
+			{
+				updateMesh(mesh, frameSkeleton);
+			}
+
+			if (d->drawBones)
+				updateSkeleton();
+		}
 	}
 }
 
@@ -99,6 +102,36 @@ void GMSkeletonGameObject::setDrawBones(bool b)
 		{
 			model->getShader().setDiscard(!b);
 		}
+	}
+}
+
+void GMSkeletonGameObject::play()
+{
+	D(d);
+	d->playing = true;
+}
+
+void GMSkeletonGameObject::pause()
+{
+	D(d);
+	d->playing = false;
+}
+
+void GMSkeletonGameObject::reset(bool update)
+{
+	D(d);
+	d->animationTime = 0;
+
+	if (update)
+	{
+		// 更新一帧
+		bool t = isPlaying();
+		play();
+		this->update(0);
+		if (t)
+			play();
+		else
+			pause();
 	}
 }
 

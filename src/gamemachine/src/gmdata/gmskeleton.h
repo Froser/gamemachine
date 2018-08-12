@@ -3,7 +3,6 @@
 #include <gmcommon.h>
 BEGIN_NS
 
-
 GM_ALIGNED_STRUCT(GMSkeletonVertex)
 {
 	GMVec2 texCoords = Zero<GMVec2>();
