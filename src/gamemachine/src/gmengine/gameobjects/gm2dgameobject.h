@@ -88,7 +88,8 @@ GM_PRIVATE_OBJECT(GMTextGameObject)
 	ITypoEngine* typoEngine = nullptr;
 	bool insetTypoEngine = true;
 	GMFontHandle font = 0;
-	GMOwnedPtr<GMModel> model;
+	GMModel* model = nullptr;
+	GMAsset modelAsset;
 	GMTextColorType colorType = GMTextColorType::ByScript;
 	GMFloat4 color = GMFloat4(1, 1, 1, 1);
 	Vector<GMVertex> vericesCache;
@@ -150,7 +151,8 @@ private:
 
 GM_PRIVATE_OBJECT(GMSprite2DGameObject)
 {
-	GMOwnedPtr<GMModel> model;
+	GMModel* model = nullptr;
+	GMAsset modelAsset;
 	ITexture* texture = nullptr;
 	GMRect textureRc;
 	GMint texHeight = 0;
@@ -194,7 +196,8 @@ protected:
 
 GM_PRIVATE_OBJECT(GMBorder2DGameObject)
 {
-	GMOwnedPtr<GMModel> model;
+	GMModel* model = nullptr;
+	GMAsset modelAsset;
 	GMRect corner;
 };
 

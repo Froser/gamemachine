@@ -37,7 +37,7 @@ void Demo_SpecularMap::init()
 	{
 		gm::ITexture* texture = nullptr;
 		gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "cube_diffuse.png", &texture);
-		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
+		getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Texture, texture));
 
 		gm::GMModel* cube = nullptr;
 		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::one3(), &cube);
@@ -49,10 +49,10 @@ void Demo_SpecularMap::init()
 		gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::Diffuse);
 
 		gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "cube_specular.png", &texture);
-		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
+		getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Texture, texture));
 		gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::Specular);
 
-		gm::GMAsset asset = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Model, cube);
+		gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, cube));
 		d->gameObject = new gm::GMGameObject(asset);
 		d->gameObject->setTranslation(Translate(GMVec3(-.2f, 0, .5f)));
 		d->gameObject->setScaling(Scale(GMVec3(.1f, .1f, .1f)));
@@ -62,7 +62,7 @@ void Demo_SpecularMap::init()
 	{
 		gm::ITexture* texture = nullptr;
 		gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "cube_diffuse.png", &texture);
-		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
+		getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Texture, texture));
 
 		gm::GMModel* cube = nullptr;
 		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::one3(), &cube);
@@ -73,7 +73,7 @@ void Demo_SpecularMap::init()
 		shader.getMaterial().shininess = 99;
 		gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::Diffuse);
 
-		gm::GMAsset asset = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Model, cube);
+		gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, cube));
 		d->gameObject2 = new gm::GMGameObject(asset);
 		d->gameObject2->setTranslation(Translate(GMVec3(.2f, 0, .5f)));
 		d->gameObject2->setScaling(Scale(GMVec3(.1f, .1f, .1f)));

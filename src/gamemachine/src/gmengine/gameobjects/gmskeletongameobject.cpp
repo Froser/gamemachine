@@ -80,8 +80,7 @@ void GMSkeletonGameObject::createSkeletonBonesObject()
 		GM.createModelDataProxyAndTransfer(getContext(), skeletonModel);
 		GM_ASSERT(getWorld());
 
-		GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, skeletonModel);
-		d->skeletonBonesObject.reset(new GMGameObject(asset));
+		d->skeletonBonesObject.reset(new GMGameObject(GMAsset(GMAssetType::Model, skeletonModel)));
 		d->skeletonBonesObject->setContext(getContext());
 		getWorld()->addToRenderList(d->skeletonBonesObject.get());
 	}

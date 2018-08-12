@@ -109,7 +109,7 @@ void GMRigidPhysicsObject::setShape(GMAsset shape)
 	D(d);
 	D_BASE(db, Base);
 	GM_ASSERT(!d->shape);
-	d->shape = GMAssets::getPhysicsShape(shape);
+	d->shape = shape.getPhysicsShape();
 
 	const GMMat4& translation = db->gameObject->getTranslation();
 	btTransform trans;

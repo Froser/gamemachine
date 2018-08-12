@@ -15,7 +15,7 @@ GMGameObject* GMParticleModel_2D::createGameObject(
 {
 	D(d);
 	GMGameObject* object = new GMGameObject();
-	d->particleModel.reset(new GMModel());
+	d->particleModel = new GMModel();
 	d->particleModel->getShader().setCull(GMS_Cull::None);
 	d->particleModel->getShader().setBlend(true);
 	d->particleModel->getShader().setNoDepthTest(true);
@@ -25,7 +25,7 @@ GMGameObject* GMParticleModel_2D::createGameObject(
 	d->particleModel->setType(GMModelType::Particle);
 
 	d->particleModel->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
-	GMMesh* mesh = new GMMesh(d->particleModel.get());
+	GMMesh* mesh = new GMMesh(d->particleModel);
 
 	// 使用triangles拓扑，一次性填充所有的矩形
 	GMsize_t total = d->system->getEmitter()->getParticleCount();
@@ -40,9 +40,9 @@ GMGameObject* GMParticleModel_2D::createGameObject(
 		mesh->vertex(GMVertex());
 	}
 
-	GM.createModelDataProxyAndTransfer(context, d->particleModel.get());
+	GM.createModelDataProxyAndTransfer(context, d->particleModel);
 	object->setContext(context);
-	object->addModel(GMAssets::createIsolatedAsset(GMAssetType::Model, d->particleModel.get()));
+	object->addModel(GMAsset(GMAssetType::Model, d->particleModel));
 	return object;
 }
 

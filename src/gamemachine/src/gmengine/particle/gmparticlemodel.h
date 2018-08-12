@@ -8,7 +8,7 @@ BEGIN_NS
 GM_PRIVATE_OBJECT(GMParticleModel_2D)
 {
 	GMOwnedPtr<GMGameObject> particleObject;
-	GMOwnedPtr<GMModel> particleModel;
+	GMModel* particleModel = nullptr;
 	GMParticleSystem* system = nullptr;
 };
 

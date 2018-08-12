@@ -17,7 +17,6 @@ GMGBuffer::~GMGBuffer()
 {
 	D(d);
 	GM_delete(d->quad);
-	GM_delete(d->quadModel);
 	GM_delete(d->geometryFramebuffers);
 }
 
@@ -25,12 +24,12 @@ void GMGBuffer::createQuad()
 {
 	D(d);
 	GM_ASSERT(!d->quad);
-	GM_ASSERT(!d->quadModel);
-	GMPrimitiveCreator::createQuadrangle(GMPrimitiveCreator::one2(), 0, &d->quadModel);
-	GM_ASSERT(d->quadModel);
-	d->quadModel->setType(GMModelType::LightPassQuad);
-	GM.createModelDataProxyAndTransfer(d->context, d->quadModel);
-	d->quad = new GMGameObject(GMAssets::createIsolatedAsset(GMAssetType::Model, d->quadModel));
+	GMModel* model = nullptr;
+	GMPrimitiveCreator::createQuadrangle(GMPrimitiveCreator::one2(), 0, &model);
+	GM_ASSERT(model);
+	model->setType(GMModelType::LightPassQuad);
+	GM.createModelDataProxyAndTransfer(d->context, model);
+	d->quad = new GMGameObject(GMAsset(GMAssetType::Model, model));
 	d->quad->setContext(d->context);
 }
 

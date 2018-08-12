@@ -211,7 +211,7 @@ void GMTextGameObject::draw()
 {
 	D(d);
 	update();
-	drawModel(getContext(), d->model.get());
+	drawModel(getContext(), d->model);
 }
 
 void GMTextGameObject::update()
@@ -221,7 +221,7 @@ void GMTextGameObject::update()
 	// 如果需要的空间更大，也重新创建一个model
 	if (!d->model || d->length < d->text.length())
 	{
-		d->model.reset(createModel());
+		d->model = createModel();
 		d->length = d->text.length();
 		markDirty();
 	}
@@ -229,7 +229,7 @@ void GMTextGameObject::update()
 	// 如果字符被更改，则更新其缓存
 	if (isDirty())
 	{
-		updateVertices(d->model.get());
+		updateVertices(d->model);
 		cleanDirty();
 	}
 }
@@ -238,6 +238,7 @@ GMModel* GMTextGameObject::createModel()
 {
 	D(d);
 	GMModel* model = new GMModel();
+	d->modelAsset = GMAsset(GMAssetType::Model, model);
 	model->setType(GMModelType::Text);
 	model->setUsageHint(GMUsageHint::DynamicDraw);
 	model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
@@ -389,7 +390,7 @@ void GMSprite2DGameObject::draw()
 {
 	D(d);
 	update();
-	drawModel(getContext(), d->model.get());
+	drawModel(getContext(), d->model);
 }
 
 void GMSprite2DGameObject::setDepth(GMfloat depth)
@@ -453,19 +454,19 @@ void GMSprite2DGameObject::update()
 	D(d);
 	if (!d->model)
 	{
-		d->model.reset(createModel());
+		d->model = createModel();
 		markDirty();
 	}
 
 	if (d->needUpdateTexture)
 	{
-		updateTexture(d->model.get());
+		updateTexture(d->model);
 		d->needUpdateTexture = false;
 	}
 
 	if (isDirty())
 	{
-		updateVertices(d->model.get());
+		updateVertices(d->model);
 		cleanDirty();
 	}
 }
@@ -474,6 +475,7 @@ GMModel* GMSprite2DGameObject::createModel()
 {
 	D(d);
 	GMModel* model = new GMModel();
+	d->modelAsset = GMAsset(GMAssetType::Model, model);
 	model->setType(GMModelType::Model2D);
 	model->setUsageHint(GMUsageHint::DynamicDraw);
 	model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
@@ -577,6 +579,7 @@ GMModel* GMBorder2DGameObject::createModel()
 {
 	D(d);
 	GMModel* model = new GMModel();
+	d->modelAsset = GMAsset(GMAssetType::Model, model);
 	model->setType(GMModelType::Model2D);
 	model->setUsageHint(GMUsageHint::DynamicDraw);
 	model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);

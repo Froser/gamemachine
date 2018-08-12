@@ -128,10 +128,8 @@ ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const GMString& name)
 {
 	D(d);
 	GMAssets& assets = d->world->getAssets();
-	GMAssetsNode* texNode = assets.getNodeFromPath(GM_ASSET_TEXTURES);
-	GM_ASSERT(texNode);
-	GMAssetsNode* node = GMAssets::findChild(texNode, name);
-	if (!node)
+	GMAsset asset = assets.getAsset(GM_ASSET_TEXTURES + name);
+	if (asset.isEmpty())
 	{
 		GMString fn;
 		GMBuffer buf;
@@ -152,14 +150,14 @@ ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const GMString& name)
 			delete img;
 
 			GM_ASSERT(texture);
-			assets.insertAsset(GM_ASSET_TEXTURES, GMString(name), GMAssetType::Texture, texture);
+			assets.addAsset(GM_ASSET_TEXTURES + GMString(name), GMAsset(GMAssetType::Texture, texture));
 			return texture;
 		}
 		return nullptr;
 	}
 	else
 	{
-		return GMAssets::getTexture(node->asset);
+		return asset.getTexture();
 	}
 }
 
@@ -377,15 +375,11 @@ void GMBSPShaderLoader::parse_map_fromLightmap(GMShader& shader, GMXMLElement* e
 		if (GMString::stringEquals(from, "lightmap"))
 		{
 			GMAssets& assets = d->world->getAssets();
-			GMAssetsNode* lightmapNode = assets.getNodeFromPath(GM_ASSET_LIGHTMAPS);
-
-			GMTextureSampler* sampler = &shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
-			GMAssetsNode* node = GMAssets::findChild(lightmapNode, std::to_string(d->lightmapId).c_str());
-			GM_ASSERT(node);
-
-			ITexture* tex = GMAssets::getTexture(node->asset);
+			GMAsset asset = assets.getAsset(GM_ASSET_LIGHTMAPS + std::to_string(d->lightmapId));
+			ITexture* tex = asset.getTexture();
 			if (tex)
 			{
+				GMTextureSampler* sampler = &shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
 				sampler->addFrame(tex);
 				gm_info(gm_dbg_wrap("found map from lightmap {0}"), GMString(d->lightmapId));
 			}

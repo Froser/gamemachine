@@ -20,9 +20,9 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	GMMat4 transformMatrix = Identity<GMMat4>();
 	const IRenderContext* context = nullptr;
 	bool autoUpdateTransformMatrix = true;
+	GMAsset asset;
 };
 
-struct GMAsset;
 class GMGameObject : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMGameObject)
@@ -113,7 +113,6 @@ class GMCubeMapGameObject : public GMGameObject
 {
 public:
 	GMCubeMapGameObject(ITexture* texture);
-	~GMCubeMapGameObject();
 
 public:
 	//! 将立方体贴图从渲染中移除

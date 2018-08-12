@@ -61,14 +61,7 @@ GMBSPSkyGameObject::GMBSPSkyGameObject(const GMShader& shader, const GMVec3& min
 
 	GMModel* obj = nullptr;
 	createSkyBox(&obj);
-	GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, obj);
-	addModel(asset);
-}
-
-GMBSPSkyGameObject::~GMBSPSkyGameObject()
-{
-	D(d);
-	GM_delete(getModels().getModels());
+	addModel(GMAsset(GMAssetType::Model, obj));
 }
 
 void GMBSPSkyGameObject::createSkyBox(OUT GMModel** obj)
@@ -420,7 +413,7 @@ void GMBSPGameWorld::preparePolygonFace(GMint polygonFaceNumber, GMint drawSurfa
 	GMModel* model = nullptr;
 	d->render.createObject(polygonFace, shader, &model);
 	GM_ASSERT(model);
-	GMAsset asset = getAssets().insertAsset(GMAssetType::Model, model);
+	GMAsset asset = getAssets().addAsset(GMAsset(GMAssetType::Model, model));
 	obj = new GMGameObject(asset);
 
 	rd.polygonFaceObjects[&polygonFace] = obj;
@@ -449,7 +442,7 @@ void GMBSPGameWorld::prepareMeshFace(GMint meshFaceNumber, GMint drawSurfaceInde
 	d->render.createObject(meshFace, shader, &model);
 	GM_ASSERT(model);
 
-	GMAsset asset = getAssets().insertAsset(GMAssetType::Model, model);
+	GMAsset asset = getAssets().addAsset(GMAsset(GMAssetType::Model, model));
 	obj = new GMGameObject(asset);
 	rd.meshFaceObjects[&meshFace] = obj;
 	addObjectAndInit(obj);
@@ -477,7 +470,7 @@ void GMBSPGameWorld::preparePatch(GMint patchNumber, GMint drawSurfaceIndex)
 
 		GMModels* models = nullptr;
 		d->render.createObject(biqp, shader, &models);
-		GMAsset asset = getAssets().insertAsset(GMAssetType::Models, models);
+		GMAsset asset = getAssets().addAsset(GMAsset(GMAssetType::Models, models));
 		GMGameObject* obj = new GMGameObject(asset);
 		rd.biquadraticPatchObjects[&biqp] = obj;
 		addObjectAndInit(obj);
@@ -568,12 +561,11 @@ bool GMBSPGameWorld::setMaterialTexture(T& face, REF GMShader& shader)
 	// 先从地图Shaders中找，如果找不到，就直接读取材质
 	if (!d->shaderLoader.findItem(name, lightmapid, &shader))
 	{
-		std::string texturePath = GMAssets::combinePath({ GM_ASSET_TEXTURES, bsp.shaders[textureid].shader }).toStdString();
-		GMAssetsNode* node = getAssets().getNodeFromPath(texturePath.c_str());
-		if (!node)
+		GMAsset asset = getAssets().getAsset(GM_ASSET_TEXTURES + bsp.shaders[textureid].shader);
+		if (asset.isEmpty())
 			return false;
 
-		ITexture* texture = GMAssets::getTexture(node->asset);
+		ITexture* texture = asset.getTexture();
 		GM_ASSERT(texture);
 		shader.getMaterial().ks = shader.getMaterial().kd = GMVec3(0);
 		shader.getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(texture);
@@ -592,10 +584,7 @@ void GMBSPGameWorld::setMaterialLightmap(GMint lightmapid, REF GMShader& shader)
 	else
 		id = lightmapid >= 0 ? lightmapid : WHITE_LIGHTMAP;
 
-	std::string lightmapPath = GMAssets::combinePath({ GM_ASSET_LIGHTMAPS, std::to_string(id) }).toStdString();
-	GMAssetsNode* node = getAssets().getNodeFromPath(lightmapPath.c_str());
-	GM_ASSERT(node);
-	ITexture* texture = GMAssets::getTexture(node->asset);
+	ITexture* texture = getAssets().getAsset(GM_ASSET_LIGHTMAPS + std::to_string(id)).getTexture();
 	shader.getTextureList().getTextureSampler(GMTextureType::Lightmap).addFrame(texture);
 }
 
@@ -640,7 +629,7 @@ void GMBSPGameWorld::initTextures()
 			ITexture* texture;
 			factory->createTexture(getContext(), tex, &texture);
 			delete tex;
-			getAssets().insertAsset(GM_ASSET_TEXTURES, GMString(shader.shader), GMAssetType::Texture, texture);
+			getAssets().addAsset(GM_ASSET_TEXTURES + GMString(shader.shader), GMAsset(GMAssetType::Texture, texture));
 		}
 		else
 		{
@@ -695,7 +684,7 @@ void GMBSPGameWorld::initLightmaps()
 		ITexture* texture = nullptr;
 		factory->createTexture(getContext(), imgBuf, &texture);
 		delete imgBuf;
-		getAssets().insertAsset(GM_ASSET_LIGHTMAPS, GMString(i), GMAssetType::Texture, texture);
+		getAssets().addAsset(GM_ASSET_LIGHTMAPS + GMString(i), GMAsset(GMAssetType::Texture, texture));
 	}
 
 	{
@@ -705,7 +694,7 @@ void GMBSPGameWorld::initLightmaps()
 		ITexture* texture = nullptr;
 		factory->createTexture(getContext(), whiteBuf, &texture);
 		delete whiteBuf;
-		getAssets().insertAsset(GM_ASSET_LIGHTMAPS, GMString(L"-1"), GMAssetType::Texture, texture);
+		getAssets().addAsset(GM_ASSET_LIGHTMAPS + GMString(L"-1"), GMAsset(GMAssetType::Texture, texture));
 	}
 }
 

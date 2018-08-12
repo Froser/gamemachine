@@ -316,16 +316,14 @@ void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, GMMo
 
 		GMMesh* m = new GMMesh(model);
 		GMAsset asset = d->shaders[mesh.shader];
-		if (!asset.asset)
+		if (asset.isEmpty())
 		{
 			ITexture* tex = nullptr;
 			GMString imgPath = GMPath::fullname(GM.getGamePackageManager()->pathOf(GMPackageIndex::Models, settings.directory), mesh.shader);
 			GMToolUtil::createTextureFromFullPath(settings.context, imgPath, &tex);
 			if (tex)
 			{
-				// TODO 需要释放GMAsset
-				asset = GMAssets::createIsolatedAsset(GMAssetType::Texture, &tex);
-				d->shaders[mesh.shader] = asset;
+				d->shaders[mesh.shader] = GMAsset(GMAssetType::Texture, &tex);
 				GMToolUtil::addTextureToShader(model->getShader(), tex, GMTextureType::Ambient);
 			}
 		}

@@ -12,7 +12,6 @@ GM_PRIVATE_OBJECT(GMGBuffer)
 	const IRenderContext* context = nullptr;
 	IFramebuffers* geometryFramebuffers = nullptr;
 	GMGameObject* quad = nullptr;
-	GMModel* quadModel = nullptr;
 	GMGeometryPassingState state = GMGeometryPassingState::Done;
 	GMGraphicEngine* engine = nullptr;
 };

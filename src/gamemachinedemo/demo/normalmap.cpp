@@ -36,7 +36,7 @@ void Demo_NormalMap::init()
 			gm::GMToolUtil::createTexture(world->getContext(), "bnp.png", &tex);
 			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::NormalMap);
 			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::Diffuse);
-			world->getAssets().insertAsset(gm::GMAssetType::Texture, tex);
+			world->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Texture, tex));
 		}
 	} cb(asDemoGameWorld(getDemoWorldReference()));
 
@@ -45,7 +45,7 @@ void Demo_NormalMap::init()
 	gm::GMfloat pos[] = { 0, 0, 1.f };
 	gm::GMModel* model;
 	gm::GMPrimitiveCreator::createQuad(extents, pos, &model, &cb);
-	gm::GMAsset quadAsset = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Model, model);
+	gm::GMAsset quadAsset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, model));
 	d->gameObject = new gm::GMGameObject(quadAsset);
 	asDemoGameWorld(getDemoWorldReference())->addObject("texture", d->gameObject);
 

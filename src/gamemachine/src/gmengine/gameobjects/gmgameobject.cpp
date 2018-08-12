@@ -15,7 +15,8 @@ GMGameObject::GMGameObject(GMAsset asset)
 void GMGameObject::addModel(GMAsset asset, bool replace)
 {
 	D(d);
-	GMModels* models = GMAssets::getModels(asset);
+	d->asset = asset;
+	GMModels* models = asset.getModels();
 	if (models)
 	{
 		if (replace)
@@ -32,7 +33,7 @@ void GMGameObject::addModel(GMAsset asset, bool replace)
 	}
 	else
 	{
-		GMModel* model = GMAssets::getModel(asset);
+		GMModel* model = asset.getModel();
 		GM_ASSERT(model);
 		d->models.push_back(model);
 	}
@@ -151,11 +152,6 @@ GMCubeMapGameObject::GMCubeMapGameObject(ITexture* texture)
 	createCubeMap(texture);
 }
 
-GMCubeMapGameObject::~GMCubeMapGameObject()
-{
-	GM_delete(getModels().getModels());
-}
-
 void GMCubeMapGameObject::deactivate()
 {
 	D(d);
@@ -236,7 +232,7 @@ void GMCubeMapGameObject::createCubeMap(ITexture* texture)
 		mesh->vertex(V2);
 	}
 
-	addModel(GMAssets::createIsolatedAsset(GMAssetType::Model, model));
+	addModel(GMAsset(GMAssetType::Model, model));
 }
 
 bool GMCubeMapGameObject::canDeferredRendering()

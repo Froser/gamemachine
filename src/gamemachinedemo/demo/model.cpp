@@ -47,7 +47,7 @@ void Demo_Model::init()
 
 	gm::ITexture* texture = nullptr;
 	gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "bnp.png", &texture);
-	getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
+	getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Texture, texture));
 
 	gm::GMGamePackage& pk = *GM.getGamePackageManager();
 	gm::GMModelLoadSettings loadSettings(
@@ -64,7 +64,7 @@ void Demo_Model::init()
 		model->getShader().getMaterial().ka = model->getShader().getMaterial().kd = model->getShader().getMaterial().ks = GMVec3(0);
 	}
 
-	gm::GMAsset asset = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Models, models);
+	gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Models, models));
 	d->gameObject = new gm::GMGameObject(asset);
 	d->gameObject->setTranslation(Translate(GMVec3(0.f, .25f, 0)));
 	d->gameObject->setScaling(Scale(GMVec3(.015f, .015f, .015f)));
@@ -80,7 +80,7 @@ void Demo_Model::init()
 		shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
 		gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::NormalMap);
 
-		asset = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Model, cube);
+		asset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, cube));
 		d->gameObject2 = new gm::GMGameObject(asset);
 		d->gameObject2->setTranslation(Translate(GMVec3(-0.25f, .25f, 0)));
 		d->gameObject2->setScaling(Scale(GMVec3(.1f, .1f, .1f)));
@@ -90,13 +90,13 @@ void Demo_Model::init()
 		gm::GMModel* cube = nullptr;
 		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::one3(), &cube);
 		gm::ITexture* texture = nullptr;
-		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
+		getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Texture, texture));
 
 		gm::GMShader& shader = cube->getShader();
 		shader.getMaterial().refractivity = 0.658f;
 		shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
 
-		asset = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Model, cube);
+		asset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, cube));
 		d->gameObject3 = new gm::GMGameObject(asset);
 		d->gameObject3->setTranslation(Translate(GMVec3(0.25f, .25f, 0)));
 		d->gameObject3->setScaling(Scale(GMVec3(.1f, .1f, .1f)));

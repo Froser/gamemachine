@@ -324,8 +324,7 @@ void GMGraphicEngine::createFilterFramebuffer()
 		quad->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(d->filterFramebuffers->getFramebuffer(0)->getTexture());
 		d->filterQuadModel.reset(quad);
 		GM.createModelDataProxyAndTransfer(d->context, quad);
-		GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, quad);
-		d->filterQuad = new GMGameObject(asset);
+		d->filterQuad = new GMGameObject(GMAsset(GMAssetType::Model, quad));
 		d->filterQuad->setContext(d->context);
 	}
 }

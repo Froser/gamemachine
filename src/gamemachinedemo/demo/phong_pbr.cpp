@@ -51,16 +51,16 @@ void Demo_Phong_PBR::init()
 			&normal
 		);
 
-		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, albedo);
+		getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Texture, albedo));
 		gm::GMToolUtil::addTextureToShader(shader, albedo, gm::GMTextureType::Albedo);
 
-		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, normal);
+		getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Texture, normal));
 		gm::GMToolUtil::addTextureToShader(shader, normal, gm::GMTextureType::NormalMap);
 
-		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, metallicRoughnessAO);
+		getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Texture, metallicRoughnessAO));
 		gm::GMToolUtil::addTextureToShader(shader, metallicRoughnessAO, gm::GMTextureType::MetallicRoughnessAO);
 
-		gm::GMAsset asset = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Model, sphere);
+		gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, sphere));
 		d->gameObject = new gm::GMGameObject(asset);
 		d->gameObject->setTranslation(Translate(GMVec3(-.66f, 0, .5f)));
 		d->gameObject->setScaling(Scale(GMVec3(.5f, .5f, .5f)));
@@ -80,13 +80,13 @@ void Demo_Phong_PBR::init()
 		gm::ITexture* normal = nullptr;
 		gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "pbr/normal.png", &normal);
 
-		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, diffuse);
+		getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Texture, diffuse));
 		gm::GMToolUtil::addTextureToShader(shader, diffuse, gm::GMTextureType::Diffuse);
 
-		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, normal);
+		getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Texture, normal));
 		gm::GMToolUtil::addTextureToShader(shader, normal, gm::GMTextureType::NormalMap);
 
-		gm::GMAsset asset = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Model, sphere);
+		gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, sphere));
 		d->gameObject_Phong = new gm::GMGameObject(asset);
 		d->gameObject_Phong->setTranslation(Translate(GMVec3(.66f, 0, .5f)));
 		d->gameObject_Phong->setScaling(Scale(GMVec3(.5f, .5f, .5f)));

@@ -1,210 +1,136 @@
 ﻿#include "stdafx.h"
 #include "gmassets.h"
 
-#define RESERVED 1024
-
-GMAssets::GMAssets()
-{
-	D(d);
-	d->root = new GMAssetsNode();
-	d->root->name = "root";
-	d->orphans.reserve(RESERVED);
-
-	// 创建默认目录
-	createNodeFromPath(GM_ASSET_MODELS);
-	createNodeFromPath(GM_ASSET_TEXTURES);
-	createNodeFromPath(GM_ASSET_LIGHTMAPS);
-}
-
-GMAssets::~GMAssets()
-{
-	D(d);
-	clearChildNode(d->root);
-	clearOrphans();
-}
-
-void GMAssets::clearOrphans()
-{
-	D(d);
-	for (auto& node : d->orphans)
-	{
-		deleteAsset(node);
-		GM_delete(node);
-	}
-}
-
-GMAsset GMAssets::insertAsset(const GMAsset& asset)
-{
-	return insertAsset(asset.type, asset.asset);
-}
-
-GMAsset GMAssets::insertAsset(GMAssetType type, void* asset)
-{
-	D(d);
-	// 使用匿名的asset，意味着它不需要被第二次找到，直接放入vector
-	GMAsset ast;
-	ast.type = type;
-	ast.asset = asset;
-
-	for (auto& node : d->orphans)
-	{
-		if (node->asset == ast)
-			return ast;
-	}
-
-	GMAssetsNode* node = new GMAssetsNode();
-	node->asset = ast;
-	d->orphans.push_back(node);
-	return node->asset;
-}
-
-GMAsset GMAssets::insertAsset(const GMString& path, const GMString& name, GMAssetType type, void* asset)
-{
-	GMAssetsNode* node = nullptr;
-	// 把(a/b, c/d)字符串类型的参数改写为(a/b/c, d)
-	GMString newPath, newName;
-	combinePath({ path, name }, &newPath, &newName);
-	node = getNodeFromPath(newPath, true);
-	node = makeChild(node, newName);
-	GM_ASSERT(node);
-	node->name = newName;
-	node->asset.type = type;
-	node->asset.asset = asset;
-	return node->asset;
-}
-
 namespace
 {
-	inline bool splash(GMwchar in)
-	{
-		return in == L'/' || in == L'\\';
-	}
+	static GMAsset s_invalidAsset;
 }
 
-GMAssetsNode* GMAssets::getNodeFromPath(const GMString& path, bool createIfNotExists)
+GMAsset::GMAsset()
 {
 	D(d);
-	GMAssetsNode* node = d->root;
-	return getNodeFromPath(node, path, createIfNotExists);
+	d->ref = new GMAtomic<GMint>(1);
 }
 
-void GMAssets::createNodeFromPath(const GMString& path)
+GMAsset::GMAsset(GMAssetType type, void* asset)
+	: GMAsset()
 {
-	getNodeFromPath(path, true);
+	D(d);
+	d->type = type;
+	d->asset = asset;
 }
 
-GMAsset GMAssets::createIsolatedAsset(GMAssetType type, void* data)
+GMAsset::~GMAsset()
 {
-	GMAsset ret;
-	ret.type = type;
-	ret.asset = data;
-	return ret;
+	D(d);
+	release();
 }
 
-GMAssetsNode* GMAssets::findChild(GMAssetsNode* parentNode, const GMString& name, bool createIfNotExists)
+GMAsset::GMAsset(const GMAsset& asset)
 {
-	if (!parentNode)
-		return nullptr;
-
-	auto iter = parentNode->childs.find(name);
-	if (iter != parentNode->childs.end())
-		return iter->second;
-
-	GM_ASSERT(iter == parentNode->childs.end());
-	if (!createIfNotExists)
-		return nullptr;
-
-	GMAssetsNode* node = new GMAssetsNode();
-	node->name = name;
-	parentNode->childs.insert({ name, node });
-	return node;
+	*this = asset;
 }
 
-GMAssetsNode* GMAssets::makeChild(GMAssetsNode* parentNode, const GMString& name)
+GMAsset::GMAsset(GMAsset&& asset) GM_NOEXCEPT
 {
-	GMAssetsNode* node = new GMAssetsNode();
-	node->name = name;
-	parentNode->childs.insert({ name, node });
-	return node;
+	*this = std::move(asset);
 }
 
-GMString GMAssets::combinePath(std::initializer_list<GMString> args, REF GMString* path, REF GMString* lastPart)
+GMAsset& GMAsset::operator=(const GMAsset& asset)
 {
-	GMString result;
-	GMString name;
-	for (auto arg : args)
+	D(d);
+	D_OF(d_asset, &asset);
+	GM_ASSERT(d_asset->ref);
+
+	if (this != &asset)
+		release();
+
+	d->ref = d_asset->ref;
+	addRef();
+
+	d->type = d_asset->type;
+	d->asset = d_asset->asset;
+	return *this;
+}
+
+GMAsset& GMAsset::operator=(GMAsset&& asset) GM_NOEXCEPT
+{
+	if (this != &asset)
+		m_data.swap(asset.m_data);
+	return *this;
+}
+
+void GMAsset::addRef()
+{
+	D(d);
+	if (d->ref)
+		++(*d->ref);
+}
+
+void GMAsset::release()
+{
+	D(d);
+	if (d->ref)
 	{
-		std::string l = arg.toStdString();
-		GMScanner s(l.c_str(), splash);
-		s.next(name);
-		while (!name.isEmpty())
-		{
-			if (lastPart)
-				*lastPart = name;
-			if (path)
-				*path = result;;
-			
-			result += name;
-			result += "/";
-			s.next(name);
-		}
+		(*d->ref)--;
+		if ((*d->ref) == 0)
+			removeData();
 	}
-	return result;
 }
 
-GMAssetsNode* GMAssets::getNodeFromPath(GMAssetsNode* beginNode, const GMString& path, bool createIfNotExists)
+void GMAsset::removeData()
 {
-	GMScanner s(path, splash);
-	GMAssetsNode* node = beginNode;
-	if (!node)
-		return node;
-
-	GMString sep;
-	s.next(sep);
-	while (!sep.isEmpty())
-	{
-		node = findChild(node, sep, createIfNotExists);
-		if (!node)
-			return nullptr;
-		s.next(sep);
-	}
-	return node;
-}
-
-void GMAssets::clearChildNode(GMAssetsNode* self)
-{
-	auto& childs = self->childs;
-	for (auto& node : childs)
-	{
-		// 递归清理子对象
-		clearChildNode(node.second);
-	}
-
-	// 清理自身
-	deleteAsset(self);
-	GM_delete(self);
-}
-
-void GMAssets::deleteAsset(GMAssetsNode* node)
-{
-	switch (node->asset.type)
+	D(d);
+	switch (getType())
 	{
 	case GMAssetType::None:
 		break;
 	case GMAssetType::Texture:
-		GM_delete(getTexture(node->asset));
+		GM_delete(getTexture());
 		break;
 	case GMAssetType::Model:
-		GM_delete(getModel(node->asset));
+		GM_delete(getModel());
 		break;
 	case GMAssetType::Models:
-		GM_delete(getModels(node->asset));
+		GM_delete(getModels());
 		break;
 	case GMAssetType::PhysicsShape:
-		GM_delete(getPhysicsShape(node->asset));
+		GM_delete(getPhysicsShape());
 		break;
 	default:
 		GM_ASSERT(false);
 		break;
 	}
+	d->asset = nullptr;
+}
+
+GMAsset GMAssets::addAsset(GMAsset asset)
+{
+	D(d);
+	d->unnamedAssets.push_back(asset);
+	return asset;
+}
+
+GMAsset GMAssets::addAsset(const GMString& name, GMAsset asset)
+{
+	D(d);
+	auto result = d->childs.insert({ name, asset });
+	if (result.second)
+		return asset;
+	return s_invalidAsset;
+}
+
+GMAsset GMAssets::getAsset(GMsize_t index)
+{
+	D(d);
+	return d->unnamedAssets[index];
+}
+
+GMAsset GMAssets::getAsset(const GMString& name)
+{
+	D(d);
+	auto iter = d->childs.find(name);
+	if (iter != d->childs.end())
+		return iter->second;
+	return s_invalidAsset;
 }

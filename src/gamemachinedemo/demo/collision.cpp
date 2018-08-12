@@ -39,7 +39,7 @@ void Demo_Collision::init()
 
 	gm::GMPhysicsShape* groundShape = nullptr;
 	gm::GMPhysicsShapeCreator::createBoxShape(GMVec3(50, 50, 50), &groundShape);
-	rigidGround->setShape(getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::PhysicsShape, groundShape));
+	rigidGround->setShape(getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::PhysicsShape, groundShape)));
 
 	gm::GMModel* groundShapeModel = nullptr;
 	gm::GMBulletHelper::createModelFromShape(groundShape, &groundShapeModel);
@@ -49,7 +49,7 @@ void Demo_Collision::init()
 	groundShapeModel->getShader().getMaterial().kd = GMVec3(.1f);
 	groundShapeModel->getShader().getMaterial().ks = GMVec3(.4f);
 	groundShapeModel->getShader().getMaterial().shininess = 9;
-	d->ground->addModel(getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Model, groundShapeModel));
+	d->ground->addModel(getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, groundShapeModel)));
 
 	// add to physics world
 	physicsWorld->addRigidObject(rigidGround);
@@ -61,7 +61,7 @@ void Demo_Collision::init()
 	{
 		gm::GMPhysicsShape* boxShape = nullptr;
 		gm::GMPhysicsShapeCreator::createBoxShape(GMVec3(.1f, .1f, .1f), &boxShape);
-		gm::GMAsset boxAsset = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::PhysicsShape, boxShape);
+		gm::GMAsset boxAsset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::PhysicsShape, boxShape));
 
 		gm::GMint idx = 0;
 		for (gm::GMint k = 0; k < ARRAY_SIZE_Y; k++)
@@ -90,7 +90,7 @@ void Demo_Collision::init()
 					boxShapeModel->getShader().getMaterial().ks = GMVec3(.4f);
 					boxShapeModel->getShader().getMaterial().shininess = 99;
 
-					box->addModel(getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Model, boxShapeModel));
+					box->addModel(getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, boxShapeModel)));
 
 					physicsWorld->addRigidObject(rigidBoxObj);
 					asDemoGameWorld(getDemoWorldReference())->addObject(gm::GMString(idx), box);
