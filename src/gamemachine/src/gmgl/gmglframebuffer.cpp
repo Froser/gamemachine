@@ -114,24 +114,19 @@ GMGLFramebuffer::GMGLFramebuffer(const IRenderContext* context)
 	d->context = context;
 }
 
-GMGLFramebuffer::~GMGLFramebuffer()
-{
-	D(d);
-	GM_delete(d->texture);
-}
-
 bool GMGLFramebuffer::init(const GMFramebufferDesc& desc)
 {
 	D(d);
-	d->texture = new GMGLFramebufferTexture(desc);
-	d->texture->init();
+	GMGLFramebufferTexture* texture = new GMGLFramebufferTexture(desc);
+	texture->init();
+	d->texture = GMAsset(GMAssetType::Texture, texture);
 	return true;
 }
 
-ITexture* GMGLFramebuffer::getTexture()
+void GMGLFramebuffer::getTexture(REF GMTextureAsset& texture)
 {
 	D(d);
-	return d->texture;
+	texture = d->texture;
 }
 
 const IRenderContext* GMGLFramebuffer::getContext()
@@ -143,8 +138,8 @@ const IRenderContext* GMGLFramebuffer::getContext()
 GMuint GMGLFramebuffer::getTextureId()
 {
 	D(d);
-	GM_ASSERT(dynamic_cast<GMGLFramebufferTexture*>(d->texture));
-	GMGLFramebufferTexture* texture = static_cast<GMGLFramebufferTexture*>(d->texture);
+	GM_ASSERT(dynamic_cast<GMGLFramebufferTexture*>(d->texture.getTexture()));
+	GMGLFramebufferTexture* texture = d->texture.get<GMGLFramebufferTexture*>();
 	return texture->getTextureId();
 }
 
@@ -390,12 +385,6 @@ GMGLShadowFramebuffers::GMGLShadowFramebuffers(const IRenderContext* context)
 {
 }
 
-GMGLShadowFramebuffers::~GMGLShadowFramebuffers()
-{
-	D(d);
-	GM_delete(d->shadowMapTexture);
-}
-
 bool GMGLShadowFramebuffers::init(const GMFramebuffersDesc& desc)
 {
 	bool b = Base::init(desc);
@@ -445,7 +434,7 @@ void GMGLShadowFramebuffers::createDepthStencilBuffer(const GMFramebufferDesc& d
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	GM_ASSERT(shadowMapTextureId != 0);
-	d->shadowMapTexture = new GMGLShadowMapTexture(shadowMapTextureId);
+	d->shadowMapTexture = GMAsset(GMAssetType::Texture, new GMGLShadowMapTexture(shadowMapTextureId));
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	GM_ASSERT(status == GL_FRAMEBUFFER_COMPLETE);

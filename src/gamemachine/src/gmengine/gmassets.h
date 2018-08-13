@@ -1,8 +1,6 @@
 ﻿#ifndef __GMASSETS_H__
 #define __GMASSETS_H__
 #include <gmcommon.h>
-#include <set>
-#include <gmtools.h>
 BEGIN_NS
 
 struct ITexture;
@@ -87,6 +85,9 @@ private:
 	void addRef();
 	void release();
 	void removeData();
+
+public:
+	static const GMAsset& invalidAsset();
 };
 
 inline bool operator ==(const GMAsset& a, const GMAsset& b) GM_NOEXCEPT
@@ -119,10 +120,6 @@ public:
 	GMAsset getAsset(GMsize_t index);
 	GMAsset getAsset(const GMString& name);
 };
-
-typedef GMAsset GMModelAsset;
-typedef GMAsset GMModelsAsset;
-typedef GMAsset GMTextureAsset;
 
 END_NS
 #endif

@@ -331,7 +331,7 @@ GM_PRIVATE_OBJECT(GMParticleSystem)
 {
 	GMOwnedPtr<GMParticleEmitter> emitter;
 	GMParticleSystemManager* manager = nullptr;
-	GMOwnedPtr<ITexture> texture;
+	GMTextureAsset texture;
 	GMBuffer textureBuffer;
 	GMOwnedPtr<IParticleModel> particleModel;
 };
@@ -340,6 +340,7 @@ class GMParticleSystem : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMParticleSystem)
 	GM_FRIEND_CLASS(GMParticleSystemManager)
+	GM_DECLARE_PROPERTY(Texture, texture, GMTextureAsset)
 
 public:
 	GMParticleSystem();
@@ -353,18 +354,6 @@ public:
 	virtual IParticleModel* createParticleModel(const GMParticleDescription& desc);
 
 public:
-	inline void setTexture(AUTORELEASE ITexture* texture) GM_NOEXCEPT
-	{
-		D(d);
-		d->texture.reset(texture);
-	}
-
-	inline ITexture* getTexture() GM_NOEXCEPT
-	{
-		D(d);
-		return d->texture.get();
-	}
-
 	inline GMParticleEmitter* getEmitter() GM_NOEXCEPT
 	{
 		D(d);

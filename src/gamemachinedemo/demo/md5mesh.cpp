@@ -74,14 +74,14 @@ void Demo_MD5Mesh::init()
 
 	widget->setSize(widget->getSize().width, top + 40);
 
-	gm::GMModels* boblampcleanModel = nullptr;
+	gm::GMAsset boblampcleanModel;
 	gm::GMModelReader::load(
 		gm::GMModelLoadSettings(L"boblampclean/boblampclean.gmmd5", L"boblampclean", gm::GMModelPathType::Relative, db->parentDemonstrationWorld->getContext()), 
 		gm::GMModelReader::Auto,
-		&boblampcleanModel
+		boblampcleanModel
 	);
 	
-	d->boblampclean = new gm::GMSkeletonGameObject(gm::GMAsset(gm::GMAssetType::Models, boblampcleanModel));
+	d->boblampclean = new gm::GMSkeletonGameObject(boblampcleanModel);
 	d->boblampclean->setScaling(Scale(GMVec3(.02f, .02f, .02f)));
 	d->boblampclean->setTranslation(Translate(GMVec3(0, -.5f, 0)));
 	d->boblampclean->setRotation(Rotate(-PI / 2, GMVec3(1, 0, 0)) * Rotate(PI, GMVec3(0, 1, 0)));

@@ -45,6 +45,12 @@ struct GMCameraLookAt;
 struct GMShaderVariablesDesc;
 struct GMShadowSourceDesc;
 
+class GMAsset;
+typedef GMAsset GMModelAsset;
+typedef GMAsset GMModelsAsset;
+typedef GMAsset GMPhysicsShapeAsset;
+typedef GMAsset GMTextureAsset;
+
 enum class GameMachineHandlerEvent
 {
 	FrameStart,
@@ -249,7 +255,7 @@ enum class GMFramebuffersClearType
 GM_INTERFACE(IFramebuffer)
 {
 	virtual bool init(const GMFramebufferDesc& desc) = 0;
-	virtual ITexture* getTexture() = 0;
+	virtual void getTexture(REF GMTextureAsset&) = 0;
 	virtual void setName(const GMString& name) = 0;
 };
 
@@ -533,14 +539,14 @@ GM_INTERFACE_FROM(IWindow, IQueriable)
 GM_INTERFACE(IFactory)
 {
 	virtual void createWindow(GMInstance instance, OUT IWindow** window) = 0;
-	virtual void createTexture(const IRenderContext* context, GMImage*, OUT ITexture**) = 0;
+	virtual void createTexture(const IRenderContext* context, GMImage*, REF GMTextureAsset&) = 0;
 	virtual void createModelDataProxy(const IRenderContext*, GMModel*, OUT GMModelDataProxy**) = 0;
 	virtual void createGlyphManager(const IRenderContext* context, OUT GMGlyphManager**) = 0;
 	virtual void createFramebuffer(const IRenderContext* context, OUT IFramebuffer**) = 0;
 	virtual void createFramebuffers(const IRenderContext* context, OUT IFramebuffers**) = 0;
 	virtual void createGBuffer(const IRenderContext* context, OUT IGBuffer**) = 0;
 	virtual void createLight(GMLightType, OUT ILight**) = 0;
-	virtual void createWhiteTexture(const IRenderContext* context, OUT ITexture**) = 0;
+	virtual void createWhiteTexture(const IRenderContext* context, REF GMTextureAsset&) = 0;
 };
 
 // Audio

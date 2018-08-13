@@ -268,7 +268,7 @@ BEGIN_DECLARE_MD5_HANDLER(frame, reader, scanner, GMModelReader_MD5Anim*)
 END_DECLARE_MD5_HANDLER()
 
 //////////////////////////////////////////////////////////////////////////
-bool GMModelReader_MD5Anim::load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT GMModels** models)
+bool GMModelReader_MD5Anim::load(const GMModelLoadSettings& settings, GMBuffer& buffer, REF GMAsset& asset)
 {
 	D(d);
 	buffer.convertToStringBuffer();
@@ -302,19 +302,17 @@ bool GMModelReader_MD5Anim::load(const GMModelLoadSettings& settings, GMBuffer& 
 	GM_ASSERT(d->numJoints == d->baseframes.size());
 	GM_ASSERT(d->numFrames == d->frames.size());
 
-	GMModels* targetModel = nullptr;
-	if (*models)
+	GMModels* targetModels = nullptr;
+	if (asset.isEmpty())
 	{
-		// 如果从外部传入了一个新建好的GMModels
-		targetModel = *models;
+		targetModels = new GMModels();
+		asset = GMAsset(GMAssetType::Models, targetModels);
 	}
 	else
 	{
-		targetModel = new GMModels();
-		if (models)
-			*models = targetModel;
+		targetModels = asset.getModels();
 	}
-	buildModel(targetModel);
+	buildModel(targetModels);
 	return true;
 }
 

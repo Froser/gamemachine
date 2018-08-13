@@ -154,7 +154,7 @@ void GMParticleModel_2D::render(const IRenderContext* context)
 	{
 		d->particleObject.reset(createGameObject(context));
 
-		if (!d->system->getTexture())
+		if (d->system->getTexture().isEmpty())
 		{
 			// 获取并设置纹理
 			GMImage* image = nullptr;
@@ -164,12 +164,12 @@ void GMParticleModel_2D::render(const IRenderContext* context)
 				GMImageReader::load(buffer.buffer, buffer.size, &image);
 				if (image)
 				{
-					ITexture* texture = nullptr;
-					GM.getFactory()->createTexture(context, image, &texture);
+					GMTextureAsset texture;
+					GM.getFactory()->createTexture(context, image, texture);
 					GM_delete(image);
 					GM_ASSERT(!d->particleObject->getModels().isEmpty());
 					GMModel* model = d->particleObject->getModels()[0];
-					model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(GMAsset(GMAssetType::Texture, texture));
+					model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(texture);
 					d->system->setTexture(texture);
 				}
 			}

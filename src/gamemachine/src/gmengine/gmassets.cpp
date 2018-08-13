@@ -3,11 +3,6 @@
 #include "gmdata/gmmodel.h"
 #include "gmphysics/gmphysicsshape.h"
 
-namespace
-{
-	static GMAsset s_invalidAsset;
-}
-
 GM_DEFINE_ASSET_GETTER(ITexture*, getTexture, GMAssetType::Texture);
 GM_DEFINE_ASSET_GETTER(GMModel*, getModel, GMAssetType::Model);
 GM_DEFINE_ASSET_GETTER(GMModels*, getModels, GMAssetType::Models);
@@ -111,6 +106,12 @@ void GMAsset::removeData()
 	d->asset = nullptr;
 }
 
+const GMAsset& GMAsset::invalidAsset()
+{
+	static GMAsset s_invalid;
+	return s_invalid;
+}
+
 GMAsset GMAssets::addAsset(GMAsset asset)
 {
 	D(d);
@@ -124,7 +125,7 @@ GMAsset GMAssets::addAsset(const GMString& name, GMAsset asset)
 	auto result = d->childs.insert({ name, asset });
 	if (result.second)
 		return asset;
-	return s_invalidAsset;
+	return GMAsset::invalidAsset();
 }
 
 GMAsset GMAssets::getAsset(GMsize_t index)
@@ -139,5 +140,5 @@ GMAsset GMAssets::getAsset(const GMString& name)
 	auto iter = d->childs.find(name);
 	if (iter != d->childs.end())
 		return iter->second;
-	return s_invalidAsset;
+	return GMAsset::invalidAsset();
 }

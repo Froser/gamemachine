@@ -4,7 +4,6 @@
 #include <linearmath.h>
 #include <time.h>
 #include <random>
-#include <atomic>
 BEGIN_NS
 
 // 此类包含了各种实用工具
@@ -316,10 +315,6 @@ class GMManualResetEvent : public GMEvent
 public:
 	GMManualResetEvent(bool initialState = false);
 };
-
-// Atomic
-template <typename T>
-using GMAtomic = std::atomic<T>;
 
 struct GMConvertion
 {

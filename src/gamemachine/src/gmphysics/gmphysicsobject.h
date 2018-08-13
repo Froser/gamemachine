@@ -119,7 +119,7 @@ GM_PRIVATE_OBJECT(GMRigidPhysicsObject)
 	btRigidBody* body = nullptr; // btRigidBody在添加到物理世界后，应该由物理世界管理声明周期
 	bool bodyDetached = false;
 	btDefaultMotionState* motionState = nullptr;
-	GMPhysicsShape* shape = nullptr;
+	GMPhysicsShapeAsset shape;
 	GMfloat mass = 0;
 	GMPhysicsActivationState state = GMPhysicsActivationState::ActiveTag;
 };
@@ -152,10 +152,10 @@ public:
 		return d->body;
 	}
 
-	GMPhysicsShape* getShape()
+	GMPhysicsShapeAsset getShape()
 	{
 		D(d);
-		GM_ASSERT(d->shape);
+		GM_ASSERT(!d->shape.isEmpty());
 		return d->shape;
 	}
 

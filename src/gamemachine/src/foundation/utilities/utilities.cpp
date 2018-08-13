@@ -517,9 +517,9 @@ GMTextureAsset GMToolUtil::createTexture(const IRenderContext* context, const GM
 	GMImageReader::load(buf.buffer, buf.size, &img);
 	GM_ASSERT(img);
 
-	ITexture* texture = nullptr;
-	GM.getFactory()->createTexture(context, img, &texture);
-	GM_ASSERT(texture);
+	GMTextureAsset texture;
+	GM.getFactory()->createTexture(context, img, texture);
+	GM_ASSERT(!texture.isEmpty());
 
 	if (width)
 		*width = img->getWidth();
@@ -528,10 +528,10 @@ GMTextureAsset GMToolUtil::createTexture(const IRenderContext* context, const GM
 		*height = img->getHeight();
 
 	GM_delete(img);
-	return GMAsset(GMAssetType::Texture, texture);
+	return std::move(texture);
 }
 
-void GMToolUtil::createTextureFromFullPath(const IRenderContext* context, const GMString& filename, OUT ITexture** texture, REF GMint* width, REF GMint* height)
+void GMToolUtil::createTextureFromFullPath(const IRenderContext* context, const GMString& filename, REF GMTextureAsset& texture, REF GMint* width, REF GMint* height)
 {
 	GMImage* img = nullptr;
 	GMBuffer buf;
@@ -540,7 +540,7 @@ void GMToolUtil::createTextureFromFullPath(const IRenderContext* context, const 
 	GM_ASSERT(img);
 
 	GM.getFactory()->createTexture(context, img, texture);
-	GM_ASSERT(texture);
+	GM_ASSERT(!texture.isEmpty());
 
 	if (width)
 		*width = img->getWidth();
@@ -549,12 +549,6 @@ void GMToolUtil::createTextureFromFullPath(const IRenderContext* context, const 
 		*height = img->getHeight();
 
 	GM_delete(img);
-}
-
-void GMToolUtil::addTextureToShader(GMShader& shader, ITexture* texture, GMTextureType type)
-{
-	auto& frames = shader.getTextureList().getTextureSampler(type);
-	frames.addFrame(GMAsset(GMAssetType::Texture, texture));
 }
 
 void GMToolUtil::addTextureToShader(GMShader& shader, GMAsset texture, GMTextureType type)
@@ -635,10 +629,7 @@ bool GMToolUtil::createPBRTextures(
 			data.mip[0].data[p + 3] = 0xFF;
 		}
 
-		ITexture* coreMetallicRoughnessAoTexture = nullptr;
-		GM.getFactory()->createTexture(context, &combinedImage, &coreMetallicRoughnessAoTexture);
-		metallicRoughnessAoTexture = GMAsset(GMAssetType::Texture, coreMetallicRoughnessAoTexture);
-
+		GM.getFactory()->createTexture(context, &combinedImage, metallicRoughnessAoTexture);
 		GM_delete(metallicImg);
 		GM_delete(roughnessImg);
 		GM_delete(aoImg);

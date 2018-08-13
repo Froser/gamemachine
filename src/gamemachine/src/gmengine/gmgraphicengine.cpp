@@ -321,10 +321,10 @@ void GMGraphicEngine::createFilterFramebuffer()
 		GMPrimitiveCreator::createQuadrangle(GMPrimitiveCreator::one2(), 0, &quad);
 		GM_ASSERT(quad);
 		quad->setType(GMModelType::Filter);
-		quad->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(
-			GMAsset(GMAssetType::Texture, d->filterFramebuffers->getFramebuffer(0)->getTexture())
-		);
-		d->filterQuadModel.reset(quad);
+
+		GMTextureAsset texture;
+		d->filterFramebuffers->getFramebuffer(0)->getTexture(texture);
+		quad->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(texture);
 		GM.createModelDataProxyAndTransfer(d->context, quad);
 		d->filterQuad = new GMGameObject(GMAsset(GMAssetType::Model, quad));
 		d->filterQuad->setContext(d->context);

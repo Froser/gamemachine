@@ -17,6 +17,7 @@
 #include <stack>
 #include <list>
 #include <memory>
+#include <atomic>
 
 template <typename T1, typename T2>
 using Pair = std::pair<T1, T2>;
@@ -64,6 +65,10 @@ void GMClearSTLContainer(T& c)
 	using std::swap;
 	swap(c, empty);
 }
+
+// Atomic
+template <typename T>
+using GMAtomic = std::atomic<T>;
 
 /* 工程编译选项 */
 // 一定会使用使用OpenGL

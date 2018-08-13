@@ -25,7 +25,7 @@ struct GMTextureAttributeBank
 GM_PRIVATE_OBJECT(GMDx11Technique)
 {
 	const IRenderContext* context = nullptr;
-	GMOwnedPtr<ITexture> whiteTexture;
+	GMTextureAsset whiteTexture;
 	GMOwnedPtr<GMDx11RasterizerStates> rasterizerStates;
 	GMOwnedPtr<GMDx11BlendStates> blendStates;
 	GMOwnedPtr<GMDx11DepthStencilStates> depthStencilStates;
@@ -90,15 +90,15 @@ protected:
 	virtual void prepareBlend(GMModel* model);
 	virtual void prepareDepthStencil(GMModel* model);
 	virtual void prepareDebug(GMModel* model);
-	virtual void applyTextureAttribute(GMModel* model, ITexture* texture, GMTextureType type);
+	virtual void applyTextureAttribute(GMModel* model, GMTextureAsset texture, GMTextureType type);
 
 	ID3DX11EffectTechnique* getTechnique();
-	ITexture* getTexture(GMTextureSampler& sampler);
+	GMTextureAsset getTexture(GMTextureSampler& sampler);
 	void setGamma(IShaderProgram* shaderProgram);
 	GMDx11EffectVariableBank& getVarBank();
 
 private:
-	ITexture* getWhiteTexture();
+	GMTextureAsset getWhiteTexture();
 };
 
 class GMDx11Technique_3D : public GMDx11Technique

@@ -215,7 +215,7 @@ BEGIN_DECLARE_MD5_HANDLER(mesh, reader, scanner, GMModelReader_MD5Mesh*)
 END_DECLARE_MD5_HANDLER()
 
 //////////////////////////////////////////////////////////////////////////
-bool GMModelReader_MD5Mesh::load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT GMModels** models)
+bool GMModelReader_MD5Mesh::load(const GMModelLoadSettings& settings, GMBuffer& buffer, REF GMAsset& asset)
 {
 	D(d);
 	buffer.convertToStringBuffer();
@@ -245,19 +245,17 @@ bool GMModelReader_MD5Mesh::load(const GMModelLoadSettings& settings, GMBuffer& 
 		}
 	}
 
-	GMModels* targetModel = nullptr;
-	if (*models)
+	GMModels* targetModels = nullptr;
+	if (asset.isEmpty())
 	{
-		// 如果从外部传入了一个新建好的GMModels
-		targetModel = *models;
+		targetModels = new GMModels();
+		asset = GMAsset(GMAssetType::Models, targetModels);
 	}
 	else
 	{
-		targetModel = new GMModels();
-		if (models)
-			*models = targetModel;
+		targetModels = asset.getModels();
 	}
-	buildModel(settings, targetModel);
+	buildModel(settings, targetModels);
 	return true;
 }
 
@@ -315,13 +313,13 @@ void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, GMMo
 		mesh.targetModel = model;
 
 		GMMesh* m = new GMMesh(model);
-		GMAsset asset = d->shaders[mesh.shader];
+		GMTextureAsset asset = d->shaders[mesh.shader];
 		if (asset.isEmpty())
 		{
-			ITexture* tex = nullptr;
+			GMTextureAsset tex;
 			GMString imgPath = GMPath::fullname(GM.getGamePackageManager()->pathOf(GMPackageIndex::Models, settings.directory), mesh.shader);
-			GMToolUtil::createTextureFromFullPath(settings.context, imgPath, &tex);
-			if (tex)
+			GMToolUtil::createTextureFromFullPath(settings.context, imgPath, tex);
+			if (!tex.isEmpty())
 			{
 				d->shaders[mesh.shader] = GMAsset(GMAssetType::Texture, &tex);
 				GMToolUtil::addTextureToShader(model->getShader(), tex, GMTextureType::Ambient);

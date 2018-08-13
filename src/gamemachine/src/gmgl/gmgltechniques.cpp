@@ -106,11 +106,10 @@ namespace
 		}
 	}
 
-	ITexture* createWhiteTexture(const IRenderContext* context)
+	GMTextureAsset createWhiteTexture(const IRenderContext* context)
 	{
-		ITexture* texture = nullptr;
-		GM.getFactory()->createWhiteTexture(context, &texture);
-		texture->init();
+		GMTextureAsset texture;
+		GM.getFactory()->createWhiteTexture(context, texture);
 		return texture;
 	}
 }
@@ -264,22 +263,22 @@ bool GMGLTechnique::drawTexture(GMModel* model, GMTextureType type)
 	GMTextureSampler& sampler = model->getShader().getTextureList().getTextureSampler(type);
 
 	// 获取序列中的这一帧
-	ITexture* texture = getTexture(sampler);
-	if (texture)
+	GMTextureAsset texture = getTexture(sampler);
+	if (!texture.isEmpty())
 	{
 		// 激活动画序列
 		GMint texId = activateTexture(model, (GMTextureType)type);
-		texture->bindSampler(&sampler);
-		texture->useTexture(texId);
+		texture.getTexture()->bindSampler(&sampler);
+		texture.getTexture()->useTexture(texId);
 		return true;
 	}
 	return false;
 }
 
-ITexture* GMGLTechnique::getTexture(GMTextureSampler& frames)
+GMTextureAsset GMGLTechnique::getTexture(GMTextureSampler& frames)
 {
 	if (frames.getFrameCount() == 0)
-		return nullptr;
+		return GMAsset::invalidAsset();
 
 	if (frames.getFrameCount() == 1)
 		return frames.getFrameByIndex(0);
@@ -433,12 +432,6 @@ void GMGLTechnique::prepareDebug(GMModel* model)
 }
 
 //////////////////////////////////////////////////////////////////////////
-GMGLTechnique_3D::~GMGLTechnique_3D()
-{
-	D(d);
-	GM_delete(d->whiteTexture);
-}
-
 void GMGLTechnique_3D::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
@@ -476,7 +469,7 @@ void GMGLTechnique_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	if (shadowSourceDesc.type != GMShadowSourceDesc::NoShadow)
 	{
 		GMGLShadowFramebuffers* shadowFramebuffers = gm_cast<GMGLShadowFramebuffers*>(db->engine->getShadowMapFramebuffers());
-		shadowFramebuffers->getShadowMapTexture()->useTexture(0);
+		shadowFramebuffers->getShadowMapTexture().getTexture()->useTexture(0);
 		applyShadow(&shadowSourceDesc, shaderProgram, shadowFramebuffers, true);
 	}
 	else
@@ -519,7 +512,7 @@ void GMGLTechnique_3D::beforeDraw(GMModel* model)
 				))
 			{
 				GMint texId = activateTexture(nullptr, (GMTextureType)type);
-				getWhiteTexture()->useTexture(texId);
+				getWhiteTexture().getTexture()->useTexture(texId);
 			}
 		}
 	}
@@ -579,11 +572,11 @@ void GMGLTechnique_3D::drawDebug()
 	shaderProgram->setInt(GMSHADER_DEBUG_DRAW_NORMAL, db->debugConfig.get(GMDebugConfigs::DrawPolygonNormalMode).toInt());
 }
 
-ITexture* GMGLTechnique_3D::getWhiteTexture()
+GMTextureAsset GMGLTechnique_3D::getWhiteTexture()
 {
 	D(d);
 	D_BASE(db, Base);
-	if (!d->whiteTexture)
+	if (d->whiteTexture.isEmpty())
 		d->whiteTexture = createWhiteTexture(db->context);
 	return d->whiteTexture;
 }
@@ -599,13 +592,13 @@ void GMGLTechnique_2D::beforeDraw(GMModel* model)
 	GMTextureSampler& sampler = model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient);
 
 	// 获取序列中的这一帧
-	ITexture* texture = getTexture(sampler);
-	if (texture)
+	GMTextureAsset texture = getTexture(sampler);
+	if (!texture.isEmpty())
 	{
 		// 激活动画序列
 		GMint texId = activateTexture(model, GMTextureType::Ambient);
-		texture->bindSampler(&sampler);
-		texture->useTexture(texId);
+		texture.getTexture()->bindSampler(&sampler);
+		texture.getTexture()->useTexture(texId);
 	}
 }
 
@@ -630,16 +623,16 @@ void GMGLTechnique_CubeMap::beforeDraw(GMModel* model)
 
 	GMTextureList& texture = model->getShader().getTextureList();
 	GMTextureSampler& sampler = texture.getTextureSampler(GMTextureType::CubeMap);
-	ITexture* glTex = sampler.getFrameByIndex(0);
-	if (glTex)
+	GMTextureAsset glTex = sampler.getFrameByIndex(0);
+	if (!glTex.isEmpty())
 	{
 		IShaderProgram* shaderProgram = getShaderProgram();
 		GM_ASSERT(model->getType() == GMModelType::CubeMap);
 		shaderProgram->setInterfaceInstance(GMGLShaderProgram::techniqueName(), getTechnique(model->getType()), GMShaderType::Vertex);
 		shaderProgram->setInterfaceInstance(GMGLShaderProgram::techniqueName(), getTechnique(model->getType()), GMShaderType::Pixel);
 		shaderProgram->setInt(GM_VariablesDesc.CubeMapTextureName, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
-		glTex->bindSampler(&sampler);
-		glTex->useTexture(GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
+		glTex.getTexture()->bindSampler(&sampler);
+		glTex.getTexture()->useTexture(GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 		db->engine->setCubeMap(glTex);
 	}
 }
@@ -652,11 +645,11 @@ void GMGLTechnique_Filter::beforeDraw(GMModel* model)
 {
 	applyShader(model);
 	GMTextureSampler& sampler = model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient);
-	ITexture* texture = getTexture(sampler);
-	GM_ASSERT(texture);
+	GMTextureAsset texture = getTexture(sampler);
+	GM_ASSERT(!texture.isEmpty());
 	GMint texId = activateTexture(model, GMTextureType::Ambient);
-	texture->bindSampler(&sampler);
-	texture->useTexture(texId);
+	texture.getTexture()->bindSampler(&sampler);
+	texture.getTexture()->useTexture(texId);
 }
 
 void GMGLTechnique_Filter::afterDraw(GMModel* model)
@@ -738,7 +731,7 @@ void GMGLTechnique_LightPass::beginModel(GMModel* model, const GMGameObject* par
 	if (shadowSourceDesc.type != GMShadowSourceDesc::NoShadow)
 	{
 		GMGLShadowFramebuffers* shadowFramebuffers = gm_cast<GMGLShadowFramebuffers*>(d->engine->getShadowMapFramebuffers());
-		shadowFramebuffers->getShadowMapTexture()->useTexture(0);
+		shadowFramebuffers->getShadowMapTexture().getTexture()->useTexture(0);
 		applyShadow(&shadowSourceDesc, shaderProgram, shadowFramebuffers, true);
 	}
 	else
@@ -763,20 +756,21 @@ void GMGLTechnique_LightPass::beforeDraw(GMModel* model)
 	GMsize_t cnt = gBufferFramebuffers->count();
 	for (GMsize_t i = 0; i < cnt; ++i)
 	{
-		ITexture* texture = gBufferFramebuffers->getFramebuffer(i)->getTexture();
+		GMTextureAsset texture;
+		gBufferFramebuffers->getFramebuffer(i)->getTexture(texture);
 		const GMsize_t textureIndex = (GMTextureRegisterQuery<GMTextureType::GeometryPasses>::Value + i);
 		GM_ASSERT(textureIndex < std::numeric_limits<GMuint>::max());
 		shaderProgram->setInt(GMGLGBuffer::GBufferGeometryUniformNames()[i].c_str(), (GMuint)textureIndex);
-		texture->useTexture((GMuint)textureIndex);
+		texture.getTexture()->useTexture((GMuint)textureIndex);
 	}
 
-	ITexture* cubeMap = d->engine->getCubeMap();
-	if (cubeMap)
+	GMTextureAsset cubeMap = d->engine->getCubeMap();
+	if (!cubeMap.isEmpty())
 	{
 		const GMsize_t id = GMTextureRegisterQuery<GMTextureType::GeometryPasses>::Value + 1 + cnt;
 		GM_ASSERT(id < std::numeric_limits<GMuint>::max());
 		shaderProgram->setInt(GM_VariablesDesc.CubeMapTextureName, (GMuint)id);
-		cubeMap->useTexture((GMuint)id);
+		cubeMap.getTexture()->useTexture((GMuint)id);
 	}
 }
 

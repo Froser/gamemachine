@@ -198,11 +198,10 @@ namespace
 		return desc;
 	}
 
-	ITexture* createWhiteTexture(const IRenderContext* context)
+	GMTextureAsset createWhiteTexture(const IRenderContext* context)
 	{
-		ITexture* texture = nullptr;
-		GM.getFactory()->createWhiteTexture(context, &texture);
-		texture->init();
+		GMTextureAsset texture;
+		GM.getFactory()->createWhiteTexture(context, texture);
 		return texture;
 	}
 }
@@ -305,13 +304,13 @@ GMDx11EffectVariableBank& GMDx11Technique::getVarBank()
 	return *d->bank;
 }
 
-ITexture* GMDx11Technique::getWhiteTexture()
+GMTextureAsset GMDx11Technique::getWhiteTexture()
 {
 	D(d);
 	D_BASE(db, Base);
-	if (!d->whiteTexture)
-		d->whiteTexture.reset(createWhiteTexture(d->context));
-	return d->whiteTexture.get();
+	if (d->whiteTexture.isEmpty())
+		d->whiteTexture = createWhiteTexture(d->context);
+	return d->whiteTexture;
 }
 
 BEGIN_NS
@@ -589,14 +588,14 @@ void GMDx11Technique::prepareTextures(GMModel* model)
 	{
 		GMTextureSampler& sampler = model->getShader().getTextureList().getTextureSampler(type);
 		// 写入纹理属性，如是否绘制，偏移等
-		ITexture* texture = getTexture(sampler);
+		GMTextureAsset texture = getTexture(sampler);
 		applyTextureAttribute(model, texture, type);
 
-		if (texture && !d->engine->isNeedDiscardTexture(model, type))
+		if (!texture.isEmpty() && !d->engine->isNeedDiscardTexture(model, type))
 		{
 			// 激活动画序列
-			texture->bindSampler(&sampler);
-			texture->useTexture((GMint)type);
+			texture.getTexture()->bindSampler(&sampler);
+			texture.getTexture()->useTexture((GMint)type);
 		}
 		else
 		{
@@ -607,10 +606,10 @@ void GMDx11Technique::prepareTextures(GMModel* model)
 				type == GMTextureType::Lightmap
 				))
 			{
-				ITexture* whiteTexture = getWhiteTexture();
+				GMTextureAsset whiteTexture = getWhiteTexture();
 				applyTextureAttribute(model, whiteTexture, type);
-				whiteTexture->bindSampler(nullptr);
-				whiteTexture->useTexture((GMint)type);
+				whiteTexture.getTexture()->bindSampler(nullptr);
+				whiteTexture.getTexture()->useTexture((GMint)type);
 			}
 		}
 	}
@@ -623,7 +622,7 @@ void GMDx11Technique::prepareTextures(GMModel* model)
 	}
 }
 
-void GMDx11Technique::applyTextureAttribute(GMModel* model, ITexture* texture, GMTextureType type)
+void GMDx11Technique::applyTextureAttribute(GMModel* model, GMTextureAsset texture, GMTextureType type)
 {
 	D(d);
 	const char* textureName = nullptr;
@@ -699,7 +698,7 @@ void GMDx11Technique::applyTextureAttribute(GMModel* model, ITexture* texture, G
 		}
 	}
 
-	if (texture)
+	if (!texture.isEmpty())
 	{
 		GM_DX_HR(bank->enabled->SetBool(TRUE));
 		GM_DX_HR(bank->offsetX->SetFloat(0.f));
@@ -905,11 +904,11 @@ void GMDx11Technique::prepareDebug(GMModel* model)
 	shaderProgram->setInt(GM_VariablesDesc.Debug.Normal, mode);
 }
 
-ITexture* GMDx11Technique::getTexture(GMTextureSampler& sampler)
+GMTextureAsset GMDx11Technique::getTexture(GMTextureSampler& sampler)
 {
 	D(d);
 	if (sampler.getFrameCount() == 0)
-		return nullptr;
+		return GMAsset::invalidAsset();
 
 	if (sampler.getFrameCount() == 1)
 		return sampler.getFrameByIndex(0);
@@ -999,12 +998,12 @@ void GMDx11Technique_2D::prepareTextures(GMModel* model)
 	{
 		GMTextureSampler& sampler = model->getShader().getTextureList().getTextureSampler(type);
 		// 写入纹理属性，如是否绘制，偏移等
-		ITexture* texture = getTexture(sampler);
+		GMTextureAsset texture = getTexture(sampler);
 		applyTextureAttribute(model, texture, type);
-		if (texture)
+		if (!texture.isEmpty())
 		{
-			texture->bindSampler(&model->getShader().getTextureList().getTextureSampler(type));
-			texture->useTexture((GMint)type);
+			texture.getTexture()->bindSampler(&model->getShader().getTextureList().getTextureSampler(type));
+			texture.getTexture()->useTexture((GMint)type);
 		}
 	}
 }
@@ -1013,12 +1012,12 @@ void GMDx11Technique_CubeMap::prepareTextures(GMModel* model)
 {
 	GMTextureSampler& sampler = model->getShader().getTextureList().getTextureSampler(GMTextureType::CubeMap);
 	// 写入纹理属性，如是否绘制，偏移等
-	ITexture* texture = getTexture(sampler);
+	GMTextureAsset texture = getTexture(sampler);
 	applyTextureAttribute(model, texture, GMTextureType::CubeMap);
-	if (texture)
+	if (!texture.isEmpty())
 	{
-		texture->bindSampler(&model->getShader().getTextureList().getTextureSampler(GMTextureType::CubeMap));
-		texture->useTexture((GMint)GMTextureType::CubeMap);
+		texture.getTexture()->bindSampler(&model->getShader().getTextureList().getTextureSampler(GMTextureType::CubeMap));
+		texture.getTexture()->useTexture((GMint)GMTextureType::CubeMap);
 		GMDx11CubeMapState& cubeMapState = getEngine()->getCubeMapState();
 		if (cubeMapState.model != model)
 		{
@@ -1055,8 +1054,9 @@ void GMDx11Technique_Filter::passAllAndDraw(GMModel* model)
 
 	for (GMuint p = 0; p < techDesc.Passes; ++p)
 	{
-		GMDx11Texture* filterTexture = gm_cast<GMDx11Texture*>(model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).getFrameByIndex(0));
-		GM_ASSERT(filterTexture);
+		GMTextureAsset filterTextureAsset = model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).getFrameByIndex(0);
+		GM_ASSERT(!filterTextureAsset.isEmpty());
+		GMDx11Texture* filterTexture = filterTextureAsset.get<GMDx11Texture*>();
 		ID3DX11EffectPass* pass = getTechnique()->GetPassByIndex(p);
 		if (windowStates.sampleCount == 1)
 		{

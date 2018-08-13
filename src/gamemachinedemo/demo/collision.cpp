@@ -37,12 +37,12 @@ void Demo_Collision::init()
 	d->ground->setPhysicsObject(rigidGround);
 	rigidGround->setMass(.0f); //static object
 
-	gm::GMPhysicsShape* groundShape = nullptr;
-	gm::GMPhysicsShapeCreator::createBoxShape(GMVec3(50, 50, 50), &groundShape);
-	rigidGround->setShape(getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::PhysicsShape, groundShape)));
+	gm::GMPhysicsShapeAsset groundShape;
+	gm::GMPhysicsShapeCreator::createBoxShape(GMVec3(50, 50, 50), groundShape);
+	rigidGround->setShape(getDemoWorldReference()->getAssets().addAsset(groundShape));
 
 	gm::GMModel* groundShapeModel = nullptr;
-	gm::GMBulletHelper::createModelFromShape(groundShape, &groundShapeModel);
+	gm::GMBulletHelper::createModelFromShape(groundShape.getPhysicsShape(), &groundShapeModel);
 	GM_ASSERT(groundShapeModel);
 
 	groundShapeModel->getShader().getMaterial().ka = GMVec3(.8125f / .7f, .644f / .7f, .043f / .7f);
@@ -59,9 +59,9 @@ void Demo_Collision::init()
 
 	// create box
 	{
-		gm::GMPhysicsShape* boxShape = nullptr;
-		gm::GMPhysicsShapeCreator::createBoxShape(GMVec3(.1f, .1f, .1f), &boxShape);
-		gm::GMAsset boxAsset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::PhysicsShape, boxShape));
+		gm::GMPhysicsShapeAsset boxShape;
+		gm::GMPhysicsShapeCreator::createBoxShape(GMVec3(.1f, .1f, .1f), boxShape);
+		gm::GMAsset boxAsset = getDemoWorldReference()->getAssets().addAsset(boxShape);
 
 		gm::GMint idx = 0;
 		for (gm::GMint k = 0; k < ARRAY_SIZE_Y; k++)
@@ -82,7 +82,7 @@ void Demo_Collision::init()
 					rigidBoxObj->setShape(boxAsset);
 
 					gm::GMModel* boxShapeModel = nullptr;
-					gm::GMBulletHelper::createModelFromShape(boxShape, &boxShapeModel);
+					gm::GMBulletHelper::createModelFromShape(boxShape.getPhysicsShape(), &boxShapeModel);
 					GM_ASSERT(boxShapeModel);
 					// Set color
 					boxShapeModel->getShader().getMaterial().ka = s_colors[idx % GM_array_size(s_colors)];

@@ -1,13 +1,14 @@
 ﻿#ifndef __GMGLFRAMEBUFFER_H__
 #define __GMGLFRAMEBUFFER_H__
 #include <gmcommon.h>
+#include <gmassets.h>
 BEGIN_NS
 
 class GMGraphicEngine;
 GM_PRIVATE_OBJECT(GMGLFramebuffer)
 {
 	const IRenderContext* context = nullptr;
-	ITexture* texture = nullptr;
+	GMTextureAsset texture;
 };
 
 class GMGLFramebuffer : public GMObject, public IFramebuffer
@@ -16,11 +17,10 @@ class GMGLFramebuffer : public GMObject, public IFramebuffer
 
 public:
 	GMGLFramebuffer(const IRenderContext* context);
-	~GMGLFramebuffer();
 
 public:
 	virtual bool init(const GMFramebufferDesc& desc) override;
-	virtual ITexture* getTexture() override;
+	virtual void getTexture(REF GMTextureAsset& texture) override;
 	virtual void setName(const GMString& name) override {}
 	virtual const IRenderContext* getContext();
 
@@ -104,7 +104,7 @@ GM_PRIVATE_OBJECT(GMGLShadowFramebuffers)
 {
 	GMint width = 0;
 	GMint height = 0;
-	GMGLShadowMapTexture* shadowMapTexture = nullptr;
+	GMTextureAsset shadowMapTexture;
 };
 
 class GMGLShadowFramebuffers : public GMGLFramebuffers
@@ -113,7 +113,6 @@ class GMGLShadowFramebuffers : public GMGLFramebuffers
 
 public:
 	GMGLShadowFramebuffers(const IRenderContext* context);
-	~GMGLShadowFramebuffers();
 
 public:
 	virtual bool init(const GMFramebuffersDesc& desc) override;
@@ -133,7 +132,7 @@ public:
 		return d->height;
 	}
 
-	inline ITexture* getShadowMapTexture()
+	inline GMTextureAsset getShadowMapTexture()
 	{
 		D(d);
 		return d->shadowMapTexture;

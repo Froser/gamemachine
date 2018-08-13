@@ -108,8 +108,8 @@ void GMRigidPhysicsObject::setShape(GMAsset shape)
 {
 	D(d);
 	D_BASE(db, Base);
-	GM_ASSERT(!d->shape);
-	d->shape = shape.getPhysicsShape();
+	GM_ASSERT(d->shape.isEmpty());
+	d->shape = shape;
 
 	const GMMat4& translation = db->gameObject->getTranslation();
 	btTransform trans;
@@ -124,7 +124,7 @@ void GMRigidPhysicsObject::setShape(GMAsset shape)
 void GMRigidPhysicsObject::initRigidBody(GMfloat mass, const btTransform& startTransform, const GMVec3& color)
 {
 	D(d);
-	btCollisionShape* shape = d->shape->getBulletShape();
+	btCollisionShape* shape = d->shape.getPhysicsShape()->getBulletShape();
 	bool isDynamic = (mass != 0.f);
 
 	btVector3 localInertia(0, 0, 0);

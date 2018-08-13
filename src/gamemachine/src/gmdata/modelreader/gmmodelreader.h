@@ -3,6 +3,7 @@
 #include <gmcommon.h>
 #include <linearmath.h>
 #include <gmgameobject.h>
+#include <gmassets.h>
 BEGIN_NS
 
 class GMModel;
@@ -11,7 +12,7 @@ struct GMModelLoadSettings;
 GM_INTERFACE(IModelReader)
 {
 	virtual ~IModelReader() {}
-	virtual bool load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT GMModels** models) = 0;
+	virtual bool load(const GMModelLoadSettings& settings, GMBuffer& buffer, REF GMAsset& asset) = 0;
 	virtual bool test(const GMBuffer& buffer) = 0;
 };
 
@@ -64,8 +65,8 @@ public:
 	};
 
 public:
-	static bool load(const GMModelLoadSettings& settings, OUT GMModels** models);
-	static bool load(const GMModelLoadSettings& settings, ModelType type, OUT GMModels** models);
+	static bool load(const GMModelLoadSettings& settings, REF GMAsset& asset);
+	static bool load(const GMModelLoadSettings& settings, ModelType type, REF GMAsset& asset);
 	static IModelReader* getReader(ModelType type);
 
 private:

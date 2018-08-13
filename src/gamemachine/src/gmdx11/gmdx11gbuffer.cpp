@@ -61,7 +61,9 @@ void GMDx11GBuffer::useGeometryTextures(ID3DX11Effect* effect)
 	for (GMsize_t i = 0; i < cnt; ++i)
 	{
 		GM_ASSERT(i < GM_array_size(GeometryFramebufferNames));
-		GMDx11Texture* tex = gm_cast<GMDx11Texture*>(geometryFramebuffers->getFramebuffer(i)->getTexture());
+		GMTextureAsset texAsset;
+		geometryFramebuffers->getFramebuffer(i)->getTexture(texAsset);
+		GMDx11Texture* tex = texAsset.get<GMDx11Texture*>();
 		ID3DX11EffectShaderResourceVariable* shaderResource = effect->GetVariableByName(
 			isMultisamping() ? GeometryMSAAFramebufferNames[i] : GeometryFramebufferNames[i]
 		)->AsShaderResource();

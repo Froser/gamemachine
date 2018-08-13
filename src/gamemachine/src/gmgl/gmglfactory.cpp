@@ -16,12 +16,11 @@ void GMGLFactory::createWindow(GMInstance instance, OUT IWindow** window)
 	GM_ASSERT(b);
 }
 
-void GMGLFactory::createTexture(const IRenderContext* context, GMImage* image, OUT ITexture** texture)
+void GMGLFactory::createTexture(const IRenderContext* context, GMImage* image, REF GMTextureAsset& texture)
 {
-	GM_ASSERT(texture);
 	GMGLTexture* t = new GMGLTexture(image);
-	(*texture) = t;
 	t->init();
+	texture = GMAsset(GMAssetType::Texture, t);
 }
 
 void GMGLFactory::createModelDataProxy(const IRenderContext* context, GMModel* model, OUT GMModelDataProxy** modelDataProxy)
@@ -63,9 +62,9 @@ void GMGLFactory::createLight(GMLightType type, OUT ILight** out)
 	}
 }
 
-void GMGLFactory::createWhiteTexture(const IRenderContext* context, OUT ITexture** out)
+void GMGLFactory::createWhiteTexture(const IRenderContext* context, REF GMTextureAsset& out)
 {
-	GM_ASSERT(out);
-	*out = new GMGLWhiteTexture(context);
-	(*out)->init();
+	GMGLWhiteTexture* t = new GMGLWhiteTexture(context);
+	t->init();
+	out = GMAsset(GMAssetType::Texture, t);
 }

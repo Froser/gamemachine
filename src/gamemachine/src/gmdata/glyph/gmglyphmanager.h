@@ -6,8 +6,6 @@
 
 BEGIN_NS
 
-struct ITexture;
-
 // 用于管理字形的类
 struct GMGlyphInfo
 {

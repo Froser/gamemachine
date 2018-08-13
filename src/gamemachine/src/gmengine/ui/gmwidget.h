@@ -109,7 +109,7 @@ GM_PRIVATE_OBJECT(GMWidgetResourceManager)
 	GMint backBufferWidth = 0;
 	GMint backBufferHeight = 0;
 	Map<GMint, GMCanvasTextureInfo> textureResources;
-	ITexture* whiteTexture = nullptr;
+	GMTextureAsset whiteTexture;
 };
 
 class GMWidgetResourceManager : public GMObject

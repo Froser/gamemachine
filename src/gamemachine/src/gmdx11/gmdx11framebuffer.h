@@ -5,12 +5,13 @@
 #include <gmcom.h>
 #include "gmdx11texture.h"
 #include <gmtools.h>
+#include <gmassets.h>
 BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMDx11Framebuffer)
 {
 	const IRenderContext* context = nullptr;
-	ITexture* renderTexture = nullptr;
+	GMTextureAsset renderTexture;
 	GMComPtr<ID3D11RenderTargetView> renderTargetView;
 	GMString name;
 };
@@ -21,12 +22,11 @@ class GMDx11Framebuffer : public GMObject, public IFramebuffer
 
 public:
 	GMDx11Framebuffer(const IRenderContext* context);
-	~GMDx11Framebuffer();
 
 public:
 	virtual bool init(const GMFramebufferDesc& desc) override;
 	virtual void setName(const GMString& name) override;
-	virtual ITexture* getTexture() override;
+	virtual void getTexture(REF GMTextureAsset& texture) override;
 
 public:
 	virtual const IRenderContext* getContext();

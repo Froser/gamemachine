@@ -15,12 +15,11 @@ void GMDx11Factory::createWindow(GMInstance instance, OUT IWindow** window)
 	GM_ASSERT(b);
 }
 
-void GMDx11Factory::createTexture(const IRenderContext* context, GMImage* image, OUT ITexture** texture)
+void GMDx11Factory::createTexture(const IRenderContext* context, GMImage* image, REF GMTextureAsset& texture)
 {
-	GM_ASSERT(texture);
 	GMDx11Texture* t = new GMDx11Texture(context, image);
-	(*texture) = t;
 	t->init();
+	texture = GMAsset(GMAssetType::Texture, t);
 }
 
 void GMDx11Factory::createModelDataProxy(const IRenderContext* context, GMModel* model, OUT GMModelDataProxy** modelDataProxy)
@@ -63,9 +62,9 @@ void GMDx11Factory::createLight(GMLightType type, OUT ILight** out)
 	}
 }
 
-void GMDx11Factory::createWhiteTexture(const IRenderContext* context, OUT ITexture** out)
+void GMDx11Factory::createWhiteTexture(const IRenderContext* context, REF GMTextureAsset& texture)
 {
-	GM_ASSERT(out);
-	*out = new GMDx11WhiteTexture(context);
-	(*out)->init();
+	GMDx11WhiteTexture* t = new GMDx11WhiteTexture(context);
+	t->init();
+	texture = GMAsset(GMAssetType::Texture, t);
 }

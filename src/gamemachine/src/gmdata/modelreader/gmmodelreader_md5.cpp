@@ -131,7 +131,7 @@ GMfloat GMMD5VectorParser::calcQuatWFromVector3(GMVec3& v3)
 	return calcQuatW(v3);
 }
 
-bool GMModelReader_MD5::load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT GMModels** models)
+bool GMModelReader_MD5::load(const GMModelLoadSettings& settings, GMBuffer& buffer, REF GMAsset& asset)
 {
 	D(d);
 	static GMModelReader_MD5Mesh s_meshReader;
@@ -162,7 +162,7 @@ bool GMModelReader_MD5::load(const GMModelLoadSettings& settings, GMBuffer& buff
 		GMBuffer meshBuffer;
 		GM.getGamePackageManager()->readFile(GMPackageIndex::Models, filename, &meshBuffer);
 		GM_ASSERT(s_meshReader.test(meshBuffer));
-		s_meshReader.load(GMModelLoadSettings(filename, settings.directory, settings.type, settings.context), meshBuffer, models);
+		s_meshReader.load(GMModelLoadSettings(filename, settings.directory, settings.type, settings.context), meshBuffer, asset);
 	}
 
 	{
@@ -170,7 +170,7 @@ bool GMModelReader_MD5::load(const GMModelLoadSettings& settings, GMBuffer& buff
 		GMBuffer meshBuffer;
 		GM.getGamePackageManager()->readFile(GMPackageIndex::Models, filename, &meshBuffer);
 		GM_ASSERT(s_animReader.test(meshBuffer));
-		s_animReader.load(GMModelLoadSettings(filename, settings.directory, settings.type, settings.context), meshBuffer, models);
+		s_animReader.load(GMModelLoadSettings(filename, settings.directory, settings.type, settings.context), meshBuffer, asset);
 	}
 
 	return true;

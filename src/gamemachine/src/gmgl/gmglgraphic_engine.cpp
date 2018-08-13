@@ -169,7 +169,7 @@ void GMGLGraphicEngine::update(GMUpdateDataType type)
 	{
 		glActiveTexture(GL_TEXTURE0 + GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-		d->cubeMap = nullptr;
+		d->cubeMap = GMAsset::invalidAsset();
 		break;
 	}
 	default:

@@ -124,7 +124,7 @@ void GMBSPShaderLoader::init(const GMString& directory, GMBSPGameWorld* world, G
 	d->bspRender = bspRender;
 }
 
-ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const GMString& name)
+GMTextureAsset GMBSPShaderLoader::addTextureToTextureContainer(const GMString& name)
 {
 	D(d);
 	GMAssets& assets = d->world->getAssets();
@@ -136,7 +136,7 @@ ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const GMString& name)
 		if (!GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Textures, name, &buf, &fn))
 		{
 			gm_warning(gm_dbg_wrap("file {0} not found."), fn);
-			return nullptr;
+			return GMAsset::invalidAsset();
 		}
 
 		GMImage* img = nullptr;
@@ -144,20 +144,17 @@ ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const GMString& name)
 
 		if (img)
 		{
-			ITexture* texture = nullptr;
+			GMTextureAsset texture;
 			IFactory* factory = GameMachine::instance().getFactory();
-			factory->createTexture(d->world->getContext(), img, &texture);
+			factory->createTexture(d->world->getContext(), img, texture);
 			GM_delete(img);
-
-			GM_ASSERT(texture);
-			assets.addAsset(GM_ASSET_TEXTURES + GMString(name), GMAsset(GMAssetType::Texture, texture));
-			return texture;
+			return assets.addAsset(GM_ASSET_TEXTURES + GMString(name), texture);
 		}
-		return nullptr;
+		return GMAsset::invalidAsset();
 	}
 	else
 	{
-		return asset.getTexture();
+		return asset;
 	}
 }
 
@@ -323,22 +320,22 @@ void GMBSPShaderLoader::parse_src(GMShader& shader, GMXMLElement* elem)
 {
 	D(d);
 	GMTextureSampler* sampler = &shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
-	ITexture* texture = addTextureToTextureContainer(elem->GetText());
-	if (texture)
-		sampler->addFrame(GMAsset(GMAssetType::Texture, texture));
+	GMTextureAsset texture = addTextureToTextureContainer(elem->GetText());
+	if (!texture.isEmpty())
+		sampler->addFrame(texture);
 }
 
 void GMBSPShaderLoader::parse_clampmap(GMShader& shader, GMXMLElement* elem)
 {
 	D(d);
 	GMTextureSampler* sampler = &shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
-	ITexture* texture = addTextureToTextureContainer(elem->GetText());
-	if (texture)
+	GMTextureAsset texture = addTextureToTextureContainer(elem->GetText());
+	if (!texture.isEmpty())
 	{
 		// TODO: GL_CLAMP
 		sampler->setWrapS(GMS_Wrap::MirroredRepeat);
 		sampler->setWrapT(GMS_Wrap::MirroredRepeat);
-		sampler->addFrame(GMAsset(GMAssetType::Texture, texture));
+		sampler->addFrame(texture);
 		parse_map_tcMod(shader, elem);
 	}
 	else
@@ -351,12 +348,12 @@ void GMBSPShaderLoader::parse_map(GMShader& shader, GMXMLElement* elem)
 {
 	D(d);
 	GMTextureSampler* sampler = &shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
-	ITexture* texture = addTextureToTextureContainer(elem->GetText());
-	if (texture)
+	GMAsset texture = addTextureToTextureContainer(elem->GetText());
+	if (!texture.isEmpty())
 	{
 		sampler->setWrapS(GMS_Wrap::Repeat);
 		sampler->setWrapT(GMS_Wrap::Repeat);
-		sampler->addFrame(GMAsset(GMAssetType::Texture, texture));
+		sampler->addFrame(texture);
 		parse_map_tcMod(shader, elem);
 	}
 	else
@@ -376,11 +373,10 @@ void GMBSPShaderLoader::parse_map_fromLightmap(GMShader& shader, GMXMLElement* e
 		{
 			GMAssets& assets = d->world->getAssets();
 			GMAsset asset = assets.getAsset(GM_ASSET_LIGHTMAPS + std::to_string(d->lightmapId));
-			ITexture* tex = asset.getTexture();
-			if (tex)
+			if (!asset.isEmpty())
 			{
 				GMTextureSampler* sampler = &shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
-				sampler->addFrame(GMAsset(GMAssetType::Texture, tex));
+				sampler->addFrame(asset);
 				gm_info(gm_dbg_wrap("found map from lightmap {0}"), GMString(d->lightmapId));
 			}
 			else
@@ -394,12 +390,12 @@ void GMBSPShaderLoader::parse_map_fromLightmap(GMShader& shader, GMXMLElement* e
 void GMBSPShaderLoader::parse_normalmap(GMShader& shader, GMXMLElement* elem)
 {
 	GMTextureSampler* sampler = &shader.getTextureList().getTextureSampler(GMTextureType::NormalMap);
-	ITexture* texture = addTextureToTextureContainer(elem->GetText());
-	if (texture)
+	GMAsset texture = addTextureToTextureContainer(elem->GetText());
+	if (!texture.isEmpty())
 	{
 		sampler->setWrapS(GMS_Wrap::Repeat);
 		sampler->setWrapT(GMS_Wrap::Repeat);
-		sampler->addFrame(GMAsset(GMAssetType::Texture, texture));
+		sampler->addFrame(texture);
 	}
 }
 
@@ -547,7 +543,6 @@ void GMBSPShaderLoader::parse_map_tcMod(GMShader& shader, GMXMLElement* elem)
 void GMBSPShaderLoader::createSky(GMShader& shader)
 {
 	D(d);
-	ITexture* texture = shader.getTextureList().getTextureSampler(GMTextureType::Ambient).getFrameByIndex(0);
 	shader.setDiscard(true);
 	if (!d->world->getSky())
 	{

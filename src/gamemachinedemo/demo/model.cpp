@@ -53,16 +53,16 @@ void Demo_Model::init()
 		"cat"
 	);
 
-	gm::GMModels* models = new gm::GMModels();
-	gm::GMModelReader::load(loadSettings, &models);
+	gm::GMAsset models;
+	gm::GMModelReader::load(loadSettings, models);
 
-	for (auto& model : models->getModels())
+	for (auto& model : models.getModels()->getModels())
 	{
 		model->getShader().getMaterial().refractivity = 0.658f;
 		model->getShader().getMaterial().ka = model->getShader().getMaterial().kd = model->getShader().getMaterial().ks = GMVec3(0);
 	}
 
-	gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Models, models));
+	gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(models);
 	d->gameObject = new gm::GMGameObject(asset);
 	d->gameObject->setTranslation(Translate(GMVec3(0.f, .25f, 0)));
 	d->gameObject->setScaling(Scale(GMVec3(.015f, .015f, .015f)));
@@ -87,8 +87,6 @@ void Demo_Model::init()
 	{
 		gm::GMModel* cube = nullptr;
 		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::one3(), &cube);
-		gm::ITexture* texture = nullptr;
-		getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Texture, texture));
 
 		gm::GMShader& shader = cube->getShader();
 		shader.getMaterial().refractivity = 0.658f;
@@ -232,8 +230,8 @@ gm::GMCubeMapGameObject* Demo_Model::createCubeMap()
 	}
 
 	gm::GMCubeMapBuffer cubeMap(*slices[0], *slices[1], *slices[2], *slices[3], *slices[4], *slices[5]);
-	gm::ITexture* cubeMapTex = nullptr;
-	GM.getFactory()->createTexture(getDemoWorldReference()->getContext(), &cubeMap, &cubeMapTex);
+	gm::GMTextureAsset cubeMapTex;
+	GM.getFactory()->createTexture(getDemoWorldReference()->getContext(), &cubeMap, cubeMapTex);
 
 	for (auto slice : slices)
 	{

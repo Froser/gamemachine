@@ -90,7 +90,7 @@ void GMModelReader_Obj::init()
 	d->materials.clear();
 }
 
-bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT GMModels** models)
+bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buffer, REF GMAsset& asset)
 {
 	D(d);
 	init();
@@ -154,7 +154,7 @@ bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buff
 		}
 	}
 
-	*models = d->models;
+	asset = GMAsset(GMAssetType::Models, d->models);
 	return true;
 }
 

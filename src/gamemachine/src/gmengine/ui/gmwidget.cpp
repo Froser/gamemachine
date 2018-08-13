@@ -163,8 +163,8 @@ GMWidgetResourceManager::GMWidgetResourceManager(const IRenderContext* context)
 	d->borderObject = gm_makeOwnedPtr<GMBorder2DGameObject>(context->getWindow()->getRenderRect());
 	d->borderObject->setContext(context);
 
-	GM.getFactory()->createWhiteTexture(context, &d->whiteTexture);
-	addTexture(GMWidgetResourceManager::WhiteTexture, GMAsset(GMAssetType::Texture, d->whiteTexture), 1, 1);
+	GM.getFactory()->createWhiteTexture(context, d->whiteTexture);
+	addTexture(GMWidgetResourceManager::WhiteTexture, d->whiteTexture, 1, 1);
 }
 
 void GMWidgetResourceManager::addTexture(TextureType type, GMAsset texture, GMint width, GMint height)

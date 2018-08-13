@@ -147,7 +147,7 @@ void GMGameObject::drawModel(const IRenderContext* context, GMModel* model)
 	technique->endModel();
 }
 
-GMCubeMapGameObject::GMCubeMapGameObject(ITexture* texture)
+GMCubeMapGameObject::GMCubeMapGameObject(GMTextureAsset texture)
 {
 	createCubeMap(texture);
 }
@@ -160,7 +160,7 @@ void GMCubeMapGameObject::deactivate()
 		world->getContext()->getEngine()->update(GMUpdateDataType::TurnOffCubeMap);
 }
 
-void GMCubeMapGameObject::createCubeMap(ITexture* texture)
+void GMCubeMapGameObject::createCubeMap(GMTextureAsset texture)
 {
 	GMfloat vertices[] = {
 		-1.0f,  1.0f, -1.0f,
@@ -220,7 +220,7 @@ void GMCubeMapGameObject::createCubeMap(ITexture* texture)
 
 	GMModel* model = new GMModel();
 	model->setType(GMModelType::CubeMap);
-	model->getShader().getTextureList().getTextureSampler(GMTextureType::CubeMap).addFrame(GMAsset(GMAssetType::Texture, texture));
+	model->getShader().getTextureList().getTextureSampler(GMTextureType::CubeMap).addFrame(texture);
 	GMMesh* mesh = new GMMesh(model);
 	for (GMuint i = 0; i < 12; i++)
 	{

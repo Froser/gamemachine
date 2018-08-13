@@ -140,7 +140,7 @@ class GMModelReader_MD5 : public GMObject, public IModelReader
 	GM_DECLARE_PROPERTY(AnimFile, animFile, GMString)
 
 public:
-	virtual bool load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT GMModels** models) override;
+	virtual bool load(const GMModelLoadSettings& settings, GMBuffer& buffer, REF GMAsset& asset) override;
 	virtual bool test(const GMBuffer& buffer) override;
 	virtual Vector<GMOwnedPtr<IMd5MeshHandler>>& getHandlers();
 

@@ -112,7 +112,7 @@ GM_PRIVATE_OBJECT(GMBSPSkyGameObject)
 class GMCubeMapGameObject : public GMGameObject
 {
 public:
-	GMCubeMapGameObject(ITexture* texture);
+	GMCubeMapGameObject(GMTextureAsset texture);
 
 public:
 	//! 将立方体贴图从渲染中移除
@@ -123,7 +123,7 @@ public:
 	void deactivate();
 
 private:
-	void createCubeMap(ITexture* texture);
+	void createCubeMap(GMTextureAsset texture);
 
 public:
 	virtual bool canDeferredRendering() override;

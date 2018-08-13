@@ -51,7 +51,7 @@ public:
 public:
 	GMS_TextureTransform& getTextureTransform(GMsize_t index);
 	void setTextureTransform(GMsize_t index, const GMS_TextureTransform& mod);
-	ITexture* getFrameByIndex(GMsize_t frameIndex);
+	GMTextureAsset getFrameByIndex(GMsize_t frameIndex);
 	GMsize_t addFrame(GMTextureAsset texture);
 	bool setTexture(GMsize_t frameIndex, GMTextureAsset texture);
 	void applyTexMode(GMfloat timeSeconds, std::function<void(GMS_TextureTransformType, Pair<GMfloat, GMfloat>&&)> callback);

@@ -51,16 +51,7 @@ struct GMToolUtil
 	*/
 	static GMTextureAsset createTexture(const IRenderContext* context, const GMString& filename, REF GMint* width = nullptr, REF GMint* height = nullptr);
 
-	static void createTextureFromFullPath(const IRenderContext* context, const GMString& filename, OUT ITexture** texture, REF GMint* width = nullptr, REF GMint* height = nullptr);
-
-	//! 将一个纹理添加到一个模型中。
-	/*!
-	  此方法会将模型添加到纹理动画列表的第1帧中。
-	  \param shader 目标模型的着色器设置。
-	  \param texture 待添加纹理。
-	  \param type 纹理类型。
-	*/
-	static void addTextureToShader(gm::GMShader& shader, ITexture* texture, GMTextureType type);
+	static void createTextureFromFullPath(const IRenderContext* context, const GMString& filename, REF GMTextureAsset& texture, REF GMint* width = nullptr, REF GMint* height = nullptr);
 
 	//! 将一个纹理添加到一个模型中。
 	/*!

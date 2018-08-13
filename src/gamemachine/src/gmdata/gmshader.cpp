@@ -13,12 +13,12 @@ void GMTextureSampler::setTextureTransform(GMsize_t index, const GMS_TextureTran
 	d->texTransform[index] = trans;
 }
 
-ITexture* GMTextureSampler::getFrameByIndex(GMsize_t frameIndex)
+GMTextureAsset GMTextureSampler::getFrameByIndex(GMsize_t frameIndex)
 {
 	D(d);
 	GM_ASSERT(!d->frames[frameIndex].isEmpty());
 	GM_ASSERT(d->frames[frameIndex].getType() == GMAssetType::Texture);
-	return d->frames[frameIndex].getTexture();
+	return d->frames[frameIndex];
 }
 
 GMsize_t GMTextureSampler::addFrame(GMTextureAsset texture)

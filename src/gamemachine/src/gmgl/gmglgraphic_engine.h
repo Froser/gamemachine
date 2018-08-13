@@ -49,7 +49,7 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	GMOwnedPtr<ITechnique> technique_3d_shadow;
 	GMOwnedPtr<ITechnique> technique_particle;
 
-	ITexture* cubeMap = nullptr;
+	GMTextureAsset cubeMap;
 	GMGLLightContext lightContext;
 };
 
@@ -76,14 +76,14 @@ public:
 	virtual void createShadowFramebuffers(OUT IFramebuffers** framebuffers) override;
 
 public:
-	inline void setCubeMap(ITexture* tex)
+	inline void setCubeMap(GMTextureAsset tex)
 	{
 		D(d);
 		if (d->cubeMap != tex)
 			d->cubeMap = tex;
 	}
 
-	inline ITexture* getCubeMap()
+	inline GMTextureAsset getCubeMap()
 	{
 		D(d);
 		return d->cubeMap;

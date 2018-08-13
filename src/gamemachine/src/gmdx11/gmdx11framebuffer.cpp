@@ -154,12 +154,6 @@ GMDx11Framebuffer::GMDx11Framebuffer(const IRenderContext* context)
 	d->context = context;
 }
 
-GMDx11Framebuffer::~GMDx11Framebuffer()
-{
-	D(d);
-	GM_delete(d->renderTexture);
-}
-
 bool GMDx11Framebuffer::init(const GMFramebufferDesc& desc)
 {
 	D(d);
@@ -168,10 +162,10 @@ bool GMDx11Framebuffer::init(const GMFramebufferDesc& desc)
 	GM_ASSERT(device);
 	GMComPtr<ID3D11Texture2D> depthStencilBuffer;
 
-	GM_ASSERT(!d->renderTexture);
+	GM_ASSERT(d->renderTexture.isEmpty());
 	GMDx11FramebufferTexture* renderTexture = new GMDx11FramebufferTexture(d->context, desc);
-	d->renderTexture = renderTexture;
-	d->renderTexture->init();
+	renderTexture->init();
+	d->renderTexture = GMAsset(GMAssetType::Texture, renderTexture);
 
 	if (!d->name.isEmpty())
 		GM_DX11_SET_OBJECT_NAME_A(renderTexture->getTexture(), d->name.toStdString().c_str());
@@ -184,14 +178,14 @@ void GMDx11Framebuffer::setName(const GMString& name)
 {
 	D(d);
 	d->name = name;
-	GM_ASSERT(!d->renderTexture && "Please call setName before init.");
+	GM_ASSERT(d->renderTexture.isEmpty() && "Please call setName before init.");
 }
 
-ITexture* GMDx11Framebuffer::getTexture()
+void GMDx11Framebuffer::getTexture(REF GMTextureAsset& texture)
 {
 	D(d);
-	GM_ASSERT(d->renderTexture);
-	return d->renderTexture;
+	GM_ASSERT(!d->renderTexture.isEmpty());
+	texture = d->renderTexture;
 }
 
 const IRenderContext* GMDx11Framebuffer::getContext()

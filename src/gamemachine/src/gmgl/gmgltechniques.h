@@ -46,7 +46,7 @@ protected:
 	virtual void deactivateTexture(GMTextureType type);
 	virtual GMint getTextureID(GMTextureType type);
 	virtual bool drawTexture(GMModel* model, GMTextureType type);
-	virtual ITexture* getTexture(GMTextureSampler& frames);
+	virtual GMTextureAsset getTexture(GMTextureSampler& frames);
 	virtual void updateCameraMatrices(IShaderProgram* shaderProgram);
 	virtual void prepareScreenInfo(IShaderProgram* shaderProgram);
 
@@ -66,7 +66,7 @@ public:
 GM_PRIVATE_OBJECT(GMGLTechnique_3D)
 {
 	GMRenderMode renderMode = GMRenderMode::Forward;
-	ITexture* whiteTexture = nullptr;
+	GMTextureAsset whiteTexture;
 };
 
 class GMGLTechnique_3D : public GMGLTechnique
@@ -75,7 +75,6 @@ class GMGLTechnique_3D : public GMGLTechnique
 
 public:
 	using GMGLTechnique::GMGLTechnique;
-	~GMGLTechnique_3D();
 
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
@@ -89,7 +88,7 @@ protected:
 	void drawDebug();
 
 private:
-	ITexture* getWhiteTexture();
+	GMTextureAsset getWhiteTexture();
 };
 
 class GMGLTechnique_2D : public GMGLTechnique_3D
