@@ -43,6 +43,14 @@ static const int GM_Debug_Normal_WorldSpace = 1;
 static const int GM_Debug_Normal_EyeSpace = 2;
 
 //--------------------------------------------------------------------------------------
+// Color Op
+//--------------------------------------------------------------------------------------
+int GM_ColorVertexOp = 0;
+static const int GM_VertexColorOp_Replace = 1;
+static const int GM_VertexColorOp_Multiply = 2;
+static const int GM_VertexColorOp_Add = 3;
+
+//--------------------------------------------------------------------------------------
 // Textures, GM_LightAttributes, Materials
 //--------------------------------------------------------------------------------------
 Texture2D GM_AmbientTexture;
@@ -721,6 +729,11 @@ GMTexture PS_3D_NormalMap()
 
 float4 PS_3D(PS_INPUT input) : SV_TARGET
 {
+    if (GM_ColorVertexOp == GM_VertexColorOp_Replace)
+    {
+        return input.Color;
+    }
+
     // 将法线换算到眼睛坐标系
     float3x3 inverseTransposeModelMatrix = ToFloat3x3(GM_InverseTransposeModelMatrix);
     float3x3 transform_Normal_Eye = mul(inverseTransposeModelMatrix, ToFloat3x3(GM_ViewMatrix));
@@ -780,7 +793,13 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
         commonInput.F0 = GM_Material.F0;
     }
 
-    return PS_3D_CalculateColor(commonInput);
+    float4 fragColor = PS_3D_CalculateColor(commonInput);
+    if (GM_ColorVertexOp == GM_VertexColorOp_Multiply)
+        fragColor *= input.Color;
+    else if (GM_ColorVertexOp == GM_VertexColorOp_Add)
+        fragColor += input.Color;
+    // else (GM_ColorVertexOp == 0) do nothing
+    return fragColor;
 }
 
 //--------------------------------------------------------------------------------------
@@ -1066,21 +1085,6 @@ VS_OUTPUT VS_Particle(VS_INPUT input)
 
 float4 PS_Particle(PS_INPUT input) : SV_TARGET
 {
-    /// Start Debug Option
-    if (GM_Debug_Normal == GM_Debug_Normal_WorldSpace)
-    {
-        float3x3 inverseTransposeModelMatrix = ToFloat3x3(GM_InverseTransposeModelMatrix);
-        float3x3 transform_Normal_Eye = mul(inverseTransposeModelMatrix, ToFloat3x3(GM_ViewMatrix));
-        return GM_NormalToTexture(normalize(mul(input.Normal, inverseTransposeModelMatrix)).xyz);
-    }
-    else if (GM_Debug_Normal == GM_Debug_Normal_EyeSpace)
-    {
-        float3x3 inverseTransposeModelMatrix = ToFloat3x3(GM_InverseTransposeModelMatrix);
-        float3x3 transform_Normal_Eye = mul(inverseTransposeModelMatrix, ToFloat3x3(GM_ViewMatrix));
-        return GM_NormalToTexture(normalize(mul(input.Normal, transform_Normal_Eye)).xyz);
-    }
-    /// End Debug Option
-
     float4 result = GM_AmbientTextureAttribute.Sample(GM_AmbientTexture, GM_AmbientSampler, input.Texcoord);
     result *= input.Color;
     return result;

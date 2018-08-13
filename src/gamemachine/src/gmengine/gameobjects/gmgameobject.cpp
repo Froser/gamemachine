@@ -94,11 +94,19 @@ bool GMGameObject::canDeferredRendering()
 	}
 	else
 	{
-		if (getModel()->getShader().getBlend() == true)
-			return false;
+		GMModel* model = getModel();
+		if (model)
+		{
+			if (model->getShader().getBlend() == true)
+				return false;
 
-		if (getModel()->getShader().getVertexColorOp() == GMS_VertexColorOp::Replace)
-			return false;
+			if (model->getShader().getVertexColorOp() == GMS_VertexColorOp::Replace)
+				return false;
+		}
+		else
+		{
+			gm_warning(gm_dbg_wrap("Game object does not contain any asset."));
+		}
 	}
 	return true;
 }

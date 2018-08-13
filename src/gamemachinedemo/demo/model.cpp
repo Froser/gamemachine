@@ -50,7 +50,8 @@ void Demo_Model::init()
 	gm::GMGamePackage& pk = *GM.getGamePackageManager();
 	gm::GMModelLoadSettings loadSettings(
 		"cat/cat.obj",
-		"cat"
+		"cat",
+		getDemoWorldReference()->getContext()
 	);
 
 	gm::GMAsset models;
@@ -59,7 +60,9 @@ void Demo_Model::init()
 	for (auto& model : models.getModels()->getModels())
 	{
 		model.getModel()->getShader().getMaterial().refractivity = 0.658f;
-		model.getModel()->getShader().getMaterial().ka = model.getModel()->getShader().getMaterial().kd = model.getModel()->getShader().getMaterial().ks = GMVec3(0);
+		model.getModel()->getShader().getMaterial().ka = 
+		model.getModel()->getShader().getMaterial().kd = 
+		model.getModel()->getShader().getMaterial().ks = GMVec3(0);
 	}
 
 	gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(models);
@@ -306,7 +309,7 @@ void Demo_Model::setDefaultLights()
 			gm::ILight* light = nullptr;
 			GM.getFactory()->createLight(gm::GMLightType::Ambient, &light);
 			GM_ASSERT(light);
-			gm::GMfloat color[] = { .3f, .3f, .3f };
+			gm::GMfloat color[] = { .8f, .8f, .8f };
 			light->setLightColor(color);
 			getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
 		}

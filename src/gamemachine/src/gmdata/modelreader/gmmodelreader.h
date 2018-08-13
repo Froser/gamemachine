@@ -38,11 +38,11 @@ enum class GMModelPathType
 */
 struct GMModelLoadSettings
 {
-	GMModelLoadSettings(const GMString& filename_, const GMString& directory_, GMModelPathType type_ = GMModelPathType::Relative, const IRenderContext* context_ = nullptr)
+	GMModelLoadSettings(const GMString& filename_, const GMString& directory_, const IRenderContext* context_, GMModelPathType type_ = GMModelPathType::Relative)
 		: filename(filename_)
 		, directory(directory_)
-		, type(type_)
 		, context(context_)
+		, type(type_)
 	{
 	}
 

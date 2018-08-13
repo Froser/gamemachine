@@ -51,6 +51,11 @@ GM2DGameObjectBase::GM2DGameObjectBase(const GMRect& renderRc)
 	d->renderRc = renderRc;
 }
 
+bool GM2DGameObjectBase::canDeferredRendering()
+{
+	return false;
+}
+
 void GM2DGameObjectBase::setGeometry(const GMRect& geometry)
 {
 	D(d);

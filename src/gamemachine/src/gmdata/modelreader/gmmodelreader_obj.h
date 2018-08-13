@@ -14,6 +14,8 @@ struct ModelReader_Obj_Material
 	GMfloat kd[3];
 	GMfloat ka[3];
 	GMfloat ks[3];
+	GMString map_Ka;
+	GMString map_Kd;
 };
 
 class GMModel;
@@ -27,6 +29,7 @@ GM_PRIVATE_OBJECT(GMModelReader_Obj)
 	AlignedVector<GMVec3> normals;
 	AlignedVector<GMVec2> texcoords;
 	Map<GMString, ModelReader_Obj_Material> materials;
+	HashMap<GMString, GMAsset, GMStringHashFunctor> shaders;
 	GMString currentMaterialName;
 	GMModel* currentModel;
 };
@@ -46,9 +49,9 @@ public:
 
 private:
 	void init();
-	void appendFace(GMScanner& scanner);
+	void appendFace(const GMModelLoadSettings& settings, GMScanner& scanner);
 	void loadMaterial(const GMModelLoadSettings& settings, const GMString& mtlFilename);
-	void applyMaterial(const ModelReader_Obj_Material& material, GMShader& shader);
+	void applyMaterial(const GMModelLoadSettings& settings, const ModelReader_Obj_Material& material, GMShader& shader);
 	ModelReader_Obj_Material* getMaterial(const GMString& materialName);
 };
 

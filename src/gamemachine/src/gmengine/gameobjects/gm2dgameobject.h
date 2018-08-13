@@ -25,6 +25,9 @@ public:
 	GM2DGameObjectBase(const GMRect& renderRc);
 
 public:
+	virtual bool canDeferredRendering();
+
+public:
 	void setGeometry(const GMRect& geometry);
 
 public:

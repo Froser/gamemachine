@@ -4,6 +4,7 @@
 #include "gmdata/gamepackage/gmgamepackage.h"
 #include "foundation/utilities/tools.h"
 #include "foundation/gamemachine.h"
+#include "foundation/utilities/utilities.h"
 
 #define RESERVED 4096
 #define INVALID -1
@@ -69,6 +70,15 @@ static void pushBackData(GMScanner& scanner, AlignedVector<T>& container)
 	container.push_back(data);
 }
 
+static void pushBackTexcoord(GMScanner& scanner, AlignedVector<GMVec2>& container)
+{
+	GMfloat u, v;
+	scanner.nextFloat(u);
+	scanner.nextFloat(v);
+	GMVec2 data(u, 1.f - v); // obj文件的tex坐标y轴是与习惯相反，用1减去
+	container.push_back(data);
+}
+
 GMModelReader_Obj::GMModelReader_Obj()
 {
 	init();
@@ -130,7 +140,7 @@ bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buff
 		else if (token == L"vt")
 		{
 			// texture
-			pushBackData<2>(s, d->texcoords);
+			pushBackTexcoord(s, d->texcoords);
 		}
 		else if (token == L"mtllib")
 		{
@@ -150,11 +160,12 @@ bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buff
 		else if (token == L"f")
 		{
 			// face
-			appendFace(s);
+			appendFace(settings, s);
 		}
 	}
 
 	asset = GMAsset(GMAssetType::Models, d->models);
+	d->shaders.clear();
 	return true;
 }
 
@@ -163,7 +174,7 @@ bool GMModelReader_Obj::test(const GMBuffer& buffer)
 	return buffer.buffer && buffer.buffer[0] == '#';
 }
 
-void GMModelReader_Obj::appendFace(GMScanner& scanner)
+void GMModelReader_Obj::appendFace(const GMModelLoadSettings& settings, GMScanner& scanner)
 {
 	D(d);
 	const ModelReader_Obj_Material& material = d->materials[d->currentMaterialName];
@@ -175,7 +186,7 @@ void GMModelReader_Obj::appendFace(GMScanner& scanner)
 		new GMMesh(d->currentModel);
 
 		d->currentModel->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
-		applyMaterial(material, d->currentModel->getShader());
+		applyMaterial(settings, material, d->currentModel->getShader());
 	}
 
 	GMint verticesCount = 0;
@@ -311,11 +322,20 @@ void GMModelReader_Obj::loadMaterial(const GMModelLoadSettings& settings, const 
 			s.nextFloat(material->ks[1]);
 			s.nextFloat(material->ks[2]);
 		}
+		else if (token == L"map_Ka")
+		{
+			s.next(material->map_Ka);
+		}
+		else if (token == L"map_Kd")
+		{
+			s.next(material->map_Kd);
+		}
 	}
 }
 
-void GMModelReader_Obj::applyMaterial(const ModelReader_Obj_Material& material, GMShader& shader)
+void GMModelReader_Obj::applyMaterial(const GMModelLoadSettings& settings, const ModelReader_Obj_Material& material, GMShader& shader)
 {
+	D(d);
 	shader.setCull(GMS_Cull::None);
 
 	GMMaterial& m = shader.getMaterial();
@@ -323,4 +343,38 @@ void GMModelReader_Obj::applyMaterial(const ModelReader_Obj_Material& material, 
 	m.kd = MakeVector3(material.kd);
 	m.ks = MakeVector3(material.ks);
 	m.shininess = material.ns;
+	
+	{
+		if (!material.map_Ka.isEmpty())
+		{
+			GMTextureAsset tex = d->shaders[material.map_Ka];
+			if (tex.isEmpty())
+			{
+				GMString imgPath = GMPath::fullname(GM.getGamePackageManager()->pathOf(GMPackageIndex::Models, settings.directory), material.map_Ka);
+				GMToolUtil::createTextureFromFullPath(settings.context, imgPath, tex);
+			}
+			if (!tex.isEmpty())
+			{
+				d->shaders[material.map_Ka] = tex;
+				GMToolUtil::addTextureToShader(shader, tex, GMTextureType::Ambient);
+			}
+		}
+	}
+
+	{
+		if (!material.map_Kd.isEmpty())
+		{
+			GMTextureAsset tex = d->shaders[material.map_Kd];
+			if (tex.isEmpty())
+			{
+				GMString imgPath = GMPath::fullname(GM.getGamePackageManager()->pathOf(GMPackageIndex::Models, settings.directory), material.map_Kd);
+				GMToolUtil::createTextureFromFullPath(settings.context, imgPath, tex);
+			}
+			if (!tex.isEmpty())
+			{
+				d->shaders[material.map_Kd] = tex;
+				GMToolUtil::addTextureToShader(shader, tex, GMTextureType::Diffuse);
+			}
+		}
+	}
 }

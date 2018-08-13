@@ -9,6 +9,7 @@ void model3d_calcCoords()
     _bitangent = bitangent;
     _uv = uv;
     _lightmapuv = lightmapuv;
+    _color = color;
 }
 
 subroutine (GM_TechniqueEntrance)

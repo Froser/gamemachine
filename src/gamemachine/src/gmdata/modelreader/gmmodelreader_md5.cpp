@@ -162,7 +162,7 @@ bool GMModelReader_MD5::load(const GMModelLoadSettings& settings, GMBuffer& buff
 		GMBuffer meshBuffer;
 		GM.getGamePackageManager()->readFile(GMPackageIndex::Models, filename, &meshBuffer);
 		GM_ASSERT(s_meshReader.test(meshBuffer));
-		s_meshReader.load(GMModelLoadSettings(filename, settings.directory, settings.type, settings.context), meshBuffer, asset);
+		s_meshReader.load(GMModelLoadSettings(filename, settings.directory, settings.context, settings.type), meshBuffer, asset);
 	}
 
 	{
@@ -170,7 +170,7 @@ bool GMModelReader_MD5::load(const GMModelLoadSettings& settings, GMBuffer& buff
 		GMBuffer meshBuffer;
 		GM.getGamePackageManager()->readFile(GMPackageIndex::Models, filename, &meshBuffer);
 		GM_ASSERT(s_animReader.test(meshBuffer));
-		s_animReader.load(GMModelLoadSettings(filename, settings.directory, settings.type, settings.context), meshBuffer, asset);
+		s_animReader.load(GMModelLoadSettings(filename, settings.directory, settings.context, settings.type), meshBuffer, asset);
 	}
 
 	return true;

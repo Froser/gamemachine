@@ -76,7 +76,7 @@ void Demo_MD5Mesh::init()
 
 	gm::GMAsset boblampcleanModel;
 	gm::GMModelReader::load(
-		gm::GMModelLoadSettings(L"boblampclean/boblampclean.gmmd5", L"boblampclean", gm::GMModelPathType::Relative, db->parentDemonstrationWorld->getContext()), 
+		gm::GMModelLoadSettings(L"boblampclean/boblampclean.gmmd5", L"boblampclean", db->parentDemonstrationWorld->getContext(), gm::GMModelPathType::Relative),
 		gm::GMModelReader::Auto,
 		boblampcleanModel
 	);

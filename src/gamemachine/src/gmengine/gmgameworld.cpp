@@ -21,7 +21,8 @@ namespace
 		}
 		else
 		{
-			if (object->getModel()->getShader().getBlend())
+			GMModel* model = object->getModel();
+			if (model && model->getShader().getBlend())
 				return true;
 		}
 		return false;

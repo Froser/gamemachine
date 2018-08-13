@@ -17,6 +17,13 @@ vec4 normalToTexture(vec3 normal_N)
 subroutine (GM_TechniqueEntrance)
 void GM_Model3D()
 {
+    // 如果是Replace，直接使用此颜色作为目标颜色
+    if (GM_ColorVertexOp == GM_VertexColorOp_Replace)
+    {
+        _frag_color = _color;
+        return;
+    }
+
     PS_3D_INPUT vertex;
     vertex.WorldPos = _model3d_position_world.xyz;
 
@@ -24,13 +31,13 @@ void GM_Model3D()
     vertex.Normal_World_N = normalize(inverse_transpose_model_matrix * _normal.xyz);
 
     mat3 normalEyeTransform = mat3(GM_ViewMatrix) * inverse_transpose_model_matrix;
-    vec3 normal_Eye_N = normalize(normalEyeTransform * _normal.xyz);
-    vertex.Normal_Eye_N = normal_Eye_N;
+    vec3 normal_World_N = normalEyeTransform * _normal.xyz;
+    vertex.Normal_Eye_N = normalize( normal_World_N );
 
     GMTangentSpace tangentSpace;
     if (GM_IsTangentSpaceInvalid(_tangent.xyz, _bitangent.xyz))
     {
-        tangentSpace = GM_CalculateTangentSpaceRuntime(vertex.WorldPos, _uv, vertex.Normal_World_N, GM_NormalMapTextureAttribute.Texture);
+        tangentSpace = GM_CalculateTangentSpaceRuntime(vertex.WorldPos, _uv, normal_World_N, GM_NormalMapTextureAttribute.Texture);
     }
     else
     {
@@ -79,4 +86,10 @@ void GM_Model3D()
         vertex.F0 = GM_Material.F0;
     }
     _frag_color = PS_3D_CalculateColor(vertex);
+
+    if (GM_ColorVertexOp == GM_VertexColorOp_Multiply)
+        _frag_color *= _color;
+    else if (GM_ColorVertexOp == GM_VertexColorOp_Add)
+        _frag_color += _color;
+    // else (GM_ColorVertexOp == 0) do nothing
 }
