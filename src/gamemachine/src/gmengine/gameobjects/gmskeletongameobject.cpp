@@ -76,7 +76,6 @@ void GMSkeletonGameObject::createSkeletonBonesObject()
 	if (skeleton && d->drawBones && !d->skeletonBonesObject)
 	{
 		// 创建连接骨骼的线条
-		// TODO 释放Asset
 		GMModel* skeletonModel = new GMModel();
 		skeletonModel->getShader().setNoDepthTest(true);
 		skeletonModel->getShader().setCull(GMS_Cull::None);
@@ -102,16 +101,12 @@ void GMSkeletonGameObject::setDrawBones(bool b)
 
 	if (d->skeletonBonesObject)
 	{
-		GMModels* m = d->skeletonBonesObject->getModels();
-		GM_ASSERT(m);
-		if (!m)
+		GMModel* model = d->skeletonBonesObject->getModel();
+		GM_ASSERT(model);
+		if (!model)
 			return;
 
-		auto& models = m->getModels();
-		for (auto model : models)
-		{
-			model.getModel()->getShader().setDiscard(!b);
-		}
+		model->getShader().setDiscard(!b);
 	}
 }
 
@@ -319,16 +314,15 @@ void GMSkeletonGameObject::updateSkeleton()
 	if (!d->skeletonBonesObject)
 		return;
 
-	if (!d->skeletonBonesObject->getModels() ||
-		d->skeletonBonesObject->getModels()->getModels().size() != 1)
+	GMModel* bonesModel = d->skeletonBonesObject->getModel();
+	if (!bonesModel)
 		return;
 
 	const GMVec4& sc = getSkeletonColor();
 	Array<GMfloat, 4> color;
 	CopyToArray(sc, &color[0]);
 
-	GMModel* skeletonModel = d->skeletonBonesObject->getModels()->getModels().front().getModel();
-	GMModelDataProxy* modelDataProxy = skeletonModel->getModelDataProxy();
+	GMModelDataProxy* modelDataProxy = bonesModel->getModelDataProxy();
 	modelDataProxy->beginUpdateBuffer(GMModelBufferType::VertexBuffer);
 	GMVertex* const vertices = static_cast<GMVertex*>(modelDataProxy->getBuffer());
 	GMVertex* verticesPtr = vertices;

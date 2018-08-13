@@ -58,7 +58,7 @@ void GMGameObject::foreach(std::function<void(GMModel*)> cb)
 	GMModels* models = getModels();
 	if (models)
 	{
-		for (auto model : models->getModels())
+		for (auto& model : models->getModels())
 		{
 			cb(model.getModel());
 		}
