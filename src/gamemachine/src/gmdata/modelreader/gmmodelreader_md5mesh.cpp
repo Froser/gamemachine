@@ -321,7 +321,7 @@ void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, GMMo
 			GMToolUtil::createTextureFromFullPath(settings.context, imgPath, tex);
 			if (!tex.isEmpty())
 			{
-				d->shaders[mesh.shader] = GMAsset(GMAssetType::Texture, &tex);
+				d->shaders[mesh.shader] = tex;
 				GMToolUtil::addTextureToShader(model->getShader(), tex, GMTextureType::Ambient);
 			}
 		}
@@ -406,6 +406,7 @@ void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, GMMo
 	}
 
 	swapAll(models);
+	d->shaders.clear();
 }
 
 void GMModelReader_MD5Mesh::swapAll(GMModels* models)
