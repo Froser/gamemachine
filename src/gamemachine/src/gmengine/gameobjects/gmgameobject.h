@@ -13,7 +13,6 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	GMuint id = 0;
 	GMOwnedPtr<GMPhysicsObject> physics;
 	GMGameWorld* world = nullptr;
-	GMModels models;
 	GMMat4 scaling = Identity<GMMat4>();
 	GMMat4 translation = Identity<GMMat4>();
 	GMQuat rotation = Identity<GMQuat>();
@@ -29,15 +28,17 @@ class GMGameObject : public GMObject
 
 public:
 	GMGameObject() = default;
-	GMGameObject(GMAsset asset);
+	GMGameObject(GMModelsAsset asset);
 	~GMGameObject() = default;
 
 public:
-	void addModel(GMAsset asset, bool replace = false);
-	GMModels& getModels();
+	void setAsset(GMModelsAsset asset);
+	GMModels* getModels();
+	GMModel* getModel();
 	void setWorld(GMGameWorld* world);
 	GMGameWorld* getWorld();
 	void setPhysicsObject(AUTORELEASE GMPhysicsObject* phyObj);
+	void foreach(std::function<void(GMModel*)>);
 
 public:
 	virtual void onAppendingObjectToWorld() {}

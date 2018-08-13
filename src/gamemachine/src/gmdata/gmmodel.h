@@ -296,17 +296,17 @@ public:
 
 GM_PRIVATE_OBJECT(GMModels)
 {
-	Vector<GMModel*> models;
+	Vector<GMAsset> models;
 	GMOwnedPtr<GMSkeleton> skeleton;
 };
 
 class GMModels : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMModels)
-	GM_DECLARE_PROPERTY(Models, models, Vector<GMModel*>)
+	GM_DECLARE_PROPERTY(Models, models, Vector<GMAsset>)
 
 public:
-	void push_back(GMModel* model);
+	void push_back(GMModelAsset model);
 	void swap(GMModels* models);
 
 public:
@@ -331,7 +331,7 @@ public:
 	GMModel* operator[](GMsize_t i)
 	{
 		D(d);
-		return d->models[i];
+		return d->models[i].getModel();
 	}
 };
 

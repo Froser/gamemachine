@@ -309,7 +309,7 @@ void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, GMMo
 		GMModel* model = new GMModel();
 		model->setUsageHint(GMUsageHint::DynamicDraw);
 		model->getShader().setFrontFace(GMS_FrontFace::COUNTER_CLOCKWISE); //MD5采用OpenGL右手坐标系，因此向前方向是逆时针的
-		models->push_back(model);
+		models->push_back(GMAsset(GMAssetType::Model, model));
 		mesh.targetModel = model;
 
 		GMMesh* m = new GMMesh(model);

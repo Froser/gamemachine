@@ -61,7 +61,7 @@ GMBSPSkyGameObject::GMBSPSkyGameObject(const GMShader& shader, const GMVec3& min
 
 	GMModel* obj = nullptr;
 	createSkyBox(&obj);
-	addModel(GMAsset(GMAssetType::Model, obj));
+	setAsset(GMAsset(GMAssetType::Model, obj));
 }
 
 void GMBSPSkyGameObject::createSkyBox(OUT GMModel** obj)

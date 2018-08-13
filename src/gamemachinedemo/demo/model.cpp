@@ -58,8 +58,8 @@ void Demo_Model::init()
 
 	for (auto& model : models.getModels()->getModels())
 	{
-		model->getShader().getMaterial().refractivity = 0.658f;
-		model->getShader().getMaterial().ka = model->getShader().getMaterial().kd = model->getShader().getMaterial().ks = GMVec3(0);
+		model.getModel()->getShader().getMaterial().refractivity = 0.658f;
+		model.getModel()->getShader().getMaterial().ka = model.getModel()->getShader().getMaterial().kd = model.getModel()->getShader().getMaterial().ks = GMVec3(0);
 	}
 
 	gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(models);

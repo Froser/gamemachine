@@ -9,8 +9,11 @@ void GMSkeletonGameObject::update(GMDuration dt)
 	D(d);
 	if (d->playing)
 	{
-		GMModels& models = getModels();
-		auto skeleton = models.getSkeleton();
+		GMModels* models = getModels();
+		if (!models)
+			return;
+
+		auto skeleton = models->getSkeleton();
 		if (skeleton)
 		{
 			initAnimation();
@@ -30,7 +33,7 @@ void GMSkeletonGameObject::update(GMDuration dt)
 			skeleton->interpolateSkeletons(frame0, frame1, interpolate);
 
 			const GMFrameSkeleton& frameSkeleton = skeleton->getAnimatedSkeleton();
-			for (auto& mesh : models.getSkeleton()->getMeshes())
+			for (auto& mesh : models->getSkeleton()->getMeshes())
 			{
 				updateMesh(mesh, frameSkeleton);
 			}
@@ -51,8 +54,11 @@ void GMSkeletonGameObject::draw()
 GMint GMSkeletonGameObject::getFramesCount()
 {
 	D(d);
-	GMModels& models = getModels();
-	auto skeleton = models.getSkeleton();
+	GMModels* models = getModels();
+	if (!models)
+		return 0;
+
+	auto skeleton = models->getSkeleton();
 	if (skeleton)
 		return skeleton->getSkeletons().getNumFrames();
 
@@ -62,8 +68,11 @@ GMint GMSkeletonGameObject::getFramesCount()
 void GMSkeletonGameObject::createSkeletonBonesObject()
 {
 	D(d);
-	GMModels& models = getModels();
-	auto skeleton = models.getSkeleton();
+	GMModels* models = getModels();
+	if (!models)
+		return;
+
+	auto skeleton = models->getSkeleton();
 	if (skeleton && d->drawBones && !d->skeletonBonesObject)
 	{
 		// 创建连接骨骼的线条
@@ -93,10 +102,15 @@ void GMSkeletonGameObject::setDrawBones(bool b)
 
 	if (d->skeletonBonesObject)
 	{
-		auto& models = d->skeletonBonesObject->getModels().getModels();
+		GMModels* m = d->skeletonBonesObject->getModels();
+		GM_ASSERT(m);
+		if (!m)
+			return;
+
+		auto& models = m->getModels();
 		for (auto model : models)
 		{
-			model->getShader().setDiscard(!b);
+			model.getModel()->getShader().setDiscard(!b);
 		}
 	}
 }
@@ -134,7 +148,7 @@ void GMSkeletonGameObject::reset(bool update)
 void GMSkeletonGameObject::initAnimation()
 {
 	D(d);
-	GMSkeleton* skeleton = getModels().getSkeleton();
+	GMSkeleton* skeleton = getModels()->getSkeleton();
 	GM_ASSERT(skeleton);
 	if (d->frameDuration == 0)
 	{
@@ -151,7 +165,7 @@ void GMSkeletonGameObject::initAnimation()
 void GMSkeletonGameObject::getAdjacentTwoFrames(GMDuration dt, REF GMint& frame0, REF GMint& frame1, REF GMfloat& interpolate)
 {
 	D(d);
-	GMSkeleton* skeleton = getModels().getSkeleton();
+	GMSkeleton* skeleton = getModels()->getSkeleton();
 	GM_ASSERT(skeleton);
 	if (skeleton->getSkeletons().getNumFrames() < 1)
 		return;
@@ -288,8 +302,11 @@ void GMSkeletonGameObject::updateMesh(GMSkeletonMesh& mesh, const GMFrameSkeleto
 void GMSkeletonGameObject::updateSkeleton()
 {
 	D(d);
-	GMModels& models = getModels();
-	auto skeleton = models.getSkeleton();
+	GMModels* models = getModels();
+	if (!models)
+		return;
+
+	auto skeleton = models->getSkeleton();
 	if (!skeleton)
 		return;
 
@@ -302,14 +319,15 @@ void GMSkeletonGameObject::updateSkeleton()
 	if (!d->skeletonBonesObject)
 		return;
 
-	if (d->skeletonBonesObject->getModels().getModels().size() != 1)
+	if (!d->skeletonBonesObject->getModels() ||
+		d->skeletonBonesObject->getModels()->getModels().size() != 1)
 		return;
 
 	const GMVec4& sc = getSkeletonColor();
 	Array<GMfloat, 4> color;
 	CopyToArray(sc, &color[0]);
 
-	GMModel* skeletonModel = d->skeletonBonesObject->getModels().getModels().front();
+	GMModel* skeletonModel = d->skeletonBonesObject->getModels()->getModels().front().getModel();
 	GMModelDataProxy* modelDataProxy = skeletonModel->getModelDataProxy();
 	modelDataProxy->beginUpdateBuffer(GMModelBufferType::VertexBuffer);
 	GMVertex* const vertices = static_cast<GMVertex*>(modelDataProxy->getBuffer());
@@ -344,8 +362,12 @@ void GMSkeletonGameObject::initSkeletonBonesMesh(GMMesh* mesh)
 {
 	D(d);
 	// 找到所有joint，连接成线
-	GMModels& models = getModels();
-	auto skeleton = models.getSkeleton();
+	GMModels* models = getModels();
+	GM_ASSERT(models);
+	if (!models)
+		return;
+
+	auto skeleton = models->getSkeleton();
 	if (!skeleton)
 		return;
 

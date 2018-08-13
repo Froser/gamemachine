@@ -171,7 +171,7 @@ void GMModelReader_Obj::appendFace(GMScanner& scanner)
 	if (!d->currentModel)
 	{
 		d->currentModel = new GMModel();
-		d->models->push_back(d->currentModel);
+		d->models->push_back(GMAsset(GMAssetType::Model, d->currentModel));
 		new GMMesh(d->currentModel);
 
 		d->currentModel->setPrimitiveTopologyMode(GMTopologyMode::Triangles);

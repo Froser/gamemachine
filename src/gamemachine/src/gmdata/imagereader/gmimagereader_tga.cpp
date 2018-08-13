@@ -176,15 +176,13 @@ if((tga) && (tga)->error) (tga)->error(tga, code);\
 gm_error(gm_dbg_wrap("Libtga:{0}"), TGAStrError(code));\
 if(tga) (tga)->last = code\
 
-		char*
-		TGAStrError(tuint8 code)
+	char* TGAStrError(tuint8 code)
 	{
 		if (code >= TGA_ERRORS) code = TGA_ERROR;
 		return tga_error_strings[code];
 	}
 
-	tlong
-		__TGASeek(TGA  *tga,
+	tlong __TGASeek(TGA  *tga,
 			tlong off,
 			int   whence)
 	{
@@ -207,8 +205,7 @@ if(tga) (tga)->last = code\
 		return tga->off;
 	}
 
-	void
-		__TGAbgr2rgb(tbyte  *data,
+	void __TGAbgr2rgb(tbyte  *data,
 			size_t  size,
 			size_t  bytes)
 	{
@@ -222,8 +219,7 @@ if(tga) (tga)->last = code\
 		}
 	}
 
-	size_t
-		TGARead(TGA    *tga,
+	size_t TGARead(TGA    *tga,
 			tbyte  *buf,
 			size_t 	size,
 			size_t 	n)
@@ -233,8 +229,7 @@ if(tga) (tga)->last = code\
 		return read / size;
 	}
 
-	int
-		TGAReadImage(TGA     *tga,
+	int TGAReadImage(TGA     *tga,
 			TGAData *data)
 	{
 		if (!tga) return 0;
@@ -282,8 +277,7 @@ if(tga) (tga)->last = code\
 		return TGA_OK;
 	}
 
-	int
-		TGAReadHeader(TGA *tga)
+	int TGAReadHeader(TGA *tga)
 	{
 		tbyte *tmp;
 
@@ -348,8 +342,7 @@ if(tga) (tga)->last = code\
 		return TGA_OK;
 	}
 
-	int
-		TGAReadImageId(TGA    *tga,
+	int TGAReadImageId(TGA    *tga,
 			tbyte **buf)
 	{
 		if (!tga || tga->hdr.id_len == 0) return 0;
@@ -375,8 +368,7 @@ if(tga) (tga)->last = code\
 		return TGA_OK;
 	}
 
-	int
-		TGAReadColorMap(TGA 	  *tga,
+	int TGAReadColorMap(TGA 	  *tga,
 			tbyte   **buf,
 			tuint32   flags)
 	{
@@ -430,8 +422,7 @@ if(tga) (tga)->last = code\
 		return read;
 	}
 
-	int
-		TGAReadRLE(TGA   *tga,
+	int TGAReadRLE(TGA   *tga,
 			tbyte *buf)
 	{
 		int head;
@@ -471,8 +462,7 @@ if(tga) (tga)->last = code\
 		return TGA_OK;
 	}
 
-	size_t
-		TGAReadScanlines(TGA 	*tga,
+	size_t TGAReadScanlines(TGA 	*tga,
 			tbyte  *buf,
 			size_t  sln,
 			size_t  n,
@@ -531,6 +521,12 @@ if(tga) (tga)->last = code\
 
 		tga->last = TGA_OK;
 		return read;
+	}
+
+	void TGAFreeData(TGAData* d)
+	{
+		if (d && d->img_data)
+			free(d->img_data);
 	}
 
 	void copyTgaRgba(const TGA& tga, const GMbyte* source, GMbyte* dest)
@@ -600,14 +596,17 @@ bool GMImageReader_TGA::load(const GMbyte* data, GMsize_t size, OUT GMImage** im
 
 		// 再按照4通道的方法拷贝数据
 		copyTgaRgba(tga, tmpData, imgData.mip[0].data);
+		GM_delete_array(tmpData);
 	}
 	else
 	{
 		gm_error(gm_dbg_wrap("GameMachine do not support non-rgb or non-rgba tga format."));
 		GM_ASSERT(false);
+		TGAFreeData(&tgaData);
 		return false;
 	}
 
+	TGAFreeData(&tgaData);
 	return true;
 }
 

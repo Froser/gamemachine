@@ -8,41 +8,29 @@
 GMGameObject::GMGameObject(GMAsset asset)
 	: GMGameObject()
 {
-	addModel(asset, true);
+	setAsset(asset);
 	updateTransformMatrix();
 }
 
-void GMGameObject::addModel(GMAsset asset, bool replace)
+void GMGameObject::setAsset(GMAsset asset)
 {
 	D(d);
+	GM_ASSERT(asset.getModel() || asset.getModels());
+	if (!asset.getModel() && !asset.getModels())
+		gm_error(gm_dbg_wrap("Asset must be a 'model' or 'models' type."));
 	d->asset = asset;
-	GMModels* models = asset.getModels();
-	if (models)
-	{
-		if (replace)
-		{
-			d->models.swap(models);
-		}
-		else
-		{
-			for (decltype(auto) model : models->getModels())
-			{
-				d->models.push_back(model);
-			}
-		}
-	}
-	else
-	{
-		GMModel* model = asset.getModel();
-		GM_ASSERT(model);
-		d->models.push_back(model);
-	}
 }
 
-GMModels& GMGameObject::getModels()
+GMModels* GMGameObject::getModels()
 {
 	D(d);
-	return d->models;
+	return d->asset.getModels();
+}
+
+GMModel* GMGameObject::getModel()
+{
+	D(d);
+	return d->asset.getModel();
 }
 
 void GMGameObject::setWorld(GMGameWorld* world)
@@ -65,24 +53,51 @@ void GMGameObject::setPhysicsObject(AUTORELEASE GMPhysicsObject* phyObj)
 	d->physics->setGameObject(this);
 }
 
+void GMGameObject::foreach(std::function<void(GMModel*)> cb)
+{
+	GMModels* models = getModels();
+	if (models)
+	{
+		for (auto model : models->getModels())
+		{
+			cb(model.getModel());
+		}
+	}
+	else
+	{
+		if (getModel())
+			cb(getModel());
+	}
+}
+
 void GMGameObject::draw()
 {
-	const GMModels& models = getModels();
-	for (decltype(auto) model : models.getModels())
-	{
-		drawModel(getContext(), model);
-	}
+	foreach([this](GMModel* m) {
+		drawModel(getContext(), m);
+	});
 }
 
 bool GMGameObject::canDeferredRendering()
 {
 	D(d);
-	for (decltype(auto) model : d->models.getModels())
+	GMModels* models = getModels();
+	if (models)
 	{
-		if (model->getShader().getBlend() == true)
+		for (decltype(auto) model : models->getModels())
+		{
+			if (model.getModel()->getShader().getBlend() == true)
+				return false;
+
+			if (model.getModel()->getShader().getVertexColorOp() == GMS_VertexColorOp::Replace)
+				return false;
+		}
+	}
+	else
+	{
+		if (getModel()->getShader().getBlend() == true)
 			return false;
 
-		if (model->getShader().getVertexColorOp() == GMS_VertexColorOp::Replace)
+		if (getModel()->getShader().getVertexColorOp() == GMS_VertexColorOp::Replace)
 			return false;
 	}
 	return true;
@@ -232,7 +247,7 @@ void GMCubeMapGameObject::createCubeMap(GMTextureAsset texture)
 		mesh->vertex(V2);
 	}
 
-	addModel(GMAsset(GMAssetType::Model, model));
+	setAsset(GMAsset(GMAssetType::Model, model));
 }
 
 bool GMCubeMapGameObject::canDeferredRendering()

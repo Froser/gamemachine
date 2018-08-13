@@ -10,10 +10,18 @@ namespace
 {
 	bool needBlend(GMGameObject* object)
 	{
-		GMModels& models = object->getModels();
-		for (auto& model : models.getModels())
+		GMModels* models = object->getModels();
+		if (models)
 		{
-			if (model->getShader().getBlend())
+			for (auto& model : models->getModels())
+			{
+				if (model.getModel()->getShader().getBlend())
+					return true;
+			}
+		}
+		else
+		{
+			if (object->getModel()->getShader().getBlend())
 				return true;
 		}
 		return false;
@@ -33,11 +41,10 @@ void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
 	obj->setContext(getContext());
 	obj->onAppendingObjectToWorld();
 	d->gameObjects.insert(GMOwnedPtr<GMGameObject>(obj));
-	GMModels& models = obj->getModels();
-	for (auto& model : models.getModels())
-	{
-		GM.createModelDataProxyAndTransfer(d->context, model);
-	}
+
+	obj->foreach([d](GMModel* m) {
+		GM.createModelDataProxyAndTransfer(d->context, m);
+	});
 }
 
 void GMGameWorld::renderScene()

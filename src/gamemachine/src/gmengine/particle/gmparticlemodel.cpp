@@ -42,7 +42,7 @@ GMGameObject* GMParticleModel_2D::createGameObject(
 
 	GM.createModelDataProxyAndTransfer(context, d->particleModel);
 	object->setContext(context);
-	object->addModel(GMAsset(GMAssetType::Model, d->particleModel));
+	object->setAsset(GMAsset(GMAssetType::Model, d->particleModel));
 	return object;
 }
 
@@ -167,9 +167,8 @@ void GMParticleModel_2D::render(const IRenderContext* context)
 					GMTextureAsset texture;
 					GM.getFactory()->createTexture(context, image, texture);
 					GM_delete(image);
-					GM_ASSERT(!d->particleObject->getModels().isEmpty());
-					GMModel* model = d->particleObject->getModels()[0];
-					model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(texture);
+					GM_ASSERT(d->particleObject->getModel());
+					d->particleObject->getModel()->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(texture);
 					d->system->setTexture(texture);
 				}
 			}

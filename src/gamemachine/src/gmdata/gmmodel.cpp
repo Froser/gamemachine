@@ -8,7 +8,7 @@
 #define TO_VEC3(i) GMVec3((i)[0], (i)[1], (i)[2])
 #define TO_VEC2(i) GMVec2((i)[0], (i)[1])
 
-void GMModels::push_back(GMModel* model)
+void GMModels::push_back(GMModelAsset model)
 {
 	D(d);
 	d->models.push_back(model);

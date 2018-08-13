@@ -49,7 +49,7 @@ void Demo_Collision::init()
 	groundShapeModel->getShader().getMaterial().kd = GMVec3(.1f);
 	groundShapeModel->getShader().getMaterial().ks = GMVec3(.4f);
 	groundShapeModel->getShader().getMaterial().shininess = 9;
-	d->ground->addModel(getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, groundShapeModel)));
+	d->ground->setAsset(getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, groundShapeModel)));
 
 	// add to physics world
 	physicsWorld->addRigidObject(rigidGround);
@@ -90,7 +90,7 @@ void Demo_Collision::init()
 					boxShapeModel->getShader().getMaterial().ks = GMVec3(.4f);
 					boxShapeModel->getShader().getMaterial().shininess = 99;
 
-					box->addModel(getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, boxShapeModel)));
+					box->setAsset(getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, boxShapeModel)));
 
 					physicsWorld->addRigidObject(rigidBoxObj);
 					asDemoGameWorld(getDemoWorldReference())->addObject(gm::GMString(idx), box);
@@ -212,10 +212,10 @@ void Demo_Collision::onWindowActivate()
 		if (rayTestResult.hit && !(rayTestResult.hitObject->isStaticObject() || rayTestResult.hitObject->isKinematicObject()))
 		{
 			if (d->lastSelect)
-				d->lastSelect->getGameObject()->getModels()[0]->getShader().getMaterial().ka = d->lastColor;
+				(*d->lastSelect->getGameObject()->getModels())[0]->getShader().getMaterial().ka = d->lastColor;
 
 			d->lastSelect = rayTestResult.hitObject;
-			GMVec3& ka = rayTestResult.hitObject->getGameObject()->getModels()[0]->getShader().getMaterial().ka;
+			GMVec3& ka = (*rayTestResult.hitObject->getGameObject()->getModels())[0]->getShader().getMaterial().ka;
 			d->lastColor = ka;
 			ka += .3f;
 

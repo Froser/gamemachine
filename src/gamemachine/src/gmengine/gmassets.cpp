@@ -104,6 +104,7 @@ void GMAsset::removeData()
 		break;
 	}
 	d->asset = nullptr;
+	GM_delete(d->ref);
 }
 
 const GMAsset& GMAsset::invalidAsset()
