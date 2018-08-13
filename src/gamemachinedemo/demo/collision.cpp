@@ -212,10 +212,10 @@ void Demo_Collision::onWindowActivate()
 		if (rayTestResult.hit && !(rayTestResult.hitObject->isStaticObject() || rayTestResult.hitObject->isKinematicObject()))
 		{
 			if (d->lastSelect)
-				(*d->lastSelect->getGameObject()->getModels())[0]->getShader().getMaterial().ka = d->lastColor;
+				d->lastSelect->getGameObject()->getModel()->getShader().getMaterial().ka = d->lastColor;
 
 			d->lastSelect = rayTestResult.hitObject;
-			GMVec3& ka = (*rayTestResult.hitObject->getGameObject()->getModels())[0]->getShader().getMaterial().ka;
+			GMVec3& ka = rayTestResult.hitObject->getGameObject()->getModel()->getShader().getMaterial().ka;
 			d->lastColor = ka;
 			ka += .3f;
 
