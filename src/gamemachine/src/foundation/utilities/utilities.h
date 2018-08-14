@@ -26,9 +26,9 @@ struct GMPrimitiveCreator
 	static const GMVec2& one2();
 	static GMfloat* origin();
 
-	static void createCube(const GMVec3& halfExtents, OUT GMModel** out);
-	static void createQuadrangle(const GMVec2& halfExtents, GMfloat z, OUT GMModel** out);
-	static void createSphere(GMfloat radius, GMint segmentsX, GMint segmentsY, OUT GMModel** out);
+	static void createCube(const GMVec3& halfExtents, REF GMModelAsset& model);
+	static void createQuadrangle(const GMVec2& halfExtents, GMfloat z, REF GMModelAsset& model);
+	static void createSphere(GMfloat radius, GMint segmentsX, GMint segmentsY, REF GMModelAsset& model);
 
 	static void createQuad(GMfloat extents[3], GMfloat position[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback = nullptr, GMModelType type = GMModelType::Model3D, GMCreateAnchor anchor = Center, GMfloat (*customUV)[12] = nullptr);
 	static void createQuad3D(GMfloat extents[3], GMfloat position[12], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback = nullptr, GMModelType type = GMModelType::Model3D, GMfloat(*customUV)[8] = nullptr);

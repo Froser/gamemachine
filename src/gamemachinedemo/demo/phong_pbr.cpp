@@ -32,9 +32,9 @@ void Demo_Phong_PBR::init()
 	getDemoWorldReference().reset(new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext()));
 
 	{
-		gm::GMModel* sphere = nullptr;
-		gm::GMPrimitiveCreator::createSphere(1.0f, 64, 64, &sphere);
-		gm::GMShader& shader = sphere->getShader();
+		gm::GMModelAsset sphere;
+		gm::GMPrimitiveCreator::createSphere(1.0f, 64, 64, sphere);
+		gm::GMShader& shader = sphere.getModel()->getShader();
 		shader.setIlluminationModel(gm::GMIlluminationModel::CookTorranceBRDF);
 		gm::GMTextureAsset albedo;
 		gm::GMTextureAsset metallicRoughnessAO;
@@ -60,16 +60,16 @@ void Demo_Phong_PBR::init()
 		getDemoWorldReference()->getAssets().addAsset(metallicRoughnessAO);
 		gm::GMToolUtil::addTextureToShader(shader, metallicRoughnessAO, gm::GMTextureType::MetallicRoughnessAO);
 
-		gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, sphere));
+		gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(sphere);
 		d->gameObject = new gm::GMGameObject(asset);
 		d->gameObject->setTranslation(Translate(GMVec3(-.66f, 0, .5f)));
 		d->gameObject->setScaling(Scale(GMVec3(.5f, .5f, .5f)));
 	}
 
 	{
-		gm::GMModel* sphere = nullptr;
-		gm::GMPrimitiveCreator::createSphere(1.0f, 64, 64, &sphere);
-		gm::GMShader& shader = sphere->getShader();
+		gm::GMModelAsset sphere;
+		gm::GMPrimitiveCreator::createSphere(1.0f, 64, 64, sphere);
+		gm::GMShader& shader = sphere.getModel()->getShader();
 		shader.setIlluminationModel(gm::GMIlluminationModel::Phong);
 		shader.getMaterial().ks = GMVec3(0.02f);
 		shader.getMaterial().kd = GMVec3(0.05f);
@@ -84,7 +84,7 @@ void Demo_Phong_PBR::init()
 		getDemoWorldReference()->getAssets().addAsset(normal);
 		gm::GMToolUtil::addTextureToShader(shader, normal, gm::GMTextureType::NormalMap);
 
-		gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, sphere));
+		gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(sphere);
 		d->gameObject_Phong = new gm::GMGameObject(asset);
 		d->gameObject_Phong->setTranslation(Translate(GMVec3(.66f, 0, .5f)));
 		d->gameObject_Phong->setScaling(Scale(GMVec3(.5f, .5f, .5f)));

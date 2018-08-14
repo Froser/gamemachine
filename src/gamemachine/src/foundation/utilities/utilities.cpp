@@ -23,7 +23,7 @@ GMfloat* GMPrimitiveCreator::origin()
 	return o;
 }
 
-void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, OUT GMModel** out)
+void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, REF GMModelAsset& model)
 {
 	static const GMVec3 s_vertices[8] = {
 		GMVec3(-1, -1, -1),
@@ -52,10 +52,10 @@ void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, OUT GMModel** out
 	顶点顺序来绘制每一个面
 	*/
 
-	GMModel* model = new GMModel();
-	model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
-	model->setType(GMModelType::Model3D);
-	GMMesh* face = new GMMesh(model);
+	GMModel* m = new GMModel();
+	m->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
+	m->setType(GMModelType::Model3D);
+	GMMesh* face = new GMMesh(m);
 
 	//Front
 	{
@@ -237,10 +237,10 @@ void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, OUT GMModel** out
 		face->vertex(V2);
 	}
 
-	*out = model;
+	model = GMAsset(GMAssetType::Model, m);
 }
 
-void GMPrimitiveCreator::createQuadrangle(const GMVec2& halfExtents, GMfloat z, OUT GMModel** out)
+void GMPrimitiveCreator::createQuadrangle(const GMVec2& halfExtents, GMfloat z, REF GMModelAsset& model)
 {
 	constexpr GMfloat texcoord[4][2] =
 	{
@@ -261,9 +261,9 @@ void GMPrimitiveCreator::createQuadrangle(const GMVec2& halfExtents, GMfloat z, 
 		{ x, y, z },
 	};
 
-	GMModel* model = new GMModel();
-	model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
-	GMMesh* mesh = new GMMesh(model);
+	GMModel* m = new GMModel();
+	m->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
+	GMMesh* mesh = new GMMesh(m);
 
 	GMVertex V1 = {
 		{ s_vertices[0][0], s_vertices[0][1], s_vertices[0][2] }, //position
@@ -290,17 +290,16 @@ void GMPrimitiveCreator::createQuadrangle(const GMVec2& halfExtents, GMfloat z, 
 	mesh->vertex(V3);
 	mesh->vertex(V4);
 
-	*out = model;
+	model = GMAsset(GMAssetType::Model, m);
 }
 
-void GMPrimitiveCreator::createSphere(GMfloat radius, GMint segmentsX, GMint segmentsY, OUT GMModel** out)
+void GMPrimitiveCreator::createSphere(GMfloat radius, GMint segmentsX, GMint segmentsY, REF GMModelAsset& model)
 {
 	GM_ASSERT(radius > 0 && segmentsX > 1 && segmentsY > 1);
-	GMModel* model = new GMModel();
-
-	model->setDrawMode(GMModelDrawMode::Index);
-	model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
-	GMMesh* mesh = new GMMesh(model);
+	GMModel* m = new GMModel();
+	m->setDrawMode(GMModelDrawMode::Index);
+	m->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
+	GMMesh* mesh = new GMMesh(m);
 
 	for (GMint y = 0; y <= segmentsY; ++y)
 	{
@@ -342,7 +341,7 @@ void GMPrimitiveCreator::createSphere(GMfloat radius, GMint segmentsX, GMint seg
 		oddRow = !oddRow;
 	}
 
-	*out = model;
+	model = GMAsset(GMAssetType::Model, m);
 }
 
 void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMModelType type, GMCreateAnchor anchor, GMfloat (*customUV)[12])

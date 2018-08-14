@@ -317,16 +317,17 @@ void GMGraphicEngine::createFilterFramebuffer()
 
 	if (!d->filterQuad)
 	{
-		GMModel* quad = nullptr;
-		GMPrimitiveCreator::createQuadrangle(GMPrimitiveCreator::one2(), 0, &quad);
-		GM_ASSERT(quad);
-		quad->setType(GMModelType::Filter);
+		GMModelAsset quad;
+		GMPrimitiveCreator::createQuadrangle(GMPrimitiveCreator::one2(), 0, quad);
+		GM_ASSERT(!quad.isEmpty());
+		GMModel* quadModel = quad.getModel();
+		quadModel->setType(GMModelType::Filter);
 
 		GMTextureAsset texture;
 		d->filterFramebuffers->getFramebuffer(0)->getTexture(texture);
-		quad->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(texture);
-		GM.createModelDataProxyAndTransfer(d->context, quad);
-		d->filterQuad = new GMGameObject(GMAsset(GMAssetType::Model, quad));
+		quadModel->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(texture);
+		GM.createModelDataProxyAndTransfer(d->context, quadModel);
+		d->filterQuad = new GMGameObject(quad);
 		d->filterQuad->setContext(d->context);
 	}
 }

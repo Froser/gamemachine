@@ -33,10 +33,10 @@ void Demo_PBR::init()
 	getDemoWorldReference().reset(new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext()));
 
 	{
-		gm::GMModel* sphere = nullptr;
-		gm::GMPrimitiveCreator::createSphere(1.0f, 64, 64, &sphere);
+		gm::GMModelAsset sphere;
+		gm::GMPrimitiveCreator::createSphere(1.0f, 64, 64, sphere);
 
-		gm::GMShader& shader = sphere->getShader();
+		gm::GMShader& shader = sphere.getModel()->getShader();
 		shader.setIlluminationModel(gm::GMIlluminationModel::CookTorranceBRDF);
 
 		gm::GMTextureAsset albedo;
@@ -64,7 +64,7 @@ void Demo_PBR::init()
 		getDemoWorldReference()->getAssets().addAsset(metallicRoughnessAO);
 		gm::GMToolUtil::addTextureToShader(shader, metallicRoughnessAO, gm::GMTextureType::MetallicRoughnessAO);
 
-		gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, sphere));
+		gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(sphere);
 		d->gameObject = new gm::GMGameObject(asset);
 		d->gameObject->setTranslation(Translate(GMVec3(0, 0, 0)));
 		d->gameObject->setScaling(Scale(GMVec3(.5f, .5f, .5f)));

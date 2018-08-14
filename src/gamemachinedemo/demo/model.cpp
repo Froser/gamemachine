@@ -73,29 +73,29 @@ void Demo_Model::init()
 
 	// 创建2个Cube，一个有NormalMap，一个无
 	{
-		gm::GMModel* cube = nullptr;
-		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::one3(), &cube);
+		gm::GMModelAsset cube;
+		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::one3(), cube);
 
-		gm::GMShader& shader = cube->getShader();
+		gm::GMShader& shader = cube.getModel()->getShader();
 		shader.getMaterial().refractivity = 0.658f;
 		shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
 		gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::NormalMap);
 
-		asset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, cube));
+		asset = getDemoWorldReference()->getAssets().addAsset(cube);
 		d->gameObject2 = new gm::GMGameObject(asset);
 		d->gameObject2->setTranslation(Translate(GMVec3(-0.25f, .25f, 0)));
 		d->gameObject2->setScaling(Scale(GMVec3(.1f, .1f, .1f)));
 		d->gameObject2->setRotation(Rotate(PI, GMVec3(0, 1, 0)));
 	}
 	{
-		gm::GMModel* cube = nullptr;
-		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::one3(), &cube);
+		gm::GMModelAsset cube;
+		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::one3(), cube);
 
-		gm::GMShader& shader = cube->getShader();
+		gm::GMShader& shader = cube.getModel()->getShader();
 		shader.getMaterial().refractivity = 0.658f;
 		shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
 
-		asset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, cube));
+		asset = getDemoWorldReference()->getAssets().addAsset(cube);
 		d->gameObject3 = new gm::GMGameObject(asset);
 		d->gameObject3->setTranslation(Translate(GMVec3(0.25f, .25f, 0)));
 		d->gameObject3->setScaling(Scale(GMVec3(.1f, .1f, .1f)));
