@@ -194,6 +194,18 @@ void GMMesh::invalidateTangentSpace()
 	}
 }
 
+void GMMesh::swap(GMVertices& vertex)
+{
+	D(d);
+	d->vertices.swap(vertex);
+}
+
+void GMMesh::swap(GMIndices& indices)
+{
+	D(d);
+	d->indices.swap(indices);
+}
+
 void GMMesh::calculateTangentSpace(GMTopologyMode topologyMode)
 {
 	D(d);

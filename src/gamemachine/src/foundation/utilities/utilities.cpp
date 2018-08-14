@@ -5,6 +5,51 @@
 #include "gmdata/gmimagebuffer.h"
 #include "gmengine/particle/gmparticle.h"
 
+#define getVertex(x, y) (vertices[(x) + (y) * (sliceM + 1)])
+
+namespace
+{
+	// 按照以下顺序求法线:
+	// p0   p1 | p2   p0 |      p2 | p1
+	//         |         |         |
+	// p2      |      p1 | p1   p0 | p0   p2
+	// 法线 = (p1 - p0) * (p2 - p0)
+	GMVec3 calculateNormal(const GMVertex& p0, const GMVertex& p1, const GMVertex& p2)
+	{
+		GMVec3 v0 = GMVec3(p0.positions[0], p0.positions[1], p0.positions[2]);
+		GMVec3 v1 = GMVec3(p1.positions[0], p1.positions[1], p1.positions[2]) - v0;
+		GMVec3 v2 = GMVec3(p2.positions[0], p2.positions[1], p2.positions[2]) - v0;
+		return Normalize(Cross(v1, v2));
+	}
+
+	enum VertexPosition
+	{
+		Left,
+		Right,
+		Up,
+		Down,
+	};
+
+	GMVertex& getAdjacentVertex(Vector<GMVertex>& vertices, GMsize_t x, GMsize_t y, GMsize_t sliceM, VertexPosition pos)
+	{
+		static GMVertex s_invalid;
+		switch (pos)
+		{
+		case Left:
+			return getVertex(x - 1, y);
+		case Right:
+			return getVertex(x + 1, y);
+		case Up:
+			return getVertex(x, y - 1);
+		case Down:
+			return getVertex(x, y + 1);
+		default:
+			GM_ASSERT(false);
+			return s_invalid;
+		}
+	}
+}
+
 const GMVec3& GMPrimitiveCreator::one3()
 {
 	static GMVec3 o (1, 1, 1);
@@ -340,6 +385,139 @@ void GMPrimitiveCreator::createSphere(GMfloat radius, GMint segmentsX, GMint seg
 		}
 		oddRow = !oddRow;
 	}
+
+	model = GMAsset(GMAssetType::Model, m);
+}
+
+void GMPrimitiveCreator::createTerrain(
+	const GMImage& img,
+	GMfloat x,
+	GMfloat z,
+	GMfloat length,
+	GMfloat width,
+	GMfloat scaling,
+	GMfloat sliceM,
+	GMfloat sliceN,
+	REF GMModelAsset& model
+)
+{
+	if (img.getData().format != GMImageFormat::RED && img.getData().type != GMImageDataType::UnsignedByte)
+	{
+		gm_error(gm_dbg_wrap("The image must be a grayscale map with unsigned bytes."));
+		return;
+	}
+
+	// 从灰度图创建地形
+	GMVertices vertices;
+	vertices.reserve( (sliceM + 1) * (sliceN + 1) );
+
+	const GMfloat dx = length / sliceM; // 2D横向
+	const GMfloat dz = width / sliceN; // 2D纵向
+	const GMfloat du = 1.f / sliceM;
+	const GMfloat dv = 1.f / sliceN;
+
+	// 先计算顶点坐标
+	GMfloat y = 0;
+	GMfloat u = 0, v = 0;
+	GMint x_image = 0, y_image = 0;
+	
+	for (GMsize_t i = 0; i < sliceN + 1; ++i)
+	{
+		for (GMsize_t j = 0; j < sliceM + 1; ++j)
+		{
+			x_image = x * img.getWidth() / length;
+			y = scaling * img.getData().mip[0].data[x_image + y_image * img.getWidth()] / 0xFF;
+
+			GMVertex vert = { { x, y, z }, { 0, 0, 0}, { u, v } };
+			vertices.push_back(std::move(vert));
+			x += dx;
+			u += du;
+		}
+
+		z += dz;
+		v += dv;
+		y_image = z * img.getHeight() / width;
+	}
+
+	// 再计算法线，一个顶点的法线等于相邻三角形平均值
+#define getAdjVert(x, y, pos) getAdjacentVertex(vertices, x, y, sliceM, pos)
+	GM_ASSERT(vertices.size() == (sliceM + 1) * (sliceN + 1));
+	for (GMsize_t i = 0; i < sliceN + 1; ++i)
+	{
+		for (GMsize_t j = 0; j < sliceM + 1; ++j)
+		{
+			// 角上的顶点，直接计算Normal，边上的顶点取2个三角形Normal平均值，中间的则取4个
+			// 四角的情况
+			if (i == 0 && j == 0)
+			{
+				GMVec3 normal = calculateNormal(getVertex(0, 0), getVertex(1, 0), getVertex(0, 1));
+				getVertex(0, 0).normals = { normal.getX(), normal.getY(), normal.getZ() };
+			}
+			else if (i == 0 && j == sliceM)
+			{
+				GMVec3 normal = calculateNormal(getVertex(sliceM, 0), getVertex(sliceM, 1), getVertex(sliceM - 1, 0));
+				getVertex(0, 0).normals = { normal.getX(), normal.getY(), normal.getZ() };
+			}
+			else if (i == sliceN && j == 0)
+			{
+				GMVec3 normal = calculateNormal(getVertex(0, sliceN), getVertex(0, sliceN - 1), getVertex(1, sliceN));
+				getVertex(0, 0).normals = { normal.getX(), normal.getY(), normal.getZ() };
+			}
+			else if (i == sliceN && j == sliceM)
+			{
+				GMVec3 normal = calculateNormal(getVertex(sliceM, sliceN), getVertex(sliceM - 1, sliceN), getVertex(sliceM, sliceN - 1));
+				getVertex(0, 0).normals = { normal.getX(), normal.getY(), normal.getZ() };
+			}
+			// 四条边的情况
+			else if (i == 0)
+			{
+				GMVec3 normal0 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Down), getAdjVert(j, i, Left));
+				GMVec3 normal1 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Right), getAdjVert(j, i, Down));
+				GMVec3 normal = Normalize((normal0 + normal1) / 2);
+				getVertex(j, i).normals = { normal.getX(), normal.getY(), normal.getZ() };
+			}
+			else if (j == 0)
+			{
+				GMVec3 normal0 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Up), getAdjVert(j, i, Right));
+				GMVec3 normal1 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Right), getAdjVert(j, i, Down));
+				GMVec3 normal = Normalize((normal0 + normal1) / 2);
+				getVertex(j, i).normals = { normal.getX(), normal.getY(), normal.getZ() };
+			}
+			else if (j == sliceM)
+			{
+				GMVec3 normal0 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Left), getAdjVert(j, i, Up));
+				GMVec3 normal1 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Down), getAdjVert(j, i, Left));
+				GMVec3 normal = Normalize((normal0 + normal1) / 2);
+				getVertex(j, i).normals = { normal.getX(), normal.getY(), normal.getZ() };
+			}
+			else if (i == sliceN)
+			{
+				GMVec3 normal0 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Left), getAdjVert(j, i, Up));
+				GMVec3 normal1 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Up), getAdjVert(j, i, Right));
+				GMVec3 normal = Normalize((normal0 + normal1) / 2);
+				getVertex(j, i).normals = { normal.getX(), normal.getY(), normal.getZ() };
+			}
+			// 中央
+			else
+			{
+				GMVec3 normal0 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Left), getAdjVert(j, i, Up));
+				GMVec3 normal1 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Up), getAdjVert(j, i, Right));
+				GMVec3 normal2 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Right), getAdjVert(j, i, Down));
+				GMVec3 normal3 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Down), getAdjVert(j, i, Left));
+				GMVec3 normal = Normalize((normal0 + normal1 + normal2 + normal3) / 4);
+				getVertex(j, i).normals = { normal.getX(), normal.getY(), normal.getZ() };
+			}
+		}
+	}
+#undef getAdjVert
+
+	GMModel* m = new GMModel();
+	GMMesh* mesh = new GMMesh(m);
+	mesh->swap(vertices);
+
+	// 顶点数据创建完毕
+	// 接下来创建indices
+	m->setDrawMode(GMModelDrawMode::Index);
 
 	model = GMAsset(GMAssetType::Model, m);
 }

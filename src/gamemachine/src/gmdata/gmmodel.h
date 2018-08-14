@@ -369,6 +369,8 @@ public:
 	void vertex(const GMVertex& vertex);
 	void index(GMuint index);
 	void invalidateTangentSpace();
+	void swap(GMVertices& vertex);
+	void swap(GMIndices& indices);
 
 public:
 	const GMVertices& vertices()
