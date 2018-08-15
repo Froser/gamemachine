@@ -26,7 +26,7 @@ public:
 	virtual bool removeObject(GMGameObject* obj) override;
 
 public:
-	bool addObject(const GMString& name, GMGameObject* obj);
+	bool addObject(const GMString& name, AUTORELEASE GMGameObject* obj);
 	bool removeObject(const GMString& name);
 	GMGameObject* findGameObject(const GMString& name);
 	bool findGameObject(const GMGameObject* obj, REF GMString& name);

@@ -53,6 +53,8 @@ set(SOURCES
 		demo/particle.cpp
 		demo/md5mesh.h
 		demo/md5mesh.cpp
+		demo/terrain.h
+		demo/terrain.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)

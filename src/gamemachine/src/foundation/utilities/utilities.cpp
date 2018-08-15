@@ -6,6 +6,7 @@
 #include "gmengine/particle/gmparticle.h"
 
 #define getVertex(x, y) (vertices[(x) + (y) * (sliceM + 1)])
+#define getIndex(x, y) ((x) + (y) * (sliceM + 1))
 
 namespace
 {
@@ -40,9 +41,9 @@ namespace
 		case Right:
 			return getVertex(x + 1, y);
 		case Up:
-			return getVertex(x, y - 1);
-		case Down:
 			return getVertex(x, y + 1);
+		case Down:
+			return getVertex(x, y - 1);
 		default:
 			GM_ASSERT(false);
 			return s_invalid;
@@ -396,18 +397,14 @@ void GMPrimitiveCreator::createTerrain(
 	GMfloat length,
 	GMfloat width,
 	GMfloat scaling,
-	GMfloat sliceM,
-	GMfloat sliceN,
+	GMsize_t sliceM,
+	GMsize_t sliceN,
 	REF GMModelAsset& model
 )
 {
-	if (img.getData().format != GMImageFormat::RED && img.getData().type != GMImageDataType::UnsignedByte)
-	{
-		gm_error(gm_dbg_wrap("The image must be a grayscale map with unsigned bytes."));
-		return;
-	}
-
 	// 从灰度图创建地形
+	const GMfloat x_start = x;
+	const GMfloat z_start = z;
 	GMVertices vertices;
 	vertices.reserve( (sliceM + 1) * (sliceN + 1) );
 
@@ -425,10 +422,10 @@ void GMPrimitiveCreator::createTerrain(
 	{
 		for (GMsize_t j = 0; j < sliceM + 1; ++j)
 		{
-			x_image = x * img.getWidth() / length;
-			y = scaling * img.getData().mip[0].data[x_image + y_image * img.getWidth()] / 0xFF;
+			x_image = (x - x_start) * img.getWidth() / length;
+			y = scaling * img.getData().mip[0].data[ (x_image + y_image * img.getWidth()) * img.getData().channels ] / 0xFF;
 
-			GMVertex vert = { { x, y, z }, { 0, 0, 0}, { u, v } };
+			GMVertex vert = { { x, y, z }, { 0, 0, 0 }, { u, v } };
 			vertices.push_back(std::move(vert));
 			x += dx;
 			u += du;
@@ -436,7 +433,8 @@ void GMPrimitiveCreator::createTerrain(
 
 		z += dz;
 		v += dv;
-		y_image = z * img.getHeight() / width;
+		y_image = (z - z_start) * img.getHeight() / width;
+		x = x_start;
 	}
 
 	// 再计算法线，一个顶点的法线等于相邻三角形平均值
@@ -448,31 +446,31 @@ void GMPrimitiveCreator::createTerrain(
 		{
 			// 角上的顶点，直接计算Normal，边上的顶点取2个三角形Normal平均值，中间的则取4个
 			// 四角的情况
-			if (i == 0 && j == 0)
+			if (i == 0 && j == 0) //左下角
 			{
-				GMVec3 normal = calculateNormal(getVertex(0, 0), getVertex(1, 0), getVertex(0, 1));
+				GMVec3 normal = calculateNormal(getVertex(j, i), getAdjVert(j, i, Up), getAdjVert(j, i, Right));
 				getVertex(0, 0).normals = { normal.getX(), normal.getY(), normal.getZ() };
 			}
-			else if (i == 0 && j == sliceM)
+			else if (i == 0 && j == sliceM) //右下角
 			{
-				GMVec3 normal = calculateNormal(getVertex(sliceM, 0), getVertex(sliceM, 1), getVertex(sliceM - 1, 0));
+				GMVec3 normal = calculateNormal(getVertex(j, i), getAdjVert(j, i, Left), getAdjVert(j, i, Up));
 				getVertex(0, 0).normals = { normal.getX(), normal.getY(), normal.getZ() };
 			}
 			else if (i == sliceN && j == 0)
 			{
-				GMVec3 normal = calculateNormal(getVertex(0, sliceN), getVertex(0, sliceN - 1), getVertex(1, sliceN));
+				GMVec3 normal = calculateNormal(getVertex(j, i), getAdjVert(j, i, Right), getAdjVert(j, i, Down));
 				getVertex(0, 0).normals = { normal.getX(), normal.getY(), normal.getZ() };
 			}
 			else if (i == sliceN && j == sliceM)
 			{
-				GMVec3 normal = calculateNormal(getVertex(sliceM, sliceN), getVertex(sliceM - 1, sliceN), getVertex(sliceM, sliceN - 1));
+				GMVec3 normal = calculateNormal(getVertex(j, i), getAdjVert(j, i, Down), getAdjVert(j, i, Left));
 				getVertex(0, 0).normals = { normal.getX(), normal.getY(), normal.getZ() };
 			}
 			// 四条边的情况
 			else if (i == 0)
 			{
-				GMVec3 normal0 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Down), getAdjVert(j, i, Left));
-				GMVec3 normal1 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Right), getAdjVert(j, i, Down));
+				GMVec3 normal0 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Left), getAdjVert(j, i, Up));
+				GMVec3 normal1 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Up), getAdjVert(j, i, Right));
 				GMVec3 normal = Normalize((normal0 + normal1) / 2);
 				getVertex(j, i).normals = { normal.getX(), normal.getY(), normal.getZ() };
 			}
@@ -492,8 +490,8 @@ void GMPrimitiveCreator::createTerrain(
 			}
 			else if (i == sliceN)
 			{
-				GMVec3 normal0 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Left), getAdjVert(j, i, Up));
-				GMVec3 normal1 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Up), getAdjVert(j, i, Right));
+				GMVec3 normal0 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Right), getAdjVert(j, i, Down));
+				GMVec3 normal1 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Down), getAdjVert(j, i, Left));
 				GMVec3 normal = Normalize((normal0 + normal1) / 2);
 				getVertex(j, i).normals = { normal.getX(), normal.getY(), normal.getZ() };
 			}
@@ -518,6 +516,20 @@ void GMPrimitiveCreator::createTerrain(
 	// 顶点数据创建完毕
 	// 接下来创建indices
 	m->setDrawMode(GMModelDrawMode::Index);
+	m->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
+	for (GMsize_t i = 0; i < sliceN; ++i)
+	{
+		for (GMsize_t j = 0; j < sliceM; ++j)
+		{
+			mesh->index(getIndex(j, i));
+			mesh->index(getIndex(j, i + 1));
+			mesh->index(getIndex(j + 1, i + 1));
+
+			mesh->index(getIndex(j, i));
+			mesh->index(getIndex(j + 1, i + 1));
+			mesh->index(getIndex(j + 1, i));
+		}
+	}
 
 	model = GMAsset(GMAssetType::Model, m);
 }

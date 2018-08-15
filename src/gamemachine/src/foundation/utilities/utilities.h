@@ -37,8 +37,8 @@ struct GMPrimitiveCreator
 		GMfloat length,
 		GMfloat width,
 		GMfloat scaling,
-		GMfloat spliceM,
-		GMfloat spliceN,
+		GMsize_t spliceM,
+		GMsize_t spliceN,
 		REF GMModelAsset& model
 	);
 

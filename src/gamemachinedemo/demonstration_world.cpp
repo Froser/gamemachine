@@ -21,6 +21,7 @@
 #include "demo/lua.h"
 #include "demo/particle.h"
 #include "demo/md5mesh.h"
+#include "demo/terrain.h"
 
 #if GM_USE_DX11
 #include <gmdx11helper.h>
@@ -33,7 +34,7 @@ namespace
 	void loadDemostrations(DemonstrationWorld* world)
 	{
 		world->addDemo(L"入门: 读取一个纹理。", new Demo_Texture(world));
-		world->addDemo(L"入门: 使用索引缓存读取一个纹理。", new Demo_Texture_Index(world));
+		//world->addDemo(L"入门: 使用索引缓存读取一个纹理。", new Demo_Texture_Index(world));
 		world->addDemo(L"高级纹理：使用法线贴图。", new Demo_NormalMap(world));
 		world->addDemo(L"效果：使用自带的各种滤镜。", new Demo_Effects(world));
 		world->addDemo(L"BSP: 渲染一个雷神之锤3的场景。", new Demo_Quake3_BSP(world));
@@ -47,6 +48,7 @@ namespace
 		world->addDemo(L"UI控件: 演示使用GameMachine提供的UI控件。", new Demo_Controls(world));
 		world->addDemo(L"粒子系统: 渲染一个粒子系统。", new Demo_Particle(world));
 		world->addDemo(L"MD5: 渲染MD5骨骼动画。", new Demo_MD5Mesh(world));
+		world->addDemo(L"地形: 渲染一个地形。", new Demo_Terrain(world));
 		// world->addDemo(L"LUA: 执行Lua脚本。", new Demo_Lua(world));
 		world->init();
 	}
