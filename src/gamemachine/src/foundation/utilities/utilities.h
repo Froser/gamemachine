@@ -14,6 +14,24 @@ GM_INTERFACE(IPrimitiveCreatorShaderCallback)
 	virtual void onCreateShader(GMShader& shader) = 0;
 };
 
+//! 表示描述一个地形的结构
+struct GMTerrainDescription
+{
+	const GMbyte* data; //!< 地形数据，如果为空，生成的高度均为0
+	GMsize_t dataStride; //!< 相邻地形数据的间隔。比如，对于RGBA 32bits的高度图，只需要取R通道作为高度图，因此dataStride为4。
+	GMint dataWidth; //!< 地形数据的宽度。
+	GMint dataHeight; //!< 地形数据的高度。
+	GMfloat terrainX; //!< 地形在x轴的起始位置。
+	GMfloat terrainZ; //!< 地形在z轴的起始位置。
+	GMfloat terrainLength; //!< 地形在x轴的长度。
+	GMfloat terrainWidth; //!< 地形在y轴的长度。
+	GMfloat heightScaling; //!< 地形高度的缩放比例。
+	GMsize_t sliceM; //!< 地形在x轴的分块数。
+	GMsize_t sliceN; //!< 地形在z轴的分块数。
+	GMfloat textureLength; //!< 一块地形纹理在x轴的长度。
+	GMfloat textureHeight; //!< 一块地形纹理在z轴的长度。
+};
+
 struct GMPrimitiveCreator
 {
 	enum GMCreateAnchor
@@ -31,14 +49,7 @@ struct GMPrimitiveCreator
 	static void createSphere(GMfloat radius, GMint segmentsX, GMint segmentsY, REF GMModelAsset& model);
 
 	static void createTerrain(
-		const GMImage& img,
-		GMfloat x,
-		GMfloat z,
-		GMfloat length,
-		GMfloat width,
-		GMfloat scaling,
-		GMsize_t spliceM,
-		GMsize_t spliceN,
+		const GMTerrainDescription& desc,
 		REF GMModelAsset& model
 	);
 

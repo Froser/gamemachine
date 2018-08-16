@@ -16,7 +16,25 @@ void Demo_Terrain::init()
 	gm::GMImage* imgMap = nullptr;
 	gm::GMImageReader::load(map.buffer, map.size, &imgMap);
 
-	gm::GMPrimitiveCreator::createTerrain(*imgMap, -512, -512, 1024, 1024, 30.f, 100, 100, d->terrainModel);
+	gm::GMTerrainDescription desc = {
+		imgMap->getData().mip[0].data,
+		imgMap->getData().channels,
+		imgMap->getWidth(),
+		imgMap->getHeight(),
+		-256.f,
+		-256.f,
+		512.f,
+		512.f,
+		80.f,
+		100,
+		100,
+		100,
+		100
+	};
+
+	gm::GMPrimitiveCreator::createTerrain(desc, d->terrainModel);
+	gm::GMTextureAsset texture = gm::GMToolUtil::createTexture(db->parentDemonstrationWorld->getContext(), L"grass.jpg");
+	gm::GMToolUtil::addTextureToShader(d->terrainModel.getModel()->getShader(), texture, gm::GMTextureType::Ambient);
 	d->terrain = new gm::GMGameObject(d->terrainModel);
 
 	asDemoGameWorld(getDemoWorldReference())->addObject(L"terrain", d->terrain);
@@ -38,6 +56,8 @@ void Demo_Terrain::event(gm::GameMachineHandlerEvent evt)
 		getDemoWorldReference()->renderScene();
 		break;
 	case gm::GameMachineHandlerEvent::Activate:
+		handleMouseEvent();
+		handleDragging();
 		break;
 	case gm::GameMachineHandlerEvent::Deactivate:
 		break;
@@ -71,21 +91,72 @@ void Demo_Terrain::setDefaultLights()
 			gm::ILight* light = nullptr;
 			GM.getFactory()->createLight(gm::GMLightType::Ambient, &light);
 			GM_ASSERT(light);
-			gm::GMfloat colorA[] = { .7f, .7f, .7f };
+			gm::GMfloat colorA[] = { .5f, .5f, .5f };
 			light->setLightColor(colorA);
 			getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
 		}
-// 
-// 		{
-// 			gm::ILight* light = nullptr;
-// 			GM.getFactory()->createLight(gm::GMLightType::Direct, &light);
-// 			GM_ASSERT(light);
-// 			gm::GMfloat colorD[] = { .7f, .7f, .7f };
-// 			light->setLightColor(colorD);
-// 
-// 			gm::GMfloat lightPos[] = { -3.f, 3.f, -3.f };
-// 			light->setLightPosition(lightPos);
-// 			getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
-// 		}
+
+		{
+			gm::ILight* light = nullptr;
+			GM.getFactory()->createLight(gm::GMLightType::Direct, &light);
+			GM_ASSERT(light);
+			gm::GMfloat colorD[] = { .3f, .3f, .3f };
+			light->setLightColor(colorD);
+
+			gm::GMfloat lightPos[] = { 100.f, 100.f, 100.f };
+			light->setLightPosition(lightPos);
+			getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
+		}
+	}
+}
+
+void Demo_Terrain::handleMouseEvent()
+{
+	D(d);
+	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputMananger()->getMouseState();
+	gm::GMMouseState state = ms.mouseState();
+	const gm::GMWindowStates& windowStates = getDemonstrationWorld()->getContext()->getWindow()->getWindowStates();
+	if (state.wheel.wheeled)
+	{
+		gm::GMfloat delta = .05f * state.wheel.delta / WHEEL_DELTA;
+		GMFloat4 scaling;
+		{
+			GetScalingFromMatrix(d->terrain->getScaling(), scaling);
+			scaling[0] += delta;
+			scaling[1] += delta;
+			scaling[2] += delta;
+			if (scaling[0] > 0 && scaling[1] > 0 && scaling[2] > 0)
+				d->terrain->setScaling(Scale(GMVec3(scaling[0], scaling[1], scaling[2])));
+		}
+	}
+
+	if (d->draggingL)
+	{
+		gm::GMfloat rotateX = state.posX - d->mouseDownX;
+		GMQuat q = Rotate(d->terrain->getRotation(),
+			PI * rotateX / windowStates.renderRect.width,
+			GMVec3(0, 1, 0));
+		d->terrain->setRotation(q);
+		d->mouseDownX = state.posX;
+		d->mouseDownY = state.posY;
+	}
+}
+
+void Demo_Terrain::handleDragging()
+{
+	D(d);
+	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputMananger()->getMouseState();
+	gm::GMMouseState state = ms.mouseState();
+	if (state.downButton & gm::GMMouseButton_Left)
+	{
+		d->mouseDownX = state.posX;
+		d->mouseDownY = state.posY;
+		d->draggingL = true;
+		getDemonstrationWorld()->getMainWindow()->setWindowCapture(true);
+	}
+	else if (state.upButton & gm::GMMouseButton_Left)
+	{
+		d->draggingL = false;
+		getDemonstrationWorld()->getMainWindow()->setWindowCapture(false);
 	}
 }

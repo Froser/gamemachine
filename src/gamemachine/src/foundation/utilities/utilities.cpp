@@ -391,27 +391,23 @@ void GMPrimitiveCreator::createSphere(GMfloat radius, GMint segmentsX, GMint seg
 }
 
 void GMPrimitiveCreator::createTerrain(
-	const GMImage& img,
-	GMfloat x,
-	GMfloat z,
-	GMfloat length,
-	GMfloat width,
-	GMfloat scaling,
-	GMsize_t sliceM,
-	GMsize_t sliceN,
+	const GMTerrainDescription& desc,
 	REF GMModelAsset& model
 )
 {
 	// 从灰度图创建地形
+	GMfloat x = desc.terrainX;
+	GMfloat z = desc.terrainZ;
 	const GMfloat x_start = x;
 	const GMfloat z_start = z;
+	const GMfloat& sliceM = desc.sliceM;
+	const GMfloat& sliceN = desc.sliceN;
+
 	GMVertices vertices;
 	vertices.reserve( (sliceM + 1) * (sliceN + 1) );
 
-	const GMfloat dx = length / sliceM; // 2D横向
-	const GMfloat dz = width / sliceN; // 2D纵向
-	const GMfloat du = 1.f / sliceM;
-	const GMfloat dv = 1.f / sliceN;
+	const GMfloat dx = desc.terrainLength / sliceM; // 2D横向
+	const GMfloat dz = desc.terrainWidth / sliceN; // 2D纵向
 
 	// 先计算顶点坐标
 	GMfloat y = 0;
@@ -422,19 +418,33 @@ void GMPrimitiveCreator::createTerrain(
 	{
 		for (GMsize_t j = 0; j < sliceM + 1; ++j)
 		{
-			x_image = (x - x_start) * img.getWidth() / length;
-			y = scaling * img.getData().mip[0].data[ (x_image + y_image * img.getWidth()) * img.getData().channels ] / 0xFF;
+			GMfloat x_distance = x - x_start;
+			x_image = x_distance * desc.dataWidth / desc.terrainLength;
+
+			if (desc.data)
+				y = desc.heightScaling * desc.data[(x_image + y_image * desc.dataWidth) * desc.dataStride] / 0xFF;
+			else
+				y = 0;
+
+			GMfloat u_len = x_distance;
+			while (u_len > desc.textureLength)
+				u_len -= desc.textureLength;
+			u = (u_len) / desc.textureLength;
+
+			GMfloat v_len = z - z_start;
+			while (v_len > desc.textureHeight)
+				v_len -= desc.textureHeight;
+			v = (v_len) / desc.textureHeight;
 
 			GMVertex vert = { { x, y, z }, { 0, 0, 0 }, { u, v } };
 			vertices.push_back(std::move(vert));
 			x += dx;
-			u += du;
 		}
 
 		z += dz;
-		v += dv;
-		y_image = (z - z_start) * img.getHeight() / width;
 		x = x_start;
+		if (desc.data)
+			y_image = (z - z_start) * desc.dataHeight / desc.terrainWidth;
 	}
 
 	// 再计算法线，一个顶点的法线等于相邻三角形平均值
