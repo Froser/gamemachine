@@ -426,15 +426,8 @@ void GMPrimitiveCreator::createTerrain(
 			else
 				y = 0;
 
-			GMfloat u_len = x_distance;
-			while (u_len > desc.textureLength)
-				u_len -= desc.textureLength;
-			u = (u_len) / desc.textureLength;
-
-			GMfloat v_len = z - z_start;
-			while (v_len > desc.textureHeight)
-				v_len -= desc.textureHeight;
-			v = (v_len) / desc.textureHeight;
+			u = (x_distance) / desc.textureLength;
+			v = (z - z_start) / desc.textureHeight;
 
 			GMVertex vert = { { x, y, z }, { 0, 0, 0 }, { u, v } };
 			vertices.push_back(std::move(vert));
