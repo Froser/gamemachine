@@ -62,6 +62,62 @@ namespace
 		return swscanf(buf, format, ret);
 #endif
 	}
+
+	bool memEquals(const GMwchar* a, const GMwchar* b, GMsize_t length)
+	{
+		if (a == b || !length)
+			return true;
+
+		register union
+		{
+			const GMwchar* w;
+			const GMuint* d;
+			GMsize_t value;
+		} sa, sb;
+		sa.w = a;
+		sb.w = b;
+
+		// check alignment
+		if ((sa.value & 2) == (sb.value & 2))
+		{
+			// both addresses have the same alignment
+			if (sa.value & 2)
+			{
+				// both addresses are not aligned to 4-bytes boundaries
+				// compare the first character
+				if (*sa.w != *sb.w)
+					return false;
+				--length;
+				++sa.w;
+				++sb.w;
+
+				// now both addresses are 4-bytes aligned
+			}
+
+			// both addresses are 4-bytes aligned
+			// do a fast 32-bit comparison
+			register const GMuint *e = sa.d + (length >> 1);
+			for (; sa.d != e; ++sa.d, ++sb.d)
+			{
+				if (*sa.d != *sb.d)
+					return false;
+			}
+
+			// do we have a tail?
+			return (length & 1) ? *sa.w == *sb.w : true;
+		}
+		else
+		{
+			// one of the addresses isn't 4-byte aligned but the other is
+			register const GMwchar* e = sa.w + length;
+			for (; sa.w != e; ++sa.w, ++sb.w)
+			{
+				if (*sa.w != *sb.w)
+					return false;
+			}
+		}
+		return true;
+	}
 }
 
 GMString::GMString(const GMString& s)
@@ -168,6 +224,16 @@ GMString& GMString::append(const GMwchar* c)
 	D_STR(d);
 	d->data += c;
 	return *this;
+}
+
+bool GMString::startsWith(const GMString& string)
+{
+	D_STR(d);
+	if (length() == 0)
+		return string.length() == 0;
+	if (string.length() > length())
+		return false;
+	return memEquals(d->data.data(), string.toStdWString().data(), string.length());
 }
 
 void GMString::assign(const GMString& s)

@@ -46,7 +46,7 @@ GM_PRIVATE_OBJECT(GMElementBlendColor)
 class GMElementBlendColor : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMElementBlendColor)
-	GM_ALLOW_COPY_DATA(GMElementBlendColor)
+	GM_ALLOW_COPY_MOVE(GMElementBlendColor)
 
 public:
 	GMElementBlendColor() = default;
@@ -214,7 +214,7 @@ GM_PRIVATE_OBJECT(GMStyle)
 class GMStyle : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMStyle)
-	GM_ALLOW_COPY_DATA(GMStyle)
+	GM_ALLOW_COPY_MOVE(GMStyle)
 
 public:
 	GMStyle(

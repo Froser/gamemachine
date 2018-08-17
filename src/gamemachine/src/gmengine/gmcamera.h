@@ -81,7 +81,7 @@ class GMSpriteGameObject;
 class GMFrustum : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMFrustum)
-	GM_ALLOW_COPY_DATA(GMFrustum)
+	GM_ALLOW_COPY_MOVE(GMFrustum)
 
 	friend class GMCamera;
 
@@ -118,7 +118,7 @@ GM_PRIVATE_OBJECT(GMCamera)
 class GMCamera : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMCamera)
-	GM_ALLOW_COPY_DATA(GMCamera)
+	GM_ALLOW_COPY_MOVE(GMCamera)
 
 public:
 	GMCamera();

@@ -30,6 +30,7 @@ class GMWidget;
 class GMWidgetResourceManager;
 class GMSystemEvent;
 class GMCamera;
+class GMRenderTechniqueManager;
 struct ILight;
 struct ISoundPlayer;
 struct IGamePackageHandler;
@@ -474,6 +475,8 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	virtual GMGlyphManager* getGlyphManager() = 0;
 
 	virtual GMCamera& getCamera() = 0;
+
+	virtual GMRenderTechniqueManager& getRenderTechniqueManager() = 0;
 };
 
 GM_INTERFACE(ITechnique)

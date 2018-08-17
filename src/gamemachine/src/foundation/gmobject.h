@@ -121,12 +121,20 @@ class GMNotAGMObject {};
 #define GM_DISABLE_COPY(clsName) public: clsName(const clsName&) = delete; clsName(clsName&&) GM_NOEXCEPT = delete;
 #define GM_DISABLE_ASSIGN(clsName) public: clsName& operator =(const clsName&) = delete; clsName& operator =(clsName&&) GM_NOEXCEPT = delete;
 
-#define GM_ALLOW_COPY_DATA(clsName) \
+#define GM_ALLOW_COPY_MOVE(clsName) \
+	GM_ALLOW_COPY(clsName) \
+	GM_ALLOW_MOVE(clsName)
+
+#define GM_ALLOW_COPY(clsName) \
 	public: \
-	clsName(const clsName& o) { copyData(o); } \
-	clsName& operator=(const clsName& o) { D(d); copyData(o); return *this; } \
-	void copyData(const clsName& another) { D(d); D_OF(d_another, &another); *d = *d_another; \
-		(static_cast<Base*>(this))->copyData(static_cast<const Base&>(another)); } \
+		clsName(const clsName& o) { copyData(o); } \
+		clsName& operator=(const clsName& o) { D(d); copyData(o); return *this; } \
+		void copyData(const clsName& another) { \
+		D(d); D_OF(d_another, &another); *d = *d_another; \
+			(static_cast<Base*>(this))->copyData(static_cast<const Base&>(another)); }
+
+#define GM_ALLOW_MOVE(clsName) \
+	public: \
 	clsName(clsName&& o) GM_NOEXCEPT { swapData(std::move(o)); } \
 	clsName& operator=(clsName&& o) GM_NOEXCEPT { D(d); swapData(std::move(o)); return *this; } \
 	void swapData(clsName&& another) GM_NOEXCEPT { m_data.swap(another.m_data); \
@@ -135,6 +143,8 @@ class GMNotAGMObject {};
 #define GM_FRIEND_CLASS(clsName) \
 	friend class clsName; \
 	friend struct GM_PRIVATE_NAME(clsName);
+
+#define friend_methods(clsName) private
 
 class GMObject;
 
@@ -283,7 +293,7 @@ struct GMMessage;
 如果为一个GMObject的直接子类定义其包含的数据，可使用GM_PRIVATE_OBJECT宏来定义数据结构，并在子类中使用
 GM_DECLARE_PRIVATE(子类名)来将子类的数据指针成员添加到子类中。<BR>
 如果某个子类不是GMObject的直接子类，则用GM_DECLARE_PRIVATE_AND_BASE(子类名，父类名)来将数据指针添加到子类中。<BR>
-使用GM_ALLOW_COPY_DATA宏来允许对象之间相互拷贝，它会生成一套左值和右值拷贝、赋值函数。<BR>
+使用GM_ALLOW_COPY_MOVE宏来允许对象之间相互拷贝，它会生成一套左值和右值拷贝、赋值函数。<BR>
 另外，GMObject的数据将会在GMObject构造时被新建，在GMObject析构时被释放。
 */
 class GMObject : public IVirtualFunctionObject
@@ -342,7 +352,7 @@ public:
 	//! 拷贝GMObject私有数据
 	/*!
 	  GMObject不允许拷贝GMObject基类私有数据，因此是个空实现。<BR>
-	  但是，GMObject的子类可以使用GM_ALLOW_COPY_DATA宏，允许子类调用其copyData方法，依次拷贝私有数据。
+	  但是，GMObject的子类可以使用GM_ALLOW_COPY_MOVE宏，允许子类调用其copyData方法，依次拷贝私有数据。
 	  \param another 拷贝私有数据的目标对象，将目标对象的私有数据拷贝到此对象。
 	*/
 	void copyData(const GMObject& another) {}

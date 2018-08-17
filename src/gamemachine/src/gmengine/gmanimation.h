@@ -60,7 +60,7 @@ GM_PRIVATE_OBJECT(GMAnimation)
 class GMAnimation : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMAnimation)
-	GM_ALLOW_COPY_DATA(GMAnimation)
+	GM_ALLOW_COPY_MOVE(GMAnimation)
 	GM_DECLARE_PROPERTY(PlayLoop, playLoop, bool)
 
 public:

@@ -4,6 +4,7 @@
 #include <gmtools.h>
 #include <gmmodel.h>
 #include <gmcamera.h>
+#include <gmrendertechnique.h>
 BEGIN_NS
 
 template <typename T>
@@ -142,6 +143,7 @@ struct GMShaderVariablesDesc
 	// 模型
 	const char* IlluminationModel;
 	const char* ColorVertexOp;
+	const char* TechniqueId;
 
 	// 调试
 	const GMShaderVariableDebugDesc Debug;
@@ -210,6 +212,7 @@ GM_PRIVATE_OBJECT(GMGraphicEngine)
 	Vector<ILight*> lights;
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	GMGlobalBlendStateDesc blendState;
+	GMRenderTechniqueManager renderTechniqueManager;
 
 	// Shadow
 	GMShadowSourceDesc shadow;
@@ -246,6 +249,7 @@ public:
 		GMS_BlendOp opAlpha
 	) override;
 	virtual void endBlend() override;
+	virtual GMRenderTechniqueManager& getRenderTechniqueManager();
 
 public:
 	const GMFilterMode::Mode getCurrentFilterMode();

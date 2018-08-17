@@ -83,6 +83,7 @@ static GMShaderVariablesDesc s_defaultShaderVariablesDesc =
 
 	"GM_IlluminationModel",
 	"GM_ColorVertexOp",
+	"GM_TechniqueId",
 
 	{
 		"GM_Debug_Normal",
@@ -381,6 +382,12 @@ void GMGraphicEngine::endBlend()
 	{
 		d->blendState.enabled = false;
 	}
+}
+
+GMRenderTechniqueManager& GMGraphicEngine::getRenderTechniqueManager()
+{
+	D(d);
+	return d->renderTechniqueManager;
 }
 
 void GMGraphicEngine::addLight(AUTORELEASE ILight* light)

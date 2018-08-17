@@ -46,7 +46,7 @@ GM_PRIVATE_OBJECT(GMSkeletonJoint)
 class GMSkeletonJoint : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMSkeletonJoint)
-	GM_ALLOW_COPY_DATA(GMSkeletonJoint)
+	GM_ALLOW_COPY_MOVE(GMSkeletonJoint)
 	GM_DECLARE_PROPERTY(Position, position, GMVec3)
 	GM_DECLARE_PROPERTY(Orientation, orientation, GMQuat)
 	GM_DECLARE_PROPERTY(ParentIndex, parentIndex, GMint)
@@ -70,7 +70,7 @@ GM_PRIVATE_OBJECT(GMFrameSkeleton)
 class GMFrameSkeleton : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMFrameSkeleton)
-	GM_ALLOW_COPY_DATA(GMFrameSkeleton)
+	GM_ALLOW_COPY_MOVE(GMFrameSkeleton)
 	GM_DECLARE_PROPERTY(Joints, joints, AlignedVector<GMSkeletonJoint>)
 
 public:

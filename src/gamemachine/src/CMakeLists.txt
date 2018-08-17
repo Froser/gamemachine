@@ -99,6 +99,8 @@ set(SOURCES
 		gmengine/gmmessage.cpp
 		gmengine/gmanimation.h
 		gmengine/gmanimation.cpp
+		gmengine/gmrendertechnique.cpp
+		gmengine/gmrendertechnique.cpp
 		gmengine/gmenums.h
 		gmgl/gmgltechniques.h
 		gmgl/gmgltechniques.cpp

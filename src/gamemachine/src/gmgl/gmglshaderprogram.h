@@ -11,6 +11,7 @@ struct GMGLShaderInfo
 	GMString filename;
 
 	static GMuint toGLShaderType(GMShaderType type);
+	static GMShaderType fromGLShaderType(GMuint type);
 };
 
 typedef AlignedVector<GMuint> GMGLShaderIDList;
@@ -52,6 +53,7 @@ private:
 	void setProgram(GMuint program) { D(d); d->shaderProgram = program; }
 	void removeShaders();
 	void expandSource(REF GMGLShaderInfo& shaderInfo);
+	GMString generateRenderTechniquesCode(REF GMGLShaderInfo& shaderInfo);
 	GMString expandSource(const GMString& workingDir, const GMString& source);
 	bool matchMacro(const GMString& source, const GMString& macro, REF GMString& result);
 	void expandInclude(const GMString& workingDir, const GMString& fn, IN OUT GMString& source);

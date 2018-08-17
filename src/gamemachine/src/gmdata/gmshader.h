@@ -212,7 +212,7 @@ GM_PRIVATE_OBJECT(GMShader)
 class GMShader : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMShader)
-	GM_ALLOW_COPY_DATA(GMShader)
+	GM_ALLOW_COPY_MOVE(GMShader)
 
 public:
 	GMShader() = default;

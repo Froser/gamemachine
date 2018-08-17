@@ -23,6 +23,20 @@ GMuint GMGLShaderInfo::toGLShaderType(GMShaderType type)
 	}
 }
 
+GMShaderType GMGLShaderInfo::fromGLShaderType(GMuint type)
+{
+	switch (type)
+	{
+	case GL_FRAGMENT_SHADER:
+		return GMShaderType::Pixel;
+	case GL_VERTEX_SHADER:
+		return GMShaderType::Vertex;
+	default:
+		GM_ASSERT(false);
+	}
+	return GMShaderType::Pixel;
+}
+
 GMGLShaderProgram::GMGLShaderProgram(const IRenderContext* context)
 {
 	D(d);
@@ -91,14 +105,7 @@ void GMGLShaderProgram::setBool(const char* name, bool value)
 
 bool GMGLShaderProgram::setInterfaceInstance(const char* interfaceName, const char* instanceName, GMShaderType type)
 {
-	GLenum shaderType = GL_VERTEX_SHADER;
-	if (type == GMShaderType::Vertex)
-		shaderType = GL_VERTEX_SHADER;
-	else if (type == GMShaderType::Pixel)
-		shaderType = GL_FRAGMENT_SHADER;
-	else
-		GM_ASSERT(false);
-	
+	GLenum shaderType = GMGLShaderInfo::toGLShaderType(type);
 	return setSubrotinue(interfaceName, instanceName, shaderType);
 }
 
@@ -179,7 +186,7 @@ void GMGLShaderProgram::load()
 			GM_ASSERT(false);
 			GMMessage crashMsg(GameMachineMessageType::CrashDown);
 			GM.postMessage(crashMsg);
-			delete[] log;
+			GM_delete_array(log);
 			return;
 		}
 
@@ -220,9 +227,23 @@ void GMGLShaderProgram::removeShaders()
 }
 
 void GMGLShaderProgram::expandSource(REF GMGLShaderInfo& shaderInfo)
-{
+ {
+	D(d);
 	// 解析源码，展开gm特有的宏
 	shaderInfo.source = expandSource(shaderInfo.filename, shaderInfo.source);
+	 
+	// 插入render techniques代码
+	IGraphicEngine* engine = d->context->getEngine();
+	if (!engine->getRenderTechniqueManager().isEmpty())
+		shaderInfo.source = generateRenderTechniquesCode(shaderInfo);
+}
+
+GMString GMGLShaderProgram::generateRenderTechniquesCode(REF GMGLShaderInfo& shaderInfo)
+{
+	D(d);
+	IGraphicEngine* engine = d->context->getEngine();
+	GMShaderType shaderType = GMGLShaderInfo::fromGLShaderType(shaderInfo.type);
+	return engine->getRenderTechniqueManager().getInjectedCode(shaderType, shaderInfo.source);
 }
 
 GMString GMGLShaderProgram::expandSource(const GMString& filename, const GMString& source)

@@ -53,7 +53,7 @@ GM_PRIVATE_OBJECT(GMParticleRadiusMode)
 class GMParticleGravityMode : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMParticleGravityMode)
-	GM_ALLOW_COPY_DATA(GMParticleGravityMode)
+	GM_ALLOW_COPY_MOVE(GMParticleGravityMode)
 	GM_DECLARE_PROPERTY(Gravity, gravity, GMVec3)
 	GM_DECLARE_PROPERTY(TangentialAcceleration, tangentialAcceleration, GMfloat)
 	GM_DECLARE_PROPERTY(TangentialAccelerationV, tangentialAccelerationV, GMfloat)
@@ -67,7 +67,7 @@ public:
 class GMParticleRadiusMode : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMParticleRadiusMode)
-	GM_ALLOW_COPY_DATA(GMParticleRadiusMode)
+	GM_ALLOW_COPY_MOVE(GMParticleRadiusMode)
 	GM_DECLARE_PROPERTY(BeginRadius, beginRadius, GMfloat)
 	GM_DECLARE_PROPERTY(BeginRadiusV, beginRadiusV, GMfloat)
 	GM_DECLARE_PROPERTY(EndRadius, endRadius, GMfloat)
@@ -120,7 +120,7 @@ GM_PRIVATE_OBJECT(GMParticleDescription)
 class GMParticleDescription : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMParticleDescription)
-	GM_ALLOW_COPY_DATA(GMParticleDescription)
+	GM_ALLOW_COPY_MOVE(GMParticleDescription)
 
 	GM_DECLARE_PROPERTY(EmitterPosition, emitterPosition, GMVec3)
 	GM_DECLARE_PROPERTY(EmitterPositionV, emitterPositionV, GMVec3)
@@ -190,7 +190,7 @@ GM_PRIVATE_OBJECT(GMParticle)
 class GMParticle : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMParticle)
-	GM_ALLOW_COPY_DATA(GMParticle)
+	GM_ALLOW_COPY_MOVE(GMParticle)
 	GM_DECLARE_PROPERTY(Position, position, GMVec3)
 	GM_DECLARE_PROPERTY(StartPosition, startPosition, GMVec3)
 	GM_DECLARE_PROPERTY(ChangePosition, changePosition, GMVec3)

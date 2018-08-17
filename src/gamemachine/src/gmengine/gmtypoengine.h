@@ -37,7 +37,7 @@ GM_PRIVATE_OBJECT(GMTypoIterator)
 class GMTypoIterator : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMTypoIterator)
-	GM_ALLOW_COPY_DATA(GMTypoIterator)
+	GM_ALLOW_COPY_MOVE(GMTypoIterator)
 
 public:
 	GMTypoIterator() = default;

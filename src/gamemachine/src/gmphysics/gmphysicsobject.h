@@ -56,8 +56,8 @@ GM_PRIVATE_OBJECT(GMPhysicsObject)
 class GMPhysicsObject : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMPhysicsObject)
-	friend class GMPhysicsWorld;
-	friend class GMGameObject;
+	GM_FRIEND_CLASS(GMPhysicsWorld);
+	GM_FRIEND_CLASS(GMGameObject);
 
 protected:
 	GMPhysicsObject() = default;

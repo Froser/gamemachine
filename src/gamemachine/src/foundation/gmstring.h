@@ -284,6 +284,8 @@ public:
 	*/
 	GMString& append(const char* c);
 
+	bool startsWith(const GMString& string);
+
 	//! 清除一个字符串中的所有字符。
 	void clear()
 	{

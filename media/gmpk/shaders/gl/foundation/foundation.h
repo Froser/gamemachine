@@ -26,3 +26,5 @@ struct GMShadowInfo
 };
 
 uniform GMShadowInfo GM_ShadowInfo;
+
+uniform int GM_TechniqueId;

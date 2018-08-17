@@ -115,7 +115,7 @@ GM_PRIVATE_OBJECT(GMBSPPhysicsObject)
 class GMBSPPhysicsObject : public GMPhysicsObject
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMBSPPhysicsObject, GMPhysicsObject)
-	friend class GMBSPPhysicsWorld;
+	GM_FRIEND_CLASS(GMBSPPhysicsWorld);
 
 public:
 	GMBSPPhysicsObject() = default;

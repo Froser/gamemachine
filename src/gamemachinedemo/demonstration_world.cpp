@@ -5,6 +5,7 @@
 #include <gmcontroltextedit.h>
 #include <gmgl.h>
 #include <gmgraphicengine.h>
+#include <gmrendertechnique.h>
 
 #include "demo/texture.h"
 #include "demo/normalmap.h"
@@ -664,6 +665,31 @@ void DemostrationEntrance::onLoadShaders(const gm::IRenderContext* context)
 {
 	D(d);
 	auto& env = GM.getRunningStates().renderEnvironment;
+
+	// 在这里加入自定义渲染
+	gm::IGraphicEngine* engine = context->getEngine();
+
+
+	gm::GMRenderTechniques techs;
+	gm::GMRenderTechnique vertexTech(gm::GMShaderType::Vertex, L"Red");
+	vertexTech.setCode(
+		gm::GMRenderTechniqueEngineType::OpenGL,
+		L"bool Red(void)"
+		L"{"
+		L" gl_Position = GM_ProjectionMatrix * GM_ViewMatrix * GM_WorldMatrix * position;"
+		L" gl_Position.y -= .3f;"
+		L" return true;"
+		L"}"
+	);
+	techs.addRenderTechnique(vertexTech);
+
+	gm::GMRenderTechnique pixelTech(gm::GMShaderType::Pixel, L"Red");
+	pixelTech.setCode(
+		gm::GMRenderTechniqueEngineType::OpenGL,
+		L"bool Red(void) { _frag_color = vec4(1,0,0,1); return true; }"
+	);
+	techs.addRenderTechnique(pixelTech);
+	engine->getRenderTechniqueManager().addRenderTechnique(techs);
 
 	if (env == gm::GMRenderEnvironment::OpenGL)
 	{

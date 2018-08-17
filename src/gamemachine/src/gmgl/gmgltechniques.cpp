@@ -151,6 +151,13 @@ void GMGLTechnique::draw(GMModel* model)
 	glBindVertexArray(0);
 }
 
+void GMGLTechnique::beginModel(GMModel* model, const GMGameObject* parent)
+{
+	auto shaderProgram = getShaderProgram();
+	shaderProgram->useProgram();
+	shaderProgram->setInt(GM_VariablesDesc.TechniqueId, model->getTechniqueId());
+}
+
 void GMGLTechnique::activateTextureTransform(GMModel* model, GMTextureType type)
 {
 	static const std::string u_scrolls_affix = (GMString(".") + GM_VariablesDesc.TextureAttributes.OffsetX).toStdString();
@@ -434,10 +441,11 @@ void GMGLTechnique::prepareDebug(GMModel* model)
 //////////////////////////////////////////////////////////////////////////
 void GMGLTechnique_3D::beginModel(GMModel* model, const GMGameObject* parent)
 {
+	Base::beginModel(model, parent);
+
 	D(d);
 	D_BASE(db, GMGLTechnique);
 	auto shaderProgram = getShaderProgram();
-	shaderProgram->useProgram();
 	updateCameraMatrices(shaderProgram);
 
 	if (parent)
@@ -605,8 +613,8 @@ void GMGLTechnique_2D::beforeDraw(GMModel* model)
 //////////////////////////////////////////////////////////////////////////
 void GMGLTechnique_CubeMap::beginModel(GMModel* model, const GMGameObject* parent)
 {
+	Base::beginModel(model, parent);
 	IShaderProgram* shaderProgram = getShaderProgram();
-	shaderProgram->useProgram();
 	updateCameraMatrices(shaderProgram);
 	shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));
 }
@@ -658,12 +666,11 @@ void GMGLTechnique_Filter::afterDraw(GMModel* model)
 
 void GMGLTechnique_Filter::beginModel(GMModel* model, const GMGameObject* parent)
 {
+	Base::beginModel(model, parent);
+
 	D(d);
 	D_BASE(db, Base);
 	IShaderProgram* shaderProgram = getShaderProgram();
-	GM_ASSERT(shaderProgram);
-	shaderProgram->useProgram();
-
 	if (d->state.HDR != db->engine->needHDR() || d->state.toneMapping != db->engine->getToneMapping())
 	{
 		d->state.HDR = db->engine->needHDR();
@@ -722,9 +729,10 @@ void GMGLTechnique_LightPass::endModel()
 
 void GMGLTechnique_LightPass::beginModel(GMModel* model, const GMGameObject* parent)
 {
+	GMGLTechnique::beginModel(model, parent);
+
 	D_BASE(d, GMGLTechnique);
 	IShaderProgram* shaderProgram = getShaderProgram();
-	shaderProgram->useProgram();
 	updateCameraMatrices(shaderProgram);
 
 	const GMShadowSourceDesc& shadowSourceDesc = d->engine->getShadowSourceDesc();
@@ -776,9 +784,10 @@ void GMGLTechnique_LightPass::beforeDraw(GMModel* model)
 
 void GMGLTechnique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* parent)
 {
+	GMGLTechnique_3D::beginModel(model, parent);
+
 	D_BASE(d, Base);
 	IShaderProgram* shaderProgram = getShaderProgram();
-	shaderProgram->useProgram();
 	if (parent)
 		shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, parent->getTransform());
 	else

@@ -48,6 +48,7 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	GMOwnedPtr<ITechnique> technique_lightPass;
 	GMOwnedPtr<ITechnique> technique_3d_shadow;
 	GMOwnedPtr<ITechnique> technique_particle;
+	GMOwnedPtr<ITechnique> technique_custom;
 
 	GMTextureAsset cubeMap;
 	GMGLLightContext lightContext;

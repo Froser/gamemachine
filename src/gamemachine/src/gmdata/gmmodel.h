@@ -7,6 +7,7 @@
 #include <gmshader.h>
 #include <atomic>
 #include <gmskeleton.h>
+#include <gmrendertechnique.h>
 
 struct ID3D11Buffer;
 
@@ -194,6 +195,7 @@ GM_PRIVATE_OBJECT(GMModel)
 	GMTopologyMode mode = GMTopologyMode::Triangles;
 	GMsize_t verticesCount = 0;
 	bool needTransfer = true;
+	GMRenderTechinqueID techniqueId = 0;
 };
 
 // 所有的顶点属性类型
@@ -230,6 +232,7 @@ public:
 	GM_DECLARE_PROPERTY(Shader, shader, GMShader);
 	GM_DECLARE_PROPERTY(VerticesCount, verticesCount, GMsize_t);
 	GM_DECLARE_PROPERTY(DrawMode, drawMode, GMModelDrawMode);
+	GM_DECLARE_PROPERTY(TechniqueId, techniqueId, GMRenderTechinqueID);
 
 public:
 	inline void setModelDataProxy(AUTORELEASE GMModelDataProxy* modelDataProxy)

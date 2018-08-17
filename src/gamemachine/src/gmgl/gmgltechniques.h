@@ -39,6 +39,7 @@ public:
 protected:
 	virtual void beforeDraw(GMModel* model) = 0;
 	virtual void afterDraw(GMModel* model) = 0;
+	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 
 protected:
 	virtual void activateTextureTransform(GMModel* model, GMTextureType type);
