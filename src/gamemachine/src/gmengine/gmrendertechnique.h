@@ -19,8 +19,10 @@ struct GMRenderTechniqueEngineType
 
 GM_PRIVATE_OBJECT(GMRenderTechniqueManager)
 {
+	const IRenderContext* context = nullptr;
 	GMAtomic<GMRenderTechinqueID> id = 10000;
 	Set<GMRenderTechniques> renderTechniques;
+	Map<GMRenderTechinqueID, GMOwnedPtr<IShaderProgram>> shaderPrograms;
 };
 
 class GMRenderTechniqueManager : public GMObject
@@ -28,13 +30,15 @@ class GMRenderTechniqueManager : public GMObject
 	GM_DECLARE_PRIVATE(GMRenderTechniqueManager)
 
 public:
+	GMRenderTechniqueManager(const IRenderContext* context);
+
+public:
 	GMRenderTechinqueID addRenderTechnique(GMRenderTechniques renderTechniques);
-	GMString getInjectedCode(GMShaderType shaderType, REF GMString& source);
+	IShaderProgram* getShaderProgram(GMRenderTechinqueID id);
 	bool isEmpty();
 
 private:
-	GMString generateTechniques(GMShaderType type);
-	GMString generateCode(GMShaderType type);
+	void createShaderProgram(const GMRenderTechniques& renderTechniques, OUT IShaderProgram** out);
 };
 
 

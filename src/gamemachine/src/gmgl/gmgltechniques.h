@@ -24,6 +24,7 @@ GM_PRIVATE_OBJECT(GMGLTechnique)
 	const GMShaderVariablesDesc* variablesDesc = nullptr;
 	GMDebugConfig debugConfig;
 	GMGammaHelper gammaHelper;
+	GMModel* currentModel = nullptr;
 };
 
 class GMGLTechnique : public GMObject, public ITechnique
@@ -40,6 +41,7 @@ protected:
 	virtual void beforeDraw(GMModel* model) = 0;
 	virtual void afterDraw(GMModel* model) = 0;
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
+	virtual void endModel() override;
 
 protected:
 	virtual void activateTextureTransform(GMModel* model, GMTextureType type);
@@ -79,7 +81,6 @@ public:
 
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
-	virtual void endModel() override;
 	virtual void beforeDraw(GMModel* model) override;
 	virtual void afterDraw(GMModel* model) override;
 	virtual IShaderProgram* getShaderProgram() override;
@@ -108,7 +109,6 @@ public:
 
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
-	virtual void endModel() override;
 	virtual void beforeDraw(GMModel* model) override;
 	virtual void afterDraw(GMModel* model) override;
 };
@@ -134,7 +134,6 @@ private:
 	virtual void beforeDraw(GMModel* model) override;
 	virtual void afterDraw(GMModel* model) override;
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
-	virtual void endModel() override;
 	virtual IShaderProgram* getShaderProgram() override;
 
 protected:
@@ -154,7 +153,6 @@ protected:
 	virtual void beforeDraw(GMModel* model) override;
 	virtual void afterDraw(GMModel* model) override;
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
-	virtual void endModel() override;
 };
 
 class GMGLTechnique_3D_Shadow : public GMGLTechnique_3D
@@ -170,6 +168,14 @@ class GMGLTechnique_Particle : public GMGLTechnique_2D
 {
 public:
 	using GMGLTechnique_2D::GMGLTechnique_2D;
+};
+
+class GMGLTechnique_Custom : public GMGLTechnique_3D
+{
+public:
+	using GMGLTechnique_3D::GMGLTechnique_3D;
+
+	virtual IShaderProgram* getShaderProgram() override;
 };
 
 END_NS

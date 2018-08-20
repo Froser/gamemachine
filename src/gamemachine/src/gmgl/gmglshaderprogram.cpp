@@ -34,7 +34,7 @@ GMShaderType GMGLShaderInfo::fromGLShaderType(GMuint type)
 	default:
 		GM_ASSERT(false);
 	}
-	return GMShaderType::Pixel;
+	return GMShaderType::Unknown;
 }
 
 GMGLShaderProgram::GMGLShaderProgram(const IRenderContext* context)
@@ -231,19 +231,6 @@ void GMGLShaderProgram::expandSource(REF GMGLShaderInfo& shaderInfo)
 	D(d);
 	// 解析源码，展开gm特有的宏
 	shaderInfo.source = expandSource(shaderInfo.filename, shaderInfo.source);
-	 
-	// 插入render techniques代码
-	IGraphicEngine* engine = d->context->getEngine();
-	if (!engine->getRenderTechniqueManager().isEmpty())
-		shaderInfo.source = generateRenderTechniquesCode(shaderInfo);
-}
-
-GMString GMGLShaderProgram::generateRenderTechniquesCode(REF GMGLShaderInfo& shaderInfo)
-{
-	D(d);
-	IGraphicEngine* engine = d->context->getEngine();
-	GMShaderType shaderType = GMGLShaderInfo::fromGLShaderType(shaderInfo.type);
-	return engine->getRenderTechniqueManager().getInjectedCode(shaderType, shaderInfo.source);
 }
 
 GMString GMGLShaderProgram::expandSource(const GMString& filename, const GMString& source)

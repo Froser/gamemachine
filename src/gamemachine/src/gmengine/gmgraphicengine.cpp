@@ -83,7 +83,6 @@ static GMShaderVariablesDesc s_defaultShaderVariablesDesc =
 
 	"GM_IlluminationModel",
 	"GM_ColorVertexOp",
-	"GM_TechniqueId",
 
 	{
 		"GM_Debug_Normal",
@@ -124,6 +123,7 @@ GMGraphicEngine::GMGraphicEngine(const IRenderContext* context)
 	d->renderConfig = GM.getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
 	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
 	d->shadow.type = GMShadowSourceDesc::NoShadow;
+	d->renderTechniqueManager.reset(new GMRenderTechniqueManager(context));
 }
 
 GMGraphicEngine::~GMGraphicEngine()
@@ -384,10 +384,10 @@ void GMGraphicEngine::endBlend()
 	}
 }
 
-GMRenderTechniqueManager& GMGraphicEngine::getRenderTechniqueManager()
+GMRenderTechniqueManager* GMGraphicEngine::getRenderTechniqueManager()
 {
 	D(d);
-	return d->renderTechniqueManager;
+	return d->renderTechniqueManager.get();
 }
 
 void GMGraphicEngine::addLight(AUTORELEASE ILight* light)

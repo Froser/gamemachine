@@ -1,13 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmrendertechnique.h"
 #include "foundation/utilities/tools.h"
-
-namespace
-{
-	static const GMString s_template_gl_code = L"if (GM_TechniqueId == ?0) { if (?1()) return; } \r\n";
-	static const GMString s_template_gl_header = L"bool ?(void) { \r\n";
-	static const GMString s_template_gl_footer = L"\r\n } \r\n";
-}
+#include "foundation/gamemachine.h"
 
 GMRenderTechinqueID GMRenderTechniqueManager::addRenderTechnique(GMRenderTechniques renderTechniques)
 {
@@ -18,78 +12,51 @@ GMRenderTechinqueID GMRenderTechniqueManager::addRenderTechnique(GMRenderTechniq
 	return d->id;
 }
 
-GMString GMRenderTechniqueManager::generateCode(GMShaderType type)
-{
-	D(d);
-	// TODO onlyGL
-	GMString code;
-	for (const auto& techniques : d->renderTechniques)
-	{
-		for (const auto& technique : techniques.getTechniques())
-		{
-			if (technique.getShaderType() == type)
-			{
-				GMString l = s_template_gl_code.replace("?0", GMString(techniques.getId())).replace("?1", GMString(technique.getName()));
-				code += l;
-			}
-		}
-	}
-	return GMConvertion::toCurrentEnvironmentString(code);
-}
-
-GMString GMRenderTechniqueManager::generateTechniques(GMShaderType type)
-{
-	D(d);
-	//TODO onlyGL
-	GMString code;
-	for (const auto& techniques : d->renderTechniques)
-	{
-		for (const auto& technique : techniques.getTechniques())
-		{
-			if (technique.getShaderType() == type)
-			{
-				const GMString& userCode = technique.getCode(GMRenderTechniqueEngineType::OpenGL);
-				if (userCode.isEmpty())
-					code += s_template_gl_header.replace("?", GMString(technique.getName())) + L"return false;" + s_template_gl_footer;
-				else
-					code += userCode;
-			}
-		}
-	}
-	return GMConvertion::toCurrentEnvironmentString(code);
-}
-
-GMString GMRenderTechniqueManager::getInjectedCode(GMShaderType shaderType, REF GMString& source)
-{
-	GMStringReader reader(source);
-	GMString line;
-	GMString result;
-	auto iter = reader.lineBegin();
-	while (true)
-	{
-		line = *iter;
-
-		// 寻找标记
-		if (line.startsWith(L"/// {gm injection code}"))
-			line += generateCode(shaderType);
-
-		if (line.startsWith(L"/// {gm injection techniques}"))
-			line += generateTechniques(shaderType);
-
-		result += std::move(line);
-
-		if (!iter.hasNextLine())
-			break;
-
-		++iter;
-	}
-	return result;
-}
-
 bool GMRenderTechniqueManager::isEmpty()
 {
 	D(d);
 	return d->renderTechniques.empty();
+}
+
+GMRenderTechniqueManager::GMRenderTechniqueManager(const IRenderContext* context)
+{
+	D(d);
+	d->context = context;
+}
+
+void GMRenderTechniqueManager::createShaderProgram(const GMRenderTechniques& renderTechniques, OUT IShaderProgram** out)
+{
+	D(d);
+	IFactory* factory = GM.getFactory();
+	factory->createShaderProgram(d->context, renderTechniques, out);
+}
+
+IShaderProgram* GMRenderTechniqueManager::getShaderProgram(GMRenderTechinqueID id)
+{
+	D(d);
+	IShaderProgram* shaderProgram = d->shaderPrograms[id].get();
+	if (!shaderProgram)
+	{
+		const GMRenderTechniques* techs = nullptr;
+		for (auto& t : d->renderTechniques)
+		{
+			if (id == t.getId())
+			{
+				techs = &t;
+				break;
+			}
+		}
+
+		GM_ASSERT(techs);
+		if (techs)
+		{
+			createShaderProgram(*techs, &shaderProgram);
+			d->shaderPrograms[id] = GMOwnedPtr<IShaderProgram>(shaderProgram);
+		}
+	}
+
+	GM_ASSERT(shaderProgram);
+	return shaderProgram;
 }
 
 GMRenderTechnique::GMRenderTechnique(GMShaderType shaderType, GMString name)

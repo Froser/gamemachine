@@ -55,6 +55,8 @@ set(SOURCES
 		demo/md5mesh.cpp
 		demo/terrain.h
 		demo/terrain.cpp
+		demo/customshader.h
+		demo/customshader.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)

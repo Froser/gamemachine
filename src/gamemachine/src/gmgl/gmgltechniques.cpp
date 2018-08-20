@@ -58,6 +58,8 @@ namespace
 			return "GM_CubeMap";
 		case GMModelType::Particle:
 			return "GM_Particle";
+		case GMModelType::Custom:
+			return "GM_Custom";
 		default:
 			GM_ASSERT(false);
 			return "GM_Model2D";
@@ -153,9 +155,16 @@ void GMGLTechnique::draw(GMModel* model)
 
 void GMGLTechnique::beginModel(GMModel* model, const GMGameObject* parent)
 {
+	D(d);
+	d->currentModel = model;
 	auto shaderProgram = getShaderProgram();
 	shaderProgram->useProgram();
-	shaderProgram->setInt(GM_VariablesDesc.TechniqueId, model->getTechniqueId());
+}
+
+void GMGLTechnique::endModel()
+{
+	D(d);
+	d->currentModel = nullptr;
 }
 
 void GMGLTechnique::activateTextureTransform(GMModel* model, GMTextureType type)
@@ -548,10 +557,6 @@ IShaderProgram* GMGLTechnique_3D::getShaderProgram()
 	return d->engine->getShaderProgram(GMShaderProgramType::ForwardShaderProgram);
 }
 
-void GMGLTechnique_3D::endModel()
-{
-}
-
 void GMGLTechnique_3D::activateMaterial(const GMShader& shader)
 {
 	D(d);
@@ -617,10 +622,6 @@ void GMGLTechnique_CubeMap::beginModel(GMModel* model, const GMGameObject* paren
 	IShaderProgram* shaderProgram = getShaderProgram();
 	updateCameraMatrices(shaderProgram);
 	shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));
-}
-
-void GMGLTechnique_CubeMap::endModel()
-{
 }
 
 void GMGLTechnique_CubeMap::beforeDraw(GMModel* model)
@@ -694,10 +695,6 @@ void GMGLTechnique_Filter::setHDR(IShaderProgram* shaderProgram)
 	shaderProgram->setInt(GM_VariablesDesc.HDR.ToneMapping, d->state.toneMapping);
 }
 
-void GMGLTechnique_Filter::endModel()
-{
-}
-
 IShaderProgram* GMGLTechnique_Filter::getShaderProgram()
 {
 	D_BASE(db, GMGLTechnique);
@@ -721,10 +718,6 @@ IShaderProgram* GMGLTechnique_LightPass::getShaderProgram()
 {
 	D_BASE(db, GMGLTechnique);
 	return db->engine->getShaderProgram(GMShaderProgramType::DeferredLightPassShaderProgram);
-}
-
-void GMGLTechnique_LightPass::endModel()
-{
 }
 
 void GMGLTechnique_LightPass::beginModel(GMModel* model, const GMGameObject* parent)
@@ -806,4 +799,13 @@ void GMGLTechnique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* par
 		"GM_Shadow",
 		GMShaderType::Pixel);
 	GM_ASSERT(b);
+}
+
+IShaderProgram* GMGLTechnique_Custom::getShaderProgram()
+{
+	D_BASE(d, GMGLTechnique);
+	GMRenderTechniqueManager* rtm = d->engine->getRenderTechniqueManager();
+	IShaderProgram* shaderProgram = rtm->getShaderProgram(d->currentModel->getTechniqueId());
+	GM_ASSERT(shaderProgram);
+	return shaderProgram;
 }

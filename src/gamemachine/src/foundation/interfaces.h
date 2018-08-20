@@ -31,6 +31,7 @@ class GMWidgetResourceManager;
 class GMSystemEvent;
 class GMCamera;
 class GMRenderTechniqueManager;
+class GMRenderTechniques;
 struct ILight;
 struct ISoundPlayer;
 struct IGamePackageHandler;
@@ -94,6 +95,7 @@ enum class GMRenderMode
 
 enum class GMShaderType
 {
+	Unknown,
 	Pixel,
 	Vertex,
 	Effect,
@@ -108,7 +110,7 @@ enum class GMRenderEnvironment
 
 //! 模型类型。
 /*!
-不同的模型类型将采用不同着色器进行处理。自定义的模型类型应当放在CustomStart之后。
+  不同的模型类型将采用不同着色器进行处理。
 */
 enum class GMModelType
 {
@@ -119,7 +121,7 @@ enum class GMModelType
 	Filter, //! 表示一个滤镜，通常是一个四边形模型，在帧缓存中获取纹理来绘制。
 	LightPassQuad, //! 表示一个光照传递模型。
 	Particle, //! 表示一个粒子模型。
-	CustomStart, //! 自定义模型类型。将自定义的类型放在此类型后面，匹配自定义的着色器程序。
+	Custom, //! 自定义模型类型。
 };
 
 GM_INTERFACE(IGameHandler)
@@ -476,7 +478,7 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 
 	virtual GMCamera& getCamera() = 0;
 
-	virtual GMRenderTechniqueManager& getRenderTechniqueManager() = 0;
+	virtual GMRenderTechniqueManager* getRenderTechniqueManager() = 0;
 };
 
 GM_INTERFACE(ITechnique)
@@ -550,6 +552,7 @@ GM_INTERFACE(IFactory)
 	virtual void createGBuffer(const IRenderContext* context, OUT IGBuffer**) = 0;
 	virtual void createLight(GMLightType, OUT ILight**) = 0;
 	virtual void createWhiteTexture(const IRenderContext* context, REF GMTextureAsset&) = 0;
+	virtual void createShaderProgram(const IRenderContext* context, const GMRenderTechniques& renderTechniques, OUT IShaderProgram** out) = 0;
 };
 
 // Audio

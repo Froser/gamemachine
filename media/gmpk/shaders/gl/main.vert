@@ -10,13 +10,9 @@
 #include "shadow.vert"
 #include "particle.vert"
 
-/// {gm injection techniques}
-
 void main(void)
 {
     init_layouts();
-
-/// {gm injection code}
 
     GM_techniqueEntrance();
 }

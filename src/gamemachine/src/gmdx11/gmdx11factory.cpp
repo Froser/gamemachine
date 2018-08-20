@@ -68,3 +68,8 @@ void GMDx11Factory::createWhiteTexture(const IRenderContext* context, REF GMText
 	t->init();
 	texture = GMAsset(GMAssetType::Texture, t);
 }
+
+void GMDx11Factory::createShaderProgram(const IRenderContext* context, const GMRenderTechniques& renderTechniques, OUT IShaderProgram** out)
+{
+	GM_ASSERT(false);
+}

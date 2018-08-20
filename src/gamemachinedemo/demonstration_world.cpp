@@ -23,6 +23,7 @@
 #include "demo/particle.h"
 #include "demo/md5mesh.h"
 #include "demo/terrain.h"
+#include "demo/customshader.h"
 
 #if GM_USE_DX11
 #include <gmdx11helper.h>
@@ -40,7 +41,7 @@ namespace
 		world->addDemo(L"效果：使用自带的各种滤镜。", new Demo_Effects(world));
 		world->addDemo(L"BSP: 渲染一个雷神之锤3的场景。", new Demo_Quake3_BSP(world));
 		world->addDemo(L"声音: 演示播放音乐。", new Demo_Sound(world));
-		world->addDemo(L"文字: 使用排版引擎实现排版。", new Demo_Literature(world));
+		//world->addDemo(L"文字: 使用排版引擎实现排版。", new Demo_Literature(world));
 		world->addDemo(L"模型: 读取模型文件。", new Demo_Model(world));
 		world->addDemo(L"物理: 演示相互碰撞的物体。", new Demo_Collision(world));
 		world->addDemo(L"高光贴图: 演示一个带有高光贴图的立方体。", new Demo_SpecularMap(world));
@@ -50,6 +51,7 @@ namespace
 		world->addDemo(L"粒子系统: 渲染一个粒子系统。", new Demo_Particle(world));
 		world->addDemo(L"MD5: 渲染MD5骨骼动画。", new Demo_MD5Mesh(world));
 		world->addDemo(L"地形: 渲染一个地形。", new Demo_Terrain(world));
+		world->addDemo(L"自定义着色器: 使用自定义着色器进行渲染。", new Demo_CustomShader(world));
 		// world->addDemo(L"LUA: 执行Lua脚本。", new Demo_Lua(world));
 		world->init();
 	}
@@ -665,31 +667,7 @@ void DemostrationEntrance::onLoadShaders(const gm::IRenderContext* context)
 {
 	D(d);
 	auto& env = GM.getRunningStates().renderEnvironment;
-
-	// 在这里加入自定义渲染
-	gm::IGraphicEngine* engine = context->getEngine();
-
-
-	gm::GMRenderTechniques techs;
-	gm::GMRenderTechnique vertexTech(gm::GMShaderType::Vertex, L"Red");
-	vertexTech.setCode(
-		gm::GMRenderTechniqueEngineType::OpenGL,
-		L"bool Red(void)"
-		L"{"
-		L" gl_Position = GM_ProjectionMatrix * GM_ViewMatrix * GM_WorldMatrix * position;"
-		L" gl_Position.y -= .3f;"
-		L" return true;"
-		L"}"
-	);
-	techs.addRenderTechnique(vertexTech);
-
-	gm::GMRenderTechnique pixelTech(gm::GMShaderType::Pixel, L"Red");
-	pixelTech.setCode(
-		gm::GMRenderTechniqueEngineType::OpenGL,
-		L"bool Red(void) { _frag_color = vec4(1,0,0,1); return true; }"
-	);
-	techs.addRenderTechnique(pixelTech);
-	engine->getRenderTechniqueManager().addRenderTechnique(techs);
+	Demo_CustomShader::initCustomShader(context);
 
 	if (env == gm::GMRenderEnvironment::OpenGL)
 	{

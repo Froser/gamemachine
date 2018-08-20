@@ -6,6 +6,7 @@ BEGIN_NS
 
 class GMImage;
 class GMModelDataProxy;
+class GMRenderTechniques;
 class GMGLFactory : public IFactory
 {
 public:
@@ -18,6 +19,7 @@ public:
 	virtual void createGBuffer(const IRenderContext* context, OUT IGBuffer**) override;
 	virtual void createLight(GMLightType, OUT ILight**) override;
 	virtual void createWhiteTexture(const IRenderContext* context, REF GMTextureAsset&) override;
+	virtual void createShaderProgram(const IRenderContext* context, const GMRenderTechniques& renderTechniques, OUT IShaderProgram** out);
 };
 
 END_NS

@@ -12,11 +12,7 @@
 #include "shadow.frag"
 #include "particle.frag"
 
-/// {gm injection techniques}
-
 void main(void)
 {
-/// {gm injection code}
-
     GM_techniqueEntrance();
 }
