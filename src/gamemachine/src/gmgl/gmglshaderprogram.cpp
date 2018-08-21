@@ -17,6 +17,8 @@ GMuint GMGLShaderInfo::toGLShaderType(GMShaderType type)
 		return GL_FRAGMENT_SHADER;
 	case GMShaderType::Vertex:
 		return GL_VERTEX_SHADER;
+	case GMShaderType::Geometry:
+		return GL_GEOMETRY_SHADER;
 	default:
 		GM_ASSERT(false);
 		return GL_NONE;
@@ -31,6 +33,8 @@ GMShaderType GMGLShaderInfo::fromGLShaderType(GMuint type)
 		return GMShaderType::Pixel;
 	case GL_VERTEX_SHADER:
 		return GMShaderType::Vertex;
+	case GL_GEOMETRY_SHADER:
+		return GMShaderType::Geometry;
 	default:
 		GM_ASSERT(false);
 	}
@@ -199,7 +203,6 @@ void GMGLShaderProgram::load()
 	glGetProgramiv(program, GL_LINK_STATUS, &linked);
 	if (!linked)
 	{
-#ifdef _DEBUG
 		GLsizei len;
 		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &len);
 
@@ -209,8 +212,7 @@ void GMGLShaderProgram::load()
 		GM_ASSERT(false);
 		GMMessage crashMsg(GameMachineMessageType::CrashDown);
 		GM.postMessage(crashMsg);
-		delete[] log;
-#endif /* DEBUG */
+		GM_delete_array(log);
 
 		removeShaders();
 	}

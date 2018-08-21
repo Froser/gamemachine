@@ -59,10 +59,9 @@ IShaderProgram* GMRenderTechniqueManager::getShaderProgram(GMRenderTechinqueID i
 	return shaderProgram;
 }
 
-GMRenderTechnique::GMRenderTechnique(GMShaderType shaderType, GMString name)
+GMRenderTechnique::GMRenderTechnique(GMShaderType shaderType)
 {
 	setShaderType(shaderType);
-	setName(std::move(name));
 }
 
 void GMRenderTechnique::setCode(GMRenderTechniqueEngineType::Type type, GMString code)

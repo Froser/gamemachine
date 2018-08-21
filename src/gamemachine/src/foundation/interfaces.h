@@ -98,6 +98,7 @@ enum class GMShaderType
 	Unknown,
 	Pixel,
 	Vertex,
+	Geometry,
 	Effect,
 };
 

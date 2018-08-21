@@ -46,7 +46,6 @@ GM_PRIVATE_OBJECT(GMRenderTechnique)
 {
 	GMShaderType shaderType;
 	GMString code[GMRenderTechniqueEngineType::EndOfRenderTechniqueEngineType];
-	GMString name;
 	GMRenderTechniques* parent = nullptr;
 };
 
@@ -56,12 +55,11 @@ class GMRenderTechnique : public GMObject
 	GM_DECLARE_PRIVATE(GMRenderTechnique)
 	GM_ALLOW_COPY_MOVE(GMRenderTechnique)
 	GM_DECLARE_PROPERTY(ShaderType, shaderType, GMShaderType)
-	GM_DECLARE_PROPERTY(Name, name, GMString)
 	GM_FRIEND_CLASS(GMRenderTechniqueManager)
 	GM_FRIEND_CLASS(GMRenderTechniques)
 
 public:
-	GMRenderTechnique(GMShaderType shaderType, GMString name);
+	GMRenderTechnique(GMShaderType shaderType);
 
 public:
 	inline const GMString& getCode(GMRenderTechniqueEngineType::Type type) const GM_NOEXCEPT

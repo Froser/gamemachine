@@ -3,6 +3,8 @@
 #include <linearmath.h>
 #include <gmwidget.h>
 
+static gm::GMRenderTechinqueID s_techid;
+
 void Demo_CustomShader::init()
 {
 	D(d);
@@ -34,10 +36,10 @@ void Demo_CustomShader::init()
 	// 创建一个带纹理的对象
 	gm::GMfloat extents[] = { 1.f, .5f, .5f };
 	gm::GMfloat pos[] = { 0, 0, 0 };
-	gm::GMModel* model;
+	gm::GMModel* model = nullptr;
 	gm::GMPrimitiveCreator::createQuad(extents, pos, &model, &cb);
 	
-	model->setTechniqueId(10001);
+	model->setTechniqueId(s_techid);
 	model->setType(gm::GMModelType::Custom);
 
 	gm::GMAsset quadAsset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, model));
@@ -80,7 +82,7 @@ void Demo_CustomShader::initCustomShader(const gm::IRenderContext* context)
 {
 	gm::IGraphicEngine* engine = context->getEngine();
 	gm::GMRenderTechniques techs;
-	gm::GMRenderTechnique vertexTech(gm::GMShaderType::Vertex, L"Red");
+	gm::GMRenderTechnique vertexTech(gm::GMShaderType::Vertex);
 	vertexTech.setCode(
 		gm::GMRenderTechniqueEngineType::OpenGL,
 		L"#version 410 core\n"
@@ -91,22 +93,63 @@ void Demo_CustomShader::initCustomShader(const gm::IRenderContext* context)
 		L"layout(location = 4) in vec3 bitangent;"
 		L"layout(location = 5) in vec2 lightmapuv;"
 		L"layout(location = 6) in vec4 color;"
+		L"out vec2 vs_uv;"
 		L"uniform mat4 GM_ViewMatrix;"
 		L"uniform mat4 GM_WorldMatrix;"
 		L"uniform mat4 GM_ProjectionMatrix;"
 		L"void main(void)"
 		L"{"
+		L" vs_uv = uv;"
 		L" gl_Position = GM_ProjectionMatrix * GM_ViewMatrix * GM_WorldMatrix * vec4(position, 1);"
 		L"}"
 	);
 	techs.addRenderTechnique(vertexTech);
 
-	gm::GMRenderTechnique pixelTech(gm::GMShaderType::Pixel, L"Red");
+	gm::GMRenderTechnique geometryTech(gm::GMShaderType::Geometry);
+	geometryTech.setCode(
+		gm::GMRenderTechniqueEngineType::OpenGL,
+		L"#version 330 core\n														"
+		L"layout(triangles) in;														"
+		L"layout(triangle_strip, max_vertices = 3) out;								"
+		L"in vec2 vs_uv[];															"
+		L"out vec2 gs_uv;															"
+		L"																			"
+		L"void main() {																"
+		L"	gs_uv = vs_uv[0];														"
+		L"	gl_Position = gl_in[0].gl_Position + vec4(-0.1, 0.0, 0.0, 0.0);			"
+		L"	EmitVertex();															"
+		L"																			"
+		L"	gs_uv = vs_uv[1];														"
+		L"	gl_Position = gl_in[1].gl_Position + vec4(0.0, 0.1, 0.0, 0.0);			"
+		L"	EmitVertex();															"
+		L"																			"
+		L"	gs_uv = vs_uv[2];														"
+		L"	gl_Position = gl_in[2].gl_Position + vec4(-0.1, 0.0, 0.1, 0.0);			"
+		L"	EmitVertex();															"
+		L"																			"
+		L"	EndPrimitive();															"
+		L"}																			"
+	);
+	techs.addRenderTechnique(geometryTech);
+
+	gm::GMRenderTechnique pixelTech(gm::GMShaderType::Pixel);
 	pixelTech.setCode(
 		gm::GMRenderTechniqueEngineType::OpenGL,
-		L"void main(void) { gl_FragColor = vec4(1,0,0,1); }"
+		L"#version 410 core\n"
+		L"in vec2 gs_uv;"
+		L"struct GMTexture"
+		L"{"
+		L"	sampler2D Texture;"
+		L"	float OffsetX;"
+		L"	float OffsetY;"
+		L"	float ScaleX;"
+		L"	float ScaleY;"
+		L"	int Enabled;"
+		L"};"
+		L"uniform GMTexture GM_DiffuseTextureAttribute;"
+		L"void main(void) { gl_FragColor = texture(GM_DiffuseTextureAttribute.Texture, gs_uv); }"
 	);
 	techs.addRenderTechnique(pixelTech);
-	engine->getRenderTechniqueManager()->addRenderTechnique(techs);
 
+	s_techid = engine->getRenderTechniqueManager()->addRenderTechnique(techs);
 }
