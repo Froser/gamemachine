@@ -313,6 +313,20 @@ GMTextureAsset GMDx11Technique::getWhiteTexture()
 	return d->whiteTexture;
 }
 
+const std::string& GMDx11Technique::getTechniqueNameByTechniqueId(GMRenderTechinqueID id)
+{
+	static Map<GMRenderTechinqueID, std::string> s_map;
+	auto iter = s_map.find(id);
+	if (iter == s_map.end())
+	{
+		auto insertResult = s_map.insert({ id, "GMTech_Custom" + GMString(id).toStdString() });
+		GM_ASSERT(insertResult.second);
+		return insertResult.first->second;
+	}
+
+	return iter->second;
+}
+
 BEGIN_NS
 struct GMDx11RasterizerStates
 {
@@ -493,6 +507,7 @@ void GMDx11Technique::beginModel(GMModel* model, const GMGameObject* parent)
 	D(d);
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
 	shaderProgram->useProgram();
+	d->currentModel = model;
 	if (!d->inputLayout)
 	{
 		D3DX11_PASS_DESC passDesc;
@@ -550,6 +565,8 @@ void GMDx11Technique::beginModel(GMModel* model, const GMGameObject* parent)
 
 void GMDx11Technique::endModel()
 {
+	D(d);
+	d->currentModel = nullptr;
 }
 
 const IRenderContext* GMDx11Technique::getContext()

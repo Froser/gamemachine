@@ -20,9 +20,14 @@ void GMDx11GraphicEngine::init()
 	Base::init();
 
 	if (d->ready)
+	{
 		initShaders(db->context);
+		db->renderTechniqueManager->init();
+	}
 	else
+	{
 		GM_ASSERT(false);
+	}
 }
 
 void GMDx11GraphicEngine::update(GMUpdateDataType type)
@@ -220,6 +225,8 @@ ITechnique* GMDx11GraphicEngine::getTechnique(GMModelType objectType)
 		return newTechnique<GMDx11Technique_Deferred_3D_LightPass>(d->technique_deferred_3d_lightpass, db->context);
 	case GMModelType::Particle:
 		return newTechnique<GMDx11Technique_Particle>(d->technique_particle, db->context);
+	case GMModelType::Custom:
+		return newTechnique<GMDx11Technique_Custom>(d->technique_custom, db->context);
 	default:
 		GM_ASSERT(false);
 		return nullptr;

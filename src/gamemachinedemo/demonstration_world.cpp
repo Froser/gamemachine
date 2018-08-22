@@ -587,7 +587,6 @@ void DemostrationEntrance::init(const gm::IRenderContext* context)
 {
 	D(d);
 	auto& rc = context->getWindow()->getRenderRect();
-
 	gm::GMGamePackage* pk = GM.getGamePackageManager();
 
 #ifdef _DEBUG
@@ -666,9 +665,8 @@ DemostrationEntrance::~DemostrationEntrance()
 void DemostrationEntrance::onLoadShaders(const gm::IRenderContext* context)
 {
 	D(d);
-	auto& env = GM.getRunningStates().renderEnvironment;
 	Demo_CustomShader::initCustomShader(context);
-
+	auto& env = GM.getRunningStates().renderEnvironment;
 	if (env == gm::GMRenderEnvironment::OpenGL)
 	{
 		bool b;
@@ -693,7 +691,17 @@ void DemostrationEntrance::onLoadShaders(const gm::IRenderContext* context)
 	{
 #if GM_USE_DX11
 		GM_ASSERT(env == gm::GMRenderEnvironment::DirectX11);
-		gm::GMDx11Helper::GMLoadDx11Shader(context->getEngine(), L"dx11/effect.fx", gm::GMShaderType::Effect);
+		gm::GMBuffer buf;
+		gm::GMString path;
+		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, L"dx11/effect.fx", &buf, &path);
+		buf.convertToStringBuffer();
+
+		gm::GMRenderTechniques techs;
+		gm::GMRenderTechnique tech(gm::GMShaderType::Effect);
+		tech.setCode(env, gm::GMString(reinterpret_cast<const char*>(buf.buffer)));
+		tech.setPath(env, path);
+		techs.addRenderTechnique(tech);
+		context->getEngine()->getRenderTechniqueManager()->addRenderTechniques(techs);
 #else
 		GM_ASSERT(false);
 #endif

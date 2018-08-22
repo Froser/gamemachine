@@ -25,6 +25,7 @@ struct GMTextureAttributeBank
 GM_PRIVATE_OBJECT(GMDx11Technique)
 {
 	const IRenderContext* context = nullptr;
+	GMModel* currentModel = nullptr;
 	GMTextureAsset whiteTexture;
 	GMOwnedPtr<GMDx11RasterizerStates> rasterizerStates;
 	GMOwnedPtr<GMDx11BlendStates> blendStates;
@@ -79,6 +80,12 @@ protected:
 		return d->engine;
 	}
 
+	inline GMModel* getCurrentModel()
+	{
+		D(d);
+		return d->currentModel;
+	}
+
 protected:
 	virtual void prepareScreenInfo();
 	virtual void prepareTextures(GMModel* model);
@@ -99,6 +106,9 @@ protected:
 
 private:
 	GMTextureAsset getWhiteTexture();
+
+public:
+	static const std::string& getTechniqueNameByTechniqueId(GMRenderTechinqueID id);
 };
 
 class GMDx11Technique_3D : public GMDx11Technique
@@ -241,6 +251,19 @@ protected:
 	virtual const char* getTechniqueName() override
 	{
 		return "GMTech_Particle";
+	}
+};
+
+class GMDx11Technique_Custom : public GMDx11Technique
+{
+public:
+	using GMDx11Technique::GMDx11Technique;
+
+protected:
+	virtual const char* getTechniqueName() override
+	{
+		GM_ASSERT(getCurrentModel());
+		return getTechniqueNameByTechniqueId(getCurrentModel()->getTechniqueId()).c_str();
 	}
 };
 

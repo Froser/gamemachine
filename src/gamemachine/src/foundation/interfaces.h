@@ -107,6 +107,7 @@ enum class GMRenderEnvironment
 	Invalid,
 	OpenGL,
 	DirectX11,
+	EndOfRenderEnvironment,
 };
 
 //! 模型类型。
@@ -553,7 +554,7 @@ GM_INTERFACE(IFactory)
 	virtual void createGBuffer(const IRenderContext* context, OUT IGBuffer**) = 0;
 	virtual void createLight(GMLightType, OUT ILight**) = 0;
 	virtual void createWhiteTexture(const IRenderContext* context, REF GMTextureAsset&) = 0;
-	virtual void createShaderProgram(const IRenderContext* context, const GMRenderTechniques& renderTechniques, OUT IShaderProgram** out) = 0;
+	virtual void createShaderPrograms(const IRenderContext* context, const GMRenderTechniqueManager& manager, REF Vector<IShaderProgram*>* out) = 0;
 };
 
 // Audio

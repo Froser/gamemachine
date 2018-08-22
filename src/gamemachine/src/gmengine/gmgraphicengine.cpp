@@ -139,6 +139,7 @@ GMGraphicEngine::~GMGraphicEngine()
 
 void GMGraphicEngine::init()
 {
+	D(d);
 	getDefaultFramebuffers()->bind();
 }
 

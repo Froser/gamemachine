@@ -43,6 +43,7 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMOwnedPtr<ITechnique> technique_deferred_3d_lightpass;
 	GMOwnedPtr<ITechnique> technique_3d_shadow;
 	GMOwnedPtr<ITechnique> technique_particle;
+	GMOwnedPtr<ITechnique> technique_custom;
 };
 
 class GMDx11GraphicEngine : public GMGraphicEngine

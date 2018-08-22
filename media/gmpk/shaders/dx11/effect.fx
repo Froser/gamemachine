@@ -357,6 +357,7 @@ struct VS_OUTPUT
 };
 
 typedef VS_OUTPUT PS_INPUT;
+typedef VS_OUTPUT GS_OUTPUT;
 
 class GMTangentSpace
 {
@@ -1323,6 +1324,7 @@ technique11 GMTech_3D
     pass P0
     {
         SetVertexShader(CompileShader(vs_5_0,VS_3D()));
+        SetGeometryShader(NULL);
         SetPixelShader(CompileShader(ps_5_0,PS_3D()));
         SetRasterizerState(GM_RasterizerState);
         SetBlendState(GM_BlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
@@ -1335,6 +1337,7 @@ technique11 GMTech_2D
     pass P0
     {
         SetVertexShader(CompileShader(vs_5_0,VS_2D()));
+        SetGeometryShader(NULL);
         SetPixelShader(CompileShader(ps_5_0,PS_2D()));
         SetRasterizerState(GM_RasterizerState);
         SetDepthStencilState(GM_DepthStencilState, 1);
@@ -1347,6 +1350,7 @@ technique11 GMTech_Text
     pass P0
     {
         SetVertexShader(CompileShader(vs_5_0,VS_Text()));
+        SetGeometryShader(NULL);
         SetPixelShader(CompileShader(ps_5_0,PS_Text()));
         SetRasterizerState(GM_RasterizerState);
         SetDepthStencilState(GM_DepthStencilState, 1);
@@ -1359,6 +1363,7 @@ technique11 GMTech_CubeMap
     pass P0
     {
         SetVertexShader(CompileShader(vs_5_0,VS_CubeMap()));
+        SetGeometryShader(NULL);
         SetPixelShader(CompileShader(ps_5_0,PS_CubeMap()));
         SetRasterizerState(GM_RasterizerState);
         SetDepthStencilState(GM_DepthStencilState, 1);
@@ -1371,6 +1376,7 @@ technique11 GMTech_Filter
     pass P0
     {
         SetVertexShader(CompileShader(vs_5_0,VS_Filter()));
+        SetGeometryShader(NULL);
         SetPixelShader(CompileShader(ps_5_0,PS_Filter()));
         SetRasterizerState(GM_RasterizerState);
         SetDepthStencilState(GM_DepthStencilState, 1);
@@ -1383,6 +1389,7 @@ technique11 GMTech_Deferred_3D
     pass P0
     {
         SetVertexShader(CompileShader(vs_5_0,VS_3D_GeometryPass()));
+        SetGeometryShader(NULL);
         SetPixelShader(CompileShader(ps_5_0,PS_3D_GeometryPass()));
         SetRasterizerState(GM_RasterizerState);
         SetDepthStencilState(GM_DepthStencilState, 1);
@@ -1395,6 +1402,7 @@ technique11 GMTech_Deferred_3D_LightPass
     pass P0
     {
         SetVertexShader(CompileShader(vs_5_0,VS_3D_LightPass()));
+        SetGeometryShader(NULL);
         SetPixelShader(CompileShader(ps_5_0,PS_3D_LightPass()));
         SetRasterizerState(GM_RasterizerState);
         SetDepthStencilState(GM_DepthStencilState, 1);
@@ -1407,6 +1415,7 @@ technique11 GMTech_3D_Shadow
     pass P0
     {
         SetVertexShader(CompileShader(vs_5_0,VS_Shadow()));
+        SetGeometryShader(NULL);
         SetRasterizerState(GM_RasterizerState);
         SetDepthStencilState(GM_DepthStencilState, 1);
         SetBlendState(GM_BlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
@@ -1418,6 +1427,7 @@ technique11 GMTech_Particle
     pass P0
     {
         SetVertexShader(CompileShader(vs_5_0,VS_Particle()));
+        SetGeometryShader(NULL);
         SetPixelShader(CompileShader(ps_5_0,PS_Particle()));
         SetRasterizerState(GM_RasterizerState);
         SetDepthStencilState(GM_DepthStencilState, 1);

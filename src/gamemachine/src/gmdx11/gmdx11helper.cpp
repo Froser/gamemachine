@@ -7,7 +7,8 @@
 
 IShaderProgram* GMDx11Helper::GMLoadDx11Shader(
 	IGraphicEngine* engine,
-	const gm::GMString& filename,
+	const GMString& code,
+	const GMString& filepath,
 	GMShaderType type
 )
 {
@@ -15,10 +16,7 @@ IShaderProgram* GMDx11Helper::GMLoadDx11Shader(
 	gm::GMComPtr<ID3D10Blob> shaderBuffer;
 	HRESULT hr;
 
-	gm::GMBuffer buf;
-	gm::GMString path;
-	GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, filename, &buf, &path);
-	if (!buf.size)
+	if (code.isEmpty())
 		return nullptr;
 
 	UINT flag = D3DCOMPILE_ENABLE_STRICTNESS;
@@ -26,11 +24,11 @@ IShaderProgram* GMDx11Helper::GMLoadDx11Shader(
 	flag |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 #endif
 
-	buf.convertToStringBuffer();
+	std::string stdCode = code.toStdString();
 	hr = D3DX11CompileFromMemory(
-		(char*)buf.buffer,
-		buf.size,
-		path.toStdString().c_str(),
+		stdCode.c_str(),
+		stdCode.length(),
+		filepath.toStdString().c_str(),
 		NULL,
 		NULL,
 		"",
@@ -47,14 +45,13 @@ IShaderProgram* GMDx11Helper::GMLoadDx11Shader(
 		if (errorMessage)
 		{
 			void* ptr = errorMessage->GetBufferPointer();
-			size_t sz = errorMessage->GetBufferSize();
 			char* t = ((char*)ptr);
 			gm_error(gm_dbg_wrap("Error in Buf: {0}"), t);
 			GM_ASSERT(false);
 		}
 		else
 		{
-			gm_error(gm_dbg_wrap("Cannot find shader file {0}"), path);
+			gm_error(gm_dbg_wrap("Cannot find shader file {0}"), filepath);
 			GM_ASSERT(false);
 		}
 		return nullptr;

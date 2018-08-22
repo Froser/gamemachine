@@ -7,22 +7,13 @@ typedef GMlong GMRenderTechinqueID;
 class GMRenderTechnique;
 class GMRenderTechniques;
 
-struct GMRenderTechniqueEngineType
-{
-	enum Type
-	{
-		OpenGL,
-		DirectX11,
-		EndOfRenderTechniqueEngineType
-	};
-};
-
 GM_PRIVATE_OBJECT(GMRenderTechniqueManager)
 {
 	const IRenderContext* context = nullptr;
 	GMAtomic<GMRenderTechinqueID> id = 10000;
 	Set<GMRenderTechniques> renderTechniques;
 	Map<GMRenderTechinqueID, GMOwnedPtr<IShaderProgram>> shaderPrograms;
+	bool inited = false;
 };
 
 class GMRenderTechniqueManager : public GMObject
@@ -33,19 +24,25 @@ public:
 	GMRenderTechniqueManager(const IRenderContext* context);
 
 public:
-	GMRenderTechinqueID addRenderTechnique(GMRenderTechniques renderTechniques);
+	GMRenderTechinqueID addRenderTechniques(GMRenderTechniques renderTechniques);
 	IShaderProgram* getShaderProgram(GMRenderTechinqueID id);
+	void init();
 	bool isEmpty();
 
-private:
-	void createShaderProgram(const GMRenderTechniques& renderTechniques, OUT IShaderProgram** out);
+public:
+	inline const Set<GMRenderTechniques>& getRenderTechniques() const GM_NOEXCEPT
+	{
+		D(d);
+		return d->renderTechniques;
+	}
 };
 
 
 GM_PRIVATE_OBJECT(GMRenderTechnique)
 {
 	GMShaderType shaderType;
-	GMString code[GMRenderTechniqueEngineType::EndOfRenderTechniqueEngineType];
+	GMString code[static_cast<GMsize_t>(GMRenderEnvironment::EndOfRenderEnvironment)];
+	GMString path[static_cast<GMsize_t>(GMRenderEnvironment::EndOfRenderEnvironment)];
 	GMRenderTechniques* parent = nullptr;
 };
 
@@ -62,14 +59,21 @@ public:
 	GMRenderTechnique(GMShaderType shaderType);
 
 public:
-	inline const GMString& getCode(GMRenderTechniqueEngineType::Type type) const GM_NOEXCEPT
+	inline const GMString& getCode(GMRenderEnvironment type) const GM_NOEXCEPT
 	{
 		D(d);
-		return d->code[type];
+		return d->code[static_cast<GMsize_t>(type)];
+	}
+
+	inline const GMString& getPath(GMRenderEnvironment type) const GM_NOEXCEPT
+	{
+		D(d);
+		return d->path[static_cast<GMsize_t>(type)];
 	}
 
 public:
-	void setCode(GMRenderTechniqueEngineType::Type type, GMString code);
+	void setCode(GMRenderEnvironment type, GMString code);
+	void setPath(GMRenderEnvironment type, GMString path);
 
 friend_methods(GMRenderTechniqueManager):
 	void setId(GMRenderTechinqueID id);

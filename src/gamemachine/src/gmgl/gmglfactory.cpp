@@ -69,17 +69,20 @@ void GMGLFactory::createWhiteTexture(const IRenderContext* context, REF GMTextur
 	out = GMAsset(GMAssetType::Texture, t);
 }
 
-void GMGLFactory::createShaderProgram(const IRenderContext* context, const GMRenderTechniques& renderTechniques, OUT IShaderProgram** out)
+void GMGLFactory::createShaderPrograms(const IRenderContext* context, const GMRenderTechniqueManager& manager, REF Vector<IShaderProgram*>* out)
 {
-	const auto& techniques = renderTechniques.getTechniques();
-	GMGLShaderProgram* shaderProgram = new GMGLShaderProgram(context);
-	for (auto& technique : techniques)
+	for (auto& renderTechniques : manager.getRenderTechniques())
 	{
-		GMGLShaderInfo shaderInfo = { GMGLShaderInfo::toGLShaderType(technique.getShaderType()), technique.getCode(GMRenderTechniqueEngineType::OpenGL) };
-		shaderProgram->attachShader(shaderInfo);
-	}
+		const auto& techniques = renderTechniques.getTechniques();
+		GMGLShaderProgram* shaderProgram = new GMGLShaderProgram(context);
+		for (auto& technique : techniques)
+		{
+			GMGLShaderInfo shaderInfo = { GMGLShaderInfo::toGLShaderType(technique.getShaderType()), technique.getCode(GMRenderEnvironment::OpenGL) };
+			shaderProgram->attachShader(shaderInfo);
+		}
 
-	shaderProgram->load();
-	if (out)
-		*out = shaderProgram;
+		shaderProgram->load();
+		if (out)
+			out->push_back(shaderProgram);
+	}
 }

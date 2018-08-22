@@ -82,6 +82,7 @@ void GMGLGraphicEngine::installShaders()
 	}
 
 	getShaderLoadCallback()->onLoadShaders(d->context);
+	d->renderTechniqueManager->init();
 }
 
 bool GMGLGraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
