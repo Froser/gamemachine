@@ -90,21 +90,17 @@ bool GMGLGraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
 	D(d);
 	switch (id)
 	{
-	case GameMachineInterfaceID::GLEffectShaderProgram:
+	case GameMachineInterfaceID::GLFiltersShaderProgram:
 		d->filterShaderProgram.reset(static_cast<GMGLShaderProgram*>(in));
-		d->filterShaderProgram->load();
 		break;
 	case GameMachineInterfaceID::GLForwardShaderProgram:
 		d->forwardShaderProgram.reset(static_cast<GMGLShaderProgram*>(in));
-		d->forwardShaderProgram->load();
 		break;
 	case GameMachineInterfaceID::GLDeferredShaderGeometryProgram:
 		d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER].reset(static_cast<GMGLShaderProgram*>(in));
-		d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->load();
 		break;
 	case GameMachineInterfaceID::GLDeferredShaderLightProgram:
 		d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER].reset(static_cast<GMGLShaderProgram*>(in));
-		d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->load();
 		break;
 	default:
 		return false;

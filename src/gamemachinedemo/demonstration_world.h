@@ -154,10 +154,6 @@ public:
 private:
 	void onLoadShaders(const gm::IRenderContext* context);
 
-private:
-	void initLoadEffectsShader(gm::GMGLShaderProgram* effectsShaderProgram);
-	void initLoadShaderProgram(gm::GMGLShaderProgram* forwardShaderProgram, gm::GMGLShaderProgram* deferredShaderProgram[2]);
-
 	// IGameHandler
 private:
 	virtual void init(const gm::IRenderContext* context) override;

@@ -122,6 +122,8 @@ set(SOURCES
 		gmgl/gmglframebuffer.cpp
 		gmgl/gmgllight.h
 		gmgl/gmgllight.cpp
+		gmgl/gmglhelper.h
+		gmgl/gmglhelper.cpp
 		gmgl/shader_constants.h
 		gmphysics/gmphysicsworld.h
 		gmphysics/gmphysicsworld.cpp

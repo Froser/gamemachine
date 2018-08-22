@@ -35,7 +35,7 @@ public:
 	GMGLShaderProgram(const IRenderContext* context);
 	~GMGLShaderProgram();
 
-	void load();
+	bool load();
 	GMuint getProgram() { D(d); return d->shaderProgram; }
 	void attachShader(const GMGLShaderInfo& shaderCfgs);
 

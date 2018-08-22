@@ -217,7 +217,7 @@ void GMDx11Factory::createShaderPrograms(const IRenderContext* context, const GM
 		}
 
 		// 生成
-		GMDx11Helper::GMLoadDx11Shader(context->getEngine(), fxCode, fxPath, gm::GMShaderType::Effect);
+		GMDx11Helper::loadEffectShader(context->getEngine(), fxCode, fxPath);
 
 		// 填充，当然Dx11下只有1个Shader
 		for (auto& renderTechniques : manager.getRenderTechniques())

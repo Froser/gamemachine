@@ -19,20 +19,24 @@ struct GMDx11Helper
 	  \param type 着色器类型，目前只能为GMShaderType::Effect。
 	  \return 操作是否成功。
 	*/
-	static IShaderProgram* GMLoadDx11Shader(
+	static IShaderProgram* loadEffectShader(
 		IGraphicEngine* engine,
 		const GMString& code,
-		const GMString& filepath,
-		GMShaderType type
+		const GMString& filepath
+	);
+
+	static void loadShader(
+		const IRenderContext* context,
+		const GMString& effectFilePath
 	);
 
 	//! 返回一个默认的采样器描述。
 	/*!
 	  \return 默认采样器描述。
 	*/
-	static const D3D11_SAMPLER_DESC& GMGetDx11DefaultSamplerDesc();
+	static const D3D11_SAMPLER_DESC& getDefaultSamplerDesc();
 
-	static D3D11_FILTER GMGetDx11Filter(GMS_TextureFilter min, GMS_TextureFilter mag);
+	static D3D11_FILTER getTextureFilter(GMS_TextureFilter min, GMS_TextureFilter mag);
 };
 
 END_NS

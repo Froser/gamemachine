@@ -139,11 +139,11 @@ bool GMGLShaderProgram::verify()
 	return d->lastUsedProgram == d->shaderProgram;
 }
 
-void GMGLShaderProgram::load()
+bool GMGLShaderProgram::load()
 {
 	D(d);
 	if (d->shaderInfos.size() == 0)
-		return;
+		return false;
 
 	GLuint program = glCreateProgram();
 	setProgram(program);
@@ -159,7 +159,7 @@ void GMGLShaderProgram::load()
 		if (!source)
 		{
 			removeShaders();
-			return;
+			return false;
 		}
 
 		glShaderSource(shader, 1, &source, NULL);
@@ -191,7 +191,7 @@ void GMGLShaderProgram::load()
 			GMMessage crashMsg(GameMachineMessageType::CrashDown);
 			GM.postMessage(crashMsg);
 			GM_delete_array(log);
-			return;
+			return false;
 		}
 
 		glAttachShader(program, shader);
@@ -199,7 +199,7 @@ void GMGLShaderProgram::load()
 
 	glLinkProgram(program);
 
-	GLint linked;
+	GLint linked = GL_FALSE;
 	glGetProgramiv(program, GL_LINK_STATUS, &linked);
 	if (!linked)
 	{
@@ -215,7 +215,10 @@ void GMGLShaderProgram::load()
 		GM_delete_array(log);
 
 		removeShaders();
+		return false;
 	}
+
+	return true;
 }
 
 void GMGLShaderProgram::removeShaders()

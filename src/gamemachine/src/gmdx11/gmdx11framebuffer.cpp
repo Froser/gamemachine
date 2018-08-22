@@ -135,7 +135,7 @@ void GMDx11FramebufferTexture::init()
 	if (!db->samplerState)
 	{
 		// 创建采样器
-		D3D11_SAMPLER_DESC desc = GMDx11Helper::GMGetDx11DefaultSamplerDesc();
+		D3D11_SAMPLER_DESC desc = GMDx11Helper::getDefaultSamplerDesc();
 		desc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
 		GM_DX_HR(db->device->CreateSamplerState(&desc, &db->samplerState));
 	}

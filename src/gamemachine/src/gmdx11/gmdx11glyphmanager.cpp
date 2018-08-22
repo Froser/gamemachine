@@ -96,8 +96,8 @@ void GMDx11GlyphTexture::bindSampler(GMTextureSampler* sampler)
 	if (!db->samplerState)
 	{
 		// 创建采样器
-		D3D11_SAMPLER_DESC desc = GMDx11Helper::GMGetDx11DefaultSamplerDesc();
-		desc.Filter = GMDx11Helper::GMGetDx11Filter(sampler->getMinFilter(), sampler->getMagFilter());
+		D3D11_SAMPLER_DESC desc = GMDx11Helper::getDefaultSamplerDesc();
+		desc.Filter = GMDx11Helper::getTextureFilter(sampler->getMinFilter(), sampler->getMagFilter());
 		desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
 		desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
 		GM_DX_HR(db->device->CreateSamplerState(&desc, &db->samplerState));

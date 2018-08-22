@@ -67,7 +67,7 @@ enum class GameMachineHandlerEvent
 enum class GameMachineInterfaceID
 {
 	GLForwardShaderProgram,
-	GLEffectShaderProgram,
+	GLFiltersShaderProgram,
 	GLDeferredShaderGeometryProgram,
 	GLDeferredShaderLightProgram,
 
@@ -99,7 +99,7 @@ enum class GMShaderType
 	Pixel,
 	Vertex,
 	Geometry,
-	Effect,
+	Effect, //DirectX11
 };
 
 enum class GMRenderEnvironment

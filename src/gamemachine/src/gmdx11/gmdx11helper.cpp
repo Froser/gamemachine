@@ -5,15 +5,14 @@
 #include <gmcom.h>
 #include "gmdx11shaderprogram.h"
 
-IShaderProgram* GMDx11Helper::GMLoadDx11Shader(
+IShaderProgram* GMDx11Helper::loadEffectShader(
 	IGraphicEngine* engine,
 	const GMString& code,
-	const GMString& filepath,
-	GMShaderType type
+	const GMString& filepath
 )
 {
-	gm::GMComPtr<ID3D10Blob> errorMessage;
-	gm::GMComPtr<ID3D10Blob> shaderBuffer;
+	GMComPtr<ID3D10Blob> errorMessage;
+	GMComPtr<ID3D10Blob> shaderBuffer;
 	HRESULT hr;
 
 	if (code.isEmpty())
@@ -62,32 +61,41 @@ IShaderProgram* GMDx11Helper::GMLoadDx11Shader(
 	if (!b || !device)
 		return nullptr;
 
-	if (type == GMShaderType::Effect)
-	{
-		GMComPtr<ID3DX11Effect> effect;
-		GM_DX_HR(D3DX11CreateEffectFromMemory(
-			shaderBuffer->GetBufferPointer(),
-			shaderBuffer->GetBufferSize(),
-			0,
-			device,
-			&effect
-		));
+	GMComPtr<ID3DX11Effect> effect;
+	GM_DX_HR(D3DX11CreateEffectFromMemory(
+		shaderBuffer->GetBufferPointer(),
+		shaderBuffer->GetBufferSize(),
+		0,
+		device,
+		&effect
+	));
 
-		GMDx11EffectShaderProgram* shaderProgram = new GMDx11EffectShaderProgram(effect);
-		b = engine->setInterface(GameMachineInterfaceID::D3D11ShaderProgram, shaderProgram);
-		GM_ASSERT(b);
+	GMDx11EffectShaderProgram* shaderProgram = new GMDx11EffectShaderProgram(effect);
+	b = engine->setInterface(GameMachineInterfaceID::D3D11ShaderProgram, shaderProgram);
+	GM_ASSERT(b);
 
-		return shaderProgram;
-	}
-	else
-	{
-		return nullptr;
-	}
-
-	return nullptr;
+	return shaderProgram;
 }
 
-const D3D11_SAMPLER_DESC& GMDx11Helper::GMGetDx11DefaultSamplerDesc()
+void GMDx11Helper::loadShader(
+	const IRenderContext* context,
+	const GMString& effectFilePath
+)
+{
+	GMBuffer buf;
+	GMString path;
+	GM.getGamePackageManager()->readFile(GMPackageIndex::Shaders, effectFilePath, &buf, &path);
+	buf.convertToStringBuffer();
+
+	GMRenderTechniques techs;
+	GMRenderTechnique tech(GMShaderType::Effect);
+	tech.setCode(GMRenderEnvironment::DirectX11, GMString(reinterpret_cast<const char*>(buf.buffer)));
+	tech.setPath(GMRenderEnvironment::DirectX11, path);
+	techs.addRenderTechnique(tech);
+	context->getEngine()->getRenderTechniqueManager()->addRenderTechniques(techs);
+}
+
+const D3D11_SAMPLER_DESC& GMDx11Helper::getDefaultSamplerDesc()
 {
 	static D3D11_SAMPLER_DESC desc = {
 		D3D11_FILTER_MIN_MAG_MIP_LINEAR,
@@ -103,7 +111,7 @@ const D3D11_SAMPLER_DESC& GMDx11Helper::GMGetDx11DefaultSamplerDesc()
 	return desc;
 }
 
-D3D11_FILTER GMDx11Helper::GMGetDx11Filter(GMS_TextureFilter min, GMS_TextureFilter mag)
+D3D11_FILTER GMDx11Helper::getTextureFilter(GMS_TextureFilter min, GMS_TextureFilter mag)
 {
 	//TODO 缺少mip过滤
 	if (min == GMS_TextureFilter::Linear && mag == GMS_TextureFilter::Linear)
