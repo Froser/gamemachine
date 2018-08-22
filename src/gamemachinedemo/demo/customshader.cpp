@@ -13,37 +13,45 @@ void Demo_CustomShader::init()
 	// 创建对象
 	getDemoWorldReference().reset(new gm::GMDemoGameWorld(d->parentDemonstrationWorld->getContext()));
 
-	// 创建一个纹理
-	struct _ShaderCb : public gm::IPrimitiveCreatorShaderCallback
-	{
-		gm::GMDemoGameWorld* world = nullptr;
-
-		_ShaderCb(gm::GMDemoGameWorld* d) : world(d)
-		{
-		}
-
-		virtual void onCreateShader(gm::GMShader& shader) override
-		{
-			shader.getMaterial().kd = GMVec3(1, 1, 1);
-			shader.getMaterial().ks = GMVec3(0);
-
-			gm::GMTextureAsset tex = gm::GMToolUtil::createTexture(world->getContext(), "gamemachine.png");
-			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::Diffuse);
-			world->getAssets().addAsset(tex);
-		}
-	} cb(asDemoGameWorld(getDemoWorldReference()));
-
 	// 创建一个带纹理的对象
-	gm::GMfloat extents[] = { 1.f, .5f, .5f };
-	gm::GMfloat pos[] = { 0, 0, 0 };
-	gm::GMModel* model = nullptr;
-	gm::GMPrimitiveCreator::createQuad(extents, pos, &model, &cb);
-	
-	model->setTechniqueId(s_techid);
-	model->setType(gm::GMModelType::Custom);
+	gm::GMModel* quad = new gm::GMModel();
+	quad->setPrimitiveTopologyMode(gm::GMTopologyMode::Triangles);
+	quad->setDrawMode(gm::GMModelDrawMode::Index);
+	gm::GMMesh* mesh = new gm::GMMesh(quad);
 
-	gm::GMAsset quadAsset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, model));
-	gm::GMGameObject* obj = new gm::GMGameObject(quadAsset);
+	gm::GMVertex V1 = { { -1.f, -.5f, 0 },{ 0, 0, -1 },{ 0, 1 } };
+	gm::GMVertex V2 = { { -1.f, .5f, 0 },{ 0, 0, -1 },{ 0, 0 } };
+	gm::GMVertex V3 = { { 1.f, -.5f, 0 },{ 0, 0, -1 },{ 1, 1 } };
+	gm::GMVertex V4 = { { 1.f, .5f, 0 },{ 0, 0, -1 },{ 1, 0 } };
+	mesh->vertex(V1);
+	mesh->vertex(V2);
+	mesh->vertex(V3);
+	mesh->vertex(V4);
+	mesh->index(0);
+	mesh->index(1);
+	mesh->index(2);
+
+	gm::GMMesh* mesh2 = new gm::GMMesh(quad);
+	mesh2->vertex(V3);
+	mesh2->vertex(V2);
+	mesh2->vertex(V4);
+	mesh2->index(0);
+	mesh2->index(1);
+	mesh2->index(2);
+
+	gm::GMAsset asset = gm::GMAsset(gm::GMAssetType::Model, quad);
+	quad->getShader().getMaterial().kd = GMVec3(1, 1, 1);
+	quad->getShader().getMaterial().ks = GMVec3(0);
+
+	gm::GMTextureAsset tex = gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "gamemachine.png");
+	gm::GMToolUtil::addTextureToShader(quad->getShader(), tex, gm::GMTextureType::Diffuse);
+	getDemoWorldReference()->getAssets().addAsset(tex);
+
+	quad->setTechniqueId(s_techid);
+	quad->setType(gm::GMModelType::Custom);
+
+	getDemoWorldReference()->getAssets().addAsset(asset);
+	gm::GMGameObject* obj = new gm::GMGameObject(asset);
 	asDemoGameWorld(getDemoWorldReference())->addObject("texture", obj);
 
 	gm::GMWidget* widget = createDefaultWidget();
@@ -127,7 +135,7 @@ void Demo_CustomShader::initCustomShader(const gm::IRenderContext* context)
 		L"	EmitVertex();															"
 		L"																			"
 		L"	gs_uv = vs_uv[1];														"
-		L"	gl_Position = gl_in[1].gl_Position + vec4(0.0, 0.1, 0.0, 0.0);			"
+		L"	gl_Position = gl_in[1].gl_Position + vec4(0.0, 0.5, 0.0, 0.0);			"
 		L"	EmitVertex();															"
 		L"																			"
 		L"	gs_uv = vs_uv[2];														"
@@ -146,7 +154,7 @@ void Demo_CustomShader::initCustomShader(const gm::IRenderContext* context)
 		L"	g[1] = input[1];\n"
 		L"	g[2] = input[2];\n"
 		L"	g[0].Position = g[0].Position + float4(-0.1, 0.0, 0.0, 0.0);\n"
-		L"	g[1].Position = g[1].Position + float4(0.0, 0.1, 0.0, 0.0);\n"
+		L"	g[1].Position = g[1].Position + float4(0.0, 0.5, 0.0, 0.0);\n"
 		L"	g[2].Position = g[2].Position + float4(-0.1, 0.0, 0.1, 0.0);\n"
 		L"	output.Append(g[0]);\n"
 		L"	output.Append(g[1]);\n"

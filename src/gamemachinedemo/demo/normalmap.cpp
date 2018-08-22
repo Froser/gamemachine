@@ -14,37 +14,25 @@ void Demo_NormalMap::init()
 	// 创建对象
 	getDemoWorldReference().reset(new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext()));
 
-	// 创建一个纹理
-	struct _ShaderCb : public gm::IPrimitiveCreatorShaderCallback
-	{
-		gm::GMDemoGameWorld* world = nullptr;
-
-		_ShaderCb(gm::GMDemoGameWorld* d) : world(d)
-		{
-		}
-
-		virtual void onCreateShader(gm::GMShader& shader) override
-		{
-			shader.setCull(gm::GMS_Cull::Cull);
-			shader.getMaterial().kd = GMVec3(.6f, .2f, .3f);
-			shader.getMaterial().ks = GMVec3(.1f, .2f, .3f);
-			shader.getMaterial().ka = GMVec3(1, 1, 1);
-			shader.getMaterial().shininess = 20;
-
-			auto pk = gm::GameMachine::instance().getGamePackageManager();
-			gm::GMTextureAsset tex = gm::GMToolUtil::createTexture(world->getContext(), "bnp.png");
-			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::NormalMap);
-			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::Diffuse);
-			world->getAssets().addAsset(tex);
-		}
-	} cb(asDemoGameWorld(getDemoWorldReference()));
-
 	// 创建一个带纹理的对象
-	gm::GMfloat extents[] = { .5f, .5f, .5f };
-	gm::GMfloat pos[] = { 0, 0, 1.f };
-	gm::GMModel* model;
-	gm::GMPrimitiveCreator::createQuad(extents, pos, &model, &cb);
-	gm::GMAsset quadAsset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, model));
+	GMVec2 extents = GMVec2(.5f, .5f);
+	gm::GMModelAsset asset;
+	gm::GMPrimitiveCreator::createQuadrangle(extents, .5f, asset);
+
+	gm::GMModel* model = asset.getModel();
+	model->getShader().setCull(gm::GMS_Cull::Cull);
+	model->getShader().getMaterial().kd = GMVec3(.6f, .2f, .3f);
+	model->getShader().getMaterial().ks = GMVec3(.1f, .2f, .3f);
+	model->getShader().getMaterial().ka = GMVec3(1, 1, 1);
+	model->getShader().getMaterial().shininess = 20;
+
+	auto pk = gm::GameMachine::instance().getGamePackageManager();
+	gm::GMTextureAsset tex = gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "bnp.png");
+	gm::GMToolUtil::addTextureToShader(model->getShader(), tex, gm::GMTextureType::NormalMap);
+	gm::GMToolUtil::addTextureToShader(model->getShader(), tex, gm::GMTextureType::Diffuse);
+	getDemoWorldReference()->getAssets().addAsset(tex);
+
+	gm::GMAsset quadAsset = getDemoWorldReference()->getAssets().addAsset(asset);
 	d->gameObject = new gm::GMGameObject(quadAsset);
 	asDemoGameWorld(getDemoWorldReference())->addObject("texture", d->gameObject);
 

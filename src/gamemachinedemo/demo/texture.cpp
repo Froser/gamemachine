@@ -11,33 +11,20 @@ void Demo_Texture::init()
 	// 创建对象
 	getDemoWorldReference().reset(new gm::GMDemoGameWorld(d->parentDemonstrationWorld->getContext()));
 
-	// 创建一个纹理
-	struct _ShaderCb : public gm::IPrimitiveCreatorShaderCallback
-	{
-		gm::GMDemoGameWorld* world = nullptr;
-
-		_ShaderCb(gm::GMDemoGameWorld* d) : world(d)
-		{
-		}
-
-		virtual void onCreateShader(gm::GMShader& shader) override
-		{
-			shader.getMaterial().kd = GMVec3(1, 1, 1);
-			shader.getMaterial().ks = GMVec3(0);
-
-			gm::GMTextureAsset tex = gm::GMToolUtil::createTexture(world->getContext(), "gamemachine.png");
-			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::Diffuse);
-			world->getAssets().addAsset(tex);
-		}
-	} cb(asDemoGameWorld(getDemoWorldReference()));
-
 	// 创建一个带纹理的对象
-	gm::GMfloat extents[] = { 1.f, .5f, .5f };
-	gm::GMfloat pos[] = { 0, 0, 0 };
-	gm::GMModel* model;
-	gm::GMPrimitiveCreator::createQuad(extents, pos, &model, &cb);
+	GMVec2 extents = GMVec2(1.f, .5f);
+	gm::GMModelAsset asset;
+	gm::GMPrimitiveCreator::createQuadrangle(extents, 0, asset);
 	
-	gm::GMAsset quadAsset = getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, model));
+	gm::GMModel* model = asset.getModel();
+	model->getShader().getMaterial().kd = GMVec3(1, 1, 1);
+	model->getShader().getMaterial().ks = GMVec3(0);
+
+	gm::GMTextureAsset tex = gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "gamemachine.png");
+	gm::GMToolUtil::addTextureToShader(model->getShader(), tex, gm::GMTextureType::Diffuse);
+	getDemoWorldReference()->getAssets().addAsset(tex);
+
+	gm::GMAsset quadAsset = getDemoWorldReference()->getAssets().addAsset(asset);
 	gm::GMGameObject* obj = new gm::GMGameObject(quadAsset);
 	asDemoGameWorld(getDemoWorldReference())->addObject("texture", obj);
 

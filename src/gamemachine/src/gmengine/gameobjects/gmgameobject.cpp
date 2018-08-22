@@ -90,6 +90,9 @@ bool GMGameObject::canDeferredRendering()
 
 			if (model.getModel()->getShader().getVertexColorOp() == GMS_VertexColorOp::Replace)
 				return false;
+
+			if (model.getModel()->getType() == GMModelType::Custom)
+				return false;
 		}
 	}
 	else
@@ -101,6 +104,9 @@ bool GMGameObject::canDeferredRendering()
 				return false;
 
 			if (model->getShader().getVertexColorOp() == GMS_VertexColorOp::Replace)
+				return false;
+
+			if (model->getType() == GMModelType::Custom)
 				return false;
 		}
 		else
