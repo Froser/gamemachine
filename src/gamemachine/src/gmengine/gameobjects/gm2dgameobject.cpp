@@ -411,7 +411,7 @@ void GMSprite2DGameObject::setDepth(GMfloat depth)
 void GMSprite2DGameObject::setTexture(GMAsset tex)
 {
 	D(d);
-	if (d->texture != tex)
+	if (!tex.isEmpty() && d->texture != tex)
 	{
 		d->texture = tex;
 		d->needUpdateTexture = true;

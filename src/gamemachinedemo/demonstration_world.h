@@ -95,6 +95,8 @@ GM_PRIVATE_OBJECT(DemonstrationWorld)
 	gm::IWindow* mainWindow = nullptr;
 	gm::GMWidgetResourceManager* manager = nullptr;
 	gm::GMAnimation animation;
+	gm::GMlong texSkin = 0;
+	gm::GMlong texBorder = 0;
 };
 
 class DemonstrationWorld : public gm::GMGameWorld
@@ -128,6 +130,18 @@ public:
 	{
 		D(d);
 		return d->manager;
+	}
+
+	gm::GMlong getTexSkinId()
+	{
+		D(d);
+		return d->texSkin;
+	}
+
+	gm::GMlong getTexBorderId()
+	{
+		D(d);
+		return d->texBorder;
 	}
 };
 

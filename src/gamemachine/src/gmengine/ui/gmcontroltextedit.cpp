@@ -374,7 +374,7 @@ GMControlTextEdit::~GMControlTextEdit() = default;
 void GMControlTextEditBorder::initStyles(GMWidget* widget)
 {
 	D(d);
-	d->borderStyle.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::TextEditBorderArea));
+	d->borderStyle.setTexture(widget->getArea(GMTextureArea::TextEditBorderArea));
 	d->borderStyle.setTextureColor(GMControlState::Normal, GMVec4(1.f, 1.f, 1.f, 1.f));
 }
 

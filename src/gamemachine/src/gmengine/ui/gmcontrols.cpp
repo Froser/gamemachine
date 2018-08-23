@@ -314,7 +314,7 @@ void GMControlButton::initStyles(GMWidget* widget)
 	D(d);
 	D_BASE(db, Base);
 
-	db->foreStyle.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::ButtonArea));
+	db->foreStyle.setTexture(widget->getArea(GMTextureArea::ButtonArea));
 	db->foreStyle.setFont(0);
 	db->foreStyle.setFontColor(GMVec4(1, 1, 1, 1));
 	db->foreStyle.setTextureColor(GMControlState::Normal, GMVec4(1.f, 1.f, 1.f, .58f));
@@ -322,7 +322,7 @@ void GMControlButton::initStyles(GMWidget* widget)
 	db->foreStyle.setFontColor(GMControlState::Normal, GMVec4(.3f, .3f, .3f, 1.f));
 	db->foreStyle.setFontColor(GMControlState::MouseOver, GMVec4(0, 0, 0, 1.f));
 
-	d->fillStyle.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::ButtonFillArea));
+	d->fillStyle.setTexture(widget->getArea(GMTextureArea::ButtonFillArea));
 	d->fillStyle.setFont(0);
 	d->fillStyle.setFontColor(GMVec4(1, 1, 1, 1));
 	d->fillStyle.setTextureColor(GMControlState::MouseOver, GMVec4(1.f, 1.f, 1.f, .63f));
@@ -352,7 +352,7 @@ bool GMControlBorder::containsPoint(const GMPoint& point)
 void GMControlBorder::initStyles(GMWidget* widget)
 {
 	D(d);
-	d->borderStyle.setTexture(GMWidgetResourceManager::Border, widget->getArea(GMTextureArea::BorderArea));
+	d->borderStyle.setTexture(widget->getArea(GMTextureArea::BorderArea));
 	d->borderStyle.setTextureColor(GMControlState::Normal, GMVec4(1.f, 1.f, 1.f, 1.f));
 }
 
@@ -530,17 +530,17 @@ void GMControlScrollBar::initStyles(GMWidget* widget)
 
 	GMStyle& styleUp = d->styleUp;
 	styleUp = styleTemplate;
-	styleUp.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::ScrollBarUp));
+	styleUp.setTexture(widget->getArea(GMTextureArea::ScrollBarUp));
 	styleUp.setTextureColor(GMControlState::Disabled, GMVec4(.87f, .87f, .87f, 1));
 
 	GMStyle& styleDown = d->styleDown;
 	styleDown = styleTemplate;
-	styleDown.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::ScrollBarDown));
+	styleDown.setTexture(widget->getArea(GMTextureArea::ScrollBarDown));
 	styleDown.setTextureColor(GMControlState::Disabled, GMVec4(.87f, .87f, .87f, 1));
 
 	GMStyle& styleTrack = d->styleTrack;
 	styleTrack = styleTemplate;
-	styleTrack.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::ScrollBarTrack));
+	styleTrack.setTexture(widget->getArea(GMTextureArea::ScrollBarTrack));
 	styleTrack.setTextureColor(GMControlState::Disabled, GMVec4(.87f, .87f, .87f, 1));
 }
 
@@ -568,7 +568,7 @@ void GMControlScrollBarThumb::initStyles(GMWidget* widget)
 	d->borderStyle.setTextureColor(GMControlState::Normal, GMVec4(1, 1, 1, .58f));
 	d->borderStyle.setTextureColor(GMControlState::Focus, GMVec4(1, 1, 1, .78f));
 	d->borderStyle.setTextureColor(GMControlState::Disabled, GMVec4(1, 1, 1, .27f));
-	d->borderStyle.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::ScrollBarThumb));
+	d->borderStyle.setTexture(widget->getArea(GMTextureArea::ScrollBarThumb));
 }
 
 GMStyle& GMControlScrollBarThumb::getStyle(GMControl::StyleType style)

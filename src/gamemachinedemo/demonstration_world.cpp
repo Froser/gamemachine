@@ -244,35 +244,35 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 
 	{
 		gm::GMRect rc = { 0, 0, 136, 54 };
-		d->mainWidget->addArea(gm::GMTextureArea::ButtonArea, rc);
+		d->mainWidget->addArea(gm::GMTextureArea::ButtonArea, getDemonstrationWorld()->getTexSkinId(), rc);
 	}
 	{
 		gm::GMRect rc = { 136, 0, 116, 54 };
-		d->mainWidget->addArea(gm::GMTextureArea::ButtonFillArea, rc);
+		d->mainWidget->addArea(gm::GMTextureArea::ButtonFillArea, getDemonstrationWorld()->getTexSkinId(), rc);
 	}
 	{
 		gm::GMRect rc = { 8, 82, 238, 39 };
-		d->mainWidget->addArea(gm::GMTextureArea::TextEditBorderArea, rc);
+		d->mainWidget->addArea(gm::GMTextureArea::TextEditBorderArea, getDemonstrationWorld()->getTexSkinId(), rc);
 	}
 	{
 		gm::GMRect rc = { 0, 0, 280, 287 };
-		d->mainWidget->addArea(gm::GMTextureArea::BorderArea, rc);
+		d->mainWidget->addArea(gm::GMTextureArea::BorderArea, getDemonstrationWorld()->getTexBorderId(), rc);
 	}
 	{
 		gm::GMRect rc = { 196, 192, 22, 20 };
-		d->mainWidget->addArea(gm::GMTextureArea::ScrollBarUp, rc);
+		d->mainWidget->addArea(gm::GMTextureArea::ScrollBarUp, getDemonstrationWorld()->getTexSkinId(), rc);
 	}
 	{
 		gm::GMRect rc = { 196, 223, 22, 20 };
-		d->mainWidget->addArea(gm::GMTextureArea::ScrollBarDown, rc);
+		d->mainWidget->addArea(gm::GMTextureArea::ScrollBarDown, getDemonstrationWorld()->getTexSkinId(), rc);
 	}
 	{
 		gm::GMRect rc = { 220, 192, 18, 42 };
-		d->mainWidget->addArea(gm::GMTextureArea::ScrollBarThumb, rc);
+		d->mainWidget->addArea(gm::GMTextureArea::ScrollBarThumb, getDemonstrationWorld()->getTexSkinId(), rc);
 	}
 	{
 		gm::GMRect rc = { 196, 212, 22, 11 };
-		d->mainWidget->addArea(gm::GMTextureArea::ScrollBarTrack, rc);
+		d->mainWidget->addArea(gm::GMTextureArea::ScrollBarTrack, getDemonstrationWorld()->getTexSkinId(), rc);
 	}
 
 	d->mainWidget->setTitle(L"选项菜单");
@@ -486,27 +486,27 @@ void DemonstrationWorld::init()
 	d->manager = new gm::GMWidgetResourceManager(getContext());
 	gm::GMint width, height;
 	gm::GMTextureAsset texture = gm::GMToolUtil::createTexture(getContext(), "skin.png", &width, &height);
-	d->manager->addTexture(gm::GMWidgetResourceManager::Skin, texture, width, height);
+	d->texSkin = d->manager->addTexture(texture, width, height);
 
 	texture = gm::GMToolUtil::createTexture(getContext(), "border.png", &width, &height);
-	d->manager->addTexture(gm::GMWidgetResourceManager::Border, texture, width, height);
+	d->texBorder = d->manager->addTexture(texture, width, height);
 
 	d->mainWidget = new gm::GMWidget(d->manager);
 	{
 		gm::GMRect rc = { 0, 0, 136, 54 };
-		d->mainWidget->addArea(gm::GMTextureArea::ButtonArea, rc);
+		d->mainWidget->addArea(gm::GMTextureArea::ButtonArea, d->texSkin, rc);
 	}
 	{
 		gm::GMRect rc = { 136, 0, 116, 54 };
-		d->mainWidget->addArea(gm::GMTextureArea::ButtonFillArea, rc);
+		d->mainWidget->addArea(gm::GMTextureArea::ButtonFillArea, d->texSkin, rc);
 	}
 	{
 		gm::GMRect rc = { 8, 82, 238, 39 };
-		d->mainWidget->addArea(gm::GMTextureArea::TextEditBorderArea, rc);
+		d->mainWidget->addArea(gm::GMTextureArea::TextEditBorderArea, d->texSkin, rc);
 	}
 	{
 		gm::GMRect rc = { 0, 0, 280, 287 };
-		d->mainWidget->addArea(gm::GMTextureArea::BorderArea, rc);
+		d->mainWidget->addArea(gm::GMTextureArea::BorderArea, d->texBorder, rc);
 	}
 
 	d->manager->registerWidget(d->mainWidget);

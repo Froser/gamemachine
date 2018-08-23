@@ -21,6 +21,7 @@ class GMControlTextArea;
 class GMTypoTextBuffer;
 class GMControlScrollBar;
 struct ITypoEngine;
+struct GMWidgetTextureArea;
 
 struct GMControlState
 {
@@ -108,8 +109,10 @@ GM_PRIVATE_OBJECT(GMWidgetResourceManager)
 	Vector<GMWidget*> widgets;
 	GMint backBufferWidth = 0;
 	GMint backBufferHeight = 0;
-	Map<GMint, GMCanvasTextureInfo> textureResources;
+	Vector<GMCanvasTextureInfo> textureResources;
 	GMTextureAsset whiteTexture;
+	GMAtomic<GMlong> textureId = 0;
+	GMlong whiteTextureId = 0;
 };
 
 class GMWidgetResourceManager : public GMObject
@@ -117,22 +120,13 @@ class GMWidgetResourceManager : public GMObject
 	GM_DECLARE_PRIVATE(GMWidgetResourceManager)
 
 public:
-	enum TextureType
-	{
-		WhiteTexture,
-		Skin,
-		Border,
-		UserDefine,
-	};
-
-public:
 	GMWidgetResourceManager(const IRenderContext* context);
 	~GMWidgetResourceManager() = default;
 
 public:
 	ITypoEngine* getTypoEngine();
-	const GMCanvasTextureInfo& getTexture(TextureType type);
-	void addTexture(TextureType type, GMAsset texture, GMint width, GMint height);
+	const GMCanvasTextureInfo& getTexture(GMlong id);
+	GMlong addTexture(GMAsset texture, GMint width, GMint height);
 
 	virtual const IRenderContext* getContext()
 	{
@@ -191,6 +185,12 @@ public:
 		D(d);
 		return d->borderObject.get();
 	}
+
+	inline GMlong getWhiteTextureId() GM_NOEXCEPT
+	{
+		D(d);
+		return d->whiteTextureId;
+	}
 };
 
 struct GMShadowStyle
@@ -203,7 +203,7 @@ struct GMShadowStyle
 
 GM_PRIVATE_OBJECT(GMStyle)
 {
-	GMWidgetResourceManager::TextureType texture;
+	GMlong texture;
 	GMFontHandle font = 0;
 	GMRect rc;
 	GMElementBlendColor textureColor;
@@ -224,7 +224,7 @@ public:
 	);
 
 public:
-	void setTexture(GMWidgetResourceManager::TextureType texture, const GMRect& rc);
+	void setTexture(const GMWidgetTextureArea& idRc);
 	void setFont(GMFontHandle font);
 	void setFontColor(const GMVec4& defaultColor = GMVec4(1, 1, 1, 1));
 	void setFontColor(GMControlState::State state, const GMVec4& color);
@@ -261,7 +261,7 @@ public:
 		return d->rc;
 	}
 
-	inline GMWidgetResourceManager::TextureType getTexture()
+	inline GMlong getTexture()
 	{
 		D(d);
 		return d->texture;
@@ -278,6 +278,12 @@ public:
 		D(d);
 		return d->shadowStyle;
 	}
+};
+
+struct GMWidgetTextureArea
+{
+	GMlong textureId;
+	GMRect rc;
 };
 
 GM_PRIVATE_OBJECT(GMWidget)
@@ -316,7 +322,7 @@ GM_PRIVATE_OBJECT(GMWidget)
 	GMint height = 0;
 	GMint x = 0;
 	GMint y = 0;
-	HashMap<GMTextureArea::Area, GMRect> areas;
+	HashMap<GMTextureArea::Area, GMWidgetTextureArea> areas;
 
 	bool movingWidget = false;
 	GMPoint movingStartPt;
@@ -331,11 +337,11 @@ public:
 	~GMWidget();
 
 public:
-	void addArea(GMTextureArea::Area area, const GMRect& rc);
+	void addArea(GMTextureArea::Area area, GMlong textureId, const GMRect& rc);
 	void render(GMfloat elpasedTime);
 	void setNextWidget(GMWidget* nextWidget);
 	void addControl(GMControl* control);
-	const GMRect& getArea(GMTextureArea::Area area);
+	const GMWidgetTextureArea& getArea(GMTextureArea::Area area);
 
 	GMStyle getTitleStyle();
 	void setTitleStyle(const GMStyle& titleStyle);

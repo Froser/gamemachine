@@ -99,11 +99,11 @@ GMStyle::GMStyle(
 	resetTextureColor(defaultTextureColor, disabledTextureColor, hiddenTextureColor);
 }
 
-void GMStyle::setTexture(GMWidgetResourceManager::TextureType texture, const GMRect& rc)
+void GMStyle::setTexture(const GMWidgetTextureArea& idRc)
 {
 	D(d);
-	d->texture = texture;
-	d->rc = rc;
+	d->texture = idRc.textureId;
+	d->rc = idRc.rc;
 }
 
 void GMStyle::setFont(GMFontHandle font)
@@ -163,11 +163,13 @@ GMWidgetResourceManager::GMWidgetResourceManager(const IRenderContext* context)
 	d->borderObject = gm_makeOwnedPtr<GMBorder2DGameObject>(context->getWindow()->getRenderRect());
 	d->borderObject->setContext(context);
 
+	addTexture(GMAsset(), 1, 1); //放入一个非法的Asset，占用textureId=0的情况
+
 	GM.getFactory()->createWhiteTexture(context, d->whiteTexture);
-	addTexture(GMWidgetResourceManager::WhiteTexture, d->whiteTexture, 1, 1);
+	d->whiteTextureId = addTexture(d->whiteTexture, 1, 1);
 }
 
-void GMWidgetResourceManager::addTexture(TextureType type, GMAsset texture, GMint width, GMint height)
+GMlong GMWidgetResourceManager::addTexture(GMAsset texture, GMint width, GMint height)
 {
 	D(d);
 	GMCanvasTextureInfo texInfo;
@@ -175,7 +177,8 @@ void GMWidgetResourceManager::addTexture(TextureType type, GMAsset texture, GMin
 	texInfo.width = width;
 	texInfo.height = height;
 
-	d->textureResources[type] = std::move(texInfo);
+	d->textureResources.push_back(std::move(texInfo));
+	return d->textureId++;
 }
 
 void GMWidgetResourceManager::registerWidget(GMWidget* widget)
@@ -201,10 +204,10 @@ ITypoEngine* GMWidgetResourceManager::getTypoEngine()
 	return d->textObject->getTypoEngine();
 }
 
-const GMCanvasTextureInfo& GMWidgetResourceManager::getTexture(TextureType type)
+const GMCanvasTextureInfo& GMWidgetResourceManager::getTexture(GMlong id)
 {
 	D(d);
-	return d->textureResources[type];
+	return d->textureResources[id];
 }
 
 void GMWidgetResourceManager::onRenderRectResized()
@@ -241,7 +244,7 @@ void GMWidget::addControl(GMControl* control)
 	GM_ASSERT(b);
 }
 
-const GMRect& GMWidget::getArea(GMTextureArea::Area area)
+const GMWidgetTextureArea& GMWidget::getArea(GMTextureArea::Area area)
 {
 	D(d);
 	return d->areas[area];
@@ -689,10 +692,10 @@ void GMWidget::setPrevCanvas(GMWidget* prevWidget)
 	d->prevWidget= prevWidget;
 }
 
-void GMWidget::addArea(GMTextureArea::Area area, const GMRect& rc)
+void GMWidget::addArea(GMTextureArea::Area area, GMlong textureId, const GMRect& rc)
 {
 	D(d);
-	d->areas[area] = rc;
+	d->areas[area] = { textureId, rc };
 }
 
 bool GMWidget::msgProc(GMSystemEvent* event)
@@ -1149,7 +1152,7 @@ void GMWidget::initStyles()
 	D(d);
 	GMStyle titleStyle;
 	titleStyle.setFont(0);
-	titleStyle.setTexture(GMWidgetResourceManager::Skin, getArea(GMTextureArea::CaptionArea));
+	titleStyle.setTexture(getArea(GMTextureArea::CaptionArea));
 	titleStyle.setTextureColor(GMControlState::Normal, GMVec4(1, 1, 1, 1));
 	titleStyle.setFontColor(GMControlState::Normal, GMVec4(1, 1, 1, 1));
 	titleStyle.getTextureColor().blend(GMControlState::Normal, .5f);
@@ -1162,7 +1165,7 @@ void GMWidget::initStyles()
 
 	GMStyle whiteTextureStyle;
 	GMRect rc = { 0, 0, 1, 1 };
-	whiteTextureStyle.setTexture(GMWidgetResourceManager::WhiteTexture, rc);
+	whiteTextureStyle.setTexture({ d->manager->getWhiteTextureId(), rc });
 	d->whiteTextureStyle = whiteTextureStyle;
 }
 

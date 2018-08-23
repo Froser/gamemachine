@@ -161,7 +161,7 @@ GM_PRIVATE_OBJECT(GMSprite2DGameObject)
 	GMint texHeight = 0;
 	GMint texWidth = 0;
 	GMfloat depth = 0;
-	bool needUpdateTexture = true;
+	bool needUpdateTexture = false;
 	GMFloat4 color = GMFloat4(1, 1, 1, 1);
 };
 
