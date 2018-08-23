@@ -103,9 +103,9 @@ private:
 // Animations
 GM_PRIVATE_OBJECT(GMGameObjectKeyframe)
 {
-	Map<GMGameObject*, GMVec4> translationMap;
-	Map<GMGameObject*, GMVec4> scalingMap;
-	Map<GMGameObject*, GMQuat> rotationMap;
+	Map <GMGameObject*, GMVec4, std::less<GMGameObject*>, AlignedAllocator<Pair<GMGameObject*, GMVec4>> > translationMap;
+	Map <GMGameObject*, GMVec4, std::less<GMGameObject*>, AlignedAllocator<Pair<GMGameObject*, GMVec4>> > scalingMap;
+	Map <GMGameObject*, GMQuat, std::less<GMGameObject*>, AlignedAllocator<Pair<GMGameObject*, GMQuat>> > rotationMap;
 	GMVec4 translation;
 	GMVec4 scaling;
 	GMQuat rotation;

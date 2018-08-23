@@ -20,7 +20,7 @@ public:
 	static void gmAlignedFreeInternal(void* ptr);
 };
 
-template < typename T, unsigned Alignment >
+template < typename T, unsigned Alignment = 16>
 class AlignedAllocator
 {
 	typedef AlignedAllocator< T, Alignment > my_type;
@@ -85,7 +85,7 @@ public:
 #define GM_ALIGNED_STRUCT(name) GM_ALIGNED_STRUCT_FROM(name, gm::GMAlignmentObject)
 
 template <typename T>
-using AlignedVector = Vector<T, AlignedAllocator<T, 16>>;
+using AlignedVector = Vector<T, AlignedAllocator<T>>;
 
 END_NS
 #endif

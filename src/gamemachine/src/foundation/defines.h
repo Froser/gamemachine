@@ -22,8 +22,8 @@
 template <typename T1, typename T2>
 using Pair = std::pair<T1, T2>;
 
-template <typename T1, typename T2, typename Cmp = std::less<T1> >
-using Map = std::map<T1, T2, Cmp>;
+template <typename T1, typename T2, typename Cmp = std::less<T1>, typename Alloc = std::allocator<std::pair<const T1, T2>> >
+using Map = std::map<T1, T2, Cmp, Alloc>;
 
 template <typename T1, typename T2, typename Cmp = std::less<T1> >
 using Multimap = std::multimap<T1, T2, Cmp>;
