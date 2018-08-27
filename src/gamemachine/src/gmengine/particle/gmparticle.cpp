@@ -309,8 +309,7 @@ GMParticleDescription GMParticleSystem::createParticleDescriptionFromCocos2DPlis
 		};
 		auto base64Decoded = GMConvertion::fromBase64(buf);
 		GMBuffer inflated;
-		GMsize_t imgSize;
-		if (GMZip::inflateMemory(base64Decoded, inflated, imgSize, TextureSizeHint) == GMZip::Ok)
+		if (GMZip::inflate(base64Decoded, inflated, TextureSizeHint) == GMZip::Ok)
 			desc.setTextureImageData(std::move(inflated));
 	}
 	else if (!proxy.getTextureFileName().isEmpty())

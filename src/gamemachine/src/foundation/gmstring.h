@@ -394,6 +394,7 @@ public:
 
 	static GMfloat parseFloat(const GMString& i, bool* ok = nullptr);
 	static GMint parseInt(const GMString& i, bool* ok = nullptr);
+	static GMlong parseLong(const GMString& i, bool* ok = nullptr);
 };
 
 struct GMStringHashFunctor

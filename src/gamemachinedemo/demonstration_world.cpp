@@ -241,39 +241,7 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 	gm::GMFontHandle stxingka = d->engine->getGlyphManager()->addFontByFileName("STXINGKA.TTF");
 	d->mainWidget = gm_makeOwnedPtr<gm::GMWidget>(getDemonstrationWorld()->getManager());
 	getDemonstrationWorld()->getManager()->registerWidget(d->mainWidget.get());
-
-	{
-		gm::GMRect rc = { 0, 0, 136, 54 };
-		d->mainWidget->addArea(gm::GMTextureArea::ButtonArea, getDemonstrationWorld()->getTexSkinId(), rc);
-	}
-	{
-		gm::GMRect rc = { 136, 0, 116, 54 };
-		d->mainWidget->addArea(gm::GMTextureArea::ButtonFillArea, getDemonstrationWorld()->getTexSkinId(), rc);
-	}
-	{
-		gm::GMRect rc = { 8, 82, 238, 39 };
-		d->mainWidget->addArea(gm::GMTextureArea::TextEditBorderArea, getDemonstrationWorld()->getTexSkinId(), rc);
-	}
-	{
-		gm::GMRect rc = { 0, 0, 280, 287 };
-		d->mainWidget->addArea(gm::GMTextureArea::BorderArea, getDemonstrationWorld()->getTexBorderId(), rc);
-	}
-	{
-		gm::GMRect rc = { 196, 192, 22, 20 };
-		d->mainWidget->addArea(gm::GMTextureArea::ScrollBarUp, getDemonstrationWorld()->getTexSkinId(), rc);
-	}
-	{
-		gm::GMRect rc = { 196, 223, 22, 20 };
-		d->mainWidget->addArea(gm::GMTextureArea::ScrollBarDown, getDemonstrationWorld()->getTexSkinId(), rc);
-	}
-	{
-		gm::GMRect rc = { 220, 192, 18, 42 };
-		d->mainWidget->addArea(gm::GMTextureArea::ScrollBarThumb, getDemonstrationWorld()->getTexSkinId(), rc);
-	}
-	{
-		gm::GMRect rc = { 196, 212, 22, 11 };
-		d->mainWidget->addArea(gm::GMTextureArea::ScrollBarTrack, getDemonstrationWorld()->getTexSkinId(), rc);
-	}
+	getDemonstrationWorld()->getUIConfiguration()->initWidget(d->mainWidget.get());
 
 	d->mainWidget->setTitle(L"选项菜单");
 	d->mainWidget->setTitleVisible(true);
@@ -453,6 +421,7 @@ DemonstrationWorld::DemonstrationWorld(const gm::IRenderContext* context, gm::IW
 {
 	D(d);
 	d->mainWindow = window;
+	d->configuration.reset(new gm::GMUIConfiguration(context));
 }
 
 DemonstrationWorld::~DemonstrationWorld()
@@ -482,32 +451,15 @@ void DemonstrationWorld::init()
 	gm::IGraphicEngine* engine = getContext()->getEngine();
 	gm::GMFontHandle stxingka = engine->getGlyphManager()->addFontByFileName("STXINGKA.TTF");
 
-	// 创建画布
+	// 创建Widget
+	gm::GMBuffer ui;
+	package->readFile(gm::GMPackageIndex::Textures, L"skin.gmui", &ui);
+	d->configuration->import(ui);
+
 	d->manager = new gm::GMWidgetResourceManager(getContext());
-	gm::GMint width, height;
-	gm::GMTextureAsset texture = gm::GMToolUtil::createTexture(getContext(), "skin.png", &width, &height);
-	d->texSkin = d->manager->addTexture(texture, width, height);
-
-	texture = gm::GMToolUtil::createTexture(getContext(), "border.png", &width, &height);
-	d->texBorder = d->manager->addTexture(texture, width, height);
-
 	d->mainWidget = new gm::GMWidget(d->manager);
-	{
-		gm::GMRect rc = { 0, 0, 136, 54 };
-		d->mainWidget->addArea(gm::GMTextureArea::ButtonArea, d->texSkin, rc);
-	}
-	{
-		gm::GMRect rc = { 136, 0, 116, 54 };
-		d->mainWidget->addArea(gm::GMTextureArea::ButtonFillArea, d->texSkin, rc);
-	}
-	{
-		gm::GMRect rc = { 8, 82, 238, 39 };
-		d->mainWidget->addArea(gm::GMTextureArea::TextEditBorderArea, d->texSkin, rc);
-	}
-	{
-		gm::GMRect rc = { 0, 0, 280, 287 };
-		d->mainWidget->addArea(gm::GMTextureArea::BorderArea, d->texBorder, rc);
-	}
+	d->configuration->initResourceManager(d->manager);
+	d->configuration->initWidget(d->mainWidget);
 
 	d->manager->registerWidget(d->mainWidget);
 	d->mainWidget->setPosition(10, 60);

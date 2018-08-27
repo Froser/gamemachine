@@ -91,6 +91,8 @@ set(SOURCES
 		gmengine/ui/gmcontrols.cpp
 		gmengine/ui/gmcontroltextedit.h
 		gmengine/ui/gmcontroltextedit.cpp
+		gmengine/ui/gmuiconfiguration.h
+		gmengine/ui/gmuiconfiguration.cpp
 		gmengine/gmtypoengine.h
 		gmengine/gmtypoengine.cpp
 		gmengine/gmgbuffer.h

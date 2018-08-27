@@ -7,6 +7,7 @@
 #include "cases/linearmath.h"
 #include "cases/variant.h"
 #include "cases/lua.h"
+#include "cases/base64.h"
 
 int main(int argc, char* argv)
 {
@@ -21,6 +22,7 @@ int main(int argc, char* argv)
 		// new cases::Thread(),
 		new cases::Variant(),
 		new cases::Lua(),
+		new cases::Base64()
 	};
 
 	for (auto& c : caseArray)

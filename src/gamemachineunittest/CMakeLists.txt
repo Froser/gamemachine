@@ -39,6 +39,8 @@ set(SOURCES
 		cases/variant.cpp
 		cases/lua.h
 		cases/lua.cpp
+		cases/base64.h
+		cases/base64.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)

@@ -53,16 +53,6 @@ namespace
 #endif
 	}
 
-	template <typename RetType>
-	GMint string_scanf(const GMwchar* buf, const GMwchar* format, RetType* ret)
-	{
-#if GM_MSVC
-		return swscanf_s(buf, format, ret);
-#else
-		return swscanf(buf, format, ret);
-#endif
-	}
-
 	bool memEquals(const GMwchar* a, const GMwchar* b, GMsize_t length)
 	{
 		if (a == b || !length)
@@ -343,20 +333,53 @@ void GMString::stringCat(GMwchar* dest, GMsize_t cchDest, const GMwchar* source)
 
 GMfloat GMString::parseFloat(const GMString& i, bool* ok)
 {
-	GMfloat result;
-	GMint c = string_scanf(i.toStdWString().c_str(), L"%f", &result);
-	if (ok)
-		*ok = c > 0;
-	return result;
+	try
+	{
+		GMfloat v = std::stof(i.toStdWString());
+		if (ok)
+			*ok = true;
+		return v;
+	}
+	catch (std::invalid_argument)
+	{
+		if (ok)
+			*ok = false;
+	}
+	return 0;
 }
 
 GMint GMString::parseInt(const GMString& i, bool* ok)
 {
-	GMint result;
-	GMint c = string_scanf(i.toStdWString().c_str(), L"%d", &result);
-	if (ok)
-		*ok = c > 0;
-	return result;
+	try
+	{
+		GMint v = std::stoi(i.toStdWString());
+		if (ok)
+			*ok = true;
+		return v;
+	}
+	catch (std::invalid_argument)
+	{
+		if (ok)
+			*ok = false;
+	}
+	return 0;
+}
+
+GMlong GMString::parseLong(const GMString& i, bool* ok)
+{
+	try
+	{
+		GMlong v = std::stol(i.toStdWString());
+		if (ok)
+			*ok = true;
+		return v;
+	}
+	catch (std::invalid_argument)
+	{
+		if (ok)
+			*ok = false;
+	}
+	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////

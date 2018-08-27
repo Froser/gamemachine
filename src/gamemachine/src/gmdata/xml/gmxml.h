@@ -11,6 +11,7 @@ typedef tinyxml2::XMLAttribute GMXMLAttribute;
 typedef tinyxml2::XMLComment GMXMLComment;
 typedef tinyxml2::XMLText GMXMLText;
 typedef tinyxml2::XMLDeclaration GMXMLDeclaration;
+typedef tinyxml2::XMLError GMXMLError;
 
 class GMXML
 {

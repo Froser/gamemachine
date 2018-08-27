@@ -6,6 +6,7 @@
 #include <gmgl.h>
 #include <gmdemogameworld.h>
 #include <gmanimation.h>
+#include <gmuiconfiguration.h>
 
 namespace gm
 {
@@ -95,8 +96,7 @@ GM_PRIVATE_OBJECT(DemonstrationWorld)
 	gm::IWindow* mainWindow = nullptr;
 	gm::GMWidgetResourceManager* manager = nullptr;
 	gm::GMAnimation animation;
-	gm::GMlong texSkin = 0;
-	gm::GMlong texBorder = 0;
+	gm::GMOwnedPtr<gm::GMUIConfiguration> configuration;
 };
 
 class DemonstrationWorld : public gm::GMGameWorld
@@ -132,16 +132,10 @@ public:
 		return d->manager;
 	}
 
-	gm::GMlong getTexSkinId()
+	gm::GMUIConfiguration* getUIConfiguration()
 	{
 		D(d);
-		return d->texSkin;
-	}
-
-	gm::GMlong getTexBorderId()
-	{
-		D(d);
-		return d->texBorder;
+		return d->configuration.get();
 	}
 };
 

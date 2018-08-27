@@ -454,9 +454,57 @@ GMBuffer GMConvertion::fromBase64(const GMBuffer& base64)
 	return std::move(tmp);
 }
 
-GMZip::ErrorCode GMZip::inflateMemory(const GMBuffer& buf, REF GMBuffer& out, REF GMsize_t& outSize, GMsize_t sizeHint)
+GMBuffer GMConvertion::toBase64(const GMBuffer& buffer)
+{
+	static const char alphabet[] = "ABCDEFGH" "IJKLMNOP" "QRSTUVWX" "YZabcdef"
+		"ghijklmn" "opqrstuv" "wxyz0123" "456789+/";
+	static const char padchar = '=';
+	int padlen = 0;
+
+	GMBuffer tmp;
+	tmp.size = (buffer.size * 4) / 3 + 3;
+	tmp.buffer = new GMbyte[tmp.size];
+	tmp.needRelease = true;
+
+	GMsize_t i = 0;
+	char *out = reinterpret_cast<char*>(tmp.buffer);
+	while (i < buffer.size)
+	{
+		int chunk = 0;
+		chunk |= int(unsigned char(buffer.buffer[i++])) << 16;
+		if (i == buffer.size)
+		{
+			padlen = 2;
+		}
+		else
+		{
+			chunk |= int(unsigned char(buffer.buffer[i++])) << 8;
+			if (i == buffer.size) padlen = 1;
+			else chunk |= int(unsigned char(buffer.buffer[i++]));
+		}
+
+		int j = (chunk & 0x00fc0000) >> 18;
+		int k = (chunk & 0x0003f000) >> 12;
+		int l = (chunk & 0x00000fc0) >> 6;
+		int m = (chunk & 0x0000003f);
+		*out++ = alphabet[j];
+		*out++ = alphabet[k];
+		if (padlen > 1) *out++ = padchar;
+		else *out++ = alphabet[l];
+		if (padlen > 0) *out++ = padchar;
+		else *out++ = alphabet[m];
+	}
+
+	tmp.size = (out - reinterpret_cast<char*>(tmp.buffer));
+	return tmp;
+}
+
+GMZip::ErrorCode GMZip::inflate(const GMBuffer& buf, REF GMBuffer& out, GMsize_t sizeHint)
 {
 	GMsize_t sizeIncFactor = 1;
+	if (!sizeHint)
+		sizeHint = 1;
+
 	out.buffer = new GMbyte[sizeHint];
 	out.size = sizeHint;
 	out.needRelease = true;
@@ -469,7 +517,7 @@ GMZip::ErrorCode GMZip::inflateMemory(const GMBuffer& buf, REF GMBuffer& out, RE
 	stream.next_out = out.buffer;
 	stream.avail_out = sizeHint;
 	GMint err = Z_OK;
-	if ((err = inflateInit2(&stream, 15 + 32)) != Z_OK)
+	if ((err = inflateInit2(&stream, MAX_WBITS + 32)) != Z_OK)
 	{
 		gm_error(gm_dbg_wrap("inflate error. error code: {0}"), GMString(err));
 		return translateError(err);
@@ -477,7 +525,7 @@ GMZip::ErrorCode GMZip::inflateMemory(const GMBuffer& buf, REF GMBuffer& out, RE
 
 	while (true)
 	{
-		err = inflate(&stream, Z_NO_FLUSH);
+		err = ::inflate(&stream, Z_NO_FLUSH);
 		if (err == Z_STREAM_END)
 			break;
 
@@ -497,7 +545,7 @@ GMZip::ErrorCode GMZip::inflateMemory(const GMBuffer& buf, REF GMBuffer& out, RE
 		if (err != Z_STREAM_END)
 		{
 			// 内存不够的情况，重新生成一段数据
-			delete[] out.buffer;
+			GM_delete_array(out.buffer);
 			GMsize_t newSize = sizeHint * (++sizeIncFactor);
 			out.buffer = new GMbyte[sizeHint];
 			out.size = sizeHint;
@@ -507,7 +555,7 @@ GMZip::ErrorCode GMZip::inflateMemory(const GMBuffer& buf, REF GMBuffer& out, RE
 		}
 	}
 
-	outSize = sizeHint - stream.avail_out;
+	out.size = sizeHint - stream.avail_out;
 	return translateError(inflateEnd(&stream));
 }
 
