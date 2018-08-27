@@ -453,7 +453,7 @@ void DemonstrationWorld::init()
 
 	// 创建Widget
 	gm::GMBuffer ui;
-	package->readFile(gm::GMPackageIndex::Textures, L"skin.gmui", &ui);
+	package->readFile(gm::GMPackageIndex::Textures, L"skin.gmskin", &ui);
 	d->configuration->import(ui);
 
 	d->manager = new gm::GMWidgetResourceManager(getContext());
