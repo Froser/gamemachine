@@ -203,7 +203,6 @@ GM_PRIVATE_OBJECT(GMShader)
 	bool discard = false;
 	bool noDepthTest = false;
 	bool drawBorder = false;
-	GMfloat lineWidth = 1;
 	GMVec3 lineColor = GMVec3(0);
 	GMTextureList textureList;
 	GMMaterial material;
@@ -231,7 +230,6 @@ public:
 	GM_DECLARE_PROPERTY(Discard, discard, bool);
 	GM_DECLARE_PROPERTY(NoDepthTest, noDepthTest, bool);
 	GM_DECLARE_PROPERTY(TextureList, textureList, GMTextureList);
-	GM_DECLARE_PROPERTY(LineWidth, lineWidth, GMfloat);
 	GM_DECLARE_PROPERTY(LineColor, lineColor, GMVec3);
 	GM_DECLARE_PROPERTY(Material, material, GMMaterial);
 	GM_DECLARE_PROPERTY(IlluminationModel, illuminationModel, GMIlluminationModel);

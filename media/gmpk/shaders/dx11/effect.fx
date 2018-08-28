@@ -828,6 +828,13 @@ float4 PS_2D(PS_INPUT input) : SV_TARGET
     float4 color = float4(0.0f, 0.0f, 0.0f, 0.0f);
     color += GM_AmbientTextureAttribute.Sample(GM_AmbientTexture, GM_AmbientSampler, input.Texcoord);
     color += GM_DiffuseTextureAttribute.Sample(GM_DiffuseTexture, GM_DiffuseSampler, input.Texcoord);
+
+    if (GM_ColorVertexOp == GM_VertexColorOp_Replace)
+        return input.Color;
+
+    if (GM_ColorVertexOp == GM_VertexColorOp_Add)
+        return color + input.Color;
+
     return color * input.Color;
 }
 

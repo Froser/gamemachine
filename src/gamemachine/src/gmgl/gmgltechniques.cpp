@@ -158,6 +158,9 @@ void GMGLTechnique::beginModel(GMModel* model, const GMGameObject* parent)
 	d->currentModel = model;
 	auto shaderProgram = getShaderProgram();
 	shaderProgram->useProgram();
+
+	// 设置顶点颜色运算方式
+	getShaderProgram()->setInt(GM_VariablesDesc.ColorVertexOp, static_cast<GMint>(model->getShader().getVertexColorOp()));
 }
 
 void GMGLTechnique::endModel()
@@ -353,7 +356,6 @@ void GMGLTechnique::applyShader(GMModel* model)
 	prepareFrontFace(model);
 	prepareCull(model);
 	prepareDepth(model);
-	prepareLine(model);
 	prepareDebug(model);
 }
 
@@ -433,12 +435,6 @@ void GMGLTechnique::prepareDepth(GMModel* model)
 		glEnable(GL_DEPTH_TEST); // glDepthMask(GL_TRUE);
 }
 
-void GMGLTechnique::prepareLine(GMModel* model)
-{
-	const GMShader& shader = model->getShader();
-	glLineWidth(shader.getLineWidth());
-}
-
 void GMGLTechnique::prepareDebug(GMModel* model)
 {
 	D(d);
@@ -506,7 +502,6 @@ void GMGLTechnique_3D::beforeDraw(GMModel* model)
 	activateMaterial(model->getShader());
 
 	// 应用Shader
-	getShaderProgram()->setInt(GM_VariablesDesc.ColorVertexOp, static_cast<GMint>(model->getShader().getVertexColorOp()));
 	applyShader(model);
 	
 	// 设置光照模型

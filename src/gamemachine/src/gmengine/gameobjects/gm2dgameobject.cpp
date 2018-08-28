@@ -66,7 +66,7 @@ void GM2DGameObjectBase::setGeometry(const GMRect& geometry)
 	}
 }
 
-void GM2DGameObjectBase::setShader(GMShader& shader)
+void GM2DGameObjectBase::initShader(GMShader& shader)
 {
 	GMGlyphManager* glyphManager = getContext()->getEngine()->getGlyphManager();
 	auto& frame = shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
@@ -247,7 +247,7 @@ GMModel* GMTextGameObject::createModel()
 	model->setType(GMModelType::Text);
 	model->setUsageHint(GMUsageHint::DynamicDraw);
 	model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
-	setShader(model->getShader());
+	initShader(model->getShader());
 
 	GMMesh* mesh = new GMMesh(model);
 	GMsize_t len = d->text.length() * 6; //每个字符，用6个顶点来渲染
@@ -484,7 +484,7 @@ GMModel* GMSprite2DGameObject::createModel()
 	model->setType(GMModelType::Model2D);
 	model->setUsageHint(GMUsageHint::DynamicDraw);
 	model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
-	setShader(model->getShader());
+	initShader(model->getShader());
 	GMMesh* mesh = new GMMesh(model);
 	GMsize_t len = VerticesCount; //每个Sprite，用4个顶点来渲染
 	for (GMsize_t i = 0; i < len; ++i)
@@ -507,7 +507,7 @@ void GMSprite2DGameObject::updateVertices(GMModel* model)
 	GMfloat t1[] = { d->textureRc.x / (GMfloat)d->texWidth, d->textureRc.y / (GMfloat)d->texHeight };
 	GMfloat t2[] = { (d->textureRc.x + d->textureRc.width) / (GMfloat)d->texWidth, (d->textureRc.y + d->textureRc.height) / (GMfloat)d->texHeight };
 	GMfloat t3[] = { (d->textureRc.x + d->textureRc.width) / (GMfloat)d->texWidth, d->textureRc.y / (GMfloat)d->texHeight };
-	GMVertex V[4] = {
+	GMVertex V[] = {
 			{
 			{ coord.x, coord.y - coord.height , d->depth },
 			{ 0 },
@@ -589,7 +589,7 @@ GMModel* GMBorder2DGameObject::createModel()
 	model->setUsageHint(GMUsageHint::DynamicDraw);
 	model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
 	model->setDrawMode(GMModelDrawMode::Index);
-	setShader(model->getShader());
+	initShader(model->getShader());
 	GMMesh* mesh = new GMMesh(model);
 	GMsize_t len = VerticesCount; //9个四边形，使用索引绘制，一共16个顶点
 	for (GMsize_t i = 0; i < len; ++i)

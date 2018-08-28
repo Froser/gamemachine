@@ -7,6 +7,7 @@
 #include <gmdemogameworld.h>
 #include <gmanimation.h>
 #include <gmuiconfiguration.h>
+#include <gmprimitivemanager.h>
 
 namespace gm
 {
@@ -136,6 +137,12 @@ public:
 	{
 		D(d);
 		return d->configuration.get();
+	}
+
+	gm::GMPrimitiveManager* getPrimitiveManager()
+	{
+		D(d);
+		return getContext()->getEngine()->getPrimitiveManager();
 	}
 };
 

@@ -69,6 +69,18 @@ set(SOURCES
 		gmengine/gmcamera.cpp
 		gmengine/gmdemogameworld.h
 		gmengine/gmdemogameworld.cpp
+		gmengine/gmtypoengine.h
+		gmengine/gmtypoengine.cpp
+		gmengine/gmgbuffer.h
+		gmengine/gmgbuffer.cpp
+		gmengine/gmmessage.h
+		gmengine/gmmessage.cpp
+		gmengine/gmanimation.h
+		gmengine/gmanimation.cpp
+		gmengine/gmrendertechnique.cpp
+		gmengine/gmrendertechnique.cpp
+		gmengine/gmprimitivemanager.h
+		gmengine/gmprimitivemanager.cpp
 		gmengine/gameobjects/gmgameobject.h
 		gmengine/gameobjects/gmgameobject.cpp
 		gmengine/gameobjects/gmspritegameobject.h
@@ -93,16 +105,6 @@ set(SOURCES
 		gmengine/ui/gmcontroltextedit.cpp
 		gmengine/ui/gmuiconfiguration.h
 		gmengine/ui/gmuiconfiguration.cpp
-		gmengine/gmtypoengine.h
-		gmengine/gmtypoengine.cpp
-		gmengine/gmgbuffer.h
-		gmengine/gmgbuffer.cpp
-		gmengine/gmmessage.h
-		gmengine/gmmessage.cpp
-		gmengine/gmanimation.h
-		gmengine/gmanimation.cpp
-		gmengine/gmrendertechnique.cpp
-		gmengine/gmrendertechnique.cpp
 		gmengine/gmenums.h
 		gmgl/gmgltechniques.h
 		gmgl/gmgltechniques.cpp

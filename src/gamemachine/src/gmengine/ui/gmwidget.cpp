@@ -63,9 +63,9 @@ public:
 	using GMSprite2DGameObject::GMSprite2DGameObject;
 
 protected:
-	virtual void setShader(GMShader& shader) override
+	virtual void initShader(GMShader& shader) override
 	{
-		GMSprite2DGameObject::setShader(shader);
+		GMSprite2DGameObject::initShader(shader);
 		shader.setBlend(false);
 	}
 };

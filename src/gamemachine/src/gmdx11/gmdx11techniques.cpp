@@ -561,6 +561,9 @@ void GMDx11Technique::beginModel(GMModel* model, const GMGameObject* parent)
 	}
 
 	setGamma(shaderProgram);
+
+	// 设置顶点颜色运算方式
+	shaderProgram->setInt(GM_VariablesDesc.ColorVertexOp, static_cast<GMint>(model->getShader().getVertexColorOp()));
 }
 
 void GMDx11Technique::endModel()
@@ -997,14 +1000,6 @@ ID3DX11EffectTechnique* GMDx11Technique::getTechnique()
 		GM_ASSERT(d->technique);
 	}
 	return d->technique;
-}
-
-void GMDx11Technique_3D::draw(GMModel* model)
-{
-	D(d);
-	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
-	shaderProgram->setInt(GM_VariablesDesc.ColorVertexOp, static_cast<GMint>(model->getShader().getVertexColorOp()));
-	GMDx11Technique::draw(model);
 }
 
 void GMDx11Technique_2D::prepareTextures(GMModel* model)

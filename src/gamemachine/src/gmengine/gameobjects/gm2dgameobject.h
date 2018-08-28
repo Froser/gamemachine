@@ -38,7 +38,7 @@ public:
 	}
 
 protected:
-	virtual void setShader(GMShader& shader);
+	virtual void initShader(GMShader& shader);
 
 	inline const GMRect& getRenderRect() GM_NOEXCEPT
 	{

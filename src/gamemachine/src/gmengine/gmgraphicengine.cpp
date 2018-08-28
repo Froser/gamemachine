@@ -6,6 +6,7 @@
 #include "gmengine/gameobjects/gmgameobject.h"
 #include "foundation/gmprofile.h"
 #include "foundation/gmconfigs.h"
+#include "gmprimitivemanager.h"
 
 static GMShaderVariablesDesc s_defaultShaderVariablesDesc =
 {
@@ -124,6 +125,7 @@ GMGraphicEngine::GMGraphicEngine(const IRenderContext* context)
 	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
 	d->shadow.type = GMShadowSourceDesc::NoShadow;
 	d->renderTechniqueManager.reset(new GMRenderTechniqueManager(context));
+	d->primitiveManager.reset(new GMPrimitiveManager(context));
 }
 
 GMGraphicEngine::~GMGraphicEngine()
@@ -389,6 +391,12 @@ GMRenderTechniqueManager* GMGraphicEngine::getRenderTechniqueManager()
 {
 	D(d);
 	return d->renderTechniqueManager.get();
+}
+
+GMPrimitiveManager* GMGraphicEngine::getPrimitiveManager()
+{
+	D(d);
+	return d->primitiveManager.get();
 }
 
 void GMGraphicEngine::addLight(AUTORELEASE ILight* light)

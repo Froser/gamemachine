@@ -212,6 +212,7 @@ GM_PRIVATE_OBJECT(GMGraphicEngine)
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	GMGlobalBlendStateDesc blendState;
 	GMOwnedPtr<GMRenderTechniqueManager> renderTechniqueManager;
+	GMOwnedPtr<GMPrimitiveManager> primitiveManager;
 
 	// Shadow
 	GMShadowSourceDesc shadow;
@@ -249,6 +250,7 @@ public:
 	) override;
 	virtual void endBlend() override;
 	virtual GMRenderTechniqueManager* getRenderTechniqueManager();
+	virtual GMPrimitiveManager* getPrimitiveManager();
 
 public:
 	const GMFilterMode::Mode getCurrentFilterMode();
