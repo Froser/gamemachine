@@ -18,6 +18,7 @@
 #include <list>
 #include <memory>
 #include <atomic>
+#include "assert.h"
 
 template <typename T1, typename T2>
 using Pair = std::pair<T1, T2>;
@@ -238,6 +239,25 @@ struct GMPoint
 	GMint x;
 	GMint y;
 };
+
+inline GMint gm_sizet_to_int(GMsize_t sz)
+{
+	GM_ASSERT(sz < static_cast<GMsize_t>(std::numeric_limits<GMint>::max()));
+	return static_cast<GMint>(sz);
+}
+
+inline GMuint gm_sizet_to_uint(GMsize_t sz)
+{
+	GM_ASSERT(sz < static_cast<GMsize_t>(std::numeric_limits<GMuint>::max()));
+	return static_cast<GMuint>(sz);
+}
+
+template <typename T>
+inline T gm_sizet_to(GMsize_t sz)
+{
+	GM_ASSERT(sz < static_cast<GMsize_t>(std::numeric_limits<T>::max()));
+	return static_cast<T>(sz);
+}
 
 template <typename T>
 inline bool GM_inRect(const T& rect, const decltype(T().x) x, const decltype(T().y) y)

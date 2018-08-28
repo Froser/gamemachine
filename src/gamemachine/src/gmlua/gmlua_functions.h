@@ -46,7 +46,7 @@ namespace luaapi
 
 		operator GMint()
 		{
-			return static_cast<GMint>(m_size);
+			return gm_sizet_to_int(m_size);
 		}
 
 	private:

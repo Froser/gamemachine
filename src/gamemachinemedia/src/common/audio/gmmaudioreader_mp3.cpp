@@ -102,11 +102,11 @@ private: // MP3解码器
 		if (stream->error == MAD_ERROR_BUFLEN) //EOF
 		{
 			GMMAudioFile_Stream::setEof(d->baseData);
-			mad_stream_buffer(stream, (unsigned char*)d->baseData->fileInfo.data, d->baseData->fileInfo.size);
+			mad_stream_buffer(stream, (unsigned char*)d->baseData->fileInfo.data, (unsigned long) d->baseData->fileInfo.size);
 			return MAD_FLOW_CONTINUE;
 		}
 
-		mad_stream_buffer(stream, (unsigned char*)d->baseData->fileInfo.data, d->baseData->fileInfo.size);
+		mad_stream_buffer(stream, (unsigned char*)d->baseData->fileInfo.data, (unsigned long) d->baseData->fileInfo.size);
 		return MAD_FLOW_CONTINUE;
 	}
 

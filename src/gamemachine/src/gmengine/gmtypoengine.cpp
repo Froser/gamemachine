@@ -456,7 +456,7 @@ GMTypoResultInfo GMTypoEngine::getResults()
 	D(d);
 	GMTypoResultInfo r = {
 		d->results,
-		static_cast<GMint>(d->lineHeight),
+		gm_sizet_to_int(d->lineHeight),
 		d->options.lineSpacing
 	};
 	return r;
@@ -653,8 +653,7 @@ bool GMTypoTextBuffer::removeChars(GMsize_t startPos, GMsize_t endPos)
 GMint GMTypoTextBuffer::getLength()
 {
 	D(d);
-	GM_ASSERT((GMuint) std::numeric_limits<GMint>::max() > d->buffer.length());
-	return d->buffer.length();
+	return gm_sizet_to_int(d->buffer.length());
 }
 
 GMint GMTypoTextBuffer::getLineHeight()
@@ -736,7 +735,7 @@ bool GMTypoTextBuffer::XtoCP(GMint x, GMint* cp, bool* trail)
 		if (r[i].x == x)
 		{
 			if (cp)
-				*cp = i - 1;
+				*cp = gm_sizet_to_int(i - 1);
 
 			if (trail)
 				*trail = true;
@@ -746,7 +745,7 @@ bool GMTypoTextBuffer::XtoCP(GMint x, GMint* cp, bool* trail)
 		else if (r[i].x < x && r[i + 1].x > x)
 		{
 			if (cp)
-				*cp = i;
+				*cp = gm_sizet_to_int(i);
 
 			if (trail)
 				*trail = false;
@@ -756,7 +755,8 @@ bool GMTypoTextBuffer::XtoCP(GMint x, GMint* cp, bool* trail)
 	}
 	
 	if (cp)
-		*cp = r.size() - 1;
+		*cp = gm_sizet_to_int(r.size() - 1);
+
 	if (trail)
 		*trail = false;
 
@@ -783,7 +783,7 @@ void GMTypoTextBuffer::getNextItemPos(GMint cp, GMint* next)
 {
 	D(d);
 	auto& r = d->engine->getResults().results;
-	for (GMint i = cp; i < static_cast<GMint>(r.size() - 2); ++i)
+	for (GMint i = cp; i < gm_sizet_to_int(r.size() - 2); ++i)
 	{
 		if (r[i].isSpace && !r[i + 1].isSpace)
 		{
@@ -792,5 +792,5 @@ void GMTypoTextBuffer::getNextItemPos(GMint cp, GMint* next)
 		}
 	}
 
-	*next = r.size() - 1;
+	*next = gm_sizet_to_int(r.size() - 1);
 }

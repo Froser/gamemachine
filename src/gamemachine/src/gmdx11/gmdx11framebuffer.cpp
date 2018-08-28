@@ -277,8 +277,7 @@ void GMDx11Framebuffers::use()
 {
 	D(d);
 	d->deviceContext->RSSetViewports(1, &d->viewport);
-	GM_ASSERT(d->renderTargetViews.size() < std::numeric_limits<UINT>::max());
-	d->deviceContext->OMSetRenderTargets((UINT)d->renderTargetViews.size(), d->renderTargetViews.data(), d->depthStencilView);
+	d->deviceContext->OMSetRenderTargets(gm_sizet_to<UINT>(d->renderTargetViews.size()), d->renderTargetViews.data(), d->depthStencilView);
 }
 
 void GMDx11Framebuffers::bind()

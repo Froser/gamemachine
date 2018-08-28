@@ -127,8 +127,8 @@ namespace {
 
 	/* TGA image handle */
 	struct _TGA {
-		GMMemoryStream*	ms = nullptr;	/* file stream */
-		tlong			off;				/* current offset in file*/
+		GMMemoryStream*	ms = nullptr;		/* file stream */
+		size_t		off;				/* current offset in file*/
 		int				last;				/* last error code */
 		TGAHeader		hdr;				/* image header */
 		TGAErrorProc 	error = nullptr;	/* user-defined error proc */
@@ -136,7 +136,7 @@ namespace {
 
 	__BEGIN_DECLS
 
-		TGA* TGAOpen __P((char *name, char *mode));
+	TGA* TGAOpen __P((char *name, char *mode));
 
 	TGA* TGAOpenFd __P((GMMemoryStream *fd));
 
@@ -153,7 +153,7 @@ namespace {
 
 	char* TGAStrError __P((tuint8 code));
 
-	tlong __TGASeek __P((TGA *tga, tlong off, int whence));
+	size_t __TGASeek __P((TGA *tga, size_t off, int whence));
 
 	void __TGAbgr2rgb __P((tbyte *data, size_t size, size_t bytes));
 
@@ -182,8 +182,8 @@ if(tga) (tga)->last = code\
 		return tga_error_strings[code];
 	}
 
-	tlong __TGASeek(TGA  *tga,
-			tlong off,
+	size_t __TGASeek(TGA  *tga,
+			size_t off,
 			int   whence)
 	{
 		GMMemoryStream::SeekMode sm;
@@ -372,7 +372,7 @@ if(tga) (tga)->last = code\
 			tbyte   **buf,
 			tuint32   flags)
 	{
-		tlong i, n, off, read, tmp;
+		size_t i, n, off, read, tmp;
 
 		if (!tga) return 0;
 
@@ -419,7 +419,7 @@ if(tga) (tga)->last = code\
 		}
 
 		tga->last = TGA_OK;
-		return read;
+		return (int)read;
 	}
 
 	int TGAReadRLE(TGA   *tga,
@@ -468,7 +468,7 @@ if(tga) (tga)->last = code\
 			size_t  n,
 			tuint32 flags)
 	{
-		tlong i, off;
+		size_t i, off;
 		size_t sln_size, read, tmp;
 
 		if (!tga || !buf) return 0;
@@ -532,17 +532,17 @@ if(tga) (tga)->last = code\
 	void copyTgaRgba(const TGA& tga, const GMbyte* source, GMbyte* dest)
 	{
 		// tga数据和我们所定义的图像坐标是颠倒的
-		GMsize_t rowBytes = tga.hdr.width * GMImageReader::DefaultChannels;
-		for (GMint i = tga.hdr.height - 1; i >= 0; --i)
+		size_t rowBytes = tga.hdr.width * GMImageReader::DefaultChannels;
+		for (int i = tga.hdr.height - 1; i >= 0; --i)
 		{
-			GMsize_t destOffset = rowBytes * (tga.hdr.height - i - 1);
-			GMsize_t srcOffset = rowBytes * i;
+			size_t destOffset = rowBytes * (tga.hdr.height - i - 1);
+			size_t srcOffset = rowBytes * i;
 			memcpy_s(dest + destOffset, rowBytes, source + srcOffset, rowBytes);
 		}
 	}
 }
 
-bool GMImageReader_TGA::load(const GMbyte* data, GMsize_t size, OUT GMImage** image)
+bool GMImageReader_TGA::load(const GMbyte* data, size_t size, OUT GMImage** image)
 {
 	GMImage* img = new GMImage();
 	*image = img;
@@ -566,7 +566,7 @@ bool GMImageReader_TGA::load(const GMbyte* data, GMsize_t size, OUT GMImage** im
 	}
 
 	// 图像深度/8得到每个像素的字节数，这里认为1个通道就占一个字节，因此通道数即图像深度/8
-	int channels = tga.hdr.depth / 8;
+	GMint channels = tga.hdr.depth / 8;
 	imgData.mip[0].width = tga.hdr.width;
 	imgData.mip[0].height = tga.hdr.height;
 	imgData.format = GMImageFormat::RGBA;
@@ -585,8 +585,8 @@ bool GMImageReader_TGA::load(const GMbyte* data, GMsize_t size, OUT GMImage** im
 	{
 		// 先构造一个TGA的RGBA数据
 		GMbyte* tmpData = new GMbyte[bufferSize];
-		GMsize_t ptr = 0;
-		for (GMsize_t i = 0; i < tga.hdr.width * tga.hdr.height * channels; ++i, ++ptr)
+		size_t ptr = 0;
+		for (size_t i = 0; i < tga.hdr.width * tga.hdr.height * channels; ++i, ++ptr)
 		{
 			*(tmpData + ptr) = *(tgaData.img_data + i);
 			if ((i + 1) % 3 == 0)

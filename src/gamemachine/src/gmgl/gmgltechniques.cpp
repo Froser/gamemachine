@@ -144,11 +144,10 @@ void GMGLTechnique::draw(GMModel* model)
 	prepareScreenInfo(getShaderProgram());
 	beforeDraw(model);
 	GLenum mode = (d->engine->isWireFrameMode(model)) ? GL_LINE_LOOP : getMode(model->getPrimitiveTopologyMode());
-	GM_ASSERT(model->getVerticesCount() < std::numeric_limits<GMuint>::max());
 	if (model->getDrawMode() == GMModelDrawMode::Vertex)
-		glDrawArrays(mode, 0, (GLsizei)model->getVerticesCount());
+		glDrawArrays(mode, 0, gm_sizet_to<GLsizei>(model->getVerticesCount()));
 	else
-		glDrawElements(mode, (GLsizei)model->getVerticesCount(), GL_UNSIGNED_INT, 0);
+		glDrawElements(mode, gm_sizet_to<GLsizei>(model->getVerticesCount()), GL_UNSIGNED_INT, 0);
 	afterDraw(model);
 	glBindVertexArray(0);
 }
@@ -760,8 +759,7 @@ void GMGLTechnique_LightPass::beforeDraw(GMModel* model)
 		GMTextureAsset texture;
 		gBufferFramebuffers->getFramebuffer(i)->getTexture(texture);
 		const GMsize_t textureIndex = (GMTextureRegisterQuery<GMTextureType::GeometryPasses>::Value + i);
-		GM_ASSERT(textureIndex < std::numeric_limits<GMuint>::max());
-		shaderProgram->setInt(GMGLGBuffer::GBufferGeometryUniformNames()[i].c_str(), (GMuint)textureIndex);
+		shaderProgram->setInt(GMGLGBuffer::GBufferGeometryUniformNames()[i].c_str(), gm_sizet_to_uint(textureIndex));
 		texture.getTexture()->useTexture((GMuint)textureIndex);
 	}
 
@@ -769,8 +767,7 @@ void GMGLTechnique_LightPass::beforeDraw(GMModel* model)
 	if (!cubeMap.isEmpty())
 	{
 		const GMsize_t id = GMTextureRegisterQuery<GMTextureType::GeometryPasses>::Value + 1 + cnt;
-		GM_ASSERT(id < std::numeric_limits<GMuint>::max());
-		shaderProgram->setInt(GM_VariablesDesc.CubeMapTextureName, (GMuint)id);
+		shaderProgram->setInt(GM_VariablesDesc.CubeMapTextureName, gm_sizet_to_uint(id));
 		cubeMap.getTexture()->useTexture((GMuint)id);
 	}
 }

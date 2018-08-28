@@ -415,7 +415,7 @@ namespace
 		GMBSPPatchPlane& p = context.planes.back();
 		p.plane = plane;
 		p.signbits = signbitsForNormal(plane);
-		return context.planes.size() - 1;
+		return gm_sizet_to_int(context.planes.size() - 1);
 	}
 
 	GMint findPlane(PatchCollideContext& context, const GMVec4& plane, GMint *flipped)
@@ -434,7 +434,7 @@ namespace
 
 		*flipped = false;
 
-		return context.planes.size() - 1;
+		return gm_sizet_to_int(context.planes.size() - 1);
 	}
 
 	GMint gridPlane(int gridPlanes[MAX_GRID_SIZE][MAX_GRID_SIZE][2], GMint i, GMint j, GMint tri)

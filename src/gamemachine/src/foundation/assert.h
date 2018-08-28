@@ -1,6 +1,5 @@
 ﻿#ifndef __ASSERT_H__
 #define __ASSERT_H__
-#include "defines.h"
 #include <type_traits>
 
 #if _DEBUG
@@ -9,13 +8,14 @@
 #define GM_ASSERT(cond)
 #endif
 
-BEGIN_NS
-class Assert
+namespace gm
 {
-public:
-	static void noop();
-	static void gm_assert(const char *assertion, const char *file, int line);
-};
+	class Assert
+	{
+	public:
+		static void noop();
+		static void gm_assert(const char *assertion, const char *file, int line);
+	};
+}
 
-END_NS
 #endif

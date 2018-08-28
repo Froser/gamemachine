@@ -130,7 +130,12 @@ void GMLuaFunctionRegister::setRegisterFunction(GMLua *l, const GMString& modnam
 
 void GMLuaFunctionRegister::newLibrary(GMLuaCoreState *l, const GMLuaReg* functions)
 {
-	luaL_newlib(l, functions);
+	// 内部通过sizeof求得functions数组大小，有个size_t->int转换，编译器会抛出警告
+	// 实际上，截断几乎不可能发生的，因此消除这个警告
+#pragma warning(push)
+#pragma warning(disable:4309)
+	luaL_newlib(l, functions); 
+#pragma warning(pop)
 }
 
 GMLua::GMLua()
@@ -271,8 +276,7 @@ GMLuaResult GMLua::pcall(const char* functionName, const std::initializer_list<G
 		push(var);
 	}
 
-	GM_ASSERT(args.size() < std::numeric_limits<GMuint>::max());
-	GMLuaResult lr = { (GMLuaStates)lua_pcall(L, (GMuint)args.size(), nRet, 0) };
+	GMLuaResult lr = { (GMLuaStates)lua_pcall(L, gm_sizet_to_uint(args.size()), nRet, 0) };
 	CHECK(lr);
 	return lr;
 }

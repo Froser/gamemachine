@@ -178,7 +178,7 @@ public:
 public:
 	GMsize_t read(GMbyte* buf, GMsize_t size);
 	GMsize_t peek(GMbyte* buf, GMsize_t size);
-	void seek(GMuint cnt, SeekMode = FromStart);
+	void seek(GMsize_t cnt, SeekMode = FromStart);
 	void rewind();
 	GMsize_t size();
 	GMsize_t tell();

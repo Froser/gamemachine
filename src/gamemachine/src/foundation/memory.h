@@ -40,7 +40,7 @@ public:
 
 	pointer address(reference ref) const { return &ref; }
 	const_pointer address(const_reference  ref) const { return &ref; }
-	pointer allocate(GMint n, const_pointer * hint = 0) {
+	pointer allocate(GMsize_t n, const_pointer * hint = 0) {
 		(void)hint;
 		return reinterpret_cast<pointer>(gmAlignedAlloc(sizeof(value_type) * n, Alignment));
 	}

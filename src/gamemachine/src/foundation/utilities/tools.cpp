@@ -279,7 +279,7 @@ GMbyte GMMemoryStream::get()
 	return c;
 }
 
-void GMMemoryStream::seek(GMuint cnt, SeekMode mode)
+void GMMemoryStream::seek(GMsize_t cnt, SeekMode mode)
 {
 	D(d);
 	if (mode == GMMemoryStream::FromStart)
@@ -513,9 +513,9 @@ GMZip::ErrorCode GMZip::inflate(const GMBuffer& buf, REF GMBuffer& out, GMsize_t
 	stream.zfree = (free_func)0;
 	stream.opaque = (voidpf)0;
 	stream.next_in = buf.buffer;
-	stream.avail_in = buf.size;
+	stream.avail_in = (uInt) buf.size;
 	stream.next_out = out.buffer;
-	stream.avail_out = sizeHint;
+	stream.avail_out = (uInt) sizeHint;
 	GMint err = Z_OK;
 	if ((err = inflateInit2(&stream, MAX_WBITS + 32)) != Z_OK)
 	{
@@ -550,7 +550,7 @@ GMZip::ErrorCode GMZip::inflate(const GMBuffer& buf, REF GMBuffer& out, GMsize_t
 			out.buffer = new GMbyte[sizeHint];
 			out.size = sizeHint;
 			stream.next_out = out.buffer + sizeHint;
-			stream.avail_out = sizeHint;
+			stream.avail_out = (uInt) sizeHint;
 			sizeHint *= sizeIncFactor;
 		}
 	}

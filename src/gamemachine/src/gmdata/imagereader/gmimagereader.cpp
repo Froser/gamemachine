@@ -35,12 +35,12 @@ private:
 	Map<GMImageReader::ImageType, IImageReader*> m_readers;
 };
 
-bool GMImageReader::load(const GMbyte* data, GMuint size, OUT GMImage** image)
+bool GMImageReader::load(const GMbyte* data, GMsize_t size, OUT GMImage** image)
 {
 	return load(data, size, ImageType_AUTO, image);
 }
 
-bool GMImageReader::load(const GMbyte* data, GMuint size, ImageType type, OUT GMImage** image)
+bool GMImageReader::load(const GMbyte* data, GMsize_t size, ImageType type, OUT GMImage** image)
 {
 	if (type == ImageType_AUTO)
 		type = test(data);

@@ -976,11 +976,10 @@ void GMDx11Technique::passAllAndDraw(GMModel* model)
 	{
 		ID3DX11EffectPass* pass = getTechnique()->GetPassByIndex(p);
 		pass->Apply(0, d->deviceContext);
-		GM_ASSERT(model->getVerticesCount() < std::numeric_limits<UINT>::max());
 		if (model->getDrawMode() == GMModelDrawMode::Vertex)
-			d->deviceContext->Draw((UINT)model->getVerticesCount(), 0);
+			d->deviceContext->Draw(gm_sizet_to<UINT>(model->getVerticesCount()), 0);
 		else
-			d->deviceContext->DrawIndexed((UINT)model->getVerticesCount(), 0, 0);
+			d->deviceContext->DrawIndexed(gm_sizet_to<UINT>(model->getVerticesCount()), 0, 0);
 	}
 }
 
@@ -1085,11 +1084,10 @@ void GMDx11Technique_Filter::passAllAndDraw(GMModel* model)
 		}
 		pass->Apply(0, d->deviceContext);
 
-		GM_ASSERT(model->getVerticesCount() < std::numeric_limits<UINT>::max());
 		if (model->getDrawMode() == GMModelDrawMode::Vertex)
-			d->deviceContext->Draw((UINT)model->getVerticesCount(), 0);
+			d->deviceContext->Draw(gm_sizet_to<UINT>(model->getVerticesCount()), 0);
 		else
-			d->deviceContext->DrawIndexed((UINT)model->getVerticesCount(), 0, 0);
+			d->deviceContext->DrawIndexed(gm_sizet_to<UINT>(model->getVerticesCount()), 0, 0);
 	}
 }
 
@@ -1159,11 +1157,10 @@ void GMDx11Technique_Deferred_3D::passAllAndDraw(GMModel* model)
 
 		GM_ASSERT(framebuffers);
 		framebuffers->bind();
-		GM_ASSERT(model->getVerticesCount() < std::numeric_limits<UINT>::max());
 		if (model->getDrawMode() == GMModelDrawMode::Vertex)
-			d->deviceContext->Draw((UINT)model->getVerticesCount(), 0);
+			d->deviceContext->Draw(gm_sizet_to<UINT>(model->getVerticesCount()), 0);
 		else
-			d->deviceContext->DrawIndexed((UINT)model->getVerticesCount(), 0, 0);
+			d->deviceContext->DrawIndexed(gm_sizet_to<UINT>(model->getVerticesCount()), 0, 0);
 		framebuffers->unbind();
 	}
 }
@@ -1177,11 +1174,10 @@ void GMDx11Technique_Deferred_3D_LightPass::passAllAndDraw(GMModel* model)
 	{
 		ID3DX11EffectPass* pass = getTechnique()->GetPassByIndex(p);
 		pass->Apply(0, d->deviceContext);
-		GM_ASSERT(model->getVerticesCount() < std::numeric_limits<UINT>::max());
 		if (model->getDrawMode() == GMModelDrawMode::Vertex)
-			d->deviceContext->Draw((UINT)model->getVerticesCount(), 0);
+			d->deviceContext->Draw(gm_sizet_to<UINT>(model->getVerticesCount()), 0);
 		else
-			d->deviceContext->DrawIndexed((UINT)model->getVerticesCount(), 0, 0);
+			d->deviceContext->DrawIndexed(gm_sizet_to<UINT>(model->getVerticesCount()), 0, 0);
 	}
 }
 

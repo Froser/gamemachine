@@ -576,7 +576,7 @@ struct GMAudioFileInfo
 {
 	GMint format;
 	const void* data;
-	GMint size;
+	GMsize_t size;
 	GMint frequency;
 	WAVEFORMATEX waveFormatExHeader;
 };

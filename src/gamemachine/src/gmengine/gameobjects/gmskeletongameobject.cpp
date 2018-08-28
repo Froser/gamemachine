@@ -60,7 +60,7 @@ GMint GMSkeletonGameObject::getFramesCount()
 
 	auto skeleton = models->getSkeleton();
 	if (skeleton)
-		return skeleton->getSkeletons().getNumFrames();
+		return gm_sizet_to_int(skeleton->getSkeletons().getNumFrames());
 
 	return 0;
 }

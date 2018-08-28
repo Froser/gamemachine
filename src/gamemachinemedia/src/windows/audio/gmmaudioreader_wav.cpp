@@ -53,7 +53,7 @@ public:
 				(WAVE_SUCCEEDED(waveLoader.GetWaveFormatExHeader(d->waveId, &d->fileInfo.waveFormatExHeader))))
 			{
 				alGenBuffers(1, &d->bufferId);
-				alBufferData(d->bufferId, d->fileInfo.format, d->fileInfo.data, d->fileInfo.size, d->fileInfo.frequency);
+				alBufferData(d->bufferId, d->fileInfo.format, d->fileInfo.data, (ALsizei) d->fileInfo.size, d->fileInfo.frequency);
 				disposeAudioFile();
 				return true;
 			}

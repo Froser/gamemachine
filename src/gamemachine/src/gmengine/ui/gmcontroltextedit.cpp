@@ -255,7 +255,7 @@ bool GMMultiLineTypoTextBuffer::XYtoCP(GMint x, GMint y, GMint* cp)
 
 		if (GM_inRect(glyphRc, pt))
 		{
-			*cp = i;
+			*cp = gm_sizet_to_int(i);
 			return true;
 		}
 	}
@@ -263,7 +263,7 @@ bool GMMultiLineTypoTextBuffer::XYtoCP(GMint x, GMint y, GMint* cp)
 	// 如果没有选中某个字符，那么选择这一行末尾
 	GMint currentLine = 0;
 	GMint rowX, rowY;
-	for (GMsize_t i = 0; i < r.size() - 1; ++i)
+	for (GMint i = 0; i < gm_sizet_to_int(r.size() - 1); ++i)
 	{
 		if (currentLine == r[i].lineNo)
 			continue;
@@ -273,14 +273,14 @@ bool GMMultiLineTypoTextBuffer::XYtoCP(GMint x, GMint y, GMint* cp)
 
 		if (r[i].y <= pt.y && pt.y <= r[i].y + getLineHeight() + getLineSpacing())
 		{
-			*cp = findLastCPInOneLine(i);
+			*cp = gm_sizet_to_int(findLastCPInOneLine(i));
 			return true;
 		}
 	}
 
 	// 还没有的话，选中最后的CP
 	if (cp)
-		*cp = r.size() - 1;
+		*cp = gm_sizet_to_int(r.size() - 1);
 
 	return true;
 }
@@ -295,7 +295,7 @@ GMint GMMultiLineTypoTextBuffer::CPToLineNumber(GMint cp)
 		analyze(cp);
 
 	decltype(auto) r = d->engine->getResults().results;
-	if (cp > static_cast<GMint>(r.size()))
+	if (cp > gm_sizet_to_int(r.size()))
 		return r[r.size() - 1].lineNo;
 
 	return r[cp].lineNo;
@@ -308,11 +308,11 @@ GMint GMMultiLineTypoTextBuffer::findFirstCPInOneLine(GMint cp)
 		analyze(cp);
 
 	decltype(auto) r = d->engine->getResults().results;
-	if (cp >= static_cast<GMint>(r.size()))
-		cp = static_cast<GMint>(r.size() - 1);
+	if (cp >= gm_sizet_to_int(r.size()))
+		cp = gm_sizet_to_int(r.size() - 1);
 
 	auto lineNo = r[cp].lineNo;
-	for (auto i = static_cast<GMint>(cp); i >= 0; --i)
+	for (auto i = gm_sizet_to_int(cp); i >= 0; --i)
 	{
 		if (r[i].lineNo < lineNo)
 			return i + 1;
@@ -327,23 +327,23 @@ GMint GMMultiLineTypoTextBuffer::findLastCPInOneLine(GMint cp)
 		analyze(cp);
 
 	decltype(auto) r = d->engine->getResults().results;
-	if (cp >= static_cast<GMint>(r.size()))
-		cp = static_cast<GMint>(r.size() - 1);
+	if (cp >= gm_sizet_to_int(r.size()))
+		cp = gm_sizet_to_int(r.size() - 1);
 
 	auto lineNo = r[cp].lineNo;
 	for (GMsize_t i = cp; i < r.size(); ++i)
 	{
 		if (r[i].lineNo > lineNo)
-			return i - 1;
+			return gm_sizet_to_int(i - 1);
 	}
-	return r.size() - 1;
+	return gm_sizet_to_int(r.size() - 1);
 }
 
 bool GMMultiLineTypoTextBuffer::isNewLine(GMint cp)
 {
 	D_BASE(d, Base);
 	decltype(auto) r = d->engine->getResults().results;
-	GM_ASSERT(cp < static_cast<GMint>(r.size()));
+	GM_ASSERT(cp < gm_sizet_to_int(r.size()));
 	return r[cp].newLineOrEOFSeparator;
 }
 
@@ -1037,7 +1037,7 @@ void GMControlTextEdit::pasteFromClipboard()
 	string = string.replace("\r", "").replace("\n", "").replace("\t", " ");
 	if (d->buffer->insertString(d->cp, string))
 	{
-		placeCaret(d->cp + string.length());
+		placeCaret(d->cp + gm_sizet_to_int(string.length()));
 		d->selectionStartCP = d->cp;
 	}
 }
@@ -1381,7 +1381,7 @@ void GMControlTextArea::pasteFromClipboard()
 	string = GMConvertion::toCurrentEnvironmentString(string).replace("\t", " ");
 	if (d->buffer->insertString(d->cp, string))
 	{
-		placeCaret(d->cp + string.length(), false);
+		placeCaret(d->cp + gm_sizet_to_int(string.length()), false);
 		d->selectionStartCP = d->cp;
 	}
 }

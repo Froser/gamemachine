@@ -285,10 +285,9 @@ void GMGLFramebuffers::createFramebuffers()
 		glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
 		Vector<GLuint> attachments;
 		GMsize_t sz = d->framebuffers.size();
-		GM_ASSERT(sz < std::numeric_limits<GMuint>::max());
 		for (GMsize_t i = 0; i < sz; i++)
 		{
-			GMuint _i = (GMuint)i;
+			GMuint _i = gm_sizet_to_uint(i);
 			attachments.push_back(GL_COLOR_ATTACHMENT0 + _i);
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _i, GL_TEXTURE_2D, d->framebuffers[_i]->getTextureId(), 0);
 		}

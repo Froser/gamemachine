@@ -76,8 +76,7 @@ void GMModelDataProxy::packIndices(Vector<GMuint>& indices)
 		}
 
 		// 每个Mesh按照自己的坐标排序，因此每个Mesh都应该在总缓存里面加上偏移
-		offset += (GMuint)mesh->vertices().size();
-		GM_ASSERT(offset < std::numeric_limits<GMuint>::max());
+		offset += gm_sizet_to_uint(mesh->vertices().size());
 	}
 }
 

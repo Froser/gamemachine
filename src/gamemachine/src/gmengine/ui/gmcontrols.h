@@ -185,7 +185,7 @@ public:
 
 	virtual GMStyle& getStyle(StyleType style);
 
-	virtual void setIndex(GMuint index)
+	virtual void setIndex(GMint index)
 	{
 		D(d);
 		d->index = index;

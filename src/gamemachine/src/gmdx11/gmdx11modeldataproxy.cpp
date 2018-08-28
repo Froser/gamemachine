@@ -94,8 +94,7 @@ void GMDx11ModelDataProxy::transfer()
 		D3D11_USAGE usage = D3D11_USAGE_DEFAULT;
 		D3D11_BUFFER_DESC bufDesc;
 		bufDesc.Usage = usage;
-		GM_ASSERT(packedIndices.size() * sizeof(decltype(packedIndices)::value_type) < std::numeric_limits<UINT>::max());
-		bufDesc.ByteWidth = (UINT) (packedIndices.size() * sizeof(decltype(packedIndices)::value_type));
+		bufDesc.ByteWidth = gm_sizet_to<UINT>(packedIndices.size() * sizeof(decltype(packedIndices)::value_type));
 		bufDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 		bufDesc.CPUAccessFlags = 0;
 		bufDesc.MiscFlags = 0;
