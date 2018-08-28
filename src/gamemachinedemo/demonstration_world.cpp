@@ -451,6 +451,7 @@ void DemonstrationWorld::init()
 	gm::IGraphicEngine* engine = getContext()->getEngine();
 	gm::GMFontHandle stxingka = engine->getGlyphManager()->addFontByFileName("STXINGKA.TTF");
 
+	/*
 	{
 		gm::GMPoint p1 = { 0, 0 }, p2 = { 200, 300 };
 		getPrimitiveManager()->addLine(p1, p2, GMVec4(0, 1, 0, 1));
@@ -459,6 +460,7 @@ void DemonstrationWorld::init()
 		gm::GMPoint p1 = { 200, 300 }, p2 = { 300, 200 };
 		getPrimitiveManager()->addLine(p1, p2, GMVec4(0, 1, 0, 1));
 	}
+	*/
 
 	// 创建Widget
 	gm::GMBuffer ui;
