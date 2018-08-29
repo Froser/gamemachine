@@ -147,7 +147,7 @@ using GMAtomic = std::atomic<T>;
 // 表示作为数据输入
 #define IN
 
-// 表示一个方法是个元方法个
+// 表示一个方法是个元方法
 #define GM_META_METHOD
 
 // 用于枚举的宏

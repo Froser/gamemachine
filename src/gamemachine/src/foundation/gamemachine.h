@@ -91,14 +91,12 @@ GM_PRIVATE_OBJECT(GameMachine)
 	GMClock clock;
 
 	Set<GMOwnedPtr<IWindow>> windows;
-	IWindow* mainWindow = nullptr;
 	IFactory* factory = nullptr;
 	GMGamePackage* gamePackageManager = nullptr;
 	GMConfigs* statesManager = nullptr;
 	GMMessage lastMessage;
 	Queue<GMMessage> messageQueue;
 	Vector<IVirtualFunctionObject*> managerQueue;
-
 	GMGameMachineRunningStates states;
 	GMConfigs configs;
 };
@@ -136,17 +134,9 @@ public:
 	  \param renderEnv 运行时的渲染环境。可以选择用OpenGL或DirectX11来进行渲染。此后的版本，也可能会增加更多的渲染环境。渲染环境一旦确立，将会影响工厂类返回的环境相关的实例。
 	*/
 	void init(
-		AUTORELEASE IWindow* mainWindow,
 		AUTORELEASE IFactory* factory,
 		GMRenderEnvironment renderEnv = GMRenderEnvironment::OpenGL
 	);
-
-	//! 获取程序主窗口。
-	/*!
-	  获取程序绘制的主窗口。
-	  \return 程序主窗口。
-	*/
-	inline IWindow* getMainWindow() { D(d); return d->mainWindow; }
 
 	//! 获取初始化时的工厂类。
 	/*!

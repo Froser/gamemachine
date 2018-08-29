@@ -90,8 +90,8 @@ private:
 class GMWindowFactory
 {
 public:
-	static bool createWindowWithOpenGL(GMInstance instance, OUT IWindow** window);
-	static bool createWindowWithDx11(GMInstance instance, OUT IWindow** window);
+	static bool createWindowWithOpenGL(GMInstance instance, IWindow* parent, OUT IWindow** window);
+	static bool createWindowWithDx11(GMInstance instance, IWindow* parent, OUT IWindow** window);
 };
 END_NS
 #endif

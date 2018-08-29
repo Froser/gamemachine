@@ -328,7 +328,7 @@ const IRenderContext* GMWindow_Dx11::getContext()
 	return d->context.get();
 }
 
-bool GMWindowFactory::createWindowWithDx11(GMInstance instance, OUT IWindow** window)
+bool GMWindowFactory::createWindowWithDx11(GMInstance instance, IWindow* parent, OUT IWindow** window)
 {
 	(*window) = new GMWindow_Dx11();
 	if (*window)

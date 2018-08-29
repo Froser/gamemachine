@@ -15,7 +15,7 @@ namespace
 	{
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".info");
 		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, "info");
-		GMDebugger::instance().info(arg0);
+		gm_info(arg0);
 		return GMReturnValues();
 	}
 
@@ -23,7 +23,7 @@ namespace
 	{
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".error");
 		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, "error");
-		GMDebugger::instance().error(arg0);
+		gm_error(arg0);
 		return GMReturnValues();
 	}
 
@@ -31,7 +31,7 @@ namespace
 	{
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".warning");
 		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, "warning");
-		GMDebugger::instance().warning(arg0);
+		gm_warning(arg0);
 		return GMReturnValues();
 	}
 
@@ -39,7 +39,7 @@ namespace
 	{
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".debug");
 		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, "debug");
-		GMDebugger::instance().debug(arg0);
+		gm_debug(arg0);
 		return GMReturnValues();
 	}
 	// {{END META FUNCTION}}

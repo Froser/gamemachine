@@ -10,9 +10,9 @@
 #include "gmgllight.h"
 #include "gmengine/ui/gmwindow.h"
 
-void GMGLFactory::createWindow(GMInstance instance, OUT IWindow** window)
+void GMGLFactory::createWindow(GMInstance instance, IWindow* parent, OUT IWindow** window)
 {
-	bool b = GMWindowFactory::createWindowWithOpenGL(instance, window);
+	bool b = GMWindowFactory::createWindowWithOpenGL(instance, parent, window);
 	GM_ASSERT(b);
 }
 

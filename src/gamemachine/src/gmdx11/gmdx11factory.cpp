@@ -12,9 +12,9 @@
 #include <regex>
 #include "gmdx11techniques.h"
 
-void GMDx11Factory::createWindow(GMInstance instance, OUT IWindow** window)
+void GMDx11Factory::createWindow(GMInstance instance, IWindow* parent, OUT IWindow** window)
 {
-	bool b = GMWindowFactory::createWindowWithDx11(instance, window);
+	bool b = GMWindowFactory::createWindowWithDx11(instance, parent, window);
 	GM_ASSERT(b);
 }
 

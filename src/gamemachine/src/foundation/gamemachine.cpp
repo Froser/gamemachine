@@ -31,19 +31,17 @@ namespace
 
 GameMachine::GameMachine()
 {
+	GMDebugger::instance();
 	updateGameMachineRunningStates();
 }
 
 void GameMachine::init(
-	IWindow* mainWindow,
 	AUTORELEASE IFactory* factory,
 	GMRenderEnvironment renderEnv
 )
 {
 	D(d);
 	initSystemInfo();
-	addWindow(mainWindow);
-	d->mainWindow = mainWindow;
 
 	setRenderEnvironment(renderEnv);
 	registerManager(factory, &d->factory);

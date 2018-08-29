@@ -271,6 +271,11 @@ END_DECLARE_MD5_HANDLER()
 bool GMModelReader_MD5Anim::load(const GMModelLoadSettings& settings, GMBuffer& buffer, REF GMAsset& asset)
 {
 	D(d);
+	d->hierarchy.joints.clear();
+	d->bounds.clear();
+	d->baseframes.clear();
+	d->frames.clear();
+
 	buffer.convertToStringBuffer();
 	GMString text = GMString(reinterpret_cast<char*>(buffer.buffer));
 	StringReader<GMwchar> sr(text.c_str());

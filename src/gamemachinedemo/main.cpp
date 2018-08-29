@@ -59,15 +59,16 @@ int WINAPI wWinMain(
 	//mainAttrs.samples = 1;
 
 	gm::IWindow* mainWindow = nullptr;
-	factory->createWindow(hInstance, &mainWindow);
+	factory->createWindow(hInstance, nullptr, &mainWindow);
 	mainWindow->create(mainAttrs);
 	mainWindow->centerWindow();
 	mainWindow->showWindow();
 	mainWindow->setHandler(new DemostrationEntrance(mainWindow));
+	GM.addWindow(mainWindow);
 
 	/*
 	gm::IWindow* mainWindow2 = nullptr;
-	factory->createWindow(hInstance, &mainWindow2);
+	factory->createWindow(hInstance, mainWindow, &mainWindow2);
 	mainWindow2->create(mainAttrs);
 	mainWindow2->centerWindow();
 	mainWindow2->showWindow();
@@ -76,7 +77,6 @@ int WINAPI wWinMain(
 	*/
 
 	GM.init(
-		mainWindow,
 		factory,
 		GetRenderEnv()
 	);

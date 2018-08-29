@@ -47,8 +47,9 @@ namespace
 GM_PRIVATE_OBJECT(GMWindow_OpenGL)
 {
 	BYTE depthBits, stencilBits;
-	HDC hDC;
-	HGLRC hRC;
+	HDC hDC = 0;
+	HGLRC hRC = 0;
+	GMWindow_OpenGL* parent = nullptr;
 };
 
 class GMWindow_OpenGL : public GMWindow
@@ -57,8 +58,15 @@ class GMWindow_OpenGL : public GMWindow
 	GM_FRIEND_CLASS(GMGLRenderContext)
 
 public:
-	GMWindow_OpenGL();
+	GMWindow_OpenGL(IWindow* parent);
 	~GMWindow_OpenGL();
+
+public:
+	inline HGLRC getGLRC() GM_NOEXCEPT
+	{
+		D(d);
+		return d->hRC;
+	}
 
 public:
 	virtual void msgProc(const GMMessage& message) override;
@@ -90,11 +98,18 @@ private:
 	GMWindow_OpenGL* windowImpl;
 };
 
-GMWindow_OpenGL::GMWindow_OpenGL()
+GMWindow_OpenGL::GMWindow_OpenGL(IWindow* parent)
 {
 	D(d);
 	d->depthBits = 24;
 	d->stencilBits = 8;
+
+	if (parent)
+	{
+		GMWindow_OpenGL* parentGLWindow = dynamic_cast<GMWindow_OpenGL*>(parent);
+		if (parentGLWindow)
+			d->parent = parentGLWindow;
+	}
 }
 
 GMWindow_OpenGL::~GMWindow_OpenGL()
@@ -174,7 +189,15 @@ void GMWindow_OpenGL::onWindowCreated(const GMWindowAttributes& wndAttrs, GMWind
 	RUN_AND_CHECK(::ReleaseDC(tmpWnd, tmpDC));
 	RUN_AND_CHECK(::DestroyWindow(tmpWnd));
 	RUN_AND_CHECK(::SetPixelFormat(d->hDC, nFormat, &pfd));
-	RUN_AND_CHECK(d->hRC = wglCreateContext(d->hDC));
+	if (!d->parent)
+	{
+		RUN_AND_CHECK(d->hRC = wglCreateContext(d->hDC));
+	}
+	else
+	{
+		RUN_AND_CHECK(d->hRC = d->parent->getGLRC());
+	}
+
 	RUN_AND_CHECK(wglMakeCurrent(d->hDC, d->hRC));
 	return;
 
@@ -231,8 +254,9 @@ void GMWindow_OpenGL::dispose()
 {
 	D(d);
 	gm::GMWindowHandle wnd = getWindowHandle();
-	if (d->hRC)
+	if (!d->parent && d->hRC)
 	{
+		// 如果一个窗口有parent，则与parent使用相同的RC，因此RC由parent释放
 		if (!wglDeleteContext(d->hRC))
 			gm_error(gm_dbg_wrap("release Rendering Context failed."));
 
@@ -246,9 +270,9 @@ void GMWindow_OpenGL::dispose()
 	}
 }
 
-bool GMWindowFactory::createWindowWithOpenGL(GMInstance instance, OUT IWindow** window)
+bool GMWindowFactory::createWindowWithOpenGL(GMInstance instance, IWindow* parent, OUT IWindow** window)
 {
-	(*window) = new GMWindow_OpenGL();
+	(*window) = new GMWindow_OpenGL(parent);
 	if (*window)
 		return true;
 	return false;

@@ -7,7 +7,7 @@ BEGIN_NS
 class GMDx11Factory : public IFactory
 {
 public:
-	virtual void createWindow(GMInstance instance, OUT IWindow** window) override;
+	virtual void createWindow(GMInstance instance, IWindow* parent, OUT IWindow** window) override;
 	virtual void createTexture(const IRenderContext* context, GMImage* image, REF GMTextureAsset& texture) override;
 	virtual void createModelDataProxy(const IRenderContext* context, GMModel* model, OUT GMModelDataProxy** painter) override;
 	virtual void createGlyphManager(const IRenderContext* context, OUT GMGlyphManager**) override;

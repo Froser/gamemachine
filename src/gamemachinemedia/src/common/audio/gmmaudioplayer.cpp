@@ -4,6 +4,7 @@
 #include <al/alc.h>
 #include "decoder.h"
 #include <gmthread.h>
+#include "../src/foundation/gamemachine.h"
 
 // 大小保持一致
 static_assert(sizeof(gm::GMint) == sizeof(ALenum), "Size error");

@@ -548,7 +548,7 @@ GM_INTERFACE_FROM(IWindow, IQueriable)
 
 GM_INTERFACE(IFactory)
 {
-	virtual void createWindow(GMInstance instance, OUT IWindow** window) = 0;
+	virtual void createWindow(GMInstance instance, IWindow* parent, OUT IWindow** window) = 0;
 	virtual void createTexture(const IRenderContext* context, GMImage*, REF GMTextureAsset&) = 0;
 	virtual void createModelDataProxy(const IRenderContext*, GMModel*, OUT GMModelDataProxy**) = 0;
 	virtual void createGlyphManager(const IRenderContext* context, OUT GMGlyphManager**) = 0;
