@@ -447,6 +447,26 @@ inline GMMat4 operator*(const GMMat4& M1, const GMMat4& M2)
 	return R;
 }
 
+inline bool operator!=(const GMVec2& V1, const GMVec2& V2)
+{
+	return !(V1 == V2);
+}
+
+inline bool operator!=(const GMVec3& V1, const GMVec3& V2)
+{
+	return !(V1 == V2);
+}
+
+inline bool operator!=(const GMVec4& V1, const GMVec4& V2)
+{
+	return !(V1 == V2);
+}
+
+inline bool operator!=(const GMQuat& Q1, const GMQuat& Q2)
+{
+	return !(Q1 == Q2);
+}
+
 inline GMVec3 operator*(const GMVec3& V1, const GMVec3& V2)
 {
 	GMVec3 R;
