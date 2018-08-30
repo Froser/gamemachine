@@ -2,6 +2,8 @@
 #define __GMPRIMITIVECREATOR_H__
 #include <gmcommon.h>
 #include <gmmodel.h>
+#include <gmasync.h>
+
 BEGIN_NS
 
 class GMModel;
@@ -72,6 +74,8 @@ struct GMToolUtil
 	  \sa GMGamePackage
 	*/
 	static GMTextureAsset createTexture(const IRenderContext* context, const GMString& filename, REF GMint* width = nullptr, REF GMint* height = nullptr);
+
+	static void beginCreateTexture(const IRenderContext* context, const GMString& filename, GMAsyncCallback callback, OUT GMAsyncResult** ar);
 
 	static void createTextureFromFullPath(const IRenderContext* context, const GMString& filename, REF GMTextureAsset& texture, REF GMint* width = nullptr, REF GMint* height = nullptr);
 

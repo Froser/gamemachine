@@ -49,7 +49,7 @@ bool GMGamePackage::readFile(GMPackageIndex index, const GMString& filename, REF
 	return readFileFromPath(p, buffer);
 }
 
-void GMGamePackage::beginReadFile(GMPackageIndex index, const GMString& filename, GMAsyncCallback callback, OUT IAsyncResult** ar, REF GMString* fullFilename)
+void GMGamePackage::beginReadFile(GMPackageIndex index, const GMString& filename, GMAsyncCallback callback, OUT GMAsyncResult** ar, REF GMString* fullFilename)
 {
 	GMString p = pathOf(index, filename);
 	if (fullFilename)
@@ -80,7 +80,7 @@ bool GMGamePackage::readFileFromPath(const GMString& path, REF GMBuffer* buffer)
 	return b;
 }
 
-void GMGamePackage::beginReadFileFromPath(const GMString& path, GMAsyncCallback& callback, OUT IAsyncResult** ar)
+void GMGamePackage::beginReadFileFromPath(const GMString& path, GMAsyncCallback& callback, OUT GMAsyncResult** ar)
 {
 	D(d);
 	d->handler->beginReadFileFromPath(path, callback, ar);
@@ -106,29 +106,4 @@ void GMGamePackage::createGamePackage(GMGamePackage* pk, GMGamePackageType t, OU
 		GM_ASSERT(false);
 		break;
 	}
-}
-
-GMGamePackageAsyncResult::~GMGamePackageAsyncResult()
-{
-	D(d);
-	delete d->thread;
-}
-
-GMBuffer* GMGamePackageAsyncResult::state()
-{
-	D(d);
-	return &d->buffer;
-}
-
-void GMGamePackageAsyncResult::wait()
-{
-	D(d);
-	if (d->thread)
-		d->thread->join();
-}
-
-bool GMGamePackageAsyncResult::isComplete()
-{
-	D(d);
-	return d->thread->isDone();
 }

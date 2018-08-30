@@ -16,21 +16,21 @@ namespace
 		// Nothing
 	}
 #endif
-}
 
-void assertTrue(bool ast, const std::string& msg, std::ostream& out = std::cout)
-{
-	::SetConsoleColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
-	out << "Unit test: " << msg.c_str() << std::setw(15);
-	if (ast)
+	void assertTrue(bool ast, const std::string& msg, std::ostream& out = std::cout)
 	{
-		::SetConsoleColor(FOREGROUND_GREEN);
-		out << "Passed!" << std::endl;
-	}
-	else
-	{
-		::SetConsoleColor(FOREGROUND_RED);
-		out << "Failed!" << std::endl;
+		::SetConsoleColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+		out << "Unit test: " << msg.c_str() << std::setw(15);
+		if (ast)
+		{
+			::SetConsoleColor(FOREGROUND_GREEN);
+			out << "Passed!" << std::endl;
+		}
+		else
+		{
+			::SetConsoleColor(FOREGROUND_RED);
+			out << "Failed!" << std::endl;
+		}
 	}
 }
 

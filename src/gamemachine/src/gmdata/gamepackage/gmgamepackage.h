@@ -2,7 +2,8 @@
 #define __GAMEPACKAGE_H__
 #include <gmcommon.h>
 #include <gmtools.h>
-#include <gmthread.h>
+#include <gmasync.h>
+
 BEGIN_NS
 
 enum class GMGamePackageType
@@ -10,6 +11,7 @@ enum class GMGamePackageType
 	Directory,
 	Zip,
 };
+
 
 //! 游戏资源类型
 /*!
@@ -33,7 +35,7 @@ GM_INTERFACE(IGamePackageHandler)
 	virtual ~IGamePackageHandler() {}
 	virtual void init() = 0;
 	virtual bool readFileFromPath(const GMString& path, REF GMBuffer* buffer) = 0;
-	virtual void beginReadFileFromPath(const GMString& path, GMAsyncCallback& callback, OUT IAsyncResult** ar) = 0;
+	virtual void beginReadFileFromPath(const GMString& path, GMAsyncCallback callback, OUT GMAsyncResult** ar) = 0;
 	virtual GMString pathRoot(GMPackageIndex index) = 0;
 	virtual Vector<GMString> getAllFiles(const GMString& directory) = 0;
 };
@@ -87,7 +89,7 @@ public:
 	*/
 	bool readFile(GMPackageIndex index, const GMString& filename, REF GMBuffer* buffer, REF GMString* fullFilename = nullptr);
 
-	void beginReadFile(GMPackageIndex index, const GMString& filename, GMAsyncCallback callback, OUT IAsyncResult** ar, REF GMString* fullFilename = nullptr);
+	void beginReadFile(GMPackageIndex index, const GMString& filename, GMAsyncCallback callback, OUT GMAsyncResult** ar, REF GMString* fullFilename = nullptr);
 
 	//! 获取资源包指定路径下的所有文件路径。
 	/*!
@@ -121,33 +123,10 @@ public:
 	  \hook GMGamePackage_readFileFromPath
 	*/
 	bool readFileFromPath(const GMString& path, REF GMBuffer* buffer);
-	void beginReadFileFromPath(const GMString& path, GMAsyncCallback& callback, OUT IAsyncResult** ar);
+	void beginReadFileFromPath(const GMString& path, GMAsyncCallback& callback, OUT GMAsyncResult** ar);
 
 protected:
 	virtual void createGamePackage(GMGamePackage* pk, GMGamePackageType t, OUT IGamePackageHandler** handler);
-};
-
-GM_PRIVATE_OBJECT(GMGamePackageAsyncResult)
-{
-	GMThread* thread = nullptr;
-	GMBuffer buffer;
-};
-
-class GMGamePackageAsyncResult : public IAsyncResult
-{
-	GM_DECLARE_PRIVATE(GMGamePackageAsyncResult);
-
-public:
-	GMGamePackageAsyncResult() = default;
-	~GMGamePackageAsyncResult();
-
-public:
-	virtual GMBuffer* state() override;
-	virtual bool isComplete() override;
-	virtual void wait() override;
-
-public:
-	void setThread(AUTORELEASE GMThread* thread) { D(d); d->thread = thread; }
 };
 
 END_NS

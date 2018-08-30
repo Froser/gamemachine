@@ -192,14 +192,5 @@ public:
 	void unlock();
 };
 
-// 同步
-GM_INTERFACE(IAsyncResult)
-{
-	virtual GMBuffer* state() = 0;
-	virtual bool isComplete() = 0;
-	virtual void wait() = 0;
-};
-
-using GMAsyncCallback = std::function<void(IAsyncResult*)>;
 END_NS
 #endif

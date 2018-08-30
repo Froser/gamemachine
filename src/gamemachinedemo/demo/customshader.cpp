@@ -43,7 +43,13 @@ void Demo_CustomShader::init()
 	quad->getShader().getMaterial().kd = GMVec3(1, 1, 1);
 	quad->getShader().getMaterial().ks = GMVec3(0);
 
-	gm::GMTextureAsset tex = gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "gamemachine.png");
+	gm::GMTextureAsset tex;
+	gm::GMAsyncResult* result = nullptr;
+	gm::GMToolUtil::beginCreateTexture(getDemoWorldReference()->getContext(), "gamemachine.png", nullptr, &result);
+	result->wait();
+	tex = *((gm::GMTextureAsset*) result->state());
+	gm::GM_delete(result);
+
 	gm::GMToolUtil::addTextureToShader(quad->getShader(), tex, gm::GMTextureType::Diffuse);
 	getDemoWorldReference()->getAssets().addAsset(tex);
 

@@ -3,46 +3,10 @@
 #include "gmgamepackagehandler.h"
 #include "foundation/utilities/tools.h"
 #include "foundation/gamemachine.h"
+#include "foundation/gmasync.h"
+#include "gmgamepackage.h"
 
 #define PKD(d) GMGamePackage::Data* d = gamePackage()->gamePackageData();
-
-class GMDefaultGamePackageHandler::GMReadFileThread : public GMThread, public IThreadCallback
-{
-public:
-	GMReadFileThread(GMDefaultGamePackageHandler* handler, const GMString& path, GMGamePackageAsyncResult* result, GMAsyncCallback callback)
-		: m_handler(handler)
-		, m_path(path)
-		, m_result(result)
-		, m_callback(callback)
-	{
-		setCallback(this);
-	}
-
-	virtual void run() override
-	{
-		GMBuffer* buf = m_result->state();
-		m_handler->readFileFromPath(m_path, buf);
-	}
-
-	virtual void onCreateThread(GMThread*) override
-	{
-	}
-
-	virtual void beforeRun(GMThread*) override
-	{
-	}
-
-	virtual void afterRun(GMThread* t) override
-	{
-		m_callback(m_result);
-	}
-
-private:
-	GMDefaultGamePackageHandler* m_handler;
-	GMGamePackageAsyncResult* m_result;
-	GMAsyncCallback m_callback;
-	GMString m_path;
-};
 
 GMDefaultGamePackageHandler::GMDefaultGamePackageHandler(GMGamePackage* pk)
 	: m_pk(pk)
@@ -74,13 +38,19 @@ bool GMDefaultGamePackageHandler::readFileFromPath(const GMString& path, REF GMB
 	return false;
 }
 
-void GMDefaultGamePackageHandler::beginReadFileFromPath(const GMString& path, GMAsyncCallback& callback, OUT IAsyncResult** ar)
+void GMDefaultGamePackageHandler::beginReadFileFromPath(const GMString& path, GMAsyncCallback callback, OUT GMAsyncResult** ar)
 {
-	GMGamePackageAsyncResult* result = new GMGamePackageAsyncResult();
-	GMReadFileThread* thread = new GMReadFileThread(this, path, result, callback);
-	result->setThread(thread);
-	(*ar) = result;
-	thread->start();
+	auto f = [this, path, callback](GMAsyncResult* r) {
+		this->readFileFromPath(path, reinterpret_cast<GMBuffer*>(r->state()));
+		r->setComplete();
+		callback(r);
+	};
+
+	GMAsyncResult* asyncResult = new GMAsyncResult();
+	GMFuture<void> future = GMAsync::async(GMAsync::Async, f, asyncResult);
+	asyncResult->setFuture(std::move(future));
+	GM_ASSERT(ar);
+	(*ar) = asyncResult;
 }
 
 void GMDefaultGamePackageHandler::init()

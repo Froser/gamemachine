@@ -62,5 +62,28 @@ public:
 GM_STATIC_ASSERT(GMAsync::Async == static_cast<GMint>(std::launch::async), "LaunchPolicy must be same with std::luanch");
 GM_STATIC_ASSERT(GMAsync::Deferred == static_cast<GMint>(std::launch::deferred), "LaunchPolicy must be same with std::luanch");
 
+// 同步
+class GMAsyncResult
+{
+public:
+	virtual void* state();
+	virtual bool isComplete();
+	virtual void wait();
+
+public:
+	void setFuture(GMFuture<void> future);
+	void setComplete() GM_NOEXCEPT
+	{
+		complete = true;
+	}
+
+private:
+	GMBuffer buffer;
+	GMFuture<void> future;
+	bool complete = false;
+};
+
+using GMAsyncCallback = std::function<void(GMAsyncResult*)>;
+
 END_NS
 #endif

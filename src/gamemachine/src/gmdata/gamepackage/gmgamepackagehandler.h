@@ -13,7 +13,7 @@ public:
 public:
 	virtual void init() override;
 	virtual bool readFileFromPath(const GMString& path, REF GMBuffer* buffer) override;
-	virtual void beginReadFileFromPath(const GMString& path, GMAsyncCallback& callback, OUT IAsyncResult** ar) override;
+	virtual void beginReadFileFromPath(const GMString& path, GMAsyncCallback callback, OUT GMAsyncResult** ar) override;
 	virtual GMString pathRoot(GMPackageIndex index) override;
 	virtual Vector<GMString> getAllFiles(const GMString& directory) override;
 

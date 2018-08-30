@@ -19,7 +19,7 @@ int main(int argc, char* argv)
 		new cases::String(),
 		new cases::Scanner(),
 		new cases::LinearMath(),
-		// new cases::Thread(),
+		new cases::Thread(),
 		new cases::Variant(),
 		new cases::Lua(),
 		new cases::Base64()
