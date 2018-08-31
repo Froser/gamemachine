@@ -187,7 +187,7 @@ void GMWindow_Dx11::onWindowCreated(const GMWindowAttributes& wndAttrs, GMWindow
 
 	UINT createFlags = 0;
 #if GM_DEBUG
-	createFlags |= D3D11_CREATE_DEVICEGM_DEBUG;
+	createFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
 	if (!d->device || !d->deviceContext)

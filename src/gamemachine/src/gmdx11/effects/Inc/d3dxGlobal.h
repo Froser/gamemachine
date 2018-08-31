@@ -26,7 +26,7 @@ using namespace D3DX11Debug;
 #define SAFE_DELETE(p)        { delete (p); p = NULL;  }
 
 #if FXDEBUG
-#define __BREAK_ON_FAIL       { _GM_DEBUGbreak(); }
+#define __BREAK_ON_FAIL       { __debugbreak(); }
 #else
 #define __BREAK_ON_FAIL 
 #endif
@@ -176,9 +176,9 @@ _declspec(selectany) unsigned int g_TimerRolloverCount = 0x80000000;
 template<class T> class CEffectVector
 {
 protected:
-#if GM_DEBUG
+#if _DEBUG
     T       *m_pCastData; // makes debugging easier to have a casted version of the data
-#endif // GM_DEBUG
+#endif // _DEBUG
 
     BYTE    *m_pData;
     UINT    m_MaxSize;
@@ -221,9 +221,9 @@ protected:
             m_pData = pNewData;
             m_MaxSize = newSize;
         }
-#if GM_DEBUG
+#if _DEBUG
         m_pCastData = (T*) m_pData;
-#endif // GM_DEBUG
+#endif // _DEBUG
         return S_OK;
     }
 
@@ -233,9 +233,9 @@ public:
     CEffectVector<T>()
     {
         m_hLastError = S_OK;
-#if GM_DEBUG
+#if _DEBUG
         m_pCastData = NULL;
-#endif // GM_DEBUG
+#endif // _DEBUG
         m_pData = NULL;
         m_CurSize = m_MaxSize = 0;
     }
@@ -274,9 +274,9 @@ public:
 
 lExit:
 
-#if GM_DEBUG
+#if _DEBUG
         m_pCastData = (T*) m_pData;
-#endif // GM_DEBUG
+#endif // _DEBUG
 
         return hr;
     }
@@ -286,9 +286,9 @@ lExit:
         Empty();
         SAFE_DELETE_ARRAY(m_pData);
         m_MaxSize = 0;
-#if GM_DEBUG
+#if _DEBUG
         m_pCastData = NULL;
-#endif // GM_DEBUG
+#endif // _DEBUG
     }
 
     void ClearWithoutDestructor()
@@ -298,9 +298,9 @@ lExit:
         SAFE_DELETE_ARRAY(m_pData);
         m_MaxSize = 0;
 
-#if GM_DEBUG
+#if _DEBUG
         m_pCastData = NULL;
-#endif // GM_DEBUG
+#endif // _DEBUG
     }
 
     void Empty()
@@ -644,7 +644,7 @@ protected:
     BOOL        m_IsAligned;        // Whether or not to align the data to c_DataAlignment
 
 public:
-#if GM_DEBUG
+#if _DEBUG
     UINT		m_cAllocations;
 #endif
 
@@ -1072,7 +1072,7 @@ lExit:
         return S_OK;
     }
 
-#if GM_DEBUG
+#if _DEBUG
     void PrintHashTableStats()
     {
         if (m_NumHashSlots == 0)
@@ -1133,7 +1133,7 @@ lExit:
 
         DPF(0, "Mean number of entries per slot: %f, Standard deviation: %f, Unused slots; %d", mean, variance, unusedSlots);
     }
-#endif // GM_DEBUG
+#endif // _DEBUG
 
     // S_OK if element is found, E_FAIL otherwise
     HRESULT FindValueWithHash(T Data, UINT Hash, CIterator *pIterator)

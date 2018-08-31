@@ -1,5 +1,5 @@
-﻿#ifndef _GM_DEBUG_H__
-#define _GM_DEBUG_H__
+﻿#ifndef __DEBUG_H__
+#define __DEBUG_H__
 #include <gmcommon.h>
 #include "gmstring.h"
 #include <gmobject.h>
@@ -92,7 +92,7 @@ public:
 #define gm_info gm::GMDebugger::instance().info
 #define gm_error gm::GMDebugger::instance().error
 #define gm_warning gm::GMDebugger::instance().warning
-#define gmGM_DEBUG gm::GMDebugger::instance().debug
+#define gm_debug gm::GMDebugger::instance().debug
 
 #if GM_WINDOWS
 	#if GM_DEBUG

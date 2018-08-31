@@ -2,11 +2,12 @@
 #define __DEFINES_H__
 
 // 容器别名
-#if GM_MSVC
+#if GM_WINDOWS
 #	include <wtypes.h>
 #else
-#	include <strings.h>
+#	include <string.h> //memset
 #endif
+
 #include <utility>
 #include <map>
 #include <set>
@@ -19,10 +20,6 @@
 #include <memory>
 #include <atomic>
 #include "assert.h"
-
-#if GM_UNIX
-#	include <string.h> //memset
-#endif
 
 template <typename T1, typename T2>
 using Pair = std::pair<T1, T2>;
@@ -76,6 +73,18 @@ template <typename T>
 using GMAtomic = std::atomic<T>;
 
 /* 工程编译选项 */
+#if GM_WINDOWS
+#	if DEBUG
+#		define GM_DEBUG 1
+#	elif _DEBUG
+#		define GM_DEBUG 1
+#	endif
+#elif GM_UNIX
+#	if DEBUG
+#		define GM_DEBUG 1
+#	endif
+#endif
+
 // 一定会使用使用OpenGL
 #ifndef GM_USE_OPENGL
 #	define GM_USE_OPENGL 1
@@ -86,17 +95,7 @@ using GMAtomic = std::atomic<T>;
 #	define GM_USE_DX11 0
 #else
 #	if GM_DEBUG
-#		define D3DGM_DEBUG_INFO
-#	endif
-#endif
-
-#if GM_WINDOWS
-#	ifdef DEBUG || _DEBUG
-#		define GM_DEBUG
-#	endif
-#elif GM_UNIX
-#	ifdef DEBUG
-#		define GM_DEBUG
+#		define D3D_DEBUG_INFO
 #	endif
 #endif
 
@@ -407,6 +406,8 @@ inline void memcpy_s(void* dest, size_t, const void* src, size_t size)
 }
 
 #define GM_MAX_PATH 260
+#else
+#define GM_MAX_PATH MAX_PATH
 #endif
 
 #endif

@@ -39,7 +39,7 @@ namespace
 	{
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".debug");
 		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, "debug");
-		gmGM_DEBUG(arg0);
+		gm_debug(arg0);
 		return GMReturnValues();
 	}
 	// {{END META FUNCTION}}

@@ -787,6 +787,7 @@ bool GMToolUtil::createPBRTextures(
 		GM_delete(aoImg);
 		return true;
 	}
+	return false;
 }
 
 void GMToolUtil::createCocos2DParticleSystem(const GMString& filename, OUT GMParticleSystem** particleSystem)

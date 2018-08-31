@@ -1089,7 +1089,7 @@ HRESULT SConstantBuffer::SetRawValue(CONST void *pData, UINT  Offset, UINT  Coun
 {
     HRESULT hr = S_OK;    
 
-#ifdef GM_DEBUG
+#ifdef _DEBUG
     LPCSTR pFuncName = "ID3DX11EffectVariable::SetRawValue";
 
     VERIFYPARAMETER(pData);
@@ -1127,7 +1127,7 @@ HRESULT SConstantBuffer::GetRawValue(__out_bcount(Count) void *pData, UINT  Offs
 {
     HRESULT hr = S_OK;    
 
-#ifdef GM_DEBUG
+#ifdef _DEBUG
     LPCSTR pFuncName = "ID3DX11EffectVariable::GetRawValue";
 
     VERIFYPARAMETER(pData);

@@ -86,7 +86,7 @@ static GMShaderVariablesDesc s_defaultShaderVariablesDesc =
 	"GM_ColorVertexOp",
 
 	{
-		"GMGM_DEBUG_Normal",
+		"GM_Debug_Normal",
 	}
 };
 

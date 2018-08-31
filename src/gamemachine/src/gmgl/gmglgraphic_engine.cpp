@@ -66,7 +66,7 @@ void GMGLGraphicEngine::init()
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
 #if GM_DEBUG
-	glEnable(GLGM_DEBUG_OUTPUT);
+	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback((GLDEBUGPROC)GL_MessageCallback, 0);
 #endif
 }

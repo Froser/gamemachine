@@ -576,7 +576,7 @@ void GMGLTechnique_3D::drawDebug()
 	D(d);
 	D_BASE(db, Base);
 	auto shaderProgram = getShaderProgram();
-	shaderProgram->setInt(GMSHADERGM_DEBUG_DRAW_NORMAL, db->debugConfig.get(GMDebugConfigs::DrawPolygonNormalMode).toInt());
+	shaderProgram->setInt(GMSHADER_DEBUG_DRAW_NORMAL, db->debugConfig.get(GMDebugConfigs::DrawPolygonNormalMode).toInt());
 }
 
 GMTextureAsset GMGLTechnique_3D::getWhiteTexture()

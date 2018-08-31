@@ -52,13 +52,13 @@ void cdecl D3DXDebugPrintf(UINT lvl, LPCSTR szFormat, ...);
 // D3DXASSERT
 //----------------------------------------------------------------------------
 
-#if GM_DEBUG
+#if _DEBUG
 int WINAPI D3DXDebugAssert(LPCSTR szFile, int nLine, LPCSTR szCondition);
 #define D3DXASSERT(condition) \
     do { if(!(condition)) D3DXDebugAssert(__FILE__, __LINE__, #condition); } while(0)
-#else // !GM_DEBUG
+#else // !_DEBUG
 #define D3DXASSERT(condition) 0
-#endif // !GM_DEBUG
+#endif // !_DEBUG
 
 
 

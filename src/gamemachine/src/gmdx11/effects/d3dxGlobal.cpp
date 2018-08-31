@@ -249,7 +249,7 @@ CDataBlockStore::CDataBlockStore()
     m_Offset = 0;
     m_IsAligned = FALSE;
 
-#if GM_DEBUG
+#if _DEBUG
     m_cAllocations = 0;
 #endif
 }
@@ -318,7 +318,7 @@ void* CDataBlockStore::Allocate(UINT bufferSize)
 {
     void *pRetValue = NULL;
 
-#if GM_DEBUG
+#if _DEBUG
     m_cAllocations++;
 #endif
 
