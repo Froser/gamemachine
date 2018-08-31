@@ -45,7 +45,7 @@ protected:
 };
 
 // 检查栈是否平衡
-#if _DEBUG
+#if GM_DEBUG
 #	define GM_CHECK_LUA_STACK_BALANCE(offset) gm::GMLuaStackBalanceCheck __balanceGuard(L, offset);
 #	define GM_CHECK_LUA_STACK_BALANCE_(l, offset) gm::GMLuaStackBalanceCheck __balanceGuard(l, offset);
 
@@ -61,7 +61,7 @@ public:
 
 	~GMLuaStackBalanceCheck()
 	{
-#if _DEBUG
+#if GM_DEBUG
 		auto currentTop = lua_gettop(m_L);
 		GM_ASSERT(currentTop == m_stack + m_offset);
 #endif

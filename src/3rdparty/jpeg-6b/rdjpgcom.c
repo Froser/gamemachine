@@ -15,6 +15,7 @@
 #include "jinclude.h"		/* get auto-config symbols, <stdio.h> */
 
 #include <ctype.h>		/* to declare isupper(), tolower() */
+
 #ifdef USE_SETMODE
 #include <fcntl.h>		/* to declare setmode()'s parameter macros */
 /* If you have setmode() but not <io.h>, just delete this line: */

@@ -2041,7 +2041,7 @@ void XMLDocument::Clear()
 		DeleteNode(_unlinked[0]);	// Will remove from _unlinked as part of delete.
 	}
 
-#ifdef TINYXML2_DEBUG
+#ifdef TINYXML2GM_DEBUG
     const bool hadError = Error();
 #endif
     ClearError();
@@ -2057,7 +2057,7 @@ void XMLDocument::Clear()
     _attributePool.Trace( "attribute" );
 #endif
 
-#ifdef TINYXML2_DEBUG
+#ifdef TINYXML2GM_DEBUG
     if ( !hadError ) {
         TIXMLASSERT( _elementPool.CurrentAllocs()   == _elementPool.Untracked() );
         TIXMLASSERT( _attributePool.CurrentAllocs() == _attributePool.Untracked() );

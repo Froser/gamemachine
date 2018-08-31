@@ -2,9 +2,9 @@
 #define __GMPRIMITIVEMANAGER_H__
 #include <gmcommon.h>
 #include <gmgameobject.h>
+#include <gm2dgameobject.h>
 BEGIN_NS
 
-class GMSprite2DGameObject;
 typedef GMlong GMPrimitiveID;
 
 GM_INTERFACE(IPrimitive)

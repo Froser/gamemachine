@@ -17,11 +17,11 @@ BEGIN_NS
 
 struct BitmapHeader
 {
-	WORD  bfType;
-	DWORD bfSize;
-	WORD  bfReserved1;
-	WORD  bfReserved2;
-	DWORD bfOffBits;
+	GMWord bfType;
+	GMDWord  bfSize;
+	GMWord   bfReserved1;
+	GMWord   bfReserved2;
+	GMDWord  bfOffBits;
 };
 
 #if GM_WINDOWS
@@ -30,25 +30,25 @@ struct BitmapHeader
 
 struct BitmapInfoHeader
 {
-	DWORD biSize;
-	LONG  biWidth;
-	LONG  biHeight;
-	WORD  biPlanes;
-	WORD  biBitCount;
-	DWORD biCompression;
-	DWORD biSizeImage;
-	LONG  biXPelsPerMeter;
-	LONG  biYPelsPerMeter;
-	DWORD biClrUsed;
-	DWORD biClrImportant;
+	GMDWord biSize;
+	GMlong  biWidth;
+	GMlong  biHeight;
+	GMWord  biPlanes;
+	GMWord  biBitCount;
+	GMDWord biCompression;
+	GMDWord biSizeImage;
+	GMlong  biXPelsPerMeter;
+	GMlong  biYPelsPerMeter;
+	GMDWord biClrUsed;
+	GMDWord biClrImportant;
 };
 
 struct PaletteEntry
 {
-	BYTE peRed;
-	BYTE peGreen;
-	BYTE peBlue;
-	BYTE peFlags;
+	GMbyte peRed;
+	GMbyte peGreen;
+	GMbyte peBlue;
+	GMbyte peFlags;
 };
 
 struct BitmapFile
@@ -56,7 +56,7 @@ struct BitmapFile
 	BitmapHeader bitmapHeader;
 	BitmapInfoHeader bitmapInfoHeader;
 	PaletteEntry palette[256];
-	BYTE *buffer;
+	GMbyte *buffer;
 };
 
 struct ImageRGB

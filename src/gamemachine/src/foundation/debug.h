@@ -1,5 +1,5 @@
-﻿#ifndef __DEBUG_H__
-#define __DEBUG_H__
+﻿#ifndef _GM_DEBUG_H__
+#define _GM_DEBUG_H__
 #include <gmcommon.h>
 #include "gmstring.h"
 #include <gmobject.h>
@@ -92,12 +92,16 @@ public:
 #define gm_info gm::GMDebugger::instance().info
 #define gm_error gm::GMDebugger::instance().error
 #define gm_warning gm::GMDebugger::instance().warning
-#define gm_debug gm::GMDebugger::instance().debug
+#define gmGM_DEBUG gm::GMDebugger::instance().debug
 
-#if _DEBUG
-#define gm_dbg_wrap(str) __FILE__ ": " __FUNCTION__ ": " ##str
-#else
-#define gm_dbg_wrap(str) __FUNCTION__ ": " ##str
+#if GM_WINDOWS
+	#if GM_DEBUG
+	#	define gm_dbg_wrap(str) __FILE__ ": " __FUNCTION__ ": " str
+	#else
+	#	define gm_dbg_wrap(str) __FUNCTION__ ": " str
+	#endif
+#elif GM_UNIX
+	#	define gm_dbg_wrap(str) str
 #endif
 
 // hooks

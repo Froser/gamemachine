@@ -338,7 +338,7 @@ namespace
 		plane = CombineVector4(t, plane);
 		plane.setW(-Dot(a, MakeVector3(plane)));
 
-#if _DEBUG
+#if GM_DEBUG
 		GMFloat4 f4_a, f4_plane;
 		a.loadFloat4(f4_a);
 		plane.loadFloat4(f4_plane);

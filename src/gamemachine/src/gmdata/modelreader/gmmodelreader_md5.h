@@ -26,12 +26,12 @@ namespace
 	class StringReader
 	{
 	public:
-		StringReader::StringReader(const CharType* string)
+		StringReader(const CharType* string)
 			: m_p(string)
 		{
 		}
 
-		bool StringReader::readLine(GMString& line)
+		bool readLine(GMString& line)
 		{
 			line.clear();
 			GMint offset = 0;

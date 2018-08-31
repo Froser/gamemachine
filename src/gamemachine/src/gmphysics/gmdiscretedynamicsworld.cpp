@@ -5,6 +5,7 @@
 #include "gmdata/gmmodel.h"
 #include "gmengine/gmgameworld.h"
 #include "gmconstraint.h"
+#include <algorithm>
 
 GMDiscreteDynamicsWorld::GMDiscreteDynamicsWorld(GMGameWorld* world)
 	: GMPhysicsWorld(world)

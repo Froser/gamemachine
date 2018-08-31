@@ -525,7 +525,7 @@ template<ETemplateVarType SourceType, ETemplateVarType DestType, typename SRC_TY
 __forceinline HRESULT CopyScalarValue(SRC_TYPE SrcValue, void *pDest, const char *pFuncName)
 {
     HRESULT hr = S_OK;
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     if (ValidatePtr)
         VERIFYPARAMETER(pDest);
 #endif
@@ -607,7 +607,7 @@ D3DX11INLINE HRESULT SetScalarArray(CONST SRC_TYPE *pSrcValues, DEST_TYPE *pDest
 {
     HRESULT hr = S_OK;
 
-#ifdef _DEBUG    
+#ifdef GM_DEBUG    
     VERIFYPARAMETER(pSrcValues);
 
     if (!AreBoundsValid(Offset, Count, pSrcValues, pType, TotalUnpackedSize))
@@ -635,7 +635,7 @@ D3DX11INLINE HRESULT GetScalarArray(SRC_TYPE *pSrcValues, DEST_TYPE *pDestValues
 {
     HRESULT hr = S_OK;
 
-#ifdef _DEBUG    
+#ifdef GM_DEBUG    
     VERIFYPARAMETER(pDestValues);
 
     if (!AreBoundsValid(Offset, Count, pDestValues, pType, TotalUnpackedSize))
@@ -1340,7 +1340,7 @@ struct TNumericVariable : public IBaseInterface
         {
             HRESULT hr = S_OK;    
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
             LPCSTR pFuncName = "ID3DX11EffectVariable::SetRawValue";
 
             VERIFYPARAMETER(pData);
@@ -1367,7 +1367,7 @@ lExit:
     {
         HRESULT hr = S_OK;    
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
         LPCSTR pFuncName = "ID3DX11EffectVariable::GetRawValue";
 
         VERIFYPARAMETER(pData);
@@ -1922,7 +1922,7 @@ HRESULT TVectorVariable<IBaseInterface, IsAnnotation, BaseType >::SetFloatVector
     HRESULT hr = S_OK;
     LPCSTR pFuncName = "ID3DX11EffectVectorVariable::SetFloatVector";
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     VERIFYPARAMETER(pData);
 #endif
 
@@ -1940,7 +1940,7 @@ HRESULT TVectorVariable<IBaseInterface, IsAnnotation, BaseType>::GetFloatVector(
     HRESULT hr = S_OK;
     LPCSTR pFuncName = "ID3DX11EffectVectorVariable::GetFloatVector";
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     VERIFYPARAMETER(pData);
 #endif
 
@@ -1958,7 +1958,7 @@ HRESULT TVectorVariable<IBaseInterface, IsAnnotation, BaseType >::SetIntVector(C
     HRESULT hr = S_OK;
     LPCSTR pFuncName = "ID3DX11EffectVectorVariable::SetIntVector";
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     VERIFYPARAMETER(pData);
 #endif
 
@@ -1976,7 +1976,7 @@ HRESULT TVectorVariable<IBaseInterface, IsAnnotation, BaseType>::GetIntVector(in
     HRESULT hr = S_OK;
     LPCSTR pFuncName = "ID3DX11EffectVectorVariable::GetIntVector";
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     VERIFYPARAMETER(pData);
 #endif
 
@@ -1994,7 +1994,7 @@ HRESULT TVectorVariable<IBaseInterface, IsAnnotation, BaseType >::SetBoolVector(
     HRESULT hr = S_OK;
     LPCSTR pFuncName = "ID3DX11EffectVectorVariable::SetBoolVector";
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     VERIFYPARAMETER(pData);
 #endif
 
@@ -2012,7 +2012,7 @@ HRESULT TVectorVariable<IBaseInterface, IsAnnotation, BaseType>::GetBoolVector(B
     HRESULT hr = S_OK;
     LPCSTR pFuncName = "ID3DX11EffectVectorVariable::GetBoolVector";
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     VERIFYPARAMETER(pData);
 #endif
 
@@ -2030,7 +2030,7 @@ HRESULT TVectorVariable<IBaseInterface, IsAnnotation, BaseType>::SetFloatVectorA
     HRESULT hr = S_OK;
     LPCSTR pFuncName = "ID3DX11EffectVectorVariable::SetFloatVectorArray";
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     if (!AreBoundsValid(Offset, Count, pData, pType, GetTotalUnpackedSize()))
     {
         DPF(0, "%s: Invalid range specified", pFuncName);
@@ -2053,7 +2053,7 @@ HRESULT TVectorVariable<IBaseInterface, IsAnnotation, BaseType>::GetFloatVectorA
     HRESULT hr = S_OK;
     LPCSTR pFuncName = "ID3DX11EffectVectorVariable::GetFloatVectorArray";
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     if (!AreBoundsValid(Offset, Count, pData, pType, GetTotalUnpackedSize()))
     {
         DPF(0, "%s: Invalid range specified", pFuncName);
@@ -2076,7 +2076,7 @@ HRESULT TVectorVariable<IBaseInterface, IsAnnotation, BaseType>::SetIntVectorArr
     HRESULT hr = S_OK;
     LPCSTR pFuncName = "ID3DX11EffectVectorVariable::SetIntVectorArray";
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     if (!AreBoundsValid(Offset, Count, pData, pType, GetTotalUnpackedSize()))
     {
         DPF(0, "%s: Invalid range specified", pFuncName);
@@ -2099,7 +2099,7 @@ HRESULT TVectorVariable<IBaseInterface, IsAnnotation, BaseType>::GetIntVectorArr
     HRESULT hr = S_OK;
     LPCSTR pFuncName = "ID3DX11EffectVectorVariable::GetIntVectorArray";
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     if (!AreBoundsValid(Offset, Count, pData, pType, GetTotalUnpackedSize()))
     {
         DPF(0, "%s: Invalid range specified", pFuncName);
@@ -2122,7 +2122,7 @@ HRESULT TVectorVariable<IBaseInterface, IsAnnotation, BaseType>::SetBoolVectorAr
     HRESULT hr = S_OK;
     LPCSTR pFuncName = "ID3DX11EffectVectorVariable::SetBoolVectorArray";
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     if (!AreBoundsValid(Offset, Count, pData, pType, GetTotalUnpackedSize()))
     {
         DPF(0, "%s: Invalid range specified", pFuncName);
@@ -2145,7 +2145,7 @@ HRESULT TVectorVariable<IBaseInterface, IsAnnotation, BaseType>::GetBoolVectorAr
     HRESULT hr = S_OK;
     LPCSTR pFuncName = "ID3DX11EffectVectorVariable::GetBoolVectorArray";
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     if (!AreBoundsValid(Offset, Count, pData, pType, GetTotalUnpackedSize()))
     {
         DPF(0, "%s: Invalid range specified", pFuncName);
@@ -2180,7 +2180,7 @@ HRESULT TVector4Variable<IBaseInterface>::SetFloatVector(CONST float *pData)
     HRESULT hr = S_OK;
     LPCSTR pFuncName = "ID3DX11EffectVectorVariable::SetFloatVector";
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     VERIFYPARAMETER(pData);
 #endif
 
@@ -2197,7 +2197,7 @@ HRESULT TVector4Variable<IBaseInterface>::GetFloatVector(float *pData)
     HRESULT hr = S_OK;
     LPCSTR pFuncName = "ID3DX11EffectVectorVariable::GetFloatVector";
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     VERIFYPARAMETER(pData);
 #endif
 
@@ -2213,7 +2213,7 @@ HRESULT TVector4Variable<IBaseInterface>::SetFloatVectorArray(CONST float *pData
     HRESULT hr = S_OK;
     LPCSTR pFuncName = "ID3DX11EffectVectorVariable::SetFloatVectorArray";
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     if (!AreBoundsValid(Offset, Count, pData, pType, GetTotalUnpackedSize()))
     {
         DPF(0, "%s: Invalid range specified", pFuncName);
@@ -2235,7 +2235,7 @@ HRESULT TVector4Variable<IBaseInterface>::GetFloatVectorArray(float *pData, UINT
     HRESULT hr = S_OK;
     LPCSTR pFuncName = "ID3DX11EffectVectorVariable::GetFloatVectorArray";
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     if (!AreBoundsValid(Offset, Count, pData, pType, GetTotalUnpackedSize()))
     {
         DPF(0, "%s: Invalid range specified", pFuncName);
@@ -2345,7 +2345,7 @@ HRESULT DoMatrixArrayInternal(SType *pType, UINT  TotalUnpackedSize, BYTE *pEffe
 {    
     HRESULT hr = S_OK;
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     if (!AreBoundsValid(Offset, Count, pMatrixData, pType, TotalUnpackedSize))
     {
         DPF(0, "%s: Invalid range specified", pFuncName);
@@ -2626,7 +2626,7 @@ D3DX11INLINE static void Matrix4x4Copy(CONST void *pSrc, void *pDst)
 template<BOOL IsColumnMajor, BOOL Transpose, BOOL IsSetting>
 D3DX11INLINE HRESULT DoMatrix4x4ArrayInternal(BYTE *pEffectData, void *pMatrixData, UINT  Offset, UINT  Count
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
                                               , SType *pType, UINT  TotalUnpackedSize, LPCSTR pFuncName)
 #else
                                               )
@@ -2634,7 +2634,7 @@ D3DX11INLINE HRESULT DoMatrix4x4ArrayInternal(BYTE *pEffectData, void *pMatrixDa
 {    
     HRESULT hr = S_OK;
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     if (!AreBoundsValid(Offset, Count, pMatrixData, pType, TotalUnpackedSize))
     {
         DPF(0, "%s: Invalid range specified", pFuncName);
@@ -2690,7 +2690,7 @@ HRESULT TMatrix4x4Variable<IBaseInterface, IsColumnMajor>::SetMatrix(CONST float
 {
     DirtyVariable();
     return DoMatrix4x4ArrayInternal<IsColumnMajor, FALSE, TRUE>(Data.pNumeric, const_cast<float*>(pData), 0, 1
-#ifdef _DEBUG 
+#ifdef GM_DEBUG 
         , pType, GetTotalUnpackedSize(), "ID3DX11EffectMatrixVariable::SetMatrix");
 #else
         );
@@ -2701,7 +2701,7 @@ template<typename IBaseInterface, BOOL IsColumnMajor>
 HRESULT TMatrix4x4Variable<IBaseInterface, IsColumnMajor>::GetMatrix(float *pData)
 {
     return DoMatrix4x4ArrayInternal<IsColumnMajor, FALSE, FALSE>(Data.pNumeric, pData, 0, 1
-#ifdef _DEBUG 
+#ifdef GM_DEBUG 
         , pType, GetTotalUnpackedSize(), "ID3DX11EffectMatrixVariable::GetMatrix");
 #else
         );
@@ -2713,7 +2713,7 @@ HRESULT TMatrix4x4Variable<IBaseInterface, IsColumnMajor>::SetMatrixArray(CONST 
 {
     DirtyVariable();
     return DoMatrix4x4ArrayInternal<IsColumnMajor, FALSE, TRUE>(Data.pNumeric, const_cast<float*>(pData), Offset, Count
-#ifdef _DEBUG 
+#ifdef GM_DEBUG 
         , pType, GetTotalUnpackedSize(), "ID3DX11EffectMatrixVariable::SetMatrixArray");
 #else
         );
@@ -2724,7 +2724,7 @@ template<typename IBaseInterface, BOOL IsColumnMajor>
 HRESULT TMatrix4x4Variable<IBaseInterface, IsColumnMajor>::GetMatrixArray(float *pData, UINT  Offset, UINT  Count)
 {
     return DoMatrix4x4ArrayInternal<IsColumnMajor, FALSE, FALSE>(Data.pNumeric, pData, Offset, Count
-#ifdef _DEBUG 
+#ifdef GM_DEBUG 
         , pType, GetTotalUnpackedSize(), "ID3DX11EffectMatrixVariable::GetMatrixArray");
 #else
         );
@@ -2736,7 +2736,7 @@ HRESULT TMatrix4x4Variable<IBaseInterface, IsColumnMajor>::SetMatrixTranspose(CO
 {
     DirtyVariable();
     return DoMatrix4x4ArrayInternal<IsColumnMajor, TRUE, TRUE>(Data.pNumeric, const_cast<float*>(pData), 0, 1
-#ifdef _DEBUG 
+#ifdef GM_DEBUG 
         , pType, GetTotalUnpackedSize(), "ID3DX11EffectMatrixVariable::SetMatrixTranspose");
 #else
         );
@@ -2747,7 +2747,7 @@ template<typename IBaseInterface, BOOL IsColumnMajor>
 HRESULT TMatrix4x4Variable<IBaseInterface, IsColumnMajor>::GetMatrixTranspose(float *pData)
 {
     return DoMatrix4x4ArrayInternal<IsColumnMajor, TRUE, FALSE>(Data.pNumeric, pData, 0, 1
-#ifdef _DEBUG 
+#ifdef GM_DEBUG 
         , pType, GetTotalUnpackedSize(), "ID3DX11EffectMatrixVariable::GetMatrixTranspose");
 #else
         );
@@ -2759,7 +2759,7 @@ HRESULT TMatrix4x4Variable<IBaseInterface, IsColumnMajor>::SetMatrixTransposeArr
 {
     DirtyVariable();
     return DoMatrix4x4ArrayInternal<IsColumnMajor, TRUE, TRUE>(Data.pNumeric, const_cast<float*>(pData), Offset, Count
-#ifdef _DEBUG 
+#ifdef GM_DEBUG 
         , pType, GetTotalUnpackedSize(), "ID3DX11EffectMatrixVariable::SetMatrixTransposeArray");
 #else
         );
@@ -2770,14 +2770,14 @@ template<typename IBaseInterface, BOOL IsColumnMajor>
 HRESULT TMatrix4x4Variable<IBaseInterface, IsColumnMajor>::GetMatrixTransposeArray(float *pData, UINT  Offset, UINT  Count)
 {
     return DoMatrix4x4ArrayInternal<IsColumnMajor, TRUE, FALSE>(Data.pNumeric, pData, Offset, Count
-#ifdef _DEBUG 
+#ifdef GM_DEBUG 
         , pType, GetTotalUnpackedSize(), "ID3DX11EffectMatrixVariable::GetMatrixTransposeArray");
 #else
         );
 #endif
 }
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
 
 // Useful object macro to check bounds and parameters
 #define CHECK_OBJECT_ARRAY_BOUNDS(Offset, Count, Pointer) \
@@ -2812,7 +2812,7 @@ HRESULT TMatrix4x4Variable<IBaseInterface, IsColumnMajor>::GetMatrixTransposeArr
     VH(E_INVALIDARG); \
 } \
 
-#else // _DEBUG
+#else // GM_DEBUG
 
 #define CHECK_OBJECT_ARRAY_BOUNDS(Offset, Count, Pointer) \
     HRESULT hr = S_OK; \
@@ -2823,7 +2823,7 @@ HRESULT TMatrix4x4Variable<IBaseInterface, IsColumnMajor>::GetMatrixTransposeArr
 #define CHECK_SCALAR_BOUNDS(Index) \
     HRESULT hr = S_OK; \
 
-#endif // _DEBUG
+#endif // GM_DEBUG
 
 //////////////////////////////////////////////////////////////////////////
 // ID3DX11EffectStringVariable (TStringVariable implementation)
@@ -2939,7 +2939,7 @@ HRESULT TInterfaceVariable<IBaseInterface>::GetClassInstance(ID3DX11EffectClassI
     HRESULT hr = S_OK;
     LPCSTR pFuncName = "ID3DX11EffectInterfaceVariable::GetClassInstance";
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     VERIFYPARAMETER(ppEffectClassInstance);
 #endif
 
@@ -3231,7 +3231,7 @@ HRESULT TShaderResourceVariable<IBaseInterface>::SetResource(ID3D11ShaderResourc
 {
     HRESULT hr = S_OK;
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     LPCSTR pFuncName = "ID3DX11EffectShaderResourceVariable::SetResource";
 
     VH(ValidateTextureType(pResource, pType->ObjectType, pFuncName));
@@ -3251,7 +3251,7 @@ HRESULT TShaderResourceVariable<IBaseInterface>::GetResource(ID3D11ShaderResourc
 {
     HRESULT hr = S_OK;
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     LPCSTR pFuncName = "ID3DX11EffectShaderResourceVariable::GetResource";
 
     VERIFYPARAMETER(ppResource);
@@ -3272,7 +3272,7 @@ HRESULT TShaderResourceVariable<IBaseInterface>::SetResourceArray(ID3D11ShaderRe
 
     CHECK_OBJECT_ARRAY_BOUNDS(Offset, Count, ppResources);
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     for (i = 0; i < Count; ++ i)
     {
         VH(ValidateTextureType(ppResources[i], pType->ObjectType, pFuncName));
@@ -3444,7 +3444,7 @@ HRESULT TUnorderedAccessViewVariable<IBaseInterface>::SetUnorderedAccessView(ID3
 {
     HRESULT hr = S_OK;
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     LPCSTR pFuncName = "ID3DX11EffectUnorderedAccessViewVariable::SetUnorderedAccessView";
 
     VH(ValidateTextureType(pResource, pType->ObjectType, pFuncName));
@@ -3464,7 +3464,7 @@ HRESULT TUnorderedAccessViewVariable<IBaseInterface>::GetUnorderedAccessView(ID3
 {
     HRESULT hr = S_OK;
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     LPCSTR pFuncName = "ID3DX11EffectUnorderedAccessViewVariable::GetUnorderedAccessView";
 
     VERIFYPARAMETER(ppResource);
@@ -3485,7 +3485,7 @@ HRESULT TUnorderedAccessViewVariable<IBaseInterface>::SetUnorderedAccessViewArra
 
     CHECK_OBJECT_ARRAY_BOUNDS(Offset, Count, ppResources);
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     for (i = 0; i < Count; ++ i)
     {
         VH(ValidateTextureType(ppResources[i], pType->ObjectType, pFuncName));
@@ -3543,7 +3543,7 @@ HRESULT TRenderTargetViewVariable<IBaseInterface>::SetRenderTarget(ID3D11RenderT
 {
     HRESULT hr = S_OK;
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     LPCSTR pFuncName = "ID3DX11EffectRenderTargetVariable::SetRenderTarget";
 
 #endif
@@ -3628,7 +3628,7 @@ HRESULT TDepthStencilViewVariable<IBaseInterface>::SetDepthStencil(ID3D11DepthSt
 {
     HRESULT hr = S_OK;
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     LPCSTR pFuncName = "ID3D11DepthStencilViewVariable::SetDepthStencil";
 
 #endif
@@ -3647,7 +3647,7 @@ HRESULT TDepthStencilViewVariable<IBaseInterface>::GetDepthStencil(ID3D11DepthSt
 {
     HRESULT hr = S_OK;
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
     LPCSTR pFuncName = "ID3D11DepthStencilViewVariable::GetDepthStencil";
 
     VERIFYPARAMETER(ppResource);

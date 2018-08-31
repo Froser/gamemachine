@@ -27,7 +27,7 @@ namespace
 	// 从系统获取字体文件，从上到下遍历，越靠前优先级越高
 	struct FontList
 	{
-		GMwchar fontName[MAX_PATH];
+		GMwchar fontName[GM_MAX_PATH];
 	};
 
 	FT_Error loadFace(const GMString& fontFullPath, FT_Face* face)

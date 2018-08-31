@@ -120,7 +120,7 @@ namespace
 
 struct PNGTestHeader
 {
-	DWORD magic1, magic2;
+	GMDWord magic1, magic2;
 };
 
 bool GMImageReader_PNG::load(const GMbyte* data, GMsize_t size, OUT GMImage** img)

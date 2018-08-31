@@ -47,15 +47,15 @@ distribution.
 */
 /*
 	gcc:
-        g++ -Wall -DTINYXML2_DEBUG tinyxml2.cpp xmltest.cpp -o gccxmltest.exe
+        g++ -Wall -DTINYXML2GM_DEBUG tinyxml2.cpp xmltest.cpp -o gccxmltest.exe
 
     Formatting, Artistic Style:
         AStyle.exe --style=1tbs --indent-switches --break-closing-brackets --indent-preprocessor tinyxml2.cpp tinyxml2.h
 */
 
-#if defined( _DEBUG ) || defined (__DEBUG__)
-#   ifndef TINYXML2_DEBUG
-#       define TINYXML2_DEBUG
+#if defined( GM_DEBUG ) || defined (_GM_DEBUG__)
+#   ifndef TINYXML2GM_DEBUG
+#       define TINYXML2GM_DEBUG
 #   endif
 #endif
 
@@ -79,10 +79,10 @@ distribution.
 #endif
 
 
-#if defined(TINYXML2_DEBUG)
+#if defined(TINYXML2GM_DEBUG)
 #   if defined(_MSC_VER)
 #       // "(void)0," is for suppressing C4127 warning in "assert(false)", "assert(true)" and the like
-#       define TIXMLASSERT( x )           if ( !((void)0,(x))) { __debugbreak(); }
+#       define TIXMLASSERT( x )           if ( !((void)0,(x))) { _GM_DEBUGbreak(); }
 #   elif defined (ANDROID_NDK)
 #       include <android/log.h>
 #       define TIXMLASSERT( x )           if ( !(x)) { __android_log_assert( "assert", "grinliz", "ASSERT in '%s' at %d.", __FILE__, __LINE__ ); }
@@ -402,7 +402,7 @@ public:
         }
         --_currentAllocs;
         Item* item = static_cast<Item*>( mem );
-#ifdef TINYXML2_DEBUG
+#ifdef TINYXML2GM_DEBUG
         memset( item, 0xfe, sizeof( *item ) );
 #endif
         item->next = _root;

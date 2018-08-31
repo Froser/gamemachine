@@ -174,61 +174,61 @@ using GMMeta = HashMap<GMString, GMObjectMember, GMStringHashFunctor>;
 template <typename T>
 struct GMMetaMemberTypeGetter
 {
-	enum { Type = GMMetaMemberType::Invalid };
+	enum { Type = (GMint) GMMetaMemberType::Invalid };
 };
 
 template <>
 struct GMMetaMemberTypeGetter<GMint>
 {
-	enum { Type = GMMetaMemberType::Int };
+	enum { Type = (GMint) GMMetaMemberType::Int };
 };
 
 template <>
 struct GMMetaMemberTypeGetter<GMfloat>
 {
-	enum { Type = GMMetaMemberType::Float };
+	enum { Type = (GMint) GMMetaMemberType::Float };
 };
 
 template <>
 struct GMMetaMemberTypeGetter<GMVec2>
 {
-	enum { Type = GMMetaMemberType::Vector2 };
+	enum { Type = (GMint) GMMetaMemberType::Vector2 };
 };
 
 template <>
 struct GMMetaMemberTypeGetter<GMVec3>
 {
-	enum { Type = GMMetaMemberType::Vector3 };
+	enum { Type = (GMint) GMMetaMemberType::Vector3 };
 };
 
 template <>
 struct GMMetaMemberTypeGetter<GMVec4>
 {
-	enum { Type = GMMetaMemberType::Vector4 };
+	enum { Type = (GMint) GMMetaMemberType::Vector4 };
 };
 
 template <>
 struct GMMetaMemberTypeGetter<GMMat4>
 {
-	enum { Type = GMMetaMemberType::Matrix4x4 };
+	enum { Type = (GMint) GMMetaMemberType::Matrix4x4 };
 };
 
 template <>
 struct GMMetaMemberTypeGetter<GMString>
 {
-	enum { Type = GMMetaMemberType::String };
+	enum { Type = (GMint) GMMetaMemberType::String };
 };
 
 template <>
 struct GMMetaMemberTypeGetter<bool>
 {
-	enum { Type = GMMetaMemberType::Boolean };
+	enum { Type = (GMint) GMMetaMemberType::Boolean };
 };
 
 template <>
 struct GMMetaMemberTypeGetter<GMObject*>
 {
-	enum { Type = GMMetaMemberType::Object };
+	enum { Type = (GMint) GMMetaMemberType::Object };
 };
 
 // 信号目标，表示一个GMObject被多少信号连接
@@ -253,7 +253,7 @@ using GMSlots = HashMap<GMSignal, Vector<GMCallbackTarget>, GMStringHashFunctor>
 
 #define GM_SIGNAL(signal) signal
 #define GM_DECLARE_SIGNAL(signal) public: static gm::GMString GM_SIGNAL(signal);
-#define GM_DEFINE_SIGNAL(signal) gm::GMString GM_SIGNAL(signal) = L#signal ;
+#define GM_DEFINE_SIGNAL(signal) gm::GMString GM_SIGNAL(signal) = #signal ;
 
 #define GM_BEGIN_META_MAP \
 	protected: \

@@ -26,7 +26,8 @@ public:
 	template <typename Iter, typename Function>
 	static void blockedAsync(LaunchPolicy policy, GMsize_t taskCount, Iter iterBegin, Iter iterEnd, Function&& function)
 	{
-		GM_STATIC_ASSERT(std::is_same<std::random_access_iterator_tag, std::iterator_traits<Iter>::iterator_category>::value, "Iterator must be a random access iterator");
+		typedef typename std::iterator_traits<Iter>::iterator_category IterTag;
+		GM_STATIC_ASSERT(std::is_same<std::random_access_iterator_tag, IterTag>::value, "Iterator must be a random access iterator");
 		typedef decltype(async(Async, std::forward<Function>(function), Iter(), Iter())) FutureType;
 
 		// 用于缓存Async状态的future，否则future析构时将会进行等待

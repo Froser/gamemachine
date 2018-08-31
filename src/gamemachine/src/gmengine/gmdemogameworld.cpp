@@ -36,9 +36,9 @@ bool GMDemoGameWorld::removeObject(const GMString& name)
 		d->renderList.erase(name);
 		d->renderListInv.erase(object);
 		if (object->canDeferredRendering())
-			std::remove(getRenderList().deferred.begin(), getRenderList().deferred.end(), object);
+			getRenderList().deferred.remove(object);
 		else
-			std::remove(getRenderList().forward.begin(), getRenderList().forward.end(), object);
+			getRenderList().forward.remove(object);
 		return GMGameWorld::removeObject(object);
 	}
 	return false;

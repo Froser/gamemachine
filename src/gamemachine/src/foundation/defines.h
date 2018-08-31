@@ -20,6 +20,10 @@
 #include <atomic>
 #include "assert.h"
 
+#if GM_UNIX
+#	include <string.h> //memset
+#endif
+
 template <typename T1, typename T2>
 using Pair = std::pair<T1, T2>;
 
@@ -81,8 +85,18 @@ using GMAtomic = std::atomic<T>;
 #ifndef GM_USE_DX11
 #	define GM_USE_DX11 0
 #else
-#	if _DEBUG
-#		define D3D_DEBUG_INFO
+#	if GM_DEBUG
+#		define D3DGM_DEBUG_INFO
+#	endif
+#endif
+
+#if GM_WINDOWS
+#	ifdef DEBUG || _DEBUG
+#		define GM_DEBUG
+#	endif
+#elif GM_UNIX
+#	ifdef DEBUG
+#		define GM_DEBUG
 #	endif
 #endif
 
@@ -106,7 +120,11 @@ using GMAtomic = std::atomic<T>;
 #endif
 
 // 定义对齐结构体
-#define GM_ALIGNED_16(t) t __declspec(align(16))
+#if GM_WINDOWS
+#	define GM_ALIGNED_16(t) t __declspec(align(16))
+#else
+#	define GM_ALIGNED_16(t) t __attribute__((aligned(16)))
+#endif
 
 #if GM_LIB
 #	define GM_API
@@ -156,11 +174,12 @@ using GMAtomic = std::atomic<T>;
 #define GM_FOREACH_ENUM_CLASS(var, start, end) for (decltype(start) var = start; (gm::GMint) var < (gm::GMint) end; var = (decltype(var))(((gm::GMint)var)+1) )
 
 // 非WINDOWS下的数据类型
-#if !GM_WINDOWS && !GM_MSVC
-typedef unsigned short WORD;
-typedef unsigned long DWORD;
-GM_STATIC_ASSERT_SIZE(WORD, 2);
-GM_STATIC_ASSERT_SIZE(DWORD, 4);
+#if GM_WINDOWS
+typedef WORD GMWord;
+typedef DWORD GMDWord;
+#else
+typedef unsigned short GMWord;
+typedef unsigned int GMDWord;
 #endif
 
 #if GM_WINDOWS
@@ -193,12 +212,10 @@ typedef size_t GMsize_t;
 typedef WPARAM GMWParam;
 typedef LPARAM GMLParam;
 typedef LRESULT GMLResult;
-typedef WORD GMWord;
 #else
 typedef GMint GMWParam;
 typedef GMlong GMLParam;
 typedef GMlong GMLResult;
-typedef short GMWord;
 #endif
 
 // 类型大小静态断言，如果在某些环境下失败，应该同步typedef使得其编译通过
@@ -209,6 +226,8 @@ GM_STATIC_ASSERT_SIZE(GMint, 4);
 GM_STATIC_ASSERT_SIZE(GMuint, 4);
 GM_STATIC_ASSERT_SIZE(GMfloat, 4);
 GM_STATIC_ASSERT_SIZE(GMint64, 8);
+GM_STATIC_ASSERT_SIZE(GMWord, 2);
+GM_STATIC_ASSERT_SIZE(GMDWord, 4);
 
 // 常用函数和工具、常量
 template <typename T, typename DeleteFunc = std::default_delete<T>>
@@ -305,7 +324,7 @@ inline void GM_delete(T*& o)
 	if (o)
 	{
 		delete o;
-#if _DEBUG
+#if GM_DEBUG
 		o = nullptr;
 #endif
 	}
@@ -333,7 +352,7 @@ inline void GM_delete_array(T*& o)
 	if (o)
 	{
 		delete[] o;
-#if _DEBUG
+#if GM_DEBUG
 		o = nullptr;
 #endif
 	}
@@ -387,6 +406,7 @@ inline void memcpy_s(void* dest, size_t, const void* src, size_t size)
 	memcpy(dest, src, size);
 }
 
+#define GM_MAX_PATH 260
 #endif
 
 #endif

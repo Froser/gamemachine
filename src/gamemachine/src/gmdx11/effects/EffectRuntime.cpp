@@ -616,14 +616,14 @@ void CEffect::IncrementTimer()
     m_LocalTimer++;
 
 #ifndef _WIN64
-#if _DEBUG && FXDEBUG
+#if GM_DEBUG && FXDEBUG
     if (m_LocalTimer > g_TimerRolloverCount)
     {
         DPF(0, "Rolling over timer (current time: %d, rollover cap: %d).", m_LocalTimer, g_TimerRolloverCount);
-#else // else !(_DEBUG && FXDEBUG)
+#else // else !(GM_DEBUG && FXDEBUG)
     if (m_LocalTimer >= 0x80000000) // check to see if we've exceeded ~2 billion
     {
-#endif // _DEBUG && FXDEBUG
+#endif // GM_DEBUG && FXDEBUG
         HandleLocalTimerRollover();
 
         m_LocalTimer = 1;

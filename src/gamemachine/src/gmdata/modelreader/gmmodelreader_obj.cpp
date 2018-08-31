@@ -226,15 +226,15 @@ void GMModelReader_Obj::appendFace(const GMModelLoadSettings& settings, GMScanne
 
 		GMFloat4 f4_vertice, f4_normal, f4_texcoord;
 		{
-			auto& vec = v != INVALID ? d->positions[v - 1] : Zero<GMVec3>();
+			auto vec = v != INVALID ? d->positions[v - 1] : Zero<GMVec3>();
 			vec.loadFloat4(f4_vertice);
 		}
 		{
-			auto& vec = n != INVALID ? d->normals[n - 1] : Zero<GMVec3>();
+			auto vec = n != INVALID ? d->normals[n - 1] : Zero<GMVec3>();
 			vec.loadFloat4(f4_normal);
 		}
 		{
-			auto& vec = t != INVALID ? d->texcoords[t - 1] : Zero<GMVec2>();
+			auto vec = t != INVALID ? d->texcoords[t - 1] : Zero<GMVec2>();
 			vec.loadFloat4(f4_texcoord);
 		}
 		GMVertex vertex = {

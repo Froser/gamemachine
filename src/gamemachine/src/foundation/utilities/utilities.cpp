@@ -722,17 +722,29 @@ bool GMToolUtil::createPBRTextures(
 
 	GM.getGamePackageManager()->readFile(GMPackageIndex::Textures, metallicPath, &metallicBuf);
 	if (!GMImageReader::load(metallicBuf.buffer, metallicBuf.size, &metallicImg))
-		goto Failed;
+	{
+		GM_delete(metallicImg);
+		return false;
+	}
 
 	GM.getGamePackageManager()->readFile(GMPackageIndex::Textures, roughnessPath, &roughnessBuf);
 	if (!GMImageReader::load(roughnessBuf.buffer, roughnessBuf.size, &roughnessImg))
-		goto Failed;
+	{
+		GM_delete(metallicImg);
+		GM_delete(roughnessImg);
+		return false;
+	}
 
 	if (!useWhiteAO)
 	{
 		GM.getGamePackageManager()->readFile(GMPackageIndex::Textures, aoPath, &aoBuf);
 		if (!GMImageReader::load(aoBuf.buffer, aoBuf.size, &aoImg))
-			goto Failed;
+		{
+			GM_delete(metallicImg);
+			GM_delete(roughnessImg);
+			GM_delete(aoImg);
+			return false;
+		}
 	}
 
 	GMint mw = metallicImg->getWidth(), mh = metallicImg->getHeight();
@@ -775,12 +787,6 @@ bool GMToolUtil::createPBRTextures(
 		GM_delete(aoImg);
 		return true;
 	}
-
-Failed:
-	GM_delete(metallicImg);
-	GM_delete(roughnessImg);
-	GM_delete(aoImg);
-	return false;
 }
 
 void GMToolUtil::createCocos2DParticleSystem(const GMString& filename, OUT GMParticleSystem** particleSystem)

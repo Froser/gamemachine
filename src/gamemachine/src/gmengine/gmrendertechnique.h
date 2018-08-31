@@ -10,7 +10,7 @@ class GMRenderTechniques;
 GM_PRIVATE_OBJECT(GMRenderTechniqueManager)
 {
 	const IRenderContext* context = nullptr;
-	GMAtomic<GMRenderTechinqueID> id = 10000;
+	GMAtomic<GMRenderTechinqueID> id;
 	Set<GMRenderTechniques> renderTechniques;
 	Map<GMRenderTechinqueID, GMOwnedPtr<IShaderProgram>> shaderPrograms;
 	bool inited = false;

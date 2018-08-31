@@ -9,6 +9,7 @@
 #ifndef _XINPUT_H_
 #define _XINPUT_H_
 
+#if GM_WINDOWS
 #include <windef.h>
 
 // Current name of the DLL shipped in the same SDK as this header.
@@ -139,6 +140,7 @@ DWORD WINAPI XInputGetDSoundAudioDeviceGuids
 #ifdef __cplusplus
 }
 #endif
+#endif  //GM_WINDOWS
 
 #endif  //_XINPUT_H_
 

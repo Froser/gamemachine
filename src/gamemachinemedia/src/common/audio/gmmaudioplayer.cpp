@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmmaudioplayer.h"
-#include <al/al.h>
-#include <al/alc.h>
+#include <AL/al.h>
+#include <AL/alc.h>
 #include "decoder.h"
 #include <gmthread.h>
 #include "../src/foundation/gamemachine.h"

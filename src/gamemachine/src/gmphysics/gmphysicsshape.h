@@ -2,14 +2,13 @@
 #define __GMPHYSICSSHAPE_H__
 #include <gmcommon.h>
 #include "gmbulletforward.h"
-#include "gmphysicsshape.h"
 
 struct GMVec3;
 BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMPhysicsShape)
 {
-	GMOwnedPtr<btCollisionShape> shape;
+	btCollisionShape* shape = nullptr;
 };
 
 class GMPhysicsShape : public GMObject
@@ -22,7 +21,7 @@ private:
 	GMPhysicsShape() = default;
 
 public:
-	~GMPhysicsShape() = default;
+	~GMPhysicsShape();
 
 public:
 	void setShape(btCollisionShape* shape);

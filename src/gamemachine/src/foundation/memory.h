@@ -84,8 +84,13 @@ public:
 #define GM_ALIGNED_STRUCT_FROM(name, from) GM_ALIGNED_16(struct) name : public from
 #define GM_ALIGNED_STRUCT(name) GM_ALIGNED_STRUCT_FROM(name, gm::GMAlignmentObject)
 
+#if GM_WINDOWS
 template <typename T>
 using AlignedVector = Vector<T, AlignedAllocator<T>>;
+#else
+template <typename T>
+using AlignedVector = Vector<T>;
+#endif
 
 END_NS
 #endif

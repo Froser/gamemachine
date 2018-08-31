@@ -202,7 +202,7 @@ protected:
 	E* m_ptr;
 };
 
-#endif
 END_NS
+#endif //GM_WINDOWS
 
 #endif

@@ -1,6 +1,10 @@
 ﻿#include "stdafx.h"
 #include "gmstring.h"
 
+#if GM_UNIX
+#include <wctype.h> //iswspace
+#endif
+
 GMsize_t GMString::npos = std::string::npos;
 
 namespace
@@ -171,25 +175,19 @@ GMString::GMString(GMwchar ch)
 GMString::GMString(const GMfloat f)
 {
 	D_STR(d);
-#if GM_MSVC
 	d->data = std::to_wstring(f);
-#else
-	GMwchar* chs = alloc_convertMultiBytesToWideChar(std::to_string(f).c_str());
-	d->data = chs;
-	free_wideChar(chs);
-#endif
 }
 
 GMString::GMString(const GMint i)
 {
 	D_STR(d);
-#if GM_MSVC
 	d->data = std::to_wstring(i);
-#else
-	GMwchar* chs = alloc_convertMultiBytesToWideChar(std::to_string(i).c_str());
-	d->data = chs;
-	free_wideChar(chs);
-#endif
+}
+
+GMString::GMString(const GMlong i)
+{
+	D_STR(d);
+	d->data = std::to_wstring(i);
 }
 
 char GMString::operator[](GMsize_t i) const

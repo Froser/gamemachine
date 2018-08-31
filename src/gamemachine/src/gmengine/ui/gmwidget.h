@@ -111,7 +111,7 @@ GM_PRIVATE_OBJECT(GMWidgetResourceManager)
 	GMint backBufferHeight = 0;
 	Vector<GMCanvasTextureInfo> textureResources;
 	GMTextureAsset whiteTexture;
-	GMAtomic<GMlong> textureId = 0;
+	GMAtomic<GMlong> textureId;
 	GMlong whiteTextureId = 0;
 };
 

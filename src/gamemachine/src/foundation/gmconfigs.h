@@ -100,16 +100,8 @@ struct GMConfigWrapperBase
 {
 	GMConfigWrapperBase() = default;
 	GMConfigWrapperBase(const GMConfig& vm, const GMString guids[]) : m_vm(&vm), m_guids(guids) {}
-	const GMVariant& get(StateType state) const
-	{
-		return const_cast<GMConfig&>(*m_vm)[m_guids[(GMuint)state]];
-	}
-
-	void set(StateType state, const GMVariant& variant)
-	{
-		const_cast<GMConfig&>(*m_vm)[m_guids[(GMuint)state]] = variant;
-	}
-
+	const GMVariant& get(StateType state) const;
+	void set(StateType state, const GMVariant& variant);
 	bool isEmpty() { return !m_vm; }
 
 private:
@@ -179,6 +171,18 @@ public:
 private:
 	void init();
 };
+
+template <typename StateType>
+const GMVariant& GMConfigWrapperBase<StateType>::get(StateType state) const
+{
+	return const_cast<GMConfig&>(*m_vm)[m_guids[(GMuint)state]];
+}
+
+template <typename StateType>
+void GMConfigWrapperBase<StateType>::set(StateType state, const GMVariant& variant)
+{
+	const_cast<GMConfig&>(*m_vm)[m_guids[(GMuint)state]] = variant;
+}
 
 END_NS
 #endif

@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmmaudioreader_mp3.h"
-#include <al/al.h>
+#include <AL/al.h>
 #include "mad.h"
 #include "common/utilities/gmmstream.h"
 #include "gmmaudioreader_stream.h"
@@ -177,7 +177,7 @@ private: // MP3解码器
 	{
 		if (!d->fmtCreated)
 		{
-			d->baseData->fileInfo.waveFormatExHeader.cbSize = sizeof(WAVEFORMATEX);
+			d->baseData->fileInfo.waveFormatExHeader.cbSize = sizeof(gm::GMWaveFormatEx);
 			d->baseData->fileInfo.waveFormatExHeader.nChannels = pcm->channels;
 			d->baseData->fileInfo.waveFormatExHeader.nBlockAlign = 4;
 			d->baseData->fileInfo.waveFormatExHeader.wFormatTag = 1;

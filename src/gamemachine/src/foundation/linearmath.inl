@@ -267,7 +267,7 @@ inline GMVec2 operator-(const GMVec2& V1, const GMVec2& V2)
 	V.v_ = DirectX::operator-(V1.v_, V2.v_);
 #else
 	V.v_ = V1.v_ - V2.v_;
-#endif;
+#endif
 	return V;
 }
 
@@ -330,7 +330,7 @@ inline GMVec3& operator*=(GMVec3& V1, gm::GMfloat S)
 	DirectX::operator*=(V1.v_, S);
 #else
 	V1 = V1 * S;
-#endif;
+#endif
 	return V1;
 }
 
@@ -373,7 +373,7 @@ inline GMVec4 operator+(const GMVec4& V1, const GMVec4& V2)
 	V.v_ = DirectX::operator+(V1.v_, V2.v_);
 #else
 	V.v_ = V1.v_ + V2.v_;
-#endif;
+#endif
 	return V;
 }
 
@@ -405,7 +405,7 @@ inline bool operator==(const GMVec2& V1, const GMVec2& V2)
 	return DirectX::XMVector2Equal(V1.v_, V2.v_);
 #else
 	return V1.v_ == V2.v_;
-#endif;
+#endif
 }
 
 inline bool operator==(const GMVec3& V1, const GMVec3& V2)
@@ -414,7 +414,7 @@ inline bool operator==(const GMVec3& V1, const GMVec3& V2)
 	return DirectX::XMVector2Equal(V1.v_, V2.v_);
 #else
 	return V1.v_ == V2.v_;
-#endif;
+#endif
 }
 
 inline bool operator==(const GMVec4& V1, const GMVec4& V2)
@@ -423,7 +423,7 @@ inline bool operator==(const GMVec4& V1, const GMVec4& V2)
 	return DirectX::XMVector4Equal(V1.v_, V2.v_);
 #else
 	return V1.v_ == V2.v_;
-#endif;
+#endif
 }
 
 inline bool operator==(const GMQuat& Q1, const GMQuat& Q2)
@@ -432,7 +432,7 @@ inline bool operator==(const GMQuat& Q1, const GMQuat& Q2)
 	return DirectX::XMVector4Equal(Q1.v_, Q2.v_);
 #else
 	return Q1.v_ == Q2.v_;
-#endif;
+#endif
 }
 
 inline GMMat4 operator*(const GMMat4& M1, const GMMat4& M2)

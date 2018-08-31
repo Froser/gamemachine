@@ -45,7 +45,7 @@ void cdecl D3DXDebugPrintf(UINT lvl, LPCSTR szFormat, ...) {}
 // D3DXASSERT
 //
 
-#ifdef _DEBUG
+#ifdef GM_DEBUG
 
 int WINAPI D3DXDebugAssert(LPCSTR szFile, int nLine, LPCSTR szCondition)
 {

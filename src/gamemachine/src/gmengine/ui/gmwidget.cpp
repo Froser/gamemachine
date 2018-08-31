@@ -151,6 +151,7 @@ GMWidgetResourceManager::GMWidgetResourceManager(const IRenderContext* context)
 {
 	D(d);
 	d->context = context;
+	d->textureId = 0;
 	d->textObject = gm_makeOwnedPtr<GMTextGameObject>(context->getWindow()->getRenderRect());
 	d->textObject->setContext(context);
 

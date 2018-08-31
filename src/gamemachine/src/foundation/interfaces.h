@@ -7,6 +7,21 @@
 struct GMFloat4;
 struct GMMat4;
 
+// Audio
+#ifndef _WAVEFORMATEX_
+#define _WAVEFORMATEX_
+typedef struct tWAVEFORMATEX
+{
+	GMWord    wFormatTag;
+	GMWord    nChannels;
+	GMDWord   nSamplesPerSec;
+	GMDWord   nAvgBytesPerSec;
+	GMWord    nBlockAlign;
+	GMWord    wBitsPerSample;
+	GMWord    cbSize;
+} WAVEFORMATEX;
+#endif /* _WAVEFORMATEX_ */
+
 BEGIN_NS
 
 // 前置声明
@@ -174,8 +189,8 @@ struct GMWindowAttributes
 {
 	GMWindowHandle hwndParent = NULL;
 	GMString windowName = L"Default GameMachine Main Window";
-	DWORD dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME;
-	DWORD dwExStyle = NULL;
+	GMDWord dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME;
+	GMDWord dwExStyle = NULL;
 	RECT rc = { 0, 0, 1024, 768 };
 	HMENU hMenu = NULL;
 	GMint samples = 8;
@@ -187,6 +202,7 @@ struct GMWindowAttributes
 };
 typedef GMuint GMUIInstance;
 typedef GMuint GMWindowHandle;
+typedef GMuint GMInstance;
 #endif
 
 struct GMCursorDesc
@@ -560,20 +576,7 @@ GM_INTERFACE(IFactory)
 	virtual void createShaderPrograms(const IRenderContext* context, const GMRenderTechniqueManager& manager, REF Vector<IShaderProgram*>* out) = 0;
 };
 
-// Audio
-#ifndef _WAVEFORMATEX_
-#define _WAVEFORMATEX_
-typedef struct tWAVEFORMATEX
-{
-	WORD    wFormatTag;
-	WORD    nChannels;
-	DWORD   nSamplesPerSec;
-	DWORD   nAvgBytesPerSec;
-	WORD    nBlockAlign;
-	WORD    wBitsPerSample;
-	WORD    cbSize;
-} WAVEFORMATEX;
-#endif /* _WAVEFORMATEX_ */
+typedef WAVEFORMATEX GMWaveFormatEx;
 
 struct GMAudioFileInfo
 {
@@ -581,7 +584,7 @@ struct GMAudioFileInfo
 	const void* data;
 	GMsize_t size;
 	GMint frequency;
-	WAVEFORMATEX waveFormatExHeader;
+	GMWaveFormatEx waveFormatExHeader;
 };
 
 GM_INTERFACE(IAudioStream)
@@ -620,4 +623,5 @@ GM_INTERFACE(IAudioReader)
 };
 
 END_NS
+
 #endif

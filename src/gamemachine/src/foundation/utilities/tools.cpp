@@ -471,16 +471,16 @@ GMBuffer GMConvertion::toBase64(const GMBuffer& buffer)
 	while (i < buffer.size)
 	{
 		int chunk = 0;
-		chunk |= int(unsigned char(buffer.buffer[i++])) << 16;
+		chunk |= (int)((unsigned char)(buffer.buffer[i++])) << 16;
 		if (i == buffer.size)
 		{
 			padlen = 2;
 		}
 		else
 		{
-			chunk |= int(unsigned char(buffer.buffer[i++])) << 8;
+			chunk |= (int)((unsigned char)(buffer.buffer[i++])) << 8;
 			if (i == buffer.size) padlen = 1;
-			else chunk |= int(unsigned char(buffer.buffer[i++]));
+			else chunk |= (int)((unsigned char)(buffer.buffer[i++]));
 		}
 
 		int j = (chunk & 0x00fc0000) >> 18;

@@ -28,6 +28,7 @@ bool GMRenderTechniqueManager::isEmpty()
 GMRenderTechniqueManager::GMRenderTechniqueManager(const IRenderContext* context)
 {
 	D(d);
+	d->id = 10000l;
 	d->context = context;
 }
 

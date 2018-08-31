@@ -542,7 +542,7 @@ GMVariant GMLua::getTop()
 	D(d);
 	GM_CHECK_LUA_STACK_BALANCE(0);
 	if (lua_isinteger(L, -1))
-		return lua_tointeger(L, -1);
+		return static_cast<GMint>(lua_tointeger(L, -1));
 	if (lua_isnumber(L, -1))
 		return lua_tonumber(L, -1);
 	if (lua_isstring(L, -1))

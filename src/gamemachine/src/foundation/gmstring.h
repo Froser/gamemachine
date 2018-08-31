@@ -106,6 +106,8 @@ public:
 	*/
 	explicit GMString(const GMint i);
 
+	explicit GMString(const GMlong i);
+
 public:
 	//! 判断此字符串和另外的字符串是否完全一样。
 	/*!
@@ -403,7 +405,7 @@ struct GMStringHashFunctor
 	{
 		if (str.needRehash())
 		{
-			GMsize_t hashCode = std::hash_value(str.toStdWString());
+			GMsize_t hashCode = std::hash<std::wstring>()(str.toStdWString());
 			str.setHashCode(hashCode);
 			return hashCode;
 		}

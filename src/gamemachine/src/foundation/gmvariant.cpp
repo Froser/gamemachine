@@ -40,7 +40,7 @@ void GMVariant::makeOwned(const T& obj)
 template <GMVariant::Type T>
 void GMVariant::copyOwned(const GMVariant& rhs)
 {
-	typedef EnumTypeMap<T>::StructType RealType;
+	typedef typename EnumTypeMap<T>::StructType RealType;
 	m_data.p = new RealType(rhs.get<RealType>(rhs.m_data.p));
 }
 

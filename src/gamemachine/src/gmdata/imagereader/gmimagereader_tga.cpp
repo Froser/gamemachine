@@ -63,18 +63,18 @@ namespace {
 
 #define TGA_ERRORS 8  /* total number of error codes */
 
-	/* text strings corresponding to the error codes */
-	static char*
-		tga_error_strings[] = {
-			"Success",
-			"Error",
-			"Out of memory",
-			"Failed to open file",
-			"Seek failed",
-			"Read failed",
-			"Write failed",
-			"Unknown sub-format"
-	};
+/* text strings corresponding to the error codes */
+static const char*
+	tga_error_strings[] = {
+		"Success",
+		"Error",
+		"Out of memory",
+		"Failed to open file",
+		"Seek failed",
+		"Read failed",
+		"Write failed",
+		"Unknown sub-format"
+};
 
 
 #if SIZEOF_UNSIGNED_INT == 4
@@ -151,7 +151,7 @@ namespace {
 
 	int TGAReadImage __P((TGA *tga, TGAData *data));
 
-	char* TGAStrError __P((tuint8 code));
+	const char* TGAStrError __P((tuint8 code));
 
 	size_t __TGASeek __P((TGA *tga, size_t off, int whence));
 
@@ -176,7 +176,7 @@ if((tga) && (tga)->error) (tga)->error(tga, code);\
 gm_error(gm_dbg_wrap("Libtga:{0}"), TGAStrError(code));\
 if(tga) (tga)->last = code\
 
-	char* TGAStrError(tuint8 code)
+	const char* TGAStrError(tuint8 code)
 	{
 		if (code >= TGA_ERRORS) code = TGA_ERROR;
 		return tga_error_strings[code];

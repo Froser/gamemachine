@@ -21,6 +21,14 @@ namespace
 			*d = GM.getRunningStates();
 		}
 
+		GMGameMachineRunningStatesProxy& operator= (GMGameMachineRunningStatesProxy&& p) GM_NOEXCEPT
+		{
+			D(d);
+			D_OF(dp, &p);
+			*d = *dp;
+			return *this;
+		}
+
 	protected:
 		virtual bool registerMeta() override
 		{
@@ -48,8 +56,10 @@ namespace
 
 	LUA_API GMLuaFunctionReturn getRunningStates(GMLuaCoreState* L)
 	{
+		static GMGameMachineRunningStatesProxy proxy;
+		proxy = GMGameMachineRunningStatesProxy();
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".getRunningStates");
-		return GMReturnValues (L, GMVariant(GMGameMachineRunningStatesProxy()));
+		return GMReturnValues (L, GMVariant(proxy));
 	}
 	// {{END META FUNCTION}}
 

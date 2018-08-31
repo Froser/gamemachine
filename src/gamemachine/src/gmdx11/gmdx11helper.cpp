@@ -19,8 +19,8 @@ IShaderProgram* GMDx11Helper::loadEffectShader(
 		return nullptr;
 
 	UINT flag = D3DCOMPILE_ENABLE_STRICTNESS;
-#if _DEBUG
-	flag |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+#if GM_DEBUG
+	flag |= D3DCOMPILEGM_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 #endif
 
 	std::string stdCode = code.toStdString();

@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include <gl/glew.h>
+#include <GL/glew.h>
 #include "gmglframebuffer.h"
 #include "gmgltexture.h"
 #include "gmengine/gmgraphicengine.h"

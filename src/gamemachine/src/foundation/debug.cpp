@@ -21,24 +21,24 @@ namespace
 
 void GMDebugger::info(const GMString& string, const std::initializer_list<GMString>& arguments)
 {
-	print(string, L"info", &(IDebugOutput::info), arguments);
+	print(string, L"info", &IDebugOutput::info, arguments);
 }
 
 void GMDebugger::warning(const GMString& string, const std::initializer_list<GMString>& arguments)
 {
-	print(string, L"warning", &(IDebugOutput::warning), arguments);
+	print(string, L"warning", &IDebugOutput::warning, arguments);
 }
 
 void GMDebugger::debug(const GMString& string, const std::initializer_list<GMString>& arguments)
 {
-#if _DEBUG
-	print(string, L"debug", &(IDebugOutput::debug), arguments);
+#if GM_DEBUG
+	print(string, L"debug", &IDebugOutput::debug, arguments);
 #endif
 }
 
 void GMDebugger::error(const GMString& string, const std::initializer_list<GMString>& arguments)
 {
-	print(string, L"error", &(IDebugOutput::error), arguments);
+	print(string, L"error", &IDebugOutput::error, arguments);
 }
 
 void GMDebugger::print(

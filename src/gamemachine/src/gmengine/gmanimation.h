@@ -70,8 +70,7 @@ public:
 		setTargetObjects(targetGameObjects...);
 	}
 
-	template <>
-	GMAnimation(void) = default;
+	GMAnimation() = default;
 
 	~GMAnimation();
 

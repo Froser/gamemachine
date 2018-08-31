@@ -42,7 +42,7 @@ void GMDx11Light::activateLight(GMuint index, ITechnique* technique)
 		GM_ASSERT(d->effect);
 	}
 
-#if _DEBUG
+#if GM_DEBUG
 	GMDx11Technique* dxTechnique = gm_cast<GMDx11Technique*>(technique);
 	GM_ASSERT(d->effect == dxTechnique->getEffect());
 #endif

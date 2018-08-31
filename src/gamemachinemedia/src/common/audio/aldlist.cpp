@@ -24,8 +24,9 @@
 
 #include "stdafx.h"
 #include "aldlist.h"
-#include <al/alc.h>
-#include <al/al.h>
+#include <AL/alc.h>
+#include <AL/al.h>
+#include <gmstring.h>
 
 /*
  * Init call
@@ -179,7 +180,7 @@ bool ALDeviceList::IsExtensionSupported(int index, char *szExtName)
 
 	if (index < GetNumDevices()) {
 		for (unsigned int i = 0; i < vDeviceInfo[index].pvstrExtensions.size(); i++) {
-			if (!_stricmp(vDeviceInfo[index].pvstrExtensions.at(i).c_str(), szExtName)) {
+			if (gm::GMString::stringEquals(vDeviceInfo[index].pvstrExtensions.at(i).c_str(), szExtName)) {
 				bReturn = true;
 				break;
 			}
@@ -235,7 +236,7 @@ void ALDeviceList::FilterDevicesExtension(char *szExtName)
 	for (unsigned int i = 0; i < vDeviceInfo.size(); i++) {
 		bFound = false;
 		for (unsigned int j = 0; j < vDeviceInfo[i].pvstrExtensions.size(); j++) {
-			if (!_stricmp(vDeviceInfo[i].pvstrExtensions.at(j).c_str(), szExtName)) {
+			if (gm::GMString::stringEquals(vDeviceInfo[i].pvstrExtensions.at(j).c_str(), szExtName)) {
 				bFound = true;
 				break;
 			}
