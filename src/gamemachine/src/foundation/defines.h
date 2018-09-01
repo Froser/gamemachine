@@ -405,9 +405,13 @@ inline void memcpy_s(void* dest, size_t, const void* src, size_t size)
 	memcpy(dest, src, size);
 }
 
-#define GM_MAX_PATH 260
+#	define GM_MAX_PATH 260
+#	define GM_CDECL __attribute__((cdecl))
+#	define GM_STDCALL __attribute__((stdcall))
 #else
-#define GM_MAX_PATH MAX_PATH
+#	define GM_CDECL __cdecl
+#	define GM_STDCALL __stdcall
+#	define GM_MAX_PATH MAX_PATH
 #endif
 
 #endif

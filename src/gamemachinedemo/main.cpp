@@ -1,5 +1,7 @@
 ﻿#include <iostream>
+#if GM_WINDOWS
 #include <windows.h>
+#endif
 #include <fstream>
 #include <gamemachine.h>
 #include <gmm.h>
@@ -22,6 +24,7 @@ gm::GMRenderEnvironment GetRenderEnv()
 	return s_env;
 }
 
+#if GM_WINDOWS
 int WINAPI wWinMain(
 	HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
@@ -84,3 +87,4 @@ int WINAPI wWinMain(
 	GM.startGameMachine();
 	return 0;
 }
+#endif

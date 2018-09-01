@@ -114,7 +114,7 @@ void DemoHandler::onDeactivate()
 	noShadow.type = gm::GMShadowSourceDesc::NoShadow;
 	d->engine->setShadowSource(noShadow);
 
-	gm::GMRenderConfig& config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+	gm::GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
 	config.set(gm::GMRenderConfigs::HDR_Bool, false);
 
 	d->parentDemonstrationWorld->getMainWidget()->setVisible(true);
@@ -550,7 +550,7 @@ void DemonstrationWorld::resetProjectionAndEye()
 void DemostrationEntrance::init(const gm::IRenderContext* context)
 {
 	D(d);
-	auto& rc = context->getWindow()->getRenderRect();
+	auto rc = context->getWindow()->getRenderRect();
 	gm::GMGamePackage* pk = GM.getGamePackageManager();
 
 #ifdef _DEBUG

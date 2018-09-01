@@ -11,6 +11,7 @@
 
 #if GM_WINDOWS
 #include <windef.h>
+#endif
 
 // Current name of the DLL shipped in the same SDK as this header.
 // The name reflects the current version
@@ -67,7 +68,7 @@
 //
 #define XINPUT_FLAG_GAMEPAD             0x00000001
 
-
+#if GM_WINDOWS
 //
 // Structures used by XInput APIs
 //
@@ -139,7 +140,8 @@ DWORD WINAPI XInputGetDSoundAudioDeviceGuids
 
 #ifdef __cplusplus
 }
-#endif
+#endif // __cpluscplus
+
 #endif  //GM_WINDOWS
 
 #endif  //_XINPUT_H_

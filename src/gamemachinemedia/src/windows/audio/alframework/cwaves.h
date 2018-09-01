@@ -87,7 +87,7 @@ typedef struct
 	unsigned long	ulDataOffset;
 } WAVEFILEINFO, *LPWAVEFILEINFO;
 
-typedef int (__cdecl *PFNALGETENUMVALUE)( const char *szEnumName );
+typedef int (GM_CDECL *PFNALGETENUMVALUE)( const char *szEnumName );
 typedef int	WAVEID;
 
 class CWaves  

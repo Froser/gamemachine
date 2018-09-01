@@ -204,7 +204,7 @@ private: // MP3解码器
 		}
 	}
 
-	typedef int(__cdecl *PFNALGETENUMVALUE)(const char *szEnumName);
+	typedef int(GM_CDECL *PFNALGETENUMVALUE)(const char *szEnumName);
 
 	static ALenum getFileFormat(Data* d, PFNALGETENUMVALUE pfnGetEnumValue)
 	{

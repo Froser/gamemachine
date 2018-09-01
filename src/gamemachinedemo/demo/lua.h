@@ -18,8 +18,6 @@ class Demo_Lua : public DemoHandler
 {
 	GM_DECLARE_PRIVATE_AND_BASE(Demo_Lua, DemoHandler);
 
-	typedef DemoHandler Base;
-
 public:
 	using Base::Base;
 

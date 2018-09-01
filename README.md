@@ -10,3 +10,9 @@
 ATTENTION:
 目前只能在Windows平台通过编译，其他平台暂时未支持；
 只能使用VS2015及以上的版本编译
+
+Linux:
+sudo apt-get install build-essential
+sudo apt-get install libgl1-mesa-dev
+sudo apt-get install libglu-dev
+

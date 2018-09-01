@@ -1,6 +1,10 @@
 ﻿#include "stdafx.h"
 #include "terrain.h"
 
+#ifndef WHEEL_DELTA
+#define WHEEL_DELTA 120
+#endif
+
 void Demo_Terrain::init()
 {
 	D(d);
