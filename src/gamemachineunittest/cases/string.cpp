@@ -59,14 +59,14 @@ void cases::String::addToUnitTest(UnitTest& ut)
 
 	ut.addTestCase("GMString::stringCopy", []() {
 		gm::GMwchar dest[20];
-		gm::GMwchar* src = L"gamemachine";
+		const gm::GMwchar* src = L"gamemachine";
 		gm::GMString::stringCopy(dest, src);
 		return gm::GMString(dest) == L"gamemachine";
 	});
 
 	ut.addTestCase("GMString::stringCat", []() {
 		gm::GMwchar dest[20] = { L'g', L'a', L'm', L'e', 0 };
-		gm::GMwchar* src = L"machine";
+		const gm::GMwchar* src = L"machine";
 		gm::GMString::stringCat(dest, src);
 		return gm::GMString(dest) == L"gamemachine";
 	});

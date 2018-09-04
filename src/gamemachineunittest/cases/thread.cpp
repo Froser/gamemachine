@@ -129,7 +129,9 @@ void cases::Thread::addToUnitTest(UnitTest& ut)
 
 	ut.addTestCase("Async", []() {
 		bool finished = false;
+#if GM_WINDOWS
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+#endif
 		gm::GMAsyncCallback cb = [&finished](gm::GMAsyncResult* ar) {
 			std::cout << "工作线程已经完成。" << std::endl;
 			finished = ar->isComplete();

@@ -1,5 +1,5 @@
 project (gamemachinemedia)
-gm_init_solution()
+gm_begin_project(${PROJECT_NAME})
 
 include_directories(
 		./
@@ -67,3 +67,4 @@ endif(MSVC)
 
 target_link_libraries(${PROJECT_NAME} libmad)
 target_link_libraries(${PROJECT_NAME} OpenAL)
+gm_end_project(${PROJECT_NAME})

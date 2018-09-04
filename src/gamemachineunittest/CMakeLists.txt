@@ -1,7 +1,7 @@
 ﻿CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
 
-project (gamemachineunittest)
-gm_init_solution()
+project (gamemachineunittest C CXX)
+gm_begin_project(${PROJECT_NAME})
 
 include_directories(
 		../3rdparty/glm-0.9.9-a2
@@ -52,6 +52,11 @@ add_executable(${PROJECT_NAME}
 		${SOURCES}
 	)
 
+		set(THREADS_PREFER_PTHREAD_FLAG ON)
+		find_package(Threads REQUIRED)
+		message("GameMachine: pthread Linked.")
+		target_link_libraries(${PROJECT_NAME} Threads::Threads)
+
 if(MSVC)
 	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE" ) 
 endif(MSVC)
@@ -59,3 +64,4 @@ endif(MSVC)
 gm_add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME} gamemachine)
+gm_end_project(${PROJECT_NAME})

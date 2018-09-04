@@ -10,7 +10,7 @@ void cases::Variant::addToUnitTest(UnitTest& ut)
 	});
 
 	ut.addTestCase("Construct i64", []() {
-		gm::GMVariant v_i64(100ll);
+		gm::GMVariant v_i64((gm::GMint64)100ll);
 		return v_i64.toInt64() == 100ll;
 	});
 

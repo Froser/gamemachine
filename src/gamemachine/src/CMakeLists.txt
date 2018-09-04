@@ -1,3 +1,5 @@
+gm_begin_project(${PROJECT_NAME})
+
 include_directories(
 		./
 		../include
@@ -11,8 +13,6 @@ include_directories(
 		../../3rdparty/glm-0.9.9-a2
 		../../3rdparty/bullet3-2.87/src
 	)
-
-gm_init_solution()
 
 set(SOURCES
 		stdafx.cpp
@@ -226,6 +226,12 @@ set(WIN32_SOURCES
 	)
 
 set(UNIX_SOURCES
+		foundation/platforms/unix/check.h
+		foundation/platforms/unix/thread.cpp
+		foundation/platforms/unix/timer.cpp
+		foundation/platforms/unix/gamemachine.cpp
+		foundation/platforms/unix/screen.cpp
+		foundation/platforms/unix/path.cpp
 		foundation/platforms/unix/window/gmwindow.cpp
 		foundation/platforms/unix/window/gmwindow_opengl.cpp
 		foundation/platforms/unix/window/gminput.h
@@ -303,7 +309,6 @@ if(MSVC)
 	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/WX" )
 endif(MSVC)
 
-gm_link_dependencies(${PROJECT_NAME})
 gm_link_bullet3()
 target_link_libraries(${PROJECT_NAME} glew_s)
 target_link_libraries(${PROJECT_NAME} lua)
@@ -311,3 +316,5 @@ target_link_libraries(${PROJECT_NAME} png_static)
 target_link_libraries(${PROJECT_NAME} zlibstatic)
 target_link_libraries(${PROJECT_NAME} libjpeg)
 target_link_libraries(${PROJECT_NAME} freetype)
+
+gm_end_project(${PROJECT_NAME})

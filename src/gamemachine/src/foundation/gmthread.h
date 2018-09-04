@@ -3,11 +3,21 @@
 #include <gmcommon.h>
 #include "utilities/tools.h"
 #include <mutex>
+#if GM_UNIX
+#include <pthread.h>
+#endif
 
 BEGIN_NS
 
+#if GM_WINDOWS
 typedef void* GMThreadHandle;
 typedef GMlong GMThreadId;
+#elif GM_UNIX
+// USE pthread
+typedef pthread_t GMThreadHandle;
+typedef pthread_t GMThreadId;
+typedef pthread_attr_t GMThreadAttr;
+#endif
 
 enum class ThreadState
 {
@@ -39,9 +49,12 @@ struct IThreadCallback
 GM_PRIVATE_OBJECT(GMThread)
 {
 	IThreadCallback* callback = nullptr;
-	GMThreadHandle handle;
+	GMThreadHandle handle = 0;
 	ThreadState state;
 	ThreadPriority priority = ThreadPriority::Normal;
+#if GM_UNIX
+	GMThreadAttr attr;
+#endif
 	bool done = false;
 };
 
@@ -161,6 +174,9 @@ GM_PRIVATE_OBJECT(GMMutex)
 {
 #if GM_WINDOWS
 	HANDLE mutex;
+#endif
+#if GM_UNIX
+	pthread_mutex_t mutex;
 #endif
 };
 

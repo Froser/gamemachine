@@ -9,7 +9,7 @@
 #include "cases/lua.h"
 #include "cases/base64.h"
 
-int main(int argc, char* argv)
+int main(int argc, char* argv[])
 {
 	UnitTest unitTest;
 

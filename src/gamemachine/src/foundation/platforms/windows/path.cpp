@@ -3,10 +3,8 @@
 #include <gmtools.h>
 #include <io.h>
 #include <direct.h>
+#include <shlobj.h>
 
-#if _MSC_VER
-#	include <shlobj.h>
-#else
 //TODO 这里在其他系统下存在问题
 BOOL SHGetSpecialFolderPathA(HWND hwnd, LPSTR pszPath, int csidl, BOOL fCreate);
 BOOL SHGetSpecialFolderPathW(HWND hwnd, LPWSTR pszPath, int csidl, BOOL fCreate);

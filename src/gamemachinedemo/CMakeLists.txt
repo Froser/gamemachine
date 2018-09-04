@@ -1,7 +1,7 @@
 ﻿CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
 
-project (gamemachinedemo)
-gm_init_solution()
+project (gamemachinedemo C CXX)
+gm_begin_project(${PROJECT_NAME})
 
 include_directories(
 		../3rdparty/glm-0.9.9-a2
@@ -74,3 +74,5 @@ gm_add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME} gamemachine)
 target_link_libraries(${PROJECT_NAME} gamemachinemedia)
+
+gm_end_project(${PROJECT_NAME})

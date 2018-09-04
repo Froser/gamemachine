@@ -11,6 +11,9 @@ namespace
 		SetConsoleTextAttribute(handle, foreColor);
 	}
 #else
+#	define FOREGROUND_RED 0
+#	define FOREGROUND_GREEN 0
+#	define FOREGROUND_BLUE 0
 	void SetConsoleColor(unsigned short)
 	{
 		// Nothing
