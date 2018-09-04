@@ -197,12 +197,20 @@ struct GMWindowAttributes
 	GMInstance instance;
 };
 #else
+typedef GMint GMUIInstance;
+typedef GMint GMWindowHandle;
+typedef GMint GMInstance;
 struct GMWindowAttributes
 {
+	GMWindowHandle hwndParent = 0;
+	GMString windowName = L"Default GameMachine Main Window";
+	GMulong dwStyle = 0;
+	GMulong dwExStyle = 0;
+	GMRect rc = { 0, 0, 1024, 768 };
+	GMint hMenu = 0;
+	GMint samples = 8;
+	GMInstance instance;
 };
-typedef GMuint GMUIInstance;
-typedef GMuint GMWindowHandle;
-typedef GMuint GMInstance;
 #endif
 
 struct GMCursorDesc

@@ -70,7 +70,7 @@ public:
 
 public:
 	virtual void msgProc(const GMMessage& message) override;
-	virtual void onWindowCreated(const GMWindowAttributes& wndAttrs, GMWindowHandle handle) override;
+	virtual void onWindowCreated(const GMWindowAttributes& wndAttrs) override;
 	virtual IGraphicEngine* getGraphicEngine() override;
 	virtual const IRenderContext* getContext() override;
 
@@ -118,11 +118,9 @@ GMWindow_OpenGL::~GMWindow_OpenGL()
 	dispose();
 }
 
-void GMWindow_OpenGL::onWindowCreated(const GMWindowAttributes& wndAttrs, GMWindowHandle handle)
+void GMWindow_OpenGL::onWindowCreated(const GMWindowAttributes& wndAttrs)
 {
 	D(d);
-	GM_ASSERT(handle);
-
 	gm::GMWindowAttributes attrs = wndAttrs;
 	attrs.dwExStyle |= WS_EX_CLIENTEDGE;
 	attrs.dwStyle |= WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_BORDER | WS_CAPTION;

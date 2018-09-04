@@ -169,7 +169,7 @@ public:
 
 enum class GMIlluminationModel
 {
-	None = 0,
+	Invalid = 0,
 	Phong,
 	CookTorranceBRDF,
 };

@@ -116,6 +116,10 @@ GMWindowProcHandler GMWindow::getProcHandler()
 	return &WndProc;
 }
 
+GMWindow::GMWindow()
+{
+}
+
 GMWindow::~GMWindow()
 {
 	D(d);
@@ -248,7 +252,7 @@ GMWindowHandle GMWindow::create(const GMWindowAttributes& wndAttrs)
 		this);
 	GM_ASSERT(hwnd);
 
-	onWindowCreated(wndAttrs, hwnd);
+	onWindowCreated(wndAttrs);
 
 	d->windowStates.renderRect = getRenderRect();
 	return hwnd;

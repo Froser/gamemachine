@@ -5,7 +5,7 @@ BEGIN_NS
 
 enum class GameMachineMessageType
 {
-	None,
+	Invalid,
 	QuitGameMachine,
 	CrashDown,
 	FrameUpdate,
@@ -16,13 +16,13 @@ enum class GameMachineMessageType
 
 struct GMMessage
 {
-	GMMessage(GameMachineMessageType t = GameMachineMessageType::None, GMint tp = 0, GMint v = 0, void* objPtr = nullptr)
+	GMMessage(GameMachineMessageType t = GameMachineMessageType::Invalid, GMint tp = 0, GMint v = 0, void* objPtr = nullptr)
 		: msgType(t)
 		, type(tp)
 		, value(v)
 	{}
 
-	GameMachineMessageType msgType = GameMachineMessageType::None;
+	GameMachineMessageType msgType = GameMachineMessageType::Invalid;
 	GMint type = 0;
 	GMint value = 0;
 	void* objPtr = 0;

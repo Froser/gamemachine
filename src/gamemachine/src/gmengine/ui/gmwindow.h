@@ -45,6 +45,7 @@ class GMWindow : public GMObject, public IWindow
 	GM_DECLARE_PRIVATE(GMWindow)
 
 public:
+	GMWindow();
 	~GMWindow();
 
 public:
@@ -80,7 +81,7 @@ public:
 	virtual GMWindowProcHandler getProcHandler();
 	virtual bool handleSystemEvent(GMSystemEvent* event, REF GMLResult& result);
 	virtual const GMwchar* getWindowClassName() { return L"GameMachine Window"; }
-	virtual void onWindowCreated(const GMWindowAttributes& wndAttrs, GMWindowHandle handle) {}
+	virtual void onWindowCreated(const GMWindowAttributes& wndAttrs) {}
 
 private:
 	void destroyWindow();

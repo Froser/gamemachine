@@ -225,6 +225,13 @@ set(WIN32_SOURCES
 		foundation/platforms/windows/window/gminput.cpp
 	)
 
+set(UNIX_SOURCES
+		foundation/platforms/unix/window/gmwindow.cpp
+		foundation/platforms/unix/window/gmwindow_opengl.cpp
+		foundation/platforms/unix/window/gminput.h
+		foundation/platforms/unix/window/gminput.cpp
+	)
+
 set(WIN32_DX11_SOURCES
 		foundation/utilities/gmcom.h
 		foundation/platforms/windows/window/gmwindow_dx11.cpp
@@ -275,6 +282,10 @@ set(WIN32_DX11_SOURCES
 if(WIN32)
 	list(APPEND SOURCES ${WIN32_SOURCES})
 endif(WIN32)
+
+if(UNIX)
+	list(APPEND SOURCES ${UNIX_SOURCES})
+endif(UNIX)
 
 if(GM_USE_DX11)
 	list(APPEND SOURCES ${WIN32_DX11_SOURCES})

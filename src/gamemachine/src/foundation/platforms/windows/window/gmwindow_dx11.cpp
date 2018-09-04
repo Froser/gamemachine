@@ -46,7 +46,7 @@ public:
 public:
 	virtual void msgProc(const GMMessage& message) override;
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
-	virtual void onWindowCreated(const GMWindowAttributes& attrs, GMWindowHandle handle) override;
+	virtual void onWindowCreated(const GMWindowAttributes& attrs) override;
 	virtual IGraphicEngine* getGraphicEngine() override;
 	virtual const IRenderContext* getContext() override;
 };
@@ -100,11 +100,10 @@ bool GMWindow_Dx11::getInterface(GameMachineInterfaceID id, void** out)
 	return true;
 }
 
-void GMWindow_Dx11::onWindowCreated(const GMWindowAttributes& wndAttrs, GMWindowHandle handle)
+void GMWindow_Dx11::onWindowCreated(const GMWindowAttributes& wndAttrs)
 {
 	D(d);
 	D_BASE(db, GMWindow);
-	GM_ASSERT(handle);
 
 	GMWindowStates& windowStates = db->windowStates;
 

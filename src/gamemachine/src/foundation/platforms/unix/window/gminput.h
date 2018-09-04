@@ -7,33 +7,12 @@
 
 BEGIN_NS
 
-class GMXInputWrapper
-{
-	typedef DWORD(WINAPI *XInputGetState_Delegate)(DWORD dwUserIndex, XINPUT_STATE* pState);
-	typedef DWORD(WINAPI *XInputSetState_Delegate)(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration);
-
-public:
-	GMXInputWrapper();
-	~GMXInputWrapper();
-
-public:
-	DWORD XInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState);
-	DWORD XInputSetState(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration);
-
-private:
-	HMODULE m_module;
-	XInputGetState_Delegate m_xinputGetState;
-	XInputSetState_Delegate m_xinputSetState;
-};
-
 GM_PRIVATE_OBJECT(GMInput)
 {
 	enum { MAX_KEYS = 256 };
 	bool detectingMode = false;
 	IWindow* window = nullptr;
 
-	// joystick (xinput)
-	GMXInputWrapper xinput;
 	GMJoystickState joystickState;
 
 	// keyboard

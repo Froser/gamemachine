@@ -9,10 +9,12 @@ include_directories(
 		./
 	)
 
-link_libraries(
-		glu32.lib
-		opengl32.lib
-	)
+if(WIN32)
+	link_libraries(
+			glu32.lib
+			opengl32.lib
+		)
+endif(WIN32)
 
 set(SOURCES
 		stdafx.h

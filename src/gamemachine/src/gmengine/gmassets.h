@@ -19,7 +19,7 @@ class GMPhysicsShape;
 */
 enum class GMAssetType
 {
-	None, //!< 无类型，绝对不会用到
+	Invalid, //!< 无类型，绝对不会用到
 	Texture, //!< 纹理贴图类型
 	Model, //!< 模型类型
 	Models, //!< 一组模型类型
@@ -39,7 +39,7 @@ enum class GMAssetType
 GM_PRIVATE_OBJECT(GMAsset)
 {
 	GMAtomic<GMlong>* ref = nullptr;
-	GMAssetType type = GMAssetType::None;
+	GMAssetType type = GMAssetType::Invalid;
 	void* asset = nullptr;
 };
 

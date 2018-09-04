@@ -85,7 +85,7 @@ void GMAsset::removeData()
 	D(d);
 	switch (getType())
 	{
-	case GMAssetType::None:
+	case GMAssetType::Invalid:
 		break;
 	case GMAssetType::Texture:
 		GM_delete(getTexture());
