@@ -70,7 +70,12 @@ public:
 		setTargetObjects(targetGameObjects...);
 	}
 
+#if GM_MSVC
+	template <>
+	GMAnimation(void) = default;
+#elif GM_GCC
 	GMAnimation() = default;
+#endif
 
 	~GMAnimation();
 
