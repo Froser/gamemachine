@@ -17,6 +17,7 @@ set(SOURCES
 		common.h
 
 		src/gmm/gmm.h
+		src/common/gmmfactory.cpp
 		src/common/utilities/gmmstream.cpp
 		src/common/utilities/gmmstream.h
 		src/common/audio/aldlist.cpp
@@ -28,21 +29,12 @@ set(SOURCES
 		src/common/audio/gmmaudioreader_stream.cpp
 		src/common/audio/gmmaudioreader_mp3.h
 		src/common/audio/gmmaudioreader_mp3.cpp
+		src/common/audio/gmmaudioreader.cpp
+		src/common/audio/gmmaudioreader_wav.h
+		src/common/audio/gmmaudioreader_wav.cpp
+		src/common/audio/alframework/cwaves.cpp
+		src/common/audio/alframework/cwaves.h
 	)
-
-set(WIN32_SOURCES
-		src/windows/gmmfactory.cpp
-		src/windows/gmmdef.h
-		src/windows/audio/alframework/cwaves.cpp
-		src/windows/audio/alframework/cwaves.h
-		src/windows/audio/gmmaudioreader.cpp
-		src/windows/audio/gmmaudioreader_wav.h
-		src/windows/audio/gmmaudioreader_wav.cpp
-	)
-
-if(WIN32)
-	list(APPEND SOURCES ${WIN32_SOURCES})
-endif(WIN32)
 
 gm_source_group_by_dir(SOURCES)
 

@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include <gmm.h>
-#include "gmmdef.h"
 
 gm::IAudioReader* GMMFactory::getAudioReader()
 {
