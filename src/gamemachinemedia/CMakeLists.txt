@@ -1,5 +1,5 @@
 project (gamemachinemedia)
-gm_begin_project(${PROJECT_NAME})
+gm_begin_project()
 
 include_directories(
 		./

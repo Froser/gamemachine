@@ -1,4 +1,4 @@
-gm_begin_project(${PROJECT_NAME})
+gm_begin_project()
 
 include_directories(
 		./
@@ -225,19 +225,6 @@ set(WIN32_SOURCES
 		foundation/platforms/windows/window/gminput.cpp
 	)
 
-set(UNIX_SOURCES
-		foundation/platforms/unix/check.h
-		foundation/platforms/unix/thread.cpp
-		foundation/platforms/unix/timer.cpp
-		foundation/platforms/unix/gamemachine.cpp
-		foundation/platforms/unix/screen.cpp
-		foundation/platforms/unix/path.cpp
-		foundation/platforms/unix/window/gmwindow.cpp
-		foundation/platforms/unix/window/gmwindow_opengl.cpp
-		foundation/platforms/unix/window/gminput.h
-		foundation/platforms/unix/window/gminput.cpp
-	)
-
 set(WIN32_DX11_SOURCES
 		foundation/utilities/gmcom.h
 		foundation/platforms/windows/window/gmwindow_dx11.cpp
@@ -283,6 +270,21 @@ set(WIN32_DX11_SOURCES
 		gmdx11/effects/binary/EffectStateBase11.h
 		gmdx11/effects/binary/EffectStates11.h
 		gmdx11/effects/binary/SOParser.h
+	)
+
+set(UNIX_SOURCES
+		foundation/platforms/unix/check.h
+		foundation/platforms/unix/thread.cpp
+		foundation/platforms/unix/timer.cpp
+		foundation/platforms/unix/gamemachine.cpp
+		foundation/platforms/unix/screen.cpp
+		foundation/platforms/unix/path.cpp
+		foundation/platforms/unix/clipboard.cpp
+		foundation/platforms/unix/utils.cpp
+		foundation/platforms/unix/window/gmwindow.cpp
+		foundation/platforms/unix/window/gmwindow_opengl.cpp
+		foundation/platforms/unix/window/gminput.h
+		foundation/platforms/unix/window/gminput.cpp
 	)
 
 if(WIN32)

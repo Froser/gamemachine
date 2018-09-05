@@ -1,7 +1,7 @@
 ﻿CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
 
 project (gamemachineunittest)
-gm_begin_project(${PROJECT_NAME})
+gm_begin_project()
 
 include_directories(
 		../3rdparty/glm-0.9.9-a2

@@ -52,13 +52,13 @@ enum WAVERESULT
 #define _WAVEFORMATEX_
 typedef struct tWAVEFORMATEX
 {
-    WORD    wFormatTag;
-    WORD    nChannels;
-    DWORD   nSamplesPerSec;
-    DWORD   nAvgBytesPerSec;
-    WORD    nBlockAlign;
-    WORD    wBitsPerSample;
-    WORD    cbSize;
+    GMWord    wFormatTag;
+    GMWord    nChannels;
+    GMDWord   nSamplesPerSec;
+    GMDWord   nAvgBytesPerSec;
+    GMWord    nBlockAlign;
+    GMWord    wBitsPerSample;
+    GMWord    cbSize;
 } WAVEFORMATEX;
 #endif /* _WAVEFORMATEX_ */
 
@@ -67,11 +67,11 @@ typedef struct tWAVEFORMATEX
 typedef struct {
     WAVEFORMATEX    Format;
     union {
-        WORD wValidBitsPerSample;       /* bits of precision  */
-        WORD wSamplesPerBlock;          /* valid if wBitsPerSample==0 */
-        WORD wReserved;                 /* If neither applies, set to zero. */
+        GMWord wValidBitsPerSample;       /* bits of precision  */
+        GMWord wSamplesPerBlock;          /* valid if wBitsPerSample==0 */
+        GMWord wReserved;                 /* If neither applies, set to zero. */
     } Samples;
-    DWORD           dwChannelMask;      /* which channels are */
+    GMDWord           dwChannelMask;      /* which channels are */
                                         /* present in stream  */
     GUID            SubFormat;
 } WAVEFORMATEXTENSIBLE, *PWAVEFORMATEXTENSIBLE;
