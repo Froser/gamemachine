@@ -3,6 +3,8 @@
 
 #if GM_UNIX
 #include <wctype.h> //iswspace
+#include <stdlib.h>
+#include <locale.h>
 #endif
 
 GMsize_t GMString::npos = std::string::npos;
@@ -16,16 +18,21 @@ namespace
 		GMwchar* data = new GMwchar[sz];
 		::MultiByteToWideChar(CP_UTF8, 0, mbs, -1, data, sz);
 		return data;
+#elif GM_UNIX
+		setlocale(LC_CTYPE, "zh_CN.utf8");
+		GMsize_t sz = mbstowcs(nullptr, mbs, 0) + 1;
+		GMwchar* data = new GMwchar[sz];
+		mbstowcs(data, mbs, sz);
+		return data;
 #else
+		GM_ASSERT(false);
 		return nullptr;
 #endif
 	}
 
 	void free_wideChar(GMwchar* c)
 	{
-#if GM_WINDOWS
 		GM_delete(c);
-#endif
 	}
 
 	char* alloc_convertWideCharToMultiBytes(const GMwchar* wch)
@@ -35,16 +42,20 @@ namespace
 		char* data = new char[sz];
 		::WideCharToMultiByte(CP_UTF8, 0, wch, -1, data, sz, nullptr, nullptr);
 		return data;
+#elif GM_UNIX
+		GMsize_t sz = wcstombs(nullptr, wch, 0) + 1;
+		char* data = new char[sz];
+		wcstombs(data, wch, sz);
+		return data;
 #else
+		GM_ASSERT(false);
 		return nullptr;
 #endif
 	}
 
 	void free_multibytes(char* c)
 	{
-#if GM_WINDOWS
 		GM_delete(c);
-#endif
 	}
 
 	template <typename RetType>

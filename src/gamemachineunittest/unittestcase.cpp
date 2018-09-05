@@ -10,15 +10,6 @@ namespace
 		HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
 		SetConsoleTextAttribute(handle, foreColor);
 	}
-#else
-#	define FOREGROUND_RED 0
-#	define FOREGROUND_GREEN 0
-#	define FOREGROUND_BLUE 0
-	void SetConsoleColor(unsigned short)
-	{
-		// Nothing
-	}
-#endif
 
 	void assertTrue(bool ast, const std::string& msg, std::ostream& out = std::cout)
 	{
@@ -34,7 +25,23 @@ namespace
 			::SetConsoleColor(FOREGROUND_RED);
 			out << "Failed!" << std::endl;
 		}
+		::SetConsoleColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 	}
+#elif GM_UNIX
+	void assertTrue(bool ast, const std::string& msg, std::ostream& out = std::cout)
+	{
+		out << "Unit test: " << msg.c_str();
+		if (ast)
+		{
+			out << "\x1b[32m " << std::setw(15) << "Passed!\x1b[0m" << std::endl;
+		}
+		else
+		{
+			out << "\x1b[31m " << std::setw(15) << "Failed!\x1b[0m" << std::endl;
+		}
+	}
+#endif
+
 }
 
 void UnitTest::addTestCase(const std::string& msg, TestPredicate p)

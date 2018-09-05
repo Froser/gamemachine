@@ -1,6 +1,6 @@
 ﻿CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
 
-project (gamemachineunittest C CXX)
+project (gamemachineunittest)
 gm_begin_project(${PROJECT_NAME})
 
 include_directories(
@@ -51,11 +51,6 @@ add_definitions(-DUNICODE -D_UNICODE)
 add_executable(${PROJECT_NAME}
 		${SOURCES}
 	)
-
-		set(THREADS_PREFER_PTHREAD_FLAG ON)
-		find_package(Threads REQUIRED)
-		message("GameMachine: pthread Linked.")
-		target_link_libraries(${PROJECT_NAME} Threads::Threads)
 
 if(MSVC)
 	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE" ) 

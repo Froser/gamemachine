@@ -2,6 +2,7 @@
 #include "check.h"
 #include <gmthread.h>
 #include <signal.h>
+#include <unistd.h>
 
 namespace
 {
@@ -49,7 +50,11 @@ void GMThread::start()
 	if (d->callback)
 		d->callback->onCreateThread(this);
 	d->done = false;
-	pthread_create(&d->handle, &d->attr, threadProc, this);
+	if (pthread_create(&d->handle, &d->attr, threadProc, this))
+	{
+		gm_error(gm_dbg_wrap("Create thread error."));
+		GM_ASSERT(false);
+	}
 }
 
 void GMThread::setCallback(IThreadCallback* callback)
@@ -83,7 +88,7 @@ void GMThread::terminateThread(GMint ret)
 
 void GMThread::sleep(GMint milliseconds)
 {
-	sleep(milliseconds);
+	usleep(milliseconds * 1000);
 }
 
 // Mutex
