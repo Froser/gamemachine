@@ -279,7 +279,7 @@ struct GMScreen
 #if GM_WINDOWS
 typedef HANDLE GMEventHandle;
 #else
-typedef void* GMEventHandle; //TODO
+typedef void* GMEventHandle;
 #endif
 
 GM_PRIVATE_OBJECT(GMEvent)

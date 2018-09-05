@@ -55,6 +55,23 @@ public:
 	}
 };
 
+class TestThread_Event : public gm::GMThread
+{
+public:
+	TestThread_Event()
+	{
+	}
+
+	virtual void run() override
+	{
+		std::cout << "正在等待Event..." << std::endl;
+		event.wait();
+	}
+
+public:
+	gm::GMAutoResetEvent event;
+};
+
 gm::GMMutex g_testMutex;
 std::vector<int> g_mutexResultList;
 
@@ -140,5 +157,14 @@ void cases::Thread::addToUnitTest(UnitTest& ut)
 		std::cout << "等待线程已经结束" << std::endl;
 		gm::GM_delete(ar);
 		return gm::__i == LOOP_NUM && finished;
+	});
+
+	ut.addTestCase("GMEvent", []() {
+		TestThread_Event thread;
+		thread.start();
+		gm::GMThread::sleep(2000);
+		thread.event.set();
+		thread.join();
+		return true;
 	});
 }

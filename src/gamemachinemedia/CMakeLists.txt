@@ -59,4 +59,5 @@ endif(MSVC)
 
 target_link_libraries(${PROJECT_NAME} libmad)
 target_link_libraries(${PROJECT_NAME} OpenAL)
+target_link_libraries(${PROJECT_NAME} gamemachine)
 gm_end_project(${PROJECT_NAME})

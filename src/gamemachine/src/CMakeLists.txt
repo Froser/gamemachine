@@ -281,6 +281,7 @@ set(UNIX_SOURCES
 		foundation/platforms/unix/path.cpp
 		foundation/platforms/unix/clipboard.cpp
 		foundation/platforms/unix/utils.cpp
+		foundation/platforms/unix/event.cpp
 		foundation/platforms/unix/window/gmwindow.cpp
 		foundation/platforms/unix/window/gmwindow_opengl.cpp
 		foundation/platforms/unix/window/gminput.h
@@ -311,7 +312,6 @@ if(MSVC)
 	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/WX" )
 endif(MSVC)
 
-gm_link_bullet3()
 target_link_libraries(${PROJECT_NAME} glew_s)
 target_link_libraries(${PROJECT_NAME} lua)
 target_link_libraries(${PROJECT_NAME} png_static)

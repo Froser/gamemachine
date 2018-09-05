@@ -60,7 +60,18 @@ typedef struct tWAVEFORMATEX
     GMWord    wBitsPerSample;
     GMWord    cbSize;
 } WAVEFORMATEX;
+
 #endif /* _WAVEFORMATEX_ */
+
+#if !GM_MSVC
+struct GUID
+{
+	unsigned long  Data1;
+	unsigned short Data2;
+	unsigned short Data3;
+	unsigned char  Data4[8];
+};
+#endif
 
 #ifndef _WAVEFORMATEXTENSIBLE_
 #define _WAVEFORMATEXTENSIBLE_
@@ -71,7 +82,7 @@ typedef struct {
         GMWord wSamplesPerBlock;          /* valid if wBitsPerSample==0 */
         GMWord wReserved;                 /* If neither applies, set to zero. */
     } Samples;
-    GMDWord           dwChannelMask;      /* which channels are */
+    GMDWord         dwChannelMask;      /* which channels are */
                                         /* present in stream  */
     GUID            SubFormat;
 } WAVEFORMATEXTENSIBLE, *PWAVEFORMATEXTENSIBLE;
@@ -86,6 +97,26 @@ typedef struct
 	FILE			*pFile;
 	unsigned long	ulDataOffset;
 } WAVEFILEINFO, *LPWAVEFILEINFO;
+
+#ifndef WAVE_FORMAT_PCM
+#define WAVE_FORMAT_PCM 1
+
+struct WAVEFORMAT
+{
+	GMWord  wFormatTag;
+	GMWord  nChannels;
+	GMDWord nSamplesPerSec;
+	GMDWord nAvgBytesPerSec;
+	GMWord  nBlockAlign;
+};
+
+struct PCMWAVEFORMAT
+{
+	WAVEFORMAT wf;
+	GMWord     wBitsPerSample;
+};
+
+#endif
 
 typedef int (GM_CDECL *PFNALGETENUMVALUE)( const char *szEnumName );
 typedef int	WAVEID;

@@ -33,10 +33,20 @@ int WINAPI wWinMain(
 )
 {
 	LPWSTR cmdLine = GetCommandLineW();
+#elif GM_UNIX
+int main(int argc, char* argv[])
+{	
+#endif
+
+#if GM_WINDOWS
 	gm::GMsize_t sz = gm::GMString::countOfCharacters(cmdLine);
 	gm::GMRenderEnvironment env = gm::GMRenderEnvironment::DirectX11;
 	if (sz > 7 && gm::GMString(cmdLine + sz - 7) == "-opengl")
 		env = gm::GMRenderEnvironment::OpenGL;
+#elif GM_UNIX
+	gm::GMRenderEnvironment env = gm::GMRenderEnvironment::OpenGL;
+	gm::GMInstance hInstance = 0; // Useless in unix
+#endif
 	SetRenderEnv(env);
 
 	gm::IFactory* factory = nullptr;
@@ -87,4 +97,3 @@ int WINAPI wWinMain(
 	GM.startGameMachine();
 	return 0;
 }
-#endif

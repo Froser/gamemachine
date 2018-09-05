@@ -25,7 +25,7 @@
 #include <gmmcommon.h>
 #include <gmtools.h>
 #include <gmstring.h>
-#include "CWaves.h"
+#include "cwaves.h"
 #include <errno.h>
 
 #pragma pack(push, 4)

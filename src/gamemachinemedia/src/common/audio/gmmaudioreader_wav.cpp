@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmmaudioreader_wav.h"
 #include "alframework/cwaves.h"
-#include <al/al.h>
+#include <AL/al.h>
 #include <gmtools.h>
 
 #pragma pack(push, 4)
