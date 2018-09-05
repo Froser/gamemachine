@@ -5,17 +5,6 @@
 #include <direct.h>
 #include <shlobj.h>
 
-//TODO 这里在其他系统下存在问题
-BOOL SHGetSpecialFolderPathA(HWND hwnd, LPSTR pszPath, int csidl, BOOL fCreate);
-BOOL SHGetSpecialFolderPathW(HWND hwnd, LPWSTR pszPath, int csidl, BOOL fCreate);
-#	ifdef UNICODE
-#		define SHGetSpecialFolderPath  SHGetSpecialFolderPathW
-#	else
-#		define SHGetSpecialFolderPath  SHGetSpecialFolderPathA
-#	endif // !UNICODE
-#	define CSIDL_FONTS 0x0014
-#endif
-
 GMString GMPath::directoryName(const GMString& fileName)
 {
 	GMString winFileName = fileName.replace("/", "\\");
