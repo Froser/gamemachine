@@ -31,7 +31,6 @@ struct GMMessage
 enum class GMSystemEventType
 {
 	Unknown,
-	Destroy,
 	WindowSizeChanged,
 	KeyDown,
 	KeyUp,

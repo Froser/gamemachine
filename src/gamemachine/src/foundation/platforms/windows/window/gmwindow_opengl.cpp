@@ -114,7 +114,6 @@ GMWindow_OpenGL::GMWindow_OpenGL(IWindow* parent)
 
 GMWindow_OpenGL::~GMWindow_OpenGL()
 {
-	::SetWindowLongPtr(getWindowHandle(), GWLP_USERDATA, NULL);
 	dispose();
 }
 
@@ -251,6 +250,8 @@ void GMWindow_OpenGL::msgProc(const GMMessage& message)
 void GMWindow_OpenGL::dispose()
 {
 	D(d);
+	::SetWindowLongPtr(getWindowHandle(), GWLP_USERDATA, NULL);
+	
 	gm::GMWindowHandle wnd = getWindowHandle();
 	if (!d->parent && d->hRC)
 	{
@@ -270,8 +271,11 @@ void GMWindow_OpenGL::dispose()
 
 bool GMWindowFactory::createWindowWithOpenGL(GMInstance instance, IWindow* parent, OUT IWindow** window)
 {
-	(*window) = new GMWindow_OpenGL(parent);
-	if (*window)
-		return true;
+	if (window)
+	{
+		(*window) = new GMWindow_OpenGL(parent);
+		if (*window)
+			return true;
+	}
 	return false;
 }

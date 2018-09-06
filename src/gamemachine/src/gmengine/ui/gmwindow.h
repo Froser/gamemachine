@@ -83,9 +83,8 @@ public:
 	virtual const GMwchar* getWindowClassName() { return L"GameMachine Window"; }
 	virtual void onWindowCreated(const GMWindowAttributes& wndAttrs) {}
 
-private:
-	void destroyWindow();
-	void changeCursor();
+protected:
+	virtual void changeCursor();
 };
 
 class GMWindowFactory

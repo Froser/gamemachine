@@ -286,6 +286,10 @@ set(UNIX_SOURCES
 		foundation/platforms/unix/window/gmwindow_opengl.cpp
 		foundation/platforms/unix/window/gminput.h
 		foundation/platforms/unix/window/gminput.cpp
+		foundation/platforms/unix/window/gmxrendercontext.h
+		foundation/platforms/unix/window/gmxrendercontext.cpp
+		foundation/platforms/unix/window/gmwindowhelper.h
+		foundation/platforms/unix/window/gmwindowhelper.cpp
 	)
 
 if(WIN32)

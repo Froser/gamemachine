@@ -21,9 +21,6 @@ bool GMWindow::handleSystemEvent(GMSystemEvent* event, REF GMLResult& result)
 
 	switch (event->getType())
 	{
-	case GMSystemEventType::Destroy:
-		destroyWindow();
-		break;
 	case GMSystemEventType::WindowSizeChanged:
 		GM.postMessage({ GameMachineMessageType::WindowSizeChanged });
 		break;

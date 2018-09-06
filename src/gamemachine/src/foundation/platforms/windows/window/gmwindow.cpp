@@ -258,11 +258,6 @@ GMWindowHandle GMWindow::create(const GMWindowAttributes& wndAttrs)
 	return hwnd;
 }
 
-void GMWindow::destroyWindow()
-{
-	PostQuitMessage(0L);
-}
-
 void GMWindow::changeCursor()
 {
 	D(d);
