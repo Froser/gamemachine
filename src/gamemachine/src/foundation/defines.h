@@ -82,6 +82,8 @@ using GMAtomic = std::atomic<T>;
 #elif GM_UNIX
 #	if DEBUG
 #		define GM_DEBUG 1
+#	elif NDEBUG
+#		define GM_DEBUG 0
 #	endif
 #endif
 
