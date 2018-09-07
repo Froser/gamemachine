@@ -2,6 +2,7 @@
 #include "assert.h"
 #include <sstream>
 
+#if GM_WINDOWS
 void Assert::noop()
 {
 }
@@ -22,3 +23,5 @@ void Assert::gm_assert(const char *assertion, const char *file, int line)
 		_CrtDbgBreak();
 #endif
 }
+
+#endif

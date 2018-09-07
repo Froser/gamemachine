@@ -26,6 +26,12 @@ GMXRenderContext::GMXRenderContext(IWindow* window, const char* displayName)
 	if (!s_display)
 	{
 		s_display = XOpenDisplay(displayName);
+		if (!s_display)
+		{
+			gm_error(gm_dbg_wrap("get display failed."));
+			return;
+		}
+
 		XSynchronize(s_display, True);
 		if (!glXQueryExtension(s_display, NULL, NULL))
 			gm_error(gm_dbg_wrap("OpenGL GLX extension not supported by s_display '{0}"), XDisplayName(displayName));

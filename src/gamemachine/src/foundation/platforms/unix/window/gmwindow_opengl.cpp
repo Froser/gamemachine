@@ -88,6 +88,7 @@ public:
 private:
 	GLXContext createNewContext();
 	void dispose();
+	void createGraphicEngine();
 };
 
 GMWindow_OpenGL::GMWindow_OpenGL(IWindow* parent)
@@ -240,6 +241,8 @@ void GMWindow_OpenGL::onWindowCreated(const GMWindowAttributes& wndAttrs)
 
 	XEvent eventReturnBuffer;
 	XPeekIfEvent(context->getDisplay(), &eventReturnBuffer, &windowIsVisible_Predicator, (XPointer)getWindowHandle());
+
+	createGraphicEngine();
 }
 
 GLXContext GMWindow_OpenGL::createNewContext()
@@ -300,10 +303,10 @@ const IRenderContext* GMWindow_OpenGL::getContext()
 	D_BASE(d, Base);
 	if (!d->context)
 	{
-		GMXRenderContext* context = new GMXRenderContext(this, getenv("DISPLAY"));
+		GMXRenderContext* context = new GMXRenderContext(this);
 		d->context.reset(context);
 		context->setWindow(this);
-		context->setEngine(getGraphicEngine());
+		
 	}
 	return d->context.get();
 }
@@ -326,6 +329,13 @@ void GMWindow_OpenGL::dispose()
 		XDestroyWindow(context->getDisplay(), getWindowHandle());
 		setWindowHandle(0);
 	}
+}
+
+void GMWindow_OpenGL::createGraphicEngine()
+{
+	D(d);
+	GMXRenderContext* context = gm_cast<GMXRenderContext*>(d->context.get());
+	context->setEngine(getGraphicEngine());
 }
 
 bool GMWindowFactory::createWindowWithOpenGL(GMInstance instance, IWindow* parent, OUT IWindow** window)
