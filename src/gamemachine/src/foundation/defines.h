@@ -19,6 +19,7 @@
 #include <list>
 #include <memory>
 #include <atomic>
+#include <limits>
 #include "assert.h"
 
 template <typename T1, typename T2>
@@ -73,18 +74,10 @@ template <typename T>
 using GMAtomic = std::atomic<T>;
 
 /* 工程编译选项 */
-#if GM_WINDOWS
-#	if DEBUG
-#		define GM_DEBUG 1
-#	elif _DEBUG
-#		define GM_DEBUG 1
-#	endif
-#elif GM_UNIX
-#	if DEBUG
-#		define GM_DEBUG 1
-#	elif NDEBUG
-#		define GM_DEBUG 0
-#	endif
+#if DEBUG
+#	define GM_DEBUG 1
+#elif _DEBUG
+#	define GM_DEBUG 1
 #endif
 
 // 一定会使用使用OpenGL

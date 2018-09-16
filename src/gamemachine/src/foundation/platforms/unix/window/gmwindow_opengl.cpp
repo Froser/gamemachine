@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "gmengine/ui/gmwindow.h"
+#include <GL/glew.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <X11/Xlib.h>
@@ -12,7 +13,7 @@
 #define ATTRIB_VAL(a, v) { ATTRIB(a); ATTRIB(v); }
 #define MAX_ATTRIBS 100
 #define ATTRIBS attributes
-#define INIT_ATTRIBS() GMint attributes[MAX_ATTRIBS]; GMint where = 0;
+#define INIT_ATTRIBS() GMint attributes[MAX_ATTRIBS] = {0}; GMint where = 0;
 
 #ifndef HOST_NAME_MAX
 #define HOST_NAME_MAX 255
@@ -20,27 +21,33 @@
 
 namespace
 {
-	bool chooseConfig(GLXFBConfig* config, const GMWindowAttributes& wndAttrs, const GMXRenderContext* context)
+	void setAttributes(GMint* attributes, const GMWindowAttributes& wndAttrs, bool useSample)
 	{
-		INIT_ATTRIBS();
-		ATTRIB_VAL(GLX_RED_SIZE, 1);
-		ATTRIB_VAL(GLX_GREEN_SIZE, 1);
-		ATTRIB_VAL(GLX_BLUE_SIZE, 1);
-		ATTRIB_VAL(GLX_ALPHA_SIZE, 1);
+		int where = 0;
+		ATTRIB_VAL(GLX_X_RENDERABLE, True);
+		ATTRIB_VAL(GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT);
+		ATTRIB_VAL(GLX_RENDER_TYPE, GLX_RGBA_BIT);
+		ATTRIB_VAL(GLX_X_VISUAL_TYPE, GLX_TRUE_COLOR);
+		ATTRIB_VAL(GLX_RED_SIZE, 8);
+		ATTRIB_VAL(GLX_GREEN_SIZE, 8);
+		ATTRIB_VAL(GLX_BLUE_SIZE, 8);
+		ATTRIB_VAL(GLX_ALPHA_SIZE, 8);
 		ATTRIB_VAL(GLX_DOUBLEBUFFER, True);
-		ATTRIB_VAL(GLX_STEREO, True);
-		ATTRIB_VAL(GLX_DEPTH_SIZE, 1);
-		ATTRIB_VAL(GLX_STENCIL_SIZE, 1);
-
-		if (wndAttrs.samples > 1)
+		ATTRIB_VAL(GLX_DEPTH_SIZE, 24);
+		ATTRIB_VAL(GLX_STENCIL_SIZE, 8);
+		if (useSample && wndAttrs.samples > 1)
 		{
 			ATTRIB_VAL(GLX_SAMPLE_BUFFERS, 1);
 			ATTRIB_VAL(GLX_SAMPLES, wndAttrs.samples);
 		}
-
 		ATTRIB(None);
+	}
 
-		GLXFBConfig* fbconfigArray;
+	bool chooseConfig(GLXFBConfig* config, const GMWindowAttributes& wndAttrs, const GMXRenderContext* context)
+	{
+		INIT_ATTRIBS();
+		setAttributes(ATTRIBS, wndAttrs, true);
+		GLXFBConfig* fbconfigArray = NULL;
 		GMint fbconfigArraySize = 0;
 
 		fbconfigArray = glXChooseFBConfig(context->getDisplay(), context->getScreen(), ATTRIBS, &fbconfigArraySize);
@@ -52,8 +59,20 @@ namespace
 		}
 		else
 		{
-			gm_error(gm_dbg_wrap("Cannot get FBConfig."));
-			return false;
+			// Perhaps some attributes is not supported.
+			setAttributes(ATTRIBS, wndAttrs, false);
+			fbconfigArray = glXChooseFBConfig(context->getDisplay(), context->getScreen(), ATTRIBS, &fbconfigArraySize);
+			if (fbconfigArray)
+			{
+				*config = fbconfigArray[0];
+				XFree(fbconfigArray);
+				return true;
+			}
+			else
+			{
+				gm_error(gm_dbg_wrap("Cannot get FBConfig."));
+				return false;
+			}
 		}
 	}
 
@@ -84,6 +103,7 @@ public:
 	virtual IGraphicEngine* getGraphicEngine() override;
 	virtual const IRenderContext* getContext() override;
 	virtual void onWindowCreated(const GMWindowAttributes& wndAttrs) override;
+	virtual void msgProc(const GMMessage& message) override;
 
 private:
 	GLXContext createNewContext();
@@ -156,16 +176,6 @@ void GMWindow_OpenGL::onWindowCreated(const GMWindowAttributes& wndAttrs)
 	);
 
 	Display* display = context->getDisplay();
-	GMint renderType = GLX_RGBA_TYPE;
-	GLXContext share_list = NULL;
-	typedef GLXContext (*CreateContextAttribsProc) (Display*, GLXFBConfig, GLXContext, Bool, const int*);
-	CreateContextAttribsProc createContextAttribs = (CreateContextAttribsProc) glXGetProcAddressARB((const GLubyte*)("glXCreateContextAttribsARB"));
-	if (!createContextAttribs)
-	{
-		gm_error(gm_dbg_wrap("glXCreateContextAttribsARB not found. Terminated."));
-		return;
-	}
-
 	setWindowHandle(window);
 
 	// CreateContext
@@ -243,6 +253,7 @@ void GMWindow_OpenGL::onWindowCreated(const GMWindowAttributes& wndAttrs)
 	XPeekIfEvent(context->getDisplay(), &eventReturnBuffer, &windowIsVisible_Predicator, (XPointer)getWindowHandle());
 
 	createGraphicEngine();
+	glewInit();
 }
 
 GLXContext GMWindow_OpenGL::createNewContext()
@@ -250,7 +261,6 @@ GLXContext GMWindow_OpenGL::createNewContext()
 	D(d);
 	const GMXRenderContext* context = gm_cast<const GMXRenderContext*>(getContext());
 	Display* display = context->getDisplay();
-	GMint renderType = GLX_RGBA_TYPE;
 	GLXContext share_list = NULL;
 	typedef GLXContext (*CreateContextAttribsProc) (Display*, GLXFBConfig, GLXContext, Bool, const int*);
 	CreateContextAttribsProc createContextAttribs = (CreateContextAttribsProc) glXGetProcAddressARB((const GLubyte*)("glXCreateContextAttribsARB"));
@@ -267,15 +277,17 @@ GLXContext GMWindow_OpenGL::createNewContext()
 
 	GMint attributes[9];
 	GMint where = 0;
-	GMint contextFlags, contextProfile;
+	GMint contextFlags;
 #if GM_DEBUG
 	contextFlags = GLX_CONTEXT_DEBUG_BIT_ARB | GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB;
 #else
 	contextFlags = GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB;
 #endif
-	contextProfile = GLX_CONTEXT_CORE_PROFILE_BIT_ARB | GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB;
+
+	// OpenGL 3.0
+	ATTRIB_VAL(GLX_CONTEXT_MAJOR_VERSION_ARB, 3);
+	ATTRIB_VAL(GLX_CONTEXT_MINOR_VERSION_ARB, 0);
 	ATTRIB_VAL(GLX_CONTEXT_FLAGS_ARB, contextFlags);
-	ATTRIB_VAL(GLX_CONTEXT_PROFILE_MASK_ARB, contextProfile);
 	ATTRIB(None);
 
 	GLXContext xcontext = createContextAttribs(display, d->fbConfig, share_list, true, attributes);
@@ -334,8 +346,20 @@ void GMWindow_OpenGL::dispose()
 void GMWindow_OpenGL::createGraphicEngine()
 {
 	D(d);
-	GMXRenderContext* context = gm_cast<GMXRenderContext*>(d->context.get());
-	context->setEngine(getGraphicEngine());
+	const GMXRenderContext* context = gm_cast<const GMXRenderContext*>(getContext());
+	const_cast<GMXRenderContext*>(context)->setEngine(getGraphicEngine());
+}
+
+void GMWindow_OpenGL::msgProc(const GMMessage& message)
+{
+	Base::msgProc(message);
+
+	D(d);
+	const GMXRenderContext* context = gm_cast<const GMXRenderContext*>(getContext());
+	if (message.msgType == GameMachineMessageType::FrameUpdate)
+	{
+		glXSwapBuffers(context->getDisplay(), getWindowHandle());
+	}
 }
 
 bool GMWindowFactory::createWindowWithOpenGL(GMInstance instance, IWindow* parent, OUT IWindow** window)
