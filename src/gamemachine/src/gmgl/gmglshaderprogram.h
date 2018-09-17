@@ -68,7 +68,7 @@ public:
 public:
 	static constexpr const char* techniqueName()
 	{
-		return "GM_techniqueEntrance";
+		return "GM_TechniqueEntrance";
 	}
 };
 

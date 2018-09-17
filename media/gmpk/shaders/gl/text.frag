@@ -1,4 +1,3 @@
-subroutine (GM_TechniqueEntrance)
 void GM_Text(void)
 {
     if (GM_AmbientTextureAttribute.Enabled == 1)

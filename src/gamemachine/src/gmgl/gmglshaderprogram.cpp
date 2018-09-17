@@ -7,6 +7,73 @@
 #include "foundation/gamemachine.h"
 #include <linearmath.h>
 
+namespace
+{
+	GMint toTechniqueEntranceId(const char* instanceName)
+	{
+		enum
+		{
+			// ModelType
+			Model2D = GMModelType::Model2D,
+			Model3D = GMModelType::Model3D,
+			Text = GMModelType::Text,
+			CubeMap = GMModelType::CubeMap,
+			Particle = GMModelType::Particle,
+			Custom = GMModelType::Custom,
+			Shadow,
+
+			// Filter (gmgraphicengine.h)
+			DefaultFilter = 0,
+			InversionFilter = 1,
+			SharpenFilter = 2,
+			BlurFilter = 3,
+			GrayscaleFilter = 4,
+			EdgeDetectFilter = 5,
+		};
+
+		GM_STATIC_ASSERT(Shadow == 8, "If shadow enum value is changed, you have to modify glsl.");
+
+		if (GMString::stringEquals("GM_Model2D", instanceName))
+		{
+			return Model2D;
+		}
+		else if (GMString::stringEquals("GM_Model3D", instanceName))
+		{
+			return Model3D;
+		}
+		else if (GMString::stringEquals("GM_Text", instanceName))
+		{
+			return Text;
+		}
+		else if (GMString::stringEquals("GM_CubeMap", instanceName))
+		{
+			return CubeMap;
+		}
+		else if (GMString::stringEquals("GM_Particle", instanceName))
+		{
+			return Particle;
+		}
+		else if (GMString::stringEquals("GM_Custom", instanceName))
+		{
+			return Custom;
+		}
+		else if (GMString::stringEquals("GM_Shadow", instanceName))
+		{
+			return Shadow;
+		}
+		else
+		{
+			for (GMint i = 0; i < GMFilterCount; ++i)
+			{
+				if (GMString::stringEquals(GM_VariablesDesc.FilterAttributes.Types[i], instanceName))
+					return i;
+			}
+		}
+		GM_ASSERT(false);
+		return Model2D;
+	}
+}
+
 GLuint GMGLShaderProgram::Data::lastUsedProgram = -1;
 
 GMuint GMGLShaderInfo::toGLShaderType(GMShaderType type)
@@ -117,20 +184,8 @@ bool GMGLShaderProgram::setSubrotinue(const char* funcName, const char* implemen
 {
 	GM_ASSERT(verify());
 	D(d);
-	GLint subroutineUniform = glGetSubroutineUniformLocation(d->shaderProgram, shaderType, funcName);
-	if (subroutineUniform >= 0)
-	{
-		GLuint subroutineIndex = glGetSubroutineIndex(d->shaderProgram, shaderType, implement);
-		if (subroutineIndex != GL_INVALID_INDEX)
-		{
-			GLsizei n;
-			glGetProgramStageiv(d->shaderProgram, shaderType, GL_ACTIVE_SUBROUTINE_UNIFORM_LOCATIONS, &n);
-			GM_ASSERT(n == 1); //GM目前只用1个subroutine来决定渲染流程。subroutine这个特性真的是太难用了
-			glUniformSubroutinesuiv(shaderType, n, &subroutineIndex);
-			return true;
-		}
-	}
-	return false;
+	setInt(funcName, toTechniqueEntranceId(implement));
+	return true;
 }
 
 bool GMGLShaderProgram::verify()

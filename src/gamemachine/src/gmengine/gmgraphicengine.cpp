@@ -348,8 +348,9 @@ IGBuffer* GMGraphicEngine::createGBuffer()
 void GMGraphicEngine::setShadowSource(const GMShadowSourceDesc& desc)
 {
 	D(d);
+	GMint64 ver = d->shadow.version;
 	d->shadow = desc;
-	d->shadow.version = ++GMShadowSourceDesc::version;
+	d->shadow.version = ++ver;
 }
 
 GMCamera& GMGraphicEngine::getCamera()

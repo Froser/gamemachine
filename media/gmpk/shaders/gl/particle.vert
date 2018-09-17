@@ -12,7 +12,6 @@ void particle_calcCoords()
     _color = color;
 }
 
-subroutine (GM_TechniqueEntrance)
 void GM_Particle()
 {
     particle_calcCoords();

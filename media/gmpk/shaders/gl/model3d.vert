@@ -12,7 +12,6 @@ void model3d_calcCoords()
     _color = color;
 }
 
-subroutine (GM_TechniqueEntrance)
 void GM_Model3D()
 {
     model3d_calcCoords();

@@ -75,8 +75,6 @@ struct GMToolUtil
 	*/
 	static GMTextureAsset createTexture(const IRenderContext* context, const GMString& filename, REF GMint* width = nullptr, REF GMint* height = nullptr);
 
-	static void beginCreateTexture(const IRenderContext* context, const GMString& filename, GMAsyncCallback callback, OUT GMAsyncResult** ar);
-
 	static void createTextureFromFullPath(const IRenderContext* context, const GMString& filename, REF GMTextureAsset& texture, REF GMint* width = nullptr, REF GMint* height = nullptr);
 
 	//! 将一个纹理添加到一个模型中。

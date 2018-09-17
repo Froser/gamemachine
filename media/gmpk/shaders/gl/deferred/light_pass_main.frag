@@ -1,4 +1,4 @@
-#version 410
+#version 330
 #include "../foundation/foundation.h"
 #include "../foundation/properties.h"
 #include "../foundation/light.h"

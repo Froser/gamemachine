@@ -9,10 +9,6 @@ uniform mat4 GM_InverseViewMatrix;
 uniform int GM_shader_type;
 uniform int GM_shader_proc;
 
-subroutine void GM_TechniqueEntrance();
-subroutine (GM_TechniqueEntrance) void GM_Noop() {}
-subroutine uniform GM_TechniqueEntrance GM_techniqueEntrance;
-
 struct GMShadowInfo
 {
     int HasShadow;

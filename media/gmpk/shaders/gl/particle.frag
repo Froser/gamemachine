@@ -1,6 +1,5 @@
 in vec4 _particle_position_world;
 
-subroutine (GM_TechniqueEntrance)
 void GM_Particle()
 {
     if (GM_AmbientTextureAttribute.Enabled == 1)

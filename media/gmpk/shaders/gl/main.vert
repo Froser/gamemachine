@@ -1,4 +1,4 @@
-#version 410
+#version 330
 #include "foundation/foundation.h"
 #include "foundation/vert_header.h"
 
@@ -10,9 +10,11 @@
 #include "shadow.vert"
 #include "particle.vert"
 
+#include "foundation/invoke.h"
+
 void main(void)
 {
     init_layouts();
 
-    GM_techniqueEntrance();
+    GM_InvokeTechniqueEntrance();
 }

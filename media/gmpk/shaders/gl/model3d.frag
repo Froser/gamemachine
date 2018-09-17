@@ -14,7 +14,6 @@ vec4 normalToTexture(vec3 normal_N)
     return vec4( (normal_N + 1) * .5f, 1);
 }
 
-subroutine (GM_TechniqueEntrance)
 void GM_Model3D()
 {
     // 如果是Replace，直接使用此颜色作为目标颜色

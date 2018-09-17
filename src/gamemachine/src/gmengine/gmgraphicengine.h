@@ -164,7 +164,6 @@ struct GMShadowSourceDesc
 	GMint width;
 	GMint height;
 
-	GMint64 currentVersion = 0;
 	static GMint64 version;
 };
 

@@ -1,4 +1,4 @@
-#version 410 core
+#version 330 core
 
 #include "../foundation/foundation.h"
 #include "../foundation/properties.h"
@@ -29,7 +29,6 @@ vec4 normalToTexture(vec3 normal)
 }
 in vec4 _deferred_geometry_pass_position_world;
 
-subroutine (GM_TechniqueEntrance)
 void GM_GeometryPass()
 {
     ${deferred_geometry_pass_gPosition_Refractivity}.rgb = _deferred_geometry_pass_position_world.rgb;
@@ -91,6 +90,5 @@ void GM_GeometryPass()
 
 void main(void)
 {
-    //GM_techniqueEntrance();
     GM_GeometryPass();
 }

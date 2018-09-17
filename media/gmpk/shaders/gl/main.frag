@@ -1,4 +1,4 @@
-#version 410 core
+#version 330
 #include "foundation/foundation.h"
 #include "foundation/properties.h"
 #include "foundation/frag_header.h"
@@ -12,7 +12,9 @@
 #include "shadow.frag"
 #include "particle.frag"
 
+#include "foundation/invoke.h"
+
 void main(void)
 {
-    GM_techniqueEntrance();
+    GM_InvokeTechniqueEntrance();
 }

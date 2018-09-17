@@ -1,4 +1,3 @@
-subroutine (GM_TechniqueEntrance)
 void GM_Model2D()
 {
     gl_Position = GM_WorldMatrix * position;

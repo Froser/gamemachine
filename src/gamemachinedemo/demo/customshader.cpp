@@ -45,9 +45,7 @@ void Demo_CustomShader::init()
 
 	gm::GMTextureAsset tex;
 	gm::GMAsyncResult* result = nullptr;
-	gm::GMToolUtil::beginCreateTexture(getDemoWorldReference()->getContext(), "gamemachine.png", nullptr, &result);
-	result->wait();
-	tex = *((gm::GMTextureAsset*) result->state());
+	tex = gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "gamemachine.png");
 	gm::GM_delete(result);
 
 	gm::GMToolUtil::addTextureToShader(quad->getShader(), tex, gm::GMTextureType::Diffuse);

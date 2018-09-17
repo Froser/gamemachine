@@ -1,4 +1,4 @@
-#version 410
+#version 330
 in vec2 _texCoords;
 out vec4 frag_color;
 uniform sampler2D GM_framebuffer;
@@ -57,15 +57,13 @@ vec3 kernel(float kernels[9], sampler2D t, vec2 uv)
     return color;
 }
 
-subroutine vec3 GM_FilterRoutineType(sampler2D t, vec2 texcoord);
-
-subroutine (GM_FilterRoutineType) vec3 GM_InversionFilter(sampler2D t, vec2 uv)
+vec3 GM_InversionFilter(sampler2D t, vec2 uv)
 {
     vec3 color = texture(t, uv).rgb;
     return vec3(1.f - color.r, 1.f - color.g, 1.f - color.b);
 }
 
-subroutine (GM_FilterRoutineType) vec3 GM_SharpenFilter(sampler2D t, vec2 uv)
+vec3 GM_SharpenFilter(sampler2D t, vec2 uv)
 {
     float kernels[9] = float[](
         -1, -1, -1,
@@ -75,7 +73,7 @@ subroutine (GM_FilterRoutineType) vec3 GM_SharpenFilter(sampler2D t, vec2 uv)
     return kernel(kernels, t, uv);
 }
 
-subroutine (GM_FilterRoutineType) vec3 GM_BlurFilter(sampler2D t, vec2 uv)
+vec3 GM_BlurFilter(sampler2D t, vec2 uv)
 {
     float kernels[9] = float[](
         1.0 / 16, 2.0 / 16, 1.0 / 16,
@@ -85,16 +83,16 @@ subroutine (GM_FilterRoutineType) vec3 GM_BlurFilter(sampler2D t, vec2 uv)
     return kernel(kernels, t, uv);
 }
 
-subroutine (GM_FilterRoutineType) vec3 GM_GrayscaleFilter(sampler2D t, vec2 uv)
+vec3 GM_GrayscaleFilter(sampler2D t, vec2 uv)
 {
     vec3 fragColor = texture(t, uv).rgb;
     float average = 0.2126 * fragColor.r + 0.7152 * fragColor.g + 0.0722 * fragColor.b;
     return vec3(average, average, average);
 }
 
-subroutine (GM_FilterRoutineType) vec3 GM_EdgeDetectFilter(sampler2D t, vec2 uv)
+vec3 GM_EdgeDetectFilter(sampler2D t, vec2 uv)
 {
-        float kernels[9] = float[](
+    float kernels[9] = float[](
         1, 1, 1,
         1, -8, 1,
         1, 1, 1
@@ -102,15 +100,43 @@ subroutine (GM_FilterRoutineType) vec3 GM_EdgeDetectFilter(sampler2D t, vec2 uv)
     return kernel(kernels, t, uv);
 }
 
-subroutine (GM_FilterRoutineType) vec3 GM_DefaultFilter(sampler2D t, vec2 uv)
+vec3 GM_DefaultFilter(sampler2D t, vec2 uv)
 {
     return texture(t, uv).rgb;
 }
 
-subroutine uniform GM_FilterRoutineType GM_Filter;
+// 子程序选择，对应gmglshaderprogram.cpp@toTechniqueEntranceId
+uniform int GM_Filter;
+const int GM_FilterType_DefaultFilter = 0;
+const int GM_FilterType_InversionFilter = 1;
+const int GM_FilterType_SharpenFilter = 2;
+const int GM_FilterType_BlurFilter = 3;
+const int GM_FilterType_GrayscaleFilter = 4;
+const int GM_FilterType_EdgeDetectFilter = 5;
+
+vec3 GM_InvokeFilter(sampler2D t, vec2 texcoords)
+{
+    // 与GMModelType的顺序一致
+    switch (GM_Filter)
+    {
+        case GM_FilterType_DefaultFilter:
+            return GM_DefaultFilter(t, texcoords);
+        case GM_FilterType_InversionFilter:
+            return GM_InversionFilter(t, texcoords);
+        case GM_FilterType_SharpenFilter:
+            return GM_SharpenFilter(t, texcoords);
+        case GM_FilterType_BlurFilter:
+            return GM_BlurFilter(t, texcoords);
+        case GM_FilterType_GrayscaleFilter:
+            return GM_GrayscaleFilter(t, texcoords);
+        case GM_FilterType_EdgeDetectFilter:
+            return GM_EdgeDetectFilter(t, texcoords);
+    }
+    return vec3(0, 0, 0);
+}
 
 void main()
 {
-    frag_color = vec4(max(GM_Filter(GM_framebuffer, _texCoords), vec3(0, 0, 0)), 1);
+    frag_color = vec4(max(GM_InvokeFilter(GM_framebuffer, _texCoords), vec3(0, 0, 0)), 1);
     frag_color = calculateWithToneMapping(frag_color);
 }

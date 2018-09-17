@@ -1,4 +1,4 @@
-#version 410
+#version 330
 #include "../foundation/foundation.h"
 #include "../foundation/vert_header.h"
 
@@ -15,7 +15,6 @@ void deferred_geometry_pass_calcCoords()
     _lightmapuv = lightmapuv;
 }
 
-subroutine (GM_TechniqueEntrance)
 void GM_GeometryPass()
 {
     deferred_geometry_pass_calcCoords();
@@ -24,6 +23,5 @@ void GM_GeometryPass()
 void main(void)
 {
     init_layouts();
-    //GM_techniqueEntrance();
     GM_GeometryPass();
 }

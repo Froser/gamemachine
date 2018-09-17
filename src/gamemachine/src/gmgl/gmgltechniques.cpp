@@ -71,21 +71,21 @@ namespace
 		static IShaderProgram* lastProgram = nullptr;
 		static GMint64 lastShadowVersion = 0;
 		static const GMString s_shadowInfo = GMString(GM_VariablesDesc.ShadowInfo.ShadowInfo) + ".";
-		static std::string s_position = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.Position).toStdString();
-		static std::string s_matrix = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMatrix).toStdString();
-		static std::string s_width = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMapWidth).toStdString();
-		static std::string s_height = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMapWidth).toStdString();
-		static std::string s_biasMin = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.BiasMin).toStdString();
-		static std::string s_biasMax = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.BiasMax).toStdString();
-		static std::string s_hasShadow = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.HasShadow).toStdString();
-		static std::string s_shadowMap = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMap).toStdString();
+		static const std::string s_position = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.Position).toStdString();
+		static const std::string s_matrix = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMatrix).toStdString();
+		static const std::string s_width = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMapWidth).toStdString();
+		static const std::string s_height = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMapWidth).toStdString();
+		static const std::string s_biasMin = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.BiasMin).toStdString();
+		static const std::string s_biasMax = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.BiasMax).toStdString();
+		static const std::string s_hasShadow = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.HasShadow).toStdString();
+		static const std::string s_shadowMap = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMap).toStdString();
 
 		if (hasShadow)
 		{
-			if (g_shadowDirty || lastShadowVersion != shadowSourceDesc->currentVersion)
+			if (g_shadowDirty || lastShadowVersion != shadowSourceDesc->version)
 			{
 				lastProgram = shaderProgram;
-				lastShadowVersion = shadowSourceDesc->currentVersion;
+				lastShadowVersion = shadowSourceDesc->version;
 
 				shaderProgram->setBool(s_hasShadow.c_str(), 1);
 				const GMCamera& camera = shadowSourceDesc->camera;

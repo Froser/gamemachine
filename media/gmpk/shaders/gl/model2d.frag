@@ -1,4 +1,3 @@
-subroutine (GM_TechniqueEntrance)
 void GM_Model2D()
 {
     if (GM_AmbientTextureAttribute.Enabled == 1)

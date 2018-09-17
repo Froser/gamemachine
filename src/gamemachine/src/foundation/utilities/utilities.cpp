@@ -637,40 +637,6 @@ GMTextureAsset GMToolUtil::createTexture(const IRenderContext* context, const GM
 	return std::move(texture);
 }
 
-void GMToolUtil::beginCreateTexture(const IRenderContext* context, const GMString& filename, GMAsyncCallback callback, OUT GMAsyncResult** ar)
-{
-	class GMTextureAssetAsyncResult : public GMAsyncResult
-	{
-	public:
-		virtual void* state() override
-		{
-			return &asset;
-		}
-
-	public:
-		void setAsset(GMTextureAsset asset)
-		{
-			this->asset = std::move(asset);
-		}
-
-	private:
-		GMTextureAsset asset;
-	};
-
-	auto f = [context, filename, callback](GMAsyncResult* r) {
-		GMTextureAssetAsyncResult* ar = gm_cast<GMTextureAssetAsyncResult*>(r);
-		ar->setAsset(createTexture(context, filename));
-		ar->setComplete();
-		callback(r);
-	};
-
-	GMAsyncResult* asyncResult = new GMTextureAssetAsyncResult();
-	GMFuture<void> future = GMAsync::async(GMAsync::Async, f, asyncResult);
-	asyncResult->setFuture(std::move(future));
-	GM_ASSERT(ar);
-	(*ar) = asyncResult;
-}
-
 void GMToolUtil::createTextureFromFullPath(const IRenderContext* context, const GMString& filename, REF GMTextureAsset& texture, REF GMint* width, REF GMint* height)
 {
 	GMImage* img = nullptr;
