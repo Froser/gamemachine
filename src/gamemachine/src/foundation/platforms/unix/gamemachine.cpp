@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "check.h"
 #include "../../gamemachine.h"
+#include <locale.h>
 
 namespace
 {
@@ -31,5 +32,12 @@ void GameMachine::initSystemInfo()
 	{
 		d->states.systemInfo.endiannessMode = getMachineEndianness();
 		inited = true;
+
+		// set locale
+		char* result = setlocale(LC_ALL, "zh_CN.utf8");
+		if (!result)
+		{
+			gm_error(gm_dbg_wrap("Set locale failed. Type 'sudo apt-get install language-pack-zh-hans' to install ch_ZN locale pack."));
+		}
 	}
 }

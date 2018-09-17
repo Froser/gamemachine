@@ -7,6 +7,10 @@
 #include <chrono>
 #include <ctime>
 
+#if !GM_WINDOWS
+#include <iostream>
+#endif
+
 namespace
 {
 	GMString getFormattedTime()
@@ -64,6 +68,8 @@ void GMDebugger::print(
 	{
 #if GM_WINDOWS
 		OutputDebugStringW(s.toStdWString().c_str());
+#else
+		std::cout << s.toStdString() << std::endl;
 #endif
 	}
 }

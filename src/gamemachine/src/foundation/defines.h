@@ -74,10 +74,18 @@ template <typename T>
 using GMAtomic = std::atomic<T>;
 
 /* 工程编译选项 */
-#if DEBUG
-#	define GM_DEBUG 1
-#elif _DEBUG
-#	define GM_DEBUG 1
+#ifndef GM_DEBUG
+#	if GM_WINDOWS
+#		if DEBUG
+#			define GM_DEBUG 1
+#		elif _DEBUG
+#			define GM_DEBUG 1
+#		endif
+#	elif GM_UNIX
+#		ifdef GM_DEBUG_FLAG
+#			define GM_DEBUG 1
+#		endif
+#	endif
 #endif
 
 // 一定会使用使用OpenGL

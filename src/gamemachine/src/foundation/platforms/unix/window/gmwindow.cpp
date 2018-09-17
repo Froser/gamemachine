@@ -53,7 +53,13 @@ GMRect GMWindow::getRenderRect()
 
 void GMWindow::centerWindow()
 {
-	GM_ASSERT(false);
+	D(d);
+	const auto& windowRect = getWindowRect();
+	const GMXRenderContext* context = gm_cast<const GMXRenderContext*>(getContext());
+
+	GMint x = (context->getScreenWidth() - windowRect.width) / 2;
+	GMint y = (context->getScreenHeight() - windowRect.height) / 2;
+	XMoveWindow(context->getDisplay(), getWindowHandle(), x, y);
 }
 
 bool GMWindow::isWindowActivate()

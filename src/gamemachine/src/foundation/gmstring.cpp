@@ -1,10 +1,10 @@
 ﻿#include "stdafx.h"
 #include "gmstring.h"
+#include "foundation/debug.h"
 
 #if GM_UNIX
 #include <wctype.h> //iswspace
 #include <stdlib.h>
-#include <locale.h>
 #endif
 
 GMsize_t GMString::npos = std::string::npos;
@@ -19,8 +19,12 @@ namespace
 		::MultiByteToWideChar(CP_UTF8, 0, mbs, -1, data, sz);
 		return data;
 #elif GM_UNIX
-		setlocale(LC_CTYPE, "zh_CN.utf8");
 		GMsize_t sz = mbstowcs(nullptr, mbs, 0) + 1;
+		if (sz == 0)
+		{
+			gm_error(gm_dbg_wrap("Error in mbstowcs"));
+			return nullptr;
+		}
 		GMwchar* data = new GMwchar[sz];
 		mbstowcs(data, mbs, sz);
 		return data;
@@ -44,6 +48,11 @@ namespace
 		return data;
 #elif GM_UNIX
 		GMsize_t sz = wcstombs(nullptr, wch, 0) + 1;
+		if (sz == 0)
+		{
+			gm_error(gm_dbg_wrap("Error in wcstombs"));
+			return nullptr;
+		}
 		char* data = new char[sz];
 		wcstombs(data, wch, sz);
 		return data;

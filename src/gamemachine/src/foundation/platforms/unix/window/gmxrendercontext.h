@@ -27,6 +27,8 @@ class GMXRenderContext : public GMObject, public GMRenderContext
 {
 	GM_DECLARE_PRIVATE(GMXRenderContext)
 	GM_DECLARE_PROPERTY(GlxContext, glxContext, GLXContext)
+	GM_DECLARE_PROPERTY(ScreenWidth, screenWidth, GMint)
+	GM_DECLARE_PROPERTY(ScreenHeight, screenHeight, GMint)
 	GM_DECLARE_GETTER(NetWMSupported, netWMSupported, bool)
 	GM_DECLARE_GETTER(AtomDeleteWindow, aDeleteWindow, Atom)
 	GM_DECLARE_GETTER(AtomNetWMPid, aNetWMPid, Atom)

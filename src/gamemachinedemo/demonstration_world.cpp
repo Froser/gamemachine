@@ -553,8 +553,12 @@ void DemostrationEntrance::init(const gm::IRenderContext* context)
 	auto rc = context->getWindow()->getRenderRect();
 	gm::GMGamePackage* pk = GM.getGamePackageManager();
 
-#ifdef GM_DEBUG
+#if GM_WINDOWS
+#	ifdef GM_DEBUG
 	pk->loadPackage("D:/gmpk");
+#	else
+	pk->loadPackage((gm::GMPath::getCurrentPath() + L"gm.pk0"));
+#	endif
 #else
 	pk->loadPackage((gm::GMPath::getCurrentPath() + L"gm.pk0"));
 #endif
