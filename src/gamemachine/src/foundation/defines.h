@@ -1,6 +1,21 @@
 ﻿#ifndef __DEFINES_H__
 #define __DEFINES_H__
 
+/* 工程编译选项 */
+#ifndef GM_DEBUG
+#	if GM_WINDOWS
+#		if DEBUG
+#			define GM_DEBUG 1
+#		elif _DEBUG
+#			define GM_DEBUG 1
+#		endif
+#	elif GM_UNIX
+#		ifdef GM_DEBUG_FLAG
+#			define GM_DEBUG 1
+#		endif
+#	endif
+#endif
+
 // 容器别名
 #if GM_WINDOWS
 #	include <wtypes.h>
@@ -72,21 +87,6 @@ void GMClearSTLContainer(T& c)
 // Atomic
 template <typename T>
 using GMAtomic = std::atomic<T>;
-
-/* 工程编译选项 */
-#ifndef GM_DEBUG
-#	if GM_WINDOWS
-#		if DEBUG
-#			define GM_DEBUG 1
-#		elif _DEBUG
-#			define GM_DEBUG 1
-#		endif
-#	elif GM_UNIX
-#		ifdef GM_DEBUG_FLAG
-#			define GM_DEBUG 1
-#		endif
-#	endif
-#endif
 
 // 一定会使用使用OpenGL
 #ifndef GM_USE_OPENGL
