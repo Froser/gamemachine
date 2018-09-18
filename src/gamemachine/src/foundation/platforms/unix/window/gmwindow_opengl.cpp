@@ -181,6 +181,7 @@ void GMWindow_OpenGL::onWindowCreated(const GMWindowAttributes& wndAttrs)
 	// CreateContext
 	GLXContext glxContext = createNewContext();
 	const_cast<GMXRenderContext*>(context)->setGlxContext(glxContext);
+	context->switchToContext();
 
 	XSizeHints sizeHints;
 	sizeHints.flags = USPosition | USSize;
@@ -247,7 +248,6 @@ void GMWindow_OpenGL::onWindowCreated(const GMWindowAttributes& wndAttrs)
 		}
 	}
 
-	context->switchToContext();
 	XMapWindow(context->getDisplay(), getWindowHandle());
 	XFree(visualInfo);
 

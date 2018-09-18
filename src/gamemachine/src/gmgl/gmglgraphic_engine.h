@@ -14,11 +14,6 @@ class GMGameWorld;
 class GameLight;
 struct ITechnique;
 
-extern "C"
-{
-	extern GMuint s_glErrCode;
-}
-
 enum
 {
 	DEFERRED_GEOMETRY_PASS_SHADER,
@@ -96,6 +91,15 @@ public:
 
 private:
 	void installShaders();
+
+public:
+	enum
+	{
+		GLMaxError = 64
+	};
+	
+	static void removeGLErrors();
+	static void getGLErrors(GMuint* errors, GMsize_t* count);
 };
 
 class GMGLUtility

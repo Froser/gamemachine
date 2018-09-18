@@ -15,8 +15,6 @@
 
 extern "C"
 {
-	GLenum s_glErrCode;
-
 	namespace
 	{
 		void GLAPIENTRY GL_MessageCallback(
@@ -331,4 +329,32 @@ void GMGLUtility::blendFunc(
 		}
 	}
 	glBlendEquationSeparate(ops[0], ops[1]);
+}
+
+void GMGLGraphicEngine::removeGLErrors()
+{
+	while (glGetError() != GL_NO_ERROR)
+	{
+	}
+}
+
+void GMGLGraphicEngine::getGLErrors(GMuint* errors, GMsize_t* count)
+{
+	GLenum errorCode = GL_NO_ERROR;
+	GMsize_t cnt = 0;
+	while ( (errorCode = glGetError()) != GL_NO_ERROR)
+	{
+		++cnt;
+		if (errors)
+			*errors++ = errorCode;
+
+		if (cnt == GLMaxError)
+		{
+			removeGLErrors();
+			break;
+		}
+	}
+	
+	if (count)
+		*count = cnt;
 }
