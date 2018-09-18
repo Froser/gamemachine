@@ -2,6 +2,8 @@
 #include "check.h"
 #include "../../gamemachine.h"
 #include <locale.h>
+#include <X11/Xlib.h>
+#include "window/gmxrendercontext.h"
 
 namespace
 {
@@ -13,11 +15,46 @@ namespace
 			return GMEndiannessMode::LittleEndian;
 		return GMEndiannessMode::BigEndian;
 	}
-}
 
+	IWindow* findWindow(const Set<GMOwnedPtr<IWindow>>& windows, Window window)
+	{
+		for (const auto& w : windows)
+		{
+			if (w->getWindowHandle() == window)
+				return w.get();
+		}
+		return nullptr;
+	}
+}
 
 void GameMachine::runEventLoop()
 {
+	D(d);
+	const GMXRenderContext* context = nullptr;
+	if (d->windows.size() > 0)
+	{
+		IWindow* window = d->windows.begin()->get();
+		context = gm_cast<const GMXRenderContext*>(window->getContext());
+	}
+
+	XEvent e;
+	while (1)
+	{
+		if (context)
+		{
+			XNextEvent(context->getDisplay(), &e);
+			IWindow* window = findWindow(d->windows, e.xany.window);
+			if (window)
+			{
+				GMXEventContext c = { &e, window };
+				window->getProcHandler()(window->getWindowHandle(), 0, 0, reinterpret_cast<GMLParam>(&c));
+			}
+		}
+
+		if (!renderFrame())
+			break;
+	}
+	terminate();
 }
 
 void GameMachine::translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lParam, OUT GMSystemEvent** event)

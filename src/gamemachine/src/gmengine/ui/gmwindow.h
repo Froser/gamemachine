@@ -3,8 +3,6 @@
 #include <gmcommon.h>
 BEGIN_NS
 
-typedef GMLResult (GM_SYSTEM_CALLBACK *GMWindowProcHandler)(GMWindowHandle hWnd, GMuint uMsg, GMWParam wParam, GMLParam lParam);
-
 class GMRenderContext : public IRenderContext
 {
 public:
@@ -64,6 +62,7 @@ public:
 	virtual IGameHandler* getHandler() override;
 	virtual const GMWindowStates& getWindowStates() override;
 	virtual void setCursor(GMCursorType cursorType) override;
+	virtual GMWindowProcHandler getProcHandler() override;
 
 public:
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
@@ -78,7 +77,6 @@ public:
 
 	// 以下是由GMWindow子类override的
 public:
-	virtual GMWindowProcHandler getProcHandler();
 	virtual bool handleSystemEvent(GMSystemEvent* event, REF GMLResult& result);
 	virtual const GMwchar* getWindowClassName() { return L"GameMachine Window"; }
 	virtual void onWindowCreated(const GMWindowAttributes& wndAttrs) {}

@@ -5,6 +5,22 @@
 #include "gminput.h"
 #include "gmxrendercontext.h"
 #include "gmwindowhelper.h"
+#include <gamemachine.h>
+
+namespace
+{
+	GMLResult GM_SYSTEM_CALLBACK WndProc(GMWindowHandle hWnd, GMuint uMsg, GMWParam wParam, GMLParam lParam)
+	{
+		GMXEventContext* c = reinterpret_cast<GMXEventContext*>(lParam);
+		GMWindow* window = gm_cast<GMWindow*>(c->window);
+		GMSystemEvent* sysEvent = new GMSystemEvent();
+		GM.translateSystemEvent(uMsg, wParam, lParam, &sysEvent);
+		GMScopedPtr<GMSystemEvent> guard(sysEvent);
+		GMLResult lRes = 0;
+		window->handleSystemEvent(sysEvent, lRes);
+		return lRes;
+	}
+}
 
 GMWindow::GMWindow()
 {
@@ -64,27 +80,18 @@ void GMWindow::centerWindow()
 
 bool GMWindow::isWindowActivate()
 {
-	GM_ASSERT(false);
 	return true;
 }
 
 void GMWindow::setWindowCapture(bool)
 {
-	GM_ASSERT(false);
-}
-
-void GMWindow::msgProc(const GMMessage& message)
-{
-	GM_ASSERT(false);
 }
 
 void GMWindow::changeCursor()
 {
-	GM_ASSERT(false);
 }
 
 GMWindowProcHandler GMWindow::getProcHandler()
 {
-	GM_ASSERT(false);
-	return 0;
+	return &WndProc;
 }

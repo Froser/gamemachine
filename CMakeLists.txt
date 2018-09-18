@@ -101,9 +101,11 @@ macro(gm_begin_project)
 		endif()
 	endif(APPLE)
 	if(WIN32)
+		message("GameMachine: Windows system detected.")
 		add_definitions(-DGM_WINDOWS)
 	endif(WIN32)
 	if(UNIX)
+		message("GameMachine: Unix-Like system (except APPLE) detected.")
 		add_definitions(-DGM_UNIX)
 	endif(UNIX)
 	set(CMAKE_CXX_STANDARD 14)
@@ -178,16 +180,16 @@ if(GM_USE_DX11)
 	add_definitions(-DGM_USE_DX11)
 endif(GM_USE_DX11)
 
-# Projects:
-add_subdirectory(src)
-
-if (DOXYGEN_FOUND AND GM_BUILD_DOCS)
-	add_subdirectory(doc gamemachinedocs)
-endif(DOXYGEN_FOUND AND GM_BUILD_DOCS)
-
 if(UNIX)
 	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 		message("GameMachine: Debug build type detected.")
 		add_definitions(-DGM_DEBUG_FLAG)
 	endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif(UNIX)
+
+# Projects:
+add_subdirectory(src)
+
+if (DOXYGEN_FOUND AND GM_BUILD_DOCS)
+	add_subdirectory(doc gamemachinedocs)
+endif(DOXYGEN_FOUND AND GM_BUILD_DOCS)

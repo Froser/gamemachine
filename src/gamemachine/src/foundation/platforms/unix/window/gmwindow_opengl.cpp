@@ -210,7 +210,9 @@ void GMWindow_OpenGL::onWindowCreated(const GMWindowAttributes& wndAttrs)
 	);
 	XFree(textProperty.value);
 
-	XSetWMProtocols(context->getDisplay(), getWindowHandle(), const_cast<Atom*>(&context->getAtomDeleteWindow()), True);
+	if (!XSetWMProtocols(context->getDisplay(), getWindowHandle(), const_cast<Atom*>(&context->getAtomDeleteWindow()), True))
+		gm_error(gm_dbg_wrap("Cannot set atom protocol: 'WM_DELETE_WINDOW'"));
+
 	if (context->getNetWMSupported()
 		&& context->getAtomNetWMPid() != None
 		&& context->getAtomClientMachine() != None
@@ -284,9 +286,9 @@ GLXContext GMWindow_OpenGL::createNewContext()
 	contextFlags = GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB;
 #endif
 
-	// OpenGL 3.0
+	// OpenGL 3.3
 	ATTRIB_VAL(GLX_CONTEXT_MAJOR_VERSION_ARB, 3);
-	ATTRIB_VAL(GLX_CONTEXT_MINOR_VERSION_ARB, 0);
+	ATTRIB_VAL(GLX_CONTEXT_MINOR_VERSION_ARB, 3);
 	ATTRIB_VAL(GLX_CONTEXT_FLAGS_ARB, contextFlags);
 	ATTRIB(None);
 

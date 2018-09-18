@@ -86,3 +86,28 @@ void GMWindow::setCursor(GMCursorType cursorType)
 	D(d);
 	d->cursor = cursorType;
 }
+
+void GMWindow::msgProc(const GMMessage& message)
+{
+	D(d);
+	if (message.msgType == GameMachineMessageType::SystemMessage)
+	{
+		GMSystemEvent* event = static_cast<GMSystemEvent*>(message.objPtr);
+		for (auto widget : d->widgets)
+		{
+			widget->msgProc(event);
+		}
+	}
+	else if (message.msgType == GameMachineMessageType::FrameUpdate)
+	{
+		if (d->input)
+			d->input->update();
+
+		d->windowStates.renderRect = getRenderRect();
+		GMDuration elapsed = GM.getRunningStates().lastFrameElpased;
+		for (auto widget : d->widgets)
+		{
+			widget->render(elapsed);
+		}
+	}
+}

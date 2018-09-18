@@ -2,16 +2,20 @@
 #include "check.h"
 #include "defines.h"
 #include "foundation/assert.h"
+#include <time.h>
 
 extern "C"
 {
 	GMint64 highResolutionTimerFrequency()
 	{
-		return 0;
+		// In unix, we use it as a unit-conversion.
+		return 1000000000;
 	}
 
 	GMint64 highResolutionTimer()
 	{
-		return 0;
+		struct timespec now;
+		clock_gettime(CLOCK_MONOTONIC, &now);
+		return now.tv_sec * highResolutionTimerFrequency() + now.tv_nsec;
 	}
 }

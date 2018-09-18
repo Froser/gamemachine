@@ -14,12 +14,12 @@ namespace
 		enum
 		{
 			// ModelType
-			Model2D = GMModelType::Model2D,
-			Model3D = GMModelType::Model3D,
-			Text = GMModelType::Text,
-			CubeMap = GMModelType::CubeMap,
-			Particle = GMModelType::Particle,
-			Custom = GMModelType::Custom,
+			Model2D = (GMint) GMModelType::Model2D,
+			Model3D = (GMint) GMModelType::Model3D,
+			Text = (GMint) GMModelType::Text,
+			CubeMap = (GMint) GMModelType::CubeMap,
+			Particle = (GMint) GMModelType::Particle,
+			Custom = (GMint) GMModelType::Custom,
 			Shadow,
 
 			// Filter (gmgraphicengine.h)
@@ -242,6 +242,7 @@ bool GMGLShaderProgram::load()
 
 			gm_error(gm_dbg_wrap("GMGLShaderProgram::load: Shader source: \n{0}"), report);
 			gm_error(gm_dbg_wrap("GMGLShaderProgram::load: Shader compilation failed: {0}"), log);
+			gm_error(gm_dbg_wrap("filename: {0} {1}"), GM_CRLF, GMString(entry.filename));
 			GM_ASSERT(false);
 			GMMessage crashMsg(GameMachineMessageType::CrashDown);
 			GM.postMessage(crashMsg);

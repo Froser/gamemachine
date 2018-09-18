@@ -97,7 +97,7 @@ void Demo_CustomShader::initCustomShader(const gm::IRenderContext* context)
 	gm::GMRenderTechnique vertexTech(gm::GMShaderType::Vertex);
 	vertexTech.setCode(
 		gm::GMRenderEnvironment::OpenGL,
-		L"#version 410 core\n"
+		L"#version 330 core\n"
 		L"layout(location = 0) in vec3 position;"
 		L"layout(location = 1) in vec3 normal;"
 		L"layout(location = 2) in vec2 uv;"
@@ -170,7 +170,7 @@ void Demo_CustomShader::initCustomShader(const gm::IRenderContext* context)
 	gm::GMRenderTechnique pixelTech(gm::GMShaderType::Pixel);
 	pixelTech.setCode(
 		gm::GMRenderEnvironment::OpenGL,
-		L"#version 410 core\n"
+		L"#version 330 core\n"
 		L"in vec2 gs_uv;"
 		L"struct GMTexture"
 		L"{"

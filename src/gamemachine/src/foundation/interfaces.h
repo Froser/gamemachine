@@ -548,6 +548,7 @@ enum class GMCursorType
 	EndOfEnum,
 };
 
+typedef GMLResult (GM_SYSTEM_CALLBACK *GMWindowProcHandler)(GMWindowHandle hWnd, GMuint uMsg, GMWParam wParam, GMLParam lParam);
 GM_INTERFACE_FROM(IWindow, IQueriable)
 {
 	virtual IInput* getInputMananger() = 0;
@@ -568,6 +569,7 @@ GM_INTERFACE_FROM(IWindow, IQueriable)
 	virtual IGraphicEngine* getGraphicEngine() = 0;
 	virtual const IRenderContext* getContext() = 0;
 	virtual void setCursor(GMCursorType type) = 0;
+	virtual GMWindowProcHandler getProcHandler() = 0;
 };
 
 GM_INTERFACE(IFactory)

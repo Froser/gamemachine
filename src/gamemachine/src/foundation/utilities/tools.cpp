@@ -42,6 +42,7 @@ void GMClock::update()
 	D(d);
 	d->end = highResolutionTimer();
 	GMint64 delta = d->end - d->begin;
+	GM_ASSERT(delta > 0);
 
 	if (!d->paused)
 	{

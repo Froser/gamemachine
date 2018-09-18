@@ -12,6 +12,9 @@
 #	elif GM_UNIX
 #		ifdef GM_DEBUG_FLAG
 #			define GM_DEBUG 1
+#			undef NDEBUG
+#		else
+#			define NDEBUG
 #		endif
 #	endif
 #endif

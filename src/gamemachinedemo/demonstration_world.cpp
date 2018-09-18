@@ -560,7 +560,11 @@ void DemostrationEntrance::init(const gm::IRenderContext* context)
 	pk->loadPackage((gm::GMPath::getCurrentPath() + L"gm.pk0"));
 #	endif
 #else
+#	ifdef GM_DEBUG
+	pk->loadPackage("/home/froser/Documents/gmpk");
+#	else
 	pk->loadPackage((gm::GMPath::getCurrentPath() + L"gm.pk0"));
+#	endif
 #endif
 
 	context->getEngine()->setShaderLoadCallback(this);

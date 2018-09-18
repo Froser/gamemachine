@@ -70,5 +70,11 @@ private:
 	static GMint s_instanceCount;
 };
 
+struct GMXEventContext
+{
+	XEvent* event;
+	IWindow* window;
+};
+
 END_NS
 #endif
