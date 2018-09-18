@@ -53,10 +53,16 @@ IFramebuffers* GMGLGBuffer::createGeometryFramebuffers()
 	};
 
 	GM.getFactory()->createFramebuffers(d->context, &framebuffers);
+	GM_ASSERT(framebuffers);
+
 	GMFramebuffersDesc fbDesc;
 	fbDesc.rect = windowStates.renderRect;
-	framebuffers->init(fbDesc);
-	GM_ASSERT(framebuffers);
+	bool suc = framebuffers->init(fbDesc);
+	if (!suc)
+	{
+		gm_error(gm_dbg_wrap("Create framebuffer error."));
+		GM_ASSERT(suc);
+	}
 
 	constexpr GMuint framebufferCount = GM_array_size(s_GBufferGeometryUniformNames);
 	GM_STATIC_ASSERT(framebufferCount <= 8, "Too many targets.");

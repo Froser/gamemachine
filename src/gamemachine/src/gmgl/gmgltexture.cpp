@@ -4,6 +4,7 @@
 #include "shader_constants.h"
 #include "gmdata/gmmodel.h"
 #include <GL/glew.h>
+#include "gmglgraphic_engine.h"
 
 namespace
 {
@@ -115,6 +116,7 @@ void GMGLTexture::init()
 	GMint level;
 	const GMImage::Data& imgData = d->image->getData();
 
+	GMGLBeginGetErrorsAndCheck();
 	glGenTextures(1, &d->id);
 	glBindTexture(d->target, d->id);
 
@@ -158,6 +160,8 @@ void GMGLTexture::init()
 
 	glBindTexture(d->target, 0);
 	d->inited = true;
+
+	GMGLEndGetErrorsAndCheck();
 }
 
 void GMGLTexture::bindSampler(GMTextureSampler* sampler)

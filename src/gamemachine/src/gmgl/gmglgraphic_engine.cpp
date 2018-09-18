@@ -331,7 +331,7 @@ void GMGLUtility::blendFunc(
 	glBlendEquationSeparate(ops[0], ops[1]);
 }
 
-void GMGLGraphicEngine::removeGLErrors()
+void GMGLGraphicEngine::clearGLErrors()
 {
 	while (glGetError() != GL_NO_ERROR)
 	{
@@ -350,11 +350,25 @@ void GMGLGraphicEngine::getGLErrors(GMuint* errors, GMsize_t* count)
 
 		if (cnt == GLMaxError)
 		{
-			removeGLErrors();
+			clearGLErrors();
 			break;
 		}
 	}
 	
+	if (errors)
+		*errors++ = GL_NO_ERROR;
+	
 	if (count)
 		*count = cnt;
+}
+
+void GMGLGraphicEngine::checkGLErrors(const GMuint* errors)
+{
+	for (GMsize_t i = 0;; ++i)
+	{
+		if (errors[i] != GL_NO_ERROR)
+			gm_error(gm_dbg_wrap("OpenGL error occurs: {0}"), GMString( (GMint)errors[i] ));
+		else
+			break;
+	}
 }

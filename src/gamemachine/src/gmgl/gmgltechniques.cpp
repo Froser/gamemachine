@@ -139,6 +139,8 @@ GMGLTechnique::GMGLTechnique(const IRenderContext* context)
 void GMGLTechnique::draw(GMModel* model)
 {
 	D(d);
+	GMGLBeginGetErrorsAndCheck();
+
 	glBindVertexArray(model->getModelBuffer()->getMeshBuffer().arrayId);
 	applyStencil(*d->engine);
 	prepareScreenInfo(getShaderProgram());
@@ -150,6 +152,8 @@ void GMGLTechnique::draw(GMModel* model)
 		glDrawElements(mode, gm_sizet_to<GLsizei>(model->getVerticesCount()), GL_UNSIGNED_INT, 0);
 	afterDraw(model);
 	glBindVertexArray(0);
+
+	GMGLEndGetErrorsAndCheck();
 }
 
 void GMGLTechnique::beginModel(GMModel* model, const GMGameObject* parent)

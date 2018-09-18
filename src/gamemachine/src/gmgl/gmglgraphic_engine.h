@@ -14,6 +14,31 @@ class GMGameWorld;
 class GameLight;
 struct ITechnique;
 
+#if GM_DEBUG
+#define GMGLBeginGetErrors() GMGLGraphicEngine::clearGLErrors()
+#define GMGLEndGetErrors GMGLGraphicEngine::getGLErrors
+#define GMGLDeclareErrors(var) GMuint var[GMGLGraphicEngine::GLMaxError + 1] = {0}
+#define GMGLCheckErrors(var) GMGLGraphicEngine::checkGLErrors(var)
+#define GMGLBeginGetErrorsAndCheck() \
+	{ \
+ 	GMGLDeclareErrors(__errors); \
+	GMGLEndGetErrors(__errors, nullptr); \
+	GMGLCheckErrors(__errors); \
+	GMGLBeginGetErrors(); }
+#define GMGLEndGetErrorsAndCheck() \
+	{ \
+ 	GMGLDeclareErrors(__errors); \
+	GMGLEndGetErrors(__errors, nullptr); \
+	GMGLCheckErrors(__errors); }
+#else
+#define GMGLBeginGetErrors()
+#define GMGLEndGetErrors
+#define GMGLDeclareErrors(var)
+#define GMGLCheckErrors(var)
+#define GMGLBeginGetErrorsAndCheck()
+#define GMGLEndGetErrorsAndCheck()
+#endif
+
 enum
 {
 	DEFERRED_GEOMETRY_PASS_SHADER,
@@ -98,8 +123,9 @@ public:
 		GLMaxError = 64
 	};
 	
-	static void removeGLErrors();
+	static void clearGLErrors();
 	static void getGLErrors(GMuint* errors, GMsize_t* count);
+	static void checkGLErrors(const GMuint* errors);
 };
 
 class GMGLUtility
