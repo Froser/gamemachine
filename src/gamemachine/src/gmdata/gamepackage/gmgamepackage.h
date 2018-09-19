@@ -27,6 +27,7 @@ enum class GMPackageIndex
 	Audio, //!< 声音文件类型，存放在"资源包/audio"下
 	Particle, //!< 粒子文件类型，存放在"资源包/particles"下
 	Scripts, //!< 脚本类型，存放在"资源包/scripts"下
+	Fonts, //!< 字体文件，存放在"资源包/fonts"下
 };
 
 class GMBSPGameWorld;

@@ -29,6 +29,7 @@ struct GMFont
 {
 	GMString fontPath;
 	GMFontFace face;
+	GMBuffer buffer;
 };
 
 typedef HashMap<GMFontHandle, HashMap<GMint, HashMap<GMwchar, GMGlyphInfo> > > CharList;
@@ -41,8 +42,8 @@ GM_PRIVATE_OBJECT(GMGlyphManager)
 	GMfloat maxHeight;
 	Vector<GMFont> fonts;
 
-	GMFontHandle defaultFontSun;
-	GMFontHandle defaultFontTimesNewRoman;
+	GMFontHandle defaultCN = GMInvalidFontHandle;
+	GMFontHandle defaultEN = GMInvalidFontHandle;
 };
 
 class GMGlyphManager : public GMObject
@@ -65,21 +66,38 @@ public:
 	const GMGlyphInfo& getChar(GMwchar c, GMFontSizePt fontSize, GMFontHandle font);
 	GMFontHandle addFontByFileName(const GMString& fontFileName);
 	GMFontHandle addFontByFullName(const GMString& fontFullName);
+	GMFontHandle addFontByMemory(GMBuffer&& buffer);
 
 public:
 	virtual GMTextureAsset glyphTexture() = 0;
 
 public:
+	void setCN(GMFontHandle fontHandle)
+	{
+		D(d);
+		d->defaultCN = fontHandle;
+		if (d->defaultCN == GMInvalidFontHandle)
+			d->defaultCN = 0;
+	}
+
+	void setEN(GMFontHandle fontHandle)
+	{
+		D(d);
+		d->defaultEN = fontHandle;
+		if (d->defaultEN == GMInvalidFontHandle)
+			d->defaultEN = 0;
+	}
+
 	inline GMFontHandle getSimHei()
 	{
 		D(d);
-		return d->defaultFontSun;
+		return d->defaultCN;
 	}
 
 	inline GMFontHandle getTimesNewRoman()
 	{
 		D(d);
-		return d->defaultFontTimesNewRoman;
+		return d->defaultEN;
 	}
 
 private:

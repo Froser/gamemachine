@@ -79,6 +79,8 @@ GMString GMDefaultGamePackageHandler::pathRoot(GMPackageIndex index)
 		return d->packagePath + L"particles/";
 	case GMPackageIndex::Scripts:
 		return d->packagePath + L"scripts/";
+	case GMPackageIndex::Fonts:
+		return d->packagePath + L"fonts/";
 	default:
 		GM_ASSERT(false);
 		break;
@@ -297,6 +299,8 @@ GMString GMZipGamePackageHandler::pathRoot(GMPackageIndex index)
 		return L"particles/";
 	case GMPackageIndex::Scripts:
 		return L"scripts/";
+	case GMPackageIndex::Fonts:
+		return d->packagePath + L"fonts/";
 	default:
 		GM_ASSERT(false);
 		break;

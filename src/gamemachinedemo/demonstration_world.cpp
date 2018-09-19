@@ -567,6 +567,22 @@ void DemostrationEntrance::init(const gm::IRenderContext* context)
 #	endif
 #endif
 
+	{
+		gm::GMBuffer buf;
+		gm::GMGlyphManager* glyphManager = context->getEngine()->getGlyphManager();
+		pk->readFile(gm::GMPackageIndex::Fonts, L"simhei.ttf", &buf);
+		gm::GMFontHandle font = glyphManager->addFontByMemory(std::move(buf));
+		glyphManager->setCN(font);
+	}
+
+	{
+		gm::GMBuffer buf;
+		gm::GMGlyphManager* glyphManager = context->getEngine()->getGlyphManager();
+		pk->readFile(gm::GMPackageIndex::Fonts, L"times.ttf", &buf);
+		gm::GMFontHandle font = glyphManager->addFontByMemory(std::move(buf));
+		glyphManager->setEN(font);
+	}
+
 	context->getEngine()->setShaderLoadCallback(this);
 	d->renderConfig = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
 	d->debugConfig = GM.getConfigs().getConfig(gm::GMConfigs::Debug).asDebugConfig();

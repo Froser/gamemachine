@@ -24,15 +24,15 @@ namespace
 
 	static TypoLibrary g_lib;
 
-	// 从系统获取字体文件，从上到下遍历，越靠前优先级越高
-	struct FontList
-	{
-		GMwchar fontName[GM_MAX_PATH];
-	};
-
 	FT_Error loadFace(const GMString& fontFullPath, FT_Face* face)
 	{
 		FT_Error err = FT_New_Face(g_lib.library, fontFullPath.toStdString().c_str(), 0, face);
+		return err;
+	}
+
+	FT_Error loadFace(const GMBuffer& buffer, FT_Face* face)
+	{
+		FT_Error err = FT_New_Memory_Face(g_lib.library, buffer.buffer, buffer.size, 0, face);
 		return err;
 	}
 }
@@ -93,6 +93,25 @@ GMFontHandle GMGlyphManager::addFontByFullName(const GMString& fontFullName)
 	return GMInvalidFontHandle;
 }
 
+GMFontHandle GMGlyphManager::addFontByMemory(GMBuffer&& buffer)
+{
+	D(d);
+	GMFont font;
+	FT_Face face;
+	FT_Error err = loadFace(buffer, &face);
+
+	// FT规定在FT_Done_Face之前不能释放Buffer，因此这里所有的操作必须使用移动语义，防止Buffer释放
+	if (err == FT_Err_Ok)
+	{
+		font.buffer = std::move(buffer);
+		font.face = face;
+		d->fonts.push_back(std::move(font));
+		return d->fonts.size() - 1;
+	}
+	gm_error(gm_dbg_wrap("load font failed."));
+	return GMInvalidFontHandle;
+}
+
 GMGlyphInfo& GMGlyphManager::insertChar(GMint fontSize, GMFontHandle font, GMwchar ch, const GMGlyphInfo& glyph)
 {
 	D(d);
@@ -105,13 +124,6 @@ GMGlyphManager::GMGlyphManager(const IRenderContext* context)
 {
 	D(d);
 	d->context = context;
-	d->defaultFontSun = addFontByFileName("simhei.ttf");
-	d->defaultFontTimesNewRoman = addFontByFileName("times.ttf");
-
-	if (d->defaultFontSun == GMInvalidFontHandle)
-		d->defaultFontSun = 0;
-	if (d->defaultFontTimesNewRoman == GMInvalidFontHandle)
-		d->defaultFontTimesNewRoman = 0;
 }
 
 GMGlyphManager::~GMGlyphManager()
