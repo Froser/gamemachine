@@ -187,9 +187,14 @@ enum GMKey
 	GMKey_ASCII, // 键盘上的KeyCode从此开始，如'A'就是 GMKey_ASCII + 'A'
 };
 
-inline GMKey GM_keyFromASCII(GMbyte key)
+inline GMKey GM_ASCIIToKey(GMbyte key)
 {
 	return static_cast<GMKey>(GMKey_ASCII + key);
+}
+
+inline GMbyte GM_KeyToASCII(GMKey key)
+{
+	return static_cast<GMbyte>(key - GMKey_ASCII);
 }
 
 enum GMFunctionCharacter

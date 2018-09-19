@@ -152,7 +152,7 @@ namespace
 			return iter->second;
 
 		// 如果GMKey没有在其中，说明是个ASCII码
-		return static_cast<GMWParam>(key - GMKey_ASCII);
+		return static_cast<GMWParam>(GM_KeyToASCII(key));
 	}
 }
 

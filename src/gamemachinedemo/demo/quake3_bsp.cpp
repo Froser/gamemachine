@@ -169,13 +169,13 @@ void Demo_Quake3_BSP::event(gm::GameMachineHandlerEvent evt)
 		gm::GMJoystickState state = joyState.joystickState();
 		GMVec3 direction(0);
 
-		if (kbState.keydown(gm::GM_keyFromASCII('A')))
+		if (kbState.keydown(gm::GM_ASCIIToKey('A')))
 			d->sprite->action(gm::GMMovement::Move, GMVec3(-1, 0, 0));
-		if (kbState.keydown(gm::GM_keyFromASCII('D')))
+		if (kbState.keydown(gm::GM_ASCIIToKey('D')))
 			d->sprite->action(gm::GMMovement::Move, GMVec3(1, 0, 0));
-		if (kbState.keydown(gm::GM_keyFromASCII('S')))
+		if (kbState.keydown(gm::GM_ASCIIToKey('S')))
 			d->sprite->action(gm::GMMovement::Move, GMVec3(0, 0, -1));
-		if (kbState.keydown(gm::GM_keyFromASCII('W')))
+		if (kbState.keydown(gm::GM_ASCIIToKey('W')))
 			d->sprite->action(gm::GMMovement::Move, GMVec3(0, 0, 1));
 
 		if (state.thumbLX > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
@@ -190,12 +190,12 @@ void Demo_Quake3_BSP::event(gm::GameMachineHandlerEvent evt)
 		if (kbState.keyTriggered(gm::GMKey_Space) || state.buttons & XINPUT_GAMEPAD_RIGHT_SHOULDER || state.buttons & XINPUT_GAMEPAD_LEFT_SHOULDER)
 			d->sprite->action(gm::GMMovement::Jump);
 
-		if (kbState.keyTriggered(gm::GM_keyFromASCII('V')))
+		if (kbState.keyTriggered(gm::GM_ASCIIToKey('V')))
 			joyState.joystickVibrate(30000, 30000);
-		else if (kbState.keydown(gm::GM_keyFromASCII('C')))
+		else if (kbState.keydown(gm::GM_ASCIIToKey('C')))
 			joyState.joystickVibrate(0, 0);
 
-		if (kbState.keyTriggered(gm::GM_keyFromASCII('I')))
+		if (kbState.keyTriggered(gm::GM_ASCIIToKey('I')))
 			db->debugConfig.set(gm::GMDebugConfigs::RunProfile_Bool, !db->debugConfig.get(gm::GMDebugConfigs::RunProfile_Bool).toBool());
 
 		gm::GMfloat joystickPitch = 0, joystickYaw = 0;
@@ -222,15 +222,15 @@ void Demo_Quake3_BSP::event(gm::GameMachineHandlerEvent evt)
 		gm::GMMouseState ms = mouseState.mouseState();
 		d->sprite->look(Radians(-ms.deltaY * mouseSensitivity), Radians(-ms.deltaX * mouseSensitivity));
 		
-		if (kbState.keyTriggered(gm::GM_keyFromASCII('R')))
+		if (kbState.keyTriggered(gm::GM_ASCIIToKey('R')))
 			setMouseTrace(!d->mouseTrace);
 
-		if (kbState.keyTriggered(gm::GM_keyFromASCII('0')))
+		if (kbState.keyTriggered(gm::GM_ASCIIToKey('0')))
 			db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, 0);
 
 		for (gm::GMint i = 0; i < 8; ++i)
 		{
-			if (kbState.keyTriggered(gm::GM_keyFromASCII('1' + (gm::GMint)i)))
+			if (kbState.keyTriggered(gm::GM_ASCIIToKey('1' + (gm::GMint)i)))
 				db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, (gm::GMint)i + 1);
 		}
 		break;

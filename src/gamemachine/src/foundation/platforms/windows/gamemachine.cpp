@@ -160,7 +160,7 @@ namespace
 		auto iter = s_keyMap.find(wParam);
 		if (iter != s_keyMap.end())
 			return iter->second;
-		return (GMKey)wParam;
+		return GM_ASCIIToKey((GMKey)wParam);
 	}
 
 	GMMouseButton translateButton(GMWParam wParam)

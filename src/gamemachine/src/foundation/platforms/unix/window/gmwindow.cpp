@@ -13,7 +13,7 @@ namespace
 	{
 		GMXEventContext* c = reinterpret_cast<GMXEventContext*>(lParam);
 		GMWindow* window = gm_cast<GMWindow*>(c->window);
-		GMSystemEvent* sysEvent = new GMSystemEvent();
+		GMSystemEvent* sysEvent = nullptr;
 		GM.translateSystemEvent(uMsg, wParam, lParam, &sysEvent);
 		GMScopedPtr<GMSystemEvent> guard(sysEvent);
 		GMLResult lRes = 0;
