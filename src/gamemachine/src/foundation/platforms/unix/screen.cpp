@@ -2,12 +2,22 @@
 #include "check.h"
 #include <gmtools.h>
 
-GMfloat GMScreen::dpi()
+GMint GMScreen::horizontalResolutionDpi()
 {
 	static GMint dpi = -1;
 	if (dpi < 0)
 	{
-		dpi = 1; //TODO
+		dpi = 96; //TODO
+	}
+	return dpi;
+}
+
+GMint GMScreen::verticalResolutionDpi()
+{
+	static GMint dpi = -1;
+	if (dpi < 0)
+	{
+		dpi = 96; //TODO
 	}
 	return dpi;
 }

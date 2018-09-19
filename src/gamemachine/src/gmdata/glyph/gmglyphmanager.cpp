@@ -149,15 +149,26 @@ const GMGlyphInfo& GMGlyphManager::createChar(GMwchar c, GMFontSizePt fontSize, 
 
 	FT_Face face = (FT_Face) f->face;
 	error = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
-	error = FT_Set_Char_Size(face, 0, fontSize << 6, GMScreen::dpi(), GMScreen::dpi());
+	GM_ASSERT(error == FT_Err_Ok);
+
+	error = FT_Set_Char_Size(face, 0, fontSize << 6, GMScreen::horizontalResolutionDpi(), GMScreen::verticalResolutionDpi());
+	GM_ASSERT(error == FT_Err_Ok);
+
 	charIndex = FT_Get_Char_Index(face, c);
 	if (charIndex == 0)
 		return errGlyph;
 
 	error = FT_Load_Glyph(face, charIndex, FT_LOAD_DEFAULT);
+	GM_ASSERT(error == FT_Err_Ok);
+
 	error = FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
+	GM_ASSERT(error == FT_Err_Ok);
+
 	error = FT_Get_Glyph(face->glyph, &glyph);
+	GM_ASSERT(error == FT_Err_Ok);
+
 	error = FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, 0, 1);
+	GM_ASSERT(error == FT_Err_Ok);
 	FT_BitmapGlyph bitmapGlyph = (FT_BitmapGlyph)glyph;
 
 	// 创建结构

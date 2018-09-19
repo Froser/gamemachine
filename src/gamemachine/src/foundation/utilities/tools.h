@@ -272,7 +272,8 @@ struct GMPath
 //GMPath: platforms/[os]/screen.cpp
 struct GMScreen
 {
-	static GMfloat dpi();
+	static GMint horizontalResolutionDpi();
+	static GMint verticalResolutionDpi();
 };
 
 //GMEvent: platforms/[os]/event.cpp
@@ -319,7 +320,7 @@ public:
 struct GMConvertion
 {
 	static GMfloat pointToInch(GMint pt);
-	static GMfloat pointToPixel(GMint pt);
+	static GMfloat pointToPixel(GMint pt, bool horizontal = true);
 	static bool hexToRGB(const GMString& hex, GMfloat rgb[3]);
 	static GMVec4 hexToRGB(const GMString& hex);
 	static GMString toUnixString(const GMString& string);

@@ -320,9 +320,9 @@ GMfloat GMConvertion::pointToInch(GMint pt)
 	return pt / 72.f;
 }
 
-GMfloat GMConvertion::pointToPixel(GMint pt)
+GMfloat GMConvertion::pointToPixel(GMint pt, bool horizontal)
 {
-	return pointToInch(pt) * GMScreen::dpi();
+	return pointToInch(pt) * (horizontal ? GMScreen::horizontalResolutionDpi() : GMScreen::verticalResolutionDpi());
 }
 
 bool GMConvertion::hexToRGB(const GMString& hex, GMfloat rgb[3])
