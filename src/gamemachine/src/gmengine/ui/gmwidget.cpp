@@ -30,7 +30,7 @@ namespace
 	GMControl* getPrevControl(GMControl* control)
 	{
 		GMWidget* parentCanvas = control->getParent();
-		GMsize_t index = (GMint) control->getIndex() - 1;
+		GMint index = gm_sizet_to_int(control->getIndex()) - 1;
 		while (index < 0)
 		{
 			parentCanvas = parentCanvas->getPrevCanvas();

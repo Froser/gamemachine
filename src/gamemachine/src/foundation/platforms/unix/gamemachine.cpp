@@ -145,12 +145,16 @@ void GameMachine::runEventLoop()
 	{
 		if (context)
 		{
-			XNextEvent(context->getDisplay(), &e);
-			IWindow* window = findWindow(d->windows, e.xany.window);
-			if (window)
+			Display* display = context->getDisplay();
+			while (XPending(display))
 			{
-				GMXEventContext c = { &e, window };
-				window->getProcHandler()(window->getWindowHandle(), 0, 0, reinterpret_cast<GMLParam>(&c));
+				XNextEvent(display, &e);
+				IWindow* window = findWindow(d->windows, e.xany.window);
+				if (window)
+				{
+					GMXEventContext c = { &e, window };
+					window->getProcHandler()(window->getWindowHandle(), 0, 0, reinterpret_cast<GMLParam>(&c));
+				}
 			}
 		}
 
@@ -190,9 +194,15 @@ void GameMachine::translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lP
 			GMPoint mousePoint = { xevent->xbutton.x, xevent->xbutton.y };
 			GMSystemEventType type = GMSystemEventType::Unknown;
 			if (xevent->type == ButtonPress)
+			{
 				type = GMSystemEventType::MouseDown;
+				// gm_debug(gm_dbg_wrap("Mouse down detected."));
+			}
 			else if (xevent->type == ButtonRelease)
+			{
 				type = GMSystemEventType::MouseUp;
+				// gm_debug(gm_dbg_wrap("Mouse up detected."));
+			}
 
 			GMMouseButton triggeredButton = GMMouseButton_None;
 			if (xevent->xbutton.button == Button1)
@@ -209,6 +219,7 @@ void GameMachine::translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lP
 		case MotionNotify:
 		{
 			GMPoint mousePoint = { xevent->xmotion.x, xevent->xmotion.y };
+			// gm_debug(gm_dbg_wrap("Mouse move detected. ({0}, {1})"), GMString(mousePoint.x), GMString(mousePoint.y));
 			GMSystemEventType type = GMSystemEventType::MouseMove;
 			GMMouseButton triggeredButton = GMMouseButton_None;
 			if (xevent->xbutton.button == Button1)
