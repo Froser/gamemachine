@@ -163,6 +163,9 @@ void GMGLTechnique::beginModel(GMModel* model, const GMGameObject* parent)
 	auto shaderProgram = getShaderProgram();
 	shaderProgram->useProgram();
 
+	// We must init this uniform. Otherwise some X11 (Ubuntu) Windows will be abnormal.
+	shaderProgram->setInt(GM_VariablesDesc.CubeMapTextureName, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
+
 	// 设置顶点颜色运算方式
 	getShaderProgram()->setInt(GM_VariablesDesc.ColorVertexOp, static_cast<GMint>(model->getShader().getVertexColorOp()));
 }
