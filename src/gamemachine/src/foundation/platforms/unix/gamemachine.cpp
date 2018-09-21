@@ -7,6 +7,11 @@
 
 namespace
 {
+	void getCPUInfo()
+	{
+		
+	}
+
 	GMEndiannessMode getMachineEndianness()
 	{
 		long int i = 1;
@@ -268,6 +273,7 @@ void GameMachine::initSystemInfo()
 	if (!inited)
 	{
 		d->states.systemInfo.endiannessMode = getMachineEndianness();
+		d->states.systemInfo.numberOfProcessors = 1;
 		inited = true;
 
 		// set locale

@@ -31,6 +31,9 @@ public:
 		typedef decltype(async(Async, std::forward<Function>(function), Iter(), Iter())) FutureType;
 
 		// 用于缓存Async状态的future，否则future析构时将会进行等待
+		if (taskCount < 1)
+			taskCount = 1;
+
 		Vector<FutureType> futures;
 		futures.reserve(taskCount);
 
