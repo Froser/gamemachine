@@ -107,6 +107,24 @@ GMString GMPath::getSpecialFolderPath(SpecialFolder sf)
 Vector<GMString> GMPath::getAllFiles(const GMString& directory)
 {
 	Vector<GMString> res;
-	GM_ASSERT(false);
+	std::string d = directory.toStdString();
+
+	DIR* dir = NULL;
+	dirent* file = NULL;
+	dir = opendir(d.c_str());
+	if (!dir)
+		return res;
+
+	while ((file = readdir(dir)) != NULL)
+	{
+		if (GMString::stringEquals(file->d_name, ".") ||
+			GMString::stringEquals(file->d_name, ".."))
+		{
+			continue;
+		}
+
+		res.push_back(fullname(directory, file->d_name));
+	}
+
 	return res;
 }

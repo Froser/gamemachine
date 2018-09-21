@@ -22,6 +22,29 @@ GMint GMXRenderContext::s_instanceCount = 0;
 
 GMXRenderContext::GMXRenderContext(IWindow* window, const char* displayName)
 {
+	initX(window, displayName);
+	++s_instanceCount;
+}
+
+GMXRenderContext::~GMXRenderContext()
+{
+	D(d);
+	--s_instanceCount;
+	if (s_instanceCount == 0)
+	{
+		XSetCloseDownMode(getDisplay(), DestroyAll);
+		XCloseDisplay(getDisplay());
+	}
+}
+
+void GMXRenderContext::switchToContext() const
+{
+	D(d);
+	glXMakeContextCurrent(getDisplay(), d->window->getWindowHandle(), d->window->getWindowHandle(), getGlxContext());
+}
+
+void GMXRenderContext::initX(IWindow* window, const char* displayName)
+{
 	D(d);
 	if (!s_display)
 	{
@@ -64,25 +87,26 @@ GMXRenderContext::GMXRenderContext(IWindow* window, const char* displayName)
 		d->aNetWMPid = getAtom("_NET_WM_PID");
 		d->aClientMachine = getAtom("WM_CLIENT_MACHINE");
 	}
-
-	++s_instanceCount;
+	initIM();
 }
 
-GMXRenderContext::~GMXRenderContext()
+void GMXRenderContext::initIM()
 {
 	D(d);
-	--s_instanceCount;
-	if (s_instanceCount == 0)
-	{
-		XSetCloseDownMode(getDisplay(), DestroyAll);
-		XCloseDisplay(getDisplay());
-	}
-}
+	d->im = XOpenIM(s_display, NULL, NULL, NULL);
+	if (!d->im)
+		gm_error(gm_dbg_wrap("Cannot open input method."));
 
-void GMXRenderContext::switchToContext() const
-{
-	D(d);
-	glXMakeContextCurrent(getDisplay(), d->window->getWindowHandle(), d->window->getWindowHandle(), getGlxContext());
+	XIMStyles* styles = NULL;
+	char* failedArg = XGetIMValues(d->im, XNQueryInputStyle, &styles, NULL);
+	if (failedArg)
+		gm_error(gm_dbg_wrap("Cannot get XIM Styles: {0}"), GMString(failedArg));
+
+	d->ic = XCreateIC(d->im, XNInputStyle, XIMPreeditNothing | XIMStatusNothing, XNClientWindow, d->window->getWindowHandle(), NULL);
+	if (!d->ic)
+		gm_error(gm_dbg_wrap("Cannot open input context."));
+
+	XSetICFocus(d->ic);
 }
 
 Atom GMXRenderContext::getAtom(const char* name)

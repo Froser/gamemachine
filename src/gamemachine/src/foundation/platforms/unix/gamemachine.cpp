@@ -128,6 +128,23 @@ namespace
 			}
 		}
 	}
+
+	void sendCharEvents(GMWindow* window, GMKey key, GMModifier m, XKeyEvent* xkey)
+	{
+		static GMwchar s_wc[128];
+		static GMLResult s_result;
+
+		const GMXRenderContext* context = gm_cast<const GMXRenderContext*>(window->getContext());
+		Status s;
+		KeySym keySym;
+		GMint len = 0;
+		len = XwcLookupString(context->getIC(), xkey, s_wc, sizeof(s_wc), &keySym, &s);
+		for (GMint i = 0; i < len; ++i)
+		{
+			GMSystemCharEvent e(GMSystemEventType::Char, key, s_wc[i], m);
+			window->handleSystemEvent(&e, s_result);
+		}
+	}
 }
 
 void GameMachine::runEventLoop()
@@ -176,10 +193,16 @@ void GameMachine::translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lP
 
 	switch (xevent->type)
 	{
+		case KeymapNotify:
+			XRefreshKeyboardMapping(&xevent->xmapping);
+			gm_debug("XRefreshKeyboardMapping");
+			break;
 		case KeyPress:
 		{
 			key = translateKey(&xevent->xkey);
-			newSystemEvent = new GMSystemKeyEvent(GMSystemEventType::KeyDown, key, translateModifier(xevent->xkey.state));
+			GMModifier m = translateModifier(xevent->xkey.state);
+			newSystemEvent = new GMSystemKeyEvent(GMSystemEventType::KeyDown, key, m);
+			sendCharEvents(window, key, m, &xevent->xkey);
 			break;
 		}
 		case KeyRelease:

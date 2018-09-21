@@ -1,6 +1,16 @@
 ﻿#include "stdafx.h"
 #include "gminput.h"
 #include <gamemachine.h>
+#include "gmxrendercontext.h"
+
+namespace
+{
+	void setCursorPos(Display* display, Window root, GMint x, GMint y)
+	{
+		XWarpPointer(display, None, root, 0, 0, 0, 0, x, y);
+		XSync(display, False);
+	}
+}
 
 GMInput::GMInput(IWindow* window)
 {
@@ -22,6 +32,10 @@ void GMInput::setDetectingMode(bool enable)
 	D(d);
 	//TODO
 	d->detectingMode = enable;
+	const GMRect& rect = d->window->getWindowStates().renderRect;
+	const GMXRenderContext* context = gm_cast<const GMXRenderContext*>(d->window->getContext());
+	Display* display = context->getDisplay();
+	setCursorPos(display, context->getRootWindow(), rect.x + rect.width / 2, rect.y + rect.height / 2);
 }
 
 GMJoystickState GMInput::joystickState()
@@ -83,6 +97,9 @@ void GMInput::msgProc(GMSystemEvent* event)
 bool GMInput::keydown(GMKey key)
 {
 	D(d);
+	const GMXRenderContext* context = gm_cast<const GMXRenderContext*>(d->window->getContext());
+
+
 	//TODO
 	return false;
 }
@@ -99,6 +116,52 @@ GMMouseState GMInput::mouseState()
 {
 	D(d);
 	GMMouseState& state = d->mouseState;
-	//TODO
+	state.wheel = d->wheelState;
+	
+	const GMXRenderContext* context = gm_cast<const GMXRenderContext*>(d->window->getContext());
+	Display* display = context->getDisplay();
+	Window window = context->getWindow()->getWindowHandle();
+
+	Window rw, cw;
+	GMint rx, ry;
+	GMint x, y;
+	GMuint mask;
+	if (XQueryPointer(
+		display, 
+		window, 
+		&rw, &cw, //root, child
+		&rx, &ry, //root x, y
+		&x, &y,
+		&mask
+	))
+	{
+		state.posX = x;
+		state.posY = y;
+
+/*
+		IKeyboardState& ks = getKeyboardState();
+		if (ks.keyTriggered(GMKey_Lbutton))
+			state.triggerButton |= GMMouseButton_Left;
+		if (ks.keyTriggered(GMKey_Rbutton))
+			state.triggerButton |= GMMouseButton_Right;
+		if (ks.keyTriggered(GMKey_Mbutton))
+			state.triggerButton |= GMMouseButton_Middle;
+			*/
+
+		if (d->detectingMode)
+		{
+			GMRect rect = d->window->getWindowRect();
+			const GMint centerX = rect.x + rect.width / 2;
+			const GMint centerY = rect.y + rect.height / 2;
+			setCursorPos(display, context->getRootWindow(), centerX, centerY);
+			state.deltaX = x - centerX;
+			state.deltaY = y - centerY;
+		}
+		else
+		{
+			state.deltaX = state.deltaY = 0;
+		}
+	}
+
 	return state;
 }

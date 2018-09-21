@@ -21,7 +21,14 @@ bool GMDefaultGamePackageHandler::readFileFromPath(const GMString& path, REF GMB
 	file.open(p, std::ios::in | std::ios::binary | std::ios::ate);
 	if (file.good())
 	{
+		file.seekg(0, std::ios::end);
 		GMint size = file.tellg();
+		if (size == -1)
+		{
+			gm_warning(gm_dbg_wrap("cannot read file from path: {0}"), path);
+			return false;
+		}
+
 		buffer->size = size;
 		buffer->buffer = new GMbyte[buffer->size];
 		buffer->needRelease = true;

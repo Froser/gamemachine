@@ -21,6 +21,8 @@ GM_PRIVATE_OBJECT(GMXRenderContext)
 	Atom aNetWMPid = None;
 	Atom aClientMachine = None;
 	bool netWMSupported;
+	XIM im;
+	XIC ic;
 };
 
 class GMXRenderContext : public GMObject, public GMRenderContext
@@ -33,6 +35,7 @@ class GMXRenderContext : public GMObject, public GMRenderContext
 	GM_DECLARE_GETTER(AtomDeleteWindow, aDeleteWindow, Atom)
 	GM_DECLARE_GETTER(AtomNetWMPid, aNetWMPid, Atom)
 	GM_DECLARE_GETTER(AtomClientMachine, aClientMachine, Atom)
+	GM_DECLARE_GETTER(IC, ic, XIC)
 
 public:
 	GMXRenderContext(IWindow* window, const char* displayName = nullptr);
@@ -60,6 +63,8 @@ public:
 	}
 
 private:
+	void initX(IWindow* window, const char* displayName);
+	void initIM();
 	Atom getAtom(const char* name);
 	GMint getWindowProperty(Window window, Atom property, Atom type, unsigned char** data);
 	bool isNetWMSupported();
