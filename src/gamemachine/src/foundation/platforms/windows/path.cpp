@@ -5,6 +5,41 @@
 #include <direct.h>
 #include <shlobj.h>
 
+namespace
+{
+	void getAllFiles(Vector<GMString>& v, const GMString& directory, bool recursive)
+	{
+		WIN32_FIND_DATA findFileData;
+		GMString wildcard = GMPath::fullname(directory, "*");
+		const std::wstring& wildcardStr = wildcard.toStdWString();
+		HANDLE hFind = FindFirstFile(wildcardStr.c_str(), &findFileData);
+		if (!GMString::stringEquals(L".", findFileData.cFileName) &&
+			!GMString::stringEquals(L"..", findFileData.cFileName))
+		{
+			if (!(findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+				v.push_back(GMPath::fullname(directory, findFileData.cFileName));
+		}
+
+		while (FindNextFile(hFind, &findFileData))
+		{
+			if (!GMString::stringEquals(L".", findFileData.cFileName) &&
+				!GMString::stringEquals(L"..", findFileData.cFileName))
+			{
+				if (recursive && findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+				{
+					getAllFiles(v, directory, recursive);
+				}
+				else
+				{
+					v.push_back(GMPath::fullname(directory, findFileData.cFileName));
+				}
+			}
+		}
+
+		FindClose(hFind);
+	}
+}
+
 GMString GMPath::directoryName(const GMString& fileName)
 {
 	GMString winFileName = fileName.replace("/", "\\");
@@ -40,25 +75,10 @@ GMString GMPath::getCurrentPath()
 	return directoryName(fn);
 }
 
-Vector<GMString> GMPath::getAllFiles(const GMString& directory)
+Vector<GMString> GMPath::getAllFiles(const GMString& directory, bool recursive)
 {
 	Vector<GMString> res;
-	GMString p = directory;
-	p.append("*");
-	_finddata_t fd;
-	long hFile = 0;
-	if ((hFile = _findfirst(p.toStdString().c_str(), &fd)) != -1)
-	{
-		do
-		{
-			if ((fd.attrib &  _A_ARCH))
-			{
-				if (!GMString::stringEquals(fd.name, ".") && !GMString::stringEquals(fd.name, ".."))
-					res.push_back(GMString(directory).append(fd.name));
-			}
-		} while (_findnext(hFile, &fd) == 0);
-		_findclose(hFile);
-	}
+	::getAllFiles(res, directory, recursive);
 	return res;
 }
 

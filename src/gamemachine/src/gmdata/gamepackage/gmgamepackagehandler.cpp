@@ -102,7 +102,7 @@ GMGamePackage* GMDefaultGamePackageHandler::gamePackage()
 
 Vector<GMString> GMDefaultGamePackageHandler::getAllFiles(const GMString& directory)
 {
-	return GMPath::getAllFiles(directory);
+	return GMPath::getAllFiles(directory, true);
 }
 
 #define CHECK(err) if (err != UNZ_OK) return false
