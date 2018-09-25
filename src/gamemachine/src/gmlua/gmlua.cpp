@@ -36,7 +36,7 @@ namespace
 		lua_newtable(l);
 		GMFloat4 f4;
 		v.loadFloat4(f4);
-		for (GMint i = 0; i < T::length(); i++)
+		for (GMint32 i = 0; i < T::length(); i++)
 		{
 			lua_pushnumber(l, i);
 			lua_pushnumber(l, f4[i]);
@@ -46,7 +46,7 @@ namespace
 	}
 
 	template <typename T>
-	bool popVector(T& v, GMint index, GMLuaCoreState* l)
+	bool popVector(T& v, GMint32 index, GMLuaCoreState* l)
 	{
 		GM_CHECK_LUA_STACK_BALANCE_(l, 0);
 		GMFloat4 f4(0, 0, 0, 0);
@@ -58,7 +58,7 @@ namespace
 			if (!lua_isinteger(l, -2))
 				return false;
 
-			GMint key = lua_tointeger(l, -2);
+			GMint32 key = lua_tointeger(l, -2);
 			if (!lua_isnumber(l, -1))
 				return false;
 
@@ -78,11 +78,11 @@ namespace
 	bool popVector(T& v, GMLuaCoreState* l)
 	{
 		GM_CHECK_LUA_STACK_BALANCE_(l, 0);
-		GMint index = lua_gettop(l);
+		GMint32 index = lua_gettop(l);
 		return popVector(v, index, l);
 	}
 
-	bool popMatrix(GMMat4& v, GMint index, GMLuaCoreState* l)
+	bool popMatrix(GMMat4& v, GMint32 index, GMLuaCoreState* l)
 	{
 		GM_CHECK_LUA_STACK_BALANCE_(l, 0);
 		GMVec4 v4[GMMat4::length()];
@@ -94,7 +94,7 @@ namespace
 			if (!lua_isinteger(l, -2))
 				return false;
 
-			GMint key = lua_tointeger(l, -2);
+			GMint32 key = lua_tointeger(l, -2);
 			bool isVector = popVector(v4[key - 1], l);
 			if (!isVector)
 				return false;
@@ -239,13 +239,13 @@ bool GMLua::getFromGlobal(const char* name, GMObject& obj)
 	return popTable(obj);
 }
 
-GMLuaResult GMLua::protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args, GMVariant* returns, GMint nRet)
+GMLuaResult GMLua::protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args, GMVariant* returns, GMint32 nRet)
 {
 	D(d);
 	GM_CHECK_LUA_STACK_BALANCE(nRet);
 	GMLuaResult lr = pcall(functionName, args, nRet);
 	CHECK(lr);
-	for (GMint i = 0; i < nRet; i++)
+	for (GMint32 i = 0; i < nRet; i++)
 	{
 		if (returns[i].isObject())
 			popTable(*returns[i].toObject());
@@ -266,7 +266,7 @@ void GMLua::loadLibrary()
 	}
 }
 
-GMLuaResult GMLua::pcall(const char* functionName, const std::initializer_list<GMVariant>& args, GMint nRet)
+GMLuaResult GMLua::pcall(const char* functionName, const std::initializer_list<GMVariant>& args, GMint32 nRet)
 {
 	D(d);
 	GM_CHECK_LUA_STACK_BALANCE(nRet);
@@ -301,7 +301,7 @@ bool GMLua::popTable(GMObject& obj)
 	return popTable(obj, lua_gettop(L));
 }
 
-bool GMLua::popTable(GMObject& obj, GMint index)
+bool GMLua::popTable(GMObject& obj, GMint32 index)
 {
 	D(d);
 	GM_CHECK_LUA_STACK_BALANCE(0);
@@ -337,7 +337,7 @@ bool GMLua::popTable(GMObject& obj, GMint index)
 					*(static_cast<bool*>(member.second.ptr)) = !!lua_toboolean(L, -1);
 					break;
 				case GMMetaMemberType::Int:
-					*(static_cast<GMint*>(member.second.ptr)) = lua_tointeger(L, -1);
+					*(static_cast<GMint32*>(member.second.ptr)) = lua_tointeger(L, -1);
 					break;
 				case GMMetaMemberType::Vector2:
 					{
@@ -426,7 +426,7 @@ void GMLua::pushMatrix(const GMMat4& v)
 	D(d);
 	GM_CHECK_LUA_STACK_BALANCE(1);
 	lua_newtable(L);
-	for (GMint i = 0; i < GMMat4::length(); i++)
+	for (GMint32 i = 0; i < GMMat4::length(); i++)
 	{
 		lua_pushnumber(L, i);
 		pushVector(v[i]);
@@ -483,7 +483,7 @@ void GMLua::setTable(const char* key, const GMObjectMember& value)
 	switch (value.type)
 	{
 	case GMMetaMemberType::Int:
-		lua_pushinteger(L, *static_cast<GMint*>(value.ptr));
+		lua_pushinteger(L, *static_cast<GMint32*>(value.ptr));
 		break;
 	case GMMetaMemberType::Float:
 		lua_pushnumber(L, *static_cast<GMfloat*>(value.ptr));
@@ -542,7 +542,7 @@ GMVariant GMLua::getTop()
 	D(d);
 	GM_CHECK_LUA_STACK_BALANCE(0);
 	if (lua_isinteger(L, -1))
-		return static_cast<GMint>(lua_tointeger(L, -1));
+		return static_cast<GMint32>(lua_tointeger(L, -1));
 	if (lua_isnumber(L, -1))
 		return lua_tonumber(L, -1);
 	if (lua_isstring(L, -1))

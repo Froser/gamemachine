@@ -12,7 +12,7 @@ struct __PopGuard							\
 BEGIN_NS
 using namespace luaapi;
 
-GMint GMArgumentHelper::getArgumentsCount(GMLuaCoreState* L)
+GMint32 GMArgumentHelper::getArgumentsCount(GMLuaCoreState* L)
 {
 	GM_CHECK_LUA_STACK_BALANCE(0);
 	return lua_gettop(L);

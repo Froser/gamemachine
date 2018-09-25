@@ -68,7 +68,7 @@ gm::GMWidget* Demo_Controls::createDefaultWidget()
 	d->mainWidget->setSize(300, 500);
 	getDemoWorldReference()->getContext()->getWindow()->addWidget(d->mainWidget.get());
 
-	gm::GMint top = 10;
+	gm::GMint32 top = 10;
 	gm::GMRect thumbCorner = { 0, 0, 7, 15 };
 	d->mainWidget->addScrollBar(
 		550,

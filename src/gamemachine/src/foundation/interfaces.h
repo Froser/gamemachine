@@ -153,7 +153,7 @@ GM_INTERFACE(ITexture)
 {
 	virtual void init() = 0;
 	virtual void bindSampler(GMTextureSampler* sampler) = 0;
-	virtual void useTexture(GMint textureIndex) = 0;
+	virtual void useTexture(GMint32 textureIndex) = 0;
 };
 
 //! 可以获取、设置对象的数据接口。
@@ -193,13 +193,13 @@ struct GMWindowAttributes
 	GMDWord dwExStyle = NULL;
 	RECT rc = { 0, 0, 1024, 768 };
 	HMENU hMenu = NULL;
-	GMint samples = 8;
+	GMint32 samples = 8;
 	GMInstance instance;
 };
 #else
-typedef GMint GMUIInstance;
-typedef GMint GMWindowHandle;
-typedef GMint GMInstance;
+typedef GMint32 GMUIInstance;
+typedef GMint32 GMWindowHandle;
+typedef GMint32 GMInstance;
 struct GMWindowAttributes
 {
 	GMWindowHandle hwndParent = 0;
@@ -207,8 +207,8 @@ struct GMWindowAttributes
 	GMulong dwStyle = 0;
 	GMulong dwExStyle = 0;
 	GMRect rc = { 0, 0, 1024, 768 };
-	GMint hMenu = 0;
-	GMint samples = 8;
+	GMint32 hMenu = 0;
+	GMint32 samples = 8;
 	GMInstance instance;
 };
 #endif
@@ -216,8 +216,8 @@ struct GMWindowAttributes
 struct GMCursorDesc
 {
 	GMWindowHandle hWnd;
-	GMuint xHotspot;
-	GMuint yHotspot;
+	GMuint32 xHotspot;
+	GMuint32 yHotspot;
 	GMfloat transparentColor[3];
 };
 
@@ -249,7 +249,7 @@ GM_INTERFACE_FROM(IShaderProgram, IQueriable)
 	virtual void setMatrix4(const char* name, const GMMat4& value) = 0;
 	virtual void setVec4(const char* name, const GMFloat4&) = 0;
 	virtual void setVec3(const char* name, const GMfloat value[3]) = 0;
-	virtual void setInt(const char* name, GMint value) = 0;
+	virtual void setInt(const char* name, GMint32 value) = 0;
 	virtual void setFloat(const char* name, GMfloat value) = 0;
 	virtual void setBool(const char* name, bool value) = 0;
 	virtual bool setInterfaceInstance(const char* interfaceName, const char* instanceName, GMShaderType type) = 0;
@@ -335,7 +335,7 @@ GM_INTERFACE(ILight)
 	virtual void setLightColor(GMfloat color[4]) = 0;
 	virtual const GMfloat* getLightPosition() const = 0;
 	virtual const GMfloat* getLightColor() const = 0;
-	virtual void activateLight(GMuint, ITechnique*) = 0;
+	virtual void activateLight(GMuint32, ITechnique*) = 0;
 };
 
 struct GMStencilOptions
@@ -524,8 +524,8 @@ struct GMWindowStates
 	GMfloat minDepth = 0; //!< 近平面的深度值。
 	GMfloat maxDepth = 1; //!< 远平面的深度值。
 	GMString workingAdapterDesc; //!< 适配器信息。
-	GMint sampleCount; //!< 多重采样数量。
-	GMint sampleQuality; //!< 多重采样质量。
+	GMint32 sampleCount; //!< 多重采样数量。
+	GMint32 sampleQuality; //!< 多重采样质量。
 	bool vsyncEnabled = false; //!< 是否垂直同步。
 	GMRect renderRect; //!< 当前窗口渲染窗口位置信息。
 };
@@ -548,7 +548,7 @@ enum class GMCursorType
 	EndOfEnum,
 };
 
-typedef GMLResult (GM_SYSTEM_CALLBACK *GMWindowProcHandler)(GMWindowHandle hWnd, GMuint uMsg, GMWParam wParam, GMLParam lParam);
+typedef GMLResult (GM_SYSTEM_CALLBACK *GMWindowProcHandler)(GMWindowHandle hWnd, GMuint32 uMsg, GMWParam wParam, GMLParam lParam);
 GM_INTERFACE_FROM(IWindow, IQueriable)
 {
 	virtual IInput* getInputMananger() = 0;
@@ -590,17 +590,17 @@ typedef WAVEFORMATEX GMWaveFormatEx;
 
 struct GMAudioFileInfo
 {
-	GMint format;
+	GMint32 format;
 	const void* data;
 	GMsize_t size;
-	GMint frequency;
+	GMint32 frequency;
 	GMWaveFormatEx waveFormatExHeader;
 };
 
 GM_INTERFACE(IAudioStream)
 {
-	virtual GMuint getBufferSize() = 0; // 每个部分的buffer大小
-	virtual GMuint getBufferNum() = 0; // buffer一共分为多少部分
+	virtual GMuint32 getBufferSize() = 0; // 每个部分的buffer大小
+	virtual GMuint32 getBufferNum() = 0; // buffer一共分为多少部分
 	virtual bool readBuffer(GMbyte* data) = 0;
 	virtual void nextChunk(gm::GMlong chunkNum) = 0;
 	virtual void rewind() = 0;
@@ -611,7 +611,7 @@ GM_INTERFACE(IAudioFile)
 	virtual bool isStream() = 0;
 	virtual IAudioStream* getStream() = 0;
 	virtual const GMAudioFileInfo& getFileInfo() = 0;
-	virtual GMuint getBufferId() = 0;
+	virtual GMuint32 getBufferId() = 0;
 };
 
 GM_INTERFACE(IAudioSource)

@@ -174,9 +174,9 @@ using GMAtomic = std::atomic<T>;
 #define GM_META_METHOD
 
 // 用于枚举的宏
-#define GM_FOREACH_ENUM(var, start, end) for (auto var = start; var < end; var = (decltype(var))(((gm::GMint)var)+1) )
+#define GM_FOREACH_ENUM(var, start, end) for (auto var = start; var < end; var = (decltype(var))(((gm::GMint32)var)+1) )
 
-#define GM_FOREACH_ENUM_CLASS(var, start, end) for (decltype(start) var = start; (gm::GMint) var < (gm::GMint) end; var = (decltype(var))(((gm::GMint)var)+1) )
+#define GM_FOREACH_ENUM_CLASS(var, start, end) for (decltype(start) var = start; (gm::GMint32) var < (gm::GMint32) end; var = (decltype(var))(((gm::GMint32)var)+1) )
 
 // 非WINDOWS下的数据类型
 #if GM_WINDOWS
@@ -199,8 +199,8 @@ BEGIN_NS
 // 基本数据类型
 typedef float GMfloat;
 typedef GMfloat GMDuration;
-typedef int GMint;
-typedef unsigned int GMuint;
+typedef int GMint32;
+typedef unsigned int GMuint32;
 typedef short GMshort;
 typedef ptrdiff_t GMptrdiff;
 typedef unsigned char GMbyte;
@@ -210,7 +210,7 @@ typedef short GMshort;
 typedef unsigned short GMushort;
 typedef wchar_t GMwchar;
 typedef int64_t GMint64;
-typedef GMint GMFontSizePt;
+typedef GMint32 GMFontSizePt;
 typedef size_t GMsize_t;
 
 #if GM_WINDOWS
@@ -218,7 +218,7 @@ typedef WPARAM GMWParam;
 typedef LPARAM GMLParam;
 typedef LRESULT GMLResult;
 #else
-typedef GMint GMWParam;
+typedef GMint32 GMWParam;
 typedef GMlong GMLParam;
 typedef GMlong GMLResult;
 #endif
@@ -227,8 +227,8 @@ typedef GMlong GMLResult;
 #define GM_STATIC_ASSERT static_assert
 #define GM_STATIC_ASSERT_SIZE(type, size) GM_STATIC_ASSERT(sizeof(type) == size, "Type '" #type "' size static assert failed. Excepted size is " #size);
 GM_STATIC_ASSERT_SIZE(GMbyte, 1);
-GM_STATIC_ASSERT_SIZE(GMint, 4);
-GM_STATIC_ASSERT_SIZE(GMuint, 4);
+GM_STATIC_ASSERT_SIZE(GMint32, 4);
+GM_STATIC_ASSERT_SIZE(GMuint32, 4);
 GM_STATIC_ASSERT_SIZE(GMfloat, 4);
 GM_STATIC_ASSERT_SIZE(GMint64, 8);
 GM_STATIC_ASSERT_SIZE(GMWord, 2);
@@ -250,7 +250,7 @@ constexpr GMsize_t GMInvalidFontHandle = -1;
 
 struct GMRect
 {
-	GMint x, y, width, height;
+	GMint32 x, y, width, height;
 };
 
 struct GMRectF
@@ -260,20 +260,20 @@ struct GMRectF
 
 struct GMPoint
 {
-	GMint x;
-	GMint y;
+	GMint32 x;
+	GMint32 y;
 };
 
-inline GMint gm_sizet_to_int(GMsize_t sz)
+inline GMint32 gm_sizet_to_int(GMsize_t sz)
 {
-	GM_ASSERT(sz < static_cast<GMsize_t>(std::numeric_limits<GMint>::max()));
-	return static_cast<GMint>(sz);
+	GM_ASSERT(sz < static_cast<GMsize_t>(std::numeric_limits<GMint32>::max()));
+	return static_cast<GMint32>(sz);
 }
 
-inline GMuint gm_sizet_to_uint(GMsize_t sz)
+inline GMuint32 gm_sizet_to_uint(GMsize_t sz)
 {
-	GM_ASSERT(sz < static_cast<GMsize_t>(std::numeric_limits<GMuint>::max()));
-	return static_cast<GMuint>(sz);
+	GM_ASSERT(sz < static_cast<GMsize_t>(std::numeric_limits<GMuint32>::max()));
+	return static_cast<GMuint32>(sz);
 }
 
 template <typename T>
@@ -302,8 +302,8 @@ inline GMRect GM_intersectRect(const GMRect& rect1, const GMRect& rect2)
 
 	rc.x = rect1.x > rect2.x ? rect1.x : rect2.x;
 	rc.y = rect1.y > rect2.y ? rect1.y : rect2.y;
-	GMint right = (rect1.x + rect1.width) < (rect2.x + rect2.width) ? (rect1.x + rect1.width) : (rect2.x + rect2.width);
-	GMint bottom = (rect1.y + rect1.height) < (rect2.y + rect2.height) ? (rect1.y + rect1.height) : (rect2.y + rect2.height);
+	GMint32 right = (rect1.x + rect1.width) < (rect2.x + rect2.width) ? (rect1.x + rect1.width) : (rect2.x + rect2.width);
+	GMint32 bottom = (rect1.y + rect1.height) < (rect2.y + rect2.height) ? (rect1.y + rect1.height) : (rect2.y + rect2.height);
 	rc.width = right - rc.x;
 	rc.height = bottom - rc.y;
 	if (rc.width < 0)

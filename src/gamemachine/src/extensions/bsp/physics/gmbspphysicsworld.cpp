@@ -99,7 +99,7 @@ void GMBSPPhysicsWorld::generatePhysicsPlaneData()
 	GMFloat4 f4_normal;
 	BSPData& bsp = d->world->bspData();
 	d->planes.resize(bsp.numplanes);
-	for (GMint i = 0; i < bsp.numplanes; i++)
+	for (GMint32 i = 0; i < bsp.numplanes; i++)
 	{
 		bsp.planes[i].normal.loadFloat4(f4_normal);
 		d->planes[i] = bsp.planes[i];
@@ -113,7 +113,7 @@ void GMBSPPhysicsWorld::generatePhysicsBrushSideData()
 	D(d);
 	BSPData& bsp = d->world->bspData();
 	d->brushsides.resize(bsp.numbrushsides);
-	for (GMint i = 0; i < bsp.numbrushsides; i++)
+	for (GMint32 i = 0; i < bsp.numbrushsides; i++)
 	{
 		GMBSP_Physics_BrushSide* bs = &d->brushsides[i];
 		bs->side = &bsp.brushsides[i];
@@ -127,7 +127,7 @@ void GMBSPPhysicsWorld::generatePhysicsBrushData()
 	D(d);
 	BSPData& bsp = d->world->bspData();
 	d->brushes.resize(bsp.numbrushes);
-	for (GMint i = 0; i < bsp.numbrushes; i++)
+	for (GMint32 i = 0; i < bsp.numbrushes; i++)
 	{
 		GMBSP_Physics_Brush* b = &d->brushes[i];
 		b->checkcount = 0;
@@ -147,17 +147,17 @@ void GMBSPPhysicsWorld::generatePhysicsPatches()
 	// not planar faces
 
 	d->patch.alloc(bsp.numDrawSurfaces);
-	for (GMint i = 0; i < bsp.numDrawSurfaces; i++)
+	for (GMint32 i = 0; i < bsp.numDrawSurfaces; i++)
 	{
 		if (bsp.drawSurfaces[i].surfaceType != MST_PATCH)
 			continue;
 
-		GMint width = bsp.drawSurfaces[i].patchWidth, height = bsp.drawSurfaces[i].patchHeight;
-		GMint c = width * height;
+		GMint32 width = bsp.drawSurfaces[i].patchWidth, height = bsp.drawSurfaces[i].patchHeight;
+		GMint32 c = width * height;
 		AlignedVector<GMVec3> points;
 		points.resize(c);
 		GMBSPDrawVertices* v = &bsp.vertices[bsp.drawSurfaces[i].firstVert];
-		for (GMint j = 0; j < c; j++, v++)
+		for (GMint32 j = 0; j < c; j++, v++)
 		{
 			points[j] = v->xyz;
 		}

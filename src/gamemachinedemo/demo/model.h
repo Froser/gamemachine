@@ -11,8 +11,8 @@ GM_PRIVATE_OBJECT(Demo_Model)
 	gm::GMGameObject* gameObject2 = nullptr;
 	gm::GMGameObject* gameObject3 = nullptr;
 	gm::GMCubeMapGameObject* skyObject = nullptr;
-	gm::GMint mouseDownX;
-	gm::GMint mouseDownY;
+	gm::GMint32 mouseDownX;
+	gm::GMint32 mouseDownY;
 	bool draggingL = false;
 	bool draggingR = false;
 	GMQuat lookAtRotation;

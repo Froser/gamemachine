@@ -14,16 +14,16 @@ BEGIN_NS
 GM_DEFINE_SIGNAL(GMControlTextEdit::textChanged)
 GM_PRIVATE_OBJECT(GMMultiLineTypoTextBuffer)
 {
-	GMint lineSpacing = 5;
-	GMint lineHeight = 0;
+	GMint32 lineSpacing = 5;
+	GMint32 lineHeight = 0;
 };
 
 GM_PRIVATE_OBJECT(GMControlTextControlTransactionAtom)
 {
-	GMint cpStart = 0;
-	GMint cpEnd = 0;
-	GMint cpLastStart = 0;
-	GMint cpLastEnd = 0;
+	GMint32 cpStart = 0;
+	GMint32 cpEnd = 0;
+	GMint32 cpLastStart = 0;
+	GMint32 cpLastEnd = 0;
 	GMControlTextEdit* textEdit = nullptr;
 };
 
@@ -34,10 +34,10 @@ class GMControlTextControlTransactionAtom : public ITransactionAtom
 public:
 	GMControlTextControlTransactionAtom(
 		GMControlTextEdit* textEdit,
-		GMint cpStart,
-		GMint cpEnd,
-		GMint cpLastStart,
-		GMint cpLastEnd
+		GMint32 cpStart,
+		GMint32 cpEnd,
+		GMint32 cpLastStart,
+		GMint32 cpLastEnd
 	);
 
 	virtual void execute() override;
@@ -46,10 +46,10 @@ public:
 
 GMControlTextControlTransactionAtom::GMControlTextControlTransactionAtom(
 	GMControlTextEdit* textEdit,
-	GMint cpStart,
-	GMint cpEnd,
-	GMint cpLastStart,
-	GMint cpLastEnd
+	GMint32 cpStart,
+	GMint32 cpEnd,
+	GMint32 cpLastStart,
+	GMint32 cpLastEnd
 )
 {
 	D(d);
@@ -82,40 +82,40 @@ public:
 	GMMultiLineTypoTextBuffer() = default;
 
 public:
-	virtual void analyze(GMint start) override;
-	virtual bool CPtoX(GMint cp, bool trail, GMint* x) { GM_ASSERT(false); return false; }
-	virtual bool XtoCP(GMint x, GMint* cp, bool* trail) { GM_ASSERT(false); return false; }
-	virtual bool CPtoXY(GMint cp, bool trail, GMint* x, GMint* y);
-	virtual bool CPtoMidXY(GMint cp, GMint* x, GMint* y);
-	virtual bool XYtoCP(GMint x, GMint y, GMint* cp);
+	virtual void analyze(GMint32 start) override;
+	virtual bool CPtoX(GMint32 cp, bool trail, GMint32* x) { GM_ASSERT(false); return false; }
+	virtual bool XtoCP(GMint32 x, GMint32* cp, bool* trail) { GM_ASSERT(false); return false; }
+	virtual bool CPtoXY(GMint32 cp, bool trail, GMint32* x, GMint32* y);
+	virtual bool CPtoMidXY(GMint32 cp, GMint32* x, GMint32* y);
+	virtual bool XYtoCP(GMint32 x, GMint32 y, GMint32* cp);
 	
 public:
-	GMint CPToLineNumber(GMint cp);
-	GMint findFirstCPInOneLine(GMint cp);
-	GMint findLastCPInOneLine(GMint cp);
-	bool isNewLine(GMint cp);
+	GMint32 CPToLineNumber(GMint32 cp);
+	GMint32 findFirstCPInOneLine(GMint32 cp);
+	GMint32 findLastCPInOneLine(GMint32 cp);
+	bool isNewLine(GMint32 cp);
 
 public:
-	inline void setLineSpacing(GMint lineSpacing) GM_NOEXCEPT
+	inline void setLineSpacing(GMint32 lineSpacing) GM_NOEXCEPT
 	{
 		D(d);
 		d->lineSpacing = lineSpacing;
 	}
 
-	inline GMint getLineSpacing() GM_NOEXCEPT
+	inline GMint32 getLineSpacing() GM_NOEXCEPT
 	{
 		D(d);
 		return d->lineSpacing;
 	}
 
-	inline void setLineHeight(GMint lineHeight) GM_NOEXCEPT
+	inline void setLineHeight(GMint32 lineHeight) GM_NOEXCEPT
 	{
 		D(d);
 		d->lineHeight = lineHeight;
 	}
 };
 
-void GMMultiLineTypoTextBuffer::analyze(GMint start)
+void GMMultiLineTypoTextBuffer::analyze(GMint32 start)
 {
 	D(d);
 	D_BASE(db, Base);
@@ -129,7 +129,7 @@ void GMMultiLineTypoTextBuffer::analyze(GMint start)
 	db->dirty = false;
 }
 
-bool GMMultiLineTypoTextBuffer::CPtoXY(GMint cp, bool trail, GMint* x, GMint* y)
+bool GMMultiLineTypoTextBuffer::CPtoXY(GMint32 cp, bool trail, GMint32* x, GMint32* y)
 {
 	D_BASE(d, Base);
 	if (cp < 0)
@@ -179,7 +179,7 @@ bool GMMultiLineTypoTextBuffer::CPtoXY(GMint cp, bool trail, GMint* x, GMint* y)
 	return true;
 }
 
-bool GMMultiLineTypoTextBuffer::CPtoMidXY(GMint cp, GMint* x, GMint* y)
+bool GMMultiLineTypoTextBuffer::CPtoMidXY(GMint32 cp, GMint32* x, GMint32* y)
 {
 	D_BASE(d, Base);
 	if (cp < 0)
@@ -222,7 +222,7 @@ bool GMMultiLineTypoTextBuffer::CPtoMidXY(GMint cp, GMint* x, GMint* y)
 	return true;
 }
 
-bool GMMultiLineTypoTextBuffer::XYtoCP(GMint x, GMint y, GMint* cp)
+bool GMMultiLineTypoTextBuffer::XYtoCP(GMint32 x, GMint32 y, GMint32* cp)
 {
 	D_BASE(d, Base);
 	if (x < 0 || y < 0)
@@ -247,10 +247,10 @@ bool GMMultiLineTypoTextBuffer::XYtoCP(GMint x, GMint y, GMint* cp)
 	for (GMsize_t i = 0; i < r.size() - 1; ++i)
 	{
 		GMRect glyphRc = {
-			static_cast<GMint>(r[i].x - r[i].bearingX),
-			static_cast<GMint>(r[i].y),
-			static_cast<GMint>(r[i].advance),
-			static_cast<GMint>(getLineHeight() + getLineSpacing())
+			static_cast<GMint32>(r[i].x - r[i].bearingX),
+			static_cast<GMint32>(r[i].y),
+			static_cast<GMint32>(r[i].advance),
+			static_cast<GMint32>(getLineHeight() + getLineSpacing())
 		};
 
 		if (GM_inRect(glyphRc, pt))
@@ -261,9 +261,9 @@ bool GMMultiLineTypoTextBuffer::XYtoCP(GMint x, GMint y, GMint* cp)
 	}
 
 	// 如果没有选中某个字符，那么选择这一行末尾
-	GMint currentLine = 0;
-	GMint rowX, rowY;
-	for (GMint i = 0; i < gm_sizet_to_int(r.size() - 1); ++i)
+	GMint32 currentLine = 0;
+	GMint32 rowX, rowY;
+	for (GMint32 i = 0; i < gm_sizet_to_int(r.size() - 1); ++i)
 	{
 		if (currentLine == r[i].lineNo)
 			continue;
@@ -285,7 +285,7 @@ bool GMMultiLineTypoTextBuffer::XYtoCP(GMint x, GMint y, GMint* cp)
 	return true;
 }
 
-GMint GMMultiLineTypoTextBuffer::CPToLineNumber(GMint cp)
+GMint32 GMMultiLineTypoTextBuffer::CPToLineNumber(GMint32 cp)
 {
 	D_BASE(d, Base);
 	if (cp < 0)
@@ -301,7 +301,7 @@ GMint GMMultiLineTypoTextBuffer::CPToLineNumber(GMint cp)
 	return r[cp].lineNo;
 }
 
-GMint GMMultiLineTypoTextBuffer::findFirstCPInOneLine(GMint cp)
+GMint32 GMMultiLineTypoTextBuffer::findFirstCPInOneLine(GMint32 cp)
 {
 	D_BASE(d, Base);
 	if (d->dirty)
@@ -320,7 +320,7 @@ GMint GMMultiLineTypoTextBuffer::findFirstCPInOneLine(GMint cp)
 	return 0;
 }
 
-GMint GMMultiLineTypoTextBuffer::findLastCPInOneLine(GMint cp)
+GMint32 GMMultiLineTypoTextBuffer::findLastCPInOneLine(GMint32 cp)
 {
 	D_BASE(d, Base);
 	if (d->dirty)
@@ -339,7 +339,7 @@ GMint GMMultiLineTypoTextBuffer::findLastCPInOneLine(GMint cp)
 	return gm_sizet_to_int(r.size() - 1);
 }
 
-bool GMMultiLineTypoTextBuffer::isNewLine(GMint cp)
+bool GMMultiLineTypoTextBuffer::isNewLine(GMint32 cp)
 {
 	D_BASE(d, Base);
 	decltype(auto) r = d->engine->getResults().results;
@@ -390,12 +390,12 @@ void GMControlTextEdit::render(GMDuration elapsed)
 	d->borderControl->render(elapsed);
 
 	// 计算首个能显示的字符
-	GMint firstX;
+	GMint32 firstX;
 	d->buffer->CPtoX(d->firstVisibleCP, false, &firstX);
 
 	// 计算选区
-	GMint caretX;
-	GMint selectionStartX = 0;
+	GMint32 caretX;
+	GMint32 selectionStartX = 0;
 	d->buffer->CPtoX(d->cp, false, &caretX);
 	if (d->cp != d->selectionStartCP)
 		d->buffer->CPtoX(d->selectionStartCP, false, &selectionStartX);
@@ -407,7 +407,7 @@ void GMControlTextEdit::render(GMDuration elapsed)
 	if (d->cp != d->selectionStartCP)
 	{
 		// 如果当前位置不等于选定开始的位置，则确定一个选区
-		GMint selectionLeftX = caretX, selectionRightX = selectionStartX;
+		GMint32 selectionLeftX = caretX, selectionRightX = selectionStartX;
 		if (selectionLeftX > selectionRightX)
 		{
 			GM_SWAP(selectionLeftX, selectionRightX);
@@ -431,14 +431,14 @@ void GMControlTextEdit::render(GMDuration elapsed)
 	widget->drawText(d->buffer.get(), d->textStyle, d->rcText, false);
 }
 
-void GMControlTextEdit::setSize(GMint width, GMint height)
+void GMControlTextEdit::setSize(GMint32 width, GMint32 height)
 {
 	D(d);
 	GMControl::setSize(width, height);
 	d->borderControl->setSize(width, height);
 }
 
-void GMControlTextEdit::setPosition(GMint x, GMint y)
+void GMControlTextEdit::setPosition(GMint32 x, GMint32 y)
 {
 	D(d);
 	GMControl::setPosition(x, y);
@@ -702,7 +702,7 @@ void GMControlTextEdit::setText(const GMString& text)
 	d->buffer->setBuffer(text);
 }
 
-void GMControlTextEdit::setPadding(GMint x, GMint y)
+void GMControlTextEdit::setPadding(GMint32 x, GMint32 y)
 {
 	D(d);
 	d->padding[0] = x;
@@ -755,8 +755,8 @@ bool GMControlTextEdit::onKey_Delete(GMSystemKeyEvent* event)
 {
 	D(d);
 	GMScopeTransaction st(&d->transactionContext);
-	GMint firstCp = Min(d->cp, d->selectionStartCP);
-	GMint lastCp = Max(d->cp, d->selectionStartCP);
+	GMint32 firstCp = Min(d->cp, d->selectionStartCP);
+	GMint32 lastCp = Max(d->cp, d->selectionStartCP);
 	ITransactionAtom* atom = st.getManager()->addAtom(new GMControlTextControlTransactionAtom(this, firstCp, firstCp, d->cp, d->selectionStartCP));
 	if (d->cp != d->selectionStartCP)
 	{
@@ -870,7 +870,7 @@ void GMControlTextEdit::createBufferTypoEngineIfNotExist()
 	GM_ASSERT(d->buffer->getTypoEngine());
 }
 
-void GMControlTextEdit::blinkCaret(GMint firstX, GMint caretX)
+void GMControlTextEdit::blinkCaret(GMint32 firstX, GMint32 caretX)
 {
 	D(d);
 	GMfloat time = GM.getRunningStates().elapsedTime;
@@ -884,7 +884,7 @@ void GMControlTextEdit::blinkCaret(GMint firstX, GMint caretX)
 		renderCaret(firstX, caretX);
 }
 
-void GMControlTextEdit::placeCaret(GMint cp, bool adjustVisibleCP)
+void GMControlTextEdit::placeCaret(GMint32 cp, bool adjustVisibleCP)
 {
 	D(d);
 	GM_ASSERT(cp >= 0);
@@ -894,7 +894,7 @@ void GMControlTextEdit::placeCaret(GMint cp, bool adjustVisibleCP)
 
 	if (adjustVisibleCP)
 	{
-		GMint firstX, x, x2;
+		GMint32 firstX, x, x2;
 		d->buffer->CPtoX(d->firstVisibleCP, false, &firstX);
 		d->buffer->CPtoX(cp, false, &x); //lead
 		if (cp == d->buffer->getLength())
@@ -909,11 +909,11 @@ void GMControlTextEdit::placeCaret(GMint cp, bool adjustVisibleCP)
 		}
 		else if (x2 > firstX + d->rcText.width)
 		{
-			GMint xNewLeft = x2 - d->rcText.width;
-			GMint cpNewFirst;
+			GMint32 xNewLeft = x2 - d->rcText.width;
+			GMint32 cpNewFirst;
 			bool newTrail;
 			d->buffer->XtoCP(xNewLeft, &cpNewFirst, &newTrail);
-			GMint xNewFirst;
+			GMint32 xNewFirst;
 			d->buffer->CPtoX(cpNewFirst, false, &xNewFirst);
 			if (xNewFirst < xNewLeft)
 				++cpNewFirst;
@@ -923,7 +923,7 @@ void GMControlTextEdit::placeCaret(GMint cp, bool adjustVisibleCP)
 	}
 }
 
-void GMControlTextEdit::placeSelectionStart(GMint selectionStartCP)
+void GMControlTextEdit::placeSelectionStart(GMint32 selectionStartCP)
 {
 	D(d);
 	GM_ASSERT(selectionStartCP >= 0);
@@ -932,10 +932,10 @@ void GMControlTextEdit::placeSelectionStart(GMint selectionStartCP)
 	d->selectionStartCP = selectionStartCP;
 }
 
-void GMControlTextEdit::adjustInsertModeRect(REF GMRect& caretRc, GMint caretX)
+void GMControlTextEdit::adjustInsertModeRect(REF GMRect& caretRc, GMint32 caretX)
 {
 	D(d);
-	GMint rightEdgeX;
+	GMint32 rightEdgeX;
 	d->buffer->CPtoX(d->cp, true, &rightEdgeX);
 	caretRc.width = rightEdgeX - caretX;
 	if (caretRc.width <= 0)
@@ -976,8 +976,8 @@ bool GMControlTextEdit::deleteSelectionText()
 {
 	D(d);
 	GMScopeTransaction st(&d->transactionContext);
-	GMint firstCp = Min(d->cp, d->selectionStartCP);
-	GMint lastCp = Max(d->cp, d->selectionStartCP);
+	GMint32 firstCp = Min(d->cp, d->selectionStartCP);
+	GMint32 lastCp = Max(d->cp, d->selectionStartCP);
 	if (firstCp < lastCp)
 	{
 		ITransactionAtom* atom = st.getManager()->addAtom(new GMControlTextControlTransactionAtom(this, firstCp, firstCp, d->cp, d->selectionStartCP));
@@ -1064,10 +1064,10 @@ void GMControlTextEdit::initStyles(GMWidget* widget)
 void GMControlTextEdit::handleMouseCaret(const GMPoint& pt, bool selectStart)
 {
 	D(d);
-	GMint xFirst;
+	GMint32 xFirst;
 	d->buffer->CPtoX(d->firstVisibleCP, false, &xFirst);
 
-	GMint cp;
+	GMint32 cp;
 	bool trail;
 	if (d->buffer->XtoCP(pt.x - d->rcText.x + xFirst, &cp, &trail))
 	{
@@ -1110,7 +1110,7 @@ void GMControlTextEdit::insertCharacter(GMwchar ch)
 		return;
 
 	GMScopeTransaction st(&d->transactionContext);
-	GMint minCP = Min(d->cp, d->selectionStartCP);
+	GMint32 minCP = Min(d->cp, d->selectionStartCP);
 
 	// 使光标出现在视线范围
 	placeCaret(d->cp, true);
@@ -1136,7 +1136,7 @@ void GMControlTextEdit::insertCharacter(GMwchar ch)
 	}
 }
 
-void GMControlTextEdit::renderCaret(GMint firstX, GMint caretX)
+void GMControlTextEdit::renderCaret(GMint32 firstX, GMint32 caretX)
 {
 	D(d);
 	GMRect rc = {
@@ -1155,19 +1155,19 @@ void GMControlTextEdit::renderCaret(GMint firstX, GMint caretX)
 	widget->drawRect(*caretColor, rc, true, .99f);
 }
 
-GMint GMControlTextEdit::getCaretHeight()
+GMint32 GMControlTextEdit::getCaretHeight()
 {
 	D(d);
 	return d->buffer->getLineHeight() + 3;
 }
 
-GMint GMControlTextEdit::getCaretTop()
+GMint32 GMControlTextEdit::getCaretTop()
 {
 	D(d);
 	return d->rcText.y;
 }
 
-void GMControlTextEdit::moveFirstVisibleCp(GMint distance)
+void GMControlTextEdit::moveFirstVisibleCp(GMint32 distance)
 {
 	D(d);
 	if (d->firstVisibleCP > distance)
@@ -1176,11 +1176,11 @@ void GMControlTextEdit::moveFirstVisibleCp(GMint distance)
 		d->firstVisibleCP = 0;
 }
 
-void GMControlTextEdit::setBufferRenderRange(GMint xFirst)
+void GMControlTextEdit::setBufferRenderRange(GMint32 xFirst)
 {
 	D(d);
 	// 获取能够显示的文本长度
-	GMint lastCP;
+	GMint32 lastCP;
 	bool lastTrail;
 	d->buffer->XtoCP(xFirst + d->rcText.width, &lastCP, &lastTrail);
 	if (lastTrail)
@@ -1213,14 +1213,14 @@ void GMControlTextArea::render(GMDuration elapsed)
 	db->borderControl->render(elapsed);
 
 	// 计算首个能显示的字符
-	GMint firstX, firstY;
+	GMint32 firstX, firstY;
 	d->buffer->CPtoXY(db->firstVisibleCP, false, &firstX, &firstY);
 
 	// 计算选区
-	GMint caretX;
-	GMint caretY;
-	GMint caretSelectionX = 0;
-	GMint caretSelectionY = 0;
+	GMint32 caretX;
+	GMint32 caretY;
+	GMint32 caretSelectionX = 0;
+	GMint32 caretSelectionY = 0;
 
 	d->buffer->CPtoXY(db->cp, false, &caretX, &caretY);
 	if (db->cp != db->selectionStartCP)
@@ -1241,8 +1241,8 @@ void GMControlTextArea::render(GMDuration elapsed)
 	widget->useStencil(true);
 
 	GMRect rcSelection;
-	GMint selectionLeftLineNo = d->buffer->CPToLineNumber(db->selectionStartCP);
-	GMint selectionRightLineNo = d->buffer->CPToLineNumber(db->cp);
+	GMint32 selectionLeftLineNo = d->buffer->CPToLineNumber(db->selectionStartCP);
+	GMint32 selectionRightLineNo = d->buffer->CPToLineNumber(db->cp);
 	if (selectionLeftLineNo > selectionRightLineNo)
 		GM_SWAP(selectionLeftLineNo, selectionRightLineNo);
 
@@ -1250,7 +1250,7 @@ void GMControlTextArea::render(GMDuration elapsed)
 	{
 		if (selectionLeftLineNo == selectionRightLineNo)
 		{
-			GMint selectionStartX = caretX, selectionEndX = caretSelectionX;
+			GMint32 selectionStartX = caretX, selectionEndX = caretSelectionX;
 			if (selectionStartX > selectionEndX)
 				GM_SWAP(selectionStartX, selectionEndX);
 
@@ -1272,8 +1272,8 @@ void GMControlTextArea::render(GMDuration elapsed)
 			if (selectionStartCP > selectionEndCP)
 				GM_SWAP(selectionStartCP, selectionEndCP);
 
-			GMint selectionStartX, selectionEndX;
-			GMint selectionStartY, selectionEndY;
+			GMint32 selectionStartX, selectionEndX;
+			GMint32 selectionStartY, selectionEndY;
 			d->buffer->CPtoXY(selectionStartCP, false, &selectionStartX, &selectionStartY);
 			d->buffer->CPtoXY(selectionEndCP, false, &selectionEndX, &selectionEndY);
 
@@ -1284,12 +1284,12 @@ void GMControlTextArea::render(GMDuration elapsed)
 			};
 
 			// 绘制最上面的矩形
-			GMint firstLineLastCp = d->buffer->findLastCPInOneLine(selectionStartCP);
+			GMint32 firstLineLastCp = d->buffer->findLastCPInOneLine(selectionStartCP);
 			{
 				// 获取选择的首行的最后一个CP
 
 				// 获取CP的X和Y
-				GMint selStartLastX, selStartLastY;
+				GMint32 selStartLastX, selStartLastY;
 				d->buffer->CPtoXY(firstLineLastCp, true, &selStartLastX, &selStartLastY);
 
 				setCaretTopRelative(selStartLastY);
@@ -1304,13 +1304,13 @@ void GMControlTextArea::render(GMDuration elapsed)
 			}
 
 			// 绘制最下方的矩形
-			GMint lastLineFirstCp = 0;
+			GMint32 lastLineFirstCp = 0;
 			{
 				// 获取选择的尾行的首个CP
 				lastLineFirstCp = d->buffer->findFirstCPInOneLine(selectionEndCP);
 
 				// 获取CP的X和Y
-				GMint selEndFirstX, selEndFirstY;
+				GMint32 selEndFirstX, selEndFirstY;
 				d->buffer->CPtoXY(lastLineFirstCp, false, &selEndFirstX, &selEndFirstY);
 
 				setCaretTopRelative(selEndFirstY);
@@ -1327,13 +1327,13 @@ void GMControlTextArea::render(GMDuration elapsed)
 			if (selectionRightLineNo - selectionLeftLineNo > 1)
 			{
 				// 如果中间还有内容，中间全选内容
-				GMint nextLineFirstCp = firstLineLastCp + 1;
-				GMint currentLineLastCp = 0;
+				GMint32 nextLineFirstCp = firstLineLastCp + 1;
+				GMint32 currentLineLastCp = 0;
 				while (nextLineFirstCp <= lastLineFirstCp - 1) //lastLineFirstCp - 1表示倒数第二行的最后一个CP
 				{
 					currentLineLastCp = d->buffer->findLastCPInOneLine(nextLineFirstCp);
 					// 现在获取了这一行的CP范围，可以开始绘制选区了
-					GMint leftX, leftY, rightX, rightY;
+					GMint32 leftX, leftY, rightX, rightY;
 					d->buffer->CPtoXY(nextLineFirstCp, false, &leftX, &leftY);
 					d->buffer->CPtoXY(currentLineLastCp, false, &rightX, &rightY);
 
@@ -1390,7 +1390,7 @@ void GMControlTextArea::insertCharacter(GMwchar ch)
 {
 	D_BASE(d, Base);
 	GMScopeTransaction st(&d->transactionContext);
-	GMint minCP = Min(d->cp, d->selectionStartCP);
+	GMint32 minCP = Min(d->cp, d->selectionStartCP);
 
 	// 使光标出现在视线范围
 	placeCaret(d->cp, true);
@@ -1416,7 +1416,7 @@ void GMControlTextArea::insertCharacter(GMwchar ch)
 	}
 }
 
-void GMControlTextArea::setSize(GMint width, GMint height)
+void GMControlTextArea::setSize(GMint32 width, GMint32 height)
 {
 	D_BASE(d, Base);
 	Base::setSize(width, height);
@@ -1424,16 +1424,16 @@ void GMControlTextArea::setSize(GMint width, GMint height)
 	d->buffer->setSize(rc);
 }
 
-GMint GMControlTextArea::getCaretTop()
+GMint32 GMControlTextArea::getCaretTop()
 {
 	D(d);
 	D_BASE(db, Base);
-	GMint yFirst = 0;
+	GMint32 yFirst = 0;
 	d->buffer->CPtoXY(db->firstVisibleCP, false, nullptr, &yFirst);
 	return d->caretTopRelative + db->rcText.y + d->scrollOffset - yFirst;
 }
 
-GMint GMControlTextArea::getCaretHeight()
+GMint32 GMControlTextArea::getCaretHeight()
 {
 	D(d);
 	return d->buffer->getLineHeight() + d->buffer->getLineSpacing();
@@ -1443,10 +1443,10 @@ void GMControlTextArea::handleMouseCaret(const GMPoint& pt, bool selectStart)
 {
 	D(d);
 	D_BASE(db, Base);
-	GMint xFirst, yFirst;
+	GMint32 xFirst, yFirst;
 	d->buffer->CPtoXY(db->firstVisibleCP, false, &xFirst, &yFirst);
 
-	GMint cp;
+	GMint32 cp;
 	GMPoint adjustedPt = {
 		pt.x,
 		pt.y - d->scrollOffset
@@ -1479,19 +1479,19 @@ void GMControlTextArea::setScrollBar(bool scrollBar)
 	}
 }
 
-void GMControlTextArea::setLineSpacing(GMint lineSpacing) GM_NOEXCEPT
+void GMControlTextArea::setLineSpacing(GMint32 lineSpacing) GM_NOEXCEPT
 {
 	D(d);
 	d->buffer->setLineSpacing(lineSpacing);
 }
 
-void GMControlTextArea::setLineHeight(GMint lineHeight) GM_NOEXCEPT
+void GMControlTextArea::setLineHeight(GMint32 lineHeight) GM_NOEXCEPT
 {
 	D(d);
 	d->buffer->setLineHeight(lineHeight);
 }
 
-void GMControlTextArea::placeCaret(GMint cp, bool adjustVisibleCP)
+void GMControlTextArea::placeCaret(GMint32 cp, bool adjustVisibleCP)
 {
 	D(d);
 	D_BASE(db, Base);
@@ -1499,7 +1499,7 @@ void GMControlTextArea::placeCaret(GMint cp, bool adjustVisibleCP)
 	if (cp > d->buffer->getLength())
 		cp = d->buffer->getLength();
 
-	GMint firstX, firstY, x, y, x2, y2;
+	GMint32 firstX, firstY, x, y, x2, y2;
 	d->buffer->CPtoXY(db->firstVisibleCP, false, &firstX, &firstY);
 	d->buffer->CPtoXY(cp, false, &x, &y);
 
@@ -1523,18 +1523,18 @@ void GMControlTextArea::placeCaret(GMint cp, bool adjustVisibleCP)
 		else if (y2 > firstY + db->rcText.height)
 		{
 			// 向下翻页的情况
-			GMint yNewTop = y2 - db->rcText.height;
-			GMint cpNew;
+			GMint32 yNewTop = y2 - db->rcText.height;
+			GMint32 cpNew;
 			d->buffer->XYtoCP(x, yNewTop, &cpNew);
 
 			auto cpDiff = d->buffer->CPToLineNumber(db->cp) - d->buffer->CPToLineNumber(cp);
-			GMint xNewFirst, yNewFirst;
+			GMint32 xNewFirst, yNewFirst;
 			d->buffer->CPtoXY(cpNew, false, &xNewFirst, &yNewFirst);
 
 			if (yNewFirst < yNewTop)
 				++cpDiff;
 
-			for (GMint i = 0; i < cpDiff; ++i)
+			for (GMint32 i = 0; i < cpDiff; ++i)
 			{
 				db->firstVisibleCP = d->buffer->findLastCPInOneLine(db->firstVisibleCP) + 1;
 			}
@@ -1652,16 +1652,16 @@ void GMControlTextArea::onMouseLeave()
 bool GMControlTextArea::onMouseWheel(GMSystemMouseWheelEvent* event)
 {
 	D(d);
-	GMint detents = event->getDelta() / GM_WHEEL_DELTA;
+	GMint32 detents = event->getDelta() / GM_WHEEL_DELTA;
 	moveToLine(getCurrentVisibleLineNo() - detents);
 	return true;
 }
 
-void GMControlTextArea::adjustInsertModeRect(REF GMRect& caretRc, GMint caretX)
+void GMControlTextArea::adjustInsertModeRect(REF GMRect& caretRc, GMint32 caretX)
 {
 	D(d);
 	D_BASE(db, Base);
-	GMint rightEdgeX;
+	GMint32 rightEdgeX;
 	d->buffer->CPtoXY(db->cp, true, &rightEdgeX, nullptr);
 	caretRc.width = rightEdgeX - caretX;
 	if (caretRc.width <= 0)
@@ -1670,7 +1670,7 @@ void GMControlTextArea::adjustInsertModeRect(REF GMRect& caretRc, GMint caretX)
 	caretRc.y = getCaretTop() + getCaretHeight() - 2;
 }
 
-void GMControlTextArea::moveFirstVisibleCp(GMint distance)
+void GMControlTextArea::moveFirstVisibleCp(GMint32 distance)
 {
 	D(d);
 	D_BASE(db, Base);
@@ -1690,10 +1690,10 @@ bool GMControlTextArea::onKey_UpDown(GMSystemKeyEvent* event)
 	D(d);
 	D_BASE(db, Base);
 	GMKey key = event->getKey();
-	GMint cp = 0;
-	GMint x = 0, y = 0;
+	GMint32 cp = 0;
+	GMint32 x = 0, y = 0;
 	d->buffer->CPtoMidXY(db->cp, &x, &y);
-	GMint lh = d->buffer->getLineHeight() + d->buffer->getLineSpacing();
+	GMint32 lh = d->buffer->getLineHeight() + d->buffer->getLineSpacing();
 	if (event->getModifier() & GMModifier_Ctrl)
 	{
 		if (key == GMKey_Up)
@@ -1784,12 +1784,12 @@ bool GMControlTextArea::onKey_Back(GMSystemKeyEvent* event)
 	return true;
 }
 
-void GMControlTextArea::setBufferRenderRange(GMint xFirst, GMint yFirst)
+void GMControlTextArea::setBufferRenderRange(GMint32 xFirst, GMint32 yFirst)
 {
 	D(d);
 	D_BASE(db, Base);
 	// 获取能够显示的文本长度
-	GMint lastCP;
+	GMint32 lastCP;
 	d->buffer->XYtoCP(xFirst + db->rcText.width, yFirst + db->rcText.height, &lastCP);
 	GM_ASSERT(d->buffer->findFirstCPInOneLine(db->firstVisibleCP) == db->firstVisibleCP);
 	d->buffer->setRenderRange(db->firstVisibleCP, lastCP);
@@ -1856,16 +1856,16 @@ bool GMControlTextArea::hasScrollBarAndPointInScrollBarRect(const GMPoint& pt)
 	return GM_inRect(d->scrollBar->getBoundingRect(), pt);
 }
 
-void GMControlTextArea::moveToLine(GMint lineNo)
+void GMControlTextArea::moveToLine(GMint32 lineNo)
 {
 	D(d);
 	D_BASE(db, Base);
-	GMint visibleLineNo = d->buffer->CPToLineNumber(db->firstVisibleCP);
+	GMint32 visibleLineNo = d->buffer->CPToLineNumber(db->firstVisibleCP);
 	// 从当前的行数来遍历
 	if (lineNo < visibleLineNo)
 	{
 		// 向上翻
-		for (GMint i = db->firstVisibleCP; i >= 0; --i)
+		for (GMint32 i = db->firstVisibleCP; i >= 0; --i)
 		{
 			if (d->buffer->CPToLineNumber(i) == lineNo)
 			{
@@ -1877,7 +1877,7 @@ void GMControlTextArea::moveToLine(GMint lineNo)
 	else if (lineNo > visibleLineNo)
 	{
 		// 向下翻
-		for (GMint i = db->firstVisibleCP; i <= d->buffer->getLength(); ++i)
+		for (GMint32 i = db->firstVisibleCP; i <= d->buffer->getLength(); ++i)
 		{
 			if (d->buffer->CPToLineNumber(i) == lineNo)
 			{
@@ -1888,7 +1888,7 @@ void GMControlTextArea::moveToLine(GMint lineNo)
 	}
 }
 
-GMint GMControlTextArea::getCurrentVisibleLineNo()
+GMint32 GMControlTextArea::getCurrentVisibleLineNo()
 {
 	D(d);
 	D_BASE(db, Base);

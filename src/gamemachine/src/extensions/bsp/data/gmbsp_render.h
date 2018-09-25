@@ -41,18 +41,18 @@ GM_ALIGNED_STRUCT(GMBSP_Render_Vertex)
 
 GM_ALIGNED_STRUCT(GMBSP_Render_Face)
 {
-	GMint firstVertex;
-	GMint numVertices;
-	GMint textureIndex;
-	GMint lightmapIndex;
-	GMint firstIndex;
-	GMint numIndices;
+	GMint32 firstVertex;
+	GMint32 numVertices;
+	GMint32 textureIndex;
+	GMint32 lightmapIndex;
+	GMint32 firstIndex;
+	GMint32 numIndices;
 };
 
 GM_ALIGNED_STRUCT(GMBSP_Render_FaceDirectoryEntry)
 {
 	GMBSPSurfaceType faceType;
-	GMint typeFaceNumber;		//face number in the list of faces of this type
+	GMint32 typeFaceNumber;		//face number in the list of faces of this type
 };
 
 //every patch (curved surface) is split into biquadratic (3x3) patches
@@ -71,21 +71,21 @@ GM_ALIGNED_STRUCT(GMBSP_Render_BiquadraticPatch)
 	bool tesselate(int newTesselation);
 
 	AlignedVector<GMBSP_Render_Vertex> vertices;
-	AlignedVector<GMuint> indices;
+	AlignedVector<GMuint32> indices;
 	GMBSP_Render_Vertex controlPoints[9];
-	GMint tesselation = 0;
+	GMint32 tesselation = 0;
 	//arrays for multi_draw_arrays
-	GMint* trianglesPerRow = nullptr;
-	GMuint** rowIndexPointers = nullptr;
+	GMint32* trianglesPerRow = nullptr;
+	GMuint32** rowIndexPointers = nullptr;
 };
 
 //curved surface
 GM_ALIGNED_STRUCT(GMBSP_Render_Patch)
 {
-	GMint textureIndex;
-	GMint lightmapIndex;
-	GMint width, height;
-	GMint numQuadraticPatches;
+	GMint32 textureIndex;
+	GMint32 lightmapIndex;
+	GMint32 width, height;
+	GMint32 numQuadraticPatches;
 	AlignedVector<GMBSP_Render_BiquadraticPatch> quadraticPatches;
 };
 
@@ -97,9 +97,9 @@ enum
 GM_ALIGNED_STRUCT(GMBSP_Render_Leaf)
 {
 	GMVec3 boundingBoxVertices[8];
-	GMint cluster;	//cluster index for visdata
-	GMint firstLeafFace;	//first index in leafFaces array
-	GMint numFaces;
+	GMint32 cluster;	//cluster index for visdata
+	GMint32 firstLeafFace;	//first index in leafFaces array
+	GMint32 numFaces;
 };
 
 struct GMBSP_Render_VisibilityData
@@ -112,8 +112,8 @@ struct GMBSP_Render_VisibilityData
 	{
 		GM_delete_array(bitset);
 	}
-	GMint numClusters;
-	GMint bytesPerCluster;
+	GMint32 numClusters;
+	GMint32 bytesPerCluster;
 	GMbyte * bitset;
 };
 
@@ -133,16 +133,16 @@ GM_PRIVATE_OBJECT(GMBSPRender)
 	Map<GMBSPEntity*, GMEntityObject*> entitiyObjects;
 
 	// 用于记录每种类型的面在faceDirectory中的位置
-	Vector<GMint> polygonIndices;
-	Vector<GMint> meshFaceIndices;
-	Vector<GMint> patchIndices;
+	Vector<GMint32> polygonIndices;
+	Vector<GMint32> meshFaceIndices;
+	Vector<GMint32> patchIndices;
 
 	BSPData* bsp = nullptr;
 	Bitset facesToDraw;
 	Bitset entitiesToDraw;
-	GMint numPolygonFaces = 0;
-	GMint numPatches = 0;
-	GMint numMeshFaces = 0;
+	GMint32 numPolygonFaces = 0;
+	GMint32 numPatches = 0;
+	GMint32 numMeshFaces = 0;
 	AlignedVector<GMGameObject*> alwaysVisibleObjects;
 	GMBSP_Render_VisibilityData visibilityData;
 

@@ -218,7 +218,7 @@ void GMControlButton::render(GMDuration elapsed)
 
 	D(d);
 	D_BASE(db, Base);
-	GMint offsetX = 0, offsetY = 0;
+	GMint32 offsetX = 0, offsetY = 0;
 	GMControlState::State state = GMControlState::Normal;
 	if (!getEnabled())
 	{
@@ -591,7 +591,7 @@ GMControlScrollBar::GMControlScrollBar(GMWidget* widget)
 	d->thumb = gm_makeOwnedPtr<GMControlScrollBarThumb>(widget);
 }
 
-void GMControlScrollBar::setMaximum(GMint maximum)
+void GMControlScrollBar::setMaximum(GMint32 maximum)
 {
 	D(d);
 	if (d->maximum != maximum)
@@ -601,7 +601,7 @@ void GMControlScrollBar::setMaximum(GMint maximum)
 	}
 }
 
-void GMControlScrollBar::setMinimum(GMint minimum)
+void GMControlScrollBar::setMinimum(GMint32 minimum)
 {
 	D(d);
 	if (d->minimum != minimum)
@@ -611,7 +611,7 @@ void GMControlScrollBar::setMinimum(GMint minimum)
 	}
 }
 
-void GMControlScrollBar::setValue(GMint value)
+void GMControlScrollBar::setValue(GMint32 value)
 {
 	D(d);
 	if (d->value != value)
@@ -709,16 +709,16 @@ bool GMControlScrollBar::onMouseMove(GMSystemMouseEvent* event)
 	if (d->draggingThumb)
 	{
 		d->rcThumb.y = d->mousePt.y - d->thumbOffset;
-		GMint maximum = d->rcTrack.y + d->rcTrack.height - d->rcThumb.height;
+		GMint32 maximum = d->rcTrack.y + d->rcTrack.height - d->rcThumb.height;
 		if (d->rcThumb.y > maximum)
 			d->rcThumb.y = maximum;
 
-		GMint minimum = d->rcTrack.y;
+		GMint32 minimum = d->rcTrack.y;
 		if (d->rcThumb.y < minimum)
 			d->rcThumb.y = minimum;
 
 		// 计算出一个最接近的值
-		GMint value = Round(static_cast<GMfloat>(d->rcThumb.y - minimum) * getMaximum() / (maximum - minimum)) + getMinimum();
+		GMint32 value = Round(static_cast<GMfloat>(d->rcThumb.y - minimum) * getMaximum() / (maximum - minimum)) + getMinimum();
 		if (value > getMaximum())
 			value = getMaximum();
 		setValue(value);
@@ -747,7 +747,7 @@ void GMControlScrollBar::updateThumbRect()
 		getMinimum() <= getValue() && getValue() <= getMaximum())
 	{
 		d->showThumb = true;
-		GMint pageSize = getMaximum() - getMinimum() + getPageStep();
+		GMint32 pageSize = getMaximum() - getMinimum() + getPageStep();
 		if (pageSize <= 0)
 			pageSize = 1;
 		d->rcThumb.height = getPageStep() * d->rcTrack.height / pageSize;
@@ -847,7 +847,7 @@ void GMControlScrollBar::clampValue()
 		setValue(getMinimum());
 }
 
-void GMControlScrollBar::scroll(GMint value)
+void GMControlScrollBar::scroll(GMint32 value)
 {
 	D(d);
 	d->value += value;

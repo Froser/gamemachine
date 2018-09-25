@@ -10,7 +10,7 @@ namespace
 {
 	GM_PRIVATE_OBJECT(LuaObject)
 	{
-		gm::GMint i;
+		gm::GMint32 i;
 		gm::GMfloat f;
 		bool b;
 		gm::GMString str;
@@ -23,7 +23,7 @@ namespace
 	class LuaObject : public gm::GMObject
 	{
 		GM_DECLARE_PRIVATE(LuaObject)
-		GM_DECLARE_PROPERTY(i, i, gm::GMint)
+		GM_DECLARE_PROPERTY(i, i, gm::GMint32)
 		GM_DECLARE_PROPERTY(f, f, gm::GMfloat)
 		GM_DECLARE_PROPERTY(b, b, bool)
 		GM_DECLARE_PROPERTY(str, str, gm::GMString)

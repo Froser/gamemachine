@@ -65,9 +65,9 @@ namespace
 
 	HCURSOR getCursor(GMCursorType cursorType)
 	{
-		constexpr GMuint sz = (GMuint)GMCursorType::EndOfEnum;
+		constexpr GMuint32 sz = (GMuint32)GMCursorType::EndOfEnum;
 		static HCURSOR cursors[sz] = { NULL };
-		if (!cursors[(GMuint)cursorType])
+		if (!cursors[(GMuint32)cursorType])
 		{
 			LPCWSTR cursor = NULL;
 			switch (cursorType)
@@ -95,9 +95,9 @@ namespace
 				break;
 			}
 
-			cursors[(GMuint)cursorType] = ::LoadCursor(NULL, cursor);
+			cursors[(GMuint32)cursorType] = ::LoadCursor(NULL, cursor);
 		}
-		return cursors[(GMuint)cursorType];
+		return cursors[(GMuint32)cursorType];
 	}
 }
 

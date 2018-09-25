@@ -251,7 +251,7 @@ void GMCubeMapGameObject::createCubeMap(GMTextureAsset texture)
 	model->setType(GMModelType::CubeMap);
 	model->getShader().getTextureList().getTextureSampler(GMTextureType::CubeMap).addFrame(texture);
 	GMMesh* mesh = new GMMesh(model);
-	for (GMuint i = 0; i < 12; i++)
+	for (GMuint32 i = 0; i < 12; i++)
 	{
 		GMVertex V0 = { { vertices[i * 9 + 0], vertices[i * 9 + 1], vertices[i * 9 + 2] }, { vertices[i * 9 + 0], vertices[i * 9 + 1], vertices[i * 9 + 2] } };
 		GMVertex V1 = { { vertices[i * 9 + 3], vertices[i * 9 + 4], vertices[i * 9 + 5] },{ vertices[i * 9 + 3], vertices[i * 9 + 4], vertices[i * 9 + 5] } };

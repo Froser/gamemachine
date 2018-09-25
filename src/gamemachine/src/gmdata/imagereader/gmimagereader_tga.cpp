@@ -566,14 +566,14 @@ bool GMImageReader_TGA::load(const GMbyte* data, size_t size, OUT GMImage** imag
 	}
 
 	// 图像深度/8得到每个像素的字节数，这里认为1个通道就占一个字节，因此通道数即图像深度/8
-	GMint channels = tga.hdr.depth / 8;
+	GMint32 channels = tga.hdr.depth / 8;
 	imgData.mip[0].width = tga.hdr.width;
 	imgData.mip[0].height = tga.hdr.height;
 	imgData.format = GMImageFormat::RGBA;
 	imgData.internalFormat = GMImageInternalFormat::RGBA8;
 	imgData.channels = GMImageReader::DefaultChannels;
 
-	GMuint bufferSize = tga.hdr.width * tga.hdr.height * GMImageReader::DefaultChannels;
+	GMuint32 bufferSize = tga.hdr.width * tga.hdr.height * GMImageReader::DefaultChannels;
 	imgData.mip[0].data = new GMbyte[bufferSize];
 	imgData.size = bufferSize;
 	

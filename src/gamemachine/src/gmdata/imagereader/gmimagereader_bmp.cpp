@@ -61,9 +61,9 @@ struct BitmapFile
 
 struct ImageRGB
 {
-	GMint r;
-	GMint g;
-	GMint b;
+	GMint32 r;
+	GMint32 g;
+	GMint32 b;
 };
 END_NS
 
@@ -101,8 +101,8 @@ bool GMImageReader_BMP::load(const GMbyte* byte, GMsize_t size, OUT GMImage** im
 	long paletteLen = bitmapFile.bitmapHeader.bfOffBits - sizeof(BitmapHeader)-sizeof(BitmapInfoHeader);
 	ms.read(reinterpret_cast<GMbyte*>(&bitmapFile.palette), paletteLen);
 
-	GMuint bytePerPixel = bitmapFile.bitmapInfoHeader.biBitCount >> 3;
-	GMuint skip = 4 - ((bitmapFile.bitmapInfoHeader.biWidth * bytePerPixel) & 3);
+	GMuint32 bytePerPixel = bitmapFile.bitmapInfoHeader.biBitCount >> 3;
+	GMuint32 skip = 4 - ((bitmapFile.bitmapInfoHeader.biWidth * bytePerPixel) & 3);
 	if (bitmapFile.bitmapInfoHeader.biBitCount == 24
 		&& bitmapFile.bitmapInfoHeader.biCompression == 0)
 	{
@@ -148,7 +148,7 @@ bool GMImageReader_BMP::test(const GMbyte* byte)
 	return header && header->bfType == 19778;
 }
 
-void GMImageReader_BMP::writeDataToImage(BitmapFile& bitmap, GMImage* img, GMuint size)
+void GMImageReader_BMP::writeDataToImage(BitmapFile& bitmap, GMImage* img, GMuint32 size)
 {
 	GM_ASSERT(img);
 	GMImage::Data& data = img->getData();
@@ -164,12 +164,12 @@ void GMImageReader_BMP::writeDataToImage(BitmapFile& bitmap, GMImage* img, GMuin
 	data.size = size;
 }
 
-void GMImageReader_BMP::flipVertically(GMbyte* data, GMuint width, GMuint height)
+void GMImageReader_BMP::flipVertically(GMbyte* data, GMuint32 width, GMuint32 height)
 {
-	const GMuint bytePerPixel = 4;
-	GMuint rowsToSwap = height % 2 == 1 ? (height - 1) / 2 : height / 2;
+	const GMuint32 bytePerPixel = 4;
+	GMuint32 rowsToSwap = height % 2 == 1 ? (height - 1) / 2 : height / 2;
 	GMbyte* tempRow = new GMbyte[width * bytePerPixel];
-	for (GMuint i = 0; i < rowsToSwap; ++i)
+	for (GMuint32 i = 0; i < rowsToSwap; ++i)
 	{
 		memcpy(tempRow, &data[i * width * bytePerPixel], width * bytePerPixel);
 		memcpy(&data[i * width * bytePerPixel], &data[(height - i - 1) * width * bytePerPixel], width * bytePerPixel);

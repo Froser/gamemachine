@@ -52,7 +52,7 @@ void GMDebugger::print(
 	const std::initializer_list<GMString>& arguments)
 {
 	D(d);
-	GMint i = 0;
+	GMint32 i = 0;
 	for (decltype(auto) argument : arguments)
 	{
 		string = string.replace(L"{" + GMString(i++) + L"}", argument);

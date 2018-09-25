@@ -311,13 +311,13 @@ void GMDx11Framebuffers::clear(GMFramebuffersClearType type)
 {
 	D(d);
 	UINT clearFlag = 0;
-	GMuint iType = (GMuint)type;
-	if (iType & (GMuint)GMFramebuffersClearType::Depth)
+	GMuint32 iType = (GMuint32)type;
+	if (iType & (GMuint32)GMFramebuffersClearType::Depth)
 		clearFlag |= D3D11_CLEAR_DEPTH;
-	if (iType & (GMuint)GMFramebuffersClearType::Stencil)
+	if (iType & (GMuint32)GMFramebuffersClearType::Stencil)
 		clearFlag |= D3D11_CLEAR_STENCIL;
 
-	if (iType & (GMuint)GMFramebuffersClearType::Color)
+	if (iType & (GMuint32)GMFramebuffersClearType::Color)
 	{
 		for (auto renderTargetView : d->renderTargetViews)
 		{

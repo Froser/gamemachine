@@ -167,7 +167,7 @@ GMXInputWrapper::GMXInputWrapper()
 	, m_xinputSetState(nullptr)
 	, m_module(0)
 {
-	for (GMint i = 0; i < 3; i++)
+	for (GMint32 i = 0; i < 3; i++)
 	{
 		m_module = LoadLibrary(xinputDlls[i].toStdWString().c_str());
 		if (m_module)
@@ -352,8 +352,8 @@ GMMouseState GMInput::mouseState()
 	if (d->detectingMode)
 	{
 		GMRect rect = d->window->getWindowRect();
-		const GMint centerX = rect.x + rect.width / 2;
-		const GMint centerY = rect.y + rect.height / 2;
+		const GMint32 centerX = rect.x + rect.width / 2;
+		const GMint32 centerY = rect.y + rect.height / 2;
 		::SetCursorPos(centerX, centerY);
 		state.deltaX = pos.x - centerX;
 		state.deltaY = pos.y - centerY;

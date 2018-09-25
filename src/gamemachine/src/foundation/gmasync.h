@@ -63,8 +63,8 @@ public:
 	}
 };
 
-GM_STATIC_ASSERT(GMAsync::Async == static_cast<GMint>(std::launch::async), "LaunchPolicy must be same with std::luanch");
-GM_STATIC_ASSERT(GMAsync::Deferred == static_cast<GMint>(std::launch::deferred), "LaunchPolicy must be same with std::luanch");
+GM_STATIC_ASSERT(GMAsync::Async == static_cast<GMint32>(std::launch::async), "LaunchPolicy must be same with std::luanch");
+GM_STATIC_ASSERT(GMAsync::Deferred == static_cast<GMint32>(std::launch::deferred), "LaunchPolicy must be same with std::luanch");
 
 // 同步
 class GMAsyncResult

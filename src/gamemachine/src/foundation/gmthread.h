@@ -109,7 +109,7 @@ public:
 	  \param ret 线程结束返回值。
 	  \sa run()
 	*/
-	void terminateThread(GMint ret = 0);
+	void terminateThread(GMint32 ret = 0);
 
 	//! 阻塞调用线程，等待此线程结束。
 	/*!
@@ -117,7 +117,7 @@ public:
 	  \param miliseconds 等待此线程的结束时间。如果超过时间，线程仍然未结束，则此方法返回值为false，否则返回值为true。单位为毫秒，如果为0表示永远等待下去。
 	  \return 该线程是否在规定时间内返回。
 	*/
-	bool join(GMuint milliseconds = 0);
+	bool join(GMuint32 milliseconds = 0);
 
 	//! 获得线程ID。
 	/*！
@@ -167,7 +167,7 @@ public:
 	  将调用的线程睡眠一段时间，这段时间只是一个大概值，取决于操作系统如何调度线程。
 	  \param milliseconds 睡眠时间，单位为毫秒。
 	*/
-	static void sleep(GMint milliseconds);
+	static void sleep(GMint32 milliseconds);
 };
 
 GM_PRIVATE_OBJECT(GMMutex)

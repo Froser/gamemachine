@@ -10,17 +10,17 @@ BEGIN_NS
 struct GMGlyphInfo
 {
 	bool valid;
-	GMint x, y; // 字形在纹理中的位置
-	GMint width, height; // 字形在纹理中的大小
-	GMint bearingX, bearingY;
-	GMint advance;
+	GMint32 x, y; // 字形在纹理中的位置
+	GMint32 width, height; // 字形在纹理中的大小
+	GMint32 bearingX, bearingY;
+	GMint32 advance;
 };
 
 struct GMGlyphBitmap
 {
 	GMbyte* buffer;
-	GMuint width;
-	GMuint rows;
+	GMuint32 width;
+	GMuint32 rows;
 };
 
 typedef void* GMFontFace;
@@ -32,13 +32,13 @@ struct GMFont
 	GMBuffer buffer;
 };
 
-typedef HashMap<GMFontHandle, HashMap<GMint, HashMap<GMwchar, GMGlyphInfo> > > CharList;
+typedef HashMap<GMFontHandle, HashMap<GMint32, HashMap<GMwchar, GMGlyphInfo> > > CharList;
 
 GM_PRIVATE_OBJECT(GMGlyphManager)
 {
 	const IRenderContext* context = nullptr;
 	CharList chars;
-	GMint cursor_u, cursor_v;
+	GMint32 cursor_u, cursor_v;
 	GMfloat maxHeight;
 	Vector<GMFont> fonts;
 

@@ -78,7 +78,7 @@ public:
 		return d->fileInfo;
 	}
 
-	virtual gm::GMuint getBufferId()
+	virtual gm::GMuint32 getBufferId()
 	{
 		D(d);
 		return d->bufferId;

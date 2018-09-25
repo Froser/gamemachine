@@ -10,11 +10,11 @@ BEGIN_NS
 GM_PRIVATE_OBJECT(GMXRenderContext)
 {
 	IWindow* window = nullptr;
-	GMint screen;
-	GMint screenWidth, screenHeight, screenWidthMM, screenHeightMM;
+	GMint32 screen;
+	GMint32 screenWidth, screenHeight, screenWidthMM, screenHeightMM;
 	Window rootWindow;
 	GLXContext glxContext;
-	GMint connection = 0;
+	GMint32 connection = 0;
 	Atom aDeleteWindow = None;
 	Atom aState = None;
 	Atom aStateFullScreen = None;
@@ -29,8 +29,8 @@ class GMXRenderContext : public GMObject, public GMRenderContext
 {
 	GM_DECLARE_PRIVATE(GMXRenderContext)
 	GM_DECLARE_PROPERTY(GlxContext, glxContext, GLXContext)
-	GM_DECLARE_PROPERTY(ScreenWidth, screenWidth, GMint)
-	GM_DECLARE_PROPERTY(ScreenHeight, screenHeight, GMint)
+	GM_DECLARE_PROPERTY(ScreenWidth, screenWidth, GMint32)
+	GM_DECLARE_PROPERTY(ScreenHeight, screenHeight, GMint32)
 	GM_DECLARE_GETTER(NetWMSupported, netWMSupported, bool)
 	GM_DECLARE_GETTER(AtomDeleteWindow, aDeleteWindow, Atom)
 	GM_DECLARE_GETTER(AtomNetWMPid, aNetWMPid, Atom)
@@ -50,7 +50,7 @@ public:
 		return const_cast<Display*>(s_display);
 	}
 
-	inline GMint getScreen() const GM_NOEXCEPT
+	inline GMint32 getScreen() const GM_NOEXCEPT
 	{
 		D(d);
 		return d->screen;
@@ -66,13 +66,13 @@ private:
 	void initX(IWindow* window, const char* displayName);
 	void initIM();
 	Atom getAtom(const char* name);
-	GMint getWindowProperty(Window window, Atom property, Atom type, unsigned char** data);
+	GMint32 getWindowProperty(Window window, Atom property, Atom type, unsigned char** data);
 	bool isNetWMSupported();
 	bool isHintPresent(Window window, Atom property, Atom hint);
 
 private:
 	static Display* s_display;
-	static GMint s_instanceCount;
+	static GMint32 s_instanceCount;
 };
 
 struct GMXEventContext

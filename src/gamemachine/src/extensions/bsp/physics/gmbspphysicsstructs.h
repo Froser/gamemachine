@@ -8,9 +8,9 @@ BEGIN_NS
 
 #define PlaneTypeForNormal(x) (x[0] == 1.0 ? PLANE_X : (x[1] == 1.0 ? PLANE_Y : (x[2] == 1.0 ? PLANE_Z : PLANE_NON_AXIAL) ) )
 
-inline GMint signbitsForNormal(const GMVec4& normal)
+inline GMint32 signbitsForNormal(const GMVec4& normal)
 {
-	GMint bits = 0;
+	GMint32 bits = 0;
 	if (normal.getX() < 0)
 		bits |= 1 << 0;
 	if (normal.getY() < 0)
@@ -31,8 +31,8 @@ enum PlaneType
 GM_ALIGNED_STRUCT(GMBSPLeafList)
 {
 	GMVec3 bounds[2];
-	AlignedVector<GMint> list;
-	GMint lastLeaf;
+	AlignedVector<GMint32> list;
+	GMint32 lastLeaf;
 };
 
 struct BSPTracePlane;
@@ -40,7 +40,7 @@ GM_ALIGNED_STRUCT(GMBSP_Physics_BrushSide)
 {
 	GMBSPBrushSide* side;
 	BSPTracePlane* plane;
-	GMint surfaceFlags;
+	GMint32 surfaceFlags;
 };
 
 GM_ALIGNED_STRUCT(GMBSP_Physics_Brush)
@@ -51,25 +51,25 @@ GM_ALIGNED_STRUCT(GMBSP_Physics_Brush)
 	}
 
 	GMBSPBrush* brush;
-	GMint contents;
+	GMint32 contents;
 	GMVec3 bounds[2];
 	GMBSP_Physics_BrushSide *sides;
-	GMint checkcount;
+	GMint32 checkcount;
 };
 
 // Begin patches definitions
 GM_ALIGNED_STRUCT(GMBSPPatchPlane)
 {
 	GMVec4 plane;
-	GMint signbits;		// signx + (signy<<1) + (signz<<2), used as lookup during collision
+	GMint32 signbits;		// signx + (signy<<1) + (signz<<2), used as lookup during collision
 };
 
 GM_ALIGNED_STRUCT(GMBSPFacet)
 {
-	GMint surfacePlane;
-	GMint numBorders;		// 3 or four + 6 axial bevels + 4 or 3 * 4 edge bevels
-	GMint borderPlanes[4 + 6 + 16];
-	GMint borderInward[4 + 6 + 16];
+	GMint32 surfacePlane;
+	GMint32 numBorders;		// 3 or four + 6 axial bevels + 4 or 3 * 4 edge bevels
+	GMint32 borderPlanes[4 + 6 + 16];
+	GMint32 borderInward[4 + 6 + 16];
 	bool borderNoAdjust[4 + 6 + 16];
 };
 
@@ -86,7 +86,7 @@ GM_ALIGNED_STRUCT(GMBSP_Physics_Patch)
 	GMBSPSurface* surface = nullptr;
 	GMBSPShader* shader = nullptr;
 	GMBSPPatchCollide *pc = nullptr;
-	GMint checkcount = 0;
+	GMint32 checkcount = 0;
 
 	GMBSP_Physics_Patch()
 		: checkcount(0)

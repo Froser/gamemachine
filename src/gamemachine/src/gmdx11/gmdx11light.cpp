@@ -32,7 +32,7 @@ const GMfloat* GMDx11Light::getLightColor() const
 	return d->color;
 }
 
-void GMDx11Light::activateLight(GMuint index, ITechnique* technique)
+void GMDx11Light::activateLight(GMuint32 index, ITechnique* technique)
 {
 	D(d);
 	if (!d->effect)

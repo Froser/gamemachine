@@ -9,8 +9,8 @@ GM_PRIVATE_OBJECT(Demo_SpecularMap)
 {
 	gm::GMGameObject* gameObject = nullptr;
 	gm::GMGameObject* gameObject2 = nullptr;
-	gm::GMint mouseDownX;
-	gm::GMint mouseDownY;
+	gm::GMint32 mouseDownX;
+	gm::GMint32 mouseDownY;
 	bool draggingL = false;
 	bool draggingR = false;
 	GMQuat lookAtRotation;

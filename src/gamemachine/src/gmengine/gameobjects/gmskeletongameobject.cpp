@@ -18,7 +18,7 @@ void GMSkeletonGameObject::update(GMDuration dt)
 		{
 			initAnimation();
 
-			GMint frame0 = 0, frame1 = 0;
+			GMint32 frame0 = 0, frame1 = 0;
 			GMfloat interpolate = 0;
 			if (d->frame == AutoPlayFrame)
 			{
@@ -51,7 +51,7 @@ void GMSkeletonGameObject::draw()
 		GMGameObject::draw();
 }
 
-GMint GMSkeletonGameObject::getFramesCount()
+GMint32 GMSkeletonGameObject::getFramesCount()
 {
 	D(d);
 	GMModels* models = getModels();
@@ -157,7 +157,7 @@ void GMSkeletonGameObject::initAnimation()
 	}
 }
 
-void GMSkeletonGameObject::getAdjacentTwoFrames(GMDuration dt, REF GMint& frame0, REF GMint& frame1, REF GMfloat& interpolate)
+void GMSkeletonGameObject::getAdjacentTwoFrames(GMDuration dt, REF GMint32& frame0, REF GMint32& frame1, REF GMfloat& interpolate)
 {
 	D(d);
 	GMSkeleton* skeleton = getModels()->getSkeleton();
@@ -188,7 +188,7 @@ void GMSkeletonGameObject::getAdjacentTwoFrames(GMDuration dt, REF GMint& frame0
 
 void GMSkeletonGameObject::updateMesh(GMSkeletonMesh& mesh, const GMFrameSkeleton& frameSkeleton)
 {
-	static GMint numberOfProcessors = GM.getRunningStates().systemInfo.numberOfProcessors;
+	static GMint32 numberOfProcessors = GM.getRunningStates().systemInfo.numberOfProcessors;
 
 	GMModel* model = mesh.targetModel;
 	GM_ASSERT(model);
@@ -220,14 +220,14 @@ void GMSkeletonGameObject::updateMesh(GMSkeletonMesh& mesh, const GMFrameSkeleto
 			mesh.vertices.begin(),
 			mesh.vertices.end(),
 			[&vertices, &mesh, &frameSkeleton](auto begin, auto end) {
-				GMint index = begin - mesh.vertices.begin();
+				GMint32 index = begin - mesh.vertices.begin();
 				for (auto iter = begin; iter != end; ++iter)
 				{
 					auto& vert = *iter;
 					Vertex vertex;
 					GMVec3 pos = Zero<GMVec3>();
 					// 每个顶点的坐标由结点的权重累计计算得到
-					for (GMint i = 0; i < vert.weightCount; ++i)
+					for (GMint32 i = 0; i < vert.weightCount; ++i)
 					{
 						const auto& weight = mesh.weights[vert.startWeight + i];
 						const auto& joint = frameSkeleton.getJoints()[weight.jointIndex];
@@ -276,10 +276,10 @@ void GMSkeletonGameObject::updateMesh(GMSkeletonMesh& mesh, const GMFrameSkeleto
 		);
 
 		// 组装Vertex
-		GMint vertexIndex = 0;
+		GMint32 vertexIndex = 0;
 		for (const auto& triIdx : mesh.triangleIndices)
 		{
-			for (GMint i = 0; i < 3; ++i)
+			for (GMint32 i = 0; i < 3; ++i)
 			{
 				GMVertex& v = modelVertices[vertexIndex];
 				const Vertex& vertexTemp = vertices[triIdx[i]];

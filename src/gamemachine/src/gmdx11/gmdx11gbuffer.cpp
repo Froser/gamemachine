@@ -98,9 +98,9 @@ IFramebuffers* GMDx11GBuffer::createGeometryFramebuffers()
 	fbDesc.rect = windowStates.renderRect;
 	framebuffers->init(fbDesc);
 
-	constexpr GMint framebufferCount = GM_array_size(GeometryFramebufferNames); //一共有8个SV_TARGET
+	constexpr GMint32 framebufferCount = GM_array_size(GeometryFramebufferNames); //一共有8个SV_TARGET
 	GM_STATIC_ASSERT(framebufferCount <= 8, "Too many targets.");
-	for (GMint i = 0; i < framebufferCount; ++i)
+	for (GMint32 i = 0; i < framebufferCount; ++i)
 	{
 		IFramebuffer* framebuffer = nullptr;
 		GM.getFactory()->createFramebuffer(d->context, &framebuffer);

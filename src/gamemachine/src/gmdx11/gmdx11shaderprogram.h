@@ -29,7 +29,7 @@ public:
 	virtual void setMatrix4(const char* name, const GMMat4& value) override;
 	virtual void setVec4(const char* name, const GMFloat4&) override;
 	virtual void setVec3(const char* name, const GMfloat value[3]) override;
-	virtual void setInt(const char* name, GMint value) override;
+	virtual void setInt(const char* name, GMint32 value) override;
 	virtual void setFloat(const char* name, GMfloat value) override;
 	virtual void setBool(const char* name, bool value) override;
 	virtual bool setInterfaceInstance(const char* interfaceName, const char* instanceName, GMShaderType type) override;

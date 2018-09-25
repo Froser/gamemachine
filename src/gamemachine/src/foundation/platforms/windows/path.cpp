@@ -102,7 +102,7 @@ void GMPath::createDirectory(const GMString& dir)
 	if (stdUp.back() == '/' || stdUp.back() == '\\')
 		stdUp = stdUp.substr(0, stdUp.length() - 1); //去掉斜杠和反斜杠
 	stdUp = directoryName(stdUp).toStdWString();
-	for (GMuint i = 0; i < stdUp.length(); i++)
+	for (GMuint32 i = 0; i < stdUp.length(); i++)
 	{
 		if (stdUp[i] == '/')
 			stdUp[i] = '\\';

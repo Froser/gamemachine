@@ -91,7 +91,7 @@ void GMDx11Texture::bindSampler(GMTextureSampler* sampler)
 	}
 }
 
-void GMDx11Texture::useTexture(GMint textureType)
+void GMDx11Texture::useTexture(GMint32 textureType)
 {
 	D(d);
 	if (!d->effect)
@@ -157,11 +157,11 @@ void GMDx11Texture::init()
 		texDesc.CPUAccessFlags = 0;
 		texDesc.MiscFlags = 0;
 
-		GMint index = 0;
+		GMint32 index = 0;
 		GM_ASSERT(texDesc.ArraySize == 1);
-		for (GMuint j = 0; j < texDesc.MipLevels; ++j, ++index)
+		for (GMuint32 j = 0; j < texDesc.MipLevels; ++j, ++index)
 		{
-			GMuint pitch = d->image->getWidth(j);
+			GMuint32 pitch = d->image->getWidth(j);
 			resourceData[index].pSysMem = imageData.mip[j].data;
 			resourceData[index].SysMemPitch = pitch * d->image->getData().channels;
 		}
@@ -191,12 +191,12 @@ void GMDx11Texture::init()
 		texDesc.CPUAccessFlags = 0;
 		texDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
 
-		for (GMuint j = 0; j < texDesc.MipLevels; ++j)
+		for (GMuint32 j = 0; j < texDesc.MipLevels; ++j)
 		{
-			GMuint offset = 0;
-			for (GMuint i = 0; i < texDesc.ArraySize; ++i)
+			GMuint32 offset = 0;
+			for (GMuint32 i = 0; i < texDesc.ArraySize; ++i)
 			{
-				GMuint pitch = d->image->getWidth(j);
+				GMuint32 pitch = d->image->getWidth(j);
 				resourceData[i].pSysMem = imageData.mip[j].data + offset;
 				resourceData[i].SysMemPitch = pitch * imageData.channels;
 				offset += d->image->getWidth(j) * d->image->getHeight(j) * imageData.channels;
@@ -249,9 +249,9 @@ void GMDx11WhiteTexture::init()
 	texDesc.CPUAccessFlags = 0;
 	texDesc.MiscFlags = 0;
 
-	GMint index = 0;
+	GMint32 index = 0;
 	GM_ASSERT(texDesc.ArraySize == 1);
-	GMuint pitch = 1;
+	GMuint32 pitch = 1;
 	resourceData.pSysMem = texData;
 	resourceData.SysMemPitch = pitch * 4;
 

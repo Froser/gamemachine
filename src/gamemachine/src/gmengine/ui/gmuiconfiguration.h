@@ -10,8 +10,8 @@ class GMWidget;
 struct GMUITexture
 {
 	GMlong id;
-	GMint width;
-	GMint height;
+	GMint32 width;
+	GMint32 height;
 	GMTextureAsset asset;
 };
 

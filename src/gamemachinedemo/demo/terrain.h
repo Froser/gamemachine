@@ -8,8 +8,8 @@ GM_PRIVATE_OBJECT(Demo_Terrain)
 {
 	gm::GMAsset terrainModel;
 	gm::GMGameObject* terrain = nullptr;
-	gm::GMint mouseDownX;
-	gm::GMint mouseDownY;
+	gm::GMint32 mouseDownX;
+	gm::GMint32 mouseDownY;
 	bool draggingL = false;
 };
 

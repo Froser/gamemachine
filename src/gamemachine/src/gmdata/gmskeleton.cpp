@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include <gmskeleton.h>
 
-void GMSkeleton::interpolateSkeletons(GMint frame0, GMint frame1, GMfloat p)
+void GMSkeleton::interpolateSkeletons(GMint32 frame0, GMint32 frame1, GMfloat p)
 {
 	// 变换每个Joint
 	D(d);

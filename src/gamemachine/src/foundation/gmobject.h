@@ -174,61 +174,61 @@ using GMMeta = HashMap<GMString, GMObjectMember, GMStringHashFunctor>;
 template <typename T>
 struct GMMetaMemberTypeGetter
 {
-	enum { Type = (GMint) GMMetaMemberType::Invalid };
+	enum { Type = (GMint32) GMMetaMemberType::Invalid };
 };
 
 template <>
-struct GMMetaMemberTypeGetter<GMint>
+struct GMMetaMemberTypeGetter<GMint32>
 {
-	enum { Type = (GMint) GMMetaMemberType::Int };
+	enum { Type = (GMint32) GMMetaMemberType::Int };
 };
 
 template <>
 struct GMMetaMemberTypeGetter<GMfloat>
 {
-	enum { Type = (GMint) GMMetaMemberType::Float };
+	enum { Type = (GMint32) GMMetaMemberType::Float };
 };
 
 template <>
 struct GMMetaMemberTypeGetter<GMVec2>
 {
-	enum { Type = (GMint) GMMetaMemberType::Vector2 };
+	enum { Type = (GMint32) GMMetaMemberType::Vector2 };
 };
 
 template <>
 struct GMMetaMemberTypeGetter<GMVec3>
 {
-	enum { Type = (GMint) GMMetaMemberType::Vector3 };
+	enum { Type = (GMint32) GMMetaMemberType::Vector3 };
 };
 
 template <>
 struct GMMetaMemberTypeGetter<GMVec4>
 {
-	enum { Type = (GMint) GMMetaMemberType::Vector4 };
+	enum { Type = (GMint32) GMMetaMemberType::Vector4 };
 };
 
 template <>
 struct GMMetaMemberTypeGetter<GMMat4>
 {
-	enum { Type = (GMint) GMMetaMemberType::Matrix4x4 };
+	enum { Type = (GMint32) GMMetaMemberType::Matrix4x4 };
 };
 
 template <>
 struct GMMetaMemberTypeGetter<GMString>
 {
-	enum { Type = (GMint) GMMetaMemberType::String };
+	enum { Type = (GMint32) GMMetaMemberType::String };
 };
 
 template <>
 struct GMMetaMemberTypeGetter<bool>
 {
-	enum { Type = (GMint) GMMetaMemberType::Boolean };
+	enum { Type = (GMint32) GMMetaMemberType::Boolean };
 };
 
 template <>
 struct GMMetaMemberTypeGetter<GMObject*>
 {
-	enum { Type = (GMint) GMMetaMemberType::Object };
+	enum { Type = (GMint32) GMMetaMemberType::Object };
 };
 
 // 信号目标，表示一个GMObject被多少信号连接

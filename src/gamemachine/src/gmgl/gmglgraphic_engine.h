@@ -17,7 +17,7 @@ struct ITechnique;
 #if GM_DEBUG
 #define GMGLBeginGetErrors() GMGLGraphicEngine::clearGLErrors()
 #define GMGLEndGetErrors GMGLGraphicEngine::getGLErrors
-#define GMGLDeclareErrors(var) GMuint var[GMGLGraphicEngine::GLMaxError + 1] = {0}
+#define GMGLDeclareErrors(var) GMuint32 var[GMGLGraphicEngine::GLMaxError + 1] = {0}
 #define GMGLCheckErrors(var) GMGLGraphicEngine::checkGLErrors(var)
 #define GMGLBeginGetErrorsAndCheck() \
 	{ \
@@ -124,8 +124,8 @@ public:
 	};
 	
 	static void clearGLErrors();
-	static void getGLErrors(GMuint* errors, GMsize_t* count);
-	static void checkGLErrors(const GMuint* errors);
+	static void getGLErrors(GMuint32* errors, GMsize_t* count);
+	static void checkGLErrors(const GMuint32* errors);
 };
 
 class GMGLUtility

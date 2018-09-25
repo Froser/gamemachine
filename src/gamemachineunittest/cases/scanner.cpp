@@ -27,7 +27,7 @@ void cases::Scanner::addToUnitTest(UnitTest& ut)
 		gm::GMString input = L"game 1 2.0f machine";
 		gm::GMScanner scanner(input);
 		gm::GMString strOut, strOut2;
-		gm::GMint number;
+		gm::GMint32 number;
 		gm::GMfloat number2;
 		scanner.next(strOut);
 		scanner.nextInt(number);

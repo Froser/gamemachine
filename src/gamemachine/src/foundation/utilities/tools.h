@@ -23,7 +23,7 @@ GM_PRIVATE_OBJECT(GMClock)
 	bool paused;
 
 	//以下用于计算帧率
-	GMint frameCount;
+	GMint32 frameCount;
 	GMint64 lastCycle;
 };
 
@@ -188,7 +188,7 @@ public:
 //Bitset
 GM_PRIVATE_OBJECT(Bitset)
 {
-	GMint numBytes;
+	GMint32 numBytes;
 	GMbyte* bits;
 };
 
@@ -209,7 +209,7 @@ public:
 		GM_delete_array(d->bits);
 	}
 
-	bool init(GMint numberOfBits);
+	bool init(GMint32 numberOfBits);
 
 	inline void clearAll()
 	{
@@ -223,25 +223,25 @@ public:
 		memset(d->bits, 0xFF, d->numBytes);
 	}
 
-	inline void clear(GMint bitNumber)
+	inline void clear(GMint32 bitNumber)
 	{
 		D(d);
 		d->bits[bitNumber >> 3] &= ~(1 << (bitNumber & 7));
 	}
 
-	inline void set(GMint bitNumber)
+	inline void set(GMint32 bitNumber)
 	{
 		D(d);
 		d->bits[bitNumber >> 3] |= 1 << (bitNumber & 7);
 	}
 
-	inline GMbyte isSet(GMint bitNumber)
+	inline GMbyte isSet(GMint32 bitNumber)
 	{
 		D(d);
 		return d->bits[bitNumber >> 3] & 1 << (bitNumber & 7);
 	}
 
-	inline void toggle(GMint bitNumber)
+	inline void toggle(GMint32 bitNumber)
 	{
 		if (isSet(bitNumber))
 			clear(bitNumber);
@@ -272,8 +272,8 @@ struct GMPath
 //GMPath: platforms/[os]/screen.cpp
 struct GMScreen
 {
-	static GMint horizontalResolutionDpi();
-	static GMint verticalResolutionDpi();
+	static GMint32 horizontalResolutionDpi();
+	static GMint32 verticalResolutionDpi();
 };
 
 //GMEvent: platforms/[os]/event.cpp
@@ -300,7 +300,7 @@ public:
 	~GMEvent();
 
 public:
-	void wait(GMuint milliseconds = 0);
+	void wait(GMuint32 milliseconds = 0);
 	void set();
 	void reset();
 };
@@ -319,8 +319,8 @@ public:
 
 struct GMConvertion
 {
-	static GMfloat pointToInch(GMint pt);
-	static GMfloat pointToPixel(GMint pt, bool horizontal = true);
+	static GMfloat pointToInch(GMint32 pt);
+	static GMfloat pointToPixel(GMint32 pt, bool horizontal = true);
 	static bool hexToRGB(const GMString& hex, GMfloat rgb[3]);
 	static GMVec4 hexToRGB(const GMString& hex);
 	static GMString toUnixString(const GMString& string);
@@ -396,7 +396,7 @@ public:
 	static ErrorCode inflate(const GMBuffer& buf, REF GMBuffer& out, GMsize_t sizeHint);
 
 private:
-	static ErrorCode translateError(GMint);
+	static ErrorCode translateError(GMint32);
 };
 
 END_NS

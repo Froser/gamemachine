@@ -64,13 +64,13 @@ void GMGLModelDataProxy::transfer()
 	
 	if (model->getDrawMode() == GMModelDrawMode::Index)
 	{
-		Vector<GMuint> packedIndices;
+		Vector<GMuint32> packedIndices;
 		// 把数据打入顶点数组
 		packIndices(packedIndices);
 
 		glGenBuffers(1, &bufferData.indexBufferId);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferData.indexBufferId);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GMuint) * packedIndices.size(), packedIndices.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GMuint32) * packedIndices.size(), packedIndices.data(), GL_STATIC_DRAW);
 
 		verticeCount = packedIndices.size();
 	}

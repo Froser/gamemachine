@@ -14,7 +14,7 @@ namespace
 	GMwchar* alloc_convertMultiBytesToWideChar(const char* mbs)
 	{
 #if GM_WINDOWS
-		GMint sz = ::MultiByteToWideChar(CP_UTF8, 0, mbs, -1, nullptr, 0);
+		GMint32 sz = ::MultiByteToWideChar(CP_UTF8, 0, mbs, -1, nullptr, 0);
 		GMwchar* data = new GMwchar[sz];
 		::MultiByteToWideChar(CP_UTF8, 0, mbs, -1, data, sz);
 		return data;
@@ -42,7 +42,7 @@ namespace
 	char* alloc_convertWideCharToMultiBytes(const GMwchar* wch)
 	{
 #if GM_WINDOWS
-		GMint sz = ::WideCharToMultiByte(CP_UTF8, 0, wch, -1, nullptr, 0, nullptr, nullptr);
+		GMint32 sz = ::WideCharToMultiByte(CP_UTF8, 0, wch, -1, nullptr, 0, nullptr, nullptr);
 		char* data = new char[sz];
 		::WideCharToMultiByte(CP_UTF8, 0, wch, -1, data, sz, nullptr, nullptr);
 		return data;
@@ -68,7 +68,7 @@ namespace
 	}
 
 	template <typename RetType>
-	GMint string_scanf(const char* buf, const char* format, RetType* ret)
+	GMint32 string_scanf(const char* buf, const char* format, RetType* ret)
 	{
 #if GM_MSVC
 		return sscanf_s(buf, format, ret);
@@ -85,7 +85,7 @@ namespace
 		register union
 		{
 			const GMwchar* w;
-			const GMuint* d;
+			const GMuint32* d;
 			GMsize_t value;
 		} sa, sb;
 		sa.w = a;
@@ -110,7 +110,7 @@ namespace
 
 			// both addresses are 4-bytes aligned
 			// do a fast 32-bit comparison
-			register const GMuint *e = sa.d + (length >> 1);
+			register const GMuint32 *e = sa.d + (length >> 1);
 			for (; sa.d != e; ++sa.d, ++sb.d)
 			{
 				if (*sa.d != *sb.d)
@@ -198,7 +198,7 @@ GMString::GMString(const GMfloat f)
 	d->data = std::to_wstring(f);
 }
 
-GMString::GMString(const GMint i)
+GMString::GMString(const GMint32 i)
 {
 	D_STR(d);
 	d->data = std::to_wstring(i);
@@ -377,11 +377,11 @@ GMfloat GMString::parseFloat(const GMString& i, bool* ok)
 	return 0;
 }
 
-GMint GMString::parseInt(const GMString& i, bool* ok)
+GMint32 GMString::parseInt(const GMString& i, bool* ok)
 {
 	try
 	{
-		GMint v = std::stoi(i.toStdWString());
+		GMint32 v = std::stoi(i.toStdWString());
 		if (ok)
 			*ok = true;
 		return v;
@@ -531,7 +531,7 @@ bool GMScanner::nextFloat(REF GMfloat& ref)
 	return true;
 }
 
-bool GMScanner::nextInt(REF GMint& ref)
+bool GMScanner::nextInt(REF GMint32& ref)
 {
 	D_STR(d);
 	if (!d->valid)

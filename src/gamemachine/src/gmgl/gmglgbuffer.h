@@ -17,7 +17,7 @@ public:
 	virtual void lightPass() override;
 
 public:
-	void drawGeometryBuffer(GMuint index, const GMRect& rect);
+	void drawGeometryBuffer(GMuint32 index, const GMRect& rect);
 
 public:
 	static const std::string* GBufferGeometryUniformNames();

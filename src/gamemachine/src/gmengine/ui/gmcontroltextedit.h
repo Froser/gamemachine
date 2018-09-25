@@ -14,22 +14,22 @@ GM_PRIVATE_OBJECT(GMControlTextEdit)
 	GMVec4 textColor = GMVec4(0, 0, 0, 1);
 	GMVec4 selectionBackColor = GMConvertion::hexToRGB(L"#A3CEF1");
 	GMVec4 caretColor = GMVec4(0, 0, 0, 1);
-	GMint cp = 0;
-	GMint firstVisibleCP = 0;
-	GMint selectionStartCP = 0;
+	GMint32 cp = 0;
+	GMint32 firstVisibleCP = 0;
+	GMint32 selectionStartCP = 0;
 	GMRect rcText;
 	GMStyle textStyle;
 	GMOwnedPtr<GMTypoTextBuffer> buffer;
 	GMOwnedPtr<GMControlBorder> borderControl;
 	GMTransactionContext transactionContext;
-	GMint borderWidth = 5;
+	GMint32 borderWidth = 5;
 	GMfloat lastBlink = 0;
 	GMfloat deltaBlink = .5f;
 	bool caretOn = true;
 	bool showCaret = true;
 	bool insertMode = true;
 	bool mouseDragging = false;
-	GMint padding[2] = { 5, 10 };
+	GMint32 padding[2] = { 5, 10 };
 };
 
 class GMControlTextEdit : public GMControl
@@ -51,8 +51,8 @@ public:
 
 public:
 	virtual void render(GMDuration elapsed) override;
-	virtual void setSize(GMint width, GMint height) override;
-	virtual void setPosition(GMint x, GMint y) override;
+	virtual void setSize(GMint32 width, GMint32 height) override;
+	virtual void setPosition(GMint32 x, GMint32 y) override;
 	virtual GMStyle& getStyle(GMControl::StyleType style) override;
 	virtual void onFocusOut() override;
 	virtual bool onKeyDown(GMSystemKeyEvent* event) override;
@@ -65,9 +65,9 @@ public:
 	virtual void onMouseLeave() override;
 	virtual bool canHaveFocus() override;
 	virtual void setText(const GMString& text);
-	virtual void setPadding(GMint x, GMint y);
-	virtual void placeCaret(GMint cP, bool adjustVisibleCP = true);
-	virtual void placeSelectionStart(GMint selectionStartCP);
+	virtual void setPadding(GMint32 x, GMint32 y);
+	virtual void placeCaret(GMint32 cP, bool adjustVisibleCP = true);
+	virtual void placeSelectionStart(GMint32 selectionStartCP);
 
 // 处理特殊按键
 protected:
@@ -87,17 +87,17 @@ public:
 	void redo();
 
 protected:
-	virtual void renderCaret(GMint firstX, GMint caretX);
+	virtual void renderCaret(GMint32 firstX, GMint32 caretX);
 	virtual void pasteFromClipboard();
-	virtual GMint getCaretTop();
-	virtual GMint getCaretHeight();
+	virtual GMint32 getCaretTop();
+	virtual GMint32 getCaretHeight();
 	virtual void handleMouseCaret(const GMPoint& pt, bool selectStart);
-	virtual void adjustInsertModeRect(REF GMRect& caretRc, GMint caretX);
-	virtual void moveFirstVisibleCp(GMint distance);
+	virtual void adjustInsertModeRect(REF GMRect& caretRc, GMint32 caretX);
+	virtual void moveFirstVisibleCp(GMint32 distance);
 
 protected:
 	void createBufferTypoEngineIfNotExist();
-	void blinkCaret(GMint firstX, GMint caretX);
+	void blinkCaret(GMint32 firstX, GMint32 caretX);
 	void moveCaret(bool next, bool newItem, bool select);
 	bool deleteSelectionText();
 	void selectAll();
@@ -105,7 +105,7 @@ protected:
 	void copyToClipboard();
 	void handleMouseSelect(GMSystemMouseEvent* event, bool selectStart);
 	void initStyles(GMWidget* widget);
-	void setBufferRenderRange(GMint xFirst);
+	void setBufferRenderRange(GMint32 xFirst);
 
 public:
 	inline GMControlBorder* getBorder() GM_NOEXCEPT
@@ -114,7 +114,7 @@ public:
 		return d->borderControl.get();
 	}
 
-	inline void setBorderWidth(GMint width) GM_NOEXCEPT
+	inline void setBorderWidth(GMint32 width) GM_NOEXCEPT
 	{
 		D(d);
 		d->borderWidth = width;
@@ -150,11 +150,11 @@ protected:
 
 GM_PRIVATE_OBJECT(GMControlTextArea)
 {
-	GMint caretTopRelative = 0;
+	GMint32 caretTopRelative = 0;
 	GMMultiLineTypoTextBuffer* buffer = nullptr;
-	GMint scrollOffset = 0;
+	GMint32 scrollOffset = 0;
 	bool hasScrollBar = false;
-	GMint scrollBarSize = 20;
+	GMint32 scrollBarSize = 20;
 	bool scrollBarLocked = false;
 	GMOwnedPtr<GMControlScrollBar> scrollBar;
 };
@@ -162,7 +162,7 @@ GM_PRIVATE_OBJECT(GMControlTextArea)
 class GMControlTextArea : public GMControlTextEdit
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMControlTextArea, GMControlTextEdit)
-	GM_DECLARE_PROPERTY(ScrollBarSize, scrollBarSize, GMint)
+	GM_DECLARE_PROPERTY(ScrollBarSize, scrollBarSize, GMint32)
 
 public:
 	GMControlTextArea(GMWidget* widget);
@@ -171,11 +171,11 @@ public:
 	virtual void render(GMDuration elapsed) override;
 	virtual void pasteFromClipboard() override;
 	virtual void insertCharacter(GMwchar ch) override;
-	virtual void setSize(GMint width, GMint height) override;
-	virtual GMint getCaretTop() override;
-	virtual GMint getCaretHeight() override;
+	virtual void setSize(GMint32 width, GMint32 height) override;
+	virtual GMint32 getCaretTop() override;
+	virtual GMint32 getCaretHeight() override;
 	virtual void handleMouseCaret(const GMPoint& pt, bool selectStart) override;
-	virtual void placeCaret(GMint cp, bool adjustVisibleCP) override;
+	virtual void placeCaret(GMint32 cp, bool adjustVisibleCP) override;
 	virtual void updateRect() override;
 	virtual bool handleMouse(GMSystemMouseEvent* event) override;
 	virtual bool onMouseMove(GMSystemMouseEvent* event) override;
@@ -185,8 +185,8 @@ public:
 	virtual void onMouseEnter() override;
 	virtual void onMouseLeave() override;
 	virtual bool onMouseWheel(GMSystemMouseWheelEvent* event) override;
-	virtual void adjustInsertModeRect(REF GMRect& caretRc, GMint caretX);
-	virtual void moveFirstVisibleCp(GMint distance) override;
+	virtual void adjustInsertModeRect(REF GMRect& caretRc, GMint32 caretX);
+	virtual void moveFirstVisibleCp(GMint32 distance) override;
 
 // 处理按键
 	virtual bool onKey_UpDown(GMSystemKeyEvent* event) override;
@@ -195,8 +195,8 @@ public:
 
 public:
 	void setScrollBar(bool scrollBar);
-	void setLineSpacing(GMint lineSpacing) GM_NOEXCEPT;
-	void setLineHeight(GMint lineHeight) GM_NOEXCEPT;
+	void setLineSpacing(GMint32 lineSpacing) GM_NOEXCEPT;
+	void setLineHeight(GMint32 lineHeight) GM_NOEXCEPT;
 
 public:
 	inline GMControlScrollBar* getScrollBar() GM_NOEXCEPT
@@ -206,18 +206,18 @@ public:
 	}
 
 protected:
-	void setBufferRenderRange(GMint xFirst, GMint yFirst);
+	void setBufferRenderRange(GMint32 xFirst, GMint32 yFirst);
 
 private:
 	void updateScrollBar();
 	void updateScrollBarPageStep();
 	bool hasScrollBarAndPointInScrollBarRect(const GMPoint& pt);
-	void moveToLine(GMint lineNo);
-	GMint getCurrentVisibleLineNo();
+	void moveToLine(GMint32 lineNo);
+	GMint32 getCurrentVisibleLineNo();
 	void onScrollBarValueChanged(const GMControlScrollBar* sb);
 
 private:
-	inline void setCaretTopRelative(GMint caretTopRelative) GM_NOEXCEPT
+	inline void setCaretTopRelative(GMint32 caretTopRelative) GM_NOEXCEPT
 	{
 		D(d);
 		d->caretTopRelative = caretTopRelative;

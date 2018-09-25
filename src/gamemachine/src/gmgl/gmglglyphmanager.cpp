@@ -36,19 +36,19 @@ public:
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	virtual void useTexture(GMint textureIndex) override
+	virtual void useTexture(GMint32 textureIndex) override
 	{
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, m_id);
 	}
 
-	GMuint getTextureId()
+	GMuint32 getTextureId()
 	{
 		return m_id;
 	}
 
 private:
-	GMuint m_id;
+	GMuint32 m_id;
 };
 END_NS
 

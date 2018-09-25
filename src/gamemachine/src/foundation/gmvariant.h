@@ -30,8 +30,8 @@ public:
 
 	union Data
 	{
-		GMint i32;
-		GMuint u;
+		GMint32 i32;
+		GMuint32 u;
 		GMfloat f;
 		bool b;
 		void* p;
@@ -46,9 +46,9 @@ public:
 	};
 
 	GMVariant();
-	GMVariant(GMint);
+	GMVariant(GMint32);
 	GMVariant(GMint64);
-	GMVariant(GMuint);
+	GMVariant(GMuint32);
 	GMVariant(GMfloat);
 	GMVariant(bool);
 	GMVariant(const GMVec2&);
@@ -70,9 +70,9 @@ public:
 	GMVariant& operator=(GMVariant&&);
 
 public:
-	GMint toInt() const;
+	GMint32 toInt() const;
 	GMint64 toInt64() const;
-	GMuint toUInt() const;
+	GMuint32 toUInt() const;
 	GMfloat toFloat() const;
 	GMObject* toObject() const;
 	void* toPointer() const;

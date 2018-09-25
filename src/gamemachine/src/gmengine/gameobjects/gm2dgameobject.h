@@ -83,7 +83,7 @@ enum class GMTextDrawMode
 GM_PRIVATE_OBJECT(GMTextGameObject)
 {
 	GMString text;
-	GMint lineSpacing = 0;
+	GMint32 lineSpacing = 0;
 	bool center = false;
 	bool newline = true;
 	GMsize_t length = 0;
@@ -116,7 +116,7 @@ public:
 	void setCenter(bool center) GM_NOEXCEPT;
 	void setFont(GMFontHandle font) GM_NOEXCEPT;
 	void setNewline(bool newline) GM_NOEXCEPT;
-	void setLineSpacing(GMint lineSpacing) GM_NOEXCEPT;
+	void setLineSpacing(GMint32 lineSpacing) GM_NOEXCEPT;
 
 	//! 设置文本缓存。
 	/*!
@@ -158,8 +158,8 @@ GM_PRIVATE_OBJECT(GMSprite2DGameObject)
 	GMAsset modelAsset;
 	GMAsset texture;
 	GMRect textureRc;
-	GMint texHeight = 0;
-	GMint texWidth = 0;
+	GMint32 texHeight = 0;
+	GMint32 texWidth = 0;
 	GMfloat depth = 0;
 	bool needUpdateTexture = false;
 	GMFloat4 color = GMFloat4(1, 1, 1, 1);
@@ -185,7 +185,7 @@ public:
 public:
 	void setDepth(GMfloat depth);
 	void setTexture(GMAsset tex);
-	void setTextureSize(GMint width, GMint height);
+	void setTextureSize(GMint32 width, GMint32 height);
 	void setTextureRect(const GMRect& rect);
 
 private:

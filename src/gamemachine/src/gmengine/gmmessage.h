@@ -16,15 +16,15 @@ enum class GameMachineMessageType
 
 struct GMMessage
 {
-	GMMessage(GameMachineMessageType t = GameMachineMessageType::Invalid, GMint tp = 0, GMint v = 0, void* objPtr = nullptr)
+	GMMessage(GameMachineMessageType t = GameMachineMessageType::Invalid, GMint32 tp = 0, GMint32 v = 0, void* objPtr = nullptr)
 		: msgType(t)
 		, type(tp)
 		, value(v)
 	{}
 
 	GameMachineMessageType msgType = GameMachineMessageType::Invalid;
-	GMint type = 0;
-	GMint value = 0;
+	GMint32 type = 0;
+	GMint32 value = 0;
 	void* objPtr = 0;
 };
 
@@ -236,7 +236,7 @@ enum GMMouseButtonType
 	GMMouseButton_Middle = 0x04,
 };
 
-typedef GMuint GMMouseButton;
+typedef GMuint32 GMMouseButton;
 
 enum GMModifierType
 {
@@ -245,7 +245,7 @@ enum GMModifierType
 	GMModifier_Shift = 0x02
 };
 
-typedef GMuint GMModifier;
+typedef GMuint32 GMModifier;
 
 GM_PRIVATE_OBJECT(GMSystemEvent)
 {

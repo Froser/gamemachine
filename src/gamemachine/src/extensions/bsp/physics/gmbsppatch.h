@@ -18,9 +18,9 @@ class GMBSPPatch : public GMObject
 	GM_DECLARE_PRIVATE(GMBSPPatch)
 
 public:
-	void alloc(GMint num);
-	GMBSP_Physics_Patch* patches(GMint at);
-	void generatePatchCollide(GMint index, GMint width, GMint height, const GMVec3* points, AUTORELEASE GMBSP_Physics_Patch* patch);
+	void alloc(GMint32 num);
+	GMBSP_Physics_Patch* patches(GMint32 at);
+	void generatePatchCollide(GMint32 index, GMint32 width, GMint32 height, const GMVec3* points, AUTORELEASE GMBSP_Physics_Patch* patch);
 };
 
 END_NS

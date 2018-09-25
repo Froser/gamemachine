@@ -62,9 +62,9 @@ inline gm::GMfloat Floor(gm::GMfloat x) { return floor(x); }
 inline gm::GMfloat Ceil(gm::GMfloat x) { return ceil(x); }
 inline gm::GMfloat Min(gm::GMfloat x, gm::GMfloat y) { return x < y ? x : y; }
 inline gm::GMfloat Max(gm::GMfloat x, gm::GMfloat y) { return x > y ? x : y; }
-inline gm::GMint Round(gm::GMfloat d)
+inline gm::GMint32 Round(gm::GMfloat d)
 {
-	return d >= 0.0 ? static_cast<gm::GMint>(d + 0.5) : static_cast<gm::GMint>(d - static_cast<gm::GMint>(d - 1) + 0.5) + static_cast<gm::GMint>(d - 1);
+	return d >= 0.0 ? static_cast<gm::GMint32>(d + 0.5) : static_cast<gm::GMint32>(d - static_cast<gm::GMint32>(d - 1) + 0.5) + static_cast<gm::GMint32>(d - 1);
 }
 
 template <typename T>
@@ -135,7 +135,7 @@ inline bool FuzzyCompare(gm::GMfloat p1, gm::GMfloat p2, gm::GMfloat qualifier =
 #define GMMATH_LOAD_FLOAT4						\
 		void loadFloat4(GMFloat4& f4) const		\
 		{										\
-			for (gm::GMint i = 0;				\
+			for (gm::GMint32 i = 0;				\
 				i < length(); ++i)				\
 			{									\
 				f4.v_[i] = v_[i];				\
@@ -160,7 +160,7 @@ inline bool FuzzyCompare(gm::GMfloat p1, gm::GMfloat p2, gm::GMfloat qualifier =
 #endif
 #define GMMATH_END_STRUCT };
 
-#define GMMATH_LEN(len) constexpr static gm::GMint length() { return (len); }
+#define GMMATH_LEN(len) constexpr static gm::GMint32 length() { return (len); }
 
 struct GMFloat4
 {
@@ -189,13 +189,13 @@ struct GMFloat4
 	};
 
 	DirectX::XMFLOAT4 v_;
-	gm::GMfloat& operator[](gm::GMint i)
+	gm::GMfloat& operator[](gm::GMint32 i)
 	{
 		GM_ASSERT(i < 4);
 		return *(&(v_.x) + i);
 	}
 
-	const gm::GMfloat& operator[](gm::GMint i) const
+	const gm::GMfloat& operator[](gm::GMint32 i) const
 	{
 		GM_ASSERT(i < 4);
 		return *(&(v_.x) + i);
@@ -203,14 +203,14 @@ struct GMFloat4
 #else
 	gm::GMfloat v_[4];
 
-	gm::GMfloat& operator[](gm::GMint i)
+	gm::GMfloat& operator[](gm::GMint32 i)
 	{
 		GM_ASSERT(i < 4);
 		GM_ASSERT(v_);
 		return v_[i];
 	}
 
-	const gm::GMfloat& operator[](gm::GMint i) const
+	const gm::GMfloat& operator[](gm::GMint32 i) const
 	{
 		GM_ASSERT(i < 4);
 		GM_ASSERT(v_);
@@ -222,7 +222,7 @@ struct GMFloat4
 struct GMFloat16
 {
 	GMFloat4 v_[4];
-	GMFloat4& operator[](gm::GMint i)
+	GMFloat4& operator[](gm::GMint32 i)
 	{
 		return v_[i];
 	}
@@ -337,13 +337,13 @@ GMMATH_LEN(4)
 void loadFloat16(GMFloat16& f16) const
 {
 #if GM_USE_DX11
-	for (gm::GMint i = 0; i < 4; ++i)
+	for (gm::GMint32 i = 0; i < 4; ++i)
 	{
 		GMFloat4& f4 = f16.v_[i];
 		DirectX::XMStoreFloat4(&(f4.v_), v_.r[i]);
 	}
 #else
-	for (gm::GMint i = 0; i < 4; ++i)
+	for (gm::GMint32 i = 0; i < 4; ++i)
 	{
 		GMFloat4& f4 = f16.v_[i];
 		(*this)[i].loadFloat4(f4);
@@ -354,14 +354,14 @@ void loadFloat16(GMFloat16& f16) const
 void setFloat16(const GMFloat16& f16)
 {
 #if GM_USE_DX11
-	for (gm::GMint i = 0; i < 4; ++i)
+	for (gm::GMint32 i = 0; i < 4; ++i)
 	{
 		const GMFloat4& f4 = f16.v_[i];
 		v_.r[i] = DirectX::XMLoadFloat4(&(f4.v_));
 	}
 #else
 
-	for (gm::GMint i = 0; i < 4; ++i)
+	for (gm::GMint32 i = 0; i < 4; ++i)
 	{
 		const GMFloat4& f4 = f16.v_[i];
 		v_[i][0] = f4[0];
@@ -372,7 +372,7 @@ void setFloat16(const GMFloat16& f16)
 #endif
 }
 
-GMVec4 operator[](gm::GMint i) const
+GMVec4 operator[](gm::GMint32 i) const
 {
 	GMVec4 R;
 #if GM_USE_DX11

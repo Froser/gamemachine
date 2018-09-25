@@ -25,7 +25,7 @@ GM_PRIVATE_OBJECT(GMTextureSampler)
 	Array<GMTextureAsset, MAX_ANIMATION_FRAME> frames; // 每个texture由TEXTURE_INDEX_MAX个纹理动画组成。静态纹理的纹理动画数量为1
 	Array<GMS_TextureTransform, MAX_TEX_TRANS> texTransform;
 	GMsize_t frameCount = 0;
-	GMint animationMs = 1; //每一帧动画间隔 (ms)
+	GMint32 animationMs = 1; //每一帧动画间隔 (ms)
 	GMS_TextureFilter magFilter = GMS_TextureFilter::Linear;
 	GMS_TextureFilter minFilter = GMS_TextureFilter::LinearMipmapLinear;
 	GMS_Wrap wrapS = GMS_Wrap::Repeat;
@@ -38,7 +38,7 @@ class GMTextureSampler : public GMObject
 
 public:
 	GM_DECLARE_PROPERTY(FrameCount, frameCount, GMsize_t);
-	GM_DECLARE_PROPERTY(AnimationMs, animationMs, GMint);
+	GM_DECLARE_PROPERTY(AnimationMs, animationMs, GMint32);
 	GM_DECLARE_PROPERTY(MagFilter, magFilter, GMS_TextureFilter);
 	GM_DECLARE_PROPERTY(MinFilter, minFilter, GMS_TextureFilter);
 	GM_DECLARE_PROPERTY(WrapS, wrapS, GMS_Wrap);
@@ -78,7 +78,7 @@ enum class GMTextureType
 	EndOfEnum,
 };
 
-static constexpr GMuint GMMaxTextureCount(GMTextureType type)
+static constexpr GMuint32 GMMaxTextureCount(GMTextureType type)
 {
 	return type == GMTextureType::BeginOfEnum || type == GMTextureType::EndOfCommonTexture || type == GMTextureType::EndOfEnum ? 0 :
 		type == GMTextureType::GeometryPasses ? 8 : 1;
@@ -89,8 +89,8 @@ struct GMTextureRegisterQuery
 {
 	enum
 	{
-		Value = GMMaxTextureCount((GMTextureType)((GMint)Type - 1)) +
-			GMTextureRegisterQuery<(GMTextureType)((GMint)Type - 1)>::Value
+		Value = GMMaxTextureCount((GMTextureType)((GMint32)Type - 1)) +
+			GMTextureRegisterQuery<(GMTextureType)((GMint32)Type - 1)>::Value
 	};
 };
 
@@ -189,7 +189,7 @@ GM_ALIGNED_STRUCT(GMMaterial)
 GM_PRIVATE_OBJECT(GMShader)
 {
 	GMIlluminationModel illuminationModel = GMIlluminationModel::Phong;
-	GMuint surfaceFlag = 0;
+	GMuint32 surfaceFlag = 0;
 	GMS_Cull cull = GMS_Cull::Cull;
 	GMS_FrontFace frontFace = GMS_FrontFace::CLOCKWISE;
 	GMS_BlendFunc blendFactorSrcRGB = GMS_BlendFunc::Zero;
@@ -217,7 +217,7 @@ public:
 	GMShader() = default;
 
 public:
-	GM_DECLARE_PROPERTY(SurfaceFlag, surfaceFlag, GMuint);
+	GM_DECLARE_PROPERTY(SurfaceFlag, surfaceFlag, GMuint32);
 	GM_DECLARE_PROPERTY(Cull, cull, GMS_Cull);
 	GM_DECLARE_PROPERTY(FrontFace, frontFace, GMS_FrontFace);
 	GM_DECLARE_PROPERTY(BlendFactorSourceRGB, blendFactorSrcRGB, GMS_BlendFunc);

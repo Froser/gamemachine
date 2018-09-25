@@ -18,7 +18,7 @@ IGraphicEngine* GMRenderContext::getEngine() const
 
 
 Display* GMXRenderContext::s_display = nullptr;
-GMint GMXRenderContext::s_instanceCount = 0;
+GMint32 GMXRenderContext::s_instanceCount = 0;
 
 GMXRenderContext::GMXRenderContext(IWindow* window, const char* displayName)
 {
@@ -114,11 +114,11 @@ Atom GMXRenderContext::getAtom(const char* name)
 	return XInternAtom(getDisplay(), name, False);
 }
 
-GMint GMXRenderContext::getWindowProperty(Window window, Atom property, Atom type, unsigned char** data)
+GMint32 GMXRenderContext::getWindowProperty(Window window, Atom property, Atom type, unsigned char** data)
 {
-	GMint status;
+	GMint32 status;
 	Atom typeReturned = None;
-	GMint tempFormat;
+	GMint32 tempFormat;
 	GMulong numberOfElements;
 	GMulong dtempBytesAfter;
 	status = XGetWindowProperty(
@@ -152,7 +152,7 @@ bool GMXRenderContext::isNetWMSupported()
 {
 	Atom wmCheck;
 	Window** window1 = new Window*();
-	GMint numberOfWindows = 0;
+	GMint32 numberOfWindows = 0;
 	bool netWMSupported = false;
 	wmCheck = getAtom("_NET_SUPPORTING_WM_CHECK");
 	numberOfWindows = getWindowProperty(getRootWindow(), wmCheck, XA_WINDOW, (unsigned char **)window1);
@@ -178,9 +178,9 @@ bool GMXRenderContext::isHintPresent(Window window, Atom property, Atom hint)
 {
 	Atom* atoms = nullptr;
 	bool supported = false;
-	GMint numberOfAtoms = getWindowProperty(window, property, XA_ATOM, (unsigned char**) &atoms);
+	GMint32 numberOfAtoms = getWindowProperty(window, property, XA_ATOM, (unsigned char**) &atoms);
 
-	for (GMint i = 0; i < numberOfAtoms; ++i)
+	for (GMint32 i = 0; i < numberOfAtoms; ++i)
 	{
 		if (atoms[i] == hint)
 		{

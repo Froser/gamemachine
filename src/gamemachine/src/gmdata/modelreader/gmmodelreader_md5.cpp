@@ -26,7 +26,7 @@ namespace
 }
 
 BEGIN_DECLARE_MD5_HANDLER(GMMD5Version, reader, scanner, GMModelReader_MD5*)
-	GMint version;
+	GMint32 version;
 	scanner.nextInt(version);
 	reader->setMD5Version(version);
 	return true;

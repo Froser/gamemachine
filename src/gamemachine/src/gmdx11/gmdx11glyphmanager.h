@@ -21,7 +21,7 @@ public:
 public:
 	virtual void init() override;
 	virtual void bindSampler(GMTextureSampler* sampler) override;
-	virtual void useTexture(GMint textureIndex) override;
+	virtual void useTexture(GMint32 textureIndex) override;
 
 public:
 	inline ID3D11Texture2D* getD3D11Texture()

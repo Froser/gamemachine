@@ -10,7 +10,7 @@
 
 // Handlers
 BEGIN_DECLARE_MD5_HANDLER(MD5Version, reader, scanner, GMModelReader_MD5Mesh*)
-	GMint version;
+	GMint32 version;
 	scanner.nextInt(version);
 	reader->setMD5Version(version);
 	return true;
@@ -24,7 +24,7 @@ BEGIN_DECLARE_MD5_HANDLER(commandline, reader, scanner, GMModelReader_MD5Mesh*)
 END_DECLARE_MD5_HANDLER()
 
 BEGIN_DECLARE_MD5_HANDLER(numJoints, reader, scanner, GMModelReader_MD5Mesh*)
-	GMint numJoints;
+	GMint32 numJoints;
 	scanner.nextInt(numJoints);
 	reader->setNumJoints(numJoints);
 	reader->initJoints(numJoints);
@@ -32,7 +32,7 @@ BEGIN_DECLARE_MD5_HANDLER(numJoints, reader, scanner, GMModelReader_MD5Mesh*)
 END_DECLARE_MD5_HANDLER()
 
 BEGIN_DECLARE_MD5_HANDLER(numMeshes, reader, scanner, GMModelReader_MD5Mesh*)
-	GMint numMeshes;
+	GMint32 numMeshes;
 	scanner.nextInt(numMeshes);
 	reader->setNumMeshes(numMeshes);
 	reader->initMeshes(numMeshes);
@@ -121,7 +121,7 @@ struct Handler_mesh_inner : IMd5MeshHandler
 		}
 		else if (content == L"numverts")
 		{
-			GMint n;
+			GMint32 n;
 			scanner.nextInt(n);
 			m_cacheMesh->numVertices = n;
 			m_cacheMesh->vertices.resize(n);
@@ -141,7 +141,7 @@ struct Handler_mesh_inner : IMd5MeshHandler
 		else if (content == L"vert")
 		{
 			// vert <int:vertexIndex> ( <vec2:texCoords> ) <int:startWeight> <int:weightCount>
-			GMint index, i;
+			GMint32 index, i;
 			GMModelReader_MD5Mesh_Vertex v;
 			scanner.nextInt(index);
 			v.texCoords = GMMD5VectorParser::parseVector2(scanner);
@@ -153,7 +153,7 @@ struct Handler_mesh_inner : IMd5MeshHandler
 		}
 		else if (content == L"numtris")
 		{
-			GMint n;
+			GMint32 n;
 			scanner.nextInt(n);
 			m_cacheMesh->numTriangles = n;
 			m_cacheMesh->triangleIndices.resize(n);
@@ -161,7 +161,7 @@ struct Handler_mesh_inner : IMd5MeshHandler
 		else if (content == L"tri")
 		{
 			// tri <int:triangleIndex> <int:vertIndex0> <int:vertIndex1> <int:vertIndex2>
-			GMint index, indices[3];
+			GMint32 index, indices[3];
 			scanner.nextInt(index);
 			scanner.nextInt(indices[0]);
 			scanner.nextInt(indices[1]);
@@ -170,7 +170,7 @@ struct Handler_mesh_inner : IMd5MeshHandler
 		}
 		else if (content == L"numweights")
 		{
-			GMint n;
+			GMint32 n;
 			scanner.nextInt(n);
 			m_cacheMesh->numWeights = n;
 			m_cacheMesh->weights.resize(n);
@@ -179,7 +179,7 @@ struct Handler_mesh_inner : IMd5MeshHandler
 		{
 			// weight <int:weightIndex> <int:jointIndex> <float:weightBias> ( <vec3:weightPosition> )
 			GMModelReader_MD5Mesh_Weight weight;
-			GMint index, i;
+			GMint32 index, i;
 			GMfloat f;
 			scanner.nextInt(index);
 			scanner.nextInt(i);
@@ -295,7 +295,7 @@ void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, GMMo
 	if (!models)
 		return;
 	
-	static GMint numberOfProcessors = GM.getRunningStates().systemInfo.numberOfProcessors;
+	static GMint32 numberOfProcessors = GM.getRunningStates().systemInfo.numberOfProcessors;
 	// 临时结构，用于缓存顶点、法线
 	struct Vertex
 	{
@@ -336,14 +336,14 @@ void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, GMMo
 			mesh.vertices.begin(),
 			mesh.vertices.end(),
 			[&vertices, &mesh, &d](auto begin, auto end) {
-				GMint index = begin - mesh.vertices.begin();
+				GMint32 index = begin - mesh.vertices.begin();
 				for (auto iter = begin; iter != end; ++iter)
 				{
 					auto& vert = *iter;
 					Vertex vertex;
 					GMVec3 pos = Zero<GMVec3>();
 					// 每个顶点的坐标由结点的权重累计计算得到
-					for (GMint i = 0; i < vert.weightCount; ++i)
+					for (GMint32 i = 0; i < vert.weightCount; ++i)
 					{
 						const auto& weight = mesh.weights[vert.startWeight + i];
 						const auto& joint = d->joints[weight.jointIndex];
@@ -395,7 +395,7 @@ void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, GMMo
 		// 组装Vertex
 		for (const auto& triIdx : mesh.triangleIndices)
 		{
-			for (GMint i = 0; i < 3; ++i)
+			for (GMint32 i = 0; i < 3; ++i)
 			{
 				GMVertex v = { 0 };
 				const Vertex& vertexTemp = vertices[triIdx[i]];

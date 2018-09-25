@@ -234,7 +234,7 @@ void GameMachine::runEventLoop()
 	terminate();
 }
 
-void GameMachine::translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lParam, OUT GMSystemEvent** event)
+void GameMachine::translateSystemEvent(GMuint32 uMsg, GMWParam wParam, GMLParam lParam, OUT GMSystemEvent** event)
 {
 	GM_ASSERT(event);
 	GMKey key;
@@ -284,7 +284,7 @@ void GameMachine::translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lP
 	{
 		GMPoint mousePoint =
 		{
-			(GMint)LOWORD(lParam), (GMint)HIWORD(lParam)
+			(GMint32)LOWORD(lParam), (GMint32)HIWORD(lParam)
 		};
 
 		GMSystemEventType type = GMSystemEventType::Unknown;
@@ -337,7 +337,7 @@ void GameMachine::translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lP
 	{
 		GMPoint mousePoint =
 		{
-			(GMint)LOWORD(lParam), (GMint)HIWORD(lParam)
+			(GMint32)LOWORD(lParam), (GMint32)HIWORD(lParam)
 		};
 		GMshort delta = GET_WHEEL_DELTA_WPARAM(wParam);
 		newSystemEvent = new GMSystemMouseWheelEvent(

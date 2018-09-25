@@ -38,7 +38,7 @@ namespace
 		bool readLine(GMString& line)
 		{
 			line.clear();
-			GMint offset = 0;
+			GMint32 offset = 0;
 			while (isNotReturn(*m_p))
 			{
 				if (!*m_p)
@@ -55,13 +55,13 @@ namespace
 	};
 }
 
-template <GMint D, typename T>
+template <GMint32 D, typename T>
 static void pushBackData(GMScanner& scanner, AlignedVector<T>& container)
 {
 	T data;
 	GMfloat f;
 	GMFloat4 f4;
-	for (GMint i = 0; i < D; i++)
+	for (GMint32 i = 0; i < D; i++)
 	{
 		scanner.nextFloat(f);
 		f4[i] = f;
@@ -189,7 +189,7 @@ void GMModelReader_Obj::appendFace(const GMModelLoadSettings& settings, GMScanne
 		applyMaterial(settings, material, d->currentModel->getShader());
 	}
 
-	GMint verticesCount = 0;
+	GMint32 verticesCount = 0;
 	GMFloat4 firstVertex, firstNormal, firstTexcoord;
 	GMFloat4 lastVertex, lastNormal, lastTexcoord;
 	GMString face;
@@ -201,7 +201,7 @@ void GMModelReader_Obj::appendFace(const GMModelLoadSettings& settings, GMScanne
 		if (face.isEmpty())
 			break;
 
-		GMint v = INVALID, t = INVALID, n = INVALID;
+		GMint32 v = INVALID, t = INVALID, n = INVALID;
 		GMScanner faceScanner(face, false, slashPredicate);
 		faceScanner.nextInt(v);
 		faceScanner.nextInt(t);

@@ -13,7 +13,7 @@ namespace
 		const btTransform& parentTransform,
 		btAlignedObjectArray<btVector3>& vertexPositions,
 		btAlignedObjectArray<btVector3>& vertexNormals,
-		btAlignedObjectArray<GMint>& indicesOut)
+		btAlignedObjectArray<GMint32>& indicesOut)
 	{
 		//	switch (collisionShape->getShapeType())
 		//	{
@@ -24,21 +24,21 @@ namespace
 			btConvexShape* convex = static_cast<btConvexShape*>(collisionShape);
 			btShapeHull* hull = new btShapeHull(convex);
 			hull->buildHull(0.0);
-			for (GMint t = 0; t < hull->numTriangles(); t++)
+			for (GMint32 t = 0; t < hull->numTriangles(); t++)
 			{
 				btVector3 triNormal;
-				GMint index0 = hull->getIndexPointer()[t * 3 + 0];
-				GMint index1 = hull->getIndexPointer()[t * 3 + 1];
-				GMint index2 = hull->getIndexPointer()[t * 3 + 2];
+				GMint32 index0 = hull->getIndexPointer()[t * 3 + 0];
+				GMint32 index1 = hull->getIndexPointer()[t * 3 + 1];
+				GMint32 index2 = hull->getIndexPointer()[t * 3 + 2];
 				btVector3 pos0 = parentTransform*hull->getVertexPointer()[index0];
 				btVector3 pos1 = parentTransform*hull->getVertexPointer()[index1];
 				btVector3 pos2 = parentTransform*hull->getVertexPointer()[index2];
 				triNormal = (pos1 - pos0).cross(pos2 - pos0);
 				triNormal.normalize();
 
-				for (GMint v = 0; v < 3; v++)
+				for (GMint32 v = 0; v < 3; v++)
 				{
-					GMint index = hull->getIndexPointer()[t * 3 + v];
+					GMint32 index = hull->getIndexPointer()[t * 3 + v];
 					btVector3 pos = parentTransform*hull->getVertexPointer()[index];
 					indicesOut.push_back(vertexPositions.size());
 					vertexPositions.push_back(pos);
@@ -63,17 +63,17 @@ namespace
 
 		btAlignedObjectArray<btVector3> vertexPositions;
 		btAlignedObjectArray<btVector3> vertexNormals;
-		btAlignedObjectArray<GMint> indices;
+		btAlignedObjectArray<GMint32> indices;
 		collisionShape2TriangleMesh(shape, origin, vertexPositions, vertexNormals, indices);
 
 		GMMesh* body = new GMMesh(out);
 		out->getShader().setCull(GMS_Cull::None);
-		GMint faceCount = indices.size() / 3;
-		for (GMint i = 0; i < faceCount; ++i)
+		GMint32 faceCount = indices.size() / 3;
+		for (GMint32 i = 0; i < faceCount; ++i)
 		{
-			for (GMint j = 0; j < 3; ++j)
+			for (GMint32 j = 0; j < 3; ++j)
 			{
-				GMint idx = i * 3 + j;
+				GMint32 idx = i * 3 + j;
 				const btVector3& vertex = vertexPositions[indices[idx]];
 				const btVector3& normal = vertexNormals[indices[idx]];
 				GMVertex v = {

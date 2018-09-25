@@ -161,8 +161,8 @@ struct GMShadowSourceDesc
 	GMVec4 position;
 	float biasMin = 0.0005f;
 	float biasMax = 0.005f;
-	GMint width;
-	GMint height;
+	GMint32 width;
+	GMint32 height;
 
 	static GMint64 version;
 };
@@ -176,7 +176,7 @@ struct GMGlobalBlendStateDesc
 	GMS_BlendFunc sourceAlpha;
 	GMS_BlendFunc destAlpha;
 	GMS_BlendOp opAlpha;
-	GMint blendRefCount = 0;
+	GMint32 blendRefCount = 0;
 };
 
 GM_PRIVATE_OBJECT(GMFramebuffersStack)

@@ -93,7 +93,7 @@ public:
 		return nullptr;
 	}
 
-	virtual GMuint framebufferId() override
+	virtual GMuint32 framebufferId() override
 	{
 		return 0;
 	}
@@ -135,7 +135,7 @@ const IRenderContext* GMGLFramebuffer::getContext()
 	return d->context;
 }
 
-GMuint GMGLFramebuffer::getTextureId()
+GMuint32 GMGLFramebuffer::getTextureId()
 {
 	D(d);
 	GM_ASSERT(dynamic_cast<GMGLFramebufferTexture*>(d->texture.getTexture()));
@@ -248,7 +248,7 @@ const IRenderContext* GMGLFramebuffers::getContext()
 	return d->context;
 }
 
-GMuint GMGLFramebuffers::framebufferId()
+GMuint32 GMGLFramebuffers::framebufferId()
 {
 	D(d);
 	return d->fbo;
@@ -287,7 +287,7 @@ void GMGLFramebuffers::createFramebuffers()
 		GMsize_t sz = d->framebuffers.size();
 		for (GMsize_t i = 0; i < sz; i++)
 		{
-			GMuint _i = gm_sizet_to_uint(i);
+			GMuint32 _i = gm_sizet_to_uint(i);
 			attachments.push_back(GL_COLOR_ATTACHMENT0 + _i);
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _i, GL_TEXTURE_2D, d->framebuffers[_i]->getTextureId(), 0);
 		}
@@ -296,7 +296,7 @@ void GMGLFramebuffers::createFramebuffers()
 		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		if (status != GL_FRAMEBUFFER_COMPLETE)
 		{
-			gm_error(gm_dbg_wrap("GMGLFramebuffers::createFramebuffers: FB incomplete error, status: {0}"), GMString(static_cast<GMint>(status)));
+			gm_error(gm_dbg_wrap("GMGLFramebuffers::createFramebuffers: FB incomplete error, status: {0}"), GMString(static_cast<GMint32>(status)));
 			GM_ASSERT(false);
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			return;
@@ -309,13 +309,13 @@ void GMGLFramebuffers::createFramebuffers()
 void GMGLFramebuffers::clear(GMFramebuffersClearType type)
 {
 	D(d);
-	GMuint iType = (GMuint)type;
+	GMuint32 iType = (GMuint32)type;
 	GLenum mask = 0x00;
-	if (iType & (GMuint)GMFramebuffersClearType::Color)
+	if (iType & (GMuint32)GMFramebuffersClearType::Color)
 		mask |= GL_COLOR_BUFFER_BIT;
-	if (iType & (GMuint)GMFramebuffersClearType::Depth)
+	if (iType & (GMuint32)GMFramebuffersClearType::Depth)
 		mask |= GL_DEPTH_BUFFER_BIT;
-	if (iType & (GMuint)GMFramebuffersClearType::Stencil)
+	if (iType & (GMuint32)GMFramebuffersClearType::Stencil)
 		mask |= GL_STENCIL_BUFFER_BIT;
 
 	if (mask)
@@ -356,7 +356,7 @@ IFramebuffers* GMGLFramebuffers::createDefaultFramebuffers(const IRenderContext*
 	return new GMGLDefaultFramebuffers(context);
 }
 
-GMGLShadowMapTexture::GMGLShadowMapTexture(GMuint textureId)
+GMGLShadowMapTexture::GMGLShadowMapTexture(GMuint32 textureId)
 {
 	D(d);
 	d->textureId = textureId;
@@ -368,7 +368,7 @@ GMGLShadowMapTexture::~GMGLShadowMapTexture()
 	glDeleteTextures(1, &d->textureId);
 }
 
-void GMGLShadowMapTexture::useTexture(GMint)
+void GMGLShadowMapTexture::useTexture(GMint32)
 {
 	D(d);
 	glActiveTexture(GL_TEXTURE0 + GMTextureRegisterQuery<GMTextureType::ShadowMap>::Value);

@@ -87,7 +87,7 @@ GM_PRIVATE_OBJECT(GMParticleDescription)
 	GMfloat emitterEmitAngleV = 0;
 	GMfloat emitterEmitSpeed = 0; //!< 发射器发射速率
 	GMfloat emitterEmitSpeedV = 0;
-	GMint particleCount; //!< 粒子数目
+	GMint32 particleCount; //!< 粒子数目
 	GMfloat emitRate; //!< 每秒发射速率
 	GMfloat duration; //!< 发射时间
 	GMParticleEmitterType emitterType = GMParticleEmitterType::Gravity;
@@ -128,7 +128,7 @@ class GMParticleDescription : public GMObject
 	GM_DECLARE_PROPERTY(EmitterEmitAngleV, emitterEmitAngleV, GMfloat)
 	GM_DECLARE_PROPERTY(EmitterEmitSpeed, emitterEmitSpeed, GMfloat)
 	GM_DECLARE_PROPERTY(EmitterEmitSpeedV, emitterEmitSpeedV, GMfloat)
-	GM_DECLARE_PROPERTY(ParticleCount, particleCount, GMint)
+	GM_DECLARE_PROPERTY(ParticleCount, particleCount, GMint32)
 	GM_DECLARE_PROPERTY(EmitRate, emitRate, GMfloat)
 	GM_DECLARE_PROPERTY(Duration, duration, GMfloat)
 	GM_DECLARE_PROPERTY(EmitterType, emitterType, GMParticleEmitterType)
@@ -219,7 +219,7 @@ GM_PRIVATE_OBJECT(GMParticleEmitter)
 	GMfloat emitAngleV = 0;
 	GMfloat emitSpeed = 0;
 	GMfloat emitSpeedV = 0;
-	GMint particleCount = 0;
+	GMint32 particleCount = 0;
 	GMDuration emitRate = 0;
 	GMDuration duration = 0;
 	GMOwnedPtr<GMParticleEffect> effect;
@@ -239,7 +239,7 @@ class GMParticleEmitter : public GMObject
 	GM_DECLARE_PROPERTY(EmitAngleV, emitAngleV, GMfloat)
 	GM_DECLARE_PROPERTY(EmitSpeed, emitSpeed, GMfloat)
 	GM_DECLARE_PROPERTY(EmitSpeedV, emitSpeedV, GMfloat)
-	GM_DECLARE_PROPERTY(ParticleCount, particleCount, GMint)
+	GM_DECLARE_PROPERTY(ParticleCount, particleCount, GMint32)
 	GM_DECLARE_PROPERTY(EmitRate, emitRate, GMfloat)
 	GM_DECLARE_PROPERTY(Duration, duration, GMfloat)
 

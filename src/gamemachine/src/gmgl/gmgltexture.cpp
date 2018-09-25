@@ -113,7 +113,7 @@ void GMGLTexture::init()
 		return;
 	}
 
-	GMint level;
+	GMint32 level;
 	const GMImage::Data& imgData = d->image->getData();
 
 	GMGLBeginGetErrorsAndCheck();
@@ -216,7 +216,7 @@ void GMGLTexture::bindSampler(GMTextureSampler* sampler)
 	}
 }
 
-void GMGLTexture::useTexture(GMint textureIndex)
+void GMGLTexture::useTexture(GMint32 textureIndex)
 {
 	D(d);
 	glActiveTexture(GL_TEXTURE0 + textureIndex);
@@ -256,7 +256,7 @@ void GMGLWhiteTexture::bindSampler(GMTextureSampler* sampler)
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void GMGLWhiteTexture::useTexture(GMint textureIndex)
+void GMGLWhiteTexture::useTexture(GMint32 textureIndex)
 {
 	D(d);
 	glActiveTexture(GL_TEXTURE0 + textureIndex);

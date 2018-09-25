@@ -14,7 +14,7 @@ GMEvent::~GMEvent()
 	::CloseHandle(d->handle);
 }
 
-void GMEvent::wait(GMuint milliseconds)
+void GMEvent::wait(GMuint32 milliseconds)
 {
 	D(d);
 	milliseconds = !milliseconds ? INFINITE : milliseconds;

@@ -14,7 +14,7 @@ namespace
 
 // Handlers
 BEGIN_DECLARE_MD5_HANDLER(MD5Version, reader, scanner, GMModelReader_MD5Anim*)
-	GMint version;
+	GMint32 version;
 	scanner.nextInt(version);
 	reader->setMD5Version(version);
 	return true;
@@ -28,7 +28,7 @@ BEGIN_DECLARE_MD5_HANDLER(commandline, reader, scanner, GMModelReader_MD5Anim*)
 END_DECLARE_MD5_HANDLER()
 
 BEGIN_DECLARE_MD5_HANDLER(numFrames, reader, scanner, GMModelReader_MD5Anim*)
-	GMint i;
+	GMint32 i;
 	scanner.nextInt(i);
 	reader->setNumFrames(i);
 	reader->initFrames(i);
@@ -36,21 +36,21 @@ BEGIN_DECLARE_MD5_HANDLER(numFrames, reader, scanner, GMModelReader_MD5Anim*)
 END_DECLARE_MD5_HANDLER()
 
 BEGIN_DECLARE_MD5_HANDLER(numJoints, reader, scanner, GMModelReader_MD5Anim*)
-	GMint i;
+	GMint32 i;
 	scanner.nextInt(i);
 	reader->setNumJoints(i);
 	return true;
 END_DECLARE_MD5_HANDLER()
 
 BEGIN_DECLARE_MD5_HANDLER(frameRate, reader, scanner, GMModelReader_MD5Anim*)
-	GMint i;
+	GMint32 i;
 	scanner.nextInt(i);
 	reader->setFrameRate(i);
 	return true;
 END_DECLARE_MD5_HANDLER()
 
 BEGIN_DECLARE_MD5_HANDLER(numAnimatedComponents, reader, scanner, GMModelReader_MD5Anim*)
-	GMint i;
+	GMint32 i;
 	scanner.nextInt(i);
 	reader->setNumAnimatedComponents(i);
 	return true;
@@ -231,18 +231,18 @@ GM_ALIGNED_STRUCT(Handler_frame_inner), IMd5MeshHandler
 		return true;
 	}
 
-	void setFrameNum(GMint frameNum) GM_NOEXCEPT
+	void setFrameNum(GMint32 frameNum) GM_NOEXCEPT
 	{
 		m_frameNum = frameNum;
 	}
 
-	void initFrame(GMint size)
+	void initFrame(GMint32 size)
 	{
 		m_frame.frameData.reserve(size);
 	}
 
 private:
-	GMint m_frameNum = -1;
+	GMint32 m_frameNum = -1;
 	GMModelReader_MD5Anim_Frame m_frame;
 };
 
@@ -375,13 +375,13 @@ void GMModelReader_MD5Anim::addBaseframe(GMModelReader_MD5Anim_Baseframe&& basef
 	d->baseframes.push_back(std::move(baseframe));
 }
 
-void GMModelReader_MD5Anim::initFrames(GMint num)
+void GMModelReader_MD5Anim::initFrames(GMint32 num)
 {
 	D(d);
 	d->frames.resize(num);
 }
 
-void GMModelReader_MD5Anim::setFrame(GMint index, GMModelReader_MD5Anim_Frame&& frame)
+void GMModelReader_MD5Anim::setFrame(GMint32 index, GMModelReader_MD5Anim_Frame&& frame)
 {
 	D(d);
 	d->frames[index] = std::move(frame);

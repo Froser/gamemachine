@@ -109,10 +109,10 @@ void GMBSPSkyGameObject::createSkyBox(OUT GMModel** obj)
 	};
 
 	// Scaling surface
-	const GMint SCALING = 2;
+	const GMint32 SCALING = 2;
 	GMVec3 center = (d->min + d->max) / 2.f;
 	GMMat4 transScale = Scale(GMVec3(SCALING, 1, SCALING));
-	for (GMuint i = 0; i < 24; i++)
+	for (GMuint32 i = 0; i < 24; i++)
 	{
 		GMMat4 transRestore = Translate(center);
 		GMMat4 transMoveToAxisOrigin = Translate(-center);
@@ -127,7 +127,7 @@ void GMBSPSkyGameObject::createSkyBox(OUT GMModel** obj)
 	model->setShader(d->shader);
 
 	GMMesh* mesh = new GMMesh(model);
-	for (GMuint i = 0; i < 6; i++)
+	for (GMuint32 i = 0; i < 6; i++)
 	{
 		GMVertex P0 = {
 			{ vertices[i * 4].getX(), vertices[i * 4].getY(), vertices[i * 4].getZ() },
@@ -161,13 +161,13 @@ void GMBSPSkyGameObject::createSkyBox(OUT GMModel** obj)
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
-typedef void (GMBSPGameWorld::*drawFaceHandler)(GMint);
+typedef void (GMBSPGameWorld::*drawFaceHandler)(GMint32);
 
 namespace
 {
 	void drawFacesToRenderList(
 		GMBSPGameWorld* world,
-		const Vector<GMint>& indices,
+		const Vector<GMint32>& indices,
 		drawFaceHandler handler,
 		GMBSPSurfaceType targetType
 		)
@@ -287,7 +287,7 @@ const GMVariant& GMBSPGameWorld::getRenderConfig(gm::GMBSPRenderConfigs config)
 	return d->bspRenderConfigWrapper.get(config);
 }
 
-Map<GMint, Set<GMBSPEntity*> >& GMBSPGameWorld::getEntities()
+Map<GMint32, Set<GMBSPEntity*> >& GMBSPGameWorld::getEntities()
 {
 	D(d);
 	return d->entities;
@@ -307,11 +307,11 @@ void GMBSPGameWorld::calculateVisibleFaces()
 
 	rd.facesToDraw.clearAll();
 	rd.entitiesToDraw.clearAll();
-	GMint cameraLeaf = calculateLeafNode(pos);
-	GMint cameraCluster = bsp.leafs[cameraLeaf].cluster;
+	GMint32 cameraLeaf = calculateLeafNode(pos);
+	GMint32 cameraCluster = bsp.leafs[cameraLeaf].cluster;
 	camera.getPlanes(frustumPlanes);
 
-	for (GMint i = 0; i < bsp.numleafs; ++i)
+	for (GMint32 i = 0; i < bsp.numleafs; ++i)
 	{
 		//if the leaf is not in the PVS, continue
 		if (!isClusterVisible(cameraCluster, bsp.leafs[i].cluster))
@@ -322,7 +322,7 @@ void GMBSPGameWorld::calculateVisibleFaces()
 			continue;
 
 		//loop through faces in this leaf and mark them to be drawn
-		for (GMint j = 0; j < bsp.leafs[i].numLeafSurfaces; ++j)
+		for (GMint32 j = 0; j < bsp.leafs[i].numLeafSurfaces; ++j)
 		{
 			rd.facesToDraw.set(bsp.leafsurfaces[bsp.leafs[i].firstLeafSurface + j]);
 		}
@@ -331,12 +331,12 @@ void GMBSPGameWorld::calculateVisibleFaces()
 	}
 }
 
-GMint GMBSPGameWorld::calculateLeafNode(const GMVec3& position)
+GMint32 GMBSPGameWorld::calculateLeafNode(const GMVec3& position)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
 
-	GMint currentNode = 0;
+	GMint32 currentNode = 0;
 
 	//loop until we find a negative index
 	while (currentNode >= 0)
@@ -352,13 +352,13 @@ GMint GMBSPGameWorld::calculateLeafNode(const GMVec3& position)
 	return ~currentNode;
 }
 
-GMint GMBSPGameWorld::isClusterVisible(GMint cameraCluster, GMint testCluster)
+GMint32 GMBSPGameWorld::isClusterVisible(GMint32 cameraCluster, GMint32 testCluster)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
 	GMBSPRenderData& rd = d->render.renderData();
 
-	GMint index = cameraCluster * rd.visibilityData.bytesPerCluster + testCluster / 8;
+	GMint32 index = cameraCluster * rd.visibilityData.bytesPerCluster + testCluster / 8;
 	return rd.visibilityData.bitset[index] & (1 << (testCluster & 7));
 }
 
@@ -392,7 +392,7 @@ void GMBSPGameWorld::prepareFacesToRenderList()
 	::drawFacesToRenderList(this, renderData().patchIndices, &GMBSPGameWorld::preparePatchToRenderList, MST_PATCH);
 }
 
-void GMBSPGameWorld::preparePolygonFace(GMint polygonFaceNumber, GMint drawSurfaceIndex)
+void GMBSPGameWorld::preparePolygonFace(GMint32 polygonFaceNumber, GMint32 drawSurfaceIndex)
 {
 	D(d);
 	GMBSPRenderData& rd = d->render.renderData();
@@ -420,7 +420,7 @@ void GMBSPGameWorld::preparePolygonFace(GMint polygonFaceNumber, GMint drawSurfa
 	addObjectAndInit(obj);
 }
 
-void GMBSPGameWorld::prepareMeshFace(GMint meshFaceNumber, GMint drawSurfaceIndex)
+void GMBSPGameWorld::prepareMeshFace(GMint32 meshFaceNumber, GMint32 drawSurfaceIndex)
 {
 	D(d);
 	GMBSPRenderData& rd = d->render.renderData();
@@ -448,7 +448,7 @@ void GMBSPGameWorld::prepareMeshFace(GMint meshFaceNumber, GMint drawSurfaceInde
 	addObjectAndInit(obj);
 }
 
-void GMBSPGameWorld::preparePatch(GMint patchNumber, GMint drawSurfaceIndex)
+void GMBSPGameWorld::preparePatch(GMint32 patchNumber, GMint32 drawSurfaceIndex)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
@@ -463,7 +463,7 @@ void GMBSPGameWorld::preparePatch(GMint patchNumber, GMint drawSurfaceIndex)
 	}
 	setMaterialLightmap(rd.patches[patchNumber].lightmapIndex, shader);
 
-	for (GMint i = 0; i < rd.patches[patchNumber].numQuadraticPatches; ++i)
+	for (GMint32 i = 0; i < rd.patches[patchNumber].numQuadraticPatches; ++i)
 	{
 		GMBSP_Render_BiquadraticPatch& biqp = rd.patches[patchNumber].quadraticPatches[i];
 		GM_ASSERT(rd.biquadraticPatchObjects.find(&biqp) == rd.biquadraticPatchObjects.end());
@@ -477,7 +477,7 @@ void GMBSPGameWorld::preparePatch(GMint patchNumber, GMint drawSurfaceIndex)
 	}
 }
 
-void GMBSPGameWorld::preparePolygonFaceToRenderList(GMint polygonFaceNumber)
+void GMBSPGameWorld::preparePolygonFaceToRenderList(GMint32 polygonFaceNumber)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
@@ -495,7 +495,7 @@ void GMBSPGameWorld::preparePolygonFaceToRenderList(GMint polygonFaceNumber)
 	addToRenderList(obj);
 }
 
-void GMBSPGameWorld::prepareMeshFaceToRenderList(GMint meshFaceNumber)
+void GMBSPGameWorld::prepareMeshFaceToRenderList(GMint32 meshFaceNumber)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
@@ -513,13 +513,13 @@ void GMBSPGameWorld::prepareMeshFaceToRenderList(GMint meshFaceNumber)
 	addToRenderList(obj);
 }
 
-void GMBSPGameWorld::preparePatchToRenderList(GMint patchNumber)
+void GMBSPGameWorld::preparePatchToRenderList(GMint32 patchNumber)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
 	GMBSPRenderData& rd = d->render.renderData();
 
-	for (GMint i = 0; i < rd.patches[patchNumber].numQuadraticPatches; ++i)
+	for (GMint32 i = 0; i < rd.patches[patchNumber].numQuadraticPatches; ++i)
 		prepareToRenderList(rd.patches[patchNumber].quadraticPatches[i]);
 }
 
@@ -554,8 +554,8 @@ bool GMBSPGameWorld::setMaterialTexture(T& face, REF GMShader& shader)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
-	GMint textureid = face.textureIndex;
-	GMint lightmapid = face.lightmapIndex;
+	GMint32 textureid = face.textureIndex;
+	GMint32 lightmapid = face.lightmapIndex;
 	const GMString& name = bsp.shaders[textureid].shader;
 
 	// 先从地图Shaders中找，如果找不到，就直接读取材质
@@ -571,11 +571,11 @@ bool GMBSPGameWorld::setMaterialTexture(T& face, REF GMShader& shader)
 	return true;
 }
 
-void GMBSPGameWorld::setMaterialLightmap(GMint lightmapid, REF GMShader& shader)
+void GMBSPGameWorld::setMaterialLightmap(GMint32 lightmapid, REF GMShader& shader)
 {
 	D(d);
-	const GMint WHITE_LIGHTMAP = -1;
-	GMint id = 0;
+	const GMint32 WHITE_LIGHTMAP = -1;
+	GMint32 id = 0;
 
 	if (shader.getSurfaceFlag() & SURF_NOLIGHTMAP)
 		id = WHITE_LIGHTMAP;
@@ -614,7 +614,7 @@ void GMBSPGameWorld::initTextures()
 
 	IFactory* factory = GM.getFactory();
 
-	for (GMint i = 0; i < bsp.numShaders; i++)
+	for (GMint32 i = 0; i < bsp.numShaders; i++)
 	{
 		GMBSPShader& shader = bsp.shaders[i];
 		// 如果一个texture在shader中已经定义，那么不读取它了，而使用shader中的材质
@@ -638,7 +638,7 @@ void GMBSPGameWorld::initTextures()
 
 bool GMBSPGameWorld::findTexture(const GMString& textureFilename, OUT GMImage** img)
 {
-	const GMint maxChars = 128;
+	const GMint32 maxChars = 128;
 	static GMString priorities[maxChars] =
 	{
 		".jpg",
@@ -646,10 +646,10 @@ bool GMBSPGameWorld::findTexture(const GMString& textureFilename, OUT GMImage** 
 		".png",
 		".bmp"
 	};
-	static GMint dem = 4;
+	static GMint32 dem = 4;
 	GMGamePackage* pk = GM.getGamePackageManager();
 
-	for (GMint i = 0; i < dem; i++)
+	for (GMint32 i = 0; i < dem; i++)
 	{
 		GMString fn = textureFilename + priorities[i];
 		GMBuffer buf;
@@ -671,11 +671,11 @@ void GMBSPGameWorld::initLightmaps()
 	BSPData& bsp = d->bsp.bspData();
 	IFactory* factory = GM.getFactory();
 
-	const GMint BSP_LIGHTMAP_EXT = 128;
-	const GMint BSP_LIGHTMAP_SIZE = BSP_LIGHTMAP_EXT * BSP_LIGHTMAP_EXT * 3 * sizeof(GMbyte);
-	GMint numLightmaps = bsp.numLightBytes / (BSP_LIGHTMAP_SIZE * sizeof(GMbyte));
+	const GMint32 BSP_LIGHTMAP_EXT = 128;
+	const GMint32 BSP_LIGHTMAP_SIZE = BSP_LIGHTMAP_EXT * BSP_LIGHTMAP_EXT * 3 * sizeof(GMbyte);
+	GMint32 numLightmaps = bsp.numLightBytes / (BSP_LIGHTMAP_SIZE * sizeof(GMbyte));
 
-	for (GMint i = 0; i < numLightmaps; i++)
+	for (GMint32 i = 0; i < numLightmaps; i++)
 	{
 		GMbyte* lightmapBytes = bsp.lightBytes.data() + i * BSP_LIGHTMAP_SIZE;
 		GMImageBuffer* imgBuf = new GMImageBuffer(GMImageFormat::RGB, BSP_LIGHTMAP_EXT, BSP_LIGHTMAP_EXT, BSP_LIGHTMAP_SIZE, lightmapBytes);
@@ -703,7 +703,7 @@ void GMBSPGameWorld::prepareFaces()
 	GMBSPRenderData& rd = d->render.renderData();
 
 	//loop through faces
-	for (GMint i = 0; i < bsp.numDrawSurfaces; ++i)
+	for (GMint32 i = 0; i < bsp.numDrawSurfaces; ++i)
 	{
 		if (rd.faceDirectory[i].faceType == 0)
 			return;
@@ -727,7 +727,7 @@ void GMBSPGameWorld::prepareEntities()
 	for (auto entity : bsp.entities)
 	{
 		BSPGameWorldEntityReader::import(*entity, this);
-		GMint leaf = calculateLeafNode(MakeVector3(entity->origin));
+		GMint32 leaf = calculateLeafNode(MakeVector3(entity->origin));
 		d->entities[leaf].insert(entity);
 	}
 }

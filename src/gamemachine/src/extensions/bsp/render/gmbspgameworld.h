@@ -28,7 +28,7 @@ public:
 	void loadBSP(const GMString& mapName);
 	void setSky(AUTORELEASE GMGameObject* sky);
 	GMGameObject* getSky();
-	Map<GMint, Set<GMBSPEntity*> >& getEntities();
+	Map<GMint32, Set<GMBSPEntity*> >& getEntities();
 	void addObjectAndInit(AUTORELEASE GMGameObject* obj, bool alwaysVisible);
 	void setDefaultLights();
 	void setSprite(GMSpriteGameObject* sprite);
@@ -44,9 +44,9 @@ public:
 
 	//renders:
 public:
-	void preparePolygonFaceToRenderList(GMint polygonFaceNumber);
-	void prepareMeshFaceToRenderList(GMint meshFaceNumber);
-	void preparePatchToRenderList(GMint patchNumber);
+	void preparePolygonFaceToRenderList(GMint32 polygonFaceNumber);
+	void prepareMeshFaceToRenderList(GMint32 meshFaceNumber);
+	void preparePatchToRenderList(GMint32 patchNumber);
 
 private:
 	void calculateVisibleFaces();
@@ -56,8 +56,8 @@ private:
 	void prepareToRenderList(GMBSP_Render_BiquadraticPatch& biqp);
 	void prepareAlwaysVisibleObjects();
 	template <typename T> bool setMaterialTexture(T& face, REF GMShader& shader);
-	void setMaterialLightmap(GMint lightmapid, REF GMShader& shader);
-	int isClusterVisible(GMint cameraCluster, GMint testCluster);
+	void setMaterialLightmap(GMint32 lightmapid, REF GMShader& shader);
+	int isClusterVisible(GMint32 cameraCluster, GMint32 testCluster);
 
 	//imports:
 private:
@@ -68,11 +68,11 @@ private:
 	bool findTexture(const GMString& textureFilename, OUT GMImage** img);
 	void initLightmaps();
 	void prepareFaces();
-	void preparePolygonFace(GMint polygonFaceNumber, GMint drawSurfaceIndex);
-	void prepareMeshFace(GMint meshFaceNumber, GMint drawSurfaceIndex);
-	void preparePatch(GMint patchNumber, GMint drawSurfaceIndex);
+	void preparePolygonFace(GMint32 polygonFaceNumber, GMint32 drawSurfaceIndex);
+	void prepareMeshFace(GMint32 meshFaceNumber, GMint32 drawSurfaceIndex);
+	void preparePatch(GMint32 patchNumber, GMint32 drawSurfaceIndex);
 	void prepareEntities();
-	GMint calculateLeafNode(const GMVec3& position);
+	GMint32 calculateLeafNode(const GMVec3& position);
 
 	// this is usually used by BSPShaderLoader, BSPGameWorldEntityReader, physics world
 public:

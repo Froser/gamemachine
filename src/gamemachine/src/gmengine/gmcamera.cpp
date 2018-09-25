@@ -181,7 +181,7 @@ void GMCamera::lookAt(const GMCameraLookAt& lookAt)
 	d->frustum.updateViewMatrix(::getViewMatrix(lookAt));
 }
 
-GMVec3 GMCamera::getRayToWorld(const GMRect& renderRect, GMint x, GMint y) const
+GMVec3 GMCamera::getRayToWorld(const GMRect& renderRect, GMint32 x, GMint32 y) const
 {
 	D(d);
 	GMVec3 world = Unproject(

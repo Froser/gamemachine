@@ -150,7 +150,7 @@ void GMWindow_OpenGL::onWindowCreated(const GMWindowAttributes& wndAttrs)
 	HWND tmpWnd = NULL;
 	HDC tmpDC = NULL;
 	HGLRC tmpRC = NULL;
-	gm::GMint pixelFormat;
+	gm::GMint32 pixelFormat;
 	RUN_AND_CHECK(tmpWnd = createTempWindow());
 	RUN_AND_CHECK(tmpDC = ::GetDC(tmpWnd));
 	RUN_AND_CHECK(pixelFormat = ::ChoosePixelFormat(tmpDC, &pfd));
@@ -163,7 +163,7 @@ void GMWindow_OpenGL::onWindowCreated(const GMWindowAttributes& wndAttrs)
 	gm::GMWindowHandle wnd = getWindowHandle();
 	RUN_AND_CHECK(d->hDC = ::GetDC(wnd));
 
-	gm::GMint pixAttribs[] =
+	gm::GMint32 pixAttribs[] =
 	{
 		WGL_DRAW_TO_WINDOW_ARB,	GL_TRUE,
 		WGL_SUPPORT_OPENGL_ARB,	GL_TRUE,
@@ -178,8 +178,8 @@ void GMWindow_OpenGL::onWindowCreated(const GMWindowAttributes& wndAttrs)
 		0
 	};
 
-	gm::GMint nFormat = 0;
-	gm::GMuint nCount = 0;
+	gm::GMint32 nFormat = 0;
+	gm::GMuint32 nCount = 0;
 	RUN_AND_CHECK(wglChoosePixelFormatARB(d->hDC, &pixAttribs[0], NULL, 1, &nFormat, (UINT*)&nCount));
 	RUN_AND_CHECK(wglMakeCurrent(NULL, NULL));
 	RUN_AND_CHECK(wglDeleteContext(tmpRC));

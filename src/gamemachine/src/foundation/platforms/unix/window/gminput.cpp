@@ -5,7 +5,7 @@
 
 namespace
 {
-	void setCursorPos(Display* display, Window root, GMint x, GMint y)
+	void setCursorPos(Display* display, Window root, GMint32 x, GMint32 y)
 	{
 		XWarpPointer(display, None, root, 0, 0, 0, 0, x, y);
 		XSync(display, False);
@@ -123,9 +123,9 @@ GMMouseState GMInput::mouseState()
 	Window window = context->getWindow()->getWindowHandle();
 
 	Window rw, cw;
-	GMint rx, ry;
-	GMint x, y;
-	GMuint mask;
+	GMint32 rx, ry;
+	GMint32 x, y;
+	GMuint32 mask;
 	if (XQueryPointer(
 		display, 
 		window, 
@@ -151,8 +151,8 @@ GMMouseState GMInput::mouseState()
 		if (d->detectingMode)
 		{
 			GMRect rect = d->window->getWindowRect();
-			const GMint centerX = rect.x + rect.width / 2;
-			const GMint centerY = rect.y + rect.height / 2;
+			const GMint32 centerX = rect.x + rect.width / 2;
+			const GMint32 centerY = rect.y + rect.height / 2;
 			setCursorPos(display, context->getRootWindow(), centerX, centerY);
 			state.deltaX = x - centerX;
 			state.deltaY = y - centerY;

@@ -118,7 +118,7 @@ private: // MP3解码器
 		if (d->terminateDecode)
 			return MAD_FLOW_STOP;
 
-		gm::GMuint nchannels, nsamples;
+		gm::GMuint32 nchannels, nsamples;
 		mad_fixed_t const *left_ch, *right_ch;
 
 		/* pcm->samplerate contains the sampling frequency */
@@ -158,7 +158,7 @@ private: // MP3解码器
 		return MAD_FLOW_STOP;
 	}
 
-	static inline gm::GMint scale(mad_fixed_t sample)
+	static inline gm::GMint32 scale(mad_fixed_t sample)
 	{
 		/* round */
 		sample += (1L << (MAD_F_FRACBITS - 16));
@@ -194,7 +194,7 @@ private: // MP3解码器
 
 			GM_ASSERT(!d->baseData->output);
 			d->baseData->output = new GMMStream[d->baseData->bufferNum];
-			for (gm::GMuint i = 0; i < d->baseData->bufferNum; i++)
+			for (gm::GMuint32 i = 0; i < d->baseData->bufferNum; i++)
 			{
 				d->baseData->output[i].resize(d->baseData->bufferSize);
 			}

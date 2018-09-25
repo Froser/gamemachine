@@ -24,7 +24,7 @@ struct __PopGuard							\
 typedef luaL_Reg GMLuaReg;
 typedef lua_State GMLuaCoreState;
 typedef lua_CFunction GMLuaCFunction;
-typedef GMint GMLuaFunctionReturn;
+typedef GMint32 GMLuaFunctionReturn;
 
 class GMLua;
 namespace luaapi
@@ -52,7 +52,7 @@ protected:
 class GMLuaStackBalanceCheck
 {
 public:
-	GMLuaStackBalanceCheck(GMLuaCoreState* l, GMint offset)
+	GMLuaStackBalanceCheck(GMLuaCoreState* l, GMint32 offset)
 		: m_L(l)
 		, m_offset(offset)
 	{
@@ -68,8 +68,8 @@ public:
 	}
 
 private:
-	GMint m_stack;
-	GMint m_offset;
+	GMint32 m_stack;
+	GMint32 m_offset;
 	GMLuaCoreState* m_L;
 };
 
@@ -157,7 +157,7 @@ public:
 	*/
 	bool getFromGlobal(const char* name, GMObject& obj);
 
-	GMLuaResult protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args, GMVariant* returns = nullptr, GMint nRet = 0);
+	GMLuaResult protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args, GMVariant* returns = nullptr, GMint32 nRet = 0);
 
 // 针对堆栈的操作，提供给友元
 private:
@@ -186,7 +186,7 @@ private:
 	  \return 操作是否成功。
 	  \sa GMObject::registerMeta()
 	*/
-	bool popTable(GMObject& obj, GMint index);
+	bool popTable(GMObject& obj, GMint32 index);
 
 	bool popVector(GMVec2& v);
 	void pushVector(const GMVec2& v);
@@ -217,7 +217,7 @@ public:
 
 private:
 	void loadLibrary();
-	GMLuaResult pcall(const char* functionName, const std::initializer_list<GMVariant>& args, GMint nRet);
+	GMLuaResult pcall(const char* functionName, const std::initializer_list<GMVariant>& args, GMint32 nRet);
 	void setTable(const char* key, const GMObjectMember& value);
 };
 

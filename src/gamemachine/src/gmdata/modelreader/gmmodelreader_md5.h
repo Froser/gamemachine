@@ -34,7 +34,7 @@ namespace
 		bool readLine(GMString& line)
 		{
 			line.clear();
-			GMint offset = 0;
+			GMint32 offset = 0;
 			while (isNotReturn(*m_p))
 			{
 				if (!*m_p)
@@ -87,7 +87,7 @@ GM_INTERFACE(IMd5MeshHandler)
 GM_ALIGNED_STRUCT(GMModelReader_MD5Mesh_Joint)
 {
 	GMString name;
-	GMint parentIndex;
+	GMint32 parentIndex;
 	GMVec3 position;
 	GMQuat orientation;
 	GMString annotation;
@@ -100,9 +100,9 @@ typedef GMSkeletonMesh GMModelReader_MD5Mesh_Mesh;
 GM_ALIGNED_STRUCT(GMModelReader_MD5Anim_Joint)
 {
 	GMString jointName;
-	GMint parentIndex;
-	GMint flags;
-	GMint startIndex;
+	GMint32 parentIndex;
+	GMint32 flags;
+	GMint32 startIndex;
 	GMString annotation;
 };
 
@@ -127,7 +127,7 @@ GM_ALIGNED_STRUCT(GMModelReader_MD5Anim_Frame)
 GM_PRIVATE_OBJECT(GMModelReader_MD5)
 {
 	Vector<GMOwnedPtr<IMd5MeshHandler>> handlers;
-	GMint MD5Version;
+	GMint32 MD5Version;
 	GMString meshFile;
 	GMString animFile;
 };
@@ -135,7 +135,7 @@ GM_PRIVATE_OBJECT(GMModelReader_MD5)
 class GMModelReader_MD5 : public GMObject, public IModelReader
 {
 	GM_DECLARE_PRIVATE(GMModelReader_MD5)
-	GM_DECLARE_PROPERTY(MD5Version, MD5Version, GMint)
+	GM_DECLARE_PROPERTY(MD5Version, MD5Version, GMint32)
 	GM_DECLARE_PROPERTY(MeshFile, meshFile, GMString)
 	GM_DECLARE_PROPERTY(AnimFile, animFile, GMString)
 

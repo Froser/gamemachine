@@ -53,7 +53,7 @@ void GMModelDataProxy::packVertices(Vector<GMVertex>& vertices)
 {
 	GMModel* model = getModel();
 	GMMeshes& meshes = model->getMeshes();
-	GMuint offset = 0;
+	GMuint32 offset = 0;
 	for (auto& mesh : meshes)
 	{
 		for (auto& vertex : mesh->vertices())
@@ -63,14 +63,14 @@ void GMModelDataProxy::packVertices(Vector<GMVertex>& vertices)
 	}
 }
 
-void GMModelDataProxy::packIndices(Vector<GMuint>& indices)
+void GMModelDataProxy::packIndices(Vector<GMuint32>& indices)
 {
 	GMModel* model = getModel();
 	GMMeshes& meshes = model->getMeshes();
-	GMuint offset = 0;
+	GMuint32 offset = 0;
 	for (auto& mesh : meshes)
 	{
-		for (GMuint index : mesh->indices())
+		for (GMuint32 index : mesh->indices())
 		{
 			indices.push_back(index + offset);
 		}
@@ -176,7 +176,7 @@ void GMMesh::vertex(const GMVertex& v)
 	d->vertices.push_back(v);
 }
 
-void GMMesh::index(GMuint index)
+void GMMesh::index(GMuint32 index)
 {
 	D(d);
 	d->indices.push_back(index);
@@ -211,16 +211,16 @@ void GMMesh::calculateTangentSpace(GMTopologyMode topologyMode)
 	if (topologyMode == GMTopologyMode::Lines)
 		return;
 
-	for (GMuint i = 0; i < d->vertices.size(); i++)
+	for (GMuint32 i = 0; i < d->vertices.size(); i++)
 	{
 		GMVec3 e0, e1, e2;
 		GMVec2 uv0, uv1, uv2;
 		GMVertex& currentVertex = d->vertices[i];
 		if (topologyMode == GMTopologyMode::Triangles)
 		{
-			GMuint startIndex = i / 3 * 3;
-			GMuint vertexIndices[3] = { startIndex, startIndex + 1, startIndex + 2 };
-			GMuint indexInTriangle = i % 3;
+			GMuint32 startIndex = i / 3 * 3;
+			GMuint32 vertexIndices[3] = { startIndex, startIndex + 1, startIndex + 2 };
+			GMuint32 indexInTriangle = i % 3;
 			e0 = TO_VEC3(d->vertices[vertexIndices[indexInTriangle % 3]].positions);
 			e1 = TO_VEC3(d->vertices[vertexIndices[(indexInTriangle + 1) % 3]].positions);
 			e2 = TO_VEC3(d->vertices[vertexIndices[(indexInTriangle + 2) % 3]].positions);
@@ -233,7 +233,7 @@ void GMMesh::calculateTangentSpace(GMTopologyMode topologyMode)
 			GM_ASSERT(topologyMode == GMTopologyMode::TriangleStrip);
 			if (i < 3)
 			{
-				GMuint vertexIndices[3] = { 0, 1, 2 };
+				GMuint32 vertexIndices[3] = { 0, 1, 2 };
 				e0 = TO_VEC3(d->vertices[vertexIndices[i % 3]].positions);
 				e1 = TO_VEC3(d->vertices[vertexIndices[(i + 1) % 3]].positions);
 				e2 = TO_VEC3(d->vertices[vertexIndices[(i + 2) % 3]].positions);

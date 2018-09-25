@@ -58,7 +58,7 @@ class GMWidget;
 struct GMSystemInfo
 {
 	GMEndiannessMode endiannessMode = GMEndiannessMode::Unknown;
-	GMint numberOfProcessors = 0;
+	GMint32 numberOfProcessors = 0;
 	GMProcessorArchitecture processorArchitecture;
 };
 
@@ -217,7 +217,7 @@ public:
 	/*!
 	  翻译后的事件将是平台无关的。
 	*/
-	void translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lParam, OUT GMSystemEvent** event);
+	void translateSystemEvent(GMuint32 uMsg, GMWParam wParam, GMLParam lParam, OUT GMSystemEvent** event);
 
 	//! 为GameMachine注册个窗口。
 	/*!

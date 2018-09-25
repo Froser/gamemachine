@@ -15,10 +15,10 @@ namespace
 	GMControl* getNextControl(GMControl* control)
 	{
 		GMWidget* parentWidget = control->getParent();
-		GMuint index = control->getIndex() + 1;
+		GMuint32 index = control->getIndex() + 1;
 
 		// 如果下一个控件不在此画布内，则跳到下一个画布进行查找
-		while (index >= (GMuint)parentWidget->getControls().size())
+		while (index >= (GMuint32)parentWidget->getControls().size())
 		{
 			parentWidget = parentWidget->getNextCanvas();
 			index = 0;
@@ -30,7 +30,7 @@ namespace
 	GMControl* getPrevControl(GMControl* control)
 	{
 		GMWidget* parentCanvas = control->getParent();
-		GMint index = gm_sizet_to_int(control->getIndex()) - 1;
+		GMint32 index = gm_sizet_to_int(control->getIndex()) - 1;
 		while (index < 0)
 		{
 			parentCanvas = parentCanvas->getPrevCanvas();
@@ -170,7 +170,7 @@ GMWidgetResourceManager::GMWidgetResourceManager(const IRenderContext* context)
 	d->whiteTextureId = addTexture(d->whiteTexture, 1, 1);
 }
 
-GMlong GMWidgetResourceManager::addTexture(GMAsset texture, GMint width, GMint height)
+GMlong GMWidgetResourceManager::addTexture(GMAsset texture, GMint32 width, GMint32 height)
 {
 	D(d);
 	GMCanvasTextureInfo texInfo;
@@ -284,10 +284,10 @@ void GMWidget::setTitle(
 void GMWidget::addLabel(
 	const GMString& text,
 	const GMVec4& fontColor,
-	GMint x,
-	GMint y,
-	GMint width,
-	GMint height,
+	GMint32 x,
+	GMint32 y,
+	GMint32 width,
+	GMint32 height,
 	bool isDefault,
 	OUT GMControlLabel** out
 )
@@ -306,10 +306,10 @@ void GMWidget::addLabel(
 
 void GMWidget::addButton(
 	const GMString& text,
-	GMint x,
-	GMint y,
-	GMint width,
-	GMint height,
+	GMint32 x,
+	GMint32 y,
+	GMint32 width,
+	GMint32 height,
 	bool isDefault,
 	OUT GMControlButton** out
 )
@@ -327,8 +327,8 @@ void GMWidget::addButton(
 
 void GMWidget::addBorder(
 	const GMRect& corner,
-	const GMint marginLeft,
-	const GMint marginTop
+	const GMint32 marginLeft,
+	const GMint32 marginTop
 )
 {
 	D(d);
@@ -346,10 +346,10 @@ void GMWidget::addBorder(
 }
 
 void GMWidget::addBorder(
-	GMint x,
-	GMint y,
-	GMint width,
-	GMint height,
+	GMint32 x,
+	GMint32 y,
+	GMint32 width,
+	GMint32 height,
 	const GMRect& cornerRect,
 	OUT GMControlBorder** out
 )
@@ -367,10 +367,10 @@ void GMWidget::addBorder(
 
 void GMWidget::addTextEdit(
 	const GMString& text,
-	GMint x,
-	GMint y,
-	GMint width,
-	GMint height,
+	GMint32 x,
+	GMint32 y,
+	GMint32 width,
+	GMint32 height,
 	bool isDefault,
 	const GMRect& cornerRect,
 	OUT GMControlTextEdit** out
@@ -392,10 +392,10 @@ void GMWidget::addTextEdit(
 
 void GMWidget::addTextArea(
 	const GMString& text,
-	GMint x,
-	GMint y,
-	GMint width,
-	GMint height,
+	GMint32 x,
+	GMint32 y,
+	GMint32 width,
+	GMint32 height,
 	bool isDefault,
 	bool hasScrollBar,
 	const GMRect& textAreaCornerRect,
@@ -424,10 +424,10 @@ void GMWidget::addTextArea(
 }
 
 void GMWidget::addScrollBar(
-	GMint x,
-	GMint y,
-	GMint width,
-	GMint height,
+	GMint32 x,
+	GMint32 y,
+	GMint32 width,
+	GMint32 height,
 	bool isDefault,
 	const GMRect& scrollBarThumbCornerRect,
 	OUT GMControlScrollBar** out
@@ -454,7 +454,7 @@ void GMWidget::drawText(
 	bool shadow,
 	bool center,
 	bool newLine,
-	GMint lineSpacing
+	GMint32 lineSpacing
 )
 {
 	// 不需要绘制透明元素
@@ -546,7 +546,7 @@ void GMWidget::drawSprite(
 	mapRect(targetRc);
 
 	const GMRect& textureRc = style.getTextureRect();
-	GMuint texId = style.getTexture();
+	GMuint32 texId = style.getTexture();
 	const GMCanvasTextureInfo& texInfo = d->manager->getTexture(style.getTexture());
 
 	GMSprite2DGameObject* spriteObject = d->manager->getSpriteObject();
@@ -575,7 +575,7 @@ void GMWidget::drawRect(
 	mapRect(targetRc);
 
 	const GMRect& textureRc = d->whiteTextureStyle.getTextureRect();
-	GMuint texId = d->whiteTextureStyle.getTexture();
+	GMuint32 texId = d->whiteTextureStyle.getTexture();
 	const GMCanvasTextureInfo& texInfo = d->manager->getTexture(d->whiteTextureStyle.getTexture());
 
 	GMSprite2DGameObject* spriteObject = isOpaque ? d->manager->getOpaqueSpriteObject() : d->manager->getSpriteObject();
@@ -603,7 +603,7 @@ void GMWidget::drawBorder(
 	mapRect(targetRc);
 
 	const GMRect& textureRc = style.getTextureRect();
-	GMuint texId = style.getTexture();
+	GMuint32 texId = style.getTexture();
 	const GMCanvasTextureInfo& texInfo = d->manager->getTexture(style.getTexture());
 
 	GMBorder2DGameObject* borderObject = d->manager->getBorderObject();
@@ -668,7 +668,7 @@ void GMWidget::requestFocus(GMControl* control)
 	s_controlFocus = control;
 }
 
-void GMWidget::setSize(GMint width, GMint height)
+void GMWidget::setSize(GMint32 width, GMint32 height)
 {
 	D(d);
 	d->width = width;
@@ -1039,13 +1039,13 @@ bool GMWidget::onCycleFocus(bool goForward)
 	GMWidget* widget = nullptr;
 	GMWidget* lastCanvas = nullptr;
 	const Vector<GMWidget*>& widgets = d->manager->getCanvases();
-	GMint sz = (GMint)widgets.size();
+	GMint32 sz = (GMint32)widgets.size();
 
 	if (!s_controlFocus)
 	{
 		if (goForward)
 		{
-			for (GMint i = 0; i < sz; ++i)
+			for (GMint32 i = 0; i < sz; ++i)
 			{
 				widget = lastCanvas = widgets[i];
 				const Vector<GMControl*> controls = widget->getControls();
@@ -1058,7 +1058,7 @@ bool GMWidget::onCycleFocus(bool goForward)
 		}
 		else
 		{
-			for (GMint i = sz - 1; i >= 0; --i)
+			for (GMint32 i = sz - 1; i >= 0; --i)
 			{
 				widget = lastCanvas = widgets[i];
 				const Vector<GMControl*> controls = widget->getControls();

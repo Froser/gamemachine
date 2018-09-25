@@ -35,7 +35,7 @@ public:
 public:
 	virtual void init() override;
 	virtual void bindSampler(GMTextureSampler* sampler) override;
-	virtual void useTexture(GMint textureType) override;
+	virtual void useTexture(GMint32 textureType) override;
 
 	virtual const IRenderContext* getContext();
 

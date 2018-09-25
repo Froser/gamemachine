@@ -31,13 +31,13 @@ extern "C"
 			{
 				gm_error(gm_dbg_wrap("GL CALLBACK: {0} type = {1}, severity = {2}, message = {3}"),
 					(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
-					GMString(static_cast<GMint>(type)), GMString(static_cast<GMint>(severity)), message);
+					GMString(static_cast<GMint32>(type)), GMString(static_cast<GMint32>(severity)), message);
 			}
 			else if (severity == GL_DEBUG_SEVERITY_LOW)
 			{
 				gm_warning(gm_dbg_wrap("GL CALLBACK: {0} type = {1}, severity = {2}, message = {3}"),
 				(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
-					GMString(static_cast<GMint>(type)), GMString(static_cast<GMint>(severity)), message);
+					GMString(static_cast<GMint32>(type)), GMString(static_cast<GMint32>(severity)), message);
 			}
 		}
 	}
@@ -137,7 +137,7 @@ void GMGLGraphicEngine::activateLights(ITechnique* technique)
 		GM_ASSERT(lightCount <= getMaxLightCount());
 		shaderProgram->setInt(GM_VariablesDesc.LightCount, gm_sizet_to_uint(lightCount));
 
-		for (GMuint i = 0; i < (GMuint)lightCount; ++i)
+		for (GMuint32 i = 0; i < (GMuint32)lightCount; ++i)
 		{
 			lights[i]->activateLight(i, technique);
 		}
@@ -268,7 +268,7 @@ void GMGLUtility::blendFunc(
 	};
 
 	GLenum factors[4];
-	for (GMint i = 0; i < GM_array_size(gms_factors); i++)
+	for (GMint32 i = 0; i < GM_array_size(gms_factors); i++)
 	{
 		switch (gms_factors[i])
 		{
@@ -310,7 +310,7 @@ void GMGLUtility::blendFunc(
 	glBlendFuncSeparate(factors[0], factors[1], factors[2], factors[3]);
 
 	GLenum ops[2];
-	for (GMint i = 0; i < GM_array_size(gms_ops); i++)
+	for (GMint32 i = 0; i < GM_array_size(gms_ops); i++)
 	{
 		switch (gms_ops[i])
 		{
@@ -338,7 +338,7 @@ void GMGLGraphicEngine::clearGLErrors()
 	}
 }
 
-void GMGLGraphicEngine::getGLErrors(GMuint* errors, GMsize_t* count)
+void GMGLGraphicEngine::getGLErrors(GMuint32* errors, GMsize_t* count)
 {
 	GLenum errorCode = GL_NO_ERROR;
 	GMsize_t cnt = 0;
@@ -362,12 +362,12 @@ void GMGLGraphicEngine::getGLErrors(GMuint* errors, GMsize_t* count)
 		*count = cnt;
 }
 
-void GMGLGraphicEngine::checkGLErrors(const GMuint* errors)
+void GMGLGraphicEngine::checkGLErrors(const GMuint32* errors)
 {
 	for (GMsize_t i = 0;; ++i)
 	{
 		if (errors[i] != GL_NO_ERROR)
-			gm_error(gm_dbg_wrap("OpenGL error occurs: {0}"), GMString( (GMint)errors[i] ));
+			gm_error(gm_dbg_wrap("OpenGL error occurs: {0}"), GMString( (GMint32)errors[i] ));
 		else
 			break;
 	}

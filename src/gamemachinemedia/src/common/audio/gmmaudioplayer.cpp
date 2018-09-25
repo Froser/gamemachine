@@ -7,8 +7,8 @@
 #include "../src/foundation/gamemachine.h"
 
 // 大小保持一致
-static_assert(sizeof(gm::GMint) == sizeof(ALenum), "Size error");
-static_assert(sizeof(gm::GMint) == sizeof(ALsizei), "Size error");
+static_assert(sizeof(gm::GMint32) == sizeof(ALenum), "Size error");
+static_assert(sizeof(gm::GMint32) == sizeof(ALsizei), "Size error");
 static ALenum s_alErrCode;
 #define GMM_CHECK_AL_ERROR() GM_ASSERT((s_alErrCode = alGetError()) == AL_NO_ERROR);
 
@@ -196,8 +196,8 @@ public:
 		// 初始化
 		alSourcei(d->sourceId, AL_LOOPING, AL_FALSE);
 		gm::IAudioStream* stream = d->file->getStream();
-		gm::GMuint bufferSize = stream->getBufferSize();
-		gm::GMuint bufferNum = stream->getBufferNum();
+		gm::GMuint32 bufferSize = stream->getBufferSize();
+		gm::GMuint32 bufferNum = stream->getBufferNum();
 		gm::GMbyte* audioData = new gm::GMbyte[bufferSize];
 		if (!d->buffers)
 		{
@@ -214,7 +214,7 @@ public:
 
 		// 先填充Buffer
 		auto& fileInfo = d->file->getFileInfo();
-		for (gm::GMuint i = 0; i < bufferNum - 1; ++i)
+		for (gm::GMuint32 i = 0; i < bufferNum - 1; ++i)
 		{
 			stream->readBuffer(audioData);
 			alBufferData(d->buffers[i], fileInfo.format, audioData, bufferSize, fileInfo.frequency);
@@ -365,7 +365,7 @@ GMMAudioPlayer::~GMMAudioPlayer()
 	shutdownDevice();
 }
 
-bool GMMAudioPlayer::openDevice(gm::GMint idx)
+bool GMMAudioPlayer::openDevice(gm::GMint32 idx)
 {
 	D(d);
 	bool bRet = false;

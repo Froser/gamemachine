@@ -7,7 +7,7 @@ BEGIN_NS
 class GMGLGlyphTexture;
 GM_PRIVATE_OBJECT(GMGLGlyphManager)
 {
-	GMint cursor_u, cursor_v;
+	GMint32 cursor_u, cursor_v;
 	GMfloat maxHeight;
 	GMTextureAsset texture;
 };

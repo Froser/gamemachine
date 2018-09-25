@@ -33,7 +33,7 @@ namespace
 			}
 			case GMMetaMemberType::Int:
 			{
-				*static_cast<GMint*>(member.second.ptr) = GMString::parseInt(value);
+				*static_cast<GMint32*>(member.second.ptr) = GMString::parseInt(value);
 				break;
 			}
 			case GMMetaMemberType::Object:
@@ -56,14 +56,14 @@ namespace
 					if (member.second.type == GMMetaMemberType::Float)
 						*static_cast<GMfloat*>(member.second.ptr) = GMString::parseFloat(plistValue);
 					else if (member.second.type == GMMetaMemberType::Int)
-						*static_cast<GMint*>(member.second.ptr) = static_cast<GMint>(GMString::parseFloat(plistValue));
+						*static_cast<GMint32*>(member.second.ptr) = static_cast<GMint32>(GMString::parseFloat(plistValue));
 				}
 				else if (plistType == "integer")
 				{
 					if (member.second.type == GMMetaMemberType::Float)
 						*static_cast<GMfloat*>(member.second.ptr) = static_cast<GMfloat>(GMString::parseInt(plistValue));
 					else if (member.second.type == GMMetaMemberType::Int)
-						*static_cast<GMint*>(member.second.ptr) = GMString::parseInt(plistValue);
+						*static_cast<GMint32*>(member.second.ptr) = GMString::parseInt(plistValue);
 				}
 				else if (plistType == "string")
 				{

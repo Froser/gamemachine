@@ -149,7 +149,7 @@ namespace
 	)
 	{
 		D3D11_BLEND_DESC desc = { 0 };
-		for (GMuint i = 0; i < 8; ++i)
+		for (GMuint32 i = 0; i < 8; ++i)
 		{
 			desc.RenderTarget[i].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 		}
@@ -358,9 +358,9 @@ public:
 
 		GMS_FrontFace frontFace = model->getShader().getFrontFace();
 		GMS_Cull cullMode = model->getShader().getCull();
-		GMuint fillMode = engine->isWireFrameMode(model) ? WireFrame : Solid;
+		GMuint32 fillMode = engine->isWireFrameMode(model) ? WireFrame : Solid;
 
-		GMComPtr<ID3D11RasterizerState>& state = states[fillMode][(GMuint)cullMode][(GMuint)frontFace];
+		GMComPtr<ID3D11RasterizerState>& state = states[fillMode][(GMuint32)cullMode][(GMuint32)frontFace];
 		if (!state)
 		{
 			D3D11_RASTERIZER_DESC desc = getRasterizerDesc(fillMode != WireFrame, frontFace, cullMode, multisampleEnable, multisampleEnable);
@@ -404,7 +404,7 @@ public:
 		GMS_BlendOp opAlpha
 	)
 	{
-		GMComPtr<ID3D11BlendState>& state = states[enable ? 1 : 0][(GMuint)srcRGB][(GMuint)destRGB][(GMuint)opRGB][(GMuint)srcAlpha][(GMuint)destAlpha][(GMuint)opAlpha];
+		GMComPtr<ID3D11BlendState>& state = states[enable ? 1 : 0][(GMuint32)srcRGB][(GMuint32)destRGB][(GMuint32)opRGB][(GMuint32)srcAlpha][(GMuint32)destAlpha][(GMuint32)opAlpha];
 		if (!state)
 		{
 			D3D11_BLEND_DESC desc = getBlendDesc(enable, srcRGB, destRGB, opRGB, srcAlpha, destAlpha, opAlpha);
@@ -439,12 +439,12 @@ private:
 	const IRenderContext* context = nullptr;
 	GMDx11GraphicEngine* engine = nullptr;
 	GMComPtr<ID3D11BlendState> states[2]
-		[(GMuint)GMS_BlendFunc::MaxOfBlendFunc]	// Source RGB
-		[(GMuint)GMS_BlendFunc::MaxOfBlendFunc]	// Dest RGB
-		[(GMuint)GMS_BlendOp::MaxOfBlendOp]		// Op RGB
-		[(GMuint)GMS_BlendFunc::MaxOfBlendFunc]	// Source Alpha
-		[(GMuint)GMS_BlendFunc::MaxOfBlendFunc]	// Dest Alpha
-		[(GMuint)GMS_BlendOp::MaxOfBlendOp]		// Op Alpha
+		[(GMuint32)GMS_BlendFunc::MaxOfBlendFunc]	// Source RGB
+		[(GMuint32)GMS_BlendFunc::MaxOfBlendFunc]	// Dest RGB
+		[(GMuint32)GMS_BlendOp::MaxOfBlendOp]		// Op RGB
+		[(GMuint32)GMS_BlendFunc::MaxOfBlendFunc]	// Source Alpha
+		[(GMuint32)GMS_BlendFunc::MaxOfBlendFunc]	// Dest Alpha
+		[(GMuint32)GMS_BlendOp::MaxOfBlendOp]		// Op Alpha
 	;
 };
 
@@ -563,7 +563,7 @@ void GMDx11Technique::beginModel(GMModel* model, const GMGameObject* parent)
 	setGamma(shaderProgram);
 
 	// 设置顶点颜色运算方式
-	shaderProgram->setInt(GM_VariablesDesc.ColorVertexOp, static_cast<GMint>(model->getShader().getVertexColorOp()));
+	shaderProgram->setInt(GM_VariablesDesc.ColorVertexOp, static_cast<GMint32>(model->getShader().getVertexColorOp()));
 }
 
 void GMDx11Technique::endModel()
@@ -615,7 +615,7 @@ void GMDx11Technique::prepareTextures(GMModel* model)
 		{
 			// 激活动画序列
 			texture.getTexture()->bindSampler(&sampler);
-			texture.getTexture()->useTexture((GMint)type);
+			texture.getTexture()->useTexture((GMint32)type);
 		}
 		else
 		{
@@ -629,7 +629,7 @@ void GMDx11Technique::prepareTextures(GMModel* model)
 				GMTextureAsset whiteTexture = getWhiteTexture();
 				applyTextureAttribute(model, whiteTexture, type);
 				whiteTexture.getTexture()->bindSampler(nullptr);
-				whiteTexture.getTexture()->useTexture((GMint)type);
+				whiteTexture.getTexture()->useTexture((GMint32)type);
 			}
 		}
 	}
@@ -755,8 +755,8 @@ void GMDx11Technique::applyTextureAttribute(GMModel* model, GMTextureAsset textu
 void GMDx11Technique::prepareBuffer(GMModel* model)
 {
 	D(d);
-	GMuint stride = sizeof(GMVertex);
-	GMuint offset = 0;
+	GMuint32 stride = sizeof(GMVertex);
+	GMuint32 offset = 0;
 	GMComPtr<ID3D11Buffer> vertexBuffer;
 	IQueriable* modelDataProxy = model->getModelDataProxy();
 	modelDataProxy->getInterface(GameMachineInterfaceID::D3D11VertexBuffer, (void**)&vertexBuffer);
@@ -813,7 +813,7 @@ void GMDx11Technique::prepareMaterials(GMModel* model)
 
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
 	GMIlluminationModel illuminationModel = shader.getIlluminationModel();
-	shaderProgram->setInt(GM_VariablesDesc.IlluminationModel, (GMint)illuminationModel);
+	shaderProgram->setInt(GM_VariablesDesc.IlluminationModel, (GMint32)illuminationModel);
 }
 
 void GMDx11Technique::prepareBlend(GMModel* model)
@@ -918,7 +918,7 @@ void GMDx11Technique::prepareDepthStencil(GMModel* model)
 void GMDx11Technique::prepareDebug(GMModel* model)
 {
 	D(d);
-	GMint mode = d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonNormalMode).toInt();
+	GMint32 mode = d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonNormalMode).toInt();
 	
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
 	shaderProgram->setInt(GM_VariablesDesc.Debug.Normal, mode);
@@ -935,7 +935,7 @@ GMTextureAsset GMDx11Technique::getTexture(GMTextureSampler& sampler)
 
 	// 如果frameCount > 1，说明是个动画，要根据Shader的间隔来选择合适的帧
 	// TODO
-	GMint elapsed = GM.getRunningStates().elapsedTime * 1000;
+	GMint32 elapsed = GM.getRunningStates().elapsedTime * 1000;
 
 	return sampler.getFrameByIndex((elapsed / sampler.getAnimationMs()) % sampler.getFrameCount());
 }
@@ -975,7 +975,7 @@ void GMDx11Technique::passAllAndDraw(GMModel* model)
 	D3DX11_TECHNIQUE_DESC techDesc;
 	GM_DX_HR(getTechnique()->GetDesc(&techDesc));
 
-	for (GMuint p = 0; p < techDesc.Passes; ++p)
+	for (GMuint32 p = 0; p < techDesc.Passes; ++p)
 	{
 		ID3DX11EffectPass* pass = getTechnique()->GetPassByIndex(p);
 		pass->Apply(0, d->deviceContext);
@@ -1014,7 +1014,7 @@ void GMDx11Technique_2D::prepareTextures(GMModel* model)
 		if (!texture.isEmpty())
 		{
 			texture.getTexture()->bindSampler(&model->getShader().getTextureList().getTextureSampler(type));
-			texture.getTexture()->useTexture((GMint)type);
+			texture.getTexture()->useTexture((GMint32)type);
 		}
 	}
 }
@@ -1028,7 +1028,7 @@ void GMDx11Technique_CubeMap::prepareTextures(GMModel* model)
 	if (!texture.isEmpty())
 	{
 		texture.getTexture()->bindSampler(&model->getShader().getTextureList().getTextureSampler(GMTextureType::CubeMap));
-		texture.getTexture()->useTexture((GMint)GMTextureType::CubeMap);
+		texture.getTexture()->useTexture((GMint32)GMTextureType::CubeMap);
 		GMDx11CubeMapState& cubeMapState = getEngine()->getCubeMapState();
 		if (cubeMapState.model != model)
 		{
@@ -1063,7 +1063,7 @@ void GMDx11Technique_Filter::passAllAndDraw(GMModel* model)
 	D3DX11_TECHNIQUE_DESC techDesc;
 	GM_DX_HR(getTechnique()->GetDesc(&techDesc));
 
-	for (GMuint p = 0; p < techDesc.Passes; ++p)
+	for (GMuint32 p = 0; p < techDesc.Passes; ++p)
 	{
 		GMTextureAsset filterTextureAsset = model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).getFrameByIndex(0);
 		GM_ASSERT(!filterTextureAsset.isEmpty());
@@ -1145,7 +1145,7 @@ void GMDx11Technique_Deferred_3D::passAllAndDraw(GMModel* model)
 
 	IGBuffer* gbuffer = getEngine()->getGBuffer();
 	IFramebuffers* framebuffers = gbuffer->getGeometryFramebuffers();
-	for (GMuint p = 0; p < techDesc.Passes; ++p)
+	for (GMuint32 p = 0; p < techDesc.Passes; ++p)
 	{
 		ID3DX11EffectPass* pass = getTechnique()->GetPassByIndex(p);
 		pass->Apply(0, d->deviceContext);
@@ -1165,7 +1165,7 @@ void GMDx11Technique_Deferred_3D_LightPass::passAllAndDraw(GMModel* model)
 	D(d);
 	D3DX11_TECHNIQUE_DESC techDesc;
 	GM_DX_HR(getTechnique()->GetDesc(&techDesc));
-	for (GMuint p = 0; p < techDesc.Passes; ++p)
+	for (GMuint32 p = 0; p < techDesc.Passes; ++p)
 	{
 		ID3DX11EffectPass* pass = getTechnique()->GetPassByIndex(p);
 		pass->Apply(0, d->deviceContext);

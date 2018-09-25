@@ -50,7 +50,7 @@ struct GMTransactionContext
 
 GM_PRIVATE_OBJECT(GMTransactionManager)
 {
-	GMint nest = 0;
+	GMint32 nest = 0;
 	GMTransactionContext* transactionContext = nullptr;
 };
 

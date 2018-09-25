@@ -293,7 +293,7 @@ void GMMemoryStream::seek(GMsize_t cnt, SeekMode mode)
 }
 
 //Bitset
-bool Bitset::init(GMint numberOfBits)
+bool Bitset::init(GMint32 numberOfBits)
 {
 	D(d);
 	//Delete any memory allocated to bits
@@ -316,12 +316,12 @@ bool Bitset::init(GMint numberOfBits)
 }
 
 //Convertion
-GMfloat GMConvertion::pointToInch(GMint pt)
+GMfloat GMConvertion::pointToInch(GMint32 pt)
 {
 	return pt / 72.f;
 }
 
-GMfloat GMConvertion::pointToPixel(GMint pt, bool horizontal)
+GMfloat GMConvertion::pointToPixel(GMint32 pt, bool horizontal)
 {
 	return pointToInch(pt) * (horizontal ? GMScreen::horizontalResolutionDpi() : GMScreen::verticalResolutionDpi());
 }
@@ -333,7 +333,7 @@ bool GMConvertion::hexToRGB(const GMString& hex, GMfloat rgb[3])
 	struct __InvalidHex : public std::runtime_error {
 		__InvalidHex() : std::runtime_error("Invalid hex format.") {}
 	};
-	auto toDecFromHex = [](char ch) -> GMint {
+	auto toDecFromHex = [](char ch) -> GMint32 {
 		switch (ch)
 		{
 		case '0':
@@ -416,8 +416,8 @@ GMString GMConvertion::toWin32String(const GMString& string)
 
 GMBuffer GMConvertion::fromBase64(const GMBuffer& base64)
 {
-	GMuint buf = 0;
-	GMint nbits = 0;
+	GMuint32 buf = 0;
+	GMint32 nbits = 0;
 	GMBuffer tmp;
 	tmp.size = (base64.size * 3) / 4;
 	tmp.buffer = new GMbyte[tmp.size];
@@ -425,8 +425,8 @@ GMBuffer GMConvertion::fromBase64(const GMBuffer& base64)
 
 	GMsize_t offset = 0;
 	for (GMsize_t i = 0; i < base64.size; ++i) {
-		GMint ch = base64.buffer[i];
-		GMint d;
+		GMint32 ch = base64.buffer[i];
+		GMint32 d;
 
 		if (ch >= 'A' && ch <= 'Z')
 			d = ch - 'A';
@@ -518,7 +518,7 @@ GMZip::ErrorCode GMZip::inflate(const GMBuffer& buf, REF GMBuffer& out, GMsize_t
 	stream.avail_in = (uInt) buf.size;
 	stream.next_out = out.buffer;
 	stream.avail_out = (uInt) sizeHint;
-	GMint err = Z_OK;
+	GMint32 err = Z_OK;
 	if ((err = inflateInit2(&stream, MAX_WBITS + 32)) != Z_OK)
 	{
 		gm_error(gm_dbg_wrap("inflate error. error code: {0}"), GMString(err));
@@ -561,7 +561,7 @@ GMZip::ErrorCode GMZip::inflate(const GMBuffer& buf, REF GMBuffer& out, GMsize_t
 	return translateError(inflateEnd(&stream));
 }
 
-GMZip::ErrorCode GMZip::translateError(GMint err)
+GMZip::ErrorCode GMZip::translateError(GMint32 err)
 {
 	switch (err)
 	{

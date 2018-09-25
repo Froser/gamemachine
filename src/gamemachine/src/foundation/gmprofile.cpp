@@ -84,6 +84,6 @@ void GMProfile::stopRecord()
 
 	GMProfileSessions::GMProfileSession& ps = profileSession();
 	GMThreadId id = GMThread::getCurrentThreadId();
-	GMint& level = ps.level;
+	GMint32& level = ps.level;
 	g_handler->endProfile(d->name, d->stopwatch.timeInSecond(), id, --level);
 }

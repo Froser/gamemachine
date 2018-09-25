@@ -13,7 +13,7 @@
 #define ATTRIB_VAL(a, v) { ATTRIB(a); ATTRIB(v); }
 #define MAX_ATTRIBS 100
 #define ATTRIBS attributes
-#define INIT_ATTRIBS() GMint attributes[MAX_ATTRIBS] = {0}; GMint where = 0;
+#define INIT_ATTRIBS() GMint32 attributes[MAX_ATTRIBS] = {0}; GMint32 where = 0;
 
 #ifndef HOST_NAME_MAX
 #define HOST_NAME_MAX 255
@@ -21,7 +21,7 @@
 
 namespace
 {
-	void setAttributes(GMint* attributes, const GMWindowAttributes& wndAttrs, bool useSample)
+	void setAttributes(GMint32* attributes, const GMWindowAttributes& wndAttrs, bool useSample)
 	{
 		int where = 0;
 		ATTRIB_VAL(GLX_X_RENDERABLE, True);
@@ -48,7 +48,7 @@ namespace
 		INIT_ATTRIBS();
 		setAttributes(ATTRIBS, wndAttrs, true);
 		GLXFBConfig* fbconfigArray = NULL;
-		GMint fbconfigArraySize = 0;
+		GMint32 fbconfigArraySize = 0;
 
 		fbconfigArray = glXChooseFBConfig(context->getDisplay(), context->getScreen(), ATTRIBS, &fbconfigArraySize);
 		if (fbconfigArray)
@@ -277,9 +277,9 @@ GLXContext GMWindow_OpenGL::createNewContext()
 		return glXCreateNewContext(display, d->fbConfig, GLX_RGBA_TYPE, share_list, true);
 	}
 
-	GMint attributes[9];
-	GMint where = 0;
-	GMint contextFlags;
+	GMint32 attributes[9];
+	GMint32 where = 0;
+	GMint32 contextFlags;
 #if GM_DEBUG
 	contextFlags = GLX_CONTEXT_DEBUG_BIT_ARB | GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB;
 #else

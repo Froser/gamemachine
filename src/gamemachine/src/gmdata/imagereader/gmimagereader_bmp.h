@@ -14,8 +14,8 @@ public:
 	virtual bool test(const GMbyte* byte) override;
 
 private:
-	void writeDataToImage(BitmapFile& bitmap, GMImage* img, GMuint size);
-	void flipVertically(GMbyte* data, GMuint width, GMuint height);
+	void writeDataToImage(BitmapFile& bitmap, GMImage* img, GMuint32 size);
+	void flipVertically(GMbyte* data, GMuint32 width, GMuint32 height);
 };
 
 END_NS

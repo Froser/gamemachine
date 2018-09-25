@@ -40,7 +40,7 @@ IModelReader* GMModelReader::getReader(ModelType type)
 
 GMModelReader::ModelType GMModelReader::test(const GMBuffer& buffer)
 {
-	for (ModelType i = ModelType_Begin; i < ModelType_End; i = (ModelType)((GMuint)i + 1))
+	for (ModelType i = ModelType_Begin; i < ModelType_End; i = (ModelType)((GMuint32)i + 1))
 	{
 		if (getReader(i)->test(buffer))
 			return i;

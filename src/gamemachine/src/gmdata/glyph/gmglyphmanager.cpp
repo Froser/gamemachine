@@ -37,7 +37,7 @@ namespace
 	}
 }
 
-const GMGlyphInfo& GMGlyphManager::getChar(GMwchar c, GMint fontSize, GMFontHandle font)
+const GMGlyphInfo& GMGlyphManager::getChar(GMwchar c, GMint32 fontSize, GMFontHandle font)
 {
 	return getCharInner(c, fontSize, font, 0);
 }
@@ -112,7 +112,7 @@ GMFontHandle GMGlyphManager::addFontByMemory(GMBuffer&& buffer)
 	return GMInvalidFontHandle;
 }
 
-GMGlyphInfo& GMGlyphManager::insertChar(GMint fontSize, GMFontHandle font, GMwchar ch, const GMGlyphInfo& glyph)
+GMGlyphInfo& GMGlyphManager::insertChar(GMint32 fontSize, GMFontHandle font, GMwchar ch, const GMGlyphInfo& glyph)
 {
 	D(d);
 	auto result = d->chars[font][fontSize].insert({ ch, glyph });

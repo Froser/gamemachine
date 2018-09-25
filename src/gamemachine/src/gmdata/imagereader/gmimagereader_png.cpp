@@ -36,7 +36,7 @@ namespace
 		info_ptr = png_create_info_struct(png_ptr);
 		setjmp(png_jmpbuf(png_ptr));
 
-		GMint temp = png_sig_cmp((png_const_bytep)data, (png_size_t)0, PNG_BYTES_TO_CHECK);
+		GMint32 temp = png_sig_cmp((png_const_bytep)data, (png_size_t)0, PNG_BYTES_TO_CHECK);
 		// 检测是否为png文件
 		GM_ASSERT(temp == 0);
 		PngImage imgsource = { data, dataSize, 0 };

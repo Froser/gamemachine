@@ -104,7 +104,7 @@ public:
 	/*!
 	  \param i 整型数源。如i为1的时候，GMString值为"1"。
 	*/
-	explicit GMString(const GMint i);
+	explicit GMString(const GMint32 i);
 
 	explicit GMString(const GMlong i);
 
@@ -298,7 +298,7 @@ public:
 	}
 
 	//! 为字符串预先分配空间。
-	void reserve(GMint size)
+	void reserve(GMint32 size)
 	{
 		D_STR(d);
 		d->data.reserve(size);
@@ -397,7 +397,7 @@ public:
 	}
 
 	static GMfloat parseFloat(const GMString& i, bool* ok = nullptr);
-	static GMint parseInt(const GMString& i, bool* ok = nullptr);
+	static GMint32 parseInt(const GMString& i, bool* ok = nullptr);
 	static GMlong parseLong(const GMString& i, bool* ok = nullptr);
 };
 
@@ -498,7 +498,7 @@ public:
 	void next(REF GMString& ref);
 	void nextToTheEnd(REF GMString& ref);
 	bool nextFloat(REF GMfloat& ref);
-	bool nextInt(REF GMint& ref);
+	bool nextInt(REF GMint32& ref);
 	void peek(REF GMString& ref);
 };
 

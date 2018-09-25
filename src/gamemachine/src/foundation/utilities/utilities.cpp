@@ -85,7 +85,7 @@ void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, REF GMModelAsset&
 
 	GMVec3 vertices_vec[8];
 	GMFloat4 vertices[8];
-	for (GMint i = 0; i < GM_array_size(vertices); ++i)
+	for (GMint32 i = 0; i < GM_array_size(vertices); ++i)
 	{
 		vertices_vec[i] = s_vertices[i] * halfExtents;
 		vertices_vec[i].loadFloat4(vertices[i]);
@@ -339,7 +339,7 @@ void GMPrimitiveCreator::createQuadrangle(const GMVec2& halfExtents, GMfloat z, 
 	model = GMAsset(GMAssetType::Model, m);
 }
 
-void GMPrimitiveCreator::createSphere(GMfloat radius, GMint segmentsX, GMint segmentsY, REF GMModelAsset& model)
+void GMPrimitiveCreator::createSphere(GMfloat radius, GMint32 segmentsX, GMint32 segmentsY, REF GMModelAsset& model)
 {
 	GM_ASSERT(radius > 0 && segmentsX > 1 && segmentsY > 1);
 	GMModel* m = new GMModel();
@@ -347,9 +347,9 @@ void GMPrimitiveCreator::createSphere(GMfloat radius, GMint segmentsX, GMint seg
 	m->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
 	GMMesh* mesh = new GMMesh(m);
 
-	for (GMint y = 0; y <= segmentsY; ++y)
+	for (GMint32 y = 0; y <= segmentsY; ++y)
 	{
-		for (GMint x = 0; x <= segmentsX; ++x)
+		for (GMint32 x = 0; x <= segmentsX; ++x)
 		{
 			GMfloat xSegment = (GMfloat)x / segmentsX;
 			GMfloat ySegment = (GMfloat)y / segmentsY;
@@ -366,11 +366,11 @@ void GMPrimitiveCreator::createSphere(GMfloat radius, GMint segmentsX, GMint seg
 	}
 
 	bool oddRow = false;
-	for (GMint y = 0; y < segmentsY; ++y)
+	for (GMint32 y = 0; y < segmentsY; ++y)
 	{
 		if (!oddRow)
 		{
-			for (GMint x = 0; x <= segmentsX; ++x)
+			for (GMint32 x = 0; x <= segmentsX; ++x)
 			{
 				mesh->index(y       * (segmentsX + 1) + x);
 				mesh->index((y + 1) * (segmentsX + 1) + x);
@@ -378,7 +378,7 @@ void GMPrimitiveCreator::createSphere(GMfloat radius, GMint segmentsX, GMint seg
 		}
 		else
 		{
-			for (GMint x = segmentsX; x >= 0; --x)
+			for (GMint32 x = segmentsX; x >= 0; --x)
 			{
 				mesh->index((y + 1) * (segmentsX + 1) + x);
 				mesh->index(y       * (segmentsX + 1) + x);
@@ -412,7 +412,7 @@ void GMPrimitiveCreator::createTerrain(
 	// 先计算顶点坐标
 	GMfloat y = 0;
 	GMfloat u = 0, v = 0;
-	GMint x_image = 0, y_image = 0;
+	GMint32 x_image = 0, y_image = 0;
 	
 	for (GMsize_t i = 0; i < sliceN + 1; ++i)
 	{
@@ -551,7 +551,7 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 	const GMfloat(&uvArr)[8] = *_uv;
 	const GMfloat(&v)[12] = *_pos;
 
-	static constexpr GMint indices[] = {
+	static constexpr GMint32 indices[] = {
 		0, 3, 1,
 		2, 1, 3,
 	};
@@ -560,7 +560,7 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 
 	// 实体
 	GMfloat t[12];
-	for (GMint i = 0; i < 12; i++)
+	for (GMint32 i = 0; i < 12; i++)
 	{
 		t[i] = extents[i % 3] * v[i];
 	}
@@ -571,13 +571,13 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 		model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
 
 		GMFloat4 f4_vertex, f4_normal, f4_uv;
-		for (GMint i = 0; i < 2; i++)
+		for (GMint32 i = 0; i < 2; i++)
 		{
-			for (GMint j = 0; j < 3; j++) // j表示面的一个顶点
+			for (GMint32 j = 0; j < 3; j++) // j表示面的一个顶点
 			{
-				GMint idx = i * 3 + j; //顶点的开始
-				GMint idx_next = i * 3 + (j + 1) % 3;
-				GMint idx_prev = i * 3 + (j + 2) % 3;
+				GMint32 idx = i * 3 + j; //顶点的开始
+				GMint32 idx_next = i * 3 + (j + 1) % 3;
+				GMint32 idx_prev = i * 3 + (j + 2) % 3;
 				GMVec2 uv(uvArr[indices[idx] * 2], uvArr[indices[idx] * 2 + 1]);
 				GMVec3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
 				GMVec3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
@@ -615,7 +615,7 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 	*obj = model;
 }
 
-GMTextureAsset GMToolUtil::createTexture(const IRenderContext* context, const GMString& filename, REF GMint* width, REF GMint* height)
+GMTextureAsset GMToolUtil::createTexture(const IRenderContext* context, const GMString& filename, REF GMint32* width, REF GMint32* height)
 {
 	GMImage* img = nullptr;
 	GMBuffer buf;
@@ -637,7 +637,7 @@ GMTextureAsset GMToolUtil::createTexture(const IRenderContext* context, const GM
 	return std::move(texture);
 }
 
-void GMToolUtil::createTextureFromFullPath(const IRenderContext* context, const GMString& filename, REF GMTextureAsset& texture, REF GMint* width, REF GMint* height)
+void GMToolUtil::createTextureFromFullPath(const IRenderContext* context, const GMString& filename, REF GMTextureAsset& texture, REF GMint32* width, REF GMint32* height)
 {
 	GMImage* img = nullptr;
 	GMBuffer buf;
@@ -713,14 +713,14 @@ bool GMToolUtil::createPBRTextures(
 		}
 	}
 
-	GMint mw = metallicImg->getWidth(), mh = metallicImg->getHeight();
-	GMint rw = roughnessImg->getWidth(), rh = roughnessImg->getHeight();
-	GMint aow = aoImg ? aoImg->getWidth() : mw, aoh = aoImg ? aoImg->getHeight() : mh;
+	GMint32 mw = metallicImg->getWidth(), mh = metallicImg->getHeight();
+	GMint32 rw = roughnessImg->getWidth(), rh = roughnessImg->getHeight();
+	GMint32 aow = aoImg ? aoImg->getWidth() : mw, aoh = aoImg ? aoImg->getHeight() : mh;
 
 	if (mw == rw && rw == aow && mh == rh && rh == aoh)
 	{
-		GMint metallicStep = metallicImg->getData().channels;
-		GMint roughnessStep = roughnessImg->getData().channels;
+		GMint32 metallicStep = metallicImg->getData().channels;
+		GMint32 roughnessStep = roughnessImg->getData().channels;
 
 		GMImage combinedImage;
 		GMImage::Data& data = combinedImage.getData();
@@ -732,14 +732,14 @@ bool GMToolUtil::createPBRTextures(
 		data.mip[0].height = metallicImg->getHeight();
 		data.mip[0].width = metallicImg->getWidth();
 
-		GMint sz = data.mip[0].width * data.mip[0].height * 4;
+		GMint32 sz = data.mip[0].width * data.mip[0].height * 4;
 		data.mip[0].data = new GMbyte[sz];
 		GMbyte* metallicPtr = metallicImg->getData().mip[0].data;
 		GMbyte* roughnessPtr = roughnessImg->getData().mip[0].data;
 
-		GMint aoStep = aoImg ? aoImg->getData().channels : 0;
+		GMint32 aoStep = aoImg ? aoImg->getData().channels : 0;
 		GMbyte* aoPtr = aoImg ? aoImg->getData().mip[0].data : nullptr;
-		for (GMint p = 0; p < sz; p+=4, metallicPtr+=metallicStep, roughnessPtr+=roughnessStep, aoPtr+=aoStep)
+		for (GMint32 p = 0; p < sz; p+=4, metallicPtr+=metallicStep, roughnessPtr+=roughnessStep, aoPtr+=aoStep)
 		{
 			data.mip[0].data[p] = *metallicPtr;
 			data.mip[0].data[p + 1] = *roughnessPtr;

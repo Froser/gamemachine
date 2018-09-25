@@ -11,8 +11,8 @@ GM_PRIVATE_OBJECT(GMSkeletonGameObject)
 	GMDuration animationTime = 0;
 	GMDuration animationDuration = 0;
 	GMDuration frameDuration = 0;
-	GMint frame = AutoPlayFrame;
-	GMint frameInterpolate = 0;
+	GMint32 frame = AutoPlayFrame;
+	GMint32 frameInterpolate = 0;
 	GMOwnedPtr<GMGameObject> skeletonBonesObject;
 	bool drawSkin = true;
 	bool drawBones = true;
@@ -35,7 +35,7 @@ public:
 	virtual void draw() override;
 
 public:
-	GMint getFramesCount();
+	GMint32 getFramesCount();
 	void createSkeletonBonesObject();
 	void setDrawBones(bool b);
 	void play();
@@ -43,7 +43,7 @@ public:
 	void reset(bool update);
 
 public:
-	inline void setFrame(GMint frame, GMint frameInterpolate) GM_NOEXCEPT
+	inline void setFrame(GMint32 frame, GMint32 frameInterpolate) GM_NOEXCEPT
 	{
 		D(d);
 		d->frame = frame;
@@ -64,7 +64,7 @@ public:
 
 private:
 	void initAnimation();
-	void getAdjacentTwoFrames(GMDuration dt, REF GMint& frame0, REF GMint& frame1, REF GMfloat& interpolate);
+	void getAdjacentTwoFrames(GMDuration dt, REF GMint32& frame0, REF GMint32& frame1, REF GMfloat& interpolate);
 	void updateMesh(GMSkeletonMesh& mesh, const GMFrameSkeleton& frameSkeleton);
 	void updateSkeleton();
 	void initSkeletonBonesMesh(GMMesh* mesh);

@@ -62,7 +62,7 @@ namespace
 		return nullptr;
 	}
 
-	GMMouseButton translateButton(GMuint state)
+	GMMouseButton translateButton(GMuint32 state)
 	{
 		GMMouseButton button = GMMouseButton_None;
 		if (state & Button1Mask)
@@ -74,7 +74,7 @@ namespace
 		return button;
 	}
 
-	GMModifier translateModifier(GMuint state)
+	GMModifier translateModifier(GMuint32 state)
 	{
 		GMModifier modifier = GMModifier_None;
 		if (state & ControlMask)
@@ -89,7 +89,7 @@ namespace
 		XComposeStatus composeStatus;
 		char asciiCode[32];
 		KeySym keySym;
-		GMint len = 0;
+		GMint32 len = 0;
 		len = XLookupString(xkey, asciiCode, sizeof(asciiCode), &keySym, &composeStatus);
 		if (len > 0)
 		{
@@ -173,9 +173,9 @@ namespace
 		const GMXRenderContext* context = gm_cast<const GMXRenderContext*>(window->getContext());
 		Status s;
 		KeySym keySym;
-		GMint len = 0;
+		GMint32 len = 0;
 		len = XwcLookupString(context->getIC(), xkey, s_wc, sizeof(s_wc), &keySym, &s);
-		for (GMint i = 0; i < len; ++i)
+		for (GMint32 i = 0; i < len; ++i)
 		{
 			GMSystemCharEvent e(GMSystemEventType::Char, key, s_wc[i], m);
 			window->handleSystemEvent(&e, s_result);
@@ -217,7 +217,7 @@ void GameMachine::runEventLoop()
 	terminate();
 }
 
-void GameMachine::translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lParam, OUT GMSystemEvent** event)
+void GameMachine::translateSystemEvent(GMuint32 uMsg, GMWParam wParam, GMLParam lParam, OUT GMSystemEvent** event)
 {
 	GM_ASSERT(event);
 	GMXEventContext* c = reinterpret_cast<GMXEventContext*>(lParam);

@@ -4,11 +4,11 @@
 #include <gmasync.h>
 
 #define LOOP_NUM 3
-volatile static gm::GMint g_testCode = 0;
+volatile static gm::GMint32 g_testCode = 0;
 
 namespace gm
 {
-	static GMint __i;
+	static GMint32 __i;
 
 	void beginDoSomething(GMAsyncCallback callback, OUT GMAsyncResult** ar, std::ostream& out = std::cout)
 	{
@@ -47,7 +47,7 @@ class TestThread_Term : public gm::GMThread
 public:
 	virtual void run() override
 	{
-		gm::GMint i = 0;
+		gm::GMint32 i = 0;
 		while (i++ < 1000)
 		{
 			sleep(500);

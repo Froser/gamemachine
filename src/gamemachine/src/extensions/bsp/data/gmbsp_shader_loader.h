@@ -17,7 +17,7 @@ GM_PRIVATE_OBJECT(GMBSPShaderLoader)
 	AlignedVector<GMXMLDocument*> shaderDocs;
 
 	// 纹理编号，从TEXTURE_INDEX_AMBIENT开始
-	GMint lightmapId;
+	GMint32 lightmapId;
 };
 
 
@@ -32,13 +32,13 @@ public:
 public:
 	void init(const GMString& directory, GMBSPGameWorld* world, GMBSPRenderData* bspRenderData);
 	void load();
-	bool findItem(const GMString& name, GMint lightmapId, REF GMShader* shader);
+	bool findItem(const GMString& name, GMint32 lightmapId, REF GMShader* shader);
 
 	// parsers:
 private:
 	GMTextureAsset addTextureToTextureContainer(const GMString& name);
 	void parse(const char* buffer);
-	void parseItem(GMXMLElement* elem, GMint lightmapId, REF GMShader* shaderPtr);
+	void parseItem(GMXMLElement* elem, GMint32 lightmapId, REF GMShader* shaderPtr);
 	void parseStart();
 	void parseEnd();
 

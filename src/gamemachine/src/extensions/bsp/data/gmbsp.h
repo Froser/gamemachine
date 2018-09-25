@@ -55,64 +55,64 @@ typedef GMVec3 BSPVector3;
 // BSP file struct
 struct GMBSPLump
 {
-	GMint fileofs, filelen;
+	GMint32 fileofs, filelen;
 };
 
 struct GMBSPHeader
 {
-	GMint ident;
-	GMint version;
+	GMint32 ident;
+	GMint32 version;
 	GMBSPLump lumps[HEADER_LUMPS];
 };
 
 struct GMBSPModel
 {
 	GMfloat mins[3], maxs[3];
-	GMint firstSurface, numSurfaces;
-	GMint firstBrush, numBrushes;
+	GMint32 firstSurface, numSurfaces;
+	GMint32 firstBrush, numBrushes;
 };
 
 struct GMBSPShader
 {
 	char shader[MAX_SHADER_PATH];
-	GMint surfaceFlags;
-	GMint contentFlags;
+	GMint32 surfaceFlags;
+	GMint32 contentFlags;
 };
 
 struct GMBSPNode
 {
-	GMint planeNum;
-	GMint children[2];
-	GMint mins[3];
-	GMint maxs[3];
+	GMint32 planeNum;
+	GMint32 children[2];
+	GMint32 mins[3];
+	GMint32 maxs[3];
 };
 
 struct GMBSPLeaf
 {
-	GMint cluster;
-	GMint area;
+	GMint32 cluster;
+	GMint32 area;
 
-	GMint mins[3];
-	GMint maxs[3];
+	GMint32 mins[3];
+	GMint32 maxs[3];
 
-	GMint firstLeafSurface;
-	GMint numLeafSurfaces;
+	GMint32 firstLeafSurface;
+	GMint32 numLeafSurfaces;
 
-	GMint firstLeafBrush;
-	GMint numLeafBrushes;
+	GMint32 firstLeafBrush;
+	GMint32 numLeafBrushes;
 };
 
 struct GMBSPBrushSide
 {
-	GMint planeNum;
-	GMint shaderNum;
+	GMint32 planeNum;
+	GMint32 shaderNum;
 };
 
 struct GMBSPBrush
 {
-	GMint firstSide;
-	GMint numSides;
-	GMint shaderNum;
+	GMint32 firstSide;
+	GMint32 numSides;
+	GMint32 shaderNum;
 };
 
 GM_ALIGNED_STRUCT(GMBSPEPair)
@@ -130,7 +130,7 @@ GM_ALIGNED_STRUCT(GMBSPEntity)
 	}
 
 	GMfloat origin[3];
-	GMint firstDrawSurf = 0;
+	GMint32 firstDrawSurf = 0;
 	GMBSPEPair* epairs = 0;
 
 private:
@@ -144,39 +144,39 @@ private:
 
 struct GMBSPSurface
 {
-	GMint shaderNum;
-	GMint fogNum;
-	GMint surfaceType;
+	GMint32 shaderNum;
+	GMint32 fogNum;
+	GMint32 surfaceType;
 
-	GMint firstVert;
-	GMint numVerts;
+	GMint32 firstVert;
+	GMint32 numVerts;
 
-	GMint firstIndex;
-	GMint numIndexes;
+	GMint32 firstIndex;
+	GMint32 numIndexes;
 
-	GMint lightmapNum;
-	GMint lightmapX, lightmapY;
-	GMint lightmapWidth, lightmapHeight;
+	GMint32 lightmapNum;
+	GMint32 lightmapX, lightmapY;
+	GMint32 lightmapWidth, lightmapHeight;
 
 	BSPVector3 lightmapOrigin;
 	BSPVector3 lightmapVecs[3];
 
-	GMint patchWidth;
-	GMint patchHeight;
+	GMint32 patchWidth;
+	GMint32 patchHeight;
 };
 
 struct GMBSPScript
 {
 	char filename[1024];
 	char *buffer, *script_p, *end_p;
-	GMint line;
+	GMint32 line;
 };
 
 struct GMBSPFog
 {
 	char shader[MAX_SHADER_PATH];
-	GMint brushNum;
-	GMint visibleSide;	// the brush side that ray tests need to clip against (-1 == none)
+	GMint32 brushNum;
+	GMint32 visibleSide;	// the brush side that ray tests need to clip against (-1 == none)
 };
 
 struct GMBSPDrawVertices
@@ -214,34 +214,34 @@ GM_PRIVATE_OBJECT(GMBSP)
 	Vector<char> entdata;
 	Vector<GMBSPLeaf> leafs;
 	Vector<GMBSPNode> nodes;
-	Vector<GMint> leafsurfaces;
-	Vector<GMint> leafbrushes;
+	Vector<GMint32> leafsurfaces;
+	Vector<GMint32> leafbrushes;
 	Vector<GMBSPBrush> brushes;
 	Vector<GMBSPBrushSide> brushsides;
 	Vector<GMbyte> lightBytes;
 	Vector<GMbyte> gridData;
 	Vector<GMbyte> visBytes;
-	Vector<GMint> drawIndexes;
+	Vector<GMint32> drawIndexes;
 	Vector<GMBSPFog> fogs;
 	Vector<GMBSPEntity*> entities;
 
-	GMint nummodels = 0;
-	GMint numShaders = 0;
-	GMint entdatasize = 0;
-	GMint numleafs = 0;
-	GMint numplanes = 0;
-	GMint numnodes = 0;
-	GMint numleafsurfaces = 0;
-	GMint numleafbrushes = 0;
-	GMint numbrushes = 0;
-	GMint numbrushsides = 0;
-	GMint numLightBytes = 0;
-	GMint numGridPoints = 0;
-	GMint numVisBytes = 0;
-	GMint numDrawVertices = 0;
-	GMint numDrawIndexes = 0;
-	GMint numDrawSurfaces = 0;
-	GMint numFogs = 0;
+	GMint32 nummodels = 0;
+	GMint32 numShaders = 0;
+	GMint32 entdatasize = 0;
+	GMint32 numleafs = 0;
+	GMint32 numplanes = 0;
+	GMint32 numnodes = 0;
+	GMint32 numleafsurfaces = 0;
+	GMint32 numleafbrushes = 0;
+	GMint32 numbrushes = 0;
+	GMint32 numbrushsides = 0;
+	GMint32 numLightBytes = 0;
+	GMint32 numGridPoints = 0;
+	GMint32 numVisBytes = 0;
+	GMint32 numDrawVertices = 0;
+	GMint32 numDrawIndexes = 0;
+	GMint32 numDrawSurfaces = 0;
+	GMint32 numFogs = 0;
 	const GMBuffer* buffer = nullptr;
 	GMBSPHeader* header = nullptr;
 
@@ -251,7 +251,7 @@ private:
 	bool tokenready;
 	GMBSPScript scriptstack[MAX_INCLUDES];
 	GMBSPScript *script;
-	GMint scriptline;
+	GMint32 scriptline;
 };
 
 typedef GMBSPPrivate BSPData;
@@ -277,7 +277,7 @@ private:
 private:
 	void swapBsp();
 	void toDxCoord();
-	void parseFromMemory(char *buffer, GMint size);
+	void parseFromMemory(char *buffer, GMint32 size);
 	void generateLightVolumes();
 	void parseEntities();
 	bool parseEntity(OUT GMBSPEntity** entity);

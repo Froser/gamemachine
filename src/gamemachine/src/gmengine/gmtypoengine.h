@@ -16,9 +16,9 @@ struct GMTypoResult
 	GMfloat width = 0;
 	GMfloat height = 0;
 	GMfloat advance = 0;
-	GMint bearingX = 0;
-	GMint bearingY = 0;
-	GMint lineNo = 0;
+	GMint32 bearingX = 0;
+	GMint32 bearingY = 0;
+	GMint32 lineNo = 0;
 	const GMGlyphInfo* glyph = nullptr;
 	bool valid = true;
 	bool newLineOrEOFSeparator = false;
@@ -31,7 +31,7 @@ GM_PRIVATE_OBJECT(GMTypoIterator)
 {
 	ITypoEngine* typo = nullptr;
 	GMsize_t index = 0;
-	GMint offset[2] = { 0 };
+	GMint32 offset[2] = { 0 };
 };
 
 class GMTypoIterator : public GMObject
@@ -60,7 +60,7 @@ public:
 struct GMTypoOptions
 {
 	GMFontSizePt defaultFontSize = 12;
-	GMint lineSpacing = 0;
+	GMint32 lineSpacing = 0;
 	GMRect typoArea = { 0, 0, -1, -1 }; // 排版框，排版引擎将在此框内排版
 	bool center = false;
 	bool newline = true;
@@ -74,8 +74,8 @@ struct GMTypoOptions
 struct GMTypoResultInfo
 {
 	const Vector<GMTypoResult>& results;
-	GMint lineHeight;
-	GMint lineSpacing;
+	GMint32 lineHeight;
+	GMint32 lineSpacing;
 };
 
 GM_INTERFACE(ITypoEngine)
@@ -83,7 +83,7 @@ GM_INTERFACE(ITypoEngine)
 	virtual GMTypoIterator begin(const GMString& literature, const GMTypoOptions& options, GMsize_t start = 0) = 0;
 	virtual GMTypoIterator end() = 0;
 	virtual void setFont(GMFontHandle) = 0;
-	virtual void setLineHeight(GMint) = 0;
+	virtual void setLineHeight(GMint32) = 0;
 	virtual void createInstance(OUT ITypoEngine**) = 0;
 	virtual GMTypoResultInfo getResults() = 0;
 	virtual const GMTypoResultInfo getResults() const= 0;
@@ -131,7 +131,7 @@ protected:
 
 protected:
 	virtual void setColor(GMfloat rgb[3]);
-	virtual void setFontSize(GMint sz);
+	virtual void setFontSize(GMint32 sz);
 
 private:
 	bool parsePair(const GMString& key, REF GMString& value);
@@ -153,9 +153,9 @@ GM_PRIVATE_OBJECT(GMTypoEngine)
 	GMfloat lineHeight = 0;
 
 	// 绘制状态
-	GMint current_x = 0;
-	GMint current_y = 0;
-	GMint currentLineNo = 1;
+	GMint32 current_x = 0;
+	GMint32 current_y = 0;
+	GMint32 currentLineNo = 1;
 	GMFontSizePt fontSize = 12;
 	GMfloat color[3] = { 1.f, 1.f, 1.f };
 
@@ -174,7 +174,7 @@ public:
 	virtual GMTypoIterator begin(const GMString& literature, const GMTypoOptions& options, GMsize_t start) override;
 	virtual GMTypoIterator end() override;
 	virtual void setFont(GMFontHandle font) override;
-	virtual void setLineHeight(GMint lineHeight) override;
+	virtual void setLineHeight(GMint32 lineHeight) override;
 	virtual void createInstance(OUT ITypoEngine**) override;
 	virtual GMTypoResultInfo getResults() override;
 	virtual const GMTypoResultInfo getResults() const override;
@@ -188,7 +188,7 @@ private:
 
 public:
 	void setColor(GMfloat rgb[3]);
-	void setFontSize(GMint pt);
+	void setFontSize(GMint32 pt);
 };
 
 GM_PRIVATE_OBJECT(GMTypoTextBuffer)
@@ -238,18 +238,18 @@ public:
 	bool insertString(GMsize_t pos, const GMString& str);
 	bool removeChar(GMsize_t pos);
 	bool removeChars(GMsize_t startPos, GMsize_t endPos);
-	GMint getLength();
-	GMint getLineHeight();
+	GMint32 getLength();
+	GMint32 getLineHeight();
 	GMwchar getChar(GMsize_t pos);
 
 	// 排版相关
 public:
 	virtual bool isPlainText() GM_NOEXCEPT;
-	virtual void analyze(GMint start);
-	virtual bool CPtoX(GMint cp, bool trail, GMint* x);
-	virtual bool XtoCP(GMint x, GMint* cp, bool* trail);
-	virtual void getPriorItemPos(GMint cp, GMint* prior);
-	virtual void getNextItemPos(GMint cp, GMint* next);
+	virtual void analyze(GMint32 start);
+	virtual bool CPtoX(GMint32 cp, bool trail, GMint32* x);
+	virtual bool XtoCP(GMint32 x, GMint32* cp, bool* trail);
+	virtual void getPriorItemPos(GMint32 cp, GMint32* prior);
+	virtual void getNextItemPos(GMint32 cp, GMint32* next);
 
 protected:
 	inline void markDirty()

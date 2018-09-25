@@ -6,10 +6,10 @@ BEGIN_NS
 
 struct PngData
 {
-	GMint width, height;
-	GMint bit_depth;
+	GMint32 width, height;
+	GMint32 bit_depth;
 	bool hasAlpha;
-	GMint channels;
+	GMint32 channels;
 	GMbyte *rgba = nullptr;
 };
 

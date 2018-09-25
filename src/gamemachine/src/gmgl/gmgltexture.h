@@ -12,11 +12,11 @@ BEGIN_NS
 GM_PRIVATE_OBJECT(GMGLTexture)
 {
 	bool inited = false;
-	GMuint id = 0;
-	GMuint target = 0;
-	GMuint format = 0;
-	GMuint internalFormat = 0;
-	GMuint dataType = 0;
+	GMuint32 id = 0;
+	GMuint32 target = 0;
+	GMuint32 format = 0;
+	GMuint32 internalFormat = 0;
+	GMuint32 dataType = 0;
 	const GMImage* image = nullptr;
 	bool texParamsSet = false;
 };
@@ -32,12 +32,12 @@ public:
 public:
 	virtual void init() override;
 	virtual void bindSampler(GMTextureSampler* sampler) override;
-	virtual void useTexture(GMint textureIndex) override;
+	virtual void useTexture(GMint32 textureIndex) override;
 };
 
 GM_PRIVATE_OBJECT(GMGLWhiteTexture)
 {
-	GMuint textureId = 0;
+	GMuint32 textureId = 0;
 	const IRenderContext* context = nullptr;
 };
 
@@ -52,7 +52,7 @@ public:
 public:
 	virtual void init() override;
 	virtual void bindSampler(GMTextureSampler* sampler) override;
-	virtual void useTexture(GMint textureIndex) override;
+	virtual void useTexture(GMint32 textureIndex) override;
 };
 
 END_NS

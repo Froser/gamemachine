@@ -30,7 +30,7 @@ GM_PRIVATE_OBJECT(DemoHandler)
 	gm::GMControlLabel* lbRendering = nullptr;
 	gm::GMControlLabel* lbGammaCorrection = nullptr;
 	gm::GMControlLabel* lbDebugNormal = nullptr;
-	gm::GMint nextControlTop = 0;
+	gm::GMint32 nextControlTop = 0;
 };
 
 class DemoHandler : public gm::GMObject
@@ -61,7 +61,7 @@ protected:
 protected:
 	void backToEntrance();
 	bool isActivating();
-	gm::GMint getClientAreaTop();
+	gm::GMint32 getClientAreaTop();
 
 	inline gm::GMOwnedPtr<gm::GMGameWorld>& getDemoWorldReference()
 	{
@@ -111,7 +111,7 @@ public:
 public:
 	inline DemoHandler* getCurrentDemo() { D(d); return d->currentDemo; }
 	void setCurrentDemo(DemoHandler* demo) { D(d); d->currentDemo = demo; }
-	void setCurrentDemo(gm::GMint index) { D(d); d->currentDemo = d->demos[0].second; }
+	void setCurrentDemo(gm::GMint32 index) { D(d); d->currentDemo = d->demos[0].second; }
 	inline gm::GMWidget* getMainWidget() { D(d); return d->mainWidget; }
 
 public:

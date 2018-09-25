@@ -262,7 +262,7 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 	d->mainWidget->setSize(300, 500);
 	getDemoWorldReference()->getContext()->getWindow()->addWidget(d->mainWidget.get());
 
-	gm::GMint top = 10;
+	gm::GMint32 top = 10;
 
 	if (!getDescription().isEmpty())
 	{
@@ -410,7 +410,7 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 	return d->mainWidget.get();
 }
 
-gm::GMint DemoHandler::getClientAreaTop()
+gm::GMint32 DemoHandler::getClientAreaTop()
 {
 	D(d);
 	return d->nextControlTop;
@@ -479,7 +479,7 @@ void DemonstrationWorld::init()
 	d->mainWidget->setTitleVisible(true);
 	d->mainWidget->setKeyboardInput(true);
 
-	gm::GMint Y = 10, marginY = 10;
+	gm::GMint32 Y = 10, marginY = 10;
 	for (auto& demo : d->demos)
 	{
 		gm::GMControlButton* button = nullptr;

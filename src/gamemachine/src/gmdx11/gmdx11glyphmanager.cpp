@@ -104,8 +104,8 @@ void GMDx11GlyphTexture::bindSampler(GMTextureSampler* sampler)
 	}
 }
 
-void GMDx11GlyphTexture::useTexture(GMint)
+void GMDx11GlyphTexture::useTexture(GMint32)
 {
 	D(d);
-	Base::useTexture((GMint)GMTextureType::Ambient);
+	Base::useTexture((GMint32)GMTextureType::Ambient);
 }

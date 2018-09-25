@@ -248,7 +248,7 @@ bool GMBSPMove::slideMove(GMDuration dt, bool hasGravity)
 	GMBSPPhysicsWorld::Data& wd = d->world->physicsData();
 	GMVec3 velocity = d->movementState.velocity;
 
-	GMint numbumps = 4, bumpcount;
+	GMint32 numbumps = 4, bumpcount;
 	GMVec3 endVelocity, endClipVelocity;
 	if (hasGravity)
 	{
@@ -291,7 +291,7 @@ bool GMBSPMove::slideMove(GMDuration dt, bool hasGravity)
 
 		t -= t * moveTrace.fraction;
 
-		GMuint i;
+		GMuint32 i;
 		for (i = 0; i < planes.size(); i++)
 		{
 			if (Dot(moveTrace.plane.normal, planes[i]) > 0.99)
@@ -315,7 +315,7 @@ bool GMBSPMove::slideMove(GMDuration dt, bool hasGravity)
 			clipVelocity(velocity, planes[i], cv, OVERCLIP);
 			clipVelocity(endVelocity, planes[i], endClipVelocity, OVERCLIP);
 
-			for (GMuint j = 0; j < planes.size(); j++)
+			for (GMuint32 j = 0; j < planes.size(); j++)
 			{
 				if (i == j)
 					continue;
@@ -345,7 +345,7 @@ bool GMBSPMove::slideMove(GMDuration dt, bool hasGravity)
 					endClipVelocity = dir * s;
 				}
 
-				for (GMuint k = 0; k < planes.size(); k++)
+				for (GMuint32 k = 0; k < planes.size(); k++)
 				{
 					if (k == i || k == j)
 						continue;

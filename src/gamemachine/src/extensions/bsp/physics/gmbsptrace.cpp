@@ -19,14 +19,14 @@ GM_ALIGNED_STRUCT(GMBSPTraceWork)
 	GMVec3 extents{ 0 };	// greatest of abs(size[0]) and abs(size[1])
 	GMVec3 bounds[2] = { Zero<GMVec3>(), Zero<GMVec3>() };	// enclosing box of start and end surrounding by size
 	GMVec3 modelOrigin = Zero<GMVec3>();// origin of the model tracing through
-	GMint contents = 0; // ored contents of the model tracing through
+	GMint32 contents = 0; // ored contents of the model tracing through
 	bool isPoint = false; // optimized case
 	BSPTraceResult trace; // returned from trace call
 	BSPSphere sphere; // sphere for oriendted capsule collision
 };
 END_NS
 
-void GMBSPTrace::initTrace(BSPData* bsp, Map<GMint, Set<GMBSPEntity*> >* entities, Map<GMBSPEntity*, GMEntityObject*>* entityObjects, GMBSPPhysicsWorld* world)
+void GMBSPTrace::initTrace(BSPData* bsp, Map<GMint32, Set<GMBSPEntity*> >* entities, Map<GMBSPEntity*, GMEntityObject*>* entityObjects, GMBSPPhysicsWorld* world)
 {
 	D(d);
 	d->bsp = bsp;
@@ -114,7 +114,7 @@ void GMBSPTrace::trace(const GMVec3& start, const GMVec3& end, const GMVec3& ori
 	if (tw.sphere.use)
 	{
 		tw.sphere.offset.loadFloat4(f4_sphere_offset);
-		for (GMint i = 0; i < 3; i++) {
+		for (GMint32 i = 0; i < 3; i++) {
 			if (f4_start[i] < f4_end[i]) {
 				f4_bounds[0][i] = f4_start[i] - fabs(f4_sphere_offset[i]) - tw.sphere.radius;
 				f4_bounds[1][i] = f4_end[i] + fabs(f4_sphere_offset[i]) + tw.sphere.radius;
@@ -127,7 +127,7 @@ void GMBSPTrace::trace(const GMVec3& start, const GMVec3& end, const GMVec3& ori
 	}
 	else
 	{
-		for (GMint i = 0; i < 3; i++)
+		for (GMint32 i = 0; i < 3; i++)
 		{
 			if (f4_start[i] < f4_end[i])
 			{
@@ -199,7 +199,7 @@ void GMBSPTrace::trace(const GMVec3& start, const GMVec3& end, const GMVec3& ori
 	trace = tw.trace;
 }
 
-void GMBSPTrace::traceThroughTree(GMBSPTraceWork& tw, GMint num, GMfloat p1f, GMfloat p2f, const GMVec3& p1, const GMVec3& p2)
+void GMBSPTrace::traceThroughTree(GMBSPTraceWork& tw, GMint32 num, GMfloat p1f, GMfloat p2f, const GMVec3& p1, const GMVec3& p2)
 {
 	D(d);
 	BSPData& bsp = *d->bsp;
@@ -269,7 +269,7 @@ void GMBSPTrace::traceThroughTree(GMBSPTraceWork& tw, GMint num, GMfloat p1f, GM
 
 	// put the crosspoint SURFACE_CLIP_EPSILON pixels on the near side
 	GMfloat idist;
-	GMint side;
+	GMint32 side;
 	GMfloat frac, frac2;
 	if (t1 < t2)
 	{
@@ -331,9 +331,9 @@ void GMBSPTrace::traceThroughLeaf(GMBSPTraceWork& tw, GMBSPLeaf* leaf)
 	BSPData& bsp = *d->bsp;
 	GMBSPPhysicsWorld::Data& pw = d->world->physicsData();
 	// trace line against all brushes in the leaf
-	for (GMint k = 0; k < leaf->numLeafBrushes; k++)
+	for (GMint32 k = 0; k < leaf->numLeafBrushes; k++)
 	{
-		GMint brushnum = bsp.leafbrushes[leaf->firstLeafBrush + k];
+		GMint32 brushnum = bsp.leafbrushes[leaf->firstLeafBrush + k];
 
 		GMBSP_Physics_Brush* b = &pw.brushes[brushnum];
 
@@ -352,7 +352,7 @@ void GMBSPTrace::traceThroughLeaf(GMBSPTraceWork& tw, GMBSPLeaf* leaf)
 		}
 	}
 
-	for (GMint k = 0; k < leaf->numLeafSurfaces; k++)
+	for (GMint32 k = 0; k < leaf->numLeafSurfaces; k++)
 	{
 		GMBSP_Physics_Patch* patch = pw.patch.patches(bsp.leafsurfaces[leaf->firstLeafSurface + k]);
 		if (!patch) {
@@ -390,7 +390,7 @@ void GMBSPTrace::traceThroughPatch(GMBSPTraceWork& tw, GMBSP_Physics_Patch* patc
 
 void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide* pc)
 {
-	GMint j, hit, hitnum;
+	GMint32 j, hit, hitnum;
 	GMfloat offset, enterFrac, leaveFrac, t;
 	GMBSPPatchPlane* planes;
 	GMVec4 plane, bestplane;
@@ -518,18 +518,18 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 void GMBSPTrace::tracePointThroughPatchCollide(GMBSPTraceWork& tw, const GMBSPPatchCollide *pc)
 {
 	GMfloat intersect;
-	GMint j, k;
+	GMint32 j, k;
 	GMfloat offset;
 	GMfloat d1, d2;
 
-	AlignedVector<GMint> frontFacing;
+	AlignedVector<GMint32> frontFacing;
 	frontFacing.resize(pc->planes.size());
 	AlignedVector<GMfloat> intersection;
 	intersection.resize(pc->planes.size());
 
 	// determine the trace's relationship to all planes
 	const AlignedVector<GMBSPPatchPlane>& planes = pc->planes;
-	GMint i = 0;
+	GMint32 i = 0;
 	for (const auto& plane : planes)
 	{
 		offset = Dot(tw.offsets[plane.signbits], MakeVector3(plane.plane));
@@ -603,7 +603,7 @@ void GMBSPTrace::tracePointThroughPatchCollide(GMBSPTraceWork& tw, const GMBSPPa
 	}
 }
 
-GMint GMBSPTrace::checkFacetPlane(const GMVec4& plane, const GMVec3& start, const GMVec3& end, GMfloat *enterFrac, GMfloat *leaveFrac, GMint *hit)
+GMint32 GMBSPTrace::checkFacetPlane(const GMVec4& plane, const GMVec3& start, const GMVec3& end, GMfloat *enterFrac, GMfloat *leaveFrac, GMint32 *hit)
 {
 	float d1, d2, f;
 
@@ -667,7 +667,7 @@ void GMBSPTrace::traceThroughBrush(GMBSPTraceWork& tw, GMBSP_Physics_Brush *brus
 
 	if (tw.sphere.use)
 	{
-		for (GMint i = 0; i < brush->brush->numSides; i++) {
+		for (GMint32 i = 0; i < brush->brush->numSides; i++) {
 			side = brush->sides + i;
 			plane = &pw.planes[side->side->planeNum];
 
@@ -737,7 +737,7 @@ void GMBSPTrace::traceThroughBrush(GMBSPTraceWork& tw, GMBSP_Physics_Brush *brus
 		// find the latest time the trace crosses a plane towards the interior
 		// and the earliest time the trace crosses a plane towards the exterior
 		//
-		for (GMint i = 0; i < brush->brush->numSides; i++) {
+		for (GMint32 i = 0; i < brush->brush->numSides; i++) {
 			side = brush->sides + i;
 			plane = &pw.planes[side->side->planeNum];
 

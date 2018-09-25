@@ -20,7 +20,7 @@ struct GMDrawPolygonNormalMode
 
 struct GMFilterMode
 {
-	typedef GMint Mode;
+	typedef GMint32 Mode;
 
 	enum
 	{
@@ -36,7 +36,7 @@ struct GMFilterMode
 
 struct GMToneMapping
 {
-	typedef GMint Mode;
+	typedef GMint32 Mode;
 
 	enum
 	{
@@ -73,7 +73,7 @@ enum class GMRenderConfigs
 // GUIDs
 namespace gm_config_guids
 {
-	const GMString DebugGUIDs[(GMuint)GMDebugConfigs::Max] = {
+	const GMString DebugGUIDs[(GMuint32)GMDebugConfigs::Max] = {
 		L"24D13A91-FB21-446e-A61D-565568586D0F",
 		L"40A50C3C-BD6D-4474-B2CF-64B47079841E",
 		L"FCFDB8C5-5D5D-45e4-B109-CF7B5A6A52A7",
@@ -85,7 +85,7 @@ namespace gm_config_guids
 		L"9D067D16-80E5-442b-B129-2F33AFC9BC9B",
 	};
 
-	const GMString RenderGUIDs[(GMuint)GMRenderConfigs::Max] = {
+	const GMString RenderGUIDs[(GMuint32)GMRenderConfigs::Max] = {
 		L"12471560-175E-4eff-B3F2-0569CA14E53D",
 		L"342C6AB2-2830-4338-B30B-167A250558D7",
 		L"49DF237C-5699-49b3-83D9-E2A523C644CB",
@@ -175,13 +175,13 @@ private:
 template <typename StateType>
 const GMVariant& GMConfigWrapperBase<StateType>::get(StateType state) const
 {
-	return const_cast<GMConfig&>(*m_vm)[m_guids[(GMuint)state]];
+	return const_cast<GMConfig&>(*m_vm)[m_guids[(GMuint32)state]];
 }
 
 template <typename StateType>
 void GMConfigWrapperBase<StateType>::set(StateType state, const GMVariant& variant)
 {
-	const_cast<GMConfig&>(*m_vm)[m_guids[(GMuint)state]] = variant;
+	const_cast<GMConfig&>(*m_vm)[m_guids[(GMuint32)state]] = variant;
 }
 
 END_NS

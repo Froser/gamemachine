@@ -41,8 +41,8 @@ enum class GMImageDataType
 
 struct ImageMipData
 {
-	GMint width;
-	GMint height;
+	GMint32 width;
+	GMint32 height;
 	GMptrdiff mipStride;
 	GMbyte* data = nullptr;
 };
@@ -53,12 +53,12 @@ GM_PRIVATE_OBJECT(GMImage)
 	GMImageInternalFormat internalFormat;
 	GMImageFormat format;
 	GMImageDataType type;
-	GMint mipLevels;
-	GMint slices = 1;
+	GMint32 mipLevels;
+	GMint32 slices = 1;
 	GMptrdiff sliceStride = 0;
 	ImageMipData mip[MAX_MIP_CNT];
 	GMsize_t size = 0;
-	GMuint channels = GM_IMAGE_DEFAULT_CHANNELS;
+	GMuint32 channels = GM_IMAGE_DEFAULT_CHANNELS;
 };
 
 //! 表示一张或一系列图片。
@@ -80,8 +80,8 @@ public:
 	virtual void dispose();
 
 public:
-	inline GMint getWidth(GMint mipLevel = 0) const { return getData().mip[mipLevel].width; }
-	inline GMint getHeight(GMint mipLevel = 0) const { return getData().mip[mipLevel].height; }
+	inline GMint32 getWidth(GMint32 mipLevel = 0) const { return getData().mip[mipLevel].width; }
+	inline GMint32 getHeight(GMint32 mipLevel = 0) const { return getData().mip[mipLevel].height; }
 };
 
 END_NS

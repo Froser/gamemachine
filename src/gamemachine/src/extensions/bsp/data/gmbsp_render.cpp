@@ -9,7 +9,7 @@ GMBSPRenderData& GMBSPRender::renderData()
 }
 
 //Tesselate a biquadratic patch
-bool GMBSP_Render_BiquadraticPatch::tesselate(GMint newTesselation)
+bool GMBSP_Render_BiquadraticPatch::tesselate(GMint32 newTesselation)
 {
 	tesselation = newTesselation;
 
@@ -17,7 +17,7 @@ bool GMBSP_Render_BiquadraticPatch::tesselate(GMint newTesselation)
 	GMBSP_Render_Vertex temp[3];
 	vertices.resize((tesselation + 1)*(tesselation + 1));
 
-	for (GMint v = 0; v <= tesselation; ++v)
+	for (GMint32 v = 0; v <= tesselation; ++v)
 	{
 		px = (GMfloat)v / tesselation;
 
@@ -26,7 +26,7 @@ bool GMBSP_Render_BiquadraticPatch::tesselate(GMint newTesselation)
 			controlPoints[6] * (px*px);
 	}
 
-	for (GMint u = 1; u <= tesselation; ++u)
+	for (GMint32 u = 1; u <= tesselation; ++u)
 	{
 		py = (GMfloat)u / tesselation;
 
@@ -42,7 +42,7 @@ bool GMBSP_Render_BiquadraticPatch::tesselate(GMint newTesselation)
 			controlPoints[7] * ((1.0f - py)*py * 2) +
 			controlPoints[8] * (py*py);
 
-		for (GMint v = 0; v <= tesselation; ++v)
+		for (GMint32 v = 0; v <= tesselation; ++v)
 		{
 			px = (GMfloat)v / tesselation;
 
@@ -54,9 +54,9 @@ bool GMBSP_Render_BiquadraticPatch::tesselate(GMint newTesselation)
 
 	//Create indices
 	indices.resize(tesselation*(tesselation + 1) * 2);
-	for (GMint row = 0; row < tesselation; ++row)
+	for (GMint32 row = 0; row < tesselation; ++row)
 	{
-		for (GMint point = 0; point <= tesselation; ++point)
+		for (GMint32 point = 0; point <= tesselation; ++point)
 		{
 			//calculate indices
 			//reverse them to reverse winding
@@ -67,15 +67,15 @@ bool GMBSP_Render_BiquadraticPatch::tesselate(GMint newTesselation)
 
 
 	//Fill in the arrays for multi_draw_arrays
-	trianglesPerRow = new GMint[tesselation];
-	rowIndexPointers = new GMuint *[tesselation];
+	trianglesPerRow = new GMint32[tesselation];
+	rowIndexPointers = new GMuint32 *[tesselation];
 	if (!trianglesPerRow || !rowIndexPointers)
 	{
 		gm_error(gm_dbg_wrap("Unable to allocate memory for indices for multi_draw_arrays"));
 		return false;
 	}
 
-	for (GMint row = 0; row < tesselation; ++row)
+	for (GMint32 row = 0; row < tesselation; ++row)
 	{
 		trianglesPerRow[row] = 2 * (tesselation + 1);
 		rowIndexPointers[row] = &indices[row * 2 * (tesselation + 1)];
@@ -104,7 +104,7 @@ void GMBSPRender::generateVertices()
 	// create vertices for drawing
 	d->vertices.resize(d->bsp->numDrawVertices);
 	GMFloat4 f4_position;
-	for (GMint i = 0; i < d->bsp->numDrawVertices; i++)
+	for (GMint32 i = 0; i < d->bsp->numDrawVertices; i++)
 	{
 		d->vertices[i].position = d->bsp->vertices[i].xyz;
 
@@ -116,7 +116,7 @@ void GMBSPRender::generateVertices()
 		d->vertices[i].lightmapT = d->bsp->vertices[i].lightmap[1];
 
 		d->vertices[i].position.loadFloat4(f4_position);
-		for (GMuint j = 0; j < 3; j++)
+		for (GMuint32 j = 0; j < 3; j++)
 		{
 			if (f4_position[j] < d->boundMin[j])
 				d->boundMin[j] = f4_position[j];
@@ -134,7 +134,7 @@ void GMBSPRender::generateFaces()
 	d->facesToDraw.init(d->bsp->numDrawSurfaces);
 	d->entitiesToDraw.init(d->bsp->numleafs);
 
-	for (GMint i = 0; i < d->bsp->numDrawSurfaces; i++)
+	for (GMint32 i = 0; i < d->bsp->numDrawSurfaces; i++)
 	{
 		if (d->bsp->drawSurfaces[i].surfaceType == MST_PLANAR)
 			++d->numPolygonFaces;
@@ -147,11 +147,11 @@ void GMBSPRender::generateFaces()
 	d->polygonFaces.resize(d->numPolygonFaces);
 	d->meshFaces.resize(d->numMeshFaces);
 	d->patches.resize(d->numPatches);
-	GMint currentFace = 0;
-	GMint currentMeshFace = 0;
-	GMint currentPatch = 0;
+	GMint32 currentFace = 0;
+	GMint32 currentMeshFace = 0;
+	GMint32 currentPatch = 0;
 
-	for (GMint i = 0; i < d->bsp->numDrawSurfaces; ++i)
+	for (GMint32 i = 0; i < d->bsp->numDrawSurfaces; ++i)
 	{
 		if (d->bsp->drawSurfaces[i].surfaceType == MST_PLANAR)		//skip this loadFace if it is not a polygon face
 		{
@@ -198,20 +198,20 @@ void GMBSPRender::generateFaces()
 
 			//Create space to hold quadratic patches
 			// 一个patch有3x3个顶点组成
-			GMint numPatchesWide = (d->patches[currentPatch].width - 1) / 2;
-			GMint numPatchesHigh = (d->patches[currentPatch].height - 1) / 2;
+			GMint32 numPatchesWide = (d->patches[currentPatch].width - 1) / 2;
+			GMint32 numPatchesHigh = (d->patches[currentPatch].height - 1) / 2;
 
 			d->patches[currentPatch].numQuadraticPatches = numPatchesWide*numPatchesHigh;
 			d->patches[currentPatch].quadraticPatches.resize(d->patches[currentPatch].numQuadraticPatches);
 
 			//fill in the quadratic patches
-			for (GMint y = 0; y < numPatchesHigh; ++y)
+			for (GMint32 y = 0; y < numPatchesHigh; ++y)
 			{
-				for (GMint x = 0; x < numPatchesWide; ++x)
+				for (GMint32 x = 0; x < numPatchesWide; ++x)
 				{
-					for (GMint row = 0; row < 3; ++row)
+					for (GMint32 row = 0; row < 3; ++row)
 					{
-						for (GMint point = 0; point < 3; ++point)
+						for (GMint32 point = 0; point < 3; ++point)
 						{
 							d->patches[currentPatch].quadraticPatches[y*numPatchesWide + x].
 								controlPoints[row * 3 + point] = d->vertices[d->bsp->drawSurfaces[i].firstVert +
@@ -223,7 +223,7 @@ void GMBSPRender::generateFaces()
 					//tesselate the patch
 
 					//TODO  curveTesselation
-					GMint curveTesselation = 8;
+					GMint32 curveTesselation = 8;
 					d->patches[currentPatch].quadraticPatches[y*numPatchesWide + x].tesselate(curveTesselation);
 				}
 			}
@@ -246,7 +246,7 @@ void GMBSPRender::generateLeafs()
 	D(d);
 	//leafs
 	d->leafs.resize(d->bsp->numleafs);
-	for (GMint i = 0; i < d->bsp->numleafs; ++i)
+	for (GMint32 i = 0; i < d->bsp->numleafs; ++i)
 	{
 		d->leafs[i].cluster = d->bsp->leafs[i].cluster;
 		d->leafs[i].firstLeafFace = d->bsp->leafs[i].firstLeafSurface;
@@ -262,7 +262,7 @@ void GMBSPRender::generateLeafs()
 		d->leafs[i].boundingBoxVertices[6] = GMVec3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].maxs[2], d->bsp->leafs[i].mins[1]);
 		d->leafs[i].boundingBoxVertices[7] = GMVec3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].maxs[2], d->bsp->leafs[i].maxs[1]);
 
-		// for (GMint j = 0; j < 8; ++j)
+		// for (GMint32 j = 0; j < 8; ++j)
 		// 	d->leafs[i].boundingBoxVertices[j] /= SCALING_DOWN;
 	}
 }
@@ -276,10 +276,10 @@ void GMBSPRender::generatePlanes()
 void GMBSPRender::generateVisibilityData()
 {
 	D(d);
-	// visBytes头两个GMint表示clusters，后面的字节表示bitsets
-	size_t sz = sizeof(GMint) * 2;
+	// visBytes头两个GMint32表示clusters，后面的字节表示bitsets
+	size_t sz = sizeof(GMint32) * 2;
 	memcpy(&d->visibilityData, d->bsp->visBytes.data(), sz);
-	GMint bitsetSize = d->visibilityData.numClusters * d->visibilityData.bytesPerCluster;
+	GMint32 bitsetSize = d->visibilityData.numClusters * d->visibilityData.bytesPerCluster;
 	d->visibilityData.bitset = new GMbyte[bitsetSize];
 	memcpy(d->visibilityData.bitset, d->bsp->visBytes.data() + sz, bitsetSize);
 }
@@ -294,15 +294,15 @@ void GMBSPRender::createObject(const GMBSP_Render_Face& face, const GMShader& sh
 
 	GMFloat4 f4_position, f4_normal;
 	GM_ASSERT(face.numIndices % 3 == 0);
-	for (GMint i = 0; i < face.numIndices / 3; i++)
+	for (GMint32 i = 0; i < face.numIndices / 3; i++)
 	{
-		for (GMint j = 0; j < 3; j++)
+		for (GMint32 j = 0; j < 3; j++)
 		{
-			GMint idx = d->bsp->drawIndexes[face.firstIndex + i * 3 + j];
+			GMint32 idx = d->bsp->drawIndexes[face.firstIndex + i * 3 + j];
 			GMBSP_Render_Vertex& vertex = d->vertices[face.firstVertex + idx];
 			
-			GMint idx_prev = d->bsp->drawIndexes[face.firstIndex + i * 3 + (j + 1) % 3];
-			GMint idx_next = d->bsp->drawIndexes[face.firstIndex + i * 3 + (j + 2) % 3];
+			GMint32 idx_prev = d->bsp->drawIndexes[face.firstIndex + i * 3 + (j + 1) % 3];
+			GMint32 idx_next = d->bsp->drawIndexes[face.firstIndex + i * 3 + (j + 2) % 3];
 			GMVec3& vertex_prev = d->vertices[face.firstVertex + idx_prev].position,
 				&vertex_next = d->vertices[face.firstVertex + idx_next].position;
 			GMVec3 normal = Cross(vertex.position - vertex_prev, vertex_next - vertex.position);
@@ -327,10 +327,10 @@ void GMBSPRender::createObject(const GMBSP_Render_Face& face, const GMShader& sh
 void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const GMShader& shader, OUT GMModels** obj)
 {
 	GMModels* models = new GMModels();
-	GMint numVertices = 2 * (biqp.tesselation + 1);
+	GMint32 numVertices = 2 * (biqp.tesselation + 1);
 
 	GMFloat4 f4_position, f4_normal;
-	for (GMint row = 0; row < biqp.tesselation; ++row)
+	for (GMint32 row = 0; row < biqp.tesselation; ++row)
 	{
 		GMModel* model = new GMModel();
 		models->push_back(GMAsset(GMAssetType::Model, model));
@@ -338,17 +338,17 @@ void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const 
 		model->setShader(shader);
 		GMMesh* mesh = new GMMesh(model);
 
-		const GMuint* idxStart = &biqp.indices[row * 2 * (biqp.tesselation + 1)];
+		const GMuint32* idxStart = &biqp.indices[row * 2 * (biqp.tesselation + 1)];
 		GMVec3 normal;
-		for (GMint i = 0; i < numVertices; i++)
+		for (GMint32 i = 0; i < numVertices; i++)
 		{
-			GMint idx = *(idxStart + i);
+			GMint32 idx = *(idxStart + i);
 			const GMBSP_Render_Vertex& vertex = biqp.vertices[idx];
 
 			if (i < numVertices - 2)
 			{
-				GMint idx_prev = *(idxStart + i + 2);
-				GMint idx_next = *(idxStart + i + 1);
+				GMint32 idx_prev = *(idxStart + i + 2);
+				GMint32 idx_next = *(idxStart + i + 1);
 
 				if (i & 1) //奇数点应该调换一下前后向量，最后再改变法线方向
 					GM_SWAP(idx_prev, idx_next);
@@ -386,7 +386,7 @@ void GMBSPRender::createBox(const GMVec3& extents, const GMVec3& position, const
 		-1, 1, 1,
 		-1, 1, -1,
 	};
-	static GMint indices[] = {
+	static GMint32 indices[] = {
 		0, 2, 1,
 		2, 3, 1,
 		4, 5, 6,
@@ -411,19 +411,19 @@ void GMBSPRender::createBox(const GMVec3& extents, const GMVec3& position, const
 	position.loadFloat4(f4_position);
 
 	GMfloat t[24];
-	for (GMint i = 0; i < 24; i++)
+	for (GMint32 i = 0; i < 24; i++)
 	{
 		t[i] = f4_extents[i % 3] * v[i] + f4_position[i % 3];
 	}
 
 	GMFloat4 f4_vertex, f4_normal;
-	for (GMint i = 0; i < 12; i++)
+	for (GMint32 i = 0; i < 12; i++)
 	{
-		for (GMint j = 0; j < 3; j++) // j表示面的一个顶点
+		for (GMint32 j = 0; j < 3; j++) // j表示面的一个顶点
 		{
-			GMint idx = i * 3 + j; //顶点的开始
-			GMint idx_next = i * 3 + (j + 1) % 3;
-			GMint idx_prev = i * 3 + (j + 2) % 3;
+			GMint32 idx = i * 3 + j; //顶点的开始
+			GMint32 idx_next = i * 3 + (j + 1) % 3;
+			GMint32 idx_prev = i * 3 + (j + 2) % 3;
 			GMVec3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
 			GMVec3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
 				vertex_next(t[indices[idx_next] * 3], t[indices[idx_next] * 3 + 1], t[indices[idx_next] * 3 + 2]);

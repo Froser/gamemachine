@@ -87,7 +87,7 @@ protected:
 protected:
 	void prepareTangentSpace();
 	void packVertices(Vector<GMVertex>& vertices);
-	void packIndices(Vector<GMuint>& indices);
+	void packIndices(Vector<GMuint32>& indices);
 };
 
 enum class GMUsageHint
@@ -103,9 +103,9 @@ struct GMModelBufferData
 	{
 		struct //OpenGL
 		{
-			GMuint arrayId;
-			GMuint vertexBufferId;
-			GMuint indexBufferId;
+			GMuint32 arrayId;
+			GMuint32 vertexBufferId;
+			GMuint32 indexBufferId;
 		};
 
 		struct //DirectX
@@ -119,7 +119,7 @@ struct GMModelBufferData
 GM_PRIVATE_OBJECT(GMModelBuffer)
 {
 	GMModelBufferData buffer = { 0 };
-	GMAtomic<GMint> ref;
+	GMAtomic<GMint32> ref;
 	GMModelDataProxy* modelDataProxy = nullptr;
 };
 
@@ -213,7 +213,7 @@ enum class GMVertexDataType
 	EndOfVertexDataType
 };
 
-#define gmVertexIndex(i) ((GMuint)i)
+#define gmVertexIndex(i) ((GMuint32)i)
 
 class GMModel : public GMObject
 {
@@ -339,7 +339,7 @@ public:
 };
 
 typedef Vector<GMVertex> GMVertices;
-typedef Vector<GMuint> GMIndices;
+typedef Vector<GMuint32> GMIndices;
 
 GM_PRIVATE_OBJECT(GMMesh)
 {
@@ -370,7 +370,7 @@ public:
 	void calculateTangentSpace(GMTopologyMode topologyMode);
 	void clear();
 	void vertex(const GMVertex& vertex);
-	void index(GMuint index);
+	void index(GMuint32 index);
 	void invalidateTangentSpace();
 	void swap(GMVertices& vertex);
 	void swap(GMIndices& indices);

@@ -3,9 +3,9 @@
 #include "debug.h"
 #include <gmthread.h>
 
-GMint gm_s_numAlignedAllocs = 0;
-GMint gm_s_numAlignedFree = 0;
-GMint gm_s_totalBytesAlignedAllocs = 0;//detect memory leaks
+GMint32 gm_s_numAlignedAllocs = 0;
+GMint32 gm_s_numAlignedFree = 0;
+GMint32 gm_s_totalBytesAlignedAllocs = 0;//detect memory leaks
 
 static void *gmAllocDefault(size_t size)
 {
@@ -38,7 +38,7 @@ template <typename T>T* gmAlignPointer(T* unalignedPtr, size_t alignment)
 	return converter.ptr;
 }
 
-static inline void *gmAlignedAllocDefault(size_t size, GMint alignment)
+static inline void *gmAlignedAllocDefault(size_t size, GMint32 alignment)
 {
 	void *ret;
 	char *real;
@@ -78,7 +78,7 @@ void gmAlignedAllocSetCustom(gmAllocFunc *allocFunc, gmFreeFunc *freeFunc)
 	gm_s_freeFunc = freeFunc ? freeFunc : gmFreeDefault;
 }
 
-void* AlignedMemoryAlloc::gmAlignedAllocInternal(size_t size, GMint alignment)
+void* AlignedMemoryAlloc::gmAlignedAllocInternal(size_t size, GMint32 alignment)
 {
 	gm_s_numAlignedAllocs++;
 	void* ptr;

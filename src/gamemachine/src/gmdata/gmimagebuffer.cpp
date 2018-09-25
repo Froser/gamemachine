@@ -2,7 +2,7 @@
 #include "gmimagebuffer.h"
 #include <GL/glew.h>
 
-GMImageBuffer::GMImageBuffer(GMImageFormat format, GMuint width, GMuint height, GMsize_t bufferSize, GMbyte* buffer)
+GMImageBuffer::GMImageBuffer(GMImageFormat format, GMuint32 width, GMuint32 height, GMsize_t bufferSize, GMbyte* buffer)
 {
 	D(d);
 	d->width = width;
@@ -12,8 +12,8 @@ GMImageBuffer::GMImageBuffer(GMImageFormat format, GMuint width, GMuint height, 
 	if (format == GMImageFormat::RGB)
 	{
 		d->buffer = new GMbyte[d->size];
-		GMuint writePtr = 0;
-		for (GMuint readPtr = 0; readPtr < bufferSize;)
+		GMuint32 writePtr = 0;
+		for (GMuint32 readPtr = 0; readPtr < bufferSize;)
 		{
 			d->buffer[writePtr++] = buffer[readPtr++];
 			if (readPtr % 3 == 0)
@@ -97,7 +97,7 @@ GMCubeMapBuffer::GMCubeMapBuffer(
 		&negZ
 	};
 	GMbyte* ptr = data.mip[0].data;
-	for (GMint i = 0; i < GM_array_size(slices); ++i)
+	for (GMint32 i = 0; i < GM_array_size(slices); ++i)
 	{
 		GMsize_t sz = slices[i]->getData().size;
 		memcpy(ptr, slices[i]->getData().mip[0].data, data.sliceStride);

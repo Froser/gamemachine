@@ -9,17 +9,17 @@
 
 namespace
 {
-	GMint toTechniqueEntranceId(const char* instanceName)
+	GMint32 toTechniqueEntranceId(const char* instanceName)
 	{
 		enum
 		{
 			// ModelType
-			Model2D = (GMint) GMModelType::Model2D,
-			Model3D = (GMint) GMModelType::Model3D,
-			Text = (GMint) GMModelType::Text,
-			CubeMap = (GMint) GMModelType::CubeMap,
-			Particle = (GMint) GMModelType::Particle,
-			Custom = (GMint) GMModelType::Custom,
+			Model2D = (GMint32) GMModelType::Model2D,
+			Model3D = (GMint32) GMModelType::Model3D,
+			Text = (GMint32) GMModelType::Text,
+			CubeMap = (GMint32) GMModelType::CubeMap,
+			Particle = (GMint32) GMModelType::Particle,
+			Custom = (GMint32) GMModelType::Custom,
 			Shadow,
 
 			// Filter (gmgraphicengine.h)
@@ -63,7 +63,7 @@ namespace
 		}
 		else
 		{
-			for (GMint i = 0; i < GMFilterCount; ++i)
+			for (GMint32 i = 0; i < GMFilterCount; ++i)
 			{
 				if (GMString::stringEquals(GM_VariablesDesc.FilterAttributes.Types[i], instanceName))
 					return i;
@@ -76,7 +76,7 @@ namespace
 
 GLuint GMGLShaderProgram::Data::lastUsedProgram = -1;
 
-GMuint GMGLShaderInfo::toGLShaderType(GMShaderType type)
+GMuint32 GMGLShaderInfo::toGLShaderType(GMShaderType type)
 {
 	switch (type)
 	{
@@ -92,7 +92,7 @@ GMuint GMGLShaderInfo::toGLShaderType(GMShaderType type)
 	}
 }
 
-GMShaderType GMGLShaderInfo::fromGLShaderType(GMuint type)
+GMShaderType GMGLShaderInfo::fromGLShaderType(GMuint32 type)
 {
 	switch (type)
 	{
@@ -157,7 +157,7 @@ void GMGLShaderProgram::setVec3(const char* name, const GMfloat value[3])
 	glUniform3fv(glGetUniformLocation(getProgram(), name), 1, value);
 }
 
-void GMGLShaderProgram::setInt(const char* name, GMint value)
+void GMGLShaderProgram::setInt(const char* name, GMint32 value)
 {
 	GM_ASSERT(verify());
 	glUniform1i(glGetUniformLocation(getProgram(), name), value);
@@ -171,7 +171,7 @@ void GMGLShaderProgram::setFloat(const char* name, GMfloat value)
 
 void GMGLShaderProgram::setBool(const char* name, bool value)
 {
-	setInt(name, (GMint)value);
+	setInt(name, (GMint32)value);
 }
 
 bool GMGLShaderProgram::setInterfaceInstance(const char* interfaceName, const char* instanceName, GMShaderType type)
@@ -180,7 +180,7 @@ bool GMGLShaderProgram::setInterfaceInstance(const char* interfaceName, const ch
 	return setSubrotinue(interfaceName, instanceName, shaderType);
 }
 
-bool GMGLShaderProgram::setSubrotinue(const char* funcName, const char* implement, GMuint shaderType)
+bool GMGLShaderProgram::setSubrotinue(const char* funcName, const char* implement, GMuint32 shaderType)
 {
 	GM_ASSERT(verify());
 	D(d);
@@ -232,7 +232,7 @@ bool GMGLShaderProgram::load()
 
 			GMStringReader reader(source);
 			std::string report;
-			GMint ln = 0;
+			GMint32 ln = 0;
 			auto iter = reader.lineBegin();
 			do
 			{

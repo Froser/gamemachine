@@ -171,7 +171,7 @@ void GMTextGameObject::setNewline(bool newline) GM_NOEXCEPT
 	}
 }
 
-void GMTextGameObject::setLineSpacing(GMint lineSpacing) GM_NOEXCEPT
+void GMTextGameObject::setLineSpacing(GMint32 lineSpacing) GM_NOEXCEPT
 {
 	D(d);
 	if (d->lineSpacing != lineSpacing)
@@ -418,7 +418,7 @@ void GMSprite2DGameObject::setTexture(GMAsset tex)
 	}
 }
 
-void GMSprite2DGameObject::setTextureSize(GMint width, GMint height)
+void GMSprite2DGameObject::setTextureSize(GMint32 width, GMint32 height)
 {
 	D(d);
 	if (d->texWidth != width || d->texHeight != height)

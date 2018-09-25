@@ -2,9 +2,9 @@
 #include "check.h"
 #include <gmtools.h>
 
-GMint GMScreen::horizontalResolutionDpi()
+GMint32 GMScreen::horizontalResolutionDpi()
 {
-	static GMint dpi = -1;
+	static GMint32 dpi = -1;
 	if (dpi < 0)
 	{
 		HDC hdcScreen = GetDC(0);
@@ -14,9 +14,9 @@ GMint GMScreen::horizontalResolutionDpi()
 	return dpi;
 }
 
-GMint GMScreen::verticalResolutionDpi()
+GMint32 GMScreen::verticalResolutionDpi()
 {
-	static GMint dpi = -1;
+	static GMint32 dpi = -1;
 	if (dpi < 0)
 	{
 		HDC hdcScreen = GetDC(0);

@@ -44,17 +44,17 @@ gm::GMAudioFileInfo& GMMAudioFile_Stream::getFileInfo()
 	return d->fileInfo;
 }
 
-gm::GMuint GMMAudioFile_Stream::getBufferId()
+gm::GMuint32 GMMAudioFile_Stream::getBufferId()
 {
 	return 0;
 }
 
-gm::GMuint GMMAudioFile_Stream::getBufferNum()
+gm::GMuint32 GMMAudioFile_Stream::getBufferNum()
 {
 	return STREAM_BUFFER_NUM;
 }
 
-gm::GMuint GMMAudioFile_Stream::getBufferSize()
+gm::GMuint32 GMMAudioFile_Stream::getBufferSize()
 {
 	D(d);
 	waitForStreamReady();
@@ -118,7 +118,7 @@ void GMMAudioFile_Stream::cleanUp()
 	D(d);
 	d->blockWriteEvent.set();
 
-	for (gm::GMuint i = 0; i < d->bufferNum; ++i)
+	for (gm::GMuint32 i = 0; i < d->bufferNum; ++i)
 	{
 		if (d->output[i].isWriting())
 			d->output[i].endWrite(); //让数据读完，防止死锁
@@ -150,13 +150,13 @@ void GMMAudioFile_Stream::saveBuffer(Data* d, gm::GMbyte data)
 	}
 }
 
-void GMMAudioFile_Stream::move(std::atomic_long& ptr, gm::GMuint loop)
+void GMMAudioFile_Stream::move(std::atomic_long& ptr, gm::GMuint32 loop)
 {
 	++ptr;
 	ptr = ptr % loop;
 }
 
-gm::GMlong GMMAudioFile_Stream::peek(std::atomic_long& ptr, gm::GMuint loop)
+gm::GMlong GMMAudioFile_Stream::peek(std::atomic_long& ptr, gm::GMuint32 loop)
 {
 	return (ptr + 1) % loop;
 }

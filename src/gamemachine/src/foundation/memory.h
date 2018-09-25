@@ -3,7 +3,7 @@
 #include "defines.h"
 BEGIN_NS
 
-typedef void *(gmAlignedAllocFunc)(size_t size, GMint alignment);
+typedef void *(gmAlignedAllocFunc)(size_t size, GMint32 alignment);
 typedef void (gmAlignedFreeFunc)(void *memblock);
 typedef void *(gmAllocFunc)(size_t size);
 typedef void (gmFreeFunc)(void *memblock);
@@ -16,7 +16,7 @@ void gmAlignedAllocSetCustomAligned(gmAlignedAllocFunc *allocFunc, gmAlignedFree
 class AlignedMemoryAlloc
 {
 public:
-	static void* gmAlignedAllocInternal(size_t size, GMint alignment);
+	static void* gmAlignedAllocInternal(size_t size, GMint32 alignment);
 	static void gmAlignedFreeInternal(void* ptr);
 };
 

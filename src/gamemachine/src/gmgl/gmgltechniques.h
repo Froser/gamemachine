@@ -45,9 +45,9 @@ protected:
 
 protected:
 	virtual void activateTextureTransform(GMModel* model, GMTextureType type);
-	virtual GMint activateTexture(GMModel* model, GMTextureType type);
+	virtual GMint32 activateTexture(GMModel* model, GMTextureType type);
 	virtual void deactivateTexture(GMTextureType type);
-	virtual GMint getTextureID(GMTextureType type);
+	virtual GMint32 getTextureID(GMTextureType type);
 	virtual bool drawTexture(GMModel* model, GMTextureType type);
 	virtual GMTextureAsset getTexture(GMTextureSampler& frames);
 	virtual void updateCameraMatrices(IShaderProgram* shaderProgram);
@@ -137,7 +137,7 @@ private:
 	virtual IShaderProgram* getShaderProgram() override;
 
 protected:
-	virtual GMint activateTexture(GMModel* model, GMTextureType type);
+	virtual GMint32 activateTexture(GMModel* model, GMTextureType type);
 
 private:
 	void setHDR(IShaderProgram* shaderProgram);

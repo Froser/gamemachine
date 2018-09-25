@@ -8,8 +8,8 @@
 GM_PRIVATE_OBJECT(Demo_PBR)
 {
 	gm::GMGameObject* gameObject = nullptr;
-	gm::GMint mouseDownX;
-	gm::GMint mouseDownY;
+	gm::GMint32 mouseDownX;
+	gm::GMint32 mouseDownY;
 	bool draggingL = false;
 	bool draggingR = false;
 	GMQuat lookAtRotation;

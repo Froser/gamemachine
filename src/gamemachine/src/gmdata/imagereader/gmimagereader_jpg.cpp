@@ -86,7 +86,7 @@ bool GMImageReader_JPG::load(const GMbyte* data, GMsize_t size, OUT GMImage** im
 	imgData.format = GMImageFormat::RGBA;
 	imgData.internalFormat = GMImageInternalFormat::RGBA8;
 
-	GMuint bufferSize = cinfo.image_width * cinfo.image_height * GMImageReader::DefaultChannels;
+	GMuint32 bufferSize = cinfo.image_width * cinfo.image_height * GMImageReader::DefaultChannels;
 	imgData.mip[0].data = new GMbyte[bufferSize];
 	imgData.size = bufferSize;
 
@@ -99,7 +99,7 @@ bool GMImageReader_JPG::load(const GMbyte* data, GMsize_t size, OUT GMImage** im
 		size_t bytesSize = cinfo.image_width * cinfo.image_height * channels;
 		GMbyte* tempData = new GMbyte[bytesSize];
 		rowPtr = new GMbyte*[cinfo.image_height];
-		for (GMuint i = 0; i < cinfo.image_height; ++i)
+		for (GMuint32 i = 0; i < cinfo.image_height; ++i)
 			rowPtr[i] = &(tempData[i * cinfo.image_width * 3]);
 
 		while (cinfo.output_scanline < cinfo.output_height)
@@ -108,8 +108,8 @@ bool GMImageReader_JPG::load(const GMbyte* data, GMsize_t size, OUT GMImage** im
 			rowsRead += jpeg_read_scanlines(&cinfo, &rowPtr[rowsRead], cinfo.output_height - rowsRead);
 		}
 
-		GMuint dataPtr = 0;
-		for (GMuint i = 0; i < bytesSize; ++i, ++dataPtr)
+		GMuint32 dataPtr = 0;
+		for (GMuint32 i = 0; i < bytesSize; ++i, ++dataPtr)
 		{
 			imgData.mip[0].data[dataPtr] = tempData[i];
 			if ((i + 1) % 3 == 0)
@@ -123,7 +123,7 @@ bool GMImageReader_JPG::load(const GMbyte* data, GMsize_t size, OUT GMImage** im
 	else
 	{
 		rowPtr = new GMbyte*[cinfo.image_height];
-		for (GMuint i = 0; i < cinfo.image_height; ++i)
+		for (GMuint32 i = 0; i < cinfo.image_height; ++i)
 			rowPtr[i] = &(imgData.mip[0].data[i * cinfo.image_width * channels]);
 
 		while (cinfo.output_scanline < cinfo.output_height)

@@ -21,8 +21,8 @@ struct GMTerrainDescription
 {
 	const GMbyte* data; //!< 地形数据，如果为空，生成的高度均为0
 	GMsize_t dataStride; //!< 相邻地形数据的间隔。比如，对于RGBA 32bits的高度图，只需要取R通道作为高度图，因此dataStride为4。
-	GMint dataWidth; //!< 地形数据的宽度。
-	GMint dataHeight; //!< 地形数据的高度。
+	GMint32 dataWidth; //!< 地形数据的宽度。
+	GMint32 dataHeight; //!< 地形数据的高度。
 	GMfloat terrainX; //!< 地形在x轴的起始位置。
 	GMfloat terrainZ; //!< 地形在z轴的起始位置。
 	GMfloat terrainLength; //!< 地形在x轴的长度。
@@ -48,7 +48,7 @@ struct GMPrimitiveCreator
 
 	static void createCube(const GMVec3& halfExtents, REF GMModelAsset& model);
 	static void createQuadrangle(const GMVec2& halfExtents, GMfloat z, REF GMModelAsset& model);
-	static void createSphere(GMfloat radius, GMint segmentsX, GMint segmentsY, REF GMModelAsset& model);
+	static void createSphere(GMfloat radius, GMint32 segmentsX, GMint32 segmentsY, REF GMModelAsset& model);
 
 	static void createTerrain(
 		const GMTerrainDescription& desc,
@@ -73,9 +73,9 @@ struct GMToolUtil
 	  \param height 纹理首层的高度。可以为空。
 	  \sa GMGamePackage
 	*/
-	static GMTextureAsset createTexture(const IRenderContext* context, const GMString& filename, REF GMint* width = nullptr, REF GMint* height = nullptr);
+	static GMTextureAsset createTexture(const IRenderContext* context, const GMString& filename, REF GMint32* width = nullptr, REF GMint32* height = nullptr);
 
-	static void createTextureFromFullPath(const IRenderContext* context, const GMString& filename, REF GMTextureAsset& texture, REF GMint* width = nullptr, REF GMint* height = nullptr);
+	static void createTextureFromFullPath(const IRenderContext* context, const GMString& filename, REF GMTextureAsset& texture, REF GMint32* width = nullptr, REF GMint32* height = nullptr);
 
 	//! 将一个纹理添加到一个模型中。
 	/*!

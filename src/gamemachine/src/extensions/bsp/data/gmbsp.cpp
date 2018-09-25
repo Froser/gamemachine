@@ -23,9 +23,9 @@ namespace
 		return nullptr;
 	}
 
-	inline GMint copyLump(GMBSPHeader* header, GMint lump, void *dest, GMint size)
+	inline GMint32 copyLump(GMBSPHeader* header, GMint32 lump, void *dest, GMint32 size)
 	{
-		GMint length, ofs;
+		GMint32 length, ofs;
 
 		length = header->lumps[lump].filelen;
 		ofs = header->lumps[lump].fileofs;
@@ -65,7 +65,7 @@ namespace
 		return strPath;
 	}
 
-	inline void safeRead(FILE *f, void *buffer, GMint count)
+	inline void safeRead(FILE *f, void *buffer, GMint32 count)
 	{
 		if (fread(buffer, 1, count, f) != (size_t)count)
 			gm_error(gm_dbg_wrap("File read failure"));
@@ -83,10 +83,10 @@ namespace
 		return f;
 	}
 
-	inline GMint filelength(FILE *f)
+	inline GMint32 filelength(FILE *f)
 	{
-		GMint pos;
-		GMint end;
+		GMint32 pos;
+		GMint32 end;
 
 		pos = ftell(f);
 		fseek(f, 0, SEEK_END);
@@ -96,10 +96,10 @@ namespace
 		return end;
 	}
 
-	inline GMint loadFile(const char *filename, void **bufferptr)
+	inline GMint32 loadFile(const char *filename, void **bufferptr)
 	{
 		FILE *f;
-		GMint length;
+		GMint32 length;
 		void* buffer;
 
 		f = safeOpenRead(filename);
@@ -176,15 +176,15 @@ void GMBSP::loadPlanes()
 		GMfloat p[4];
 	};
 
-	GMint length = (d->header->lumps[LUMP_PLANES].filelen) / sizeof(__Tag);
+	GMint32 length = (d->header->lumps[LUMP_PLANES].filelen) / sizeof(__Tag);
 	if (length > 0)
 	{
 		AlignedVector<__Tag> t;
 		t.resize(length);
-		GMint num = copyLump(d->header, LUMP_PLANES, &t[0], sizeof(__Tag));
+		GMint32 num = copyLump(d->header, LUMP_PLANES, &t[0], sizeof(__Tag));
 		d->numplanes = num;
 		d->planes.resize(length);
-		for (GMint i = 0; i < num; i++)
+		for (GMint32 i = 0; i < num; i++)
 		{
 			d->planes[i].normal = GMVec3(t[i].p[0], t[i].p[1], t[i].p[2]);
 			d->planes[i].intercept = t[i].p[3];
@@ -208,15 +208,15 @@ void GMBSP::loadVertices()
 		GMbyte color[4];
 	};
 
-	GMint length = (d->header->lumps[LUMP_DRAWVERTS].filelen) / sizeof(__Tag);
+	GMint32 length = (d->header->lumps[LUMP_DRAWVERTS].filelen) / sizeof(__Tag);
 	if (length > 0)
 	{
 		AlignedVector<__Tag> t;
 		t.resize(length);
-		GMint num = copyLump(d->header, LUMP_DRAWVERTS, &t[0], sizeof(__Tag));
+		GMint32 num = copyLump(d->header, LUMP_DRAWVERTS, &t[0], sizeof(__Tag));
 		d->numDrawVertices = num;
 		d->vertices.resize(length);
-		for (GMint i = 0; i < num; i++)
+		for (GMint32 i = 0; i < num; i++)
 		{
 			d->vertices[i].xyz = GMVec3(t[i].xyz[0], t[i].xyz[1], t[i].xyz[2]);
 			d->vertices[i].normal = GMVec3(t[i].normal[0], t[i].normal[1], t[i].normal[2]);
@@ -236,39 +236,39 @@ void GMBSP::loadDrawSurfaces()
 	D(d);
 	struct __Tag
 	{
-		GMint shaderNum;
-		GMint fogNum;
-		GMint surfaceType;
+		GMint32 shaderNum;
+		GMint32 fogNum;
+		GMint32 surfaceType;
 
-		GMint firstVert;
-		GMint numVerts;
+		GMint32 firstVert;
+		GMint32 numVerts;
 
-		GMint firstIndex;
-		GMint numIndexes;
+		GMint32 firstIndex;
+		GMint32 numIndexes;
 
-		GMint lightmapNum;
-		GMint lightmapX, lightmapY;
-		GMint lightmapWidth, lightmapHeight;
+		GMint32 lightmapNum;
+		GMint32 lightmapX, lightmapY;
+		GMint32 lightmapWidth, lightmapHeight;
 
 		GMfloat lightmapOrigin[3];
 		GMfloat lightmapVecs[3][3];
 
-		GMint patchWidth;
-		GMint patchHeight;
+		GMint32 patchWidth;
+		GMint32 patchHeight;
 	};
 
-	GMint length = (d->header->lumps[LUMP_SURFACES].filelen) / sizeof(__Tag);
+	GMint32 length = (d->header->lumps[LUMP_SURFACES].filelen) / sizeof(__Tag);
 	if (length > 0)
 	{
 		AlignedVector<__Tag> t;
 		t.resize(length);
-		GMint num = copyLump(d->header, LUMP_SURFACES, &t[0], sizeof(__Tag));
+		GMint32 num = copyLump(d->header, LUMP_SURFACES, &t[0], sizeof(__Tag));
 		d->numDrawSurfaces = num;
 		d->drawSurfaces.resize(length);
-		for (GMint i = 0; i < num; i++)
+		for (GMint32 i = 0; i < num; i++)
 		{
 			d->drawSurfaces[i].lightmapOrigin = GMVec3(t[i].lightmapOrigin[0], t[i].lightmapOrigin[1], t[i].lightmapOrigin[2]);
-			for (GMint j = 0; j < 3; j++)
+			for (GMint32 j = 0; j < 3; j++)
 			{
 				d->drawSurfaces[i].lightmapVecs[j] = GMVec3(t[i].lightmapVecs[j][0], t[i].lightmapVecs[j][1], t[i].lightmapVecs[j][2]);
 			}
@@ -302,7 +302,7 @@ void GMBSP::loadNoAlignData()
 {
 	D(d);
 	const int extrasize = 1;
-	GMint length = (d->header->lumps[LUMP_SHADERS].filelen) / sizeof(GMBSPShader);
+	GMint32 length = (d->header->lumps[LUMP_SHADERS].filelen) / sizeof(GMBSPShader);
 	d->shaders.resize(length + extrasize);
 	d->numShaders = copyLump(d->header, LUMP_SHADERS, &d->shaders[0], sizeof(GMBSPShader));
 
@@ -364,7 +364,7 @@ void GMBSP::loadNoAlignData()
 void GMBSP::toDxCoord()
 {
 	D(d);
-	for (GMint i = 0; i < d->numDrawVertices; i++)
+	for (GMint32 i = 0; i < d->numDrawVertices; i++)
 	{
 		//swap y and z
 		GMfloat _y = d->vertices[i].xyz.getY();
@@ -372,7 +372,7 @@ void GMBSP::toDxCoord()
 		d->vertices[i].xyz.setZ(_y);
 	}
 
-	for (GMint i = 0; i < d->numplanes; ++i)
+	for (GMint32 i = 0; i < d->numplanes; ++i)
 	{
 		GMfloat _y = d->planes[i].normal.getY();
 		d->planes[i].normal.setY(d->planes[i].normal.getZ());
@@ -411,16 +411,16 @@ void GMBSP::parseEntities()
 void GMBSP::generateLightVolumes()
 {
 	D(d);
-	for (GMuint i = 0; i < 3; ++i)
+	for (GMuint32 i = 0; i < 3; ++i)
 	{
 		d->lightVols.lightVolInverseSize[i] = 1.f / d->lightVols.lightVolSize[i];
 	}
 	GMfloat* wMins = d->models[0].mins;
 	GMfloat* wMaxs = d->models[0].maxs;
 	GMfloat maxs[3];
-	GMint numGridPoints = 0;
+	GMint32 numGridPoints = 0;
 
-	for (GMuint i = 0; i < 3; i++)
+	for (GMuint32 i = 0; i < 3; i++)
 	{
 		d->lightVols.lightVolOrigin[i] = d->lightVols.lightVolSize[i] * ceil(wMins[i] / d->lightVols.lightVolSize[i]);
 		maxs[i] = d->lightVols.lightVolSize[i] * floor(wMaxs[i] / d->lightVols.lightVolSize[i]);
@@ -630,7 +630,7 @@ GMBSPEPair* GMBSP::parseEpair()
 void GMBSP::addScriptToStack(const char *filename)
 {
 	D(d);
-	GMint size;
+	GMint32 size;
 
 	d->script++;
 	if (d->script == &d->scriptstack[MAX_INCLUDES])

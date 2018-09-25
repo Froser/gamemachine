@@ -14,7 +14,7 @@ enum class GMBSPRenderConfigs
 
 namespace gm_config_guids
 {
-	const GMString BSPConfigGUID[(GMuint)GMBSPRenderConfigs::Max] = {
+	const GMString BSPConfigGUID[(GMuint32)GMBSPRenderConfigs::Max] = {
 		L"EF47C8CA-3F7C-4cc9-927B-11624F0032DB",
 		L"E31D6601-0066-4c35-920E-322BAC700916",
 	};
@@ -30,7 +30,7 @@ GM_PRIVATE_OBJECT(GMBSPGameWorld)
 	GMBSPPhysicsWorld* physics = nullptr;
 	GMBSPRender render;
 	GMBSPShaderLoader shaderLoader;
-	Map<GMint, Set<GMBSPEntity*> > entities;
+	Map<GMint32, Set<GMBSPEntity*> > entities;
 	GMDebugConfig debugConfig;
 	GMConfig bspRenderConfig;
 	GMBSPRenderConfig bspRenderConfigWrapper;

@@ -86,7 +86,7 @@ void GMDx11ModelDataProxy::transfer()
 
 	if (model->getDrawMode() == GMModelDrawMode::Index)
 	{
-		Vector<GMuint> packedIndices;
+		Vector<GMuint32> packedIndices;
 		// 把数据打入顶点数组
 		packIndices(packedIndices);
 

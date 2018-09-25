@@ -9,7 +9,7 @@
 
 namespace
 {
-	GMLResult GM_SYSTEM_CALLBACK WndProc(GMWindowHandle hWnd, GMuint uMsg, GMWParam wParam, GMLParam lParam)
+	GMLResult GM_SYSTEM_CALLBACK WndProc(GMWindowHandle hWnd, GMuint32 uMsg, GMWParam wParam, GMLParam lParam)
 	{
 		GMXEventContext* c = reinterpret_cast<GMXEventContext*>(lParam);
 		GMWindow* window = gm_cast<GMWindow*>(c->window);
@@ -73,8 +73,8 @@ void GMWindow::centerWindow()
 	const auto& windowRect = getWindowRect();
 	const GMXRenderContext* context = gm_cast<const GMXRenderContext*>(getContext());
 
-	GMint x = (context->getScreenWidth() - windowRect.width) / 2;
-	GMint y = (context->getScreenHeight() - windowRect.height) / 2;
+	GMint32 x = (context->getScreenWidth() - windowRect.width) / 2;
+	GMint32 y = (context->getScreenHeight() - windowRect.height) / 2;
 	XMoveWindow(context->getDisplay(), getWindowHandle(), x, y);
 }
 

@@ -19,7 +19,7 @@ namespace luaapi
 		  \param L Lua状态对象。
 		  \return 返回当前未被获取的参数数量。
 		*/
-		static GMint getArgumentsCount(GMLuaCoreState* L);
+		static GMint32 getArgumentsCount(GMLuaCoreState* L);
 		static const char* popArgumentAsString(GMLuaCoreState* L, const char* invoker);
 		static GMVariant popArgument(GMLuaCoreState* L, const char* invoker);
 		static GMVariant popArgumentAsVec2(GMLuaCoreState* L, const char* invoker);
@@ -44,7 +44,7 @@ namespace luaapi
 			: m_size(0)
 		{}
 
-		operator GMint()
+		operator GMint32()
 		{
 			return gm_sizet_to_int(m_size);
 		}

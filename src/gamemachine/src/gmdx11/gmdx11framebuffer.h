@@ -86,8 +86,8 @@ public:
 GM_PRIVATE_OBJECT(GMDx11ShadowFramebuffers)
 {
 	GMComPtr<ID3D11ShaderResourceView> depthShaderResourceView;
-	GMint width = 0;
-	GMint height = 0;
+	GMint32 width = 0;
+	GMint32 height = 0;
 };
 
 class GMDx11ShadowFramebuffers : public GMDx11Framebuffers
@@ -104,13 +104,13 @@ public:
 	ID3D11ShaderResourceView* getShadowMapShaderResourceView();
 
 public:
-	inline GMint getShadowMapWidth() GM_NOEXCEPT
+	inline GMint32 getShadowMapWidth() GM_NOEXCEPT
 	{
 		D(d);
 		return d->width;
 	}
 
-	inline GMint getShadowMapHeight() GM_NOEXCEPT
+	inline GMint32 getShadowMapHeight() GM_NOEXCEPT
 	{
 		D(d);
 		return d->height;

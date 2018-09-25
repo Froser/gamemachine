@@ -139,7 +139,7 @@ GMTypoStateMachine::ParseResult GMTypoStateMachine::applyAttribute()
 	}
 	else if (parsePair("size", value))
 	{
-		GMint sz = GMString::parseInt(value);
+		GMint32 sz = GMString::parseInt(value);
 		setFontSize(sz);
 		return Ignore;
 	}
@@ -158,7 +158,7 @@ void GMTypoStateMachine::setColor(GMfloat rgb[3])
 	d->typoEngine->setColor(rgb);
 }
 
-void GMTypoStateMachine::setFontSize(GMint sz)
+void GMTypoStateMachine::setFontSize(GMint32 sz)
 {
 	D(d);
 	d->typoEngine->setFontSize(sz);
@@ -283,7 +283,7 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 		}
 	};
 
-	GMint rows = 0;
+	GMint32 rows = 0;
 	GMsize_t len = wstr.length();
 	for (GMsize_t i = start; i < len; ++i)
 	{
@@ -315,7 +315,7 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 			{
 				// 如果是一个行分隔符，计算出本行的宽度
 				GMTypoResult* prev = pCurrent - 1;
-				GMint width = prev->x + prev->width - pStart->x;
+				GMint32 width = prev->x + prev->width - pStart->x;
 				while (pStart != pCurrent)
 				{
 					pStart->x += (d->options.typoArea.width - width) / 2;
@@ -348,7 +348,7 @@ void GMTypoEngine::setFont(GMFontHandle font)
 	d->font = font;
 }
 
-void GMTypoEngine::setLineHeight(GMint lineHeight)
+void GMTypoEngine::setLineHeight(GMint32 lineHeight)
 {
 	D(d);
 	d->lineHeight = lineHeight;
@@ -445,7 +445,7 @@ void GMTypoEngine::setColor(GMfloat rgb[3])
 	d->color[2] = rgb[2];
 }
 
-void GMTypoEngine::setFontSize(GMint pt)
+void GMTypoEngine::setFontSize(GMint32 pt)
 {
 	D(d);
 	d->fontSize = pt;
@@ -650,13 +650,13 @@ bool GMTypoTextBuffer::removeChars(GMsize_t startPos, GMsize_t endPos)
 	return true;
 }
 
-GMint GMTypoTextBuffer::getLength()
+GMint32 GMTypoTextBuffer::getLength()
 {
 	D(d);
 	return gm_sizet_to_int(d->buffer.length());
 }
 
-GMint GMTypoTextBuffer::getLineHeight()
+GMint32 GMTypoTextBuffer::getLineHeight()
 {
 	D(d);
 	if (d->dirty)
@@ -676,7 +676,7 @@ GMwchar GMTypoTextBuffer::getChar(GMsize_t pos)
 	return d->buffer[pos];
 }
 
-void GMTypoTextBuffer::analyze(GMint start)
+void GMTypoTextBuffer::analyze(GMint32 start)
 {
 	D(d);
 	GMTypoOptions options;
@@ -687,7 +687,7 @@ void GMTypoTextBuffer::analyze(GMint start)
 	d->dirty = false;
 }
 
-bool GMTypoTextBuffer::CPtoX(GMint cp, bool trail, GMint* x)
+bool GMTypoTextBuffer::CPtoX(GMint32 cp, bool trail, GMint32* x)
 {
 	D(d);
 	if (!x)
@@ -713,7 +713,7 @@ bool GMTypoTextBuffer::CPtoX(GMint cp, bool trail, GMint* x)
 	return true;
 }
 
-bool GMTypoTextBuffer::XtoCP(GMint x, GMint* cp, bool* trail)
+bool GMTypoTextBuffer::XtoCP(GMint32 x, GMint32* cp, bool* trail)
 {
 	D(d);
 	if (x < 0)
@@ -763,11 +763,11 @@ bool GMTypoTextBuffer::XtoCP(GMint x, GMint* cp, bool* trail)
 	return true;
 }
 
-void GMTypoTextBuffer::getPriorItemPos(GMint cp, GMint* prior)
+void GMTypoTextBuffer::getPriorItemPos(GMint32 cp, GMint32* prior)
 {
 	D(d);
 	auto& r = d->engine->getResults().results;
-	for (GMint i = cp - 1; i > 0; --i)
+	for (GMint32 i = cp - 1; i > 0; --i)
 	{
 		if (!r[i].isSpace && r[i - 1].isSpace)
 		{
@@ -779,11 +779,11 @@ void GMTypoTextBuffer::getPriorItemPos(GMint cp, GMint* prior)
 	*prior = 0;
 }
 
-void GMTypoTextBuffer::getNextItemPos(GMint cp, GMint* next)
+void GMTypoTextBuffer::getNextItemPos(GMint32 cp, GMint32* next)
 {
 	D(d);
 	auto& r = d->engine->getResults().results;
-	for (GMint i = cp; i < gm_sizet_to_int(r.size() - 2); ++i)
+	for (GMint32 i = cp; i < gm_sizet_to_int(r.size() - 2); ++i)
 	{
 		if (r[i].isSpace && !r[i + 1].isSpace)
 		{

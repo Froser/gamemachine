@@ -39,8 +39,8 @@ GM_ALIGNED_STRUCT(PatchCollideContext)
 
 GM_ALIGNED_STRUCT(BSPGrid)
 {
-	GMint width;
-	GMint height;
+	GMint32 width;
+	GMint32 height;
 	bool wrapWidth;
 	bool wrapHeight;
 	GMVec3 points[MAX_GRID_SIZE][MAX_GRID_SIZE];	// [width][height]
@@ -51,7 +51,7 @@ GM_ALIGNED_STRUCT(BSPWinding)
 {
 	AlignedVector<GMVec3> p;
 
-	void alloc(GMint pointNum)
+	void alloc(GMint32 pointNum)
 	{
 		GM_ASSERT(pointNum != 0);
 		p.resize(pointNum);
@@ -93,7 +93,7 @@ namespace
 
 	void setGridWrapWidth(BSPGrid* grid)
 	{
-		GMint i, j;
+		GMint32 i, j;
 		GMfloat d;
 
 		GMFloat4 f4_points_0, f4_points_1;
@@ -145,7 +145,7 @@ namespace
 
 	void subdivideGridColumns(BSPGrid* grid)
 	{
-		GMint i, j, k;
+		GMint32 i, j, k;
 
 		for (i = 0; i < grid->width - 2; ) {
 			// grid->points[i][x] is an interpolating control point
@@ -236,7 +236,7 @@ namespace
 
 	void removeDegenerateColumns(BSPGrid* grid)
 	{
-		GMint i, j, k;
+		GMint32 i, j, k;
 
 		for (i = 0; i < grid->width - 1; i++)
 		{
@@ -269,7 +269,7 @@ namespace
 
 	void transposeGrid(BSPGrid* grid)
 	{
-		GMint i, j, l;
+		GMint32 i, j, l;
 		GMVec3 temp;
 		bool tempWrap;
 
@@ -347,7 +347,7 @@ namespace
 		return true;
 	}
 
-	GMint planeEqual(GMBSPPatchPlane* p, const GMVec4& plane, GMint *flipped)
+	GMint32 planeEqual(GMBSPPatchPlane* p, const GMVec4& plane, GMint32 *flipped)
 	{
 		GMVec4 invplane;
 		GMFloat4 f4_plane, f4_param_plane, f4_invplane;
@@ -389,7 +389,7 @@ namespace
 			return -1;
 
 		// see if the points are close enough to an existing plane
-		for (GMuint i = 0; i < context.planes.size(); i++)
+		for (GMuint32 i = 0; i < context.planes.size(); i++)
 		{
 			if (Dot(MakeVector3(plane), MakeVector3(context.planes[i].plane)) < 0)
 				continue;	// allow backwards planes?
@@ -418,10 +418,10 @@ namespace
 		return gm_sizet_to_int(context.planes.size() - 1);
 	}
 
-	GMint findPlane(PatchCollideContext& context, const GMVec4& plane, GMint *flipped)
+	GMint32 findPlane(PatchCollideContext& context, const GMVec4& plane, GMint32 *flipped)
 	{
 		// see if the points are close enough to an existing plane
-		for (GMuint i = 0; i < context.planes.size(); i++)
+		for (GMuint32 i = 0; i < context.planes.size(); i++)
 		{
 			if (planeEqual(&context.planes[i], plane, flipped))
 				return i;
@@ -437,9 +437,9 @@ namespace
 		return gm_sizet_to_int(context.planes.size() - 1);
 	}
 
-	GMint gridPlane(int gridPlanes[MAX_GRID_SIZE][MAX_GRID_SIZE][2], GMint i, GMint j, GMint tri)
+	GMint32 gridPlane(int gridPlanes[MAX_GRID_SIZE][MAX_GRID_SIZE][2], GMint32 i, GMint32 j, GMint32 tri)
 	{
-		GMint p;
+		GMint32 p;
 
 		p = gridPlanes[i][j][tri];
 		if (p != -1) {
@@ -455,10 +455,10 @@ namespace
 		return -1;
 	}
 
-	int edgePlaneNum(PatchCollideContext& context, BSPGrid* grid, GMint gridPlanes[MAX_GRID_SIZE][MAX_GRID_SIZE][2], GMint i, GMint j, GMint k) {
+	int edgePlaneNum(PatchCollideContext& context, BSPGrid* grid, GMint32 gridPlanes[MAX_GRID_SIZE][MAX_GRID_SIZE][2], GMint32 i, GMint32 j, GMint32 k) {
 		GMVec3 p1, p2;
 		GMVec3 up;
-		GMint p;
+		GMint32 p;
 		GMVec4 t;
 
 		switch (k) {
@@ -517,7 +517,7 @@ namespace
 		return -1;
 	}
 
-	int pointOnPlaneSide(PatchCollideContext& context, const GMVec3& p, GMint planeNum)
+	int pointOnPlaneSide(PatchCollideContext& context, const GMVec3& p, GMint32 planeNum)
 	{
 		GMfloat d;
 
@@ -537,12 +537,12 @@ namespace
 		return SIDE_ON;
 	}
 
-	void setBorderInward(PatchCollideContext& context, GMBSPFacet* facet, BSPGrid* grid, int gridPlanes[MAX_GRID_SIZE][MAX_GRID_SIZE][2], GMint i, GMint j, GMint which)
+	void setBorderInward(PatchCollideContext& context, GMBSPFacet* facet, BSPGrid* grid, int gridPlanes[MAX_GRID_SIZE][MAX_GRID_SIZE][2], GMint32 i, GMint32 j, GMint32 which)
 	{
 		static bool debugBlock = false;
-		GMint k, l;
+		GMint32 k, l;
 		GMVec3 points[4];
-		GMint numPoints;
+		GMint32 numPoints;
 
 		switch (which) {
 		case -1:
@@ -572,14 +572,14 @@ namespace
 
 		for (k = 0; k < facet->numBorders; k++)
 		{
-			GMint front, back;
+			GMint32 front, back;
 
 			front = 0;
 			back = 0;
 
 			for (l = 0; l < numPoints; l++)
 			{
-				GMint side;
+				GMint32 side;
 
 				side = pointOnPlaneSide(context, points[l], facet->borderPlanes[k]);
 				if (side == SIDE_FRONT)
@@ -614,7 +614,7 @@ namespace
 	{
 		GMVec3 normal = MakeVector3(plane);
 		GMfloat dist = plane.getW();
-		GMint i, x;
+		GMint32 i, x;
 		GMfloat max, v;
 		GMVec3 org, vright, vup;
 		GMFloat4 f4_normal;
@@ -675,10 +675,10 @@ namespace
 	bool chopWindingInPlace(REF BSPWinding& inout, const GMVec4& plane, GMfloat epsilon)
 	{
 		AlignedVector<GMfloat> dists;
-		AlignedVector<GMint> sides;
-		GMint counts[3];
+		AlignedVector<GMint32> sides;
+		GMint32 counts[3];
 		GMfloat dot;
-		GMint j;
+		GMint32 j;
 		GMVec3 mid;
 		GMFloat4 f4_mid, fs_normal, fs_p1, fs_p2;
 
@@ -713,7 +713,7 @@ namespace
 		if (!counts[1])
 			return true; // inout stays the same
 
-		for (GMuint i = 0; i < in.p.size(); i++)
+		for (GMuint32 i = 0; i < in.p.size(); i++)
 		{
 			GMVec3 p1 = in.p[i];
 
@@ -766,10 +766,10 @@ namespace
 		mins.loadFloat4(f4_mins);
 		maxs.loadFloat4(f4_maxs);
 
-		for (GMuint i = 0; i < w.p.size(); i++)
+		for (GMuint32 i = 0; i < w.p.size(); i++)
 		{
 			w.p[i].loadFloat4(f4_p);
-			for (GMint j = 0; j < 3; j++)
+			for (GMint32 j = 0; j < 3; j++)
 			{
 				v = f4_p[j];
 				if (v < f4_mins[j])
@@ -784,7 +784,7 @@ namespace
 
 	void snapVector(GMVec3& normal)
 	{
-		GMint i;
+		GMint32 i;
 		GMFloat4 f4_normal;
 		normal.loadFloat4(f4_normal);
 
@@ -809,7 +809,7 @@ namespace
 
 	void addFacetBevels(PatchCollideContext& context, GMBSPFacet *facet)
 	{
-		GMint axis, dir, flipped;
+		GMint32 axis, dir, flipped;
 		GMVec4 plane;
 		GMfloat d;
 		GMVec4 newplane;
@@ -820,7 +820,7 @@ namespace
 		BSPWinding w, w2;
 		baseWindingForPlane(plane, w);
 
-		GMint j;
+		GMint32 j;
 		for (j = 0; j < facet->numBorders; j++)
 		{
 			if (facet->borderPlanes[j] == facet->surfacePlane)
@@ -862,7 +862,7 @@ namespace
 					continue;
 				}
 				// see if the plane is already present
-				GMint i;
+				GMint32 i;
 				for (i = 0; i < facet->numBorders; i++) {
 					if (planeEqual(&context.planes[facet->borderPlanes[i]], plane, &flipped))
 						break;
@@ -883,8 +883,8 @@ namespace
 		//
 		// test the non-axial plane edges
 		GMFloat4 f4_Vector2, f4_vec;
-		GMint k;
-		for (j = 0; j < (GMint)w.p.size(); j++)
+		GMint32 k;
+		for (j = 0; j < (GMint32)w.p.size(); j++)
 		{
 			k = (j + 1) % w.p.size();
 			vec = w.p[j] - w.p[k];
@@ -922,7 +922,7 @@ namespace
 
 					// if all the points of the facet winding are
 					// behind this plane, it is a proper edge bevel
-					GMuint l;
+					GMuint32 l;
 					for (l = 0; l < w.p.size(); l++)
 					{
 						d = Dot(w.p[l], MakeVector3(plane)) + plane.getW();
@@ -938,7 +938,7 @@ namespace
 						continue;
 					}
 					// see if the plane is allready present
-					GMint i;
+					GMint32 i;
 					for (i = 0; i < facet->numBorders; i++) {
 						if (planeEqual(&context.planes[facet->borderPlanes[i]], plane, &flipped)) {
 							break;
@@ -992,7 +992,7 @@ namespace
 		BSPWinding w;
 		baseWindingForPlane(plane, w);
 
-		GMint i;
+		GMint32 i;
 		for (i = 0; i < facet->numBorders; i++)
 		{
 			if (facet->borderPlanes[i] == -1)
@@ -1029,10 +1029,10 @@ namespace
 
 	void patchCollideFromGrid(BSPGrid *grid, GMBSPPatchCollide *pf)
 	{
-		GMint i, j;
+		GMint32 i, j;
 		GMVec3 p1, p2, p3;
-		GMint gridPlanes[MAX_GRID_SIZE][MAX_GRID_SIZE][2];
-		GMint borders[4];
+		GMint32 gridPlanes[MAX_GRID_SIZE][MAX_GRID_SIZE][2];
+		GMint32 borders[4];
 		bool noAdjust[4];
 		PatchCollideContext context;
 
@@ -1189,24 +1189,24 @@ GM_PRIVATE_NAME(GMBSPPatch)::GM_PRIVATE_DESTRUCT(GMBSPPatch)
 	}
 }
 
-void GMBSPPatch::alloc(GMint num)
+void GMBSPPatch::alloc(GMint32 num)
 {
 	D(d);
 	d->patches.resize(num);
 }
 
-GMBSP_Physics_Patch* GMBSPPatch::patches(GMint at)
+GMBSP_Physics_Patch* GMBSPPatch::patches(GMint32 at)
 {
 	D(d);
 	return d->patches[at];
 }
 
-void GMBSPPatch::generatePatchCollide(GMint index, GMint width, GMint height, const GMVec3* points, AUTORELEASE GMBSP_Physics_Patch* patch)
+void GMBSPPatch::generatePatchCollide(GMint32 index, GMint32 width, GMint32 height, const GMVec3* points, AUTORELEASE GMBSP_Physics_Patch* patch)
 {
 	D(d);
 
 	BSPGrid grid;
-	GMint i, j;
+	GMint32 i, j;
 
 	if (width <= 2 || height <= 2 || !points)
 	{

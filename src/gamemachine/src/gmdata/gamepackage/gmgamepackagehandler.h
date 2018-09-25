@@ -45,7 +45,7 @@ class GMZipGamePackageHandler : public GMDefaultGamePackageHandler
 				delete buffer;
 		}
 
-		GMuint size;
+		GMuint32 size;
 		GMbyte* buffer;
 	};
 

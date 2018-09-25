@@ -21,8 +21,8 @@ BEGIN_NS
 // 获取名称辅助函数
 // 字符串拼接太慢，因此采用一些预设的字符串
 
-constexpr GMint GMGL_MAX_UNIFORM_NAME_LEN = 64; //uniform最长名称
-constexpr GMint GMGL_MAX_LIGHT_COUNT = 10; //灯光最大数量
+constexpr GMint32 GMGL_MAX_UNIFORM_NAME_LEN = 64; //uniform最长名称
+constexpr GMint32 GMGL_MAX_LIGHT_COUNT = 10; //灯光最大数量
 
 inline const char* getTextureUniformName(GMTextureType t)
 {

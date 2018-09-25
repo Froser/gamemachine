@@ -28,7 +28,7 @@ public:
 	virtual void createPlayerSource(gm::IAudioFile* f, OUT gm::IAudioSource** handle) override;
 
 private:
-	bool openDevice(gm::GMint idx);
+	bool openDevice(gm::GMint32 idx);
 	void shutdownDevice();
 };
 

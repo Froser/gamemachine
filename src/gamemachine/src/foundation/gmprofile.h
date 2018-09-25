@@ -12,8 +12,8 @@ BEGIN_NS
 
 GM_INTERFACE(IProfileHandler)
 {
-	virtual void beginProfile(const GMString& name, GMfloat durationSinceStartInSecond, GMThreadId id, GMint level) = 0;
-	virtual void endProfile(const GMString& name, GMfloat elapsedInSecond, GMThreadId id, GMint level) = 0;
+	virtual void beginProfile(const GMString& name, GMfloat durationSinceStartInSecond, GMThreadId id, GMint32 level) = 0;
+	virtual void endProfile(const GMString& name, GMfloat elapsedInSecond, GMThreadId id, GMint32 level) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMProfile)
@@ -30,7 +30,7 @@ struct GMProfileSessions : public GMObject
 	struct GMProfileSession
 	{
 		GMProfileSession() : level(0) {};
-		GMint level;
+		GMint32 level;
 		GMint64 firstProfileTimeInCycle = -1;
 	};
 

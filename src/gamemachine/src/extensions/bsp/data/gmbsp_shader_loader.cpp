@@ -27,7 +27,7 @@ enum
 struct SurfaceFlags
 {
 	const char* name;
-	GMuint flag;
+	GMuint32 flag;
 } _surface_flags[GMS_SURFACE_FLAG_MAX] = {
 	{ "nodamage", SURF_NODAMAGE },
 	{ "slick", SURF_SLICK },
@@ -52,9 +52,9 @@ struct SurfaceFlags
 
 namespace
 {
-	GMuint parseSurfaceParm(const char* p)
+	GMuint32 parseSurfaceParm(const char* p)
 	{
-		for (GMuint i = 0; i < GMS_SURFACE_FLAG_MAX; i++)
+		for (GMuint32 i = 0; i < GMS_SURFACE_FLAG_MAX; i++)
 		{
 			if (GMString::stringEquals(p, _surface_flags[i].name))
 				return _surface_flags[i].flag;
@@ -92,7 +92,7 @@ namespace
 	{
 		GMScanner s(str);
 		GMfloat f;
-		for (GMint i = 0; i < 3; i++)
+		for (GMint32 i = 0; i < 3; i++)
 		{
 			s.nextFloat(f);
 			vec[i] = f;
@@ -174,7 +174,7 @@ void GMBSPShaderLoader::load()
 	}
 }
 
-bool GMBSPShaderLoader::findItem(const GMString& name, GMint lightmapId, REF GMShader* shader)
+bool GMBSPShaderLoader::findItem(const GMString& name, GMint32 lightmapId, REF GMShader* shader)
 {
 	D(d);
 	auto foundResult = d->items.find(name);
@@ -225,7 +225,7 @@ void GMBSPShaderLoader::parse(const char* buffer)
 	}
 }
 
-void GMBSPShaderLoader::parseItem(GMXMLElement* elem, GMint lightmapId, REF GMShader* shaderPtr)
+void GMBSPShaderLoader::parseItem(GMXMLElement* elem, GMint32 lightmapId, REF GMShader* shaderPtr)
 {
 	D(d);
 	if (!shaderPtr)
@@ -305,7 +305,7 @@ void GMBSPShaderLoader::parse_animMap(GMShader& shader, GMXMLElement* elem)
 {
 	D(d);
 	GMTextureSampler* sampler = &shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
-	GMint ms = GMString::parseInt(elem->Attribute("ms"));
+	GMint32 ms = GMString::parseInt(elem->Attribute("ms"));
 	sampler->setAnimationMs(ms);
 
 	for (GMXMLElement* it = elem->FirstChildElement(); it; it = it->NextSiblingElement())
@@ -497,7 +497,7 @@ void GMBSPShaderLoader::parse_map_tcMod(GMShader& shader, GMXMLElement* elem)
 	D(d);
 	// tcMod <type> <...>
 	const char* tcMod = elem->Attribute("tcMod");
-	GMuint tcModNum = 0;
+	GMuint32 tcModNum = 0;
 	while (tcModNum < MAX_TEX_TRANS && shader.getTextureList().getTextureSampler(GMTextureType::Ambient).getTextureTransform(tcModNum).type != GMS_TextureTransformType::NoTextureTransform)
 	{
 		tcModNum++;

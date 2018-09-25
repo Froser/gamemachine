@@ -140,7 +140,7 @@ public:
 	  \param renderRect 渲染矩形大小。
 	  \return 世界坐标。
 	*/
-	GMVec3 getRayToWorld(const GMRect& renderRect, GMint x, GMint y) const;
+	GMVec3 getRayToWorld(const GMRect& renderRect, GMint32 x, GMint32 y) const;
 
 	//! 获取平截头体的6个平面方程。
 	/*!

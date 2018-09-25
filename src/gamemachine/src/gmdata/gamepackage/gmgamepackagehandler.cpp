@@ -21,7 +21,7 @@ bool GMDefaultGamePackageHandler::readFileFromPath(const GMString& path, REF GMB
 	file.open(p, std::ios::in | std::ios::binary | std::ios::ate);
 	if (file.good())
 	{
-		GMint size = file.tellg();
+		GMint32 size = file.tellg();
 		if (size == -1)
 		{
 			gm_warning(gm_dbg_wrap("cannot read file from path: {0}"), path);
@@ -156,17 +156,17 @@ bool GMZipGamePackageHandler::readFileFromPath(const GMString& path, REF GMBuffe
 
 bool GMZipGamePackageHandler::loadZip()
 {
-	const GMuint bufSize = 4096;
+	const GMuint32 bufSize = 4096;
 
 	PKD(d);
 	releaseUnzFile();
 
 	m_uf = unzOpen64(d->packagePath.toStdString().c_str());
 	unz_global_info64 gi;
-	GMint err = unzGetGlobalInfo64(m_uf, &gi);
+	GMint32 err = unzGetGlobalInfo64(m_uf, &gi);
 	CHECK(err);
 
-	for (GMint i = 0; i < gi.number_entry; i++)
+	for (GMint32 i = 0; i < gi.number_entry; i++)
 	{
 		while (true)
 		{

@@ -13,7 +13,7 @@ GM_PRIVATE_OBJECT(GMMAudioFile_Stream)
 {
 	// 缓存相关
 	gm::GMBuffer fileBuffer;
-	gm::GMuint bufferNum = 0;
+	gm::GMuint32 bufferNum = 0;
 	gm::GMAudioFileInfo fileInfo;
 	GMMStream* output = nullptr;
 
@@ -43,12 +43,12 @@ public:
 	virtual bool isStream() override;
 	virtual gm::IAudioStream* getStream() override;
 	virtual gm::GMAudioFileInfo& getFileInfo() override;
-	virtual gm::GMuint getBufferId() override;
+	virtual gm::GMuint32 getBufferId() override;
 
 	// gm::IAudioStream
 public:
-	virtual gm::GMuint getBufferNum() override;
-	virtual gm::GMuint getBufferSize() override;
+	virtual gm::GMuint32 getBufferNum() override;
+	virtual gm::GMuint32 getBufferSize() override;
 	virtual bool readBuffer(gm::GMbyte* bytes) override;
 	virtual void nextChunk(gm::GMlong chunkNum) override;
 	virtual void rewind() override;
@@ -62,8 +62,8 @@ protected:
 
 protected:
 	static void saveBuffer(Data* d, gm::GMbyte data);
-	static void move(std::atomic_long& ptr, gm::GMuint loop);
-	static gm::GMlong peek(std::atomic_long& ptr, gm::GMuint loop);
+	static void move(std::atomic_long& ptr, gm::GMuint32 loop);
+	static gm::GMlong peek(std::atomic_long& ptr, gm::GMuint32 loop);
 
 public:
 	static void setStreamReady(Data* d);

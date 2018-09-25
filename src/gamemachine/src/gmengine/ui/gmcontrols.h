@@ -16,10 +16,10 @@ enum class GMControlType
 
 GM_PRIVATE_OBJECT(GMControl)
 {
-	GMint x = 0;
-	GMint y = 0;
-	GMint width = 0;
-	GMint height = 0;
+	GMint32 x = 0;
+	GMint32 y = 0;
+	GMint32 width = 0;
+	GMint32 height = 0;
 	GMRect boundingBox;
 	GMWidget* widget = nullptr;
 
@@ -30,7 +30,7 @@ GM_PRIVATE_OBJECT(GMControl)
 	bool hasFocus = false;
 	bool isDefault = false;
 
-	GMint index = 0; //在控件列表中的索引
+	GMint32 index = 0; //在控件列表中的索引
 };
 
 class GMControl : public GMObject
@@ -185,13 +185,13 @@ public:
 
 	virtual GMStyle& getStyle(StyleType style);
 
-	virtual void setIndex(GMint index)
+	virtual void setIndex(GMint32 index)
 	{
 		D(d);
 		d->index = index;
 	}
 
-	virtual void setPosition(GMint x, GMint y)
+	virtual void setPosition(GMint32 x, GMint32 y)
 	{
 		D(d);
 		if (d->x != x || d->y != y)
@@ -202,7 +202,7 @@ public:
 		}
 	}
 
-	virtual void setSize(GMint width, GMint height)
+	virtual void setSize(GMint32 width, GMint32 height)
 	{
 		D(d);
 		if (d->width != width || d->height != height)
@@ -238,7 +238,7 @@ public:
 		return d->widget;
 	}
 
-	inline GMint getIndex() GM_NOEXCEPT
+	inline GMint32 getIndex() GM_NOEXCEPT
 	{
 		D(d);
 		return d->index;
@@ -250,13 +250,13 @@ public:
 		return d->boundingBox;
 	}
 
-	inline GMint getWidth() GM_NOEXCEPT
+	inline GMint32 getWidth() GM_NOEXCEPT
 	{
 		D(d);
 		return d->width;
 	}
 
-	inline GMint getHeight() GM_NOEXCEPT
+	inline GMint32 getHeight() GM_NOEXCEPT
 	{
 		D(d);
 		return d->height;
@@ -400,11 +400,11 @@ GM_PRIVATE_OBJECT(GMControlScrollBar)
 	bool draggingThumb = false;
 	bool showThumb = true;
 	bool canRequestFocus = true;
-	GMint maximum = 10;
-	GMint minimum = 0;
-	GMint pageStep = 1;
-	GMint singleStep = 1;
-	GMint value = 0;
+	GMint32 maximum = 10;
+	GMint32 minimum = 0;
+	GMint32 pageStep = 1;
+	GMint32 singleStep = 1;
+	GMint32 value = 0;
 
 	GMPoint mousePt; //!< 相对于GMControlScrollBar本身的坐标
 	GMRect rcUp;
@@ -428,11 +428,11 @@ GM_PRIVATE_OBJECT(GMControlScrollBar)
 class GMControlScrollBar : public GMControl
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMControlScrollBar, GMControl)
-	GM_DECLARE_PROPERTY(PageStep, pageStep, GMint)
-	GM_DECLARE_PROPERTY(SingleStep, singleStep, GMint)
-	GM_DECLARE_GETTER(Value, value, GMint)
-	GM_DECLARE_GETTER(Maximum, maximum, GMint)
-	GM_DECLARE_GETTER(Minimum, minimum, GMint)
+	GM_DECLARE_PROPERTY(PageStep, pageStep, GMint32)
+	GM_DECLARE_PROPERTY(SingleStep, singleStep, GMint32)
+	GM_DECLARE_GETTER(Value, value, GMint32)
+	GM_DECLARE_GETTER(Maximum, maximum, GMint32)
+	GM_DECLARE_GETTER(Minimum, minimum, GMint32)
 	GM_DECLARE_PROPERTY(CanRequestFocus, canRequestFocus, bool)
 
 	GM_DECLARE_SIGNAL(valueChanged)
@@ -452,9 +452,9 @@ public:
 	GMControlScrollBar(GMWidget* widget);
 
 public:
-	void setMaximum(GMint maximum);
-	void setMinimum(GMint minimum);
-	void setValue(GMint value);
+	void setMaximum(GMint32 maximum);
+	void setMinimum(GMint32 minimum);
+	void setValue(GMint32 value);
 	void setThumbCorner(const GMRect& corner);
 
 protected:
@@ -480,7 +480,7 @@ private:
 
 protected:
 	void clampValue();
-	void scroll(GMint value);
+	void scroll(GMint32 value);
 };
 
 END_NS

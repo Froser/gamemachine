@@ -15,9 +15,9 @@
 #define END_DEFINE_TYPE_ENUM_MAP()
 
 BEGIN_DEFINE_TYPE_ENUM_MAP()
-	DEFINE_TYPE_ENUM_MAP(GMint, GMVariant::I32)
+	DEFINE_TYPE_ENUM_MAP(GMint32, GMVariant::I32)
 	DEFINE_TYPE_ENUM_MAP(GMint64, GMVariant::I64)
-	DEFINE_TYPE_ENUM_MAP(GMuint, GMVariant::UInt)
+	DEFINE_TYPE_ENUM_MAP(GMuint32, GMVariant::UInt)
 	DEFINE_TYPE_ENUM_MAP(GMfloat, GMVariant::Float)
 	DEFINE_TYPE_ENUM_MAP(bool, GMVariant::Boolean)
 	DEFINE_TYPE_ENUM_MAP(GMObject&, GMVariant::ObjectRef)
@@ -90,7 +90,7 @@ GMVariant::GMVariant()
 {
 }
 
-GMVariant::GMVariant(GMint i32)
+GMVariant::GMVariant(GMint32 i32)
 	: m_type(I32)
 {
 	m_data.i32 = i32;
@@ -102,7 +102,7 @@ GMVariant::GMVariant(GMint64 i64)
 	m_data.i64 = i64;
 }
 
-GMVariant::GMVariant(GMuint u)
+GMVariant::GMVariant(GMuint32 u)
 	: m_type(UInt)
 {
 	m_data.u = u;
@@ -250,29 +250,29 @@ GMVariant& GMVariant::operator=(GMVariant&& rhs)
 	return *this;
 }
 
-GMint GMVariant::toInt() const
+GMint32 GMVariant::toInt() const
 {
 	if (m_type == I64)
 	{
 		// 窄化转型，检查是否越界
 		GMint64 i64 = toInt64();
-		GMint64 maxI64 = static_cast<GMint64>(std::numeric_limits<GMint>::max());
+		GMint64 maxI64 = static_cast<GMint64>(std::numeric_limits<GMint32>::max());
 		GM_ASSERT(i64 <= maxI64 || !"GMVariant (toInt): int64 to int32 convertion overflow.");
-		return static_cast<GMint>(i64);
+		return static_cast<GMint32>(i64);
 	}
-	return get<GMint>(&m_data.i32);
+	return get<GMint32>(&m_data.i32);
 }
 
 GMint64 GMVariant::toInt64() const
 {
 	if (m_type == I32)
-		return get<GMint>(&m_data.i32);
+		return get<GMint32>(&m_data.i32);
 	return get<GMint64>(&m_data.i64);
 }
 
-GMuint GMVariant::toUInt() const
+GMuint32 GMVariant::toUInt() const
 {
-	return get<GMuint>(&m_data.u);
+	return get<GMuint32>(&m_data.u);
 }
 
 GMfloat GMVariant::toFloat() const

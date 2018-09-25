@@ -64,9 +64,9 @@ IFramebuffers* GMGLGBuffer::createGeometryFramebuffers()
 		GM_ASSERT(suc);
 	}
 
-	constexpr GMuint framebufferCount = GM_array_size(s_GBufferGeometryUniformNames);
+	constexpr GMuint32 framebufferCount = GM_array_size(s_GBufferGeometryUniformNames);
 	GM_STATIC_ASSERT(framebufferCount <= 8, "Too many targets.");
-	for (GMint i = 0; i < framebufferCount; ++i)
+	for (GMint32 i = 0; i < framebufferCount; ++i)
 	{
 		IFramebuffer* framebuffer = nullptr;
 		GM.getFactory()->createFramebuffer(d->context, &framebuffer);
@@ -99,7 +99,7 @@ void GMGLGBuffer::lightPass()
 	getQuad()->draw();
 }
 
-void GMGLGBuffer::drawGeometryBuffer(GMuint index, const GMRect& rect)
+void GMGLGBuffer::drawGeometryBuffer(GMuint32 index, const GMRect& rect)
 {
 	D(d);
 	GMGLFramebuffers* source = gm_cast<GMGLFramebuffers*>(getGeometryFramebuffers());

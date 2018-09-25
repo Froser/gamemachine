@@ -167,7 +167,7 @@ void GMGLTechnique::beginModel(GMModel* model, const GMGameObject* parent)
 	shaderProgram->setInt(GM_VariablesDesc.CubeMapTextureName, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 
 	// 设置顶点颜色运算方式
-	getShaderProgram()->setInt(GM_VariablesDesc.ColorVertexOp, static_cast<GMint>(model->getShader().getVertexColorOp()));
+	getShaderProgram()->setInt(GM_VariablesDesc.ColorVertexOp, static_cast<GMint32>(model->getShader().getVertexColorOp()));
 }
 
 void GMGLTechnique::endModel()
@@ -221,13 +221,13 @@ void GMGLTechnique::activateTextureTransform(GMModel* model, GMTextureType type)
 		model->getShader().getTextureList().getTextureSampler(type).applyTexMode(GM.getRunningStates().elapsedTime, applyCallback);
 }
 
-GMint GMGLTechnique::activateTexture(GMModel* model, GMTextureType type)
+GMint32 GMGLTechnique::activateTexture(GMModel* model, GMTextureType type)
 {
 	static const std::string u_tex_enabled = std::string(".") + GM_VariablesDesc.TextureAttributes.Enabled;
 	static const std::string u_tex_texture = std::string(".") + GM_VariablesDesc.TextureAttributes.Texture;
 
-	GMint idx = (GMint)type;
-	GMint texId = getTextureID(type);
+	GMint32 idx = (GMint32)type;
+	GMint32 texId = getTextureID(type);
 
 	auto shaderProgram = getShaderProgram();
 	const char* uniform = getTextureUniformName(type);
@@ -244,17 +244,17 @@ GMint GMGLTechnique::activateTexture(GMModel* model, GMTextureType type)
 void GMGLTechnique::deactivateTexture(GMTextureType type)
 {
 	static const std::string u_tex_enabled = (GMString(".") + GM_VariablesDesc.TextureAttributes.Enabled).toStdString();
-	GMint texId = getTextureID(type);
+	GMint32 texId = getTextureID(type);
 
 	auto shaderProgram = getShaderProgram();
-	GMint idx = (GMint)type;
+	GMint32 idx = (GMint32)type;
 	const char* uniform = getTextureUniformName(type);
 	static char u[GMGL_MAX_UNIFORM_NAME_LEN];
 	combineUniform(u, uniform, u_tex_enabled.c_str());
 	shaderProgram->setInt(u, 0);
 }
 
-GMint GMGLTechnique::getTextureID(GMTextureType type)
+GMint32 GMGLTechnique::getTextureID(GMTextureType type)
 {
 	switch (type)
 	{
@@ -292,7 +292,7 @@ bool GMGLTechnique::drawTexture(GMModel* model, GMTextureType type)
 	if (!texture.isEmpty())
 	{
 		// 激活动画序列
-		GMint texId = activateTexture(model, (GMTextureType)type);
+		GMint32 texId = activateTexture(model, (GMTextureType)type);
 		texture.getTexture()->bindSampler(&sampler);
 		texture.getTexture()->useTexture(texId);
 		return true;
@@ -310,7 +310,7 @@ GMTextureAsset GMGLTechnique::getTexture(GMTextureSampler& frames)
 
 	// 如果frameCount > 1，说明是个动画，要根据Shader的间隔来选择合适的帧
 	// TODO
-	GMint elapsed = GM.getRunningStates().elapsedTime * 1000;
+	GMint32 elapsed = GM.getRunningStates().elapsedTime * 1000;
 
 	return frames.getFrameByIndex((elapsed / frames.getAnimationMs()) % frames.getFrameCount());
 }
@@ -445,7 +445,7 @@ void GMGLTechnique::prepareDepth(GMModel* model)
 void GMGLTechnique::prepareDebug(GMModel* model)
 {
 	D(d);
-	GMint mode = d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonNormalMode).toInt();
+	GMint32 mode = d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonNormalMode).toInt();
 	getShaderProgram()->setInt(GM_VariablesDesc.Debug.Normal, mode);
 }
 
@@ -515,7 +515,7 @@ void GMGLTechnique_3D::beforeDraw(GMModel* model)
 	IShaderProgram* shaderProgram = getShaderProgram();
 	GMShader& shader = model->getShader();
 	GMIlluminationModel illuminationModel = shader.getIlluminationModel();
-	shaderProgram->setInt(GM_VariablesDesc.IlluminationModel, (GMint)illuminationModel);
+	shaderProgram->setInt(GM_VariablesDesc.IlluminationModel, (GMint32)illuminationModel);
 
 	// 纹理
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
@@ -529,7 +529,7 @@ void GMGLTechnique_3D::beforeDraw(GMModel* model)
 				type == GMTextureType::Lightmap
 				))
 			{
-				GMint texId = activateTexture(nullptr, (GMTextureType)type);
+				GMint32 texId = activateTexture(nullptr, (GMTextureType)type);
 				getWhiteTexture().getTexture()->useTexture(texId);
 			}
 		}
@@ -610,7 +610,7 @@ void GMGLTechnique_2D::beforeDraw(GMModel* model)
 	if (!texture.isEmpty())
 	{
 		// 激活动画序列
-		GMint texId = activateTexture(model, GMTextureType::Ambient);
+		GMint32 texId = activateTexture(model, GMTextureType::Ambient);
 		texture.getTexture()->bindSampler(&sampler);
 		texture.getTexture()->useTexture(texId);
 	}
@@ -657,7 +657,7 @@ void GMGLTechnique_Filter::beforeDraw(GMModel* model)
 	GMTextureSampler& sampler = model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient);
 	GMTextureAsset texture = getTexture(sampler);
 	GM_ASSERT(!texture.isEmpty());
-	GMint texId = activateTexture(model, GMTextureType::Ambient);
+	GMint32 texId = activateTexture(model, GMTextureType::Ambient);
 	texture.getTexture()->bindSampler(&sampler);
 	texture.getTexture()->useTexture(texId);
 }
@@ -702,11 +702,11 @@ IShaderProgram* GMGLTechnique_Filter::getShaderProgram()
 	return db->engine->getShaderProgram(GMShaderProgramType::FilterShaderProgram);
 }
 
-GMint GMGLTechnique_Filter::activateTexture(GMModel* model, GMTextureType type)
+GMint32 GMGLTechnique_Filter::activateTexture(GMModel* model, GMTextureType type)
 {
 	D(d);
 	D_BASE(db, Base);
-	GMint texId = getTextureID(type);
+	GMint32 texId = getTextureID(type);
 	IShaderProgram* shaderProgram = getShaderProgram();
 	shaderProgram->setInt(GMSHADER_FRAMEBUFFER, texId);
 
@@ -762,7 +762,7 @@ void GMGLTechnique_LightPass::beforeDraw(GMModel* model)
 		gBufferFramebuffers->getFramebuffer(i)->getTexture(texture);
 		const GMsize_t textureIndex = (GMTextureRegisterQuery<GMTextureType::GeometryPasses>::Value + i);
 		shaderProgram->setInt(GMGLGBuffer::GBufferGeometryUniformNames()[i].c_str(), gm_sizet_to_uint(textureIndex));
-		texture.getTexture()->useTexture((GMuint)textureIndex);
+		texture.getTexture()->useTexture((GMuint32)textureIndex);
 	}
 
 	GMTextureAsset cubeMap = d->engine->getCubeMap();
@@ -770,7 +770,7 @@ void GMGLTechnique_LightPass::beforeDraw(GMModel* model)
 	{
 		const GMsize_t id = GMTextureRegisterQuery<GMTextureType::GeometryPasses>::Value + 1 + cnt;
 		shaderProgram->setInt(GM_VariablesDesc.CubeMapTextureName, gm_sizet_to_uint(id));
-		cubeMap.getTexture()->useTexture((GMuint)id);
+		cubeMap.getTexture()->useTexture((GMuint32)id);
 	}
 }
 

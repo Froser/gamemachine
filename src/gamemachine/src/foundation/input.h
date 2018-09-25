@@ -30,10 +30,10 @@ struct GMWheelState
 
 struct GMMouseState
 {
-	GMint deltaX;
-	GMint deltaY;
-	GMint posX;
-	GMint posY;
+	GMint32 deltaX;
+	GMint32 deltaY;
+	GMint32 posX;
+	GMint32 posY;
 	GMMouseButton downButton;
 	GMMouseButton upButton;
 	GMMouseButton triggerButton;

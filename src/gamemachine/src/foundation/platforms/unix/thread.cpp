@@ -63,7 +63,7 @@ void GMThread::setCallback(IThreadCallback* callback)
 	d->callback = callback;
 }
 
-bool GMThread::join(GMuint milliseconds)
+bool GMThread::join(GMuint32 milliseconds)
 {
 	D(d);
 	pthread_join(d->handle, NULL);
@@ -80,13 +80,13 @@ GMThreadId GMThread::getCurrentThreadId()
 	return pthread_self();
 }
 
-void GMThread::terminateThread(GMint ret)
+void GMThread::terminateThread(GMint32 ret)
 {
 	D(d);
 	pthread_kill(d->handle, 0);
 }
 
-void GMThread::sleep(GMint milliseconds)
+void GMThread::sleep(GMint32 milliseconds)
 {
 	usleep(milliseconds * 1000);
 }

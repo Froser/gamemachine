@@ -6,8 +6,8 @@
 
 GM_PRIVATE_OBJECT(_Base)
 {
-	gm::GMint a;
-	gm::GMint b;
+	gm::GMint32 a;
+	gm::GMint32 b;
 };
 
 class _Base : public gm::GMObject
@@ -21,8 +21,8 @@ public:
 
 GM_PRIVATE_OBJECT(_Derived)
 {
-	gm::GMint c;
-	gm::GMint d;
+	gm::GMint32 c;
+	gm::GMint32 d;
 };
 
 class _Derived : public _Base

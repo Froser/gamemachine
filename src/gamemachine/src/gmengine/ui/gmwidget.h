@@ -95,8 +95,8 @@ struct GMTextureArea
 struct GMCanvasTextureInfo
 {
 	GMAsset texture;
-	GMint width = 0;
-	GMint height = 0;
+	GMint32 width = 0;
+	GMint32 height = 0;
 };
 
 GM_PRIVATE_OBJECT(GMWidgetResourceManager)
@@ -107,8 +107,8 @@ GM_PRIVATE_OBJECT(GMWidgetResourceManager)
 	GMOwnedPtr<GMSprite2DGameObject> opaqueSpriteObject;
 	GMOwnedPtr<GMBorder2DGameObject> borderObject;
 	Vector<GMWidget*> widgets;
-	GMint backBufferWidth = 0;
-	GMint backBufferHeight = 0;
+	GMint32 backBufferWidth = 0;
+	GMint32 backBufferHeight = 0;
 	Vector<GMCanvasTextureInfo> textureResources;
 	GMTextureAsset whiteTexture;
 	GMAtomic<GMlong> textureId;
@@ -126,7 +126,7 @@ public:
 public:
 	ITypoEngine* getTypoEngine();
 	const GMCanvasTextureInfo& getTexture(GMlong id);
-	GMlong addTexture(GMAsset texture, GMint width, GMint height);
+	GMlong addTexture(GMAsset texture, GMint32 width, GMint32 height);
 
 	virtual const IRenderContext* getContext()
 	{
@@ -150,13 +150,13 @@ public:
 		return d->widgets;
 	}
 
-	inline GMint getBackBufferWidth()
+	inline GMint32 getBackBufferWidth()
 	{
 		D(d);
 		return d->backBufferWidth;
 	}
 
-	inline GMint getBackBufferHeight()
+	inline GMint32 getBackBufferHeight()
 	{
 		D(d);
 		return d->backBufferHeight;
@@ -196,8 +196,8 @@ public:
 struct GMShadowStyle
 {
 	bool hasShadow = false;
-	GMint offsetX = 1;
-	GMint offsetY = 1;
+	GMint32 offsetX = 1;
+	GMint32 offsetY = 1;
 	GMVec4 color = GMVec4(0, 0, 0, 1);
 };
 
@@ -295,8 +295,8 @@ GM_PRIVATE_OBJECT(GMWidget)
 	GM_OWNED Vector<GMControl*> controls;
 	GMControl* focusControl = nullptr;
 	GMControlBorder* borderControl = nullptr;
-	GMint borderMarginLeft = 10;
-	GMint borderMarginTop = 30;
+	GMint32 borderMarginLeft = 10;
+	GMint32 borderMarginTop = 30;
 	GMfloat timeLastRefresh = 0;
 	GMControl* controlMouseOver = nullptr;
 	bool nonUserEvents = false;
@@ -305,7 +305,7 @@ GM_PRIVATE_OBJECT(GMWidget)
 	bool visible = true;
 	bool minimized = false;
 	bool title = false;
-	GMint titleHeight = 20;
+	GMint32 titleHeight = 20;
 	GMString titleText;
 	GMPoint titleOffset;
 	GMStyle titleStyle;
@@ -318,10 +318,10 @@ GM_PRIVATE_OBJECT(GMWidget)
 	GMFloat4 colorBottomLeft = GMFloat4(0, 0, 0, 0);
 	GMFloat4 colorBottomRight = GMFloat4(0, 0, 0, 0);
 
-	GMint width = 0;
-	GMint height = 0;
-	GMint x = 0;
-	GMint y = 0;
+	GMint32 width = 0;
+	GMint32 height = 0;
+	GMint32 x = 0;
+	GMint32 y = 0;
 	HashMap<GMTextureArea::Area, GMWidgetTextureArea> areas;
 
 	bool movingWidget = false;
@@ -358,36 +358,36 @@ public:
 	void addLabel(
 		const GMString& text,
 		const GMVec4& fontColor,
-		GMint x,
-		GMint y,
-		GMint width,
-		GMint height,
+		GMint32 x,
+		GMint32 y,
+		GMint32 width,
+		GMint32 height,
 		bool isDefault,
 		OUT GMControlLabel** out
 	);
 
 	void addButton(
 		const GMString& text,
-		GMint x,
-		GMint y,
-		GMint width,
-		GMint height,
+		GMint32 x,
+		GMint32 y,
+		GMint32 width,
+		GMint32 height,
 		bool isDefault,
 		OUT GMControlButton** out
 	);
 
 	void addBorder(
 		const GMRect& corner,
-		const GMint marginLeft = 10,
-		const GMint marginTop = 30
+		const GMint32 marginLeft = 10,
+		const GMint32 marginTop = 30
 	);
 
 	void addTextEdit(
 		const GMString& text,
-		GMint x,
-		GMint y,
-		GMint width,
-		GMint height,
+		GMint32 x,
+		GMint32 y,
+		GMint32 width,
+		GMint32 height,
 		bool isDefault,
 		const GMRect& cornerRect,
 		OUT GMControlTextEdit** out
@@ -395,10 +395,10 @@ public:
 
 	void addTextArea(
 		const GMString& text,
-		GMint x,
-		GMint y,
-		GMint width,
-		GMint height,
+		GMint32 x,
+		GMint32 y,
+		GMint32 width,
+		GMint32 height,
 		bool isDefault,
 		bool hasScrollBar,
 		const GMRect& textAreaCornerRect,
@@ -407,10 +407,10 @@ public:
 	);
 
 	void addScrollBar(
-		GMint x,
-		GMint y,
-		GMint width,
-		GMint height,
+		GMint32 x,
+		GMint32 y,
+		GMint32 width,
+		GMint32 height,
 		bool isDefault,
 		const GMRect& scrollBarThumbCornerRect,
 		OUT GMControlScrollBar** out
@@ -423,7 +423,7 @@ public:
 		bool shadow = false,
 		bool center = false,
 		bool newLine = true,
-		GMint lineSpacing = 0
+		GMint32 lineSpacing = 0
 	);
 
 	void drawText(
@@ -466,7 +466,7 @@ public:
 	void endStencil();
 
 	void requestFocus(GMControl* control);
-	void setSize(GMint width, GMint height);
+	void setSize(GMint32 width, GMint32 height);
 
 public:
 	virtual bool msgProc(GMSystemEvent* event);
@@ -479,10 +479,10 @@ public:
 
 protected:
 	void addBorder(
-		GMint x,
-		GMint y,
-		GMint width,
-		GMint height,
+		GMint32 x,
+		GMint32 y,
+		GMint32 width,
+		GMint32 height,
 		const GMRect& cornerRect,
 		OUT GMControlBorder** out
 	);
@@ -566,21 +566,21 @@ public:
 		d->keyboardInput = keyboardInput;
 	}
 
-	inline void setPosition(GMint x, GMint y)
+	inline void setPosition(GMint32 x, GMint32 y)
 	{
 		D(d);
 		d->x = x;
 		d->y = y;
 	}
 
-	inline void setBorderMargin(GMint left, GMint top)
+	inline void setBorderMargin(GMint32 left, GMint32 top)
 	{
 		D(d);
 		d->borderMarginLeft = left;
 		d->borderMarginTop = top;
 	}
 
-	inline GMint getTitleHeight()
+	inline GMint32 getTitleHeight()
 	{
 		D(d);
 		return d->titleHeight;

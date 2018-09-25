@@ -59,7 +59,7 @@ IImageReader* GMImageReader::getReader(ImageType type)
 
 GMImageReader::ImageType GMImageReader::test(const GMbyte* data)
 {
-	for (ImageType i = ImageType_Begin; i < ImageType_End; i = (ImageType)((GMuint)i + 1))
+	for (ImageType i = ImageType_Begin; i < ImageType_End; i = (ImageType)((GMuint32)i + 1))
 	{
 		if (getReader(i)->test(data))
 			return i;

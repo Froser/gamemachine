@@ -3,7 +3,7 @@
 #include "gmgltechniques.h"
 #include "shader_constants.h"
 
-template <GMuint i>
+template <GMuint32 i>
 struct String {};
 
 #define MAKE_STRING_MAP(i) template <> struct String<i> { static constexpr const char* Value = #i; };
@@ -22,7 +22,7 @@ MAKE_STRING_MAP(7)
 
 namespace
 {
-	const char* number(GMint index)
+	const char* number(GMint32 index)
 	{
 		BEGIN_QUERY_STRING(index);
 			ADD_QUERY_STRING(0);
@@ -67,7 +67,7 @@ const GMfloat* GMGLLight::getLightColor() const
 	return d->color;
 }
 
-void GMGLLight::activateLight(GMuint index, ITechnique* technique)
+void GMGLLight::activateLight(GMuint32 index, ITechnique* technique)
 {
 	static char light_Position[GMGL_MAX_UNIFORM_NAME_LEN];
 	static char light_Color[GMGL_MAX_UNIFORM_NAME_LEN];

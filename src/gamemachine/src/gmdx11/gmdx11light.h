@@ -20,7 +20,7 @@ public:
 	virtual void setLightColor(GMfloat color[4]) override;
 	virtual const GMfloat* getLightPosition() const override;
 	virtual const GMfloat* getLightColor() const override;
-	virtual void activateLight(GMuint, ITechnique*) override;
+	virtual void activateLight(GMuint32, ITechnique*) override;
 
 protected:
 	virtual int getLightType() = 0;

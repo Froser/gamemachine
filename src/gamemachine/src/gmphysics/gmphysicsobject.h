@@ -115,7 +115,7 @@ enum class GMPhysicsActivationState
 class GMPhysicsShape;
 GM_PRIVATE_OBJECT(GMRigidPhysicsObject)
 {
-	GMint updateRevision = -1;
+	GMint32 updateRevision = -1;
 	btRigidBody* body = nullptr; // btRigidBody在添加到物理世界后，应该由物理世界管理声明周期
 	bool bodyDetached = false;
 	btDefaultMotionState* motionState = nullptr;

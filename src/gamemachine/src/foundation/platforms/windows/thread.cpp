@@ -81,13 +81,13 @@ void GMThread::setCallback(IThreadCallback* callback)
 	d->callback = callback;
 }
 
-void GMThread::terminateThread(GMint ret)
+void GMThread::terminateThread(GMint32 ret)
 {
 	D(d);
 	::TerminateThread((HANDLE)d->handle, ret);
 }
 
-bool GMThread::join(GMuint milliseconds)
+bool GMThread::join(GMuint32 milliseconds)
 {
 	D(d);
 	return ::WaitForSingleObject((HANDLE)d->handle, !milliseconds ? INFINITE : milliseconds) == WAIT_OBJECT_0;
@@ -104,7 +104,7 @@ GMThreadId GMThread::getCurrentThreadId()
 	return ::GetCurrentThreadId();
 }
 
-void GMThread::sleep(GMint milliseconds)
+void GMThread::sleep(GMint32 milliseconds)
 {
 	::Sleep(milliseconds);
 }

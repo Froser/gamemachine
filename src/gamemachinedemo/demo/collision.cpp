@@ -9,9 +9,9 @@
 
 namespace
 {
-	constexpr gm::GMint ARRAY_SIZE_X = 5;
-	constexpr gm::GMint ARRAY_SIZE_Y = 5;
-	constexpr gm::GMint ARRAY_SIZE_Z = 5;
+	constexpr gm::GMint32 ARRAY_SIZE_X = 5;
+	constexpr gm::GMint32 ARRAY_SIZE_Y = 5;
+	constexpr gm::GMint32 ARRAY_SIZE_Z = 5;
 
 	static GMVec3 s_colors[4] =
 	{
@@ -63,12 +63,12 @@ void Demo_Collision::init()
 		gm::GMPhysicsShapeCreator::createBoxShape(GMVec3(.1f, .1f, .1f), boxShape);
 		gm::GMAsset boxAsset = getDemoWorldReference()->getAssets().addAsset(boxShape);
 
-		gm::GMint idx = 0;
-		for (gm::GMint k = 0; k < ARRAY_SIZE_Y; k++)
+		gm::GMint32 idx = 0;
+		for (gm::GMint32 k = 0; k < ARRAY_SIZE_Y; k++)
 		{
-			for (gm::GMint i = 0; i < ARRAY_SIZE_X; i++)
+			for (gm::GMint32 i = 0; i < ARRAY_SIZE_X; i++)
 			{
-				for (gm::GMint j = 0; j < ARRAY_SIZE_Z; j++, idx++)
+				for (gm::GMint32 j = 0; j < ARRAY_SIZE_Z; j++, idx++)
 				{
 					gm::GMRigidPhysicsObject* rigidBoxObj = new gm::GMRigidPhysicsObject();
 					if (idx == 0)

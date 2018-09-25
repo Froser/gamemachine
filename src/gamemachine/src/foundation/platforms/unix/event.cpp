@@ -32,7 +32,7 @@ GMEvent::~GMEvent()
 	d->handle = nullptr;
 }
 
-void GMEvent::wait(GMuint milliseconds)
+void GMEvent::wait(GMuint32 milliseconds)
 {
 	D(d);
 	GMEventHandleStruct* handle = (GMEventHandleStruct*)d->handle;

@@ -126,7 +126,7 @@ void GMWindow_Dx11::onWindowCreated(const GMWindowAttributes& wndAttrs)
 
 	UINT renderWidth = wndAttrs.rc.right - wndAttrs.rc.left;
 	UINT renderHeight = wndAttrs.rc.bottom - wndAttrs.rc.top;
-	GMuint numerator = 0, denominator = 0;
+	GMuint32 numerator = 0, denominator = 0;
 
 	// 1.枚举设备属性
 	if (!dxgiFactory || !dxgiAdapter || dxgiAdapterOutput)
@@ -136,15 +136,15 @@ void GMWindow_Dx11::onWindowCreated(const GMWindowAttributes& wndAttrs)
 		GM_DX_HR(dxgiAdapter->EnumOutputs(0, &dxgiAdapterOutput));
 	}
 
-	GMuint numModes;
+	GMuint32 numModes;
 	GM_DX_HR(dxgiAdapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, NULL));
 	d->modes = new DXGI_MODE_DESC[numModes];
 	GM_DX_HR(dxgiAdapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, d->modes));
-	for (GMuint i = 0; i < numModes; i++)
+	for (GMuint32 i = 0; i < numModes; i++)
 	{
-		if (d->modes[i].Width == (GMuint)renderWidth)
+		if (d->modes[i].Width == (GMuint32)renderWidth)
 		{
-			if (d->modes[i].Height == (GMuint)renderHeight)
+			if (d->modes[i].Height == (GMuint32)renderHeight)
 			{
 				numerator = d->modes[i].RefreshRate.Numerator;
 				denominator = d->modes[i].RefreshRate.Denominator;
@@ -242,7 +242,7 @@ void GMWindow_Dx11::onWindowCreated(const GMWindowAttributes& wndAttrs)
 	// 3.创建目标视图
 	GM_DX_HR(d->swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer)));
 
-	static GMint targetViewId = 0;
+	static GMint32 targetViewId = 0;
 	GM_DX_HR(d->device->CreateRenderTargetView(backBuffer, NULL, &d->renderTargetView));
 	GM_DX11_SET_OBJECT_NAME_A(d->renderTargetView, (GMString("GM_DefaultRenderTargetView_") + GMString(targetViewId)).toStdString().c_str());
 	++targetViewId;

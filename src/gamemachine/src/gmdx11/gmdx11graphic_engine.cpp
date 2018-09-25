@@ -60,7 +60,7 @@ void GMDx11GraphicEngine::activateLights(ITechnique* technique)
 		GM_ASSERT(lightCount <= getMaxLightCount());
 		shaderProgram->setInt(GM_VariablesDesc.LightCount, gm_sizet_to_uint(lightCount));
 
-		for (GMuint i = 0; i < (GMuint)lightCount; ++i)
+		for (GMuint32 i = 0; i < (GMuint32)lightCount; ++i)
 		{
 			lights[i]->activateLight(i, technique);
 		}

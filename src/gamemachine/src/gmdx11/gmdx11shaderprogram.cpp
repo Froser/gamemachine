@@ -32,7 +32,7 @@ void GMDx11EffectShaderProgram::setVec3(const char* name, const GMfloat value[3]
 	GM_ASSERT(false); //not supported
 }
 
-void GMDx11EffectShaderProgram::setInt(const char* name, GMint value)
+void GMDx11EffectShaderProgram::setInt(const char* name, GMint32 value)
 {
 	D(d);
 	ID3DX11EffectScalarVariable* var = getScalarVariable(name);

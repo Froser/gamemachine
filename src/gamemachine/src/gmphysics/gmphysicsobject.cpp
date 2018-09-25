@@ -59,9 +59,9 @@ void GMRigidPhysicsObject::setActivationState(GMPhysicsActivationState state, bo
 	D(d);
 	GM_ASSERT(d->body);
 	if (force)
-		d->body->forceActivationState((GMint)state);
+		d->body->forceActivationState((GMint32)state);
 	else
-		d->body->setActivationState((GMint)state);
+		d->body->setActivationState((GMint32)state);
 }
 
 void GMRigidPhysicsObject::activate(bool force)

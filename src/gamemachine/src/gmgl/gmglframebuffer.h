@@ -25,14 +25,14 @@ public:
 	virtual const IRenderContext* getContext();
 
 public:
-	GMuint getTextureId();
+	GMuint32 getTextureId();
 };
 
 class GMGLDefaultFramebuffers;
 GM_PRIVATE_OBJECT(GMGLFramebuffers)
 {
-	GMuint fbo = 0;
-	GMuint depthStencilBuffer = 0;
+	GMuint32 fbo = 0;
+	GMuint32 depthStencilBuffer = 0;
 	Vector<GMGLFramebuffer*> framebuffers;
 	bool framebuffersCreated = false;
 	GMGraphicEngine* engine = nullptr;
@@ -63,7 +63,7 @@ public:
 	virtual const IRenderContext* getContext();
 
 public:
-	virtual GMuint framebufferId();
+	virtual GMuint32 framebufferId();
 
 	const GMFramebufferDesc& getDesc()
 	{
@@ -84,7 +84,7 @@ public:
 
 GM_PRIVATE_OBJECT(GMGLShadowMapTexture)
 {
-	GMuint textureId;
+	GMuint32 textureId;
 };
 
 class GMGLShadowMapTexture : public ITexture
@@ -92,18 +92,18 @@ class GMGLShadowMapTexture : public ITexture
 	GM_DECLARE_PRIVATE(GMGLShadowMapTexture)
 
 public:
-	GMGLShadowMapTexture(GMuint textureId);
+	GMGLShadowMapTexture(GMuint32 textureId);
 	~GMGLShadowMapTexture();
 
 	virtual void init() override;
 	virtual void bindSampler(GMTextureSampler* sampler) override {}
-	virtual void useTexture(GMint) override;
+	virtual void useTexture(GMint32) override;
 };
 
 GM_PRIVATE_OBJECT(GMGLShadowFramebuffers)
 {
-	GMint width = 0;
-	GMint height = 0;
+	GMint32 width = 0;
+	GMint32 height = 0;
 	GMTextureAsset shadowMapTexture;
 };
 
@@ -120,13 +120,13 @@ public:
 	virtual void bind() override;
 
 public:
-	inline GMint getShadowMapWidth()
+	inline GMint32 getShadowMapWidth()
 	{
 		D(d);
 		return d->width;
 	}
 
-	inline GMint getShadowMapHeight()
+	inline GMint32 getShadowMapHeight()
 	{
 		D(d);
 		return d->height;

@@ -9,8 +9,8 @@ GM_PRIVATE_OBJECT(Demo_Phong_PBR)
 {
 	gm::GMGameObject* gameObject = nullptr;
 	gm::GMGameObject* gameObject_Phong = nullptr;
-	gm::GMint mouseDownX;
-	gm::GMint mouseDownY;
+	gm::GMint32 mouseDownX;
+	gm::GMint32 mouseDownY;
 	bool draggingL = false;
 	bool draggingR = false;
 	GMQuat lookAtRotation;

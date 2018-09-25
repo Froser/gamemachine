@@ -46,11 +46,11 @@ GMTextureSampler& GMTextureSampler::operator=(const GMTextureSampler& rhs)
 	D(d);
 	D_OF(rhs_d, &rhs);
 	*d = *rhs.data();
-	for (GMint i = 0; i < MAX_ANIMATION_FRAME; i++)
+	for (GMint32 i = 0; i < MAX_ANIMATION_FRAME; i++)
 	{
 		d->frames[i] = rhs_d->frames[i];
 	}
-	for (GMint i = 0; i < MAX_TEX_TRANS; i++)
+	for (GMint32 i = 0; i < MAX_TEX_TRANS; i++)
 	{
 		d->texTransform[i] = rhs_d->texTransform[i];
 	}
@@ -59,7 +59,7 @@ GMTextureSampler& GMTextureSampler::operator=(const GMTextureSampler& rhs)
 
 void GMTextureSampler::applyTexMode(GMfloat timeSeconds, std::function<void(GMS_TextureTransformType, Pair<GMfloat, GMfloat>&&)> callback)
 {
-	GMuint n = 0;
+	GMuint32 n = 0;
 	const GMS_TextureTransform& tc = getTextureTransform(n);
 	while (n < MAX_TEX_TRANS && tc.type != GMS_TextureTransformType::NoTextureTransform)
 	{

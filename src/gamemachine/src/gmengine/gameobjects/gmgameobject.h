@@ -10,7 +10,7 @@ BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMGameObject)
 {
-	GMuint id = 0;
+	GMuint32 id = 0;
 	GMOwnedPtr<GMPhysicsObject> physics;
 	GMGameWorld* world = nullptr;
 	GMMat4 scaling = Identity<GMMat4>();

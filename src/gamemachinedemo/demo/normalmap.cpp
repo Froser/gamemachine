@@ -151,10 +151,10 @@ void Demo_NormalMap::event(gm::GameMachineHandlerEvent evt)
 		if (kbState.keyTriggered(gm::GM_ASCIIToKey('0')))
 			db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, 0);
 
-		for (gm::GMint i = 0; i < 8; ++i)
+		for (gm::GMint32 i = 0; i < 8; ++i)
 		{
-			if (kbState.keyTriggered(gm::GM_ASCIIToKey('1' + (gm::GMint)i)))
-				db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, (gm::GMint)i + 1);
+			if (kbState.keyTriggered(gm::GM_ASCIIToKey('1' + (gm::GMint32)i)))
+				db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, (gm::GMint32)i + 1);
 		}
 		break;
 	}
