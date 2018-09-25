@@ -21,7 +21,6 @@ bool GMDefaultGamePackageHandler::readFileFromPath(const GMString& path, REF GMB
 	file.open(p, std::ios::in | std::ios::binary | std::ios::ate);
 	if (file.good())
 	{
-		file.seekg(0, std::ios::end);
 		GMint size = file.tellg();
 		if (size == -1)
 		{

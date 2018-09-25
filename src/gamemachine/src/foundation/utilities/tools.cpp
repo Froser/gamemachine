@@ -3,6 +3,7 @@
 #include <linearmath.h>
 #include "assert.h"
 #include <zlib.h>
+#include <fstream>
 
 //GMClock
 GMClock::GMClock()
@@ -576,4 +577,44 @@ GMZip::ErrorCode GMZip::translateError(GMint err)
 		return StreamError;
 	}
 	return UnknownError;
+}
+
+void GMTextFile::open(const GMString& fn)
+{
+	std::ifstream file;
+	std::string p = fn.toStdString();
+	file.open(p, std::ios::in | std::ios::ate);
+	if (file.good())
+	{
+		state = Ok;
+		file.seekg(0, std::ios::end);
+		size = file.tellg();
+		if (size == -1)
+		{
+			state = GMTextFile::Bad;
+			return;
+		}
+
+		char* buf = new char[size];
+		file.seekg(0, std::ios::beg);
+		file.read(buf, size);
+		file.close();
+
+		text = GMString(buf);
+		GM_delete_array(buf);
+	}
+	else
+	{
+		state = GMTextFile::Bad;
+	}
+}
+
+const GMString& GMTextFile::getText()
+{
+	return text;
+}
+
+GMTextFile::State GMTextFile::getState()
+{
+	return state;
 }

@@ -398,5 +398,26 @@ private:
 	static ErrorCode translateError(GMint);
 };
 
+class GMTextFile
+{
+public:
+	enum State
+	{
+		NotOpened,
+		Ok,
+		Bad,
+	};
+
+public:
+	void open(const GMString& file);
+	const GMString& getText();
+	State getState();
+
+private:
+	GMString text;
+	State state = NotOpened;
+	GMsize_t size = 0;
+};
+
 END_NS
 #endif
