@@ -7,9 +7,40 @@
 
 namespace
 {
-	void getCPUInfo()
+	void getSystemInfo(GMSystemInfo& si)
 	{
-		
+		static char s_line[1024] = { 0 };
+		FILE* fp = fopen ("/proc/cpuinfo", "r");
+
+		int processors = 0;
+		if (fp)
+		{
+			while (!feof(fp))
+			{
+				if ( !fgets (s_line, sizeof (s_line), fp))
+					continue;
+
+				GMString s(s_line);
+				if (s.startsWith(L"processor"))
+				{
+					++processors;
+				}
+				else if (s.startsWith(L"vendor_id"))
+				{
+					if (s.endsWith(L"GenuineIntel\n"))
+						si.processorArchitecture = GMProcessorArchitecture::Intel;
+					else if (s.endsWith(L"AuthenticAMD\n"))
+						si.processorArchitecture = GMProcessorArchitecture::AMD64;
+				}
+
+			}
+			si.numberOfProcessors = processors;
+		}
+		else
+		{
+			si.numberOfProcessors = 1;
+			si.processorArchitecture = GMProcessorArchitecture::Unknown;
+		}
 	}
 
 	GMEndiannessMode getMachineEndianness()
@@ -247,7 +278,6 @@ void GameMachine::translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lP
 		case MotionNotify:
 		{
 			GMPoint mousePoint = { xevent->xmotion.x, xevent->xmotion.y };
-			// gm_debug(gm_dbg_wrap("Mouse move detected. ({0}, {1})"), GMString(mousePoint.x), GMString(mousePoint.y));
 			GMSystemEventType type = GMSystemEventType::MouseMove;
 			GMMouseButton triggeredButton = GMMouseButton_None;
 			if (xevent->xbutton.button == Button1)
@@ -273,7 +303,7 @@ void GameMachine::initSystemInfo()
 	if (!inited)
 	{
 		d->states.systemInfo.endiannessMode = getMachineEndianness();
-		d->states.systemInfo.numberOfProcessors = 1;
+		getSystemInfo(d->states.systemInfo);
 		inited = true;
 
 		// set locale

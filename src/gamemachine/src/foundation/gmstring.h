@@ -288,6 +288,8 @@ public:
 
 	bool startsWith(const GMString& string);
 
+	bool endsWith(const GMString& string);
+
 	//! 清除一个字符串中的所有字符。
 	void clear()
 	{
@@ -468,7 +470,7 @@ public:
 	Iterator lineBegin();
 
 private:
-	const GMString m_string;
+	const GMString& m_string;
 };
 
 

@@ -7,8 +7,8 @@ namespace
 {
 	int GetModuleFileName( char* sFileName, int nSize)
 	{
+		static char sLine[1024] = { 0 };
 		int ret = -1;
-		char sLine[1024] = { 0 };
 		void* pSymbol = (void*)"";
 		FILE *fp;
 		char *pPath;

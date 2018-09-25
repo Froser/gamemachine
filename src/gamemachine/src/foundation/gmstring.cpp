@@ -244,6 +244,17 @@ bool GMString::startsWith(const GMString& string)
 	return memEquals(d->data.data(), string.toStdWString().data(), string.length());
 }
 
+bool GMString::endsWith(const GMString& string)
+{
+	D_STR(d);
+	if (length() == 0)
+		return string.length() == 0;
+	if (string.length() > length())
+		return false;
+	GMsize_t pos = length() - string.length();
+	return memEquals(d->data.data() + pos, string.toStdWString().data(), string.length());
+}
+
 void GMString::assign(const GMString& s)
 {
 	D_STR(d);
