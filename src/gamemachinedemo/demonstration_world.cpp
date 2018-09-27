@@ -37,7 +37,7 @@ namespace
 	void loadDemostrations(DemonstrationWorld* world)
 	{
 		world->addDemo(L"入门: 读取一个纹理。", new Demo_Texture(world));
-		//world->addDemo(L"入门: 使用索引缓存读取一个纹理。", new Demo_Texture_Index(world));
+		world->addDemo(L"入门: 使用索引缓存读取一个纹理。", new Demo_Texture_Index(world));
 		world->addDemo(L"高级纹理：使用法线贴图。", new Demo_NormalMap(world));
 		world->addDemo(L"效果：使用自带的各种滤镜。", new Demo_Effects(world));
 		world->addDemo(L"BSP: 渲染一个雷神之锤3的场景。", new Demo_Quake3_BSP(world));
@@ -53,7 +53,7 @@ namespace
 		world->addDemo(L"MD5: 渲染MD5骨骼动画。", new Demo_MD5Mesh(world));
 		world->addDemo(L"地形: 渲染一个地形。", new Demo_Terrain(world));
 		world->addDemo(L"自定义着色器: 使用自定义着色器进行渲染。", new Demo_CustomShader(world));
-		// world->addDemo(L"LUA: 执行Lua脚本。", new Demo_Lua(world));
+		world->addDemo(L"LUA: 执行Lua脚本。", new Demo_Lua(world));
 		world->init();
 	}
 }

@@ -808,6 +808,18 @@ void GMWidget::render(GMfloat elpasedTime)
 	if (d->title)
 		onRenderTitle();
 
+	// 如果overflow样式为hidden，那么我们要在Widget的标题栏下方绘制一块模板
+	// 这样，超出的部分将不会被绘制出来
+	// 如果overflow样式为auto，那么我们不仅要在Widget的标题栏下方绘制一块模板，还需要多绘制一个滚动条
+
+	if (getOverflow() == GMOverflowStyle::Auto || getOverflow() == GMOverflowStyle::Hidden)
+	{
+		// 计算显示内容的矩形
+		GMRect rc = getContentRect();
+		drawStencil(rc, .99f);
+		useStencil(true);
+	}
+
 	if (!d->minimized)
 	{
 		for (auto control : d->controls)
@@ -821,6 +833,11 @@ void GMWidget::render(GMfloat elpasedTime)
 
 		if (d->focusControl && d->focusControl->getParent() == this)
 			d->focusControl->render(elpasedTime);
+	}
+
+	if (getOverflow() == GMOverflowStyle::Auto || getOverflow() == GMOverflowStyle::Hidden)
+	{
+		endStencil();
 	}
 }
 
@@ -845,7 +862,7 @@ void GMWidget::refresh()
 
 	s_controlFocus = nullptr;
 	s_controlPressed = nullptr;
-	d->controlMouseOver = nullptr;
+	resetControlMouseOver();
 
 	for (auto control : d->controls)
 	{
@@ -879,7 +896,7 @@ void GMWidget::removeAllControls()
 		s_controlFocus = nullptr;
 	if (s_controlPressed && s_controlPressed->getParent() == this)
 		s_controlPressed = nullptr;
-	d->controlMouseOver = nullptr;
+	resetControlMouseOver();
 
 	for (auto control : d->controls)
 	{
@@ -1038,6 +1055,13 @@ void GMWidget::initStyles()
 	GMRect rc = { 0, 0, 1, 1 };
 	whiteTextureStyle.setTexture({ d->manager->getWhiteTextureId(), rc });
 	d->whiteTextureStyle = whiteTextureStyle;
+}
+
+GMRect GMWidget::getContentRect()
+{
+	D(d);
+	GMRect rc = { d->contentPaddingLeft, d->contentPaddingTop, d->width - d->contentPaddingRight, d->height - d->contentPaddingBottom };
+	return rc;
 }
 
 void GMWidget::clearFocus(GMWidget* sender)

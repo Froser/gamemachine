@@ -286,6 +286,14 @@ struct GMWidgetTextureArea
 	GMRect rc;
 };
 
+enum class GMOverflowStyle
+{
+	Auto,
+	Hidden,
+	Visible,
+	Scroll,
+};
+
 GM_PRIVATE_OBJECT(GMWidget)
 {
 	GMWidgetResourceManager* manager = nullptr;
@@ -297,6 +305,10 @@ GM_PRIVATE_OBJECT(GMWidget)
 	GMControlBorder* borderControl = nullptr;
 	GMint32 borderMarginLeft = 10;
 	GMint32 borderMarginTop = 30;
+	GMint32 contentPaddingLeft = 0;
+	GMint32 contentPaddingTop = 0;
+	GMint32 contentPaddingRight = 0;
+	GMint32 contentPaddingBottom = 0;
 	GMfloat timeLastRefresh = 0;
 	GMControl* controlMouseOver = nullptr;
 	bool nonUserEvents = false;
@@ -312,6 +324,7 @@ GM_PRIVATE_OBJECT(GMWidget)
 	GMStyle shadowStyle;
 
 	GMStyle whiteTextureStyle;
+	GMOverflowStyle overflow = GMOverflowStyle::Auto;
 
 	GMFloat4 colorTopLeft = GMFloat4(0, 0, 0, 0);
 	GMFloat4 colorTopRight = GMFloat4(0, 0, 0, 0);
@@ -331,6 +344,13 @@ GM_PRIVATE_OBJECT(GMWidget)
 class GMWidget : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMWidget)
+	GM_DECLARE_PROPERTY(Minimum, minimized, bool)
+	GM_DECLARE_PROPERTY(Visible, visible, bool)
+	GM_DECLARE_PROPERTY(Overflow, overflow, GMOverflowStyle)
+	GM_DECLARE_PROPERTY(ContentPaddingLeft, contentPaddingLeft, GMint32)
+	GM_DECLARE_PROPERTY(ContentPaddingTop, contentPaddingTop, GMint32)
+	GM_DECLARE_PROPERTY(ContentPaddingRight, contentPaddingRight, GMint32)
+	GM_DECLARE_PROPERTY(ContentPaddingBottom, contentPaddingBottom, GMint32)
 
 public:
 	GMWidget(GMWidgetResourceManager* manager);
@@ -444,6 +464,7 @@ private:
 	void onMouseMove(const GMPoint& pt);
 	void mapRect(GMRect& rc);
 	void initStyles();
+	GMRect getContentRect();
 
 public:
 	inline IWindow* getParentWindow()
@@ -456,30 +477,6 @@ public:
 	{
 		D(d);
 		d->parentWindow = window;
-	}
-
-	inline void setMinimize(bool minimize)
-	{
-		D(d);
-		d->minimized = minimize;
-	}
-
-	inline bool getMinimize()
-	{
-		D(d);
-		return d->minimized;
-	}
-
-	inline void setVisible(bool visible)
-	{
-		D(d);
-		d->visible = visible;
-	}
-
-	inline bool getVisible()
-	{
-		D(d);
-		return d->visible;
 	}
 
 	inline GMWidget* getNextCanvas()
@@ -543,6 +540,12 @@ public:
 		D(d);
 		GMRect rc = { 0, 0, d->width, d->height };
 		return rc;
+	}
+
+	inline void resetControlMouseOver()
+	{
+		D(d);
+		d->controlMouseOver = nullptr;
 	}
 
 public:
