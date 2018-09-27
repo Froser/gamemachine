@@ -61,74 +61,74 @@ void Demo_Quake3_BSP::init()
 
 	gm::GMWidget* widget = createDefaultWidget();
 	auto top = getClientAreaTop();
-	widget->addLabel(
+	widget->addControl(gm::GMControlLabel::createControl(
+		widget,
 		L"W、S、A、D或XBOX手柄移动",
 		getLabelFontColor(),
 		10,
 		top,
 		250,
 		30,
-		false,
-		nullptr
-	);
-	widget->addLabel(
+		false
+	));
+	widget->addControl(gm::GMControlLabel::createControl(
+		widget,
 		L"Space跳跃",
 		getLabelFontColor(),
 		10,
 		top += 20,
 		250,
 		30,
-		false,
-		nullptr
-	);
-	widget->addLabel(
+		false
+	));
+	widget->addControl(gm::GMControlLabel::createControl(
+		widget,
 		L"R显示/隐藏鼠标",
 		getLabelFontColor(),
 		10,
 		top += 20,
 		250,
 		30,
-		false,
-		nullptr
-	);
+		false
+	));
 
 	gm::GMControlButton* button = nullptr;
-	widget->addButton(
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
 		L"开启/关闭计算BSP面",
 		10,
 		top += 40,
 		250,
 		30,
-		false,
-		&button
-	);
+		false
+	));
 
 	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->world->setRenderConfig(gm::GMBSPRenderConfigs::CalculateFace_Bool, !d->world->getRenderConfig(gm::GMBSPRenderConfigs::CalculateFace_Bool).toBool());
 	});
 
-	widget->addButton(
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
 		L"开启/关闭只绘制天空",
 		10,
 		top += 40,
 		250,
 		30,
-		false,
-		&button
-	);
+		false
+	));
 	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->world->setRenderConfig(gm::GMBSPRenderConfigs::DrawSkyOnly_Bool, !d->world->getRenderConfig(gm::GMBSPRenderConfigs::DrawSkyOnly_Bool).toBool());
 	});
 
-	widget->addButton(
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
 		L"开启/关闭只绘制Lightmap",
 		10,
 		top += 40,
 		250,
 		30,
-		false,
-		&button
-	);
+		false
+	));
 	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		db->debugConfig.set(gm::GMDebugConfigs::DrawLightmapOnly_Bool, !db->debugConfig.get(gm::GMDebugConfigs::DrawLightmapOnly_Bool).toBool());
 	});

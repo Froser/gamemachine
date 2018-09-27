@@ -72,80 +72,80 @@ void Demo_Sound::init()
 	auto top = getClientAreaTop();
 
 	gm::GMControlButton* button = nullptr;
-	widget->addButton(
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
 		L"播放Wav音频",
 		10,
 		top,
 		250,
 		30,
-		false,
-		&button
-	);
+		false
+	));
 	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->wavSource->play(false);
 	});
 
-	widget->addButton(
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
 		L"暂停播放Wav音频",
 		10,
 		top += 40,
 		250,
 		30,
-		false,
-		&button
-	);
+		false
+	));
 	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->wavSource->pause();
 	});
 
-	widget->addButton(
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
 		L"停止播放Wav音频",
 		10,
 		top += 40,
 		250,
 		30,
-		false,
-		&button
-	);
+		false
+	));
 	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->wavSource->stop();
 	});
 
-	widget->addButton(
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
 		L"播放MP3音频",
 		10,
 		top += 40,
 		250,
 		30,
-		false,
-		&button
-	);
+		false
+	));
 	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->mp3Source->play(false);
 	});
 
-	widget->addButton(
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
 		L"暂停播放MP3音频",
 		10,
 		top += 40,
 		250,
 		30,
-		false,
-		&button
-	);
+		false
+	));
 	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->mp3Source->stop();
 	});
 
-	widget->addButton(
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
 		L"停止播放MP3音频",
 		10,
 		top += 40,
 		250,
 		30,
-		false,
-		&button
-	);
+		false
+	));
 	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->mp3Source->stop();
 	});

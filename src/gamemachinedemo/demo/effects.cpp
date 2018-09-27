@@ -4,15 +4,15 @@
 #include <gmwidget.h>
 
 #define DECL_BUTTON(button, top, effect, offset, text) \
-widget->addButton(	\
+widget->addControl(button = gm::GMControlButton::createControl( \
+widget,				\
 text,				\
 10,					\
 top+=(offset),		\
 250,				\
 30,					\
-false,				\
-&button				\
-);					\
+false				\
+));					\
 connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) { setEffect(effect); });
 
 void Demo_Effects::init()

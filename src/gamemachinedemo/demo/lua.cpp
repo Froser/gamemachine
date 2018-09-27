@@ -19,7 +19,8 @@ void Demo_Lua::init()
 	gm::GMRect txtCorner = { 0, 0, 6, 8 };
 	gm::GMRect thumbCorner = { 0, 0, 7, 15 };
 	d->textCode = nullptr;
-	widget->addTextArea(
+	widget->addControl(d->textCode = gm::GMControlTextArea::createControl(
+		widget,
 		L"",
 		10,
 		top,
@@ -28,36 +29,35 @@ void Demo_Lua::init()
 		false,
 		true,
 		txtCorner,
-		thumbCorner,
-		&d->textCode
-	);
+		thumbCorner
+	));
 	d->textCode->setPadding(5, 10);
 	d->textCode->setScrollBar(true);
 
 	gm::GMControlButton* btnRun = nullptr;
-	widget->addButton(
+	widget->addControl(btnRun = gm::GMControlButton::createControl(
+		widget,
 		L"运行",
 		10,
 		top += 520,
 		250,
 		30,
-		false,
-		&btnRun
-	);
+		false
+	));
 	connect(*btnRun, GM_SIGNAL(gm::GMControlButton::click), [=](auto, auto) {
 		runScript();
 	});
 
-	widget->addLabel(
+	widget->addControl(d->lbState = gm::GMControlLabel::createControl(
+		widget,
 		L"",
 		GMVec4(1, 1, 1, 1),
 		10,
 		top += 40,
 		250,
 		30,
-		false,
-		&d->lbState
-	);
+		false
+	));
 
 	widget->setSize(800, top);
 }
@@ -118,29 +118,29 @@ gm::GMWidget* Demo_Lua::createDefaultWidget()
 
 	if (!getDescription().isEmpty())
 	{
-		d->mainWidget->addLabel(
+		d->mainWidget->addControl(gm::GMControlLabel::createControl(
+			d->mainWidget.get(),
 			getDescription(),
 			getLabelFontColor(),
 			10,
 			top,
 			250,
 			30,
-			false,
-			nullptr
-		);
+			false
+		));
 		top += 40;
 	}
 
 	gm::GMControlButton* button = nullptr;
-	d->mainWidget->addButton(
+	d->mainWidget->addControl(button = gm::GMControlButton::createControl(
+		d->mainWidget.get(),
 		L"返回主菜单",
 		10,
 		top,
 		250,
 		30,
-		false,
-		&button
-	);
+		false
+	));
 	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		backToEntrance();
 	});

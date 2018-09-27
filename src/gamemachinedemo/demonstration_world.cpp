@@ -266,86 +266,86 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 
 	if (!getDescription().isEmpty())
 	{
-		d->mainWidget->addLabel(
+		d->mainWidget->addControl(gm::GMControlLabel::createControl(
+			d->mainWidget.get(),
 			getDescription(),
 			getLabelFontColor(),
 			10,
 			top,
 			250,
 			30,
-			false,
-			nullptr
-		);
+			false
+		));
 		top += 40;
 	}
 
 	gm::GMControlButton* button = nullptr;
-	d->mainWidget->addButton(
+	d->mainWidget->addControl(button = gm::GMControlButton::createControl(
+		d->mainWidget.get(),
 		L"返回主菜单",
 		10,
 		top,
 		250,
 		30,
-		false,
-		&button
-	);
+		false
+	));
 	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		backToEntrance();
 	});
 
-	d->mainWidget->addLabel(
+	d->mainWidget->addControl(gm::GMControlLabel::createControl(
+		d->mainWidget.get(),
 		L"当前状态:",
 		getLabelFontColor(),
 		10,
 		top += 40,
 		250,
 		20,
-		false,
-		nullptr
-	);
+		false
+	));
 
-	d->mainWidget->addLabel(
+	d->mainWidget->addControl(d->lbFPS = gm::GMControlLabel::createControl(
+		d->mainWidget.get(),
 		L"",
 		getLabelFontColor(),
 		10,
 		top += 20,
 		250,
 		20,
-		false,
-		&d->lbFPS
-	);
+		false
+	));
 
-	d->mainWidget->addLabel(
+	d->mainWidget->addControl(d->lbRendering = gm::GMControlLabel::createControl(
+		d->mainWidget.get(),
 		L"",
 		getLabelFontColor(),
 		10,
 		top += 20,
 		250,
 		20,
-		false,
-		&d->lbRendering
-	);
+		false
+	));
 
-	d->mainWidget->addLabel(
+	d->mainWidget->addControl(d->lbGammaCorrection = gm::GMControlLabel::createControl(
+		d->mainWidget.get(),
 		L"",
 		getLabelFontColor(),
 		10,
 		top += 20,
 		250,
 		20,
-		false,
-		&d->lbGammaCorrection
-	);
+		false
+	));
 
-	d->mainWidget->addButton(
+	d->mainWidget->addControl(button = gm::GMControlButton::createControl(
+		d->mainWidget.get(),
 		L"开启/关闭延迟渲染",
 		10,
 		top += 40,
 		250,
 		30,
-		false,
-		&button
-	);
+		false
+	));
 
 	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		if (getDemoWorldReference()->getRenderPreference() == gm::GMRenderPreference::PreferDeferredRendering)
@@ -354,52 +354,52 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 			getDemoWorldReference()->setRenderPreference(gm::GMRenderPreference::PreferDeferredRendering);
 	});
 
-	d->mainWidget->addButton(
+	d->mainWidget->addControl(button = gm::GMControlButton::createControl(
+		d->mainWidget.get(),
 		L"开启/关闭Gamma校正",
 		10,
 		top += 40,
 		250,
 		30,
-		false,
-		&button
-	);
+		false
+	));
 	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->renderConfig.set(gm::GMRenderConfigs::GammaCorrection_Bool, !d->renderConfig.get(gm::GMRenderConfigs::GammaCorrection_Bool).toBool());
 	});
 
-	d->mainWidget->addLabel(
+	d->mainWidget->addControl(d->lbDebugNormal = gm::GMControlLabel::createControl(
+		d->mainWidget.get(),
 		"",
 		getLabelFontColor(),
 		10,
 		top += 40,
 		250,
 		30,
-		false,
-		&d->lbDebugNormal
-	);
+		false
+	));
 
-	d->mainWidget->addButton(
+	d->mainWidget->addControl(button = gm::GMControlButton::createControl(
+		d->mainWidget.get(),
 		L"查看法向量",
 		10,
 		top += 40,
 		250,
 		30,
-		false,
-		&button
-	);
+		false
+	));
 	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		switchNormal();
 	});
 
-	d->mainWidget->addButton(
+	d->mainWidget->addControl(button = gm::GMControlButton::createControl(
+		d->mainWidget.get(),
 		L"切换线框模式",
 		10,
 		top += 40,
 		250,
 		30,
-		false,
-		&button
-	);
+		false
+	));
 	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->debugConfig.set(gm::GMDebugConfigs::WireFrameMode_Bool, !d->debugConfig.get(gm::GMDebugConfigs::WireFrameMode_Bool).toBool());
 	});
@@ -483,15 +483,15 @@ void DemonstrationWorld::init()
 	for (auto& demo : d->demos)
 	{
 		gm::GMControlButton* button = nullptr;
-		d->mainWidget->addButton(
+		d->mainWidget->addControl(button = gm::GMControlButton::createControl(
+			d->mainWidget,
 			demo.first,
 			10,
 			Y,
 			480,
 			30,
-			false,
-			&button
-		);
+			false
+		));
 		Y += 30 + marginY;
 		GM_ASSERT(button);
 		button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
@@ -501,15 +501,15 @@ void DemonstrationWorld::init()
 	}
 
 	gm::GMControlButton* exitButton = nullptr;
-	d->mainWidget->addButton(
+	d->mainWidget->addControl(exitButton = gm::GMControlButton::createControl(
+		d->mainWidget,
 		L"退出程序",
 		10,
 		Y,
 		480,
 		30,
-		false,
-		&exitButton
-	);
+		false
+	));
 	Y += 30 + marginY;
 	GM_ASSERT(exitButton);
 	exitButton->connect(*exitButton, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {

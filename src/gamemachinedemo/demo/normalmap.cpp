@@ -69,26 +69,26 @@ void Demo_NormalMap::init()
 	auto top = getClientAreaTop();
 
 	gm::GMControlLabel* stateLabel = nullptr;
-	widget->addLabel(
+	widget->addControl(stateLabel = gm::GMControlLabel::createControl(
+		widget,
 		L"状态：旋转中",
 		getLabelFontColor(),
 		10,
 		top,
 		250,
 		30,
-		false,
-		&stateLabel
-	);
+		false
+	));
 	gm::GMControlButton* button = nullptr;
-	widget->addButton(
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
 		L"暂停/继续旋转",
 		10,
 		top += 40,
 		250,
 		30,
-		false,
-		&button
-	);
+		false
+	));
 
 	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		if (d->animation.isPlaying())

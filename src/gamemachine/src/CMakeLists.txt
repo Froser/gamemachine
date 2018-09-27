@@ -103,6 +103,8 @@ set(SOURCES
 		gmengine/ui/gmcontrols.cpp
 		gmengine/ui/gmcontroltextedit.h
 		gmengine/ui/gmcontroltextedit.cpp
+		gmengine/ui/gmcontrolpanel.h
+		gmengine/ui/gmcontrolpanel.cpp
 		gmengine/ui/gmuiconfiguration.h
 		gmengine/ui/gmuiconfiguration.cpp
 		gmengine/gmenums.h

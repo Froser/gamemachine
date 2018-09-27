@@ -355,67 +355,13 @@ public:
 		const GMPoint& offset = { 10, 0 }
 	);
 
-	void addLabel(
-		const GMString& text,
-		const GMVec4& fontColor,
-		GMint32 x,
-		GMint32 y,
-		GMint32 width,
-		GMint32 height,
-		bool isDefault,
-		OUT GMControlLabel** out
-	);
-
-	void addButton(
-		const GMString& text,
-		GMint32 x,
-		GMint32 y,
-		GMint32 width,
-		GMint32 height,
-		bool isDefault,
-		OUT GMControlButton** out
-	);
-
 	void addBorder(
 		const GMRect& corner,
 		const GMint32 marginLeft = 10,
 		const GMint32 marginTop = 30
 	);
 
-	void addTextEdit(
-		const GMString& text,
-		GMint32 x,
-		GMint32 y,
-		GMint32 width,
-		GMint32 height,
-		bool isDefault,
-		const GMRect& cornerRect,
-		OUT GMControlTextEdit** out
-	);
-
-	void addTextArea(
-		const GMString& text,
-		GMint32 x,
-		GMint32 y,
-		GMint32 width,
-		GMint32 height,
-		bool isDefault,
-		bool hasScrollBar,
-		const GMRect& textAreaCornerRect,
-		const GMRect& scrollBarThumbCornerRect,
-		OUT GMControlTextArea** out
-	);
-
-	void addScrollBar(
-		GMint32 x,
-		GMint32 y,
-		GMint32 width,
-		GMint32 height,
-		bool isDefault,
-		const GMRect& scrollBarThumbCornerRect,
-		OUT GMControlScrollBar** out
-	);
-
+public:
 	void drawText(
 		const GMString& text,
 		GMStyle& style,

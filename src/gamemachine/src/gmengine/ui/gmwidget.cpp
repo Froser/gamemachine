@@ -281,50 +281,6 @@ void GMWidget::setTitle(
 	d->titleOffset = offset;
 }
 
-void GMWidget::addLabel(
-	const GMString& text,
-	const GMVec4& fontColor,
-	GMint32 x,
-	GMint32 y,
-	GMint32 width,
-	GMint32 height,
-	bool isDefault,
-	OUT GMControlLabel** out
-)
-{
-	GMControlLabel* labelControl = new GMControlLabel(this);
-	if (out)
-		*out = labelControl;
-
-	addControl(labelControl);
-	labelControl->setText(text);
-	labelControl->setPosition(x, y);
-	labelControl->setSize(width, height);
-	labelControl->setFontColor(fontColor);
-	labelControl->setIsDefault(isDefault);
-}
-
-void GMWidget::addButton(
-	const GMString& text,
-	GMint32 x,
-	GMint32 y,
-	GMint32 width,
-	GMint32 height,
-	bool isDefault,
-	OUT GMControlButton** out
-)
-{
-	GMControlButton* buttonControl = new GMControlButton(this);
-	if (out)
-		*out = buttonControl;
-
-	addControl(buttonControl);
-	buttonControl->setText(text);
-	buttonControl->setPosition(x, y);
-	buttonControl->setSize(width, height);
-	buttonControl->setIsDefault(isDefault);
-}
-
 void GMWidget::addBorder(
 	const GMRect& corner,
 	const GMint32 marginLeft,
@@ -355,96 +311,10 @@ void GMWidget::addBorder(
 )
 {
 	D(d);
-	GMControlBorder* borderControl = new GMControlBorder(this);
+	GMControlBorder* borderControl = GMControlBorder::createControl(this, x, y, width, height, cornerRect);
+	addControl(borderControl);
 	if (out)
 		*out = borderControl;
-
-	addControl(borderControl);
-	borderControl->setPosition(x, y);
-	borderControl->setSize(width, height);
-	borderControl->setCorner(cornerRect);
-}
-
-void GMWidget::addTextEdit(
-	const GMString& text,
-	GMint32 x,
-	GMint32 y,
-	GMint32 width,
-	GMint32 height,
-	bool isDefault,
-	const GMRect& cornerRect,
-	OUT GMControlTextEdit** out
-)
-{
-	GMControlTextEdit* textEdit= new GMControlTextEdit(this);
-	if (out)
-		*out = textEdit;
-
-	addControl(textEdit);
-	textEdit->setText(text);
-	textEdit->setPosition(x, y);
-	textEdit->setSize(width, height);
-	textEdit->setIsDefault(isDefault);
-
-	GMControlBorder* border = textEdit->getBorder();
-	border->setCorner(cornerRect);
-}
-
-void GMWidget::addTextArea(
-	const GMString& text,
-	GMint32 x,
-	GMint32 y,
-	GMint32 width,
-	GMint32 height,
-	bool isDefault,
-	bool hasScrollBar,
-	const GMRect& textAreaCornerRect,
-	const GMRect& scrollBarThumbCornerRect,
-	OUT GMControlTextArea** out
-)
-{
-	GMControlTextArea* textArea = new GMControlTextArea(this);
-	if (out)
-		*out = textArea;
-
-	addControl(textArea);
-	textArea->setText(text);
-	textArea->setPosition(x, y);
-	textArea->setSize(width, height);
-	textArea->setIsDefault(isDefault);
-	textArea->setScrollBar(hasScrollBar);
-	if (hasScrollBar)
-		textArea->getScrollBar()->setThumbCorner(scrollBarThumbCornerRect);
-
-	GMControlBorder* border = textArea->getBorder();
-	border->setCorner(textAreaCornerRect);
-
-	if (out)
-		*out = textArea;
-}
-
-void GMWidget::addScrollBar(
-	GMint32 x,
-	GMint32 y,
-	GMint32 width,
-	GMint32 height,
-	bool isDefault,
-	const GMRect& scrollBarThumbCornerRect,
-	OUT GMControlScrollBar** out
-)
-{
-	GMControlScrollBar* scrollBar = new GMControlScrollBar(this);
-	if (out)
-		*out = scrollBar;
-
-	addControl(scrollBar);
-	scrollBar->setPosition(x, y);
-	scrollBar->setSize(width, height);
-	scrollBar->setIsDefault(isDefault);
-	scrollBar->setThumbCorner(scrollBarThumbCornerRect);
-
-	if (out)
-		*out = scrollBar;
 }
 
 void GMWidget::drawText(

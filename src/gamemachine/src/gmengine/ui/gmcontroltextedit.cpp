@@ -359,6 +359,28 @@ private:
 	void initStyles(GMWidget* widget);
 };
 
+GMControlTextEdit* GMControlTextEdit::createControl(
+	GMWidget* widget,
+	const GMString& text,
+	GMint32 x,
+	GMint32 y,
+	GMint32 width,
+	GMint32 height,
+	bool isDefault,
+	const GMRect& cornerRect
+)
+{
+	GMControlTextEdit* textEdit = new GMControlTextEdit(widget);
+	textEdit->setText(text);
+	textEdit->setPosition(x, y);
+	textEdit->setSize(width, height);
+	textEdit->setIsDefault(isDefault);
+
+	GMControlBorder* border = textEdit->getBorder();
+	border->setCorner(cornerRect);
+	return textEdit;
+}
+
 GMControlTextEdit::GMControlTextEdit(GMWidget* widget)
 	: GMControl(widget)
 {
@@ -1189,6 +1211,33 @@ void GMControlTextEdit::setBufferRenderRange(GMint32 xFirst)
 		d->buffer->setRenderRange(d->firstVisibleCP, lastCP);
 }
 
+GMControlTextArea* GMControlTextArea::createControl(
+	GMWidget* widget,
+	const GMString& text,
+	GMint32 x,
+	GMint32 y,
+	GMint32 width,
+	GMint32 height,
+	bool isDefault,
+	bool hasScrollBar,
+	const GMRect& textAreaCornerRect,
+	const GMRect& scrollBarThumbCornerRect
+)
+{
+	GMControlTextArea* textArea = new GMControlTextArea(widget);
+	textArea->setText(text);
+	textArea->setPosition(x, y);
+	textArea->setSize(width, height);
+	textArea->setIsDefault(isDefault);
+	textArea->setScrollBar(hasScrollBar);
+	if (hasScrollBar)
+		textArea->getScrollBar()->setThumbCorner(scrollBarThumbCornerRect);
+
+	GMControlBorder* border = textArea->getBorder();
+	border->setCorner(textAreaCornerRect);
+	return textArea;
+}
+
 GMControlTextArea::GMControlTextArea(GMWidget* widget)
 	: Base(widget)
 {
@@ -1816,10 +1865,15 @@ void GMControlTextArea::updateScrollBar()
 		GMWidget* widget = getParent();
 		if (!d->scrollBar)
 		{
-			d->scrollBar = gm_makeOwnedPtr<GMControlScrollBar>(widget);
-			d->scrollBar->setPosition(db->rcText.x + db->rcText.width - d->scrollBarSize, db->rcText.y - 1);
-			d->scrollBar->setSize(d->scrollBarSize, db->rcText.height + 2);
-			d->scrollBar->setIsDefault(false);
+			d->scrollBar.reset(GMControlScrollBar::createControl(
+				widget,
+				db->rcText.x + db->rcText.width - d->scrollBarSize,
+				db->rcText.y - 1,
+				d->scrollBarSize,
+				db->rcText.height + 2,
+				false,
+				GMRect()
+			));
 			d->scrollBar->setCanRequestFocus(false);
 			updateScrollBarPageStep();
 			connect(*d->scrollBar, GMControlScrollBar::valueChanged, [](auto sender, auto receiver) {

@@ -290,6 +290,18 @@ public:
 	};
 
 public:
+	static GMControlLabel* createControl(
+		GMWidget* widget,
+		const GMString& text,
+		const GMVec4& fontColor,
+		GMint32 x,
+		GMint32 y,
+		GMint32 width,
+		GMint32 height,
+		bool isDefault
+	);
+
+protected:
 	GMControlLabel(GMWidget* widget) : Base(widget) { initStyles(widget); }
 
 public:
@@ -336,6 +348,17 @@ public:
 	GM_DECLARE_SIGNAL(click);
 	
 public:
+	static GMControlButton* createControl(
+		GMWidget* widget,
+		const GMString& text,
+		GMint32 x,
+		GMint32 y,
+		GMint32 width,
+		GMint32 height,
+		bool isDefault
+	);
+
+protected:
 	GMControlButton(GMWidget* widget) : Base(widget) { initStyles(widget); }
 
 public:
@@ -372,6 +395,16 @@ class GMControlBorder : public GMControl
 	GM_DECLARE_PROPERTY(BorderStyle, borderStyle, GMStyle);
 
 public:
+	static GMControlBorder* createControl(
+		GMWidget* widget,
+		GMint32 x,
+		GMint32 y,
+		GMint32 width,
+		GMint32 height,
+		const GMRect& cornerRect
+	);
+
+protected:
 	GMControlBorder(GMWidget* widget) : Base(widget) { initStyles(widget); }
 
 public:
@@ -422,7 +455,6 @@ GM_PRIVATE_OBJECT(GMControlScrollBar)
 
 	GMfloat allowClickDelay = .33f;
 	GMfloat allowClickRepeat = .05f;
-
 };
 
 class GMControlScrollBar : public GMControl
@@ -449,6 +481,17 @@ public:
 	};
 
 public:
+	static GMControlScrollBar* createControl(
+		GMWidget* widget,
+		GMint32 x,
+		GMint32 y,
+		GMint32 width,
+		GMint32 height,
+		bool isDefault,
+		const GMRect& scrollBarThumbCornerRect
+	);
+
+protected:
 	GMControlScrollBar(GMWidget* widget);
 
 public:

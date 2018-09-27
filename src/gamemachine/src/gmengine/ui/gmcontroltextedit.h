@@ -46,7 +46,21 @@ public:
 	GM_DECLARE_SIGNAL(textChanged);
 
 public:
+	static GMControlTextEdit* createControl(
+		GMWidget* widget,
+		const GMString& text,
+		GMint32 x,
+		GMint32 y,
+		GMint32 width,
+		GMint32 height,
+		bool isDefault,
+		const GMRect& cornerRect
+	);
+
+protected:
 	GMControlTextEdit(GMWidget* widget);
+
+public:
 	~GMControlTextEdit();
 
 public:
@@ -165,6 +179,20 @@ class GMControlTextArea : public GMControlTextEdit
 	GM_DECLARE_PROPERTY(ScrollBarSize, scrollBarSize, GMint32)
 
 public:
+	static GMControlTextArea* createControl(
+		GMWidget* widget,
+		const GMString& text,
+		GMint32 x,
+		GMint32 y,
+		GMint32 width,
+		GMint32 height,
+		bool isDefault,
+		bool hasScrollBar,
+		const GMRect& textAreaCornerRect,
+		const GMRect& scrollBarThumbCornerRect
+	);
+
+protected:
 	GMControlTextArea(GMWidget* widget);
 
 public:

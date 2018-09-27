@@ -78,6 +78,26 @@ GMStyle& GMControl::getStyle(StyleType style)
 	return s_style;
 }
 
+GMControlLabel* GMControlLabel::createControl(
+	GMWidget* widget,
+	const GMString& text,
+	const GMVec4& fontColor,
+	GMint32 x,
+	GMint32 y,
+	GMint32 width,
+	GMint32 height,
+	bool isDefault
+)
+{
+	GMControlLabel* labelControl = new GMControlLabel(widget);
+	labelControl->setText(text);
+	labelControl->setPosition(x, y);
+	labelControl->setSize(width, height);
+	labelControl->setFontColor(fontColor);
+	labelControl->setIsDefault(isDefault);
+	return labelControl;
+}
+
 void GMControlLabel::render(GMDuration elapsed)
 {
 	if (!getVisible())
@@ -135,6 +155,24 @@ void GMControlLabel::setFontColor(const GMVec4& color)
 }
 
 GM_DEFINE_SIGNAL(GMControlButton::click)
+
+GMControlButton* GMControlButton::createControl(
+	GMWidget* widget,
+	const GMString& text,
+	GMint32 x,
+	GMint32 y,
+	GMint32 width,
+	GMint32 height,
+	bool isDefault
+)
+{
+	GMControlButton* buttonControl = new GMControlButton(widget);
+	buttonControl->setText(text);
+	buttonControl->setPosition(x, y);
+	buttonControl->setSize(width, height);
+	buttonControl->setIsDefault(isDefault);
+	return buttonControl;
+}
 
 void GMControlButton::refresh()
 {
@@ -330,6 +368,22 @@ void GMControlButton::initStyles(GMWidget* widget)
 	d->fillStyle.setTextureColor(GMControlState::Focus, GMVec4(1.f, 1.f, 1.f, .18f));
 	d->fillStyle.setFontColor(GMControlState::Normal, GMVec4(.3f, .3f, .3f, 1.f));
 	d->fillStyle.setFontColor(GMControlState::MouseOver, GMVec4(0, 0, 0, 1.f));
+}
+
+GMControlBorder* GMControlBorder::createControl(
+	GMWidget* widget,
+	GMint32 x,
+	GMint32 y,
+	GMint32 width,
+	GMint32 height,
+	const GMRect& cornerRect
+)
+{
+	GMControlBorder* borderControl = new GMControlBorder(widget);
+	borderControl->setPosition(x, y);
+	borderControl->setSize(width, height);
+	borderControl->setCorner(cornerRect);
+	return borderControl;
 }
 
 void GMControlBorder::render(GMDuration elapsed)
@@ -582,6 +636,24 @@ GMStyle& GMControlScrollBarThumb::getStyle(GMControl::StyleType style)
 GM_DEFINE_SIGNAL(GMControlScrollBar::valueChanged)
 GM_DEFINE_SIGNAL(GMControlScrollBar::startDragThumb)
 GM_DEFINE_SIGNAL(GMControlScrollBar::endDragThumb)
+
+GMControlScrollBar* GMControlScrollBar::createControl(
+	GMWidget* widget,
+	GMint32 x,
+	GMint32 y,
+	GMint32 width,
+	GMint32 height,
+	bool isDefault,
+	const GMRect& scrollBarThumbCornerRect
+)
+{
+	GMControlScrollBar* scrollBar = new GMControlScrollBar(widget);
+	scrollBar->setPosition(x, y);
+	scrollBar->setSize(width, height);
+	scrollBar->setIsDefault(isDefault);
+	scrollBar->setThumbCorner(scrollBarThumbCornerRect);
+	return scrollBar;
+}
 
 GMControlScrollBar::GMControlScrollBar(GMWidget* widget)
 	: Base(widget) 

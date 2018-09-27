@@ -17,41 +17,41 @@ void Demo_MD5Mesh::init()
 	auto top = getClientAreaTop();
 
 	gm::GMControlButton* button = nullptr;
-	widget->addButton(
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
 		L"切换绘制皮肤",
 		10,
 		top,
 		250,
 		30,
-		false,
-		&button
-	);
+		false
+	));
 	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->boblampclean->setDrawSkin(!d->boblampclean->getDrawSkin());
 	});
 
-	widget->addButton(
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
 		L"切换骨骼",
 		10,
 		top += 40,
 		250,
 		30,
-		false,
-		&button
-	);
+		false
+	));
 	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->boblampclean->setDrawBones(!d->boblampclean->getDrawBones());
 	});
 
-	widget->addButton(
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
 		L"播放/暂停动画",
 		10,
 		top += 40,
 		250,
 		30,
-		false,
-		&button
-	);
+		false
+	));
 	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		if (d->boblampclean->isPlaying())
 			d->boblampclean->pause();
@@ -59,15 +59,15 @@ void Demo_MD5Mesh::init()
 			d->boblampclean->play();
 	});
 
-	widget->addButton(
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
 		L"重置动画",
 		10,
 		top += 40,
 		250,
 		30,
-		false,
-		&button
-	);
+		false
+	));
 	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->boblampclean->reset(true);
 	});

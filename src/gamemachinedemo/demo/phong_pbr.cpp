@@ -97,15 +97,15 @@ void Demo_Phong_PBR::init()
 	auto top = getClientAreaTop();
 
 	gm::GMControlButton* button = nullptr;
-	widget->addButton(
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
 		L"开/关HDR",
 		10,
 		top,
 		250,
 		30,
-		false,
-		&button
-	);
+		false
+	));
 
 	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		gm::GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();

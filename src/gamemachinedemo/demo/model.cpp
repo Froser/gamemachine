@@ -113,15 +113,15 @@ void Demo_Model::init()
 	gm::GMWidget* widget = createDefaultWidget();
 	auto top = getClientAreaTop();
 	gm::GMControlButton* button = nullptr;
-	widget->addButton(
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
 		L"交换物体位置",
 		10,
 		top,
 		250,
 		30,
-		false,
-		&button
-	);
+		false
+	));
 
 	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		if (d->gameObject2 && d->gameObject3)
