@@ -490,16 +490,28 @@ void GMWidget::drawBorder(
 void GMWidget::drawStencil(
 	const GMRect& rc,
 	GMfloat depth,
+	bool drawRc,
 	const GMVec4& color,
-	bool clear
+	bool clearCurrentStencil
 )
 {
 	D(d);
-	static GMStencilOptions s_stencilOptions(GMStencilOptions::OxFF, GMStencilOptions::Always);
 	auto engine = d->parentWindow->getGraphicEngine();
-	if (clear)
+	const auto& currentStencilOptions = engine->getStencilOptions();
+	if (clearCurrentStencil)
 		engine->getDefaultFramebuffers()->clear(GMFramebuffersClearType::Stencil);
-	engine->setStencilOptions(s_stencilOptions);
+
+	if (drawRc)
+	{
+		GMStencilOptions stencilOptions(GMStencilOptions::OxFF, GMStencilOptions::Always);
+		engine->setStencilOptions(stencilOptions);
+	}
+	else
+	{
+		// 如果不用绘制矩形，模板测试一定要失败，并且要更新模板缓存
+		GMStencilOptions stencilOptions(GMStencilOptions::OxFF, GMStencilOptions::Never, GMStencilOptions::Replace, GMStencilOptions::Keep, GMStencilOptions::Keep);
+		engine->setStencilOptions(stencilOptions);
+	}
 	drawRect(color, rc, true, depth);
 }
 
@@ -876,7 +888,7 @@ void GMWidget::render(GMfloat elpasedTime)
 		// 计算显示内容的矩形
 		DataSpin ds(d->scrollOffsetY, 0);
 		GMRect rc = getContentRect();
-		drawStencil(rc, .99f, GMVec4(0, 0, 0, 1));
+		drawStencil(rc, .99f, false);
 		useStencil(true);
 	}
 

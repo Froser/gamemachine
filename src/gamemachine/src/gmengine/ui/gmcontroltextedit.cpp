@@ -1279,7 +1279,7 @@ void GMControlTextArea::render(GMDuration elapsed)
 	// 绘制一个模板区域，防止光标、选中区域和文字超出渲染区域
 	GMWidget* widget = getParent();
 	GMRect expandedRcText = expandStencilRect(db->rcText); // 稍微扩大一下渲染区域，不然看起来很丑。
-	widget->drawStencil(expandedRcText, .99f);
+	widget->drawStencil(expandedRcText, .99f, true);
 	widget->useStencil(true);
 
 	GMRect rcSelection;

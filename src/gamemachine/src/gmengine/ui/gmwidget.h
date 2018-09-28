@@ -434,8 +434,9 @@ public:
 	void drawStencil(
 		const GMRect& rc,
 		GMfloat depth,
+		bool drawRc,
 		const GMVec4& color = GMVec4(1, 1, 1, 1),
-		bool clear = true
+		bool clearCurrentStencil = true
 	);
 
 	void useStencil(

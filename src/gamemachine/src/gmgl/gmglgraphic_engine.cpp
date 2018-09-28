@@ -60,8 +60,8 @@ void GMGLGraphicEngine::init()
 
 	glEnable(GL_STENCIL_TEST);
 	glClearStencil(0);
-	glStencilFunc(GL_ALWAYS, 1, 0xFF);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	GMStencilOptions options(GMStencilOptions::Ox00, GMStencilOptions::Always);
+	setStencilOptions(options);
 
 #if GM_DEBUG
 	glEnable(GL_DEBUG_OUTPUT);

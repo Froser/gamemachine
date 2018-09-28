@@ -15,17 +15,36 @@ namespace
 {
 	bool g_shadowDirty = true;
 
+	inline GLenum toStencilOp(GMStencilOptions::GMStencilOp stencilOptions)
+	{
+		switch (stencilOptions)
+		{
+		case GMStencilOptions::Keep:
+			return GL_KEEP;
+		case GMStencilOptions::Zero:
+			return GL_ZERO;
+		case GMStencilOptions::Replace:
+			return GL_REPLACE;
+		default:
+			GM_ASSERT(false);
+			return GL_KEEP;
+		}
+	}
+
 	inline void applyStencil(GMGLGraphicEngine& engine)
 	{
 		// 应用模板
-		GLenum compareOp = GL_ALWAYS;
+		GLenum compareFunc = GL_ALWAYS;
 		auto& stencilOptions = engine.getStencilOptions();
-		if (stencilOptions.compareOp == GMStencilOptions::Equal)
-			compareOp = GL_EQUAL;
-		else if (stencilOptions.compareOp == GMStencilOptions::NotEqual)
-			compareOp = GL_NOTEQUAL;
-		glStencilFunc(compareOp, 1, 0xFF);
+		if (stencilOptions.compareFunc == GMStencilOptions::Equal)
+			compareFunc = GL_EQUAL;
+		else if (stencilOptions.compareFunc == GMStencilOptions::NotEqual)
+			compareFunc = GL_NOTEQUAL;
+		else if (stencilOptions.compareFunc == GMStencilOptions::Never)
+			compareFunc = GL_NEVER;
+		glStencilFunc(compareFunc, 1, 0xFF);
 		glStencilMask(stencilOptions.writeMask);
+		glStencilOp(toStencilOp(stencilOptions.stencilFailedOp), toStencilOp(stencilOptions.stencilDepthFailedOp), toStencilOp(stencilOptions.stencilPassOp));
 	}
 
 	inline GLenum getMode(GMTopologyMode mode)

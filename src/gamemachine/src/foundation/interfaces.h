@@ -340,11 +340,12 @@ GM_INTERFACE(ILight)
 
 struct GMStencilOptions
 {
-	enum GMStencilOp
+	enum GMStencilFunction
 	{
 		Equal,
 		NotEqual,
-		Always
+		Always,
+		Never,
 	};
 
 	enum GMStencilWriteMask
@@ -353,15 +354,34 @@ struct GMStencilOptions
 		OxFF = 0xFF,
 	};
 
+	enum GMStencilOp
+	{
+		Keep,
+		Zero,
+		Replace,
+	};
+
 	GMStencilOptions() = default;
-	GMStencilOptions(GMStencilWriteMask mask, GMStencilOp op)
-		: writeMask(mask)
-		, compareOp(op)
+	GMStencilOptions(
+		GMStencilWriteMask writemask,
+		GMStencilFunction func,
+		GMStencilOp stencilFailedOperation = Keep,
+		GMStencilOp stencilDepthFailedOperation = Keep,
+		GMStencilOp stencilPassOperation = Replace
+	)
+		: writeMask(writemask)
+		, compareFunc(func)
+		, stencilFailedOp(stencilFailedOperation)
+		, stencilDepthFailedOp(stencilDepthFailedOperation)
+		, stencilPassOp(stencilPassOperation)
 	{
 	}
 
 	GMStencilWriteMask writeMask = Ox00;
-	GMStencilOp compareOp = Always;
+	GMStencilFunction compareFunc = Always;
+	GMStencilOp stencilFailedOp = Keep;
+	GMStencilOp stencilDepthFailedOp = Keep;
+	GMStencilOp stencilPassOp = Replace;
 };
 
 //! 图形绘制引擎接口
