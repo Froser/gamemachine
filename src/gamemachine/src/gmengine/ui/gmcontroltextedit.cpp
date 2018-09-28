@@ -3,12 +3,6 @@
 #include "gmcontroltextedit.h"
 #include "foundation/gamemachine.h"
 
-#ifndef WHEEL_DELTA
-#define WHEEL_DELTA 120
-#endif
-
-#define GM_WHEEL_DELTA WHEEL_DELTA
-
 BEGIN_NS
 
 GM_DEFINE_SIGNAL(GMControlTextEdit::textChanged)

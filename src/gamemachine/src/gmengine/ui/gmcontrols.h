@@ -185,6 +185,8 @@ public:
 
 	virtual GMStyle& getStyle(StyleType style);
 
+	virtual bool containsPoint(GMPoint point);
+
 	virtual void setIndex(GMint32 index)
 	{
 		D(d);
@@ -217,12 +219,6 @@ public:
 	{
 		D(d);
 		d->isDefault = isDefault;
-	}
-
-	virtual bool containsPoint(const GMPoint& point)
-	{
-		D(d);
-		return GM_inRect(d->boundingBox, point);
 	}
 
 public:
@@ -309,7 +305,7 @@ public:
 	virtual void refresh() override;
 	virtual GMStyle& getStyle(Base::StyleType style) override;
 
-	virtual bool containsPoint(const GMPoint&) override
+	virtual bool containsPoint(GMPoint) override
 	{
 		return false;
 	}
@@ -369,10 +365,10 @@ public:
 	virtual bool onMouseDown(GMSystemMouseEvent* event) override;
 	virtual bool onMouseDblClick(GMSystemMouseEvent* event) override;
 	virtual bool onMouseUp(GMSystemMouseEvent* event) override;
-	virtual bool containsPoint(const GMPoint& pt) override;
 	virtual bool canHaveFocus() override;
 	virtual bool onKeyDown(GMSystemKeyEvent* event);
 	virtual bool onKeyUp(GMSystemKeyEvent* event);
+	virtual bool containsPoint(GMPoint point) override;
 	virtual void render(GMDuration elapsed) override;
 
 private:
@@ -409,7 +405,7 @@ protected:
 
 public:
 	virtual void render(GMDuration elapsed) override;
-	virtual bool containsPoint(const GMPoint& point) override;
+	virtual bool containsPoint(GMPoint point) override;
 
 private:
 	void initStyles(GMWidget* widget);

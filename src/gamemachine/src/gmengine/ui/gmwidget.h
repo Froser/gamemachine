@@ -4,6 +4,12 @@
 #include <gmassets.h>
 BEGIN_NS
 
+#ifndef WHEEL_DELTA
+#define WHEEL_DELTA 120
+#endif
+
+#define GM_WHEEL_DELTA WHEEL_DELTA
+
 class GMControl;
 class GMGameObject;
 class GMModel;
@@ -339,6 +345,10 @@ GM_PRIVATE_OBJECT(GMWidget)
 
 	bool movingWidget = false;
 	GMPoint movingStartPt;
+
+	GMint32 scrollOffsetY = 0;
+	GMint32 scrollStep = 10;
+	GMRect controlBoundingBox = { 0 };
 };
 
 class GMWidget : public GMObject
@@ -351,6 +361,8 @@ class GMWidget : public GMObject
 	GM_DECLARE_PROPERTY(ContentPaddingTop, contentPaddingTop, GMint32)
 	GM_DECLARE_PROPERTY(ContentPaddingRight, contentPaddingRight, GMint32)
 	GM_DECLARE_PROPERTY(ContentPaddingBottom, contentPaddingBottom, GMint32)
+	GM_DECLARE_PROPERTY(ScrollStep, scrollStep, GMint32)
+	GM_DECLARE_PROPERTY(ScrollOffsetY, scrollOffsetY, GMint32)
 
 public:
 	GMWidget(GMWidgetResourceManager* manager);
@@ -422,6 +434,7 @@ public:
 	void drawStencil(
 		const GMRect& rc,
 		GMfloat depth,
+		const GMVec4& color = GMVec4(1, 1, 1, 1),
 		bool clear = true
 	);
 
@@ -433,15 +446,22 @@ public:
 
 	void requestFocus(GMControl* control);
 	void setSize(GMint32 width, GMint32 height);
-
+	
 public:
 	virtual bool msgProc(GMSystemEvent* event);
 	virtual void onInit() {}
 	virtual bool onTitleMouseDown(const GMSystemMouseEvent* event);
 	virtual bool onTitleMouseMove(const GMSystemMouseEvent* event);
 	virtual bool onTitleMouseUp(const GMSystemMouseEvent* event);
+	virtual bool onMouseWheel(const GMSystemMouseEvent* event);
 	virtual void onRenderTitle();
 	virtual void onUpdateSize();
+
+	//! 当控件大小发生变化时，调用此方法。
+	/*!
+	  此方法将会计算内部所有控件的边框大小的并集，作为控件是否超出内容矩形区域的依据。
+	*/
+	virtual void onControlRectChanged(GMControl* control);
 
 protected:
 	void addBorder(
@@ -459,7 +479,7 @@ private:
 	void refresh();
 	void focusDefaultControl();
 	void removeAllControls();
-	GMControl* getControlAtPoint(const GMPoint& pt);
+	GMControl* getControlAtPoint(GMPoint pt);
 	bool onCycleFocus(bool goForward);
 	void onMouseMove(const GMPoint& pt);
 	void mapRect(GMRect& rc);

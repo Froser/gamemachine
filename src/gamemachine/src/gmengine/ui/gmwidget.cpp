@@ -490,17 +490,17 @@ void GMWidget::drawBorder(
 void GMWidget::drawStencil(
 	const GMRect& rc,
 	GMfloat depth,
+	const GMVec4& color,
 	bool clear
 )
 {
 	D(d);
-	static GMVec4 one = GMVec4(1, 1, 1, 1);
 	static GMStencilOptions s_stencilOptions(GMStencilOptions::OxFF, GMStencilOptions::Always);
 	auto engine = d->parentWindow->getGraphicEngine();
 	if (clear)
 		engine->getDefaultFramebuffers()->clear(GMFramebuffersClearType::Stencil);
 	engine->setStencilOptions(s_stencilOptions);
-	drawRect(one, rc, true, depth);
+	drawRect(color, rc, true, depth);
 }
 
 void GMWidget::useStencil(
@@ -698,6 +698,11 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 			if (d->title && onTitleMouseUp(&cacheEvent))
 				return true;
 		}
+		else if (type == GMSystemEventType::MouseWheel)
+		{
+			if (onMouseWheel(&cacheWheelEvent))
+				return true;
+		}
 
 		if (s_controlFocus &&
 			s_controlFocus->getParent() == this &&
@@ -772,6 +777,40 @@ bool GMWidget::onTitleMouseUp(const GMSystemMouseEvent* event)
 	return false;
 }
 
+bool GMWidget::onMouseWheel(const GMSystemMouseEvent* event)
+{
+	D(d);
+	if (getOverflow() == GMOverflowStyle::Scroll || getOverflow() == GMOverflowStyle::Auto)
+	{
+		const GMSystemMouseWheelEvent* wheelEvent = gm_cast<const GMSystemMouseWheelEvent*>(event);
+
+		enum
+		{
+			CannotScroll = 0,
+			CanScrollUp = 1,
+			CanScrollDown = 2,
+		};
+		GMint32 flag = CannotScroll;
+
+		// 如果控件的包围盒高度超出内容区域，则滚动区域，设置一个scrollOffsetY
+		// scrollOffsetY为负数表示向上滚动
+		GMRect contentRect = getContentRect();
+		if (d->scrollOffsetY + d->controlBoundingBox.y + d->controlBoundingBox.height > contentRect.y + contentRect.height)
+			flag |= CanScrollDown;
+		if (d->scrollOffsetY + d->controlBoundingBox.y < contentRect.y )
+			flag |= CanScrollUp;
+
+		// wheelStep为负数，表示滚轮向下滚动，为正数表示向上
+		GMint32 wheelStep = wheelEvent->getDelta() / GM_WHEEL_DELTA * getScrollStep();
+		if ( (wheelStep < 0 && flag & CanScrollDown) || (wheelStep > 0 && flag & CanScrollUp))
+			d->scrollOffsetY += wheelStep;
+		return true;
+	}
+
+	d->scrollOffsetY = 0;
+	return false;
+}
+
 void GMWidget::onRenderTitle()
 {
 	D(d);
@@ -792,9 +831,33 @@ void GMWidget::onUpdateSize()
 	}
 }
 
+void GMWidget::onControlRectChanged(GMControl* control)
+{
+	D(d);
+	// 重新计算所有控件的并集
+	GMRect b = { 0 };
+	if (control != d->borderControl)
+	{
+		for (auto c : d->controls)
+		{
+			if (c != d->borderControl)
+				b = GM_unionRect(c->getBoundingRect(), b);
+		}
+	}
+	d->controlBoundingBox = b;
+}
+
 void GMWidget::render(GMfloat elpasedTime)
 {
 	D(d);
+	struct DataSpin
+	{
+		DataSpin(GMint32& ref, GMfloat v) : data(ref), cache(ref) { data = v; }
+		~DataSpin() { data = cache; }
+		GMint32& data;
+		GMfloat cache;
+	};
+
 	if (d->timeLastRefresh < s_timeRefresh)
 	{
 		d->timeLastRefresh = GM.getRunningStates().elapsedTime;
@@ -805,18 +868,15 @@ void GMWidget::render(GMfloat elpasedTime)
 		(d->minimized && !d->title))
 		return;
 
-	if (d->title)
-		onRenderTitle();
-
 	// 如果overflow样式为hidden，那么我们要在Widget的标题栏下方绘制一块模板
 	// 这样，超出的部分将不会被绘制出来
 	// 如果overflow样式为auto，那么我们不仅要在Widget的标题栏下方绘制一块模板，还需要多绘制一个滚动条
-
 	if (getOverflow() == GMOverflowStyle::Auto || getOverflow() == GMOverflowStyle::Hidden)
 	{
 		// 计算显示内容的矩形
+		DataSpin ds(d->scrollOffsetY, 0);
 		GMRect rc = getContentRect();
-		drawStencil(rc, .99f);
+		drawStencil(rc, .99f, GMVec4(0, 0, 0, 1));
 		useStencil(true);
 	}
 
@@ -824,6 +884,10 @@ void GMWidget::render(GMfloat elpasedTime)
 	{
 		for (auto control : d->controls)
 		{
+			// 我们先不绘制边框，最后再绘制
+			if (d->borderControl == control)
+				continue;
+
 			// 最后渲染焦点控件
 			if (control == d->focusControl)
 				continue;
@@ -838,6 +902,16 @@ void GMWidget::render(GMfloat elpasedTime)
 	if (getOverflow() == GMOverflowStyle::Auto || getOverflow() == GMOverflowStyle::Hidden)
 	{
 		endStencil();
+	}
+
+	// 最后绘制不随滚动状态而变化的部分，如边框，标题栏
+	{
+		DataSpin ds(d->scrollOffsetY, 0);
+		if (d->title)
+			onRenderTitle();
+
+		if (!d->minimized)
+			d->borderControl->render(elpasedTime);
 	}
 }
 
@@ -905,9 +979,13 @@ void GMWidget::removeAllControls()
 	GMClearSTLContainer(d->controls);
 }
 
-GMControl* GMWidget::getControlAtPoint(const GMPoint& pt)
+GMControl* GMWidget::getControlAtPoint(GMPoint pt)
 {
 	D(d);
+	// 在overflow样式为非visible时，不处理内容区域之外的控件，因为它们已经被遮挡
+	if (getOverflow() != GMOverflowStyle::Visible && !GM_inRect(getContentRect(), pt))
+		return nullptr;
+
 	for (auto control : d->controls)
 	{
 		if (!control)
@@ -1033,6 +1111,7 @@ void GMWidget::mapRect(GMRect& rc)
 	D(d);
 	rc.x += d->x;
 	rc.y += d->y;
+	rc.y += d->scrollOffsetY; // 可能存在滚动
 }
 
 void GMWidget::initStyles()

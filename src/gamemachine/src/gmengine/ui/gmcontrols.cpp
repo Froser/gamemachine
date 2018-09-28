@@ -63,6 +63,8 @@ void GMControl::updateRect()
 	d->boundingBox.y = d->y;
 	d->boundingBox.width = d->width;
 	d->boundingBox.height = d->height;
+
+	getParent()->onControlRectChanged(this);
 }
 
 void GMControl::refresh()
@@ -76,6 +78,13 @@ GMStyle& GMControl::getStyle(StyleType style)
 {
 	static GMStyle s_style;
 	return s_style;
+}
+
+bool GMControl::containsPoint(GMPoint point)
+{
+	D(d);
+	point.y -= getParent()->getScrollOffsetY();
+	return GM_inRect(d->boundingBox, point);
 }
 
 GMControlLabel* GMControlLabel::createControl(
@@ -212,12 +221,6 @@ bool GMControlButton::onMouseUp(GMSystemMouseEvent* event)
 	return handleMouseRelease(event->getPoint());
 }
 
-bool GMControlButton::containsPoint(const GMPoint& pt)
-{
-	D_BASE(d, GMControl);
-	return GM_inRect(d->boundingBox, pt);
-}
-
 bool GMControlButton::canHaveFocus()
 {
 	return getEnabled() && getVisible();
@@ -247,6 +250,11 @@ bool GMControlButton::onKeyUp(GMSystemKeyEvent* event)
 		}
 	}
 	return false;
+}
+
+bool GMControlButton::containsPoint(GMPoint point)
+{
+	return GMControl::containsPoint(point);
 }
 
 void GMControlButton::render(GMDuration elapsed)
@@ -398,7 +406,7 @@ void GMControlBorder::render(GMDuration elapsed)
 	widget->drawBorder(d->borderStyle, d->corner, db->boundingBox, .8f);
 }
 
-bool GMControlBorder::containsPoint(const GMPoint& point)
+bool GMControlBorder::containsPoint(GMPoint point)
 {
 	return false;
 }
