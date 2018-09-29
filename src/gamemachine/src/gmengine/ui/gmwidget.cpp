@@ -312,12 +312,14 @@ void GMWidget::addBorder(
 {
 	D(d);
 	GMControlBorder* borderControl = GMControlBorder::createControl(this, x, y, width, height, cornerRect);
+	borderControl->setPositionFlag(GMControlPositionFlag::Fixed);
 	addControl(borderControl);
 	if (out)
 		*out = borderControl;
 }
 
 void GMWidget::drawText(
+	GMControlPositionFlag positionFlag,
 	const GMString& text,
 	GMStyle& style,
 	const GMRect& rc,
@@ -333,13 +335,14 @@ void GMWidget::drawText(
 
 	D(d);
 	GMRect targetRc = rc;
-	mapRect(targetRc);
+	mapRect(positionFlag, targetRc);
 
 	if (shadow)
 	{
 		const GMShadowStyle& shadowStyle = style.getShadowStyle();
 		GMRect shadowRc = { rc.x + shadowStyle.offsetX, rc.y + shadowStyle.offsetY, rc.width, rc.height };
 		drawText(
+			positionFlag,
 			text,
 			d->shadowStyle,
 			shadowRc,
@@ -365,6 +368,7 @@ void GMWidget::drawText(
 }
 
 void GMWidget::drawText(
+	GMControlPositionFlag positionFlag,
 	GMTypoTextBuffer* textBuffer,
 	GMStyle& style,
 	const GMRect& rc,
@@ -377,13 +381,14 @@ void GMWidget::drawText(
 
 	D(d);
 	GMRect targetRc = rc;
-	mapRect(targetRc);
+	mapRect(positionFlag, targetRc);
 
 	if (shadow)
 	{
 		const GMShadowStyle& shadowStyle = style.getShadowStyle();
 		GMRect shadowRc = { rc.x + shadowStyle.offsetX, rc.y + shadowStyle.offsetY, rc.width, rc.height };
 		drawText(
+			positionFlag,
 			textBuffer,
 			d->shadowStyle,
 			shadowRc,
@@ -402,6 +407,7 @@ void GMWidget::drawText(
 }
 
 void GMWidget::drawSprite(
+	GMControlPositionFlag positionFlag,
 	GMStyle& style,
 	const GMRect& rc,
 	GMfloat depth
@@ -413,7 +419,7 @@ void GMWidget::drawSprite(
 
 	D(d);
 	GMRect targetRc = rc;
-	mapRect(targetRc);
+	mapRect(positionFlag, targetRc);
 
 	const GMRect& textureRc = style.getTextureRect();
 	GMuint32 texId = style.getTexture();
@@ -430,6 +436,7 @@ void GMWidget::drawSprite(
 }
 
 void GMWidget::drawRect(
+	GMControlPositionFlag positionFlag,
 	const GMVec4& bkColor,
 	const GMRect& rc,
 	bool isOpaque,
@@ -442,7 +449,7 @@ void GMWidget::drawRect(
 
 	D(d);
 	GMRect targetRc = rc;
-	mapRect(targetRc);
+	mapRect(positionFlag, targetRc);
 
 	const GMRect& textureRc = d->whiteTextureStyle.getTextureRect();
 	GMuint32 texId = d->whiteTextureStyle.getTexture();
@@ -459,6 +466,7 @@ void GMWidget::drawRect(
 }
 
 void GMWidget::drawBorder(
+	GMControlPositionFlag positionFlag,
 	GMStyle& style,
 	const GMRect& cornerRc,
 	const GMRect& rc,
@@ -470,7 +478,7 @@ void GMWidget::drawBorder(
 
 	D(d);
 	GMRect targetRc = rc;
-	mapRect(targetRc);
+	mapRect(positionFlag, targetRc);
 
 	const GMRect& textureRc = style.getTextureRect();
 	GMuint32 texId = style.getTexture();
@@ -488,6 +496,7 @@ void GMWidget::drawBorder(
 }
 
 void GMWidget::drawStencil(
+	GMControlPositionFlag positionFlag,
 	const GMRect& rc,
 	GMfloat depth,
 	bool drawRc,
@@ -512,7 +521,7 @@ void GMWidget::drawStencil(
 		GMStencilOptions stencilOptions(GMStencilOptions::OxFF, GMStencilOptions::Never, GMStencilOptions::Replace, GMStencilOptions::Keep, GMStencilOptions::Keep);
 		engine->setStencilOptions(stencilOptions);
 	}
-	drawRect(color, rc, true, depth);
+	drawRect(positionFlag, color, rc, true, depth);
 }
 
 void GMWidget::useStencil(
@@ -591,13 +600,17 @@ bool GMWidget::verticalScroll(GMint32 offset)
 bool GMWidget::verticalScrollTo(GMint32 value)
 {
 	D(d);
-	GMOverflowStyle overflow = getOverflow();
-	if (overflow == GMOverflowStyle::Scroll || overflow == GMOverflowStyle::Auto)
+	GMint32 overflowFlag = getContentOverflowFlag();
+	if ((overflowFlag & CanScrollUp) || (overflowFlag & CanScrollDown) )
 	{
-		d->scrollOffsetY = value;
-		if (d->verticalScrollbar)
-			d->verticalScrollbar->setValue(-d->scrollOffsetY);
-		return true;
+		GMOverflowStyle overflow = getOverflow();
+		if (overflow == GMOverflowStyle::Scroll || overflow == GMOverflowStyle::Auto)
+		{
+			d->scrollOffsetY = value;
+			if (d->verticalScrollbar)
+				d->verticalScrollbar->setValue(-d->scrollOffsetY);
+			return true;
+		}
 	}
 	d->scrollOffsetY = 0;
 	return false;
@@ -755,12 +768,8 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 			if (d->title && onTitleMouseUp(&cacheEvent))
 				return true;
 		}
-		else if (type == GMSystemEventType::MouseWheel)
-		{
-			if (onMouseWheel(&cacheWheelEvent))
-				return true;
-		}
-
+		
+		
 		if (s_controlFocus &&
 			s_controlFocus->getParent() == this &&
 			s_controlFocus->getEnabled())
@@ -794,6 +803,12 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 			onMouseMove(pt);
 			return false;
 		}
+		else if (type == GMSystemEventType::MouseWheel)
+		{
+			if (onMouseWheel(&cacheWheelEvent))
+				return true;
+		}
+
 		break;
 	}
 	}
@@ -847,10 +862,10 @@ void GMWidget::onRenderTitle()
 {
 	D(d);
 	GMRect rc = { 0, -d->titleHeight, d->width, d->titleHeight };
-	drawSprite(d->titleStyle, rc, .99f);
+	drawSprite(GMControlPositionFlag::Fixed, d->titleStyle, rc, .99f);
 	rc.x += d->titleOffset.x;
 	rc.y += d->titleOffset.y;
-	drawText(d->titleText, d->titleStyle, rc);
+	drawText(GMControlPositionFlag::Fixed, d->titleText, d->titleStyle, rc);
 }
 
 void GMWidget::onUpdateSize()
@@ -863,34 +878,26 @@ void GMWidget::onUpdateSize()
 	}
 }
 
-void GMWidget::onControlRectChanged(GMControl* control)
+void GMWidget::calculateControlBoundingRect()
 {
 	D(d);
 	// 重新计算所有控件的并集
 	GMRect b = { 0 };
-	if (control != d->borderControl)
+	for (auto c : d->controls)
 	{
-		for (auto c : d->controls)
-		{
-			if (c != d->borderControl)
-				b = GM_unionRect(c->getBoundingRect(), b);
-		}
+		if (c != d->borderControl)
+			b = GM_unionRect(c->getBoundingRect(), b);
 	}
-	d->controlBoundingBox = b;
-	updateVerticalScrollbar();
+	if (d->controlBoundingBox != b)
+	{
+		d->controlBoundingBox = b;
+		updateVerticalScrollbar();
+	}
 }
 
 void GMWidget::render(GMfloat elpasedTime)
 {
 	D(d);
-	struct DataSpin
-	{
-		DataSpin(GMint32& ref, GMfloat v) : data(ref), cache(ref) { data = v; }
-		~DataSpin() { data = cache; }
-		GMint32& data;
-		GMfloat cache;
-	};
-
 	if (d->timeLastRefresh < s_timeRefresh)
 	{
 		d->timeLastRefresh = GM.getRunningStates().elapsedTime;
@@ -901,7 +908,8 @@ void GMWidget::render(GMfloat elpasedTime)
 		(d->minimized && !d->title))
 		return;
 
-	// 更新滚动条状态
+	// 更新内容区域以及滚动条状态
+	calculateControlBoundingRect();
 	if (needShowVerticalScrollbar())
 		createVerticalScrollbar();
 	else
@@ -914,9 +922,8 @@ void GMWidget::render(GMfloat elpasedTime)
 	if (getOverflow() != GMOverflowStyle::Visible)
 	{
 		// 计算显示内容的矩形
-		DataSpin ds(d->scrollOffsetY, 0);
 		GMRect rc = getContentRect();
-		drawStencil(rc, .99f, false);
+		drawStencil(GMControlPositionFlag::Fixed, rc, .99f, false);
 		useStencil(true);
 	}
 
@@ -940,23 +947,18 @@ void GMWidget::render(GMfloat elpasedTime)
 			d->focusControl->render(elpasedTime);
 	}
 
-	if (getOverflow() == GMOverflowStyle::Auto || getOverflow() == GMOverflowStyle::Hidden)
-	{
+	if (getOverflow() != GMOverflowStyle::Visible)
 		endStencil();
-	}
 
 	// 最后绘制不随滚动状态而变化的部分，如边框，标题栏
-	{
-		DataSpin ds(d->scrollOffsetY, 0);
-		if (d->title)
-			onRenderTitle();
+	if (d->title)
+		onRenderTitle();
 
-		if (!d->minimized)
-		{
-			d->borderControl->render(elpasedTime);
-			if (d->verticalScrollbar)
-				d->verticalScrollbar->render(elpasedTime);
-		}
+	if (!d->minimized)
+	{
+		d->borderControl->render(elpasedTime);
+		if (d->verticalScrollbar)
+			d->verticalScrollbar->render(elpasedTime);
 	}
 }
 
@@ -1159,12 +1161,15 @@ void GMWidget::onMouseMove(const GMPoint& pt)
 		control->onMouseEnter();
 }
 
-void GMWidget::mapRect(GMRect& rc)
+void GMWidget::mapRect(GMControlPositionFlag positionFlag, GMRect& rc)
 {
 	D(d);
 	rc.x += d->x;
 	rc.y += d->y;
-	rc.y += d->scrollOffsetY; // 可能存在滚动
+
+	// 如果是跟随滚动条，需要加上滚动条偏移
+	if (positionFlag == GMControlPositionFlag::Auto)
+		rc.y += d->scrollOffsetY;
 }
 
 void GMWidget::initStyles()
@@ -1256,12 +1261,13 @@ void GMWidget::disableVerticalScrollbar()
 		d->verticalScrollbar->setVisible(false);
 		updateVerticalScrollbar();
 	}
+	d->scrollOffsetY = 0;
 }
 
 bool GMWidget::needShowVerticalScrollbar()
 {
 	GMint32 overflowFlag = getContentOverflowFlag();
-	return (overflowFlag & CanScrollUp || overflowFlag & CanScrollDown && getOverflow() != GMOverflowStyle::Visible);
+	return (overflowFlag & CanScrollUp || overflowFlag & CanScrollDown && getOverflow() != GMOverflowStyle::Visible) || getOverflow() == GMOverflowStyle::Scroll;
 }
 
 void GMWidget::clearFocus(GMWidget* sender)

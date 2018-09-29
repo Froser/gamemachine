@@ -300,6 +300,13 @@ enum class GMOverflowStyle
 	Scroll,
 };
 
+//! 表示控件在容器中的位置标识。
+enum class GMControlPositionFlag
+{
+	Auto, //!< 控件在容器中的位置是浮动的，这意味着为受到容器滚动条的影响。
+	Fixed, //!< 控件在容器中的位置是固定的。
+};
+
 GM_PRIVATE_OBJECT(GMWidget)
 {
 	GMWidgetResourceManager* manager = nullptr;
@@ -359,7 +366,7 @@ class GMWidget : public GMObject
 	GM_DECLARE_PRIVATE(GMWidget)
 	GM_DECLARE_PROPERTY(Minimum, minimized, bool)
 	GM_DECLARE_PROPERTY(Visible, visible, bool)
-	GM_DECLARE_PROPERTY(Overflow, overflow, GMOverflowStyle)
+	GM_DECLARE_PROPERTY_WITH_CALLBACK(Overflow, overflow, GMOverflowStyle, noop(), updateVerticalScrollbar())
 	GM_DECLARE_PROPERTY_WITH_CALLBACK(ContentPaddingLeft, contentPaddingLeft, GMint32, noop(), updateVerticalScrollbar())
 	GM_DECLARE_PROPERTY_WITH_CALLBACK(ContentPaddingTop, contentPaddingTop, GMint32, noop(), updateVerticalScrollbar())
 	GM_DECLARE_PROPERTY_WITH_CALLBACK(ContentPaddingRight, contentPaddingRight, GMint32, noop(), updateVerticalScrollbar())
@@ -408,6 +415,7 @@ public:
 
 public:
 	void drawText(
+		GMControlPositionFlag positionFlag,
 		const GMString& text,
 		GMStyle& style,
 		const GMRect& rc,
@@ -418,6 +426,7 @@ public:
 	);
 
 	void drawText(
+		GMControlPositionFlag positionFlag,
 		GMTypoTextBuffer* textBuffer,
 		GMStyle& style,
 		const GMRect& rc,
@@ -425,12 +434,14 @@ public:
 	);
 
 	void drawSprite(
+		GMControlPositionFlag positionFlag,
 		GMStyle& style,
 		const GMRect& rc,
 		GMfloat depth
 	);
 
 	void drawRect(
+		GMControlPositionFlag positionFlag,
 		const GMVec4& bkColor,
 		const GMRect& rc,
 		bool isOpaque,
@@ -438,6 +449,7 @@ public:
 	);
 
 	void drawBorder(
+		GMControlPositionFlag positionFlag,
 		GMStyle& style,
 		const GMRect& cornerRc,
 		const GMRect& rc,
@@ -445,6 +457,7 @@ public:
 	);
 
 	void drawStencil(
+		GMControlPositionFlag positionFlag,
 		const GMRect& rc,
 		GMfloat depth,
 		bool drawRc,
@@ -473,12 +486,6 @@ public:
 	virtual void onRenderTitle();
 	virtual void onUpdateSize();
 
-	//! 当控件大小发生变化时，调用此方法。
-	/*!
-	  此方法将会计算内部所有控件的边框大小的并集，作为控件是否超出内容矩形区域的依据。
-	*/
-	virtual void onControlRectChanged(GMControl* control);
-
 protected:
 	void addBorder(
 		GMint32 x,
@@ -498,7 +505,7 @@ private:
 	GMControl* getControlAtPoint(GMPoint pt);
 	bool onCycleFocus(bool goForward);
 	void onMouseMove(const GMPoint& pt);
-	void mapRect(GMRect& rc);
+	void mapRect(GMControlPositionFlag positionFlag, GMRect& rc);
 	void initStyles();
 	GMRect getContentRect();
 	GMint32 getContentOverflowFlag();
@@ -506,6 +513,12 @@ private:
 	void updateVerticalScrollbar();
 	void disableVerticalScrollbar();
 	bool needShowVerticalScrollbar();
+
+	//! 当控件大小发生变化时，调用此方法。
+	/*!
+	此方法将会计算内部所有控件的边框大小的并集，作为控件是否超出内容矩形区域的依据。
+	*/
+	void calculateControlBoundingRect();
 
 public:
 	inline IWindow* getParentWindow()

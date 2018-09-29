@@ -403,6 +403,7 @@ void GMControlTextEdit::render(GMDuration elapsed)
 	createBufferTypoEngineIfNotExist();
 
 	placeCaret(d->cp);
+	d->borderControl->setPositionFlag(getPositionFlag());
 	d->borderControl->render(elapsed);
 
 	// 计算首个能显示的字符
@@ -434,7 +435,7 @@ void GMControlTextEdit::render(GMDuration elapsed)
 		rcSelection.width = selectionRightX - selectionLeftX;
 		rcSelection.height = getCaretHeight();
 		GMRect rc = GM_intersectRect(rcSelection, d->rcText);
-		widget->drawRect(d->selectionBackColor, rc, true, .99f);
+		widget->drawRect(getPositionFlag(), d->selectionBackColor, rc, true, .99f);
 	}
 
 	d->textStyle.getFontColor().setCurrent(d->textColor);
@@ -444,7 +445,7 @@ void GMControlTextEdit::render(GMDuration elapsed)
 	setBufferRenderRange(firstX);
 
 	// 不允许换行
-	widget->drawText(d->buffer.get(), d->textStyle, d->rcText, false);
+	widget->drawText(getPositionFlag(), d->buffer.get(), d->textStyle, d->rcText, false);
 }
 
 void GMControlTextEdit::setSize(GMint32 width, GMint32 height)
@@ -1168,7 +1169,7 @@ void GMControlTextEdit::renderCaret(GMint32 firstX, GMint32 caretX)
 
 	caretColor = &d->caretColor;
 	GMWidget* widget = getParent();
-	widget->drawRect(*caretColor, rc, true, .99f);
+	widget->drawRect(getPositionFlag(), *caretColor, rc, true, .99f);
 }
 
 GMint32 GMControlTextEdit::getCaretHeight()
@@ -1253,6 +1254,7 @@ void GMControlTextArea::render(GMDuration elapsed)
 	createBufferTypoEngineIfNotExist();
 
 	placeCaret(db->cp, false);
+	db->borderControl->setPositionFlag(getPositionFlag());
 	db->borderControl->render(elapsed);
 
 	// 计算首个能显示的字符
@@ -1279,7 +1281,7 @@ void GMControlTextArea::render(GMDuration elapsed)
 	// 绘制一个模板区域，防止光标、选中区域和文字超出渲染区域
 	GMWidget* widget = getParent();
 	GMRect expandedRcText = expandStencilRect(db->rcText); // 稍微扩大一下渲染区域，不然看起来很丑。
-	widget->drawStencil(expandedRcText, .99f, true);
+	widget->drawStencil(getPositionFlag(), expandedRcText, .99f, true);
 	widget->useStencil(true);
 
 	GMRect rcSelection;
@@ -1302,7 +1304,7 @@ void GMControlTextArea::render(GMDuration elapsed)
 			rcSelection.width = selectionEndX - selectionStartX;
 			rcSelection.height = getCaretHeight();
 			GMRect rc = GM_intersectRect(rcSelection, expandedRcText);
-			widget->drawRect(db->selectionBackColor, rc, true, .99f);
+			widget->drawRect(getPositionFlag(), db->selectionBackColor, rc, true, .99f);
 		}
 		else
 		{
@@ -1342,7 +1344,7 @@ void GMControlTextArea::render(GMDuration elapsed)
 				if (firstLineLastCp == d->buffer->findLastCPInOneLine(firstLineLastCp))
 					minSelectionRect(rcSelection);
 				GMRect rc = GM_intersectRect(rcSelection, expandedRcText);
-				widget->drawRect(db->selectionBackColor, rc, true, .99f);
+				widget->drawRect(getPositionFlag(), db->selectionBackColor, rc, true, .99f);
 			}
 
 			// 绘制最下方的矩形
@@ -1363,7 +1365,7 @@ void GMControlTextArea::render(GMDuration elapsed)
 				if (lastLineFirstCp == d->buffer->findLastCPInOneLine(lastLineFirstCp))
 					minSelectionRect(rcSelection);
 				GMRect rc = GM_intersectRect(rcSelection, expandedRcText);
-				widget->drawRect(db->selectionBackColor, rc, true, .99f);
+				widget->drawRect(getPositionFlag(), db->selectionBackColor, rc, true, .99f);
 			}
 
 			if (selectionRightLineNo - selectionLeftLineNo > 1)
@@ -1387,7 +1389,7 @@ void GMControlTextArea::render(GMDuration elapsed)
 					if (currentLineLastCp == d->buffer->findLastCPInOneLine(currentLineLastCp))
 						minSelectionRect(rcSelection);
 					GMRect rc = GM_intersectRect(rcSelection, expandedRcText);
-					widget->drawRect(db->selectionBackColor, rc, true, .99f);
+					widget->drawRect(getPositionFlag(), db->selectionBackColor, rc, true, .99f);
 
 					nextLineFirstCp = currentLineLastCp + 1;
 				}
@@ -1403,13 +1405,14 @@ void GMControlTextArea::render(GMDuration elapsed)
 	setBufferRenderRange(firstX, firstY);
 
 	// 绘制文本
-	widget->drawText(d->buffer, db->textStyle, adjustRectByScrollOffset(db->rcText), false);
+	widget->drawText(getPositionFlag(), d->buffer, db->textStyle, adjustRectByScrollOffset(db->rcText), false);
 
 	// 结束模板区域
 	widget->endStencil();
 
 	if (d->hasScrollBar && d->scrollBar)
 	{
+		d->scrollBar->setPositionFlag(getPositionFlag());
 		d->scrollBar->render(elapsed);
 	}
 }

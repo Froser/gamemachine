@@ -160,7 +160,7 @@ gm::GMWidget* Demo_Controls::createDefaultWidget()
 	d->mainWidget->addControl(textArea2);
 
 	d->nextControlTop = top + 40;
-	d->mainWidget->setSize(800, 600);
+	d->mainWidget->setSize(600, 300);
 
 	return d->mainWidget.get();
 }

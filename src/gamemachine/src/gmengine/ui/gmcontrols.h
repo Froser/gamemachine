@@ -14,12 +14,6 @@ enum class GMControlType
 	Static,
 };
 
-enum class GMControlPositionFlag
-{
-	Auto,
-	Fixed,
-};
-
 GM_PRIVATE_OBJECT(GMControl)
 {
 	GMint32 x = 0;
@@ -42,7 +36,6 @@ GM_PRIVATE_OBJECT(GMControl)
 
 class GMControl : public GMObject
 {
-	GM_FRIEND_CLASS(GMWidget)
 	GM_DECLARE_PRIVATE(GMControl)
 
 public:
@@ -273,14 +266,11 @@ public:
 		return r;
 	}
 
-protected:
-	virtual void updateRect();
-
-friend_methods(GMWidget):
 	void setPositionFlag(GMControlPositionFlag flag) GM_NOEXCEPT
 	{
 		D(d);
-		d->positionFlag = flag;
+		if (d->positionFlag != flag)
+			d->positionFlag = flag;
 	}
 
 	inline GMControlPositionFlag getPositionFlag() GM_NOEXCEPT
@@ -288,6 +278,9 @@ friend_methods(GMWidget):
 		D(d);
 		return d->positionFlag;
 	}
+
+protected:
+	virtual void updateRect();
 };
 
 GM_PRIVATE_OBJECT(GMControlLabel)

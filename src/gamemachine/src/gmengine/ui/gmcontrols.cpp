@@ -63,8 +63,6 @@ void GMControl::updateRect()
 	d->boundingBox.y = d->y;
 	d->boundingBox.width = d->width;
 	d->boundingBox.height = d->height;
-
-	getParent()->onControlRectChanged(this);
 }
 
 void GMControl::refresh()
@@ -123,7 +121,7 @@ void GMControlLabel::render(GMDuration elapsed)
 
 	GMStyle& foreStyle = getStyle((GMControl::StyleType)ForeStyle);
 	foreStyle.getFontColor().blend(state, elapsed);
-	getParent()->drawText(getText(), foreStyle, db->boundingBox, foreStyle.getShadowStyle().hasShadow, false);
+	getParent()->drawText(getPositionFlag(), getText(), foreStyle, db->boundingBox, foreStyle.getShadowStyle().hasShadow, false);
 }
 
 void GMControlLabel::refresh()
@@ -301,14 +299,14 @@ void GMControlButton::render(GMDuration elapsed)
 	GMStyle& foreStyle = getStyle((GMControl::StyleType)ForeStyle);
 	foreStyle.getTextureColor().blend(state, elapsed, blendRate);
 	foreStyle.getFontColor().blend(state, elapsed, blendRate);
-	widget->drawSprite(foreStyle, rc, .8f);
-	widget->drawText(getText(), foreStyle, rc, foreStyle.getShadowStyle().hasShadow, true);
+	widget->drawSprite(getPositionFlag(), foreStyle, rc, .8f);
+	widget->drawText(getPositionFlag(), getText(), foreStyle, rc, foreStyle.getShadowStyle().hasShadow, true);
 
 	GMStyle& fillStyle = getStyle((GMControl::StyleType)FillStyle);
 	fillStyle.getTextureColor().blend(state, elapsed, blendRate);
 	fillStyle.getFontColor().blend(state, elapsed, blendRate);
-	widget->drawSprite(fillStyle, rc, .8f);
-	widget->drawText(getText(), fillStyle, rc, fillStyle.getShadowStyle().hasShadow, true);
+	widget->drawSprite(getPositionFlag(), fillStyle, rc, .8f);
+	widget->drawText(getPositionFlag(), getText(), fillStyle, rc, fillStyle.getShadowStyle().hasShadow, true);
 }
 
 bool GMControlButton::handleMousePressOrDblClick(const GMPoint& pt)
@@ -405,7 +403,7 @@ void GMControlBorder::render(GMDuration elapsed)
 	D_BASE(db, Base);
 	d->borderStyle.getTextureColor().blend(GMControlState::Normal, elapsed);
 	GMWidget* widget = getParent();
-	widget->drawBorder(d->borderStyle, d->corner, db->boundingBox, .8f);
+	widget->drawBorder(getPositionFlag(), d->borderStyle, d->corner, db->boundingBox, .8f);
 }
 
 bool GMControlBorder::containsPoint(GMPoint point)
@@ -562,14 +560,15 @@ void GMControlScrollBar::render(GMDuration elapsed)
 
 	GMWidget* widget = getParent();
 	GM_ASSERT(widget);
-	widget->drawSprite(d->styleUp, d->rcUp, .99f);
-	widget->drawSprite(d->styleDown, d->rcDown, .99f);
-	widget->drawSprite(d->styleTrack, d->rcTrack, .99f);
+	widget->drawSprite(getPositionFlag(), d->styleUp, d->rcUp, .99f);
+	widget->drawSprite(getPositionFlag(), d->styleDown, d->rcDown, .99f);
+	widget->drawSprite(getPositionFlag(), d->styleTrack, d->rcTrack, .99f);
 	if (d->showThumb)
 	{
 		const GMRect& thumbCorner = d->thumb->getCorner();
 		if (thumbCorner.width * 2 < d->rcThumb.width && thumbCorner.height * 2 < d->rcThumb.height)
 		{
+			d->thumb->setPositionFlag(getPositionFlag());
 			d->thumb->setPosition(d->rcThumb.x, d->rcThumb.y);
 			d->thumb->setSize(d->rcThumb.width, d->rcThumb.height);
 			d->thumb->render(elapsed);
@@ -579,7 +578,7 @@ void GMControlScrollBar::render(GMDuration elapsed)
 			// 绘制空间不足，使用整个素材来绘制
 			GMStyle& thumbStyle = getStyle((GMControl::StyleType) Thumb);
 			thumbStyle.getTextureColor().blend(GMControlState::Normal, elapsed);
-			widget->drawSprite(thumbStyle, d->rcThumb, .99f);
+			widget->drawSprite(getPositionFlag(), thumbStyle, d->rcThumb, .99f);
 		}
 	}
 }
