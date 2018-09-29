@@ -273,7 +273,7 @@ public:
 			d->positionFlag = flag;
 	}
 
-	inline GMControlPositionFlag getPositionFlag() GM_NOEXCEPT
+	inline GMControlPositionFlag getPositionFlag() const GM_NOEXCEPT
 	{
 		D(d);
 		return d->positionFlag;

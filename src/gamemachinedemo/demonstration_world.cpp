@@ -245,6 +245,9 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 
 	d->mainWidget->setTitle(L"选项菜单");
 	d->mainWidget->setTitleVisible(true);
+	d->mainWidget->setVerticalScrollbarWidth(20);
+	gm::GMRect thumbCorner = { 0, 0, 7, 15 };
+	d->mainWidget->setScrollbarThumbCorner(thumbCorner);
 
 	if (stxingka != gm::GMInvalidFontHandle)
 	{
@@ -478,7 +481,6 @@ void DemonstrationWorld::init()
 	d->mainWidget->setTitle(L"GameMachine - 展示菜单");
 	d->mainWidget->setTitleVisible(true);
 	d->mainWidget->setKeyboardInput(true);
-	d->mainWidget->setOverflow(gm::GMOverflowStyle::Scroll);
 	d->mainWidget->setVerticalScrollbarWidth(20);
 	gm::GMRect thumbCorner = { 0, 0, 7, 15 };
 	d->mainWidget->setScrollbarThumbCorner(thumbCorner);

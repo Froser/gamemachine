@@ -81,9 +81,6 @@ GMStyle& GMControl::getStyle(StyleType style)
 bool GMControl::containsPoint(GMPoint point)
 {
 	D(d);
-	// 如果是跟随滚动条，需要拣去一个滚动条的偏移
-	if (d->positionFlag == GMControlPositionFlag::Auto)
-		point.y -= getParent()->getScrollOffsetY();
 	return GM_inRect(d->boundingBox, point);
 }
 

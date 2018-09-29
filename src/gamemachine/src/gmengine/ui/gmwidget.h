@@ -358,7 +358,7 @@ GM_PRIVATE_OBJECT(GMWidget)
 	GMRect controlBoundingBox = { 0 };
 	GMOwnedPtr<GMControlScrollBar> verticalScrollbar;
 	GMint32 verticalScrollbarWidth;
-	GMRect scrollbarThumbCorner;
+	GMRect scrollbarThumbCorner = { 0 };
 };
 
 class GMWidget : public GMObject
@@ -469,7 +469,7 @@ public:
 		bool inside
 	);
 
-	void endStencil();
+	void endStencil(bool clearCurrentStencil = true);
 
 	void requestFocus(GMControl* control);
 	void setSize(GMint32 width, GMint32 height);
@@ -502,7 +502,7 @@ private:
 	void refresh();
 	void focusDefaultControl();
 	void removeAllControls();
-	GMControl* getControlAtPoint(GMPoint pt);
+	GMControl* getControlAtPoint(const GMPoint& pt);
 	bool onCycleFocus(bool goForward);
 	void onMouseMove(const GMPoint& pt);
 	void mapRect(GMControlPositionFlag positionFlag, GMRect& rc);
@@ -513,11 +513,7 @@ private:
 	void updateVerticalScrollbar();
 	void disableVerticalScrollbar();
 	bool needShowVerticalScrollbar();
-
-	//! 当控件大小发生变化时，调用此方法。
-	/*!
-	此方法将会计算内部所有控件的边框大小的并集，作为控件是否超出内容矩形区域的依据。
-	*/
+	GMSystemMouseEvent* adjustMouseEvent(GMSystemMouseEvent* event, const GMControl* control);
 	void calculateControlBoundingRect();
 
 public:

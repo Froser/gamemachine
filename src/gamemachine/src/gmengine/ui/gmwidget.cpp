@@ -535,12 +535,13 @@ void GMWidget::useStencil(
 	engine->setStencilOptions(inside ? s_inside : s_outside);
 }
 
-void GMWidget::endStencil()
+void GMWidget::endStencil(bool clearCurrentStencil)
 {
 	D(d);
 	static GMStencilOptions s_stencilOptions(GMStencilOptions::Ox00, GMStencilOptions::Always);
 	auto engine = d->parentWindow->getGraphicEngine();
-	engine->getDefaultFramebuffers()->clear(GMFramebuffersClearType::Stencil);
+	if (clearCurrentStencil)
+		engine->getDefaultFramebuffers()->clear(GMFramebuffersClearType::Stencil);
 	engine->setStencilOptions(s_stencilOptions);
 }
 
@@ -774,7 +775,7 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 			s_controlFocus->getParent() == this &&
 			s_controlFocus->getEnabled())
 		{
-			if (s_controlFocus->handleMouse(pControlEvent))
+			if (s_controlFocus->handleMouse(adjustMouseEvent(pControlEvent, s_controlFocus)))
 				return true;
 		}
 
@@ -782,7 +783,7 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 		GMControl* control = getControlAtPoint(pt);
 		if (control && control->getEnabled())
 		{
-			if (control->handleMouse(pControlEvent))
+			if (control->handleMouse(adjustMouseEvent(pControlEvent, control)))
 				return true;
 		}
 		else
@@ -805,7 +806,7 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 		}
 		else if (type == GMSystemEventType::MouseWheel)
 		{
-			if (onMouseWheel(&cacheWheelEvent))
+			if (onMouseWheel(pControlEvent))
 				return true;
 		}
 
@@ -948,7 +949,7 @@ void GMWidget::render(GMfloat elpasedTime)
 	}
 
 	if (getOverflow() != GMOverflowStyle::Visible)
-		endStencil();
+		endStencil(true);
 
 	// 最后绘制不随滚动状态而变化的部分，如边框，标题栏
 	if (d->title)
@@ -1026,12 +1027,13 @@ void GMWidget::removeAllControls()
 	GMClearSTLContainer(d->controls);
 }
 
-GMControl* GMWidget::getControlAtPoint(GMPoint pt)
+GMControl* GMWidget::getControlAtPoint(const GMPoint& pt)
 {
 	D(d);
 	// 响应scrollbars
 	if (d->verticalScrollbar)
 	{
+		GM_ASSERT(d->verticalScrollbar->getPositionFlag() == GMControlPositionFlag::Fixed);
 		if (d->verticalScrollbar->getEnabled() && d->verticalScrollbar->getVisible() && d->verticalScrollbar->containsPoint(pt))
 			return d->verticalScrollbar.get();
 	}
@@ -1045,7 +1047,11 @@ GMControl* GMWidget::getControlAtPoint(GMPoint pt)
 		if (!control)
 			continue;
 
-		if (control->getEnabled() && control->getVisible() && control->containsPoint(pt))
+		GMPoint t = pt;
+		if (control->getPositionFlag() == GMControlPositionFlag::Auto)
+			t.y -= getScrollOffsetY(); //Auto的控件，要考虑widget滚动条
+
+		if (control->getEnabled() && control->getVisible() && control->containsPoint(t))
 			return control;
 	}
 
@@ -1219,8 +1225,15 @@ GMint32 GMWidget::getContentOverflowFlag()
 void GMWidget::createVerticalScrollbar()
 {
 	D(d);
+	static const GMRect s_invalidRect = { 0 };
 	if (!d->verticalScrollbar)
 	{
+		if (d->verticalScrollbarWidth == 0)
+			gm_warning(gm_dbg_wrap("verticalScrollbarWidth is zero while rendering vertical scroll bar."));
+
+		if (d->scrollbarThumbCorner == s_invalidRect)
+			gm_warning(gm_dbg_wrap("scrollbarThumbCorner is invalid while rendering vertical scroll bar."));
+
 		GMRect contentRect = getContentRect();
 		d->verticalScrollbar.reset(GMControlScrollBar::createControl(
 			this,
@@ -1268,6 +1281,16 @@ bool GMWidget::needShowVerticalScrollbar()
 {
 	GMint32 overflowFlag = getContentOverflowFlag();
 	return (overflowFlag & CanScrollUp || overflowFlag & CanScrollDown && getOverflow() != GMOverflowStyle::Visible) || getOverflow() == GMOverflowStyle::Scroll;
+}
+
+GMSystemMouseEvent* GMWidget::adjustMouseEvent(GMSystemMouseEvent* event, const GMControl* control)
+{
+	if (control->getPositionFlag() == GMControlPositionFlag::Auto)
+	{
+		GMPoint& pt = event->getPoint();
+		pt.y -= getScrollOffsetY();
+	}
+	return event;
 }
 
 void GMWidget::clearFocus(GMWidget* sender)

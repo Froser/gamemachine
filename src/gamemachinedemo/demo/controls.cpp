@@ -51,6 +51,9 @@ gm::GMWidget* Demo_Controls::createDefaultWidget()
 
 	d->mainWidget->setTitle(L"选项菜单");
 	d->mainWidget->setTitleVisible(true);
+	d->mainWidget->setVerticalScrollbarWidth(20);
+	gm::GMRect thumbCorner = { 0, 0, 7, 15 };
+	d->mainWidget->setScrollbarThumbCorner(thumbCorner);
 
 	if (stxingka != gm::GMInvalidFontHandle)
 	{
@@ -69,10 +72,9 @@ gm::GMWidget* Demo_Controls::createDefaultWidget()
 	getDemoWorldReference()->getContext()->getWindow()->addWidget(d->mainWidget.get());
 
 	gm::GMint32 top = 10;
-	gm::GMRect thumbCorner = { 0, 0, 7, 15 };
 	d->mainWidget->addControl(gm::GMControlScrollBar::createControl(
 		d->mainWidget.get(),
-		550,
+		530,
 		20,
 		20,
 		200,
