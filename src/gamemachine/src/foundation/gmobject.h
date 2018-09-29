@@ -98,25 +98,31 @@ class GMNotAGMObject {};
 #define GM_PRIVATE_NAME(name) name##Private
 #define GM_PRIVATE_DESTRUCT(name) ~name##Private()
 
-#define GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, accessor) \
+#define GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, accessor, callback) \
 	accessor: \
-	inline paramType& get##name() GM_NOEXCEPT { D(d); return d-> memberName; } \
-	inline const paramType& get##name() const GM_NOEXCEPT { D(d); return d-> memberName; }
+	inline paramType& get##name() GM_NOEXCEPT { D(d); callback; return d-> memberName; } \
+	inline const paramType& get##name() const GM_NOEXCEPT { D(d); const_cast<std::remove_const_t<std::remove_pointer_t<decltype(this)>>*>(this)->callback; return d-> memberName; }
 
-#define GM_DECLARE_SETTER_ACCESSOR(name, memberName, paramType, accessor) \
+#define GM_DECLARE_SETTER_ACCESSOR(name, memberName, paramType, accessor, callback) \
 	accessor: \
-	void set##name(const paramType & arg) { D(d); d-> memberName = arg; }
+	void set##name(const paramType & arg) { D(d); d-> memberName = arg; callback; }
 
-#define GM_DECLARE_GETTER(name, memberName, paramType) GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, public) 
-#define GM_DECLARE_SETTER(name, memberName, paramType) GM_DECLARE_SETTER_ACCESSOR(name, memberName, paramType, public) 
+#define GM_DECLARE_GETTER(name, memberName, paramType) GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, public, noop()) 
+#define GM_DECLARE_SETTER(name, memberName, paramType) GM_DECLARE_SETTER_ACCESSOR(name, memberName, paramType, public, noop()) 
+#define GM_DECLARE_GETTER_WITH_CALLBACK(name, memberName, paramType, cb) GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, public, cb)
+#define GM_DECLARE_SETTER_WITH_CALLBACK(name, memberName, paramType, cb) GM_DECLARE_SETTER_ACCESSOR(name, memberName, paramType, public, cb)
 
 #define GM_DECLARE_PROPERTY(name, memberName, paramType) \
-	GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, public) \
-	GM_DECLARE_SETTER_ACCESSOR(name, memberName, paramType, public)
+	GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, public, noop()) \
+	GM_DECLARE_SETTER_ACCESSOR(name, memberName, paramType, public, noop())
+
+#define GM_DECLARE_PROPERTY_WITH_CALLBACK(name, memberName, paramType, getterCb, setterCb) \
+	GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, public, getterCb) \
+	GM_DECLARE_SETTER_ACCESSOR(name, memberName, paramType, public, setterCb)
 
 #define GM_DECLARE_PROTECTED_PROPERTY(name, memberName, paramType) \
-	GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, protected) \
-	GM_DECLARE_SETTER_ACCESSOR(name, memberName, paramType, protected)
+	GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, protected, noop()) \
+	GM_DECLARE_SETTER_ACCESSOR(name, memberName, paramType, protected, noop())
 
 #define GM_DISABLE_COPY(clsName) public: clsName(const clsName&) = delete; clsName(clsName&&) GM_NOEXCEPT = delete;
 #define GM_DISABLE_ASSIGN(clsName) public: clsName& operator =(const clsName&) = delete; clsName& operator =(clsName&&) GM_NOEXCEPT = delete;
@@ -377,6 +383,9 @@ private:
 
 protected:
 	virtual bool registerMeta() { return false; }
+
+protected:
+	inline void noop() const {}
 };
 
 //! 进行静态转换。

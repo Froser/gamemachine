@@ -43,9 +43,9 @@ GM_PRIVATE_OBJECT(GMAsset)
 	void* asset = nullptr;
 };
 
-class GMAsset
+class GMAsset : public GMObject
 {
-	GM_DECLARE_PRIVATE_NGO(GMAsset)
+	GM_DECLARE_PRIVATE(GMAsset)
 	GM_DECLARE_PROPERTY(Type, type, GMAssetType)
 	GM_DECLARE_ASSET_GETTER(ITexture*, getTexture);
 	GM_DECLARE_ASSET_GETTER(GMModel*, getModel);

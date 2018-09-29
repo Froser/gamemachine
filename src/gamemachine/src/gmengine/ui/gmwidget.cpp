@@ -558,6 +558,51 @@ void GMWidget::setSize(GMint32 width, GMint32 height)
 	onUpdateSize();
 }
 
+bool GMWidget::verticalScroll(GMint32 offset)
+{
+	D(d);
+	GMOverflowStyle overflow = getOverflow();
+	if (overflow == GMOverflowStyle::Scroll || overflow == GMOverflowStyle::Auto)
+	{
+		GMint32 flag = CannotScroll;
+
+		// 如果控件的包围盒高度超出内容区域，则滚动区域，设置一个scrollOffsetY
+		// scrollOffsetY为负数表示向上滚动
+		flag = getContentOverflowFlag();
+		if ((offset < 0 && flag & CanScrollDown) || (offset > 0 && flag & CanScrollUp))
+			d->scrollOffsetY += offset;
+
+		GMRect contentRect = getContentRect();
+		if (d->scrollOffsetY + d->controlBoundingBox.y + d->controlBoundingBox.height < contentRect.y + contentRect.height)
+			d->scrollOffsetY = contentRect.y + contentRect.height - d->controlBoundingBox.y - d->controlBoundingBox.height;
+		if (d->scrollOffsetY + d->controlBoundingBox.y > contentRect.y)
+			d->scrollOffsetY = contentRect.y - d->controlBoundingBox.y;
+
+		if (d->verticalScrollbar)
+			d->verticalScrollbar->setValue(-d->scrollOffsetY);
+
+		return true;
+	}
+
+	d->scrollOffsetY = 0;
+	return false;
+}
+
+bool GMWidget::verticalScrollTo(GMint32 value)
+{
+	D(d);
+	GMOverflowStyle overflow = getOverflow();
+	if (overflow == GMOverflowStyle::Scroll || overflow == GMOverflowStyle::Auto)
+	{
+		d->scrollOffsetY = value;
+		if (d->verticalScrollbar)
+			d->verticalScrollbar->setValue(-d->scrollOffsetY);
+		return true;
+	}
+	d->scrollOffsetY = 0;
+	return false;
+}
+
 bool GMWidget::initControl(GMControl* control)
 {
 	D(d);
@@ -792,35 +837,10 @@ bool GMWidget::onTitleMouseUp(const GMSystemMouseEvent* event)
 bool GMWidget::onMouseWheel(const GMSystemMouseEvent* event)
 {
 	D(d);
-	if (getOverflow() == GMOverflowStyle::Scroll || getOverflow() == GMOverflowStyle::Auto)
-	{
-		const GMSystemMouseWheelEvent* wheelEvent = gm_cast<const GMSystemMouseWheelEvent*>(event);
-
-		enum
-		{
-			CannotScroll = 0,
-			CanScrollUp = 1,
-			CanScrollDown = 2,
-		};
-		GMint32 flag = CannotScroll;
-
-		// 如果控件的包围盒高度超出内容区域，则滚动区域，设置一个scrollOffsetY
-		// scrollOffsetY为负数表示向上滚动
-		GMRect contentRect = getContentRect();
-		if (d->scrollOffsetY + d->controlBoundingBox.y + d->controlBoundingBox.height > contentRect.y + contentRect.height)
-			flag |= CanScrollDown;
-		if (d->scrollOffsetY + d->controlBoundingBox.y < contentRect.y )
-			flag |= CanScrollUp;
-
-		// wheelStep为负数，表示滚轮向下滚动，为正数表示向上
-		GMint32 wheelStep = wheelEvent->getDelta() / GM_WHEEL_DELTA * getScrollStep();
-		if ( (wheelStep < 0 && flag & CanScrollDown) || (wheelStep > 0 && flag & CanScrollUp))
-			d->scrollOffsetY += wheelStep;
-		return true;
-	}
-
-	d->scrollOffsetY = 0;
-	return false;
+	const GMSystemMouseWheelEvent* wheelEvent = gm_cast<const GMSystemMouseWheelEvent*>(event);
+	// wheelStep为负数，表示滚轮向下滚动，为正数表示向上
+	GMint32 wheelStep = wheelEvent->getDelta() / GM_WHEEL_DELTA * getScrollStep();
+	return verticalScroll(wheelStep);
 }
 
 void GMWidget::onRenderTitle()
@@ -857,6 +877,7 @@ void GMWidget::onControlRectChanged(GMControl* control)
 		}
 	}
 	d->controlBoundingBox = b;
+	updateVerticalScrollbar();
 }
 
 void GMWidget::render(GMfloat elpasedTime)
@@ -880,10 +901,17 @@ void GMWidget::render(GMfloat elpasedTime)
 		(d->minimized && !d->title))
 		return;
 
+	// 更新滚动条状态
+	if (needShowVerticalScrollbar())
+		createVerticalScrollbar();
+	else
+		disableVerticalScrollbar();
+
 	// 如果overflow样式为hidden，那么我们要在Widget的标题栏下方绘制一块模板
 	// 这样，超出的部分将不会被绘制出来
 	// 如果overflow样式为auto，那么我们不仅要在Widget的标题栏下方绘制一块模板，还需要多绘制一个滚动条
-	if (getOverflow() == GMOverflowStyle::Auto || getOverflow() == GMOverflowStyle::Hidden)
+	// 如果overflow样式为visible，允许内容溢出边框
+	if (getOverflow() != GMOverflowStyle::Visible)
 	{
 		// 计算显示内容的矩形
 		DataSpin ds(d->scrollOffsetY, 0);
@@ -896,8 +924,9 @@ void GMWidget::render(GMfloat elpasedTime)
 	{
 		for (auto control : d->controls)
 		{
-			// 我们先不绘制边框，最后再绘制
-			if (d->borderControl == control)
+			// 我们先不绘制边框、滚动条，最后再绘制
+			if (d->borderControl == control || 
+				d->verticalScrollbar.get() == control)
 				continue;
 
 			// 最后渲染焦点控件
@@ -923,7 +952,11 @@ void GMWidget::render(GMfloat elpasedTime)
 			onRenderTitle();
 
 		if (!d->minimized)
+		{
 			d->borderControl->render(elpasedTime);
+			if (d->verticalScrollbar)
+				d->verticalScrollbar->render(elpasedTime);
+		}
 	}
 }
 
@@ -994,7 +1027,14 @@ void GMWidget::removeAllControls()
 GMControl* GMWidget::getControlAtPoint(GMPoint pt)
 {
 	D(d);
-	// 在overflow样式为非visible时，不处理内容区域之外的控件，因为它们已经被遮挡
+	// 响应scrollbars
+	if (d->verticalScrollbar)
+	{
+		if (d->verticalScrollbar->getEnabled() && d->verticalScrollbar->getVisible() && d->verticalScrollbar->containsPoint(pt))
+			return d->verticalScrollbar.get();
+	}
+
+	// 在overflow样式为非visible时，不处理内容区域之外的流控件(PositonFlag == Auto)，因为它们已经被遮挡
 	if (getOverflow() != GMOverflowStyle::Visible && !GM_inRect(getContentRect(), pt))
 		return nullptr;
 
@@ -1006,6 +1046,7 @@ GMControl* GMWidget::getControlAtPoint(GMPoint pt)
 		if (control->getEnabled() && control->getVisible() && control->containsPoint(pt))
 			return control;
 	}
+
 	return nullptr;
 }
 
@@ -1152,7 +1193,75 @@ GMRect GMWidget::getContentRect()
 {
 	D(d);
 	GMRect rc = { d->contentPaddingLeft, d->contentPaddingTop, d->width - d->contentPaddingRight, d->height - d->contentPaddingBottom };
+	if (d->verticalScrollbar && d->verticalScrollbar->getVisible())
+		rc.width -= d->verticalScrollbarWidth;
+
 	return rc;
+}
+
+GMint32 GMWidget::getContentOverflowFlag()
+{
+	D(d);
+	GMint32 flag = CannotScroll;
+	GMRect contentRect = getContentRect();
+	if (d->scrollOffsetY + d->controlBoundingBox.y + d->controlBoundingBox.height > contentRect.y + contentRect.height)
+		flag |= CanScrollDown;
+	if (d->scrollOffsetY + d->controlBoundingBox.y < contentRect.y)
+		flag |= CanScrollUp;
+	return flag;
+}
+
+void GMWidget::createVerticalScrollbar()
+{
+	D(d);
+	if (!d->verticalScrollbar)
+	{
+		GMRect contentRect = getContentRect();
+		d->verticalScrollbar.reset(GMControlScrollBar::createControl(
+			this,
+			d->width - d->borderMarginLeft - d->verticalScrollbarWidth,
+			contentRect.y,
+			d->verticalScrollbarWidth,
+			contentRect.height,
+			false,
+			d->scrollbarThumbCorner
+		));
+
+		d->verticalScrollbar->setPositionFlag(GMControlPositionFlag::Fixed); // 不随Widget滚动条而移动
+		connect(*d->verticalScrollbar, GMControlScrollBar::valueChanged, [=](auto sender, auto receiver) {
+			this->verticalScrollTo(-gm_cast<GMControlScrollBar*>(sender)->getValue());
+		});
+		updateVerticalScrollbar();
+	}
+}
+
+void GMWidget::updateVerticalScrollbar()
+{
+	D(d);
+	if (d->verticalScrollbar)
+	{
+		d->verticalScrollbar->setMinimum(0);
+		d->verticalScrollbar->setPageStep(getContentRect().height);
+		d->verticalScrollbar->setMaximum(d->controlBoundingBox.height - d->verticalScrollbar->getPageStep());
+		d->verticalScrollbar->setSingleStep(getScrollStep());
+		d->verticalScrollbar->setVisible(true);
+	}
+}
+
+void GMWidget::disableVerticalScrollbar()
+{
+	D(d);
+	if (d->verticalScrollbar)
+	{
+		d->verticalScrollbar->setVisible(false);
+		updateVerticalScrollbar();
+	}
+}
+
+bool GMWidget::needShowVerticalScrollbar()
+{
+	GMint32 overflowFlag = getContentOverflowFlag();
+	return (overflowFlag & CanScrollUp || overflowFlag & CanScrollDown && getOverflow() != GMOverflowStyle::Visible);
 }
 
 void GMWidget::clearFocus(GMWidget* sender)

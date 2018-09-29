@@ -349,6 +349,9 @@ GM_PRIVATE_OBJECT(GMWidget)
 	GMint32 scrollOffsetY = 0;
 	GMint32 scrollStep = 10;
 	GMRect controlBoundingBox = { 0 };
+	GMOwnedPtr<GMControlScrollBar> verticalScrollbar;
+	GMint32 verticalScrollbarWidth;
+	GMRect scrollbarThumbCorner;
 };
 
 class GMWidget : public GMObject
@@ -357,12 +360,22 @@ class GMWidget : public GMObject
 	GM_DECLARE_PROPERTY(Minimum, minimized, bool)
 	GM_DECLARE_PROPERTY(Visible, visible, bool)
 	GM_DECLARE_PROPERTY(Overflow, overflow, GMOverflowStyle)
-	GM_DECLARE_PROPERTY(ContentPaddingLeft, contentPaddingLeft, GMint32)
-	GM_DECLARE_PROPERTY(ContentPaddingTop, contentPaddingTop, GMint32)
-	GM_DECLARE_PROPERTY(ContentPaddingRight, contentPaddingRight, GMint32)
-	GM_DECLARE_PROPERTY(ContentPaddingBottom, contentPaddingBottom, GMint32)
+	GM_DECLARE_PROPERTY_WITH_CALLBACK(ContentPaddingLeft, contentPaddingLeft, GMint32, noop(), updateVerticalScrollbar())
+	GM_DECLARE_PROPERTY_WITH_CALLBACK(ContentPaddingTop, contentPaddingTop, GMint32, noop(), updateVerticalScrollbar())
+	GM_DECLARE_PROPERTY_WITH_CALLBACK(ContentPaddingRight, contentPaddingRight, GMint32, noop(), updateVerticalScrollbar())
+	GM_DECLARE_PROPERTY_WITH_CALLBACK(ContentPaddingBottom, contentPaddingBottom, GMint32, noop(), updateVerticalScrollbar())
 	GM_DECLARE_PROPERTY(ScrollStep, scrollStep, GMint32)
 	GM_DECLARE_PROPERTY(ScrollOffsetY, scrollOffsetY, GMint32)
+	GM_DECLARE_PROPERTY(VerticalScrollbarWidth, verticalScrollbarWidth, GMint32)
+	GM_DECLARE_PROPERTY(ScrollbarThumbCorner, scrollbarThumbCorner, GMRect)
+
+public:
+	enum OverflowFlag
+	{
+		CannotScroll = 0,
+		CanScrollUp = 1,
+		CanScrollDown = 2,
+	};
 
 public:
 	GMWidget(GMWidgetResourceManager* manager);
@@ -447,7 +460,9 @@ public:
 
 	void requestFocus(GMControl* control);
 	void setSize(GMint32 width, GMint32 height);
-	
+	bool verticalScroll(GMint32 offset);
+	bool verticalScrollTo(GMint32 value);
+
 public:
 	virtual bool msgProc(GMSystemEvent* event);
 	virtual void onInit() {}
@@ -486,6 +501,11 @@ private:
 	void mapRect(GMRect& rc);
 	void initStyles();
 	GMRect getContentRect();
+	GMint32 getContentOverflowFlag();
+	void createVerticalScrollbar();
+	void updateVerticalScrollbar();
+	void disableVerticalScrollbar();
+	bool needShowVerticalScrollbar();
 
 public:
 	inline IWindow* getParentWindow()

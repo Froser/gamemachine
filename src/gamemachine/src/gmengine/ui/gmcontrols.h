@@ -14,6 +14,12 @@ enum class GMControlType
 	Static,
 };
 
+enum class GMControlPositionFlag
+{
+	Auto,
+	Fixed,
+};
+
 GM_PRIVATE_OBJECT(GMControl)
 {
 	GMint32 x = 0;
@@ -31,10 +37,12 @@ GM_PRIVATE_OBJECT(GMControl)
 	bool isDefault = false;
 
 	GMint32 index = 0; //在控件列表中的索引
+	GMControlPositionFlag positionFlag = GMControlPositionFlag::Auto;
 };
 
 class GMControl : public GMObject
 {
+	GM_FRIEND_CLASS(GMWidget)
 	GM_DECLARE_PRIVATE(GMControl)
 
 public:
@@ -267,6 +275,19 @@ public:
 
 protected:
 	virtual void updateRect();
+
+friend_methods(GMWidget):
+	void setPositionFlag(GMControlPositionFlag flag) GM_NOEXCEPT
+	{
+		D(d);
+		d->positionFlag = flag;
+	}
+
+	inline GMControlPositionFlag getPositionFlag() GM_NOEXCEPT
+	{
+		D(d);
+		return d->positionFlag;
+	}
 };
 
 GM_PRIVATE_OBJECT(GMControlLabel)

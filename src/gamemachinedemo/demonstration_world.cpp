@@ -478,6 +478,9 @@ void DemonstrationWorld::init()
 	d->mainWidget->setTitle(L"GameMachine - 展示菜单");
 	d->mainWidget->setTitleVisible(true);
 	d->mainWidget->setKeyboardInput(true);
+	d->mainWidget->setVerticalScrollbarWidth(20);
+	gm::GMRect thumbCorner = { 0, 0, 7, 15 };
+	d->mainWidget->setScrollbarThumbCorner(thumbCorner);
 
 	gm::GMint32 Y = 10, marginY = 10;
 	for (auto& demo : d->demos)
@@ -488,7 +491,7 @@ void DemonstrationWorld::init()
 			demo.first,
 			10,
 			Y,
-			480,
+			450,
 			30,
 			false
 		));
@@ -506,7 +509,7 @@ void DemonstrationWorld::init()
 		L"退出程序",
 		10,
 		Y,
-		480,
+		450,
 		30,
 		false
 	));

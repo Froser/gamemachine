@@ -83,7 +83,9 @@ GMStyle& GMControl::getStyle(StyleType style)
 bool GMControl::containsPoint(GMPoint point)
 {
 	D(d);
-	point.y -= getParent()->getScrollOffsetY();
+	// 如果是跟随滚动条，需要拣去一个滚动条的偏移
+	if (d->positionFlag == GMControlPositionFlag::Auto)
+		point.y -= getParent()->getScrollOffsetY();
 	return GM_inRect(d->boundingBox, point);
 }
 
@@ -439,7 +441,7 @@ void GMControlScrollBar::render(GMDuration elapsed)
 			{
 				if (d->allowClickDelay < now - d->arrowTime)
 				{
-					scroll(-1);
+					scroll(-d->singleStep);
 					d->arrowState = GMControlScrollBarArrowState::HeldUp;
 					d->arrowTime = now;
 				}
@@ -449,7 +451,7 @@ void GMControlScrollBar::render(GMDuration elapsed)
 			{
 				if (d->allowClickRepeat < now - d->arrowTime)
 				{
-					scroll(-1);
+					scroll(-d->singleStep);
 					d->arrowTime = now;
 				}
 				break;
@@ -464,7 +466,7 @@ void GMControlScrollBar::render(GMDuration elapsed)
 			{
 				if (d->allowClickDelay < now - d->arrowTime)
 				{
-					scroll(1);
+					scroll(d->singleStep);
 					d->arrowState = GMControlScrollBarArrowState::HeldDown;
 					d->arrowTime = now;
 				}
@@ -474,7 +476,7 @@ void GMControlScrollBar::render(GMDuration elapsed)
 			{
 				if (d->allowClickRepeat < now - d->arrowTime)
 				{
-					scroll(1);
+					scroll(d->singleStep);
 					d->arrowTime = now;
 				}
 				break;
