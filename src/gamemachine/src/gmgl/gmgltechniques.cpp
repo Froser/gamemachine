@@ -36,12 +36,36 @@ namespace
 		// 应用模板
 		GLenum compareFunc = GL_ALWAYS;
 		auto& stencilOptions = engine.getStencilOptions();
-		if (stencilOptions.compareFunc == GMStencilOptions::Equal)
+		switch (stencilOptions.compareFunc)
+		{
+		case GMStencilOptions::Equal:
 			compareFunc = GL_EQUAL;
-		else if (stencilOptions.compareFunc == GMStencilOptions::NotEqual)
+			break;
+		case GMStencilOptions::NotEqual:
 			compareFunc = GL_NOTEQUAL;
-		else if (stencilOptions.compareFunc == GMStencilOptions::Never)
+			break;
+		case GMStencilOptions::Never:
 			compareFunc = GL_NEVER;
+			break;
+		case GMStencilOptions::Always:
+			compareFunc = GL_ALWAYS;
+			break;
+		case GMStencilOptions::Less:
+			compareFunc = GL_LESS;
+			break;
+		case GMStencilOptions::LessEqual:
+			compareFunc = GL_LEQUAL;
+			break;
+		case GMStencilOptions::Greater:
+			compareFunc = GL_GREATER;
+			break;
+		case GMStencilOptions::GreaterEqual:
+			compareFunc = GL_GEQUAL;
+			break;
+		default:
+			GM_ASSERT(false);
+		}
+
 		glStencilFunc(compareFunc, 1, 0xFF);
 		glStencilMask(stencilOptions.writeMask);
 		glStencilOp(toStencilOp(stencilOptions.stencilFailedOp), toStencilOp(stencilOptions.stencilDepthFailedOp), toStencilOp(stencilOptions.stencilPassOp));

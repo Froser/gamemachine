@@ -458,18 +458,17 @@ public:
 
 	void drawStencil(
 		GMControlPositionFlag positionFlag,
-		const GMRect& rc,
+		GMRect rc,
 		GMfloat depth,
 		bool drawRc,
-		const GMVec4& color = GMVec4(1, 1, 1, 1),
-		bool clearCurrentStencil = true
+		const GMVec4& color = GMVec4(1, 1, 1, 1)
 	);
 
 	void useStencil(
 		bool inside
 	);
 
-	void endStencil(bool clearCurrentStencil = true);
+	void endStencil();
 
 	void requestFocus(GMControl* control);
 	void setSize(GMint32 width, GMint32 height);

@@ -345,6 +345,10 @@ struct GMStencilOptions
 		Equal,
 		NotEqual,
 		Always,
+		Less,
+		LessEqual,
+		Greater,
+		GreaterEqual,
 		Never,
 	};
 

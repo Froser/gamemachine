@@ -210,6 +210,10 @@ namespace
 		desc.FrontFace.StencilFunc = desc.BackFace.StencilFunc = (
 			(stencilOptions.compareFunc == GMStencilOptions::Equal) ? D3D11_COMPARISON_EQUAL :
 			(stencilOptions.compareFunc == GMStencilOptions::NotEqual) ? D3D11_COMPARISON_NOT_EQUAL : 
+			(stencilOptions.compareFunc == GMStencilOptions::Less) ? D3D11_COMPARISON_LESS :
+			(stencilOptions.compareFunc == GMStencilOptions::LessEqual) ? D3D11_COMPARISON_LESS_EQUAL :
+			(stencilOptions.compareFunc == GMStencilOptions::Greater) ? D3D11_COMPARISON_GREATER :
+			(stencilOptions.compareFunc == GMStencilOptions::GreaterEqual) ? D3D11_COMPARISON_GREATER_EQUAL :
 			(stencilOptions.compareFunc == GMStencilOptions::Never) ? D3D11_COMPARISON_NEVER : D3D11_COMPARISON_ALWAYS
 		);
 		return desc;
@@ -475,22 +479,11 @@ public:
 	}
 
 public:
-	ID3D11DepthStencilState* getDepthStencilState(bool depthEnabled, const GMStencilOptions& stencilOptions)
+	GMComPtr<ID3D11DepthStencilState> getDepthStencilState(bool depthEnabled, const GMStencilOptions& stencilOptions)
 	{
-		GMComPtr<ID3D11DepthStencilState>& state = 
-			states
-			[depthEnabled ? 1 : 0]
-			[stencilOptions.writeMask == GMStencilOptions::Ox00 ? 1 : 0]
-			[stencilOptions.compareFunc]
-			[stencilOptions.stencilFailedOp]
-			[stencilOptions.stencilDepthFailedOp]
-			[stencilOptions.stencilPassOp];
-
-		if (!state)
-		{
-			D3D11_DEPTH_STENCIL_DESC desc = getDepthStencilDesc(depthEnabled, stencilOptions);
-			createDepthStencilState(desc, &state);
-		}
+		GMComPtr<ID3D11DepthStencilState> state;
+		D3D11_DEPTH_STENCIL_DESC desc = getDepthStencilDesc(depthEnabled, stencilOptions);
+		createDepthStencilState(desc, &state);
 
 		GM_ASSERT(state);
 		return state;
@@ -506,7 +499,6 @@ private:
 private:
 	const IRenderContext* context = nullptr;
 	GMDx11GraphicEngine* engine = nullptr;
-	GMComPtr<ID3D11DepthStencilState> states[2][2][4][3][3][3];
 };
 
 END_NS

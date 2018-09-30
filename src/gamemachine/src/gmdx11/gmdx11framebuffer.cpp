@@ -324,7 +324,7 @@ void GMDx11Framebuffers::clear(GMFramebuffersClearType type)
 			d->deviceContext->ClearRenderTargetView(renderTargetView, d->clearColor);
 		}
 	}
-	d->deviceContext->ClearDepthStencilView(d->depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0U);
+	d->deviceContext->ClearDepthStencilView(d->depthStencilView, clearFlag, 1.0f, 0U);
 }
 
 IFramebuffer* GMDx11Framebuffers::getFramebuffer(GMsize_t index)

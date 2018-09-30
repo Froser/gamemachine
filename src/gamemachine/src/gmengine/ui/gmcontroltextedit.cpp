@@ -1281,7 +1281,7 @@ void GMControlTextArea::render(GMDuration elapsed)
 	// 绘制一个模板区域，防止光标、选中区域和文字超出渲染区域
 	GMWidget* widget = getParent();
 	GMRect expandedRcText = expandStencilRect(db->rcText); // 稍微扩大一下渲染区域，不然看起来很丑。
-	widget->drawStencil(getPositionFlag(), expandedRcText, .99f, true, GMVec4(), false);
+	widget->drawStencil(getPositionFlag(), expandedRcText, .99f, false);
 	widget->useStencil(true);
 
 	GMRect rcSelection;
@@ -1408,7 +1408,7 @@ void GMControlTextArea::render(GMDuration elapsed)
 	widget->drawText(getPositionFlag(), d->buffer, db->textStyle, adjustRectByScrollOffset(db->rcText), false);
 
 	// 结束模板区域
-	widget->endStencil(false);
+	widget->endStencil();
 
 	if (d->hasScrollBar && d->scrollBar)
 	{

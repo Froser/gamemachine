@@ -12,6 +12,21 @@
 
 namespace
 {
+	// 维护一个栈，用来弹出模板缓存
+	struct StencilCache
+	{
+		GMRect rc;
+		GMStencilOptions stencilOptions;
+	};
+
+	struct StencilOptionsPool
+	{
+		Stack<StencilCache> stencilCaches;
+		static GMbyte nestLevel;
+	};
+	GMbyte StencilOptionsPool::nestLevel = 0;
+	static StencilOptionsPool s_stencilPool;
+
 	GMControl* getNextControl(GMControl* control)
 	{
 		GMWidget* parentWidget = control->getParent();
@@ -447,6 +462,9 @@ void GMWidget::drawRect(
 	if (bkColor.getW() == 0)
 		return;
 
+	if (rc.width <= 0 || rc.height <= 0)
+		return;
+
 	D(d);
 	GMRect targetRc = rc;
 	mapRect(positionFlag, targetRc);
@@ -497,31 +515,51 @@ void GMWidget::drawBorder(
 
 void GMWidget::drawStencil(
 	GMControlPositionFlag positionFlag,
-	const GMRect& rc,
+	GMRect rc,
 	GMfloat depth,
 	bool drawRc,
-	const GMVec4& color,
-	bool clearCurrentStencil
+	const GMVec4& color
 )
 {
 	D(d);
 	auto engine = d->parentWindow->getGraphicEngine();
-	const auto& currentStencilOptions = engine->getStencilOptions();
-	if (clearCurrentStencil)
-		engine->getDefaultFramebuffers()->clear(GMFramebuffersClearType::Stencil);
+	engine->getDefaultFramebuffers()->clear(GMFramebuffersClearType::Stencil);
+	if (s_stencilPool.nestLevel > 0)
+	{
+		// 如果是嵌套模板，与之前的模板求交集
+		// 需要将父容器的滚动条因素纳入考虑
+		GMRect tempRc = rc;
+		if (positionFlag == GMControlPositionFlag::Auto)
+			tempRc.y += d->scrollOffsetY;
+		GM_ASSERT(!s_stencilPool.stencilCaches.empty());
+		tempRc = GM_intersectRect(tempRc, s_stencilPool.stencilCaches.top().rc);
+		rc = GM_intersectRect(rc, s_stencilPool.stencilCaches.top().rc);
+		// 绘制stencil时，将会再次把GMControlPositionFlag纳入考虑，因此此时只修改rc的高宽，不修改y
+		rc.width = tempRc.width;
+		rc.height = tempRc.height;
+	}
 
-	if (drawRc)
-	{
-		GMStencilOptions stencilOptions(GMStencilOptions::OxFF, GMStencilOptions::Always);
-		engine->setStencilOptions(stencilOptions);
-	}
-	else
-	{
-		// 如果不用绘制矩形，模板测试一定要失败，并且要更新模板缓存
-		GMStencilOptions stencilOptions(GMStencilOptions::OxFF, GMStencilOptions::Never, GMStencilOptions::Replace, GMStencilOptions::Keep, GMStencilOptions::Keep);
-		engine->setStencilOptions(stencilOptions);
-	}
+
+	// 记录下这次的绘制行为，在下一层endStencil时，还原
+	GMStencilOptions stencilOptions = drawRc ?
+		GMStencilOptions(
+			GMStencilOptions::OxFF,
+			GMStencilOptions::Always
+		) :
+		GMStencilOptions(
+			GMStencilOptions::OxFF,
+			GMStencilOptions::Never,
+			GMStencilOptions::Replace,
+			GMStencilOptions::Keep,
+			GMStencilOptions::Keep
+		);
+
+	engine->setStencilOptions(stencilOptions);
 	drawRect(positionFlag, color, rc, true, depth);
+
+	StencilCache cache = { rc, stencilOptions };
+	s_stencilPool.stencilCaches.push(std::move(cache));
+	++s_stencilPool.nestLevel;
 }
 
 void GMWidget::useStencil(
@@ -529,20 +567,30 @@ void GMWidget::useStencil(
 )
 {
 	D(d);
-	static GMStencilOptions s_inside(GMStencilOptions::OxFF, GMStencilOptions::Equal);
-	static GMStencilOptions s_outside(GMStencilOptions::OxFF, GMStencilOptions::NotEqual);
 	auto engine = d->parentWindow->getGraphicEngine();
-	engine->setStencilOptions(inside ? s_inside : s_outside);
+	engine->setStencilOptions(inside ? GMStencilOptions(GMStencilOptions::OxFF, GMStencilOptions::Equal) :
+		GMStencilOptions(GMStencilOptions::OxFF, GMStencilOptions::NotEqual));
 }
 
-void GMWidget::endStencil(bool clearCurrentStencil)
+void GMWidget::endStencil()
 {
 	D(d);
-	static GMStencilOptions s_stencilOptions(GMStencilOptions::Ox00, GMStencilOptions::Always);
+	--s_stencilPool.nestLevel;
+
+	// 弹出当前的stencil，回到上一层
+	s_stencilPool.stencilCaches.pop();
 	auto engine = d->parentWindow->getGraphicEngine();
-	if (clearCurrentStencil)
-		engine->getDefaultFramebuffers()->clear(GMFramebuffersClearType::Stencil);
-	engine->setStencilOptions(s_stencilOptions);
+	engine->getDefaultFramebuffers()->clear(GMFramebuffersClearType::Stencil);
+	if (s_stencilPool.stencilCaches.empty())
+	{
+		static GMStencilOptions s_stencilOptions(GMStencilOptions::Ox00, GMStencilOptions::Always);
+		GM_ASSERT(s_stencilPool.nestLevel == 0);
+		engine->setStencilOptions(s_stencilOptions);
+	}
+	else
+	{
+		GM_ASSERT(false); //这里应该应用上一次useStencil的设置。
+	}
 }
 
 void GMWidget::requestFocus(GMControl* control)
@@ -949,7 +997,7 @@ void GMWidget::render(GMfloat elpasedTime)
 	}
 
 	if (getOverflow() != GMOverflowStyle::Visible)
-		endStencil(true);
+		endStencil();
 
 	// 最后绘制不随滚动状态而变化的部分，如边框，标题栏
 	if (d->title)
