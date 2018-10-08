@@ -13,10 +13,18 @@
 namespace
 {
 	// 维护一个栈，用来弹出模板缓存
+	struct StencilOptionsPair
+	{
+		GMStencilOptions begin;
+		GMStencilOptions use;
+	};
+
 	struct StencilCache
 	{
 		GMRect rc;
-		GMStencilOptions stencilOptions;
+		StencilOptionsPair stencilOptions;
+		GMVec4 color;
+		GMfloat depth;
 	};
 
 	struct StencilOptionsPool
@@ -528,17 +536,11 @@ void GMWidget::drawStencil(
 	{
 		// 如果是嵌套模板，与之前的模板求交集
 		// 需要将父容器的滚动条因素纳入考虑
-		GMRect tempRc = rc;
 		if (positionFlag == GMControlPositionFlag::Auto)
-			tempRc.y += d->scrollOffsetY;
+			rc.y += d->scrollOffsetY;
 		GM_ASSERT(!s_stencilPool.stencilCaches.empty());
-		tempRc = GM_intersectRect(tempRc, s_stencilPool.stencilCaches.top().rc);
 		rc = GM_intersectRect(rc, s_stencilPool.stencilCaches.top().rc);
-		// 绘制stencil时，将会再次把GMControlPositionFlag纳入考虑，因此此时只修改rc的高宽，不修改y
-		rc.width = tempRc.width;
-		rc.height = tempRc.height;
 	}
-
 
 	// 记录下这次的绘制行为，在下一层endStencil时，还原
 	GMStencilOptions stencilOptions = drawRc ?
@@ -555,9 +557,9 @@ void GMWidget::drawStencil(
 		);
 
 	engine->setStencilOptions(stencilOptions);
-	drawRect(positionFlag, color, rc, true, depth);
+	drawRect(GMControlPositionFlag::Fixed, color, rc, true, depth);
 
-	StencilCache cache = { rc, stencilOptions };
+	StencilCache cache = { rc, { stencilOptions }, color, depth };
 	s_stencilPool.stencilCaches.push(std::move(cache));
 	++s_stencilPool.nestLevel;
 }
@@ -568,8 +570,12 @@ void GMWidget::useStencil(
 {
 	D(d);
 	auto engine = d->parentWindow->getGraphicEngine();
-	engine->setStencilOptions(inside ? GMStencilOptions(GMStencilOptions::OxFF, GMStencilOptions::Equal) :
-		GMStencilOptions(GMStencilOptions::OxFF, GMStencilOptions::NotEqual));
+	GMStencilOptions stencilOptions = inside ? GMStencilOptions(GMStencilOptions::OxFF, GMStencilOptions::Equal) :
+		GMStencilOptions(GMStencilOptions::OxFF, GMStencilOptions::NotEqual);
+	engine->setStencilOptions(stencilOptions);
+	// 缓存这次StencilOptions
+	auto& cache = s_stencilPool.stencilCaches.top();
+	cache.stencilOptions.use = stencilOptions;
 }
 
 void GMWidget::endStencil()
@@ -578,9 +584,11 @@ void GMWidget::endStencil()
 	--s_stencilPool.nestLevel;
 
 	// 弹出当前的stencil，回到上一层
-	s_stencilPool.stencilCaches.pop();
 	auto engine = d->parentWindow->getGraphicEngine();
 	engine->getDefaultFramebuffers()->clear(GMFramebuffersClearType::Stencil);
+
+	// 丢弃本次drawStencil时的缓存
+	s_stencilPool.stencilCaches.pop();
 	if (s_stencilPool.stencilCaches.empty())
 	{
 		static GMStencilOptions s_stencilOptions(GMStencilOptions::Ox00, GMStencilOptions::Always);
@@ -589,7 +597,14 @@ void GMWidget::endStencil()
 	}
 	else
 	{
-		GM_ASSERT(false); //这里应该应用上一次useStencil的设置。
+		// 重新绘制出之前保存的矩形区域，还原上一次的模板
+		auto engine = d->parentWindow->getGraphicEngine();
+		const auto& cache = s_stencilPool.stencilCaches.top();
+		engine->setStencilOptions(cache.stencilOptions.begin);
+		drawRect(GMControlPositionFlag::Fixed, cache.color, cache.rc, true, cache.depth);
+
+		// 还原上一次使用中的模板选项
+		engine->setStencilOptions(s_stencilPool.stencilCaches.top().stencilOptions.use);
 	}
 }
 
