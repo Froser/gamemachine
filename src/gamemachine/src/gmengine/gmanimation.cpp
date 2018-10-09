@@ -24,7 +24,6 @@ void GMAnimation::play()
 	D(d);
 	if (!d->isPlaying)
 	{
-		d->timeLast = GM.getRunningStates().elapsedTime;
 		d->isPlaying = true;
 	}
 }
@@ -51,14 +50,12 @@ void GMAnimation::reset()
 	}
 }
 
-void GMAnimation::update()
+void GMAnimation::update(GMDuration dt)
 {
 	D(d);
 	if (d->isPlaying)
 	{
-		auto now = GM.getRunningStates().elapsedTime;
-		d->timeline += now - d->timeLast;
-		d->timeLast = now;
+		d->timeline += dt;
 
 		// 目标关键帧，缓存当前迭代器，增加查找效率
 		GMAnimationKeyframe* currentKeyFrame = nullptr;

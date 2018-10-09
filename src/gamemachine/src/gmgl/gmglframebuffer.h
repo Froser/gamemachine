@@ -58,6 +58,7 @@ public:
 	virtual IFramebuffer* getFramebuffer(GMsize_t) override;
 	virtual GMsize_t count() override;
 	virtual void copyDepthStencilFramebuffer(IFramebuffers* dest) override;
+	virtual void setClearColor(const GMfloat rgba[4]) override;
 
 public:
 	virtual const IRenderContext* getContext();

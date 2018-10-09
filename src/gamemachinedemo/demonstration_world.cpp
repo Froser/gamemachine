@@ -7,6 +7,8 @@
 #include <gmgraphicengine.h>
 #include <gmrendertechnique.h>
 #include <gmglhelper.h>
+#include <gmmodelreader.h>
+#include <gmtools.h>
 
 #include "demo/texture.h"
 #include "demo/normalmap.h"
@@ -87,6 +89,7 @@ void DemoHandler::onActivate()
 {
 	D(d);
 	setLookAt();
+	d->engine->removeLights();
 	setDefaultLights();
 	d->activating = true;
 
@@ -98,8 +101,8 @@ void DemoHandler::onActivate()
 void DemoHandler::onDeactivate()
 {
 	D(d);
-	d->parentDemonstrationWorld->resetProjectionAndEye();
-	d->engine->removeLights();
+	d->parentDemonstrationWorld->resetCameraAndLights();
+
 	d->renderConfig.set(gm::GMRenderConfigs::FilterMode, gm::GMFilterMode::None);
 	d->activating = false;
 
@@ -452,6 +455,7 @@ void DemonstrationWorld::init()
 	D(d);
 	gm::GMGamePackage* package = GM.getGamePackageManager();
 	gm::IGraphicEngine* engine = getContext()->getEngine();
+	engine->getDefaultFramebuffers()->setClearColor(ValuePointer(gm::GMConvertion::hexToRGB(L"#041B4B")));
 	gm::GMFontHandle stxingka = engine->getGlyphManager()->addFontByFileName("STXINGKA.TTF");
 
 	/*
@@ -525,6 +529,58 @@ void DemonstrationWorld::init()
 	gm::GMRect corner = { 0,0,75,42 };
 	d->mainWidget->addBorder(corner);
 	d->mainWindow->addWidget(d->mainWidget);
+	initObjects();
+}
+
+void DemonstrationWorld::initObjects()
+{
+	D(d);
+	gm::GMGamePackage& pk = *GM.getGamePackageManager();
+	gm::GMModelLoadSettings loadSettings(
+		"love/love.obj",
+		"love",
+		getContext()
+	);
+
+	gm::GMAsset models;
+	bool b = gm::GMModelReader::load(loadSettings, models);
+	GM_ASSERT(b);
+	d->logoObj = new gm::GMGameObject(models);
+	d->logoObj->setScaling(Scale(GMVec3(.01f, .01f, .01f)));
+	d->logoObj->setTranslation(Translate(GMVec3(0, -.2f, 0)));
+
+	// 创建动画
+	GMFloat4 t4, s4;
+	GetTranslationFromMatrix(d->logoObj->getTranslation(), t4);
+	GetScalingFromMatrix(d->logoObj->getScaling(), s4);
+	GMVec4 t, s;
+	t.setFloat4(t4);
+	s.setFloat4(s4);
+	d->logoAnimation.setTargetObjects(d->logoObj);
+	d->logoAnimation.addKeyFrame(new gm::GMGameObjectKeyframe(
+		t,
+		s,
+		(Rotate(PI * 2 / 3, (GMVec3(0, 1, 0)))),
+		1.5f
+	));
+	d->logoAnimation.addKeyFrame(new gm::GMGameObjectKeyframe(
+		t,
+		s,
+		(Rotate(PI * 4 / 3, (GMVec3(0, 1, 0)))),
+		3.f
+	));
+	d->logoAnimation.addKeyFrame(new gm::GMGameObjectKeyframe(
+		t,
+		s,
+		(Rotate(PI * 2, (GMVec3(0, 1, 0)))),
+		4.5f
+	));
+	d->logoAnimation.setPlayLoop(true);
+	d->logoAnimation.play();
+
+	// 加入容器
+	addObjectAndInit(d->logoObj);
+	addToRenderList(d->logoObj);
 }
 
 void DemonstrationWorld::switchDemo()
@@ -540,8 +596,12 @@ void DemonstrationWorld::switchDemo()
 	}
 }
 
-void DemonstrationWorld::resetProjectionAndEye()
+void DemonstrationWorld::resetCameraAndLights()
 {
+	D(d);
+	auto engine = getContext()->getEngine();
+	engine->removeLights();
+
 	// 设置一个默认视角
 	gm::GMCamera& camera = getContext()->getEngine()->getCamera();
 	camera.setOrtho(-1, 1, -1, 1, .1f, 3200.f);
@@ -550,6 +610,24 @@ void DemonstrationWorld::resetProjectionAndEye()
 	lookAt.lookAt = { 0, 0, 1 };
 	lookAt.position = { 0, 0, -1 };
 	camera.lookAt(lookAt);
+
+	{
+		gm::ILight* light = nullptr;
+		GM.getFactory()->createLight(gm::GMLightType::Ambient, &light);
+		gm::GMfloat lightClr[] = { .1f, .1f, .1f, 1 };
+		light->setLightColor(lightClr);
+		engine->addLight(light);
+	}
+
+	{
+		gm::ILight* light = nullptr;
+		GM.getFactory()->createLight(gm::GMLightType::Direct, &light);
+		gm::GMfloat lightPos[] = { -5, 5, -5 };
+		light->setLightPosition(lightPos);
+		gm::GMfloat lightClr[] = { 2, 2, 2, 1 };
+		light->setLightColor(lightClr);
+		engine->addLight(light);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -599,7 +677,7 @@ void DemostrationEntrance::start()
 {
 	D(d);
 	gm::IInput* inputManager = d->mainWindow->getInputMananger();
-	getWorld()->resetProjectionAndEye();
+	getWorld()->resetCameraAndLights();
 	loadDemostrations(d->world);
 }
 
@@ -628,6 +706,7 @@ void DemostrationEntrance::event(gm::GameMachineHandlerEvent evt)
 			getWorld()->switchDemo();
 			break;
 		case gm::GameMachineHandlerEvent::Update:
+			getWorld()->getLogoAnimation().update(GM.getRunningStates().lastFrameElpased);
 			break;
 		case gm::GameMachineHandlerEvent::Render:
 			getWorld()->renderScene();

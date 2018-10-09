@@ -96,8 +96,9 @@ GM_PRIVATE_OBJECT(DemonstrationWorld)
 	gm::GMWidget* mainWidget = nullptr;
 	gm::IWindow* mainWindow = nullptr;
 	gm::GMWidgetResourceManager* manager = nullptr;
-	gm::GMAnimation animation;
 	gm::GMOwnedPtr<gm::GMUIConfiguration> configuration;
+	gm::GMGameObject* logoObj = nullptr;
+	gm::GMAnimation logoAnimation;
 };
 
 class DemonstrationWorld : public gm::GMGameWorld
@@ -118,7 +119,7 @@ public:
 	void addDemo(const gm::GMString& name, AUTORELEASE DemoHandler* demo);
 	void init();
 	void switchDemo();
-	void resetProjectionAndEye();
+	void resetCameraAndLights();
 
 public:
 	gm::IWindow* getMainWindow()
@@ -144,6 +145,15 @@ public:
 		D(d);
 		return getContext()->getEngine()->getPrimitiveManager();
 	}
+
+	gm::GMAnimation& getLogoAnimation() GM_NOEXCEPT
+	{
+		D(d);
+		return d->logoAnimation;
+	}
+
+private:
+	void initObjects();
 };
 
 GM_PRIVATE_OBJECT(DemostrationEntrance)

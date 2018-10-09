@@ -300,6 +300,7 @@ GM_INTERFACE(IFramebuffers)
 	virtual void clear(GMFramebuffersClearType = GMFramebuffersClearType::All) = 0;
 	virtual IFramebuffer* getFramebuffer(GMsize_t) = 0;
 	virtual void copyDepthStencilFramebuffer(IFramebuffers* dest) = 0;
+	virtual void setClearColor(const GMfloat rgba[4]) = 0;
 };
 
 enum class GMGeometryPassingState

@@ -348,6 +348,12 @@ void GMDx11Framebuffers::copyDepthStencilFramebuffer(IFramebuffers* dest)
 	d->deviceContext->CopyResource(d_dest->depthStencilTexture, d->depthStencilTexture);
 }
 
+void GMDx11Framebuffers::setClearColor(const GMfloat rgba[4])
+{
+	D(d);
+	memcpy_s(d->clearColor, sizeof(d->clearColor), rgba, sizeof(d->clearColor));
+}
+
 const IRenderContext* GMDx11Framebuffers::getContext()
 {
 	D(d);

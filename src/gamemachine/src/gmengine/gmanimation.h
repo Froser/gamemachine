@@ -49,8 +49,7 @@ GM_PRIVATE_OBJECT(GMAnimation)
 {
 	bool playLoop = false;
 	bool isPlaying = false;
-	GMfloat timeline = 0;
-	GMfloat timeLast = 0;
+	GMDuration timeline = 0;
 	Set<GMAnimationKeyframe*, GMAnimationKeyframeLess> keyframes;
 	Set<GMAnimationKeyframe*, GMAnimationKeyframeLess>::const_iterator keyframesIter;
 	Set<GMObject*> targetObjects;
@@ -98,7 +97,7 @@ public:
 	void play();
 	void pause();
 	void reset();
-	void update();
+	void update(GMDuration dt);
 
 private:
 	void updatePercentage();

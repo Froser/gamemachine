@@ -242,6 +242,12 @@ void GMGLFramebuffers::copyDepthStencilFramebuffer(IFramebuffers* dest)
 	glBindFramebuffer(GL_FRAMEBUFFER, cache);
 }
 
+void GMGLFramebuffers::setClearColor(const GMfloat rgba[4])
+{
+	D(d);
+	memcpy_s(d->clearColor, sizeof(d->clearColor), rgba, sizeof(d->clearColor));
+}
+
 const IRenderContext* GMGLFramebuffers::getContext()
 {
 	D(d);
