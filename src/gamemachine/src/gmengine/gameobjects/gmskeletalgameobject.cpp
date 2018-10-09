@@ -1,10 +1,10 @@
 ﻿#include "stdafx.h"
-#include "gmskeletongameobject.h"
+#include "gmskeletalgameobject.h"
 #include "foundation/gmasync.h"
 #include "foundation/gamemachine.h"
 #include "gmengine/gmgameworld.h"
 
-void GMSkeletonGameObject::update(GMDuration dt)
+void GMSkeletalGameObject::update(GMDuration dt)
 {
 	D(d);
 	if (d->playing)
@@ -44,14 +44,14 @@ void GMSkeletonGameObject::update(GMDuration dt)
 	}
 }
 
-void GMSkeletonGameObject::draw()
+void GMSkeletalGameObject::draw()
 {
 	D(d);
 	if (d->drawSkin)
 		GMGameObject::draw();
 }
 
-GMint32 GMSkeletonGameObject::getFramesCount()
+GMint32 GMSkeletalGameObject::getFramesCount()
 {
 	D(d);
 	GMModels* models = getModels();
@@ -65,7 +65,7 @@ GMint32 GMSkeletonGameObject::getFramesCount()
 	return 0;
 }
 
-void GMSkeletonGameObject::createSkeletonBonesObject()
+void GMSkeletalGameObject::createSkeletonBonesObject()
 {
 	D(d);
 	GMModels* models = getModels();
@@ -94,7 +94,7 @@ void GMSkeletonGameObject::createSkeletonBonesObject()
 	}
 }
 
-void GMSkeletonGameObject::setDrawBones(bool b)
+void GMSkeletalGameObject::setDrawBones(bool b)
 {
 	D(d);
 	d->drawBones = b;
@@ -110,19 +110,19 @@ void GMSkeletonGameObject::setDrawBones(bool b)
 	}
 }
 
-void GMSkeletonGameObject::play()
+void GMSkeletalGameObject::play()
 {
 	D(d);
 	d->playing = true;
 }
 
-void GMSkeletonGameObject::pause()
+void GMSkeletalGameObject::pause()
 {
 	D(d);
 	d->playing = false;
 }
 
-void GMSkeletonGameObject::reset(bool update)
+void GMSkeletalGameObject::reset(bool update)
 {
 	D(d);
 	d->animationTime = 0;
@@ -140,7 +140,7 @@ void GMSkeletonGameObject::reset(bool update)
 	}
 }
 
-void GMSkeletonGameObject::initAnimation()
+void GMSkeletalGameObject::initAnimation()
 {
 	D(d);
 	GMSkeleton* skeleton = getModels()->getSkeleton();
@@ -157,7 +157,7 @@ void GMSkeletonGameObject::initAnimation()
 	}
 }
 
-void GMSkeletonGameObject::getAdjacentTwoFrames(GMDuration dt, REF GMint32& frame0, REF GMint32& frame1, REF GMfloat& interpolate)
+void GMSkeletalGameObject::getAdjacentTwoFrames(GMDuration dt, REF GMint32& frame0, REF GMint32& frame1, REF GMfloat& interpolate)
 {
 	D(d);
 	GMSkeleton* skeleton = getModels()->getSkeleton();
@@ -186,7 +186,7 @@ void GMSkeletonGameObject::getAdjacentTwoFrames(GMDuration dt, REF GMint32& fram
 	interpolate = Fmod(d->animationTime, d->frameDuration) / d->frameDuration;
 }
 
-void GMSkeletonGameObject::updateMesh(GMSkeletonMesh& mesh, const GMFrameSkeleton& frameSkeleton)
+void GMSkeletalGameObject::updateMesh(GMSkeletonMesh& mesh, const GMFrameSkeleton& frameSkeleton)
 {
 	static GMint32 numberOfProcessors = GM.getRunningStates().systemInfo.numberOfProcessors;
 
@@ -294,7 +294,7 @@ void GMSkeletonGameObject::updateMesh(GMSkeletonMesh& mesh, const GMFrameSkeleto
 	}
 }
 
-void GMSkeletonGameObject::updateSkeleton()
+void GMSkeletalGameObject::updateSkeleton()
 {
 	D(d);
 	GMModels* models = getModels();
@@ -352,7 +352,7 @@ void GMSkeletonGameObject::updateSkeleton()
 	d->skeletonBonesObject->endUpdateTransform();
 }
 
-void GMSkeletonGameObject::initSkeletonBonesMesh(GMMesh* mesh)
+void GMSkeletalGameObject::initSkeletonBonesMesh(GMMesh* mesh)
 {
 	D(d);
 	// 找到所有joint，连接成线

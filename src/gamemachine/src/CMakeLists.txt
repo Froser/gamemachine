@@ -87,8 +87,8 @@ set(SOURCES
 		gmengine/gameobjects/gmspritegameobject.cpp
 		gmengine/gameobjects/gm2dgameobject.h
 		gmengine/gameobjects/gm2dgameobject.cpp
-		gmengine/gameobjects/gmskeletongameobject.h
-		gmengine/gameobjects/gmskeletongameobject.cpp
+		gmengine/gameobjects/gmskeletalgameobject.h
+		gmengine/gameobjects/gmskeletalgameobject.cpp
 		gmengine/particle/gmparticle.h
 		gmengine/particle/gmparticle.cpp
 		gmengine/particle/gmparticleeffects.h

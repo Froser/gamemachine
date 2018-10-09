@@ -4,7 +4,7 @@
 #include <gmgameobject.h>
 BEGIN_NS
 
-GM_PRIVATE_OBJECT(GMSkeletonGameObject)
+GM_PRIVATE_OBJECT(GMSkeletalGameObject)
 {
 	enum { AutoPlayFrame = -1 };
 
@@ -20,9 +20,9 @@ GM_PRIVATE_OBJECT(GMSkeletonGameObject)
 	GMVec4 skeletonColor = GMVec4(0, 1, 0, 1);
 };
 
-class GMSkeletonGameObject : public GMGameObject
+class GMSkeletalGameObject : public GMGameObject
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMSkeletonGameObject, GMGameObject)
+	GM_DECLARE_PRIVATE_AND_BASE(GMSkeletalGameObject, GMGameObject)
 	GM_DECLARE_PROPERTY(SkeletonColor, skeletonColor, GMVec4)
 	GM_DECLARE_PROPERTY(DrawSkin, drawSkin, bool)
 
