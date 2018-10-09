@@ -529,6 +529,26 @@ void DemonstrationWorld::init()
 	gm::GMRect corner = { 0,0,75,42 };
 	d->mainWidget->addBorder(corner);
 	d->mainWindow->addWidget(d->mainWidget);
+
+	gm::GMWidget* billboard = new gm::GMWidget(d->manager);
+	d->configuration->initWidget(billboard);
+	billboard->setSize(270, 90);
+	billboard->setPosition(600, 60);
+	gm::GMControlLabel* lb = gm::GMControlLabel::createControl(
+		billboard,
+		L"欢迎来到GameMachine的世界。\n"
+		L"在这里，你将看到GameMachine所展示出来的部分功能。",
+		GMVec4(1, 1, 1, 1),
+		10,
+		0,
+		250,
+		80,
+		false
+	);
+	billboard->addControl(lb);
+	billboard->addBorder(corner);
+	d->mainWindow->addWidget(billboard);
+
 	initObjects();
 }
 

@@ -306,7 +306,7 @@ GMString GMZipGamePackageHandler::pathRoot(GMPackageIndex index)
 	case GMPackageIndex::Scripts:
 		return L"scripts/";
 	case GMPackageIndex::Fonts:
-		return d->packagePath + L"fonts/";
+		return L"fonts/";
 	default:
 		GM_ASSERT(false);
 		break;

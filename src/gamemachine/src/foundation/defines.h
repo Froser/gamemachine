@@ -67,14 +67,14 @@ using Hash = std::hash<T>;
 template <typename T1, typename T2, typename Hasher = Hash<T1>>
 using HashMap = std::unordered_map<T1, T2, Hasher>;
 
-template <typename T>
-using Stack = std::stack<T>;
+template <typename T, typename Alloc = std::allocator<T>>
+using Deque = std::deque<T, Alloc>;
+
+template <typename T, typename Container = Deque<T> >
+using Stack = std::stack<T, Container>;
 
 template <typename T>
 using List = std::list<T>;
-
-template <typename T>
-using Deque = std::deque<T>;
 
 template <typename... T>
 using Tuple = std::tuple<T...>;

@@ -29,7 +29,7 @@ namespace
 
 	struct StencilOptionsPool
 	{
-		Stack<StencilCache> stencilCaches;
+		Stack<StencilCache, Deque<StencilCache, AlignedAllocator<StencilCache>>> stencilCaches;
 		static GMbyte nestLevel;
 	};
 	GMbyte StencilOptionsPool::nestLevel = 0;
@@ -560,7 +560,7 @@ void GMWidget::drawStencil(
 	drawRect(GMControlPositionFlag::Fixed, color, rc, true, depth);
 
 	StencilCache cache = { rc, { stencilOptions }, color, depth };
-	s_stencilPool.stencilCaches.push(std::move(cache));
+	s_stencilPool.stencilCaches.push(cache);
 	++s_stencilPool.nestLevel;
 }
 
@@ -1024,7 +1024,8 @@ void GMWidget::render(GMfloat elpasedTime)
 
 	if (!d->minimized)
 	{
-		d->borderControl->render(elpasedTime);
+		if (d->borderControl)
+			d->borderControl->render(elpasedTime);
 		if (d->verticalScrollbar)
 			d->verticalScrollbar->render(elpasedTime);
 	}
