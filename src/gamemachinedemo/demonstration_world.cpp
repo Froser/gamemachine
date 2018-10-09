@@ -121,6 +121,7 @@ void DemoHandler::onDeactivate()
 	config.set(gm::GMRenderConfigs::HDR_Bool, false);
 
 	d->parentDemonstrationWorld->getMainWidget()->setVisible(true);
+	d->parentDemonstrationWorld->getBillboardWidget()->setVisible(true);
 }
 
 void DemoHandler::event(gm::GameMachineHandlerEvent evt)
@@ -440,6 +441,7 @@ DemonstrationWorld::~DemonstrationWorld()
 	}
 
 	GM_delete(d->mainWidget);
+	GM_delete(d->billboard);
 	GM_delete(d->manager);
 }
 
@@ -506,7 +508,8 @@ void DemonstrationWorld::init()
 		GM_ASSERT(button);
 		button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 			d->nextDemo = demo.second;
-			d->mainWidget->setVisible(false);
+			getMainWidget()->setVisible(false);
+			getBillboardWidget()->setVisible(false);
 		});
 	}
 
@@ -547,6 +550,7 @@ void DemonstrationWorld::init()
 	);
 	billboard->addControl(lb);
 	billboard->addBorder(corner);
+	d->billboard = billboard;
 	d->mainWindow->addWidget(billboard);
 
 	initObjects();

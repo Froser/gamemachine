@@ -94,6 +94,7 @@ GM_PRIVATE_OBJECT(DemonstrationWorld)
 	DemoHandler* currentDemo = nullptr;
 	DemoHandler* nextDemo = nullptr;
 	gm::GMWidget* mainWidget = nullptr;
+	gm::GMWidget* billboard = nullptr;
 	gm::IWindow* mainWindow = nullptr;
 	gm::GMWidgetResourceManager* manager = nullptr;
 	gm::GMOwnedPtr<gm::GMUIConfiguration> configuration;
@@ -114,6 +115,7 @@ public:
 	void setCurrentDemo(DemoHandler* demo) { D(d); d->currentDemo = demo; }
 	void setCurrentDemo(gm::GMint32 index) { D(d); d->currentDemo = d->demos[0].second; }
 	inline gm::GMWidget* getMainWidget() { D(d); return d->mainWidget; }
+	inline gm::GMWidget* getBillboardWidget() { D(d); return d->billboard; }
 
 public:
 	void addDemo(const gm::GMString& name, AUTORELEASE DemoHandler* demo);
