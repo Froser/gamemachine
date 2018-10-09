@@ -838,16 +838,20 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 			s_controlFocus->getParent() == this &&
 			s_controlFocus->getEnabled())
 		{
+			GMPoint pt = pControlEvent->getPoint();
 			if (s_controlFocus->handleMouse(adjustMouseEvent(pControlEvent, s_controlFocus)))
 				return true;
+			pControlEvent->setPoint(pt);
 		}
 
 		// 点击测试，找到鼠标所在位置的控件
 		GMControl* control = getControlAtPoint(pt);
 		if (control && control->getEnabled())
 		{
+			GMPoint pt = pControlEvent->getPoint();
 			if (control->handleMouse(adjustMouseEvent(pControlEvent, control)))
 				return true;
+			pControlEvent->setPoint(pt);
 		}
 		else
 		{
