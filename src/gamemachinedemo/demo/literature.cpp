@@ -14,6 +14,7 @@ void Demo_Literature::init()
 
 	gm::GMTextGameObject* literature = new gm::GMTextGameObject(getDemoWorldReference()->getContext()->getWindow()->getRenderRect());
 	gm::GMRect rect = { 200, 220, 400, 190 };
+	literature->setLineSpacing(10);
 	literature->setGeometry(rect);
 	literature->setText(
 		"This is a [color=#ffbbff]text[color=#ffffff] demo. It shows you how to render ABC,xyz,etc.[n]"
@@ -24,7 +25,6 @@ void Demo_Literature::init()
 		"[size=20]20Points Font Size[n]"
 		"[size=10]10Points Font Size[n]"
 		"[n]"
-		"[size=25][n]Let's try some 'overflow'"
 	);
 
 	gm::GMDemoGameWorld* world = gm::gm_cast<gm::GMDemoGameWorld*>(getDemoWorldReference().get());

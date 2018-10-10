@@ -52,11 +52,31 @@ private:
 	void movePicked(const gm::GMPhysicsRayTestResult& rayTestResult);
 
 protected:
-	const gm::GMString& getDescription() const
+	const gm::GMString& getDescription() const override
 	{
 		static gm::GMString desc = L"左键选中物体。按住左键移动物体。";
 		return desc;
 	}
+
+	virtual void createPhysicsShapeAsset(REF gm::GMPhysicsShapeAsset& asset);
+};
+
+class Demo_Collision_Cone : public Demo_Collision
+{
+	using Demo_Collision::Demo_Collision;
+	virtual void createPhysicsShapeAsset(REF gm::GMPhysicsShapeAsset& asset);
+};
+
+class Demo_Collision_Cylinder : public Demo_Collision
+{
+	using Demo_Collision::Demo_Collision;
+	virtual void createPhysicsShapeAsset(REF gm::GMPhysicsShapeAsset& asset);
+};
+
+class Demo_Collision_Sphere : public Demo_Collision
+{
+	using Demo_Collision::Demo_Collision;
+	virtual void createPhysicsShapeAsset(REF gm::GMPhysicsShapeAsset& asset);
 };
 
 #endif

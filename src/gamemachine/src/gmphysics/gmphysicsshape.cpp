@@ -34,12 +34,34 @@ const btCollisionShape* GMPhysicsShape::getBulletShape() const
 
 //////////////////////////////////////////////////////////////////////////
 // Helper
-
 void GMPhysicsShapeCreator::createBoxShape(const GMVec3& halfExtents, REF GMPhysicsShapeAsset& physicsShape)
 {
 	GMFloat4 fs_halfExtents;
 	halfExtents.loadFloat4(fs_halfExtents);
 	GMPhysicsShape* shape = new GMPhysicsShape();
 	shape->setShape(new btBoxShape(btVector3(fs_halfExtents[0], fs_halfExtents[1], fs_halfExtents[2])));
+	physicsShape = GMAsset(GMAssetType::PhysicsShape, shape);
+}
+
+void GMPhysicsShapeCreator::createCylinderShape(const GMVec3& halfExtents, REF GMPhysicsShapeAsset& physicsShape)
+{
+	GMFloat4 fs_halfExtents;
+	halfExtents.loadFloat4(fs_halfExtents);
+	GMPhysicsShape* shape = new GMPhysicsShape();
+	shape->setShape(new btCylinderShape(btVector3(fs_halfExtents[0], fs_halfExtents[1], fs_halfExtents[2])));
+	physicsShape = GMAsset(GMAssetType::PhysicsShape, shape);
+}
+
+void GMPhysicsShapeCreator::createConeShape(GMfloat radius, GMfloat height, REF GMPhysicsShapeAsset& physicsShape)
+{
+	GMPhysicsShape* shape = new GMPhysicsShape();
+	shape->setShape(new btConeShape(radius, height));
+	physicsShape = GMAsset(GMAssetType::PhysicsShape, shape);
+}
+
+void GMPhysicsShapeCreator::createSphereShape(GMfloat radius, REF GMPhysicsShapeAsset& physicsShape)
+{
+	GMPhysicsShape* shape = new GMPhysicsShape();
+	shape->setShape(new btSphereShape(radius));
 	physicsShape = GMAsset(GMAssetType::PhysicsShape, shape);
 }

@@ -32,7 +32,9 @@ public:
 struct GMPhysicsShapeCreator
 {
 	static void createBoxShape(const GMVec3& halfExtents, REF GMPhysicsShapeAsset& physicsShape);
-	static void createMeshFromShape(GMPhysicsShape* shape, GMGameObject* gameObject, GMGameWorld* world);
+	static void createCylinderShape(const GMVec3& halfExtents, REF GMPhysicsShapeAsset& physicsShape);
+	static void createConeShape(GMfloat radius, GMfloat height, REF GMPhysicsShapeAsset& physicsShape);
+	static void createSphereShape(GMfloat radius, REF GMPhysicsShapeAsset& physicsShape);
 };
 
 END_NS

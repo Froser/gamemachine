@@ -47,6 +47,20 @@ namespace
 			}
 			GM_delete(hull);
 		}
+		else if (collisionShape->isCompound())
+		{
+			btCompoundShape* compound = gm_cast<btCompoundShape*>(collisionShape);
+			for (int i = 0; i < compound->getNumChildShapes(); i++)
+			{
+
+				btTransform childWorldTrans = parentTransform * compound->getChildTransform(i);
+				collisionShape2TriangleMesh(compound->getChildShape(i), childWorldTrans, vertexPositions, vertexNormals, indicesOut);
+			}
+		}
+		else
+		{
+			GM_ASSERT(false);
+		}
 		//	}
 		//	}
 	}

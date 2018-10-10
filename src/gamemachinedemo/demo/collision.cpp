@@ -22,6 +22,11 @@ namespace
 	};
 }
 
+void Demo_Collision::createPhysicsShapeAsset(REF gm::GMPhysicsShapeAsset& asset)
+{
+	gm::GMPhysicsShapeCreator::createBoxShape(GMVec3(.1f, .1f, .1f), asset);
+}
+
 void Demo_Collision::init()
 {
 	D(d);
@@ -60,7 +65,7 @@ void Demo_Collision::init()
 	// create box
 	{
 		gm::GMPhysicsShapeAsset boxShape;
-		gm::GMPhysicsShapeCreator::createBoxShape(GMVec3(.1f, .1f, .1f), boxShape);
+		createPhysicsShapeAsset(boxShape);
 		gm::GMAsset boxAsset = getDemoWorldReference()->getAssets().addAsset(boxShape);
 
 		gm::GMint32 idx = 0;
@@ -248,10 +253,10 @@ void Demo_Collision::pickUp(const gm::GMPhysicsRayTestResult& rayTestResult)
 	gm::GMPoint2PointConstraint* p2pc = new gm::GMPoint2PointConstraint(body, GMVec3(f4_localPivot[0], f4_localPivot[1], f4_localPivot[2]));
 	d->discreteWorld->addConstraint(p2pc, true);
 	d->pickedConstraint = p2pc;
-	auto settings = p2pc->getConstraintSetting();
-	settings.impulseClamp = 30.f;
-	settings.tau = .001f;
-	p2pc->setConstraintSetting(settings);
+	auto setting = p2pc->getConstraintSetting();
+	setting.impulseClamp = 30.f;
+	setting.tau = .001f;
+	p2pc->setConstraintSetting(setting);
 	d->oldPickingPos = rayTestResult.rayToWorld;
 	d->hitPos = rayTestResult.hitPointWorld;
 	d->oldPickingDist = Length(rayTestResult.hitPointWorld - rayTestResult.rayFromWorld);
@@ -281,4 +286,20 @@ void Demo_Collision::movePicked(const gm::GMPhysicsRayTestResult& rayTestResult)
 		GMVec3 newPivotB = rayTestResult.rayFromWorld + dir;
 		d->pickedConstraint->setPivotB(newPivotB);
 	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+void Demo_Collision_Cone::createPhysicsShapeAsset(REF gm::GMPhysicsShapeAsset& asset)
+{
+	gm::GMPhysicsShapeCreator::createConeShape(.1f, .1f, asset);
+}
+
+void Demo_Collision_Cylinder::createPhysicsShapeAsset(REF gm::GMPhysicsShapeAsset& asset)
+{
+	gm::GMPhysicsShapeCreator::createCylinderShape(GMVec3(.1f, .1f, .1f), asset);
+}
+
+void Demo_Collision_Sphere::createPhysicsShapeAsset(REF gm::GMPhysicsShapeAsset& asset)
+{
+	gm::GMPhysicsShapeCreator::createSphereShape(.1f, asset);
 }
