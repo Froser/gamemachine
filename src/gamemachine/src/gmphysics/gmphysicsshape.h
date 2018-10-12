@@ -43,7 +43,8 @@ struct GMPhysicsShapeHelper
 	);
 	static void createModelFromShape(
 		GMPhysicsShape* shape,
-		OUT GMModel** model);
+		OUT GMModel** model
+	);
 };
 
 END_NS
