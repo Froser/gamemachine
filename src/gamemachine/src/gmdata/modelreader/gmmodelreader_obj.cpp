@@ -171,7 +171,7 @@ bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buff
 
 bool GMModelReader_Obj::test(const GMBuffer& buffer)
 {
-	return buffer.buffer && buffer.buffer[0] == '#';
+	return buffer.buffer && (buffer.buffer[0] == '#' || buffer.buffer[0] == 'v');
 }
 
 void GMModelReader_Obj::appendFace(const GMModelLoadSettings& settings, GMScanner& scanner)

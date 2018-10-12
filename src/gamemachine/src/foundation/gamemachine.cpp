@@ -69,20 +69,6 @@ GMMessage GameMachine::peekMessage()
 	return d->lastMessage;
 }
 
-void GameMachine::createModelDataProxyAndTransfer(const IRenderContext* context, GMModel* model)
-{
-	if (model)
-	{
-		GMModelDataProxy* modelDataProxy = model->getModelDataProxy();
-		if (!modelDataProxy)
-		{
-			getFactory()->createModelDataProxy(context, model, &modelDataProxy);
-			model->setModelDataProxy(modelDataProxy);
-		}
-		modelDataProxy->transfer();
-	}
-}
-
 void GameMachine::startGameMachine()
 {
 	D(d);

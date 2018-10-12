@@ -11,6 +11,10 @@ GMDx11ModelDataProxy::GMDx11ModelDataProxy(const IRenderContext* context, GMMode
 		d->engine = gm_cast<GMDx11GraphicEngine*>(context->getEngine());
 }
 
+GMDx11ModelDataProxy::~GMDx11ModelDataProxy()
+{
+}
+
 bool GMDx11ModelDataProxy::getInterface(GameMachineInterfaceID id, void** out)
 {
 	D_BASE(db, Base);
@@ -53,8 +57,11 @@ bool GMDx11ModelDataProxy::getInterface(GameMachineInterfaceID id, void** out)
 void GMDx11ModelDataProxy::transfer()
 {
 	D(d);
+	D_BASE(db, GMModelDataProxy);
 	if (d->inited)
 		return;
+
+	prepareParentModel();
 
 	GMModel* model = getModel();
 	if (!model->isNeedTransfer())

@@ -85,7 +85,7 @@ void GMSkeletalGameObject::createSkeletonBonesObject()
 
 		GMMesh* mesh = new GMMesh(skeletonModel);
 		initSkeletonBonesMesh(mesh);
-		GM.createModelDataProxyAndTransfer(getContext(), skeletonModel);
+		getContext()->getEngine()->createModelDataProxy(getContext(), skeletonModel);
 		GM_ASSERT(getWorld());
 
 		d->skeletonBonesObject.reset(new GMGameObject(GMAsset(GMAssetType::Model, skeletonModel)));

@@ -40,7 +40,7 @@ GMGameObject* GMParticleModel_2D::createGameObject(
 		mesh->vertex(GMVertex());
 	}
 
-	GM.createModelDataProxyAndTransfer(context, d->particleModel);
+	context->getEngine()->createModelDataProxy(context, d->particleModel);
 	object->setContext(context);
 	object->setAsset(GMAsset(GMAssetType::Model, d->particleModel));
 	return object;

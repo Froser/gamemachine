@@ -3,7 +3,6 @@
 #include "gmbulletincludes.h"
 #include <gmgameobject.h>
 #include "gmphysicsshape.h"
-#include "gmbullethelper.h"
 
 const GMMotionStates& GMPhysicsObject::getMotionStates()
 {

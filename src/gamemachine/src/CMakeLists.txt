@@ -139,8 +139,6 @@ set(SOURCES
 		gmphysics/gmdiscretedynamicsworld.cpp
 		gmphysics/gmconstraint.h
 		gmphysics/gmconstraint.cpp
-		gmphysics/gmbullethelper.h
-		gmphysics/gmbullethelper.cpp
 		gmphysics/gmbulletincludes.h
 		gmphysics/gmbulletforward.h
 		foundation/utilities/tools.h

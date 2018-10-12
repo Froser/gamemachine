@@ -54,8 +54,8 @@ enum class GMS_Cull
 */
 enum class GMS_FrontFace
 {
-	CLOCKWISE, //!< 窗口坐标上投影多边形的顶点顺序为顺时针方向的表面为正面
-	COUNTER_CLOCKWISE, //!< 窗口坐标上投影多边形的顶点顺序为逆时针方向的表面为正面
+	Closewise, //!< 窗口坐标上投影多边形的顶点顺序为顺时针方向的表面为正面
+	CounterClosewise, //!< 窗口坐标上投影多边形的顶点顺序为逆时针方向的表面为正面
 };
 
 //! 纹理过滤方式

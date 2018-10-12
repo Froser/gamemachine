@@ -533,6 +533,16 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	virtual GMRenderTechniqueManager* getRenderTechniqueManager() = 0;
 
 	virtual GMPrimitiveManager* getPrimitiveManager() = 0;
+
+	//! 初始化一个对象数据代理。
+	/*!
+	初始化一个对象数据代理。每当新建一个GMModel时，需要调用此方法，为GMModel设置一个数据代理。此方法将用工厂类来为GMModel创建一个GMModelDataProxy对象。<br>
+	在创建之后，数据代理马上会将GMModel顶点数据传输到GPU。
+	\param context 当前渲染上下文。
+	\param model 需要创建数据代理的模型对象。创建好的GMModelDataProxy会绑定在此对象上。在此对象析构时，GMModelDataProxy也会析构，用户不需要关心它的生命周期。
+	\param transfer 是否马上传递顶点信息到GPU。传递后，对象的顶点信息将在内存中被释放。
+	*/
+	virtual void createModelDataProxy(const IRenderContext* context, GMModel* model, bool transfer = true) = 0;
 };
 
 GM_INTERFACE(ITechnique)

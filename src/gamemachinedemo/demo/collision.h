@@ -59,6 +59,7 @@ protected:
 	}
 
 	virtual void createPhysicsShapeAsset(REF gm::GMPhysicsShapeAsset& asset);
+	virtual void createBoxes();
 };
 
 class Demo_Collision_Cone : public Demo_Collision
@@ -77,6 +78,13 @@ class Demo_Collision_Sphere : public Demo_Collision
 {
 	using Demo_Collision::Demo_Collision;
 	virtual void createPhysicsShapeAsset(REF gm::GMPhysicsShapeAsset& asset);
+};
+
+class Demo_Collision_Model : public Demo_Collision
+{
+	using Demo_Collision::Demo_Collision;
+	virtual void createPhysicsShapeAsset(REF gm::GMPhysicsShapeAsset& asset);
+	virtual void createBoxes();
 };
 
 #endif

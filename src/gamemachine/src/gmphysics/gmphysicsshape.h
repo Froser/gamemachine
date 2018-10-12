@@ -15,7 +15,7 @@ class GMPhysicsShape : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMPhysicsShape);
 
-	friend struct GMPhysicsShapeCreator;
+	friend struct GMPhysicsShapeHelper;
 
 private:
 	GMPhysicsShape() = default;
@@ -29,12 +29,21 @@ public:
 	const btCollisionShape* getBulletShape() const;
 };
 
-struct GMPhysicsShapeCreator
+struct GMPhysicsShapeHelper
 {
 	static void createBoxShape(const GMVec3& halfExtents, REF GMPhysicsShapeAsset& physicsShape);
 	static void createCylinderShape(const GMVec3& halfExtents, REF GMPhysicsShapeAsset& physicsShape);
 	static void createConeShape(GMfloat radius, GMfloat height, REF GMPhysicsShapeAsset& physicsShape);
 	static void createSphereShape(GMfloat radius, REF GMPhysicsShapeAsset& physicsShape);
+	static bool createConvexShapeFromTriangleModel(
+		GMModelAsset model,
+		REF GMPhysicsShapeAsset& physicsShape,
+		bool optimizeConvex = false,
+		const GMVec3& scaling = GMVec3(1, 1, 1)
+	);
+	static void createModelFromShape(
+		GMPhysicsShape* shape,
+		OUT GMModel** model);
 };
 
 END_NS

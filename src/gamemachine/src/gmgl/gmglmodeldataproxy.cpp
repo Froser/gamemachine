@@ -20,8 +20,11 @@ GMGLModelDataProxy::GMGLModelDataProxy(const IRenderContext* context, GMModel* o
 void GMGLModelDataProxy::transfer()
 {
 	D(d);
+	D_BASE(db, GMModelDataProxy);
 	if (d->inited)
 		return;
+
+	prepareParentModel();
 
 	GMModel* model = getModel();
 	if (!model->isNeedTransfer())

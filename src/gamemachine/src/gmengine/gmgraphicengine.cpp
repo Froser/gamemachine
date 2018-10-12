@@ -330,7 +330,7 @@ void GMGraphicEngine::createFilterFramebuffer()
 		GMTextureAsset texture;
 		d->filterFramebuffers->getFramebuffer(0)->getTexture(texture);
 		quadModel->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(texture);
-		GM.createModelDataProxyAndTransfer(d->context, quadModel);
+		createModelDataProxy(d->context, quadModel);
 		d->filterQuad = new GMGameObject(quad);
 		d->filterQuad->setContext(d->context);
 	}
@@ -398,6 +398,21 @@ GMPrimitiveManager* GMGraphicEngine::getPrimitiveManager()
 {
 	D(d);
 	return d->primitiveManager.get();
+}
+
+void GMGraphicEngine::createModelDataProxy(const IRenderContext* context, GMModel* model, bool transfer)
+{
+	if (model)
+	{
+		GMModelDataProxy* modelDataProxy = model->getModelDataProxy();
+		if (!modelDataProxy)
+		{
+			GM.getFactory()->createModelDataProxy(context, model, &modelDataProxy);
+			model->setModelDataProxy(modelDataProxy);
+		}
+		if (transfer)
+			modelDataProxy->transfer();
+	}
 }
 
 void GMGraphicEngine::addLight(AUTORELEASE ILight* light)

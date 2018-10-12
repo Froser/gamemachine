@@ -248,8 +248,9 @@ public:
 		GMS_BlendOp opAlpha
 	) override;
 	virtual void endBlend() override;
-	virtual GMRenderTechniqueManager* getRenderTechniqueManager();
-	virtual GMPrimitiveManager* getPrimitiveManager();
+	virtual GMRenderTechniqueManager* getRenderTechniqueManager() override;
+	virtual GMPrimitiveManager* getPrimitiveManager() override;
+	virtual void createModelDataProxy(const IRenderContext* context, GMModel* model, bool transfer = true) override;
 
 public:
 	const GMFilterMode::Mode getCurrentFilterMode();

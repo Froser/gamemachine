@@ -191,7 +191,7 @@ GM_PRIVATE_OBJECT(GMShader)
 	GMIlluminationModel illuminationModel = GMIlluminationModel::Phong;
 	GMuint32 surfaceFlag = 0;
 	GMS_Cull cull = GMS_Cull::Cull;
-	GMS_FrontFace frontFace = GMS_FrontFace::CLOCKWISE;
+	GMS_FrontFace frontFace = GMS_FrontFace::Closewise;
 	GMS_BlendFunc blendFactorSrcRGB = GMS_BlendFunc::Zero;
 	GMS_BlendFunc blendFactorDestRGB = GMS_BlendFunc::Zero;
 	GMS_BlendFunc blendFactorSrcAlpha = GMS_BlendFunc::Zero;

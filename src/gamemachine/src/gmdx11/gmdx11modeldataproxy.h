@@ -24,6 +24,7 @@ class GMDx11ModelDataProxy : public GMModelDataProxy
 
 public:
 	GMDx11ModelDataProxy(const IRenderContext* context, GMModel* obj);
+	~GMDx11ModelDataProxy();
 
 public:
 	virtual void transfer() override;

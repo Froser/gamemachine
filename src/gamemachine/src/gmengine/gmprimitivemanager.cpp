@@ -36,7 +36,7 @@ GMModel* GMLine2D::createModel()
 	{
 		mesh->vertex(GMVertex());
 	}
-	GM.createModelDataProxyAndTransfer(getContext(), model);
+	getContext()->getEngine()->createModelDataProxy(getContext(), model);
 	return model;
 }
 
@@ -199,7 +199,7 @@ GMModel* GMLine3D::createModel()
 	{
 		mesh->vertex(GMVertex());
 	}
-	GM.createModelDataProxyAndTransfer(getContext(), model);
+	getContext()->getEngine()->createModelDataProxy(getContext(), model);
 	return model;
 }
 

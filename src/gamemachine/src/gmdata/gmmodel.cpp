@@ -80,21 +80,45 @@ void GMModelDataProxy::packIndices(Vector<GMuint32>& indices)
 	}
 }
 
+void GMModelDataProxy::prepareParentModel()
+{
+	D(d);
+	// 如果有父model，表示共用同一个顶点数据
+	GMModel* parent = d->model->getParentModel();
+	if (parent)
+	{
+		d->context->getEngine()->createModelDataProxy(d->context, parent, true);
+		// 参考 GMModel::GMModel(GMModelAsset parentAsset)
+		d->model->setModelBuffer(parent->getModelBuffer());
+		d->model->setPrimitiveTopologyMode(parent->getPrimitiveTopologyMode());
+		d->model->setVerticesCount(parent->getVerticesCount());
+	}
+}
+
 GMModel::GMModel()
 {
 	D(d);
 	d->modelBuffer = new GMModelBuffer();
 }
 
-GMModel::GMModel(GMModel& model)
+GMModel::GMModel(GMModelAsset parentAsset)
 {
 	D(d);
-	setModelBuffer(model.getModelBuffer());
-	setPrimitiveTopologyMode(model.getPrimitiveTopologyMode());
-	setShader(model.getShader());
-	setVerticesCount(model.getVerticesCount());
-	if (!model.getModelDataProxy())
-		GM.createModelDataProxyAndTransfer(getModelDataProxy()->getContext(), &model);
+	GM_ASSERT(parentAsset.getModel());
+	GMModel* parentModel = parentAsset.getModel();
+	while (parentModel->getParentModel())
+	{
+		parentModel = getParentModel(); //拿到最根部的Model
+	}
+	d->parentAsset = parentAsset;
+	
+	parentModel = getParentModel();
+	setShader(parentModel->getShader());
+
+	setModelBuffer(parentModel->getModelBuffer());
+	setPrimitiveTopologyMode(parentModel->getPrimitiveTopologyMode());
+	setVerticesCount(parentModel->getVerticesCount());
+
 	doNotTransferAnymore();
 }
 
@@ -293,4 +317,34 @@ void GMMesh::calculateTangentSpace(GMTopologyMode topologyMode)
 		currentVertex.bitangents[1] = f4_bitangentVector[1];
 		currentVertex.bitangents[2] = f4_bitangentVector[2];
 	}
+}
+
+bool GMMesh::calculateNormals(GMTopologyMode topologyMode, GMS_FrontFace frontFace)
+{
+	D(d);
+	// 一定要是顶点模式，而不是索引模式，不然算出来的法向量没有意义
+	if (topologyMode == GMTopologyMode::Triangles)
+	{
+		// 顶点成三角形拓扑，每个面的法线为它们的Cross Production
+		for (GMsize_t i = 0; i < d->vertices.size(); i += 3)
+		{
+			GMVertex& vertex0 = d->vertices.at(i);
+			GMVertex& vertex1 = d->vertices.at(i + 1);
+			GMVertex& vertex2 = d->vertices.at(i + 2);
+			GMVec3 p0(vertex0.positions[0], vertex0.positions[1], vertex0.positions[2]);
+			GMVec3 p1(vertex1.positions[0], vertex1.positions[1], vertex1.positions[2]);
+			GMVec3 p2(vertex2.positions[0], vertex2.positions[1], vertex2.positions[2]);
+			GMVec3 v0 = p1 - p0, v1 = p2 - p0;
+			GMVec3 normal = Normalize(Cross(v0, v1));
+			if (frontFace == GMS_FrontFace::CounterClosewise)
+				normal = -normal;
+			CopyToArray(normal, &vertex0.normals[0]);
+			CopyToArray(normal, &vertex1.normals[0]);
+			CopyToArray(normal, &vertex2.normals[0]);
+		}
+		return true;
+	}
+
+	gm_warning(gm_dbg_wrap("topologyMode is not supported."));
+	return false;
 }

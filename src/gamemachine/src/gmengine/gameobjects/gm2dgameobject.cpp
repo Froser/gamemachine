@@ -255,7 +255,8 @@ GMModel* GMTextGameObject::createModel()
 	{
 		mesh->vertex(GMVertex());
 	}
-	GM.createModelDataProxyAndTransfer(getContext(), model);
+
+	getContext()->getEngine()->createModelDataProxy(getContext(), model);
 	return model;
 }
 
@@ -491,7 +492,7 @@ GMModel* GMSprite2DGameObject::createModel()
 	{
 		mesh->vertex(GMVertex());
 	}
-	GM.createModelDataProxyAndTransfer(getContext(), model);
+	getContext()->getEngine()->createModelDataProxy(getContext(), model);
 	return model;
 }
 
@@ -613,7 +614,7 @@ GMModel* GMBorder2DGameObject::createModel()
 	INDICES(mesh, 9, 10, 13, 14);
 	INDICES(mesh, 10, 11, 14, 15);
 
-	GM.createModelDataProxyAndTransfer(getContext(), model);
+	getContext()->getEngine()->createModelDataProxy(getContext(), model);
 	return model;
 }
 

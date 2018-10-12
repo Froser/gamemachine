@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmdiscretedynamicsworld.h"
 #include "gmbulletincludes.h"
-#include "gmbullethelper.h"
 #include "gmdata/gmmodel.h"
 #include "gmengine/gmgameworld.h"
 #include "gmconstraint.h"

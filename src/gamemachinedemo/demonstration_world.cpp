@@ -50,6 +50,7 @@ namespace
 		world->addDemo(L"物理: 演示相互碰撞的物体(Cone)。", new Demo_Collision_Cone(world));
 		world->addDemo(L"物理: 演示相互碰撞的物体(Cylinder)。", new Demo_Collision_Cylinder(world));
 		world->addDemo(L"物理: 演示相互碰撞的物体(Sphere)。", new Demo_Collision_Sphere(world));
+		world->addDemo(L"物理: 演示相互碰撞的物体(Model)。", new Demo_Collision_Model(world));
 		world->addDemo(L"高光贴图: 演示一个带有高光贴图的立方体。", new Demo_SpecularMap(world));
 		world->addDemo(L"PBR: 演示PBR渲染。", new Demo_PBR(world));
 		world->addDemo(L"PBR: 演示同时通过Phong模型和PBR模型渲染。", new Demo_Phong_PBR(world));

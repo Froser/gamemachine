@@ -72,7 +72,7 @@ namespace
 		D3D11_RASTERIZER_DESC desc = {
 			isSolid ? D3D11_FILL_SOLID : D3D11_FILL_WIREFRAME,
 			cull == GMS_Cull::Cull ? D3D11_CULL_BACK : D3D11_CULL_NONE,
-			frontFace == GMS_FrontFace::CLOCKWISE ? FALSE : TRUE,
+			frontFace == GMS_FrontFace::Closewise ? FALSE : TRUE,
 			0,
 			0.f,
 			0.f,

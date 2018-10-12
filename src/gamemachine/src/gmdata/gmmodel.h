@@ -88,6 +88,7 @@ protected:
 	void prepareTangentSpace();
 	void packVertices(Vector<GMVertex>& vertices);
 	void packIndices(Vector<GMuint32>& indices);
+	void prepareParentModel();
 };
 
 enum class GMUsageHint
@@ -171,7 +172,6 @@ class GMModelBuffer : public GMObject
 // 绘制时候的排列方式
 enum class GMTopologyMode
 {
-	// 默认排列，按照Components，并按照一个个三角形来画
 	TriangleStrip,
 	Triangles,
 	Lines,
@@ -183,6 +183,7 @@ enum class GMModelDrawMode
 	Index,
 };
 
+class GMModel;
 GM_PRIVATE_OBJECT(GMModel)
 {
 	GMUsageHint hint = GMUsageHint::StaticDraw;
@@ -196,6 +197,7 @@ GM_PRIVATE_OBJECT(GMModel)
 	GMsize_t verticesCount = 0;
 	bool needTransfer = true;
 	GMRenderTechinqueID techniqueId = 0;
+	GMModelAsset parentAsset;
 };
 
 // 所有的顶点属性类型
@@ -224,7 +226,7 @@ public:
 
 public:
 	GMModel();
-	GMModel(GMModel& model);
+	GMModel(GMModelAsset parentAsset);
 	~GMModel();
 
 	GM_DECLARE_PROPERTY(PrimitiveTopologyMode, mode, GMTopologyMode);
@@ -272,16 +274,22 @@ public:
 	}
 
 	// 绘制方式
-	void setUsageHint(GMUsageHint hint) GM_NOEXCEPT
+	inline void setUsageHint(GMUsageHint hint) GM_NOEXCEPT
 	{
 		D(d);
 		d->hint = hint;
 	}
 
-	GMUsageHint getUsageHint()
+	inline GMUsageHint getUsageHint() GM_NOEXCEPT
 	{
 		D(d);
 		return d->hint;
+	}
+
+	inline GMModel* getParentModel() GM_NOEXCEPT
+	{
+		D(d);
+		return d->parentAsset.getModel();
 	}
 
 	void setModelBuffer(AUTORELEASE GMModelBuffer* mb);
@@ -368,6 +376,7 @@ public:
 	  \param topologyMode 网格拓扑模式。
 	*/
 	void calculateTangentSpace(GMTopologyMode topologyMode);
+	bool calculateNormals(GMTopologyMode topologyMode, GMS_FrontFace frontFace);
 	void clear();
 	void vertex(const GMVertex& vertex);
 	void index(GMuint32 index);

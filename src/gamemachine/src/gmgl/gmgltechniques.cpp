@@ -421,7 +421,7 @@ void GMGLTechnique::prepareCull(GMModel* model)
 void GMGLTechnique::prepareFrontFace(GMModel* model)
 {
 	const GMShader& shader = model->getShader();
-	if (shader.getFrontFace() == GMS_FrontFace::CLOCKWISE)
+	if (shader.getFrontFace() == GMS_FrontFace::Closewise)
 		glFrontFace(GL_CW);
 	else
 		glFrontFace(GL_CCW);
