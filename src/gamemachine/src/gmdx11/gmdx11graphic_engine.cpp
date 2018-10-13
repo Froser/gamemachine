@@ -18,6 +18,7 @@ void GMDx11GraphicEngine::init()
 	D(d);
 	D_BASE(db, Base);
 	Base::init();
+	getDefaultFramebuffers()->clear();
 
 	if (d->ready)
 	{

@@ -31,7 +31,7 @@ public:
 
 struct GMPhysicsShapeHelper
 {
-	static void createBoxShape(const GMVec3& halfExtents, REF GMPhysicsShapeAsset& physicsShape);
+	static void createCubeShape(const GMVec3& halfExtents, REF GMPhysicsShapeAsset& physicsShape);
 	static void createCylinderShape(const GMVec3& halfExtents, REF GMPhysicsShapeAsset& physicsShape);
 	static void createConeShape(GMfloat radius, GMfloat height, REF GMPhysicsShapeAsset& physicsShape);
 	static void createSphereShape(GMfloat radius, REF GMPhysicsShapeAsset& physicsShape);

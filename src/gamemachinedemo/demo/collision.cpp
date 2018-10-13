@@ -24,7 +24,7 @@ namespace
 
 void Demo_Collision::createPhysicsShapeAsset(REF gm::GMPhysicsShapeAsset& asset)
 {
-	gm::GMPhysicsShapeHelper::createBoxShape(GMVec3(.1f, .1f, .1f), asset);
+	gm::GMPhysicsShapeHelper::createCubeShape(GMVec3(.1f, .1f, .1f), asset);
 }
 
 void Demo_Collision::init()
@@ -43,7 +43,7 @@ void Demo_Collision::init()
 	rigidGround->setMass(.0f); //static object
 
 	gm::GMPhysicsShapeAsset groundShape;
-	gm::GMPhysicsShapeHelper::createBoxShape(GMVec3(50, 50, 50), groundShape);
+	gm::GMPhysicsShapeHelper::createCubeShape(GMVec3(50, 50, 50), groundShape);
 	rigidGround->setShape(getDemoWorldReference()->getAssets().addAsset(groundShape));
 
 	gm::GMModel* groundShapeModel = nullptr;
@@ -124,7 +124,6 @@ void Demo_Collision::event(gm::GameMachineHandlerEvent evt)
 	case gm::GameMachineHandlerEvent::Update:
 	{
 		getDemoWorldReference()->getPhysicsWorld()->update(GM.getRunningStates().lastFrameElpased, nullptr);
-		const gm::GMMotionStates& states = d->firstPhyObj->getMotionStates(); // Get current motion states
 		break;
 	}
 	case gm::GameMachineHandlerEvent::Render:

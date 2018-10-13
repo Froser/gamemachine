@@ -62,6 +62,7 @@ void GMGLGraphicEngine::init()
 	glClearStencil(0);
 	GMStencilOptions options(GMStencilOptions::Ox00, GMStencilOptions::Always);
 	setStencilOptions(options);
+	getDefaultFramebuffers()->clear();
 
 #if GM_DEBUG
 	glEnable(GL_DEBUG_OUTPUT);

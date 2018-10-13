@@ -126,7 +126,7 @@ const btCollisionShape* GMPhysicsShape::getBulletShape() const
 
 //////////////////////////////////////////////////////////////////////////
 // Helper
-void GMPhysicsShapeHelper::createBoxShape(const GMVec3& halfExtents, REF GMPhysicsShapeAsset& physicsShape)
+void GMPhysicsShapeHelper::createCubeShape(const GMVec3& halfExtents, REF GMPhysicsShapeAsset& physicsShape)
 {
 	GMFloat4 fs_halfExtents;
 	halfExtents.loadFloat4(fs_halfExtents);

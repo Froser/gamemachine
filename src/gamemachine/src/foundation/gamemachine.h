@@ -135,7 +135,7 @@ public:
 	*/
 	void init(
 		AUTORELEASE IFactory* factory,
-		GMRenderEnvironment renderEnv = GMRenderEnvironment::OpenGL
+		GMRenderEnvironment renderEnv
 	);
 
 	//! 获取初始化时的工厂类。
