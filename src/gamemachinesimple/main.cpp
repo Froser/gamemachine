@@ -12,7 +12,7 @@
 #include <gmdx11.h>
 #include <gmdx11helper.h>
 
-#define USE_OPENGL 0
+#define USE_OPENGL 1
 
 using namespace gm;
 
