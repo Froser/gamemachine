@@ -11,7 +11,6 @@ class GMRigidPhysicsObject;
 GM_PRIVATE_OBJECT(GMConstraint)
 {
 	btTypedConstraint* constraint = nullptr;
-	GMRigidPhysicsObject* body = nullptr;
 };
 
 class GMConstraint : public GMObject
@@ -19,7 +18,7 @@ class GMConstraint : public GMObject
 	GM_DECLARE_PRIVATE(GMConstraint)
 
 public:
-	GMConstraint(GMRigidPhysicsObject* body);
+	GMConstraint();
 	~GMConstraint();
 
 public:
@@ -49,6 +48,8 @@ GM_PRIVATE_OBJECT(GMPoint2PointConstraint)
 {
 	btPoint2PointConstraint* constraint = nullptr;
 	GMConstraintSetting setting;
+	GMRigidPhysicsObject* bodyA = nullptr;
+	GMRigidPhysicsObject* bodyB = nullptr;
 };
 
 class GMPoint2PointConstraint : public GMConstraint
@@ -57,6 +58,7 @@ class GMPoint2PointConstraint : public GMConstraint
 
 public:
 	GMPoint2PointConstraint(GMRigidPhysicsObject* body, const GMVec3& pivotA);
+	GMPoint2PointConstraint(GMRigidPhysicsObject* bodyA, GMRigidPhysicsObject* bodyB, const GMVec3& pivotA, const GMVec3& pivotB);
 
 public:
 	void setPivotA(const GMVec3& pivot);

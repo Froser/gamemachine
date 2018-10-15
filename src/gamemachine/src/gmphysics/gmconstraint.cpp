@@ -4,10 +4,8 @@
 #include "gmphysicsobject.h"
 #include <linearmath.h>
 
-GMConstraint::GMConstraint(GMRigidPhysicsObject* body)
+GMConstraint::GMConstraint()
 {
-	D(d);
-	d->body = body;
 }
 
 GMConstraint::~GMConstraint()
@@ -17,12 +15,26 @@ GMConstraint::~GMConstraint()
 }
 
 GMPoint2PointConstraint::GMPoint2PointConstraint(GMRigidPhysicsObject* body, const GMVec3& pivotA)
-	: GMConstraint(body)
 {
 	D(d);
 	D_BASE(db, Base);
-	db->body = body;
+	d->bodyA = body;
 	d->constraint = new btPoint2PointConstraint(*body->getRigidBody(), btVector3(pivotA.getX(), pivotA.getY(), pivotA.getZ()));
+	db->constraint = d->constraint;
+}
+
+GMPoint2PointConstraint::GMPoint2PointConstraint(GMRigidPhysicsObject* bodyA, GMRigidPhysicsObject* bodyB, const GMVec3& pivotA, const GMVec3& pivotB)
+{
+	D(d);
+	D_BASE(db, Base);
+	d->bodyA = bodyA;
+	d->bodyB = bodyB;
+	d->constraint = new btPoint2PointConstraint(
+		*bodyA->getRigidBody(), 
+		*bodyB->getRigidBody(),
+		btVector3(pivotA.getX(), pivotA.getY(), pivotA.getZ()),
+		btVector3(pivotB.getX(), pivotB.getY(), pivotB.getZ())
+	);
 	db->constraint = d->constraint;
 }
 

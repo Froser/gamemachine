@@ -63,12 +63,12 @@ void Demo_Collision::init()
 	asDemoGameWorld(getDemoWorldReference())->addObject(L"ground", d->ground);
 
 	// create box
-	createBoxes();
+	createItems();
 
 	createDefaultWidget();
 }
 
-void Demo_Collision::createBoxes()
+void Demo_Collision::createItems()
 {
 	D(d);
 	gm::GMPhysicsShapeAsset boxShape;
@@ -311,11 +311,7 @@ void Demo_Collision_Sphere::createPhysicsShapeAsset(REF gm::GMPhysicsShapeAsset&
 //////////////////////////////////////////////////////////////////////////
 static GMVec3 s_modelScaling(.02f, .02f, .02f);
 
-void Demo_Collision_Model::createPhysicsShapeAsset(REF gm::GMPhysicsShapeAsset& asset)
-{
-}
-
-void Demo_Collision_Model::createBoxes()
+void Demo_Collision_Model::createItems()
 {
 	D(d);
 	gm::GMPhysicsShapeAsset modelShape;
@@ -371,5 +367,55 @@ void Demo_Collision_Model::createBoxes()
 				asDemoGameWorld(getDemoWorldReference())->addObject(gm::GMString(idx), modelObject);
 			}
 		}
+	}
+}
+
+void Demo_Collision_Chain::createItems()
+{
+	D(d);
+	gm::GMAsset boxAsset;
+	gm::GMPhysicsShapeHelper::createCubeShape(GMVec3(.1f, .1f, .03f), boxAsset);
+	getDemoWorldReference()->getAssets().addAsset(boxAsset);
+
+	gm::GMint32 idx = 0;
+	constexpr auto MAX_BOX_CNT = 10;
+	gm::GMRigidPhysicsObject* pobjs[MAX_BOX_CNT] = { nullptr };
+
+	for (gm::GMint32 i = 0; i < MAX_BOX_CNT; i++, idx++)
+	{
+		gm::GMRigidPhysicsObject* rigidBoxObj = new gm::GMRigidPhysicsObject();
+		if (idx == 0)
+			d->firstPhyObj = rigidBoxObj; //Record one object
+
+		rigidBoxObj->setMass(1.f);
+
+		gm::GMGameObject* box = new gm::GMGameObject();
+		box->setTranslation(Translate(GMVec3(0, 2 + .2f * i, 0)));
+		box->setPhysicsObject(rigidBoxObj);
+		rigidBoxObj->setShape(boxAsset);
+
+		gm::GMModel* boxShapeModel = nullptr;
+		gm::GMPhysicsShapeHelper::createModelFromShape(boxAsset.getPhysicsShape(), &boxShapeModel);
+		GM_ASSERT(boxShapeModel);
+		// Set color
+		boxShapeModel->getShader().getMaterial().ka = s_colors[idx % GM_array_size(s_colors)];
+		boxShapeModel->getShader().getMaterial().kd = GMVec3(.1f);
+		boxShapeModel->getShader().getMaterial().ks = GMVec3(.4f);
+		boxShapeModel->getShader().getMaterial().shininess = 99;
+
+		box->setAsset(getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, boxShapeModel)));
+		pobjs[i] = rigidBoxObj;
+
+		d->discreteWorld->addRigidObject(rigidBoxObj);
+		asDemoGameWorld(getDemoWorldReference())->addObject(gm::GMString(idx), box);
+	}
+
+	for (auto i = 0; i < MAX_BOX_CNT - 1; ++i)
+	{
+		gm::GMPoint2PointConstraint* p2pcLeft = new gm::GMPoint2PointConstraint(pobjs[i], pobjs[i + 1], GMVec3(-.05f, .1f, 0), GMVec3(-.05f, -.1f, 0));
+		d->discreteWorld->addConstraint(p2pcLeft);
+
+		gm::GMPoint2PointConstraint* p2pcRight = new gm::GMPoint2PointConstraint(pobjs[i], pobjs[i + 1], GMVec3(.05f, .1f, 0), GMVec3(.05f, -.1f, 0));
+		d->discreteWorld->addConstraint(p2pcRight);
 	}
 }
