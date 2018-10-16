@@ -116,7 +116,7 @@ class GMPhysicsShape;
 GM_PRIVATE_OBJECT(GMRigidPhysicsObject)
 {
 	GMint32 updateRevision = -1;
-	btRigidBody* body = nullptr; // btRigidBody在添加到物理世界后，应该由物理世界管理声明周期
+	btRigidBody* body = nullptr; // btRigidBody在添加到物理世界后，应该由物理世界管理生命周期
 	bool bodyDetached = false;
 	btDefaultMotionState* motionState = nullptr;
 	GMPhysicsShapeAsset shape;

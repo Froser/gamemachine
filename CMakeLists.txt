@@ -1,5 +1,6 @@
 ﻿cmake_minimum_required (VERSION 3.8)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules" )
 
 macro(gm_folder foldername)
 	set_target_properties(${foldername} PROPERTIES FOLDER ${PROJECT_NAME})
@@ -163,7 +164,11 @@ option(GM_BUILD_UNITTEST "Build GameMachine Unit Tests" ON)
 option(GM_DETECT_MEMORY_LEAK "Detect memory leaking" OFF)
 
 if(WIN32)
-	option(GM_USE_DX11 "Use DirectX11 (SDK required)" ON)
+	find_package( DirectX )
+	if (${DirectX_FOUND})
+		message("GameMachine: DirectX found.")
+	endif()
+	option(GM_USE_DX11 "Use DirectX11 (SDK required)" ${DirectX_FOUND})
 endif(WIN32)
 
 # Environments:
@@ -186,6 +191,10 @@ if(UNIX)
 		add_definitions(-DGM_DEBUG_FLAG)
 	endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif(UNIX)
+
+# Includes:
+set(GM_ZLIB_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/3rdparty/zlib")
+set(GM_LIBPNG_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/3rdparty/libpng")
 
 # Projects:
 add_subdirectory(src)

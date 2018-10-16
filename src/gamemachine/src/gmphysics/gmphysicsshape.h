@@ -2,6 +2,7 @@
 #define __GMPHYSICSSHAPE_H__
 #include <gmcommon.h>
 #include "gmbulletforward.h"
+#include <gmassets.h>
 
 struct GMVec3;
 BEGIN_NS
@@ -9,11 +10,13 @@ BEGIN_NS
 GM_PRIVATE_OBJECT(GMPhysicsShape)
 {
 	btCollisionShape* shape = nullptr;
+	GMModelAsset modelCache;
 };
 
 class GMPhysicsShape : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMPhysicsShape);
+	GM_DECLARE_PROPERTY(ModelCache, modelCache, GMModelAsset)
 
 	friend struct GMPhysicsShapeHelper;
 
@@ -43,7 +46,7 @@ struct GMPhysicsShapeHelper
 	);
 	static void createModelFromShape(
 		GMPhysicsShape* shape,
-		OUT GMModel** model
+		REF GMModelAsset& asset
 	);
 };
 

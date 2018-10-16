@@ -12,6 +12,7 @@ include_directories(
 		../../3rdparty/lua/src
 		../../3rdparty/glm-0.9.9-a2
 		../../3rdparty/bullet3-2.87/src
+		../../3rdparty/assimp-3.3.1/include
 	)
 
 set(SOURCES
@@ -320,5 +321,6 @@ target_link_libraries(${PROJECT_NAME} png_static)
 target_link_libraries(${PROJECT_NAME} zlibstatic)
 target_link_libraries(${PROJECT_NAME} libjpeg)
 target_link_libraries(${PROJECT_NAME} freetype)
+target_link_libraries(${PROJECT_NAME} assimp)
 
 gm_end_project(${PROJECT_NAME})

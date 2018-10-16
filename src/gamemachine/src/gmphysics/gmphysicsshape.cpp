@@ -68,31 +68,34 @@ namespace
 		btCollisionShape* shape,
 		OUT GMModel** model)
 	{
-		GMModel* out = *model = new GMModel();
-
-		btTransform origin;
-		origin.setIdentity();
-
-		btAlignedObjectArray<btVector3> vertexPositions;
-		btAlignedObjectArray<btVector3> vertexNormals;
-		btAlignedObjectArray<GMint32> indices;
-		collisionShape2TriangleMesh(shape, origin, vertexPositions, vertexNormals, indices);
-
-		GMMesh* body = new GMMesh(out);
-		out->getShader().setCull(GMS_Cull::None);
-		GMint32 faceCount = indices.size() / 3;
-		for (GMint32 i = 0; i < faceCount; ++i)
+		if (model)
 		{
-			for (GMint32 j = 0; j < 3; ++j)
+			GMModel* out = *model = new GMModel();
+
+			btTransform origin;
+			origin.setIdentity();
+
+			btAlignedObjectArray<btVector3> vertexPositions;
+			btAlignedObjectArray<btVector3> vertexNormals;
+			btAlignedObjectArray<GMint32> indices;
+			collisionShape2TriangleMesh(shape, origin, vertexPositions, vertexNormals, indices);
+
+			GMMesh* body = new GMMesh(out);
+			out->getShader().setCull(GMS_Cull::None);
+			GMint32 faceCount = indices.size() / 3;
+			for (GMint32 i = 0; i < faceCount; ++i)
 			{
-				GMint32 idx = i * 3 + j;
-				const btVector3& vertex = vertexPositions[indices[idx]];
-				const btVector3& normal = vertexNormals[indices[idx]];
-				GMVertex v = {
-					{ vertex[0], vertex[1], vertex[2] },
-					{ normal[0], normal[1], normal[2] }
-				};
-				body->vertex(v);
+				for (GMint32 j = 0; j < 3; ++j)
+				{
+					GMint32 idx = i * 3 + j;
+					const btVector3& vertex = vertexPositions[indices[idx]];
+					const btVector3& normal = vertexNormals[indices[idx]];
+					GMVertex v = {
+						{ vertex[0], vertex[1], vertex[2] },
+						{ normal[0], normal[1], normal[2] }
+					};
+					body->vertex(v);
+				}
 			}
 		}
 	}
@@ -205,19 +208,22 @@ bool GMPhysicsShapeHelper::createConvexShapeFromTriangleModel(
 
 void GMPhysicsShapeHelper::createModelFromShape(
 	GMPhysicsShape* shape,
-	OUT GMModel** model
+	REF GMModelAsset& asset
 )
 {
-	btCollisionShape* cs = shape->getBulletShape();
-	if (!cs->getUserPointer())
+	GMModelAsset& cache = shape->getModelCache();
+	if (!cache.getModel())
 	{
-		createModelFromCollisionShape(cs, model);
-		cs->setUserPointer(*model); // Save the model. DO NOT delete this model object when you need create more
+		GMModel* model = nullptr;
+		createModelFromCollisionShape(shape->getBulletShape(), &model);
+		GM_ASSERT(model);
+		asset = GMAsset(GMAssetType::Model, model);
+		shape->setModelCache(asset);
 	}
 	else
 	{
 		// Model already exists
-		GMModel* modelCache = static_cast<GMModel*>(cs->getUserPointer());
-		*model = new GMModel(GMAsset(GMAssetType::Model, modelCache)); //use same vertex array
+		GMModel* newModel = new GMModel(cache);
+		asset = GMAsset(GMAssetType::Model, newModel);
 	}
 }

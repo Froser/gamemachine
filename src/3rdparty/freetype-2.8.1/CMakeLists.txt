@@ -263,7 +263,6 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different
 
 # Specify library include directories
 include_directories("${PROJECT_SOURCE_DIR}/include")
-include_directories("${PROJECT_SOURCE_DIR}/../zlib")
 include_directories(BEFORE "${PROJECT_BINARY_DIR}/include")
 
 file(GLOB PUBLIC_HEADERS "include/ft2build.h" "include/freetype/*.h")
@@ -373,19 +372,27 @@ else ()
   set(MAYBE_PRIVATE "PRIVATE")
 endif ()
 
-if (ZLIB_FOUND)
-  target_link_libraries(freetype ${MAYBE_PRIVATE} ${ZLIB_LIBRARIES})
-  include_directories(${ZLIB_INCLUDE_DIRS})
-endif ()
+# GameMachine uses 3rdparty/zlib
+# if (ZLIB_FOUND)
+#  target_link_libraries(freetype ${MAYBE_PRIVATE} ${ZLIB_LIBRARIES})
+#  include_directories(${ZLIB_INCLUDE_DIRS})
+# endif ()
+include_directories("${GM_ZLIB_INCLUDE_DIR}")
+
+
 if (BZIP2_FOUND)
   target_link_libraries(freetype ${MAYBE_PRIVATE} ${BZIP2_LIBRARIES})
   include_directories(${BZIP2_INCLUDE_DIR}) # not BZIP2_INCLUDE_DIRS
 endif ()
-if (PNG_FOUND)
-  add_definitions(${PNG_DEFINITIONS})
-  target_link_libraries(freetype ${MAYBE_PRIVATE} ${PNG_LIBRARIES})
-  include_directories(${PNG_INCLUDE_DIRS})
-endif ()
+
+# GameMachine uses 3rdparty/libpng
+# if (PNG_FOUND)
+#   add_definitions(${PNG_DEFINITIONS})
+#   target_link_libraries(freetype ${MAYBE_PRIVATE} ${PNG_LIBRARIES})
+#   include_directories(${PNG_INCLUDE_DIRS})
+# endif ()
+include_directories("${GM_LIBPNG_INCLUDE_DIR}")
+
 if (HARFBUZZ_FOUND)
   target_link_libraries(freetype ${MAYBE_PRIVATE} ${HARFBUZZ_LIBRARIES})
   include_directories(${HARFBUZZ_INCLUDE_DIRS})

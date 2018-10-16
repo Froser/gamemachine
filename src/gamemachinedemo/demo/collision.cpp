@@ -46,15 +46,14 @@ void Demo_Collision::init()
 	gm::GMPhysicsShapeHelper::createCubeShape(GMVec3(50, 50, 50), groundShape);
 	rigidGround->setShape(getDemoWorldReference()->getAssets().addAsset(groundShape));
 
-	gm::GMModel* groundShapeModel = nullptr;
-	gm::GMPhysicsShapeHelper::createModelFromShape(groundShape.getPhysicsShape(), &groundShapeModel);
-	GM_ASSERT(groundShapeModel);
+	gm::GMModelAsset groundShapeAsset;
+	gm::GMPhysicsShapeHelper::createModelFromShape(groundShape.getPhysicsShape(), groundShapeAsset);
 
-	groundShapeModel->getShader().getMaterial().ka = GMVec3(.8125f / .7f, .644f / .7f, .043f / .7f);
-	groundShapeModel->getShader().getMaterial().kd = GMVec3(.1f);
-	groundShapeModel->getShader().getMaterial().ks = GMVec3(.4f);
-	groundShapeModel->getShader().getMaterial().shininess = 9;
-	d->ground->setAsset(getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, groundShapeModel)));
+	groundShapeAsset.getModel()->getShader().getMaterial().ka = GMVec3(.8125f / .7f, .644f / .7f, .043f / .7f);
+	groundShapeAsset.getModel()->getShader().getMaterial().kd = GMVec3(.1f);
+	groundShapeAsset.getModel()->getShader().getMaterial().ks = GMVec3(.4f);
+	groundShapeAsset.getModel()->getShader().getMaterial().shininess = 9;
+	d->ground->setAsset(getDemoWorldReference()->getAssets().addAsset(groundShapeAsset));
 
 	// add to physics world
 	physicsWorld->addRigidObject(rigidGround);
@@ -93,17 +92,14 @@ void Demo_Collision::createItems()
 				box->setPhysicsObject(rigidBoxObj);
 				rigidBoxObj->setShape(boxAsset);
 
-				gm::GMModel* boxShapeModel = nullptr;
-				gm::GMPhysicsShapeHelper::createModelFromShape(boxShape.getPhysicsShape(), &boxShapeModel);
-				GM_ASSERT(boxShapeModel);
+				gm::GMModelAsset boxShapeAsset;
+				gm::GMPhysicsShapeHelper::createModelFromShape(boxShape.getPhysicsShape(), boxShapeAsset);
 				// Set color
-				boxShapeModel->getShader().getMaterial().ka = s_colors[idx % GM_array_size(s_colors)];
-				boxShapeModel->getShader().getMaterial().kd = GMVec3(.1f);
-				boxShapeModel->getShader().getMaterial().ks = GMVec3(.4f);
-				boxShapeModel->getShader().getMaterial().shininess = 99;
-
-				box->setAsset(getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, boxShapeModel)));
-
+				boxShapeAsset.getModel()->getShader().getMaterial().ka = s_colors[idx % GM_array_size(s_colors)];
+				boxShapeAsset.getModel()->getShader().getMaterial().kd = GMVec3(.1f);
+				boxShapeAsset.getModel()->getShader().getMaterial().ks = GMVec3(.4f);
+				boxShapeAsset.getModel()->getShader().getMaterial().shininess = 99;
+				box->setAsset(getDemoWorldReference()->getAssets().addAsset(boxShapeAsset));
 				d->discreteWorld->addRigidObject(rigidBoxObj);
 				asDemoGameWorld(getDemoWorldReference())->addObject(gm::GMString(idx), box);
 			}
@@ -377,14 +373,13 @@ void Demo_Collision_Chain::createItems()
 	gm::GMPhysicsShapeHelper::createCubeShape(GMVec3(.1f, .1f, .03f), boxAsset);
 	getDemoWorldReference()->getAssets().addAsset(boxAsset);
 
-	gm::GMint32 idx = 0;
 	constexpr auto MAX_BOX_CNT = 10;
 	gm::GMRigidPhysicsObject* pobjs[MAX_BOX_CNT] = { nullptr };
 
-	for (gm::GMint32 i = 0; i < MAX_BOX_CNT; i++, idx++)
+	for (gm::GMint32 i = 0; i < MAX_BOX_CNT; i++)
 	{
 		gm::GMRigidPhysicsObject* rigidBoxObj = new gm::GMRigidPhysicsObject();
-		if (idx == 0)
+		if (i == 0)
 			d->firstPhyObj = rigidBoxObj; //Record one object
 
 		rigidBoxObj->setMass(1.f);
@@ -394,20 +389,20 @@ void Demo_Collision_Chain::createItems()
 		box->setPhysicsObject(rigidBoxObj);
 		rigidBoxObj->setShape(boxAsset);
 
-		gm::GMModel* boxShapeModel = nullptr;
-		gm::GMPhysicsShapeHelper::createModelFromShape(boxAsset.getPhysicsShape(), &boxShapeModel);
-		GM_ASSERT(boxShapeModel);
+		gm::GMModelAsset boxShapeAsset;
+		gm::GMPhysicsShapeHelper::createModelFromShape(boxAsset.getPhysicsShape(), boxShapeAsset);
+		
 		// Set color
-		boxShapeModel->getShader().getMaterial().ka = s_colors[idx % GM_array_size(s_colors)];
-		boxShapeModel->getShader().getMaterial().kd = GMVec3(.1f);
-		boxShapeModel->getShader().getMaterial().ks = GMVec3(.4f);
-		boxShapeModel->getShader().getMaterial().shininess = 99;
+		boxShapeAsset.getModel()->getShader().getMaterial().ka = s_colors[i % GM_array_size(s_colors)];
+		boxShapeAsset.getModel()->getShader().getMaterial().kd = GMVec3(.1f);
+		boxShapeAsset.getModel()->getShader().getMaterial().ks = GMVec3(.4f);
+		boxShapeAsset.getModel()->getShader().getMaterial().shininess = 99;
 
-		box->setAsset(getDemoWorldReference()->getAssets().addAsset(gm::GMAsset(gm::GMAssetType::Model, boxShapeModel)));
+		box->setAsset(getDemoWorldReference()->getAssets().addAsset(boxShapeAsset));
 		pobjs[i] = rigidBoxObj;
 
 		d->discreteWorld->addRigidObject(rigidBoxObj);
-		asDemoGameWorld(getDemoWorldReference())->addObject(gm::GMString(idx), box);
+		asDemoGameWorld(getDemoWorldReference())->addObject(gm::GMString(i), box);
 	}
 
 	for (auto i = 0; i < MAX_BOX_CNT - 1; ++i)
