@@ -987,11 +987,11 @@ void GMWidget::render(GMfloat elpasedTime)
 	// 这样，超出的部分将不会被绘制出来
 	// 如果overflow样式为auto，那么我们不仅要在Widget的标题栏下方绘制一块模板，还需要多绘制一个滚动条
 	// 如果overflow样式为visible，允许内容溢出边框
+	GMRect contentRect = getContentRect();
 	if (getOverflow() != GMOverflowStyle::Visible)
 	{
 		// 计算显示内容的矩形
-		GMRect rc = getContentRect();
-		drawStencil(GMControlPositionFlag::Fixed, rc, .99f, false);
+		drawStencil(GMControlPositionFlag::Fixed, contentRect, .99f, false);
 		useStencil(true);
 	}
 
@@ -1008,7 +1008,15 @@ void GMWidget::render(GMfloat elpasedTime)
 			if (control == d->focusControl)
 				continue;
 
-			control->render(elpasedTime);
+			// 如果overflow样式不为visible，我们只需要绘制内容区域里面的控件
+			if (getOverflow() != GMOverflowStyle::Visible)
+			{
+				auto rc = control->getBoundingRect();
+				if (control->getPositionFlag() == GMControlPositionFlag::Auto)
+					rc.y += d->scrollOffsetY;
+				if (GM_inRect(contentRect, GMPoint{ rc.x, rc.y }) || GM_inRect(contentRect, GMPoint{ rc.x + rc.width, rc.y + rc.height }))
+					control->render(elpasedTime);
+			}
 		}
 
 		if (d->focusControl && d->focusControl->getParent() == this)
