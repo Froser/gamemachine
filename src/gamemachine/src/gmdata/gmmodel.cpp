@@ -116,6 +116,7 @@ GMModel::GMModel(GMModelAsset parentAsset)
 	setShader(parentModel->getShader());
 
 	setModelBuffer(parentModel->getModelBuffer());
+	setDrawMode(parentModel->getDrawMode());
 	setPrimitiveTopologyMode(parentModel->getPrimitiveTopologyMode());
 	setVerticesCount(parentModel->getVerticesCount());
 

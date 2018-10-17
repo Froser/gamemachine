@@ -108,7 +108,10 @@ namespace
 	void processMesh(GMModelReader_Assimp* imp, aiMesh* mesh, const aiScene* scene, GMModel* model)
 	{
 		model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
-		model->setDrawMode(GMModelDrawMode::Index);
+		if (mesh->mNumFaces > 0)
+			model->setDrawMode(GMModelDrawMode::Index);
+		else
+			model->setDrawMode(GMModelDrawMode::Vertex);
 
 		GMMesh* m = new GMMesh(model);
 		// vertices

@@ -100,7 +100,7 @@ namespace
 		}
 	}
 
-	void createConvexHullShape(GMModel* model, OUT btConvexHullShape** shape)
+	void createConvexHullShape(GMModel* model, const GMVec3& scaling, bool optimizeConvex, OUT btConvexHullShape** shape)
 	{
 		if (shape)
 		{
@@ -126,6 +126,14 @@ namespace
 					}
 				}
 			}
+
+			btShape->recalcLocalAabb();
+			btVector3 localScaling(scaling.getX(), scaling.getY(), scaling.getZ());
+			btShape->setLocalScaling(localScaling);
+
+			if (optimizeConvex)
+				btShape->optimizeConvexHull();
+
 			*shape = btShape;
 		}
 	}
@@ -208,23 +216,34 @@ bool GMPhysicsShapeHelper::createConvexShapeFromTriangleModel(
 		return false;
 	}
 
-	GMModel* m = (models->getModels().front()).getModel();
-	if (!m)
+	auto& vecModels = models->getModels();
+	btCollisionShape* btShape = nullptr;
+	if (vecModels.size() == 0)
 	{
 		gm_warning(gm_dbg_wrap("not a valid model asset."));
 		return false;
 	}
-
-	btConvexHullShape* btShape = nullptr;
-	createConvexHullShape(m, &btShape);
-	GM_ASSERT(btShape);
-
-	btShape->recalcLocalAabb();
-	btVector3 localScaling(scaling.getX(), scaling.getY(), scaling.getZ());
-	btShape->setLocalScaling(localScaling);
-
-	if (optimizeConvex)
-		btShape->optimizeConvexHull();
+	else if (vecModels.size() == 1)
+	{
+		btConvexHullShape* s = nullptr;
+		createConvexHullShape(vecModels.front().getModel(), scaling, optimizeConvex, &s);
+		GM_ASSERT(s);
+		btShape = s;
+	}
+	else
+	{
+		btCompoundShape* cs = new btCompoundShape();
+		btTransform identityTrans;
+		identityTrans.setIdentity();
+		for (auto& model : vecModels)
+		{
+			btConvexHullShape* s = nullptr;
+			createConvexHullShape(vecModels.front().getModel(), scaling, optimizeConvex, &s);
+			GM_ASSERT(s);
+			cs->addChildShape(identityTrans, s);
+		}
+		btShape = cs;
+	}
 
 	GMPhysicsShape* shape = new GMPhysicsShape();
 	shape->setShape(btShape);

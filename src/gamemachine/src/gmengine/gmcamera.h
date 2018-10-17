@@ -78,10 +78,10 @@ GM_PRIVATE_OBJECT(GMFrustum)
 
 class GMCamera;
 class GMSpriteGameObject;
-class GMFrustum : public GMObject
+class GMFrustum
 {
-	GM_DECLARE_PRIVATE(GMFrustum)
-	GM_ALLOW_COPY_MOVE(GMFrustum)
+	GM_DECLARE_PRIVATE_NGO(GMFrustum)
+	GM_DECLARE_ALIGNED_ALLOCATOR()
 
 	friend class GMCamera;
 

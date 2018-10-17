@@ -113,15 +113,15 @@ inline bool operator !=(const GMAsset& a, const GMAsset& b) GM_NOEXCEPT
 	return !(a == b);
 }
 
-GM_PRIVATE_OBJECT(GMAssets)
+GM_PRIVATE_OBJECT_UNALIGNED(GMAssets)
 {
 	Vector<GMAsset> unnamedAssets;
 	HashMap<GMString, GMAsset, GMStringHashFunctor> childs;
 };
 
-class GMAssets : public GMObject
+class GMAssets
 {
-	GM_DECLARE_PRIVATE(GMAssets)
+	GM_DECLARE_PRIVATE_NGO(GMAssets)
 
 public:
 	GMAssets() = default;
