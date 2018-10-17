@@ -321,7 +321,7 @@ bool GMModelReader_MD5Anim::load(const GMModelLoadSettings& settings, GMBuffer& 
 	return true;
 }
 
-bool GMModelReader_MD5Anim::test(const GMBuffer& buffer)
+bool GMModelReader_MD5Anim::test(const GMModelLoadSettings& settings, const GMBuffer& buffer)
 {
 	if (buffer.size > 13)
 	{

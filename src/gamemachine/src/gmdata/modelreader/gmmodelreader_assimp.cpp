@@ -5,6 +5,8 @@
 #include <assimp/postprocess.h>
 #include <assimp/IOSystem.hpp>
 #include <../code/MemoryIOWrapper.h>
+#include <../code/BaseImporter.h>
+#include <../code/StringUtils.h>
 #include "foundation/gamemachine.h"
 #include "foundation/utilities/utilities.h"
 
@@ -105,10 +107,36 @@ namespace
 		materialTextureGet(imp, material, aiTextureType_NORMALS, model, GMTextureType::NormalMap);
 	}
 
-	void processMesh(GMModelReader_Assimp* imp, aiMesh* mesh, const aiScene* scene, GMModel* model)
+	void processBones(GMModelReader_Assimp* imp, aiMesh* mesh, GMModel* model, GMModels* models)
+	{
+		GMSkeleton* skeleton = nullptr;
+		if (!(skeleton = models->getSkeleton()))
+		{
+			skeleton = new GMSkeleton();
+			models->setSkeleton(skeleton);
+		}
+
+		for (auto i = 0u; i < mesh->mNumBones; ++i)
+		{
+			aiBone* bone = mesh->mBones[i];
+			GMSkeletonMesh m;
+			m.targetModel = model;
+			m.numWeights = bone->mNumWeights;
+			
+			Vector<GMSkeletonWeight> weights;
+			weights.reserve(bone->mNumWeights);
+			for (auto j = 0u; j < bone->mNumWeights; ++j)
+			{
+			}
+
+			skeleton->getMeshes().push_back(std::move(m));
+		}
+	}
+
+	void processMesh(GMModelReader_Assimp* imp, aiMesh* mesh, const aiScene* scene, GMModel* model, GMModels* models)
 	{
 		model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
-		if (mesh->mNumFaces > 0)
+		if (mesh->HasFaces())
 			model->setDrawMode(GMModelDrawMode::Index);
 		else
 			model->setDrawMode(GMModelDrawMode::Vertex);
@@ -137,12 +165,21 @@ namespace
 		}
 
 		// faces
-		for (auto i = 0u; i < mesh->mNumFaces; ++i)
+		if (mesh->HasFaces())
 		{
-			for (auto j = 0u; j < mesh->mFaces[i].mNumIndices; ++j)
+			for (auto i = 0u; i < mesh->mNumFaces; ++i)
 			{
-				m->index(mesh->mFaces[i].mIndices[j]);
+				for (auto j = 0u; j < mesh->mFaces[i].mNumIndices; ++j)
+				{
+					m->index(mesh->mFaces[i].mIndices[j]);
+				}
 			}
+		}
+
+		// bones
+		if (mesh->HasBones())
+		{
+			processBones(imp, mesh, model, models);
 		}
 
 		// materials
@@ -165,7 +202,7 @@ namespace
 		{
 			aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
 			GMModel* model = new GMModel();
-			processMesh(imp, mesh, scene, model);
+			processMesh(imp, mesh, scene, model, models);
 			models->push_back(GMAsset(GMAssetType::Model, model));
 		}
 		// 接下来对它的子节点重复这一过程
@@ -209,8 +246,32 @@ bool GMModelReader_Assimp::load(const GMModelLoadSettings& settings, GMBuffer& b
 	return true;
 }
 
-bool GMModelReader_Assimp::test(const GMBuffer& buffer)
+bool GMModelReader_Assimp::test(const GMModelLoadSettings& settings, const GMBuffer& buffer)
 {
-	return true;
+	constexpr GMsize_t bufferSize(Assimp::Importer::MaxLenHint + 28);
+	const std::string fileName = GMPath::filename(settings.filename).toStdString();
+
+	GamePackageIOSystem ioHandler(settings, buffer.buffer, buffer.size);
+	Assimp::Importer imp;
+	auto cnt = imp.GetImporterCount();
+	for (decltype(cnt) i = 0; i < cnt; ++i)
+	{
+		Assimp::BaseImporter* bi = imp.GetImporter(i);
+		char fbuff[bufferSize];
+		ai_snprintf(fbuff, bufferSize, "%s.%s", AI_MEMORYIO_MAGIC_FILENAME, fileName.c_str());
+		if (bi->CanRead(fbuff, &ioHandler, false))
+			return true;
+	}
+
+	for (decltype(cnt) i = 0; i < cnt; ++i)
+	{
+		Assimp::BaseImporter* bi = imp.GetImporter(i);
+		char fbuff[bufferSize];
+		ai_snprintf(fbuff, bufferSize, "%s.%s", AI_MEMORYIO_MAGIC_FILENAME, fileName.c_str());
+		if (bi->CanRead(fbuff, &ioHandler, true))
+			return true;
+	}
+
+	return false;
 }
 

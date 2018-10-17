@@ -259,7 +259,7 @@ bool GMModelReader_MD5Mesh::load(const GMModelLoadSettings& settings, GMBuffer& 
 	return true;
 }
 
-bool GMModelReader_MD5Mesh::test(const GMBuffer& buffer)
+bool GMModelReader_MD5Mesh::test(const GMModelLoadSettings& settings, const GMBuffer& buffer)
 {
 	if (buffer.size > 13)
 	{

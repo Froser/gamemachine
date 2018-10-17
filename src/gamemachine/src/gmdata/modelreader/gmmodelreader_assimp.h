@@ -16,7 +16,7 @@ class GMModelReader_Assimp : public GMObject, public IModelReader
 
 public:
 	virtual bool load(const GMModelLoadSettings& settings, GMBuffer& buffer, REF GMAsset& asset) override;
-	virtual bool test(const GMBuffer& buffer) override;
+	virtual bool test(const GMModelLoadSettings& settings, const GMBuffer& buffer) override;
 
 public:
 	inline HashMap<GMString, GMAsset, GMStringHashFunctor>& getTextureMap() GM_NOEXCEPT

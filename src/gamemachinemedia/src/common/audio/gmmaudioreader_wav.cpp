@@ -18,7 +18,7 @@ static CWaves& getWaveLoader()
 	return g_cwaves;
 }
 
-GM_PRIVATE_OBJECT(GMMAudioFile_Wav)
+GM_PRIVATE_OBJECT_UNALIGNED(GMMAudioFile_Wav)
 {
 	ALuint bufferId = 0;
 	WAVEID waveId = -1;

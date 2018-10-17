@@ -37,7 +37,7 @@ private:
 	}
 };
 
-GM_PRIVATE_OBJECT(GMMAudioFile_MP3)
+GM_PRIVATE_OBJECT_UNALIGNED(GMMAudioFile_MP3)
 {
 	typedef GMMAudioFile_Stream Base;
 
@@ -49,7 +49,8 @@ GM_PRIVATE_OBJECT(GMMAudioFile_MP3)
 
 class GMMAudioFile_MP3 : public GMMAudioFile_Stream
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMMAudioFile_MP3, GMMAudioFile_Stream)
+	GM_DECLARE_PRIVATE_NGO(GMMAudioFile_MP3)
+	typedef GMMAudioFile_Stream Base;
 
 public:
 	GMMAudioFile_MP3()

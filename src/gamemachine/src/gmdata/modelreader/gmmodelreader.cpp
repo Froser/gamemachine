@@ -38,11 +38,11 @@ IModelReader* GMModelReader::getReader(ModelType type)
 	return readers.getReader(type);
 }
 
-GMModelReader::ModelType GMModelReader::test(const GMBuffer& buffer)
+GMModelReader::ModelType GMModelReader::test(const GMModelLoadSettings& settings, const GMBuffer& buffer)
 {
 	for (ModelType i = ModelType_Begin; i < ModelType_End; i = (ModelType)((GMuint32)i + 1))
 	{
-		if (getReader(i)->test(buffer))
+		if (getReader(i)->test(settings, buffer))
 			return i;
 	}
 	return ModelType_End;
@@ -62,7 +62,7 @@ bool GMModelReader::load(const GMModelLoadSettings& settings, ModelType type, RE
 		GM.getGamePackageManager()->readFileFromPath(settings.filename, &buffer);
 
 	if (type == Auto)
-		type = test(buffer);
+		type = test(settings, buffer);
 
 	if (type == ModelType_End)
 		return false;

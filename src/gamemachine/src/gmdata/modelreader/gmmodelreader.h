@@ -13,7 +13,7 @@ GM_INTERFACE(IModelReader)
 {
 	virtual ~IModelReader() {}
 	virtual bool load(const GMModelLoadSettings& settings, GMBuffer& buffer, REF GMAsset& asset) = 0;
-	virtual bool test(const GMBuffer& buffer) = 0;
+	virtual bool test(const GMModelLoadSettings& settings, const GMBuffer& buffer) = 0;
 };
 
 class GMGamePackage;
@@ -79,7 +79,7 @@ public:
 	static IModelReader* getReader(ModelType type);
 
 private:
-	static ModelType test(const GMBuffer& buffer);
+	static ModelType test(const GMModelLoadSettings& settings, const GMBuffer& buffer);
 };
 
 END_NS

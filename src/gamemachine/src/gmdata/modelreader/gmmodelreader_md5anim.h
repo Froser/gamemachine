@@ -32,7 +32,7 @@ class GMModelReader_MD5Anim : public GMModelReader_MD5
 
 public:
 	virtual bool load(const GMModelLoadSettings& settings, GMBuffer& buffer, REF GMAsset& asset) override;
-	virtual bool test(const GMBuffer& buffer) override;
+	virtual bool test(const GMModelLoadSettings& settings, const GMBuffer& buffer) override;
 	virtual Vector<GMOwnedPtr<IMd5MeshHandler>>& getHandlers() override;
 	void addJointToHierarchy(GMModelReader_MD5Anim_Joint&& joint);
 	void addBound(GMModelReader_MD5Anim_Bound&& bounds);

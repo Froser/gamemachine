@@ -161,7 +161,7 @@ bool GMModelReader_MD5::load(const GMModelLoadSettings& settings, GMBuffer& buff
 		GMString filename = settings.directory + "/" + d->meshFile;
 		GMBuffer meshBuffer;
 		GM.getGamePackageManager()->readFile(GMPackageIndex::Models, filename, &meshBuffer);
-		GM_ASSERT(s_meshReader.test(meshBuffer));
+		GM_ASSERT(s_meshReader.test(settings, meshBuffer));
 		s_meshReader.load(GMModelLoadSettings(filename, settings.directory, settings.context, settings.type), meshBuffer, asset);
 	}
 
@@ -169,14 +169,14 @@ bool GMModelReader_MD5::load(const GMModelLoadSettings& settings, GMBuffer& buff
 		GMString filename = settings.directory + "/" + d->animFile;
 		GMBuffer meshBuffer;
 		GM.getGamePackageManager()->readFile(GMPackageIndex::Models, filename, &meshBuffer);
-		GM_ASSERT(s_animReader.test(meshBuffer));
+		GM_ASSERT(s_animReader.test(settings, meshBuffer));
 		s_animReader.load(GMModelLoadSettings(filename, settings.directory, settings.context, settings.type), meshBuffer, asset);
 	}
 
 	return true;
 }
 
-bool GMModelReader_MD5::test(const GMBuffer& buffer)
+bool GMModelReader_MD5::test(const GMModelLoadSettings& settings, const GMBuffer& buffer)
 {
 	// 使用GameMachine的一种MD5格式，其实里面就是索引了mesh和anim文件
 	if (buffer.size > 14)
