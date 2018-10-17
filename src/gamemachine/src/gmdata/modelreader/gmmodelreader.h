@@ -68,8 +68,7 @@ public:
 	{
 		Auto,
 		ModelType_Begin,
-		Object = ModelType_Begin,
-		GMMd5,
+		GMMd5 = ModelType_Begin,
 		AnyOther,
 		ModelType_End,
 	};

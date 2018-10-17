@@ -179,7 +179,7 @@ GM_ALIGNED_STRUCT(GMMaterial)
 {
 	GMfloat shininess = 1;
 	GMfloat refractivity = 0;
-	GMVec3 ka = GMVec3(1);
+	GMVec3 ka = GMVec3(0);
 	GMVec3 ks = GMVec3(1);
 	GMVec3 kd = GMVec3(1);
 	

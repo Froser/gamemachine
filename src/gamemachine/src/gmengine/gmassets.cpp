@@ -47,11 +47,11 @@ GMAsset& GMAsset::operator=(const GMAsset& asset)
 	if (this != &asset)
 		release();
 
+	d->type = d_asset->type;
+	d->asset = d_asset->asset;
 	d->ref = d_asset->ref;
 	addRef();
 
-	d->type = d_asset->type;
-	d->asset = d_asset->asset;
 	return *this;
 }
 
@@ -65,6 +65,9 @@ GMAsset& GMAsset::operator=(GMAsset&& asset) GM_NOEXCEPT
 void GMAsset::addRef()
 {
 	D(d);
+	if (isEmpty())
+		return;
+
 	if (d->ref)
 		++(*d->ref);
 }
@@ -72,6 +75,9 @@ void GMAsset::addRef()
 void GMAsset::release()
 {
 	D(d);
+	if (isEmpty())
+		return;
+
 	if (d->ref)
 	{
 		(*d->ref)--;

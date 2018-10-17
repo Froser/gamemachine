@@ -81,6 +81,11 @@ void Demo_MD5Mesh::init()
 		boblampcleanModel
 	);
 	
+	for (auto& model : boblampcleanModel.getModels()->getModels())
+	{
+		model.getModel()->getShader().getMaterial().ks = GMVec3(0);
+	}
+
 	d->boblampclean = new gm::GMSkeletalGameObject(boblampcleanModel);
 	d->boblampclean->setScaling(Scale(GMVec3(.02f, .02f, .02f)));
 	d->boblampclean->setTranslation(Translate(GMVec3(0, -.5f, 0)));
@@ -99,7 +104,7 @@ void Demo_MD5Mesh::setDefaultLights()
 			GM_ASSERT(directLight);
 			gm::GMfloat lightPos[] = { 1, 0, -3 };
 			directLight->setLightPosition(lightPos);
-			gm::GMfloat color[] = { .1f, .1f, .1f };
+			gm::GMfloat color[] = { .7f, .7f, .7f };
 			directLight->setLightColor(color);
 			getDemonstrationWorld()->getContext()->getEngine()->addLight(directLight);
 		}
@@ -108,7 +113,7 @@ void Demo_MD5Mesh::setDefaultLights()
 			gm::ILight* ambientLight = nullptr;
 			GM.getFactory()->createLight(gm::GMLightType::Ambient, &ambientLight);
 			GM_ASSERT(ambientLight);
-			gm::GMfloat color[] = { .7f, .7f, .7f };
+			gm::GMfloat color[] = { .1f, .1f, .1f };
 			ambientLight->setLightColor(color);
 			getDemonstrationWorld()->getContext()->getEngine()->addLight(ambientLight);
 		}

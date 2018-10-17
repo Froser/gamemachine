@@ -237,6 +237,7 @@ void GMBSPShaderLoader::parseItem(GMXMLElement* elem, GMint32 lightmapId, REF GM
 
 	GMShader& shader = *shaderPtr;
 	shader.getMaterial().ks = shader.getMaterial().kd = GMVec3(0);
+	shader.getMaterial().ka = GMVec3(1);
 	for (GMXMLElement* it = elem->FirstChildElement(); it; it = it->NextSiblingElement())
 	{
 		BEGIN_PARSE(surfaceparm); // surfaceparm一定要在最先

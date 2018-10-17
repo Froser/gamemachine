@@ -324,7 +324,7 @@ void GMModelReader_MD5Mesh::buildModel(const GMModelLoadSettings& settings, GMMo
 			if (!tex.isEmpty())
 			{
 				d->shaders[mesh.shader] = tex;
-				GMToolUtil::addTextureToShader(model->getShader(), tex, GMTextureType::Ambient);
+				GMToolUtil::addTextureToShader(model->getShader(), tex, GMTextureType::Diffuse);
 			}
 		}
 

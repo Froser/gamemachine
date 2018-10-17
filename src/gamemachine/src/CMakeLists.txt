@@ -34,8 +34,6 @@ set(SOURCES
 		gmdata/imagereader/gmimagereader_tga.cpp
 		gmdata/modelreader/gmmodelreader.h
 		gmdata/modelreader/gmmodelreader.cpp
-		gmdata/modelreader/gmmodelreader_obj.h
-		gmdata/modelreader/gmmodelreader_obj.cpp
 		gmdata/modelreader/gmmodelreader_md5.h
 		gmdata/modelreader/gmmodelreader_md5.cpp
 		gmdata/modelreader/gmmodelreader_md5mesh.h

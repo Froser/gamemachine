@@ -48,8 +48,8 @@ void Demo_Assimp::init()
 
 	gm::GMGamePackage& pk = *GM.getGamePackageManager();
 	gm::GMModelLoadSettings loadSettings(
-		"sarah/n901.obj",
-		"sarah",
+		"boblampclean/boblampclean.md5mesh",
+		"boblampclean",
 		getDemoWorldReference()->getContext()
 	);
 

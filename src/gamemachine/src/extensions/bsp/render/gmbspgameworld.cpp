@@ -566,6 +566,7 @@ bool GMBSPGameWorld::setMaterialTexture(T& face, REF GMShader& shader)
 			return false;
 
 		shader.getMaterial().ks = shader.getMaterial().kd = GMVec3(0);
+		shader.getMaterial().ka = GMVec3(1);
 		shader.getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(asset);
 	}
 	return true;

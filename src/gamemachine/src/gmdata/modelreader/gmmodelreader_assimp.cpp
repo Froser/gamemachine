@@ -17,9 +17,10 @@ public:
 	{
 	}
 
-	Assimp::IOStream* Open(const char* pFile, const char* /*pMode*/ = "rb") override
+	Assimp::IOStream* Open(const char* pFile, const char* pMode = "rb") override
 	{
-		if (strncmp(pFile, AI_MEMORYIO_MAGIC_FILENAME, AI_MEMORYIO_MAGIC_FILENAME_LENGTH))
+		Assimp::IOStream* s = Assimp::MemoryIOSystem::Open(pFile, pMode);
+		if (!s)
 		{
 			// 通过GamePackage获取文件
 			GMString fn = m_settings.directory;
@@ -38,7 +39,7 @@ public:
 			buffer.needRelease = false;
 			return new Assimp::MemoryIOStream(buffer.buffer, buffer.size);
 		}
-		return new Assimp::MemoryIOStream(buffer, length);
+		return s;
 	}
 
 private:
@@ -183,11 +184,13 @@ bool GMModelReader_Assimp::load(const GMModelLoadSettings& settings, GMBuffer& b
 	if (settings.flipTexcoords)
 		flag |= aiProcess_FlipUVs;
 
+	const std::string fileName = GMPath::filename(settings.filename).toStdString();
 	const aiScene* scene = imp.ReadFileFromMemory(
 		buffer.buffer, 
 		buffer.size, 
 		flag,
-		new GamePackageIOSystem(settings, (const uint8_t*)buffer.buffer, buffer.size)
+		new GamePackageIOSystem(settings, (const uint8_t*)buffer.buffer, buffer.size),
+		fileName.c_str()
 	);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)

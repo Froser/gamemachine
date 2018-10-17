@@ -518,7 +518,7 @@ const aiScene* Importer::ReadFileFromMemory( const void* pBuffer,
 const aiScene* Importer::ReadFileFromMemory( const void* pBuffer,
     size_t pLength,
     unsigned int pFlags,
-	IOSystem* ioHandler,
+    IOSystem* ioHandler,
     const char* pHint /*= ""*/)
 {
     ASSIMP_BEGIN_EXCEPTION_REGION();

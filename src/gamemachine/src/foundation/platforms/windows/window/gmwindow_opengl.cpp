@@ -90,8 +90,7 @@ public:
 	virtual void switchToContext() const override
 	{
 		D_OF(d, windowImpl);
-		BOOL b = wglMakeCurrent(d->hDC, d->hRC);
-		GM_ASSERT(b);
+		wglMakeCurrent(d->hDC, d->hRC);
 	}
 
 private:
