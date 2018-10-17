@@ -6,14 +6,15 @@
 #include "gmdx11texture.h"
 BEGIN_NS
 
-GM_PRIVATE_OBJECT(GMDx11GlyphTexture)
+GM_PRIVATE_OBJECT_UNALIGNED(GMDx11GlyphTexture)
 {
 	GMComPtr<ID3D11Texture2D> texture;
 };
 
 class GMDx11GlyphTexture : public GMDx11Texture
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMDx11GlyphTexture, GMDx11Texture)
+	GM_DECLARE_PRIVATE_NGO(GMDx11GlyphTexture)
+	typedef GMDx11Texture Base;
 
 public:
 	GMDx11GlyphTexture(const IRenderContext* context);

@@ -5,14 +5,15 @@
 #include "gmengine/gmgraphicengine.h"
 #include "foundation/gamemachine.h"
 
-GM_PRIVATE_OBJECT(GMGLFramebufferTexture)
+GM_PRIVATE_OBJECT_UNALIGNED(GMGLFramebufferTexture)
 {
 	GMFramebufferDesc desc;
 };
 
 class GMGLFramebufferTexture : public GMGLTexture
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMGLFramebufferTexture, GMGLTexture);
+	GM_DECLARE_PRIVATE_NGO(GMGLFramebufferTexture)
+	typedef GMGLTexture Base;
 
 public:
 	GMGLFramebufferTexture(const GMFramebufferDesc& desc)

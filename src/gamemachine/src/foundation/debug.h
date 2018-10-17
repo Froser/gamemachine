@@ -18,14 +18,14 @@ GM_INTERFACE(IDebugOutput)
 	virtual void debug(const GMString& msg) = 0;
 };
 
-GM_PRIVATE_OBJECT(GMDebugger)
+GM_PRIVATE_OBJECT_UNALIGNED(GMDebugger)
 {
 	IDebugOutput* debugger;
 };
 
 class GMDebugger : public GMSingleton<GMDebugger>
 {
-	GM_DECLARE_PRIVATE(GMDebugger)
+	GM_DECLARE_PRIVATE_NGO(GMDebugger)
 	DECLARE_SINGLETON(GMDebugger)
 
 private:

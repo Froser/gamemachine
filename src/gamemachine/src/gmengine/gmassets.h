@@ -36,17 +36,18 @@ enum class GMAssetType
 		return nullptr;												\
 	}
 
-GM_PRIVATE_OBJECT(GMAsset)
+GM_PRIVATE_OBJECT_UNALIGNED(GMAsset)
 {
 	GMAtomic<GMlong>* ref = nullptr;
 	GMAssetType type = GMAssetType::Invalid;
 	void* asset = nullptr;
 };
 
-class GMAsset : public GMObject
+class GMAsset
 {
-	GM_DECLARE_PRIVATE(GMAsset)
-	GM_DECLARE_PROPERTY(Type, type, GMAssetType)
+	GM_DECLARE_PRIVATE_NGO(GMAsset)
+
+public:
 	GM_DECLARE_ASSET_GETTER(ITexture*, getTexture);
 	GM_DECLARE_ASSET_GETTER(GMModel*, getModel);
 	GM_DECLARE_ASSET_GETTER(GMModels*, getModels);
@@ -73,6 +74,18 @@ public:
 	{
 		D(d);
 		return !d->asset;
+	}
+
+	inline GMAssetType getType() const GM_NOEXCEPT
+	{
+		D(d);
+		return d->type;
+	}
+
+	inline void setType(GMAssetType type) GM_NOEXCEPT
+	{
+		D(d);
+		d->type = type;
 	}
 
 	template <typename T>

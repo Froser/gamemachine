@@ -9,7 +9,7 @@
 #include "shader_constants.h"
 BEGIN_NS
 
-GM_PRIVATE_OBJECT(GMGLTexture)
+GM_PRIVATE_OBJECT_UNALIGNED(GMGLTexture)
 {
 	bool inited = false;
 	GMuint32 id = 0;
@@ -35,7 +35,7 @@ public:
 	virtual void useTexture(GMint32 textureIndex) override;
 };
 
-GM_PRIVATE_OBJECT(GMGLWhiteTexture)
+GM_PRIVATE_OBJECT_UNALIGNED(GMGLWhiteTexture)
 {
 	GMuint32 textureId = 0;
 	const IRenderContext* context = nullptr;
@@ -43,7 +43,7 @@ GM_PRIVATE_OBJECT(GMGLWhiteTexture)
 
 class GMGLWhiteTexture : public ITexture
 {
-	GM_DECLARE_PRIVATE(GMGLWhiteTexture)
+	GM_DECLARE_PRIVATE_NGO(GMGLWhiteTexture)
 
 public:
 	GMGLWhiteTexture(const IRenderContext* context);

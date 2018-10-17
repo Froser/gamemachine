@@ -99,6 +99,36 @@ namespace
 			}
 		}
 	}
+
+	void createConvexHullShape(GMModel* model, OUT btConvexHullShape** shape)
+	{
+		if (shape)
+		{
+			btConvexHullShape* btShape = new btConvexHullShape();
+			if (model->getDrawMode() == GMModelDrawMode::Vertex)
+			{
+				for (const auto& mesh : model->getMeshes())
+				{
+					for (const auto& v : mesh->vertices())
+					{
+						btShape->addPoint(btVector3(v.positions[0], v.positions[1], v.positions[2]), false);
+					}
+				}
+			}
+			else
+			{
+				for (const auto& mesh : model->getMeshes())
+				{
+					const auto& vertices = mesh->vertices();
+					for (const auto& i : mesh->indices())
+					{
+						btShape->addPoint(btVector3(vertices[i].positions[0], vertices[i].positions[1], vertices[i].positions[2]), false);
+					}
+				}
+			}
+			*shape = btShape;
+		}
+	}
 }
 
 GMPhysicsShape::~GMPhysicsShape()
@@ -185,14 +215,10 @@ bool GMPhysicsShapeHelper::createConvexShapeFromTriangleModel(
 		return false;
 	}
 
-	btConvexHullShape* btShape = new btConvexHullShape();
-	for (const auto& mesh : m->getMeshes())
-	{
-		for (const auto& v : mesh->vertices())
-		{
-			btShape->addPoint(btVector3(v.positions[0], v.positions[1], v.positions[2]));
-		}
-	}
+	btConvexHullShape* btShape = nullptr;
+	createConvexHullShape(m, &btShape);
+	GM_ASSERT(btShape);
+
 	btShape->recalcLocalAabb();
 	btVector3 localScaling(scaling.getX(), scaling.getY(), scaling.getZ());
 	btShape->setLocalScaling(localScaling);

@@ -12,7 +12,7 @@ GM_PRIVATE_OBJECT(GMMultiLineTypoTextBuffer)
 	GMint32 lineHeight = 0;
 };
 
-GM_PRIVATE_OBJECT(GMControlTextControlTransactionAtom)
+GM_PRIVATE_OBJECT_UNALIGNED(GMControlTextControlTransactionAtom)
 {
 	GMint32 cpStart = 0;
 	GMint32 cpEnd = 0;
@@ -23,7 +23,7 @@ GM_PRIVATE_OBJECT(GMControlTextControlTransactionAtom)
 
 class GMControlTextControlTransactionAtom : public ITransactionAtom
 {
-	GM_DECLARE_PRIVATE(GMControlTextControlTransactionAtom)
+	GM_DECLARE_PRIVATE_NGO(GMControlTextControlTransactionAtom)
 
 public:
 	GMControlTextControlTransactionAtom(

@@ -158,7 +158,7 @@ private:
 	void initObjects();
 };
 
-GM_PRIVATE_OBJECT(DemostrationEntrance)
+GM_PRIVATE_OBJECT_UNALIGNED(DemostrationEntrance)
 {
 	DemonstrationWorld* world = nullptr;
 	gm::IWindow* mainWindow = nullptr;

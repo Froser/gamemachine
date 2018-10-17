@@ -217,9 +217,10 @@ enum class GMVertexDataType
 
 #define gmVertexIndex(i) ((GMuint32)i)
 
-class GMModel : public GMObject
+GM_ALIGNED_16(class) GMModel
 {
-	GM_DECLARE_PRIVATE(GMModel)
+	GM_DECLARE_PRIVATE_NGO(GMModel)
+	GM_DECLARE_ALIGNED_ALLOCATOR()
 
 public:
 	typedef GMfloat DataType;

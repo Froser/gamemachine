@@ -57,8 +57,15 @@ GMAsset& GMAsset::operator=(const GMAsset& asset)
 
 GMAsset& GMAsset::operator=(GMAsset&& asset) GM_NOEXCEPT
 {
+	D(d);
+	D_OF(d_asset, &asset);
 	if (this != &asset)
-		m_data.swap(asset.m_data);
+	{
+		using namespace std;
+		swap(d->ref, d_asset->ref);
+		swap(d->type, d_asset->type);
+		swap(d->asset, d_asset->asset);
+	}
 	return *this;
 }
 

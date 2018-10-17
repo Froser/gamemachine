@@ -11,7 +11,7 @@ struct GMDx11TextureSamplerVariable
 	ID3DX11EffectSamplerVariable* sampler;
 };
 
-GM_PRIVATE_OBJECT(GMDx11Texture)
+GM_PRIVATE_OBJECT_UNALIGNED(GMDx11Texture)
 {
 	const IRenderContext* context = nullptr;
 	GMImage* image = nullptr;
@@ -26,7 +26,7 @@ GM_PRIVATE_OBJECT(GMDx11Texture)
 
 class GMDx11Texture : public ITexture
 {
-	GM_DECLARE_PRIVATE(GMDx11Texture)
+	GM_DECLARE_PRIVATE_NGO(GMDx11Texture)
 
 public:
 	GMDx11Texture(const IRenderContext* context, GMImage* image);

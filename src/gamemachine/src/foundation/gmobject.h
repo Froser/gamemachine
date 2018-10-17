@@ -62,20 +62,32 @@ private:
 	T* m_ref;
 };
 
-class GMNotAGMObject {};
-
 #define GM_DECLARE_PRIVATE_AND_BASE(className, base)										\
 	public:																					\
 		typedef base Base;																	\
 		typedef className##Private Data;													\
 	private:																				\
 		gm::GMConstructHelper<Data> m_data;													\
+	private:																				\
+		void noop() {}																		\
 	public:																					\
-		inline className##Private* data() const {											\
-			return const_cast<Data*>(m_data.data()); }
+		inline Data* data() const {															\
+			(static_cast<const gm::GMObject*>(this));										\
+			return const_cast<Data*>(m_data.data()); }										\
 
 #define GM_DECLARE_PRIVATE(className) GM_DECLARE_PRIVATE_AND_BASE(className, gm::GMObject)
-#define GM_DECLARE_PRIVATE_NGO(className) GM_DECLARE_PRIVATE_AND_BASE(className, gm::GMNotAGMObject)
+
+/*! \def GM_DECLARE_PRIVATE_NGO
+  为一个不是GMObject的对象定义数据段使用的宏。
+*/
+#define GM_DECLARE_PRIVATE_NGO(className) 													\
+	public:																					\
+		typedef className##Private Data;													\
+	private:																				\
+		Data m_data;																		\
+		void noop() {}																		\
+	public:																					\
+		inline Data* data() const { return const_cast<Data*>(&m_data); }
 
 /*! \def GM
   \brief 。
@@ -97,6 +109,7 @@ class GMNotAGMObject {};
 #define GM_PRIVATE_OBJECT_FROM(name, extends) class name; GM_ALIGNED_16(struct) name##Private : public extends##Private
 #define GM_PRIVATE_NAME(name) name##Private
 #define GM_PRIVATE_DESTRUCT(name) ~name##Private()
+#define GM_PRIVATE_OBJECT_UNALIGNED(name) class name; struct name##Private
 
 #define GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, accessor, callback) \
 	accessor: \
@@ -383,9 +396,6 @@ private:
 
 protected:
 	virtual bool registerMeta() { return false; }
-
-protected:
-	inline void noop() const {}
 };
 
 //! 进行静态转换。

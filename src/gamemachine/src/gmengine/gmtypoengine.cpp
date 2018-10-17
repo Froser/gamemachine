@@ -475,7 +475,7 @@ GM_PRIVATE_OBJECT(GMTypoTextTransactionAtom)
 	GMTypoTextBuffer* buffer = nullptr;
 };
 
-class GMTypoTextTransactionAtom : public ITransactionAtom
+class GMTypoTextTransactionAtom : public GMObject, public ITransactionAtom
 {
 	GM_DECLARE_PRIVATE(GMTypoTextTransactionAtom)
 

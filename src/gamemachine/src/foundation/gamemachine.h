@@ -86,7 +86,7 @@ struct GMGameMachineRunningStates
 	GMfloat nearZ = 0; //!< 近平面的Z坐标。
 };
 
-GM_PRIVATE_OBJECT(GameMachine)
+GM_PRIVATE_OBJECT_UNALIGNED(GameMachine)
 {
 	GMClock clock;
 
@@ -108,7 +108,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 */
 class GameMachine : public GMSingleton<GameMachine>
 {
-	GM_DECLARE_PRIVATE(GameMachine)
+	GM_DECLARE_PRIVATE_NGO(GameMachine)
 	DECLARE_SINGLETON(GameMachine)
 
 	enum

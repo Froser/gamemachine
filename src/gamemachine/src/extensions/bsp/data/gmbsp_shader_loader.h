@@ -21,7 +21,7 @@ GM_PRIVATE_OBJECT(GMBSPShaderLoader)
 };
 
 
-GM_ALIGNED_16(class) GMBSPShaderLoader : public GMObject
+class GMBSPShaderLoader : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMBSPShaderLoader)
 

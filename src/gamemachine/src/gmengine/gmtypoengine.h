@@ -27,17 +27,16 @@ struct GMTypoResult
 
 struct ITypoEngine;
 
-GM_PRIVATE_OBJECT(GMTypoIterator)
+GM_PRIVATE_OBJECT_UNALIGNED(GMTypoIterator)
 {
 	ITypoEngine* typo = nullptr;
 	GMsize_t index = 0;
 	GMint32 offset[2] = { 0 };
 };
 
-class GMTypoIterator : public GMObject
+class GMTypoIterator
 {
-	GM_DECLARE_PRIVATE(GMTypoIterator)
-	GM_ALLOW_COPY_MOVE(GMTypoIterator)
+	GM_DECLARE_PRIVATE_NGO(GMTypoIterator)
 
 public:
 	GMTypoIterator() = default;

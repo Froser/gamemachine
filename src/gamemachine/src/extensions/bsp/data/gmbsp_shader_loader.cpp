@@ -548,6 +548,7 @@ void GMBSPShaderLoader::createSky(GMShader& shader)
 	if (!d->world->getSky())
 	{
 		GMShader skyShader = shader;
+
 		skyShader.setDiscard(false);
 		skyShader.setCull(GMS_Cull::None);
 		skyShader.setBlend(false);

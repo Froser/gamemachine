@@ -90,6 +90,7 @@ void GMObject::releaseConnections()
 				target.receiver->removeConnection(this, name);
 			}
 		}
+		GMClearSTLContainer(d->slots);
 	}
 
 	// 释放此对象连接的所有信号
@@ -100,8 +101,6 @@ void GMObject::releaseConnections()
 			conns.host->removeSignal(conns.name, *this);
 		}
 	}
-
-	GMClearSTLContainer(d->slots);
 }
 
 void GMObject::addConnection(GMObject* host, GMSignal signal)

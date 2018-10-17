@@ -83,14 +83,14 @@ public:
 	static IFramebuffers* createDefaultFramebuffers(const IRenderContext* context);
 };
 
-GM_PRIVATE_OBJECT(GMGLShadowMapTexture)
+GM_PRIVATE_OBJECT_UNALIGNED(GMGLShadowMapTexture)
 {
 	GMuint32 textureId;
 };
 
 class GMGLShadowMapTexture : public ITexture
 {
-	GM_DECLARE_PRIVATE(GMGLShadowMapTexture)
+	GM_DECLARE_PRIVATE_NGO(GMGLShadowMapTexture)
 
 public:
 	GMGLShadowMapTexture(GMuint32 textureId);

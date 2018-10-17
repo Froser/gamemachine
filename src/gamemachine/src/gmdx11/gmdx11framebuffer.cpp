@@ -60,14 +60,15 @@ public:
 	}
 };
 
-GM_PRIVATE_OBJECT(GMDx11FramebufferTexture)
+GM_PRIVATE_OBJECT_UNALIGNED(GMDx11FramebufferTexture)
 {
 	GMFramebufferDesc desc;
 };
 
 class GMDx11FramebufferTexture : public GMDx11Texture
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMDx11FramebufferTexture, GMDx11Texture);
+	GM_DECLARE_PRIVATE_NGO(GMDx11FramebufferTexture);
+	typedef GMDx11Texture Base;
 
 public:
 	GMDx11FramebufferTexture(const IRenderContext* context, const GMFramebufferDesc& desc);

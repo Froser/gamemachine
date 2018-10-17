@@ -211,7 +211,7 @@ GM_PRIVATE_OBJECT(GMPrimitiveLine2D)
 	GMVec4 color;
 };
 
-class GMPrimitiveLine2D : public IPrimitive
+class GMPrimitiveLine2D : public GMObject, public IPrimitive
 {
 	GM_DECLARE_PRIVATE(GMPrimitiveLine2D)
 
@@ -248,7 +248,7 @@ GM_PRIVATE_OBJECT(GMPrimitiveLine3D)
 	GMVec4 color;
 };
 
-class GMPrimitiveLine3D : public IPrimitive
+class GMPrimitiveLine3D : public GMObject, public IPrimitive
 {
 	GM_DECLARE_PRIVATE(GMPrimitiveLine3D)
 

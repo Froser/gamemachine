@@ -320,14 +320,6 @@ void Demo_Collision_Model::createItems()
 
 	gm::GMAsset model;
 	bool b = gm::GMModelReader::load(loadSettings, model);
-	GM_ASSERT(b);
-	gm::GMModelAsset m = model.getModels()->getModels().front();
-	for (auto& mesh : m.getModel()->getMeshes())
-	{
-		// teddy.obj是没有法线数据的，需要计算
-		mesh->calculateNormals(m.getModel()->getPrimitiveTopologyMode(), m.getModel()->getShader().getFrontFace());
-	}
-
 	gm::GMPhysicsShapeHelper::createConvexShapeFromTriangleModel(model, modelShape, false, s_modelScaling);
 	gm::GMAsset teddyAsset = getDemoWorldReference()->getAssets().addAsset(modelShape);
 

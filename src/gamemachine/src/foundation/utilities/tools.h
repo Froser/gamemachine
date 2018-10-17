@@ -12,7 +12,7 @@ template <typename T, typename DeleteFunc = std::default_delete<T>>
 using GMScopedPtr = GMOwnedPtr<T, DeleteFunc>;
 
 //GMClock
-GM_PRIVATE_OBJECT(GMClock)
+GM_PRIVATE_OBJECT_UNALIGNED(GMClock)
 {
 	GMint64 frequency;
 	GMint64 timeCycles;
@@ -27,9 +27,9 @@ GM_PRIVATE_OBJECT(GMClock)
 	GMint64 lastCycle;
 };
 
-class GMClock : public GMObject
+class GMClock
 {
-	GM_DECLARE_PRIVATE(GMClock)
+	GM_DECLARE_PRIVATE_NGO(GMClock)
 
 public:
 	GMClock();
@@ -54,16 +54,16 @@ private:
 };
 
 //GMStopwatch
-GM_PRIVATE_OBJECT(GMStopwatch)
+GM_PRIVATE_OBJECT_UNALIGNED(GMStopwatch)
 {
 	GMint64 frequency;
 	GMint64 start;
 	GMint64 end;
 };
 
-class GMStopwatch : public GMObject
+class GMStopwatch
 {
-	GM_DECLARE_PRIVATE(GMStopwatch);
+	GM_DECLARE_PRIVATE_NGO(GMStopwatch);
 
 public:
 	GMStopwatch();

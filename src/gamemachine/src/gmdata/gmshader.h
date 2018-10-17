@@ -32,9 +32,9 @@ GM_PRIVATE_OBJECT(GMTextureSampler)
 	GMS_Wrap wrapT = GMS_Wrap::Repeat;
 };
 
-class GMTextureSampler : public GMObject
+class GMTextureSampler
 {
-	GM_DECLARE_PRIVATE(GMTextureSampler)
+	GM_DECLARE_PRIVATE_NGO(GMTextureSampler)
 
 public:
 	GM_DECLARE_PROPERTY(FrameCount, frameCount, GMsize_t);
@@ -46,7 +46,6 @@ public:
 
 public:
 	GMTextureSampler() = default;
-	GMTextureSampler(const GMTextureSampler&) = delete;
 
 public:
 	GMS_TextureTransform& getTextureTransform(GMsize_t index);
@@ -112,13 +111,13 @@ GM_PRIVATE_OBJECT(GMTextureList)
 	GMTextureSampler cubeMap;
 };
 
-class GMTextureList : public GMObject
+GM_ALIGNED_16(class) GMTextureList
 {
-	GM_DECLARE_PRIVATE(GMTextureList)
+	GM_DECLARE_PRIVATE_NGO(GMTextureList)
+	GM_DECLARE_ALIGNED_ALLOCATOR()
 
 public:
 	GMTextureList() = default;
-	GMTextureList(const GMTextureList& texture) = delete;
 
 public:
 	inline GMTextureSampler& getTextureSampler(GMTextureType type)
@@ -208,10 +207,10 @@ GM_PRIVATE_OBJECT(GMShader)
 	GMMaterial material;
 };
 
-class GMShader : public GMObject
+GM_ALIGNED_16(class) GMShader
 {
-	GM_DECLARE_PRIVATE(GMShader)
-	GM_ALLOW_COPY_MOVE(GMShader)
+	GM_DECLARE_PRIVATE_NGO(GMShader)
+	GM_DECLARE_ALIGNED_ALLOCATOR()
 
 public:
 	GMShader() = default;

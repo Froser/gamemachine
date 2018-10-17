@@ -6,7 +6,7 @@
 #include <gmgraphicengine.h>
 BEGIN_NS
 
-GM_PRIVATE_OBJECT(GMDx11EffectShaderProgram)
+GM_PRIVATE_OBJECT_UNALIGNED(GMDx11EffectShaderProgram)
 {
 	GMComPtr<ID3DX11Effect> effect;
 	GMShaderVariablesDesc desc;
@@ -19,7 +19,7 @@ GM_PRIVATE_OBJECT(GMDx11EffectShaderProgram)
 
 class GMDx11EffectShaderProgram : public IShaderProgram
 {
-	GM_DECLARE_PRIVATE(GMDx11EffectShaderProgram)
+	GM_DECLARE_PRIVATE_NGO(GMDx11EffectShaderProgram)
 
 public:
 	GMDx11EffectShaderProgram(GMComPtr<ID3DX11Effect> effect);
