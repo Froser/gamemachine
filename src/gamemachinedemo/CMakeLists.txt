@@ -59,6 +59,8 @@ set(SOURCES
 		demo/terrain.cpp
 		demo/customshader.h
 		demo/customshader.cpp
+		demo/assimp.h
+		demo/assimp.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)

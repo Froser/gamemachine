@@ -438,6 +438,13 @@ public:
         unsigned int pFlags,
         const char* pHint = "");
 
+    const aiScene* ReadFileFromMemory(
+        const void* pBuffer,
+        size_t pLength,
+        unsigned int pFlags,
+        IOSystem* ioHandler,
+        const char* pHint = "");
+
     // -------------------------------------------------------------------
     /** Apply post-processing to an already-imported scene.
      *

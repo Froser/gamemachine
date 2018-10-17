@@ -515,6 +515,40 @@ const aiScene* Importer::ReadFileFromMemory( const void* pBuffer,
     return pimpl->mScene;
 }
 
+const aiScene* Importer::ReadFileFromMemory( const void* pBuffer,
+    size_t pLength,
+    unsigned int pFlags,
+	IOSystem* ioHandler,
+    const char* pHint /*= ""*/)
+{
+    ASSIMP_BEGIN_EXCEPTION_REGION();
+    if (!pHint) {
+        pHint = "";
+    }
+
+    if (!pBuffer || !pLength || strlen(pHint) > MaxLenHint ) {
+        pimpl->mErrorString = "Invalid parameters passed to ReadFileFromMemory()";
+        return NULL;
+    }
+
+    // prevent deletion of the previous IOHandler
+    IOSystem* io = pimpl->mIOHandler;
+    pimpl->mIOHandler = NULL;
+
+    SetIOHandler(ioHandler);
+
+    // read the file and recover the previous IOSystem
+    static const size_t BufferSize(Importer::MaxLenHint + 28);
+    char fbuff[ BufferSize ];
+    ai_snprintf(fbuff, BufferSize, "%s.%s",AI_MEMORYIO_MAGIC_FILENAME,pHint);
+
+    ReadFile(fbuff,pFlags);
+    SetIOHandler(io);
+
+    ASSIMP_END_EXCEPTION_REGION(const aiScene*);
+    return pimpl->mScene;
+}
+
 // ------------------------------------------------------------------------------------------------
 void WriteLogOpening(const std::string& file)
 {

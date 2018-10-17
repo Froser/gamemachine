@@ -38,18 +38,27 @@ enum class GMModelPathType
 */
 struct GMModelLoadSettings
 {
-	GMModelLoadSettings(const GMString& filename_, const GMString& directory_, const IRenderContext* context_, GMModelPathType type_ = GMModelPathType::Relative)
+	GMModelLoadSettings() = default;
+	GMModelLoadSettings(
+		const GMString& filename_,
+		const GMString& directory_,
+		const IRenderContext* context_,
+		GMModelPathType type_ = GMModelPathType::Relative,
+		bool flipTexcoords_ = true
+	)
 		: filename(filename_)
 		, directory(directory_)
 		, context(context_)
 		, type(type_)
+		, flipTexcoords(flipTexcoords_)
 	{
 	}
 
-	const GMString filename; //!< 需要被读取的模型文件
-	const GMString directory; //!< 模型所在目录
+	GMString filename; //!< 需要被读取的模型文件
+	GMString directory; //!< 模型所在目录
 	const IRenderContext* context;
 	GMModelPathType type; //!< 目录路径参考类型
+	bool flipTexcoords; //!< 是否颠倒纹理坐标的y轴
 };
 
 class GMModelReader
@@ -61,6 +70,7 @@ public:
 		ModelType_Begin,
 		Object = ModelType_Begin,
 		GMMd5,
+		AnyOther,
 		ModelType_End,
 	};
 

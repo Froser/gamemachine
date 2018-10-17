@@ -2,6 +2,7 @@
 #include "gmmodelreader.h"
 #include "gmmodelreader_obj.h"
 #include "gmmodelreader_md5.h"
+#include "gmmodelreader_assimp.h"
 #include "gmdata/gamepackage/gmgamepackage.h"
 #include "foundation/gamemachine.h"
 
@@ -12,6 +13,7 @@ public:
 	{
 		m_readers[GMModelReader::Object] = new GMModelReader_Obj();
 		m_readers[GMModelReader::GMMd5] = new GMModelReader_MD5();
+		m_readers[GMModelReader::AnyOther] = new GMModelReader_Assimp();
 	}
 
 	~GMModelReaderContainer()
