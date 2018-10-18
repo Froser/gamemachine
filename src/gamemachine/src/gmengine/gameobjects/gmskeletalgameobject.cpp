@@ -13,6 +13,7 @@ void GMSkeletalGameObject::update(GMDuration dt)
 		if (!models)
 			return;
 
+		/*
 		auto skeleton = models->getSkeleton();
 		if (skeleton)
 		{
@@ -41,6 +42,12 @@ void GMSkeletalGameObject::update(GMDuration dt)
 			if (d->drawBones)
 				updateSkeleton();
 		}
+		*/
+
+		if (!d->evaluator)
+			d->evaluator.reset(new GMSkeletalAnimationEvaluator(0)); //TODO
+
+		d->evaluator->update(dt);
 	}
 }
 

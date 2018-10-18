@@ -46,6 +46,8 @@ void GMSkeletalAnimationEvaluator::update(GMDuration dt)
 
 	for (const auto& joint : d->animation->joints)
 	{
+		// Position
+		GMVec3 currentPosition;
 		if (!joint.positions.empty())
 		{
 			GMfloat frameIdx = frame0 % joint.positions.size();
@@ -53,6 +55,63 @@ void GMSkeletalAnimationEvaluator::update(GMDuration dt)
 			const auto& frame = joint.positions[frameIdx];
 			const auto& nextFrame = joint.positions[nextFrameIdx];
 			GMDuration diffTime = nextFrame.time - frame.time;
+			if (diffTime < 0)
+				diffTime += d->animation->duration;
+			if (diffTime > 0)
+			{
+				GMDuration factor = (d->animationTime - frame.time) / diffTime;
+				currentPosition = Lerp(frame.value, nextFrame.value, factor);
+			}
+			else
+			{
+				currentPosition = frame.value;
+			}
 		}
+
+		// Rotation
+		GMQuat currentRotation;
+		if (!joint.rotations.empty())
+		{
+			GMfloat frameIdx = frame0 % joint.rotations.size();
+			GMfloat nextFrameIdx = frame1 % joint.rotations.size();
+			const auto& frame = joint.rotations[frameIdx];
+			const auto& nextFrame = joint.rotations[nextFrameIdx];
+			GMDuration diffTime = nextFrame.time - frame.time;
+			if (diffTime < 0)
+				diffTime += d->animation->duration;
+			if (diffTime > 0)
+			{
+				GMDuration factor = (d->animationTime - frame.time) / diffTime;
+				currentRotation = Lerp(frame.value, nextFrame.value, factor);
+			}
+			else
+			{
+				currentRotation = frame.value;
+			}
+		}
+
+		// Scaling
+		GMVec3 currentScaling;
+		if (!joint.scalings.empty())
+		{
+			GMfloat frameIdx = frame0 % joint.scalings.size();
+			GMfloat nextFrameIdx = frame1 % joint.scalings.size();
+			const auto& frame = joint.scalings[frameIdx];
+			const auto& nextFrame = joint.scalings[nextFrameIdx];
+			GMDuration diffTime = nextFrame.time - frame.time;
+			if (diffTime < 0)
+				diffTime += d->animation->duration;
+			if (diffTime > 0)
+			{
+				GMDuration factor = (d->animationTime - frame.time) / diffTime;
+				currentScaling = Lerp(frame.value, nextFrame.value, factor);
+			}
+			else
+			{
+				currentScaling = frame.value;
+			}
+		}
+
+		d->transform = Scale(currentScaling) * QuatToMatrix(currentRotation) * Translate(currentPosition);
 	}
 }

@@ -309,7 +309,7 @@ public:
 GM_PRIVATE_OBJECT(GMModels)
 {
 	Vector<GMAsset> models;
-	GMOwnedPtr<GMSkeleton> skeleton;
+	GMOwnedPtr<GMSkeleton> skeleton; //Deprecate soon...
 	GMOwnedPtr<GMSkeletalAnimations> animations;
 };
 
@@ -339,6 +339,12 @@ public:
 	{
 		D(d);
 		d->skeleton.reset(skeleton);
+	}
+
+	inline GMSkeletalAnimations* getAnimations() GM_NOEXCEPT
+	{
+		D(d);
+		return d->animations.get();
 	}
 
 	void setAnimations(AUTORELEASE GMSkeletalAnimations* animations)

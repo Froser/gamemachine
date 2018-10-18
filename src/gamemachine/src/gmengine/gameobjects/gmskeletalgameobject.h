@@ -8,9 +8,9 @@ GM_PRIVATE_OBJECT(GMSkeletalGameObject)
 {
 	enum { AutoPlayFrame = -1 };
 
-	GMDuration animationTime = 0;
-	GMDuration animationDuration = 0;
-	GMDuration frameDuration = 0;
+	GMDuration animationTime = 0; // deprecate soon
+	GMDuration animationDuration = 0; // deprecate soon
+	GMDuration frameDuration = 0; // deprecate soon
 	GMint32 frame = AutoPlayFrame;
 	GMint32 frameInterpolate = 0;
 	GMOwnedPtr<GMGameObject> skeletonBonesObject;
@@ -18,6 +18,7 @@ GM_PRIVATE_OBJECT(GMSkeletalGameObject)
 	bool drawBones = true;
 	bool playing = true;
 	GMVec4 skeletonColor = GMVec4(0, 1, 0, 1);
+	GMOwnedPtr<GMSkeletalAnimationEvaluator> evaluator;
 };
 
 class GMSkeletalGameObject : public GMGameObject
