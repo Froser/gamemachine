@@ -41,16 +41,14 @@ struct GMModelLoadSettings
 	GMModelLoadSettings() = default;
 	GMModelLoadSettings(
 		const GMString& filename_,
-		const GMString& directory_,
 		const IRenderContext* context_,
 		GMModelPathType type_ = GMModelPathType::Relative,
-		bool flipTexcoords_ = true
+		const GMString& directory_ = L""
 	)
 		: filename(filename_)
 		, directory(directory_)
 		, context(context_)
 		, type(type_)
-		, flipTexcoords(flipTexcoords_)
 	{
 	}
 
@@ -58,7 +56,6 @@ struct GMModelLoadSettings
 	GMString directory; //!< 模型所在目录
 	const IRenderContext* context;
 	GMModelPathType type; //!< 目录路径参考类型
-	bool flipTexcoords; //!< 是否颠倒纹理坐标的y轴
 };
 
 class GMModelReader

@@ -314,7 +314,6 @@ void Demo_Collision_Model::createItems()
 	gm::GMGamePackage& pk = *GM.getGamePackageManager();
 	gm::GMModelLoadSettings loadSettings(
 		"teddy/teddy.obj",
-		"teddy",
 		getDemonstrationWorld()->getContext()
 	);
 

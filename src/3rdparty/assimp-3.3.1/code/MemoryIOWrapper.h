@@ -188,7 +188,7 @@ public:
         return false;
     }
 
-private:
+protected:
     const uint8_t* buffer;
     size_t length;
 };

@@ -569,7 +569,6 @@ void DemonstrationWorld::initObjects()
 	gm::GMGamePackage& pk = *GM.getGamePackageManager();
 	gm::GMModelLoadSettings loadSettings(
 		"love/love.obj",
-		"love",
 		getContext()
 	);
 

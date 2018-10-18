@@ -144,7 +144,6 @@ public:
 		GMGamePackage& pk = *GM.getGamePackageManager();
 		GMModelLoadSettings loadSettings(
 			"teddy/teddy.obj",
-			"teddy",
 			m_world->getContext()
 		);
 

@@ -55,17 +55,20 @@ bool GMModelReader::load(const GMModelLoadSettings& settings, REF GMAsset& asset
 
 bool GMModelReader::load(const GMModelLoadSettings& settings, ModelType type, REF GMAsset& asset)
 {
+	GMModelLoadSettings settingsCache = settings;
+	settingsCache.directory = settings.directory.isEmpty() ? GMPath::directoryName(settings.filename) : settings.directory;
+
 	GMBuffer buffer;
-	if (settings.type == GMModelPathType::Relative)
-		GM.getGamePackageManager()->readFile(GMPackageIndex::Models, settings.filename, &buffer);
+	if (settingsCache.type == GMModelPathType::Relative)
+		GM.getGamePackageManager()->readFile(GMPackageIndex::Models, settingsCache.filename, &buffer);
 	else
-		GM.getGamePackageManager()->readFileFromPath(settings.filename, &buffer);
+		GM.getGamePackageManager()->readFileFromPath(settingsCache.filename, &buffer);
 
 	if (type == Auto)
-		type = test(settings, buffer);
+		type = test(settingsCache, buffer);
 
 	if (type == ModelType_End)
 		return false;
 
-	return getReader(type)->load(settings, buffer, asset);
+	return getReader(type)->load(settingsCache, buffer, asset);
 }

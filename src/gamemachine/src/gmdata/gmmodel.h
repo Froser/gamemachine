@@ -310,6 +310,7 @@ GM_PRIVATE_OBJECT(GMModels)
 {
 	Vector<GMAsset> models;
 	GMOwnedPtr<GMSkeleton> skeleton;
+	GMOwnedPtr<GMSkeletalAnimations> animations;
 };
 
 class GMModels : public GMObject
@@ -338,6 +339,12 @@ public:
 	{
 		D(d);
 		d->skeleton.reset(skeleton);
+	}
+
+	void setAnimations(AUTORELEASE GMSkeletalAnimations* animations)
+	{
+		D(d);
+		d->animations.reset(animations);
 	}
 
 	GMModel* operator[](GMsize_t i)

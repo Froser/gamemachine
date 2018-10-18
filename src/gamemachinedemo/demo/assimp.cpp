@@ -49,7 +49,6 @@ void Demo_Assimp::init()
 	gm::GMGamePackage& pk = *GM.getGamePackageManager();
 	gm::GMModelLoadSettings loadSettings(
 		"boblampclean/boblampclean.md5mesh",
-		"boblampclean",
 		getDemoWorldReference()->getContext()
 	);
 

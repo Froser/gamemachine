@@ -21,8 +21,7 @@ public:
 
 	Assimp::IOStream* Open(const char* pFile, const char* pMode = "rb") override
 	{
-		Assimp::IOStream* s = Assimp::MemoryIOSystem::Open(pFile, pMode);
-		if (!s)
+		if (strncmp(pFile, AI_MEMORYIO_MAGIC_FILENAME, AI_MEMORYIO_MAGIC_FILENAME_LENGTH))
 		{
 			// 通过GamePackage获取文件
 			GMString fn = m_settings.directory;
@@ -41,7 +40,20 @@ public:
 			buffer.needRelease = false;
 			return new Assimp::MemoryIOStream(buffer.buffer, buffer.size);
 		}
-		return s;
+		else
+		{
+			// 带有magic标志，需要进一步检查
+			// 首先，去掉magic标识
+			const char* fileName = pFile + AI_MEMORYIO_MAGIC_FILENAME_LENGTH;
+			// 如果magic之后的文件名和当前文件名不同，则表示尝试读取另外一个文件
+			if (fileName[0] == '.')
+				++fileName;
+
+			if (GMString(fileName) == GMPath::filename(m_settings.filename))
+				return new Assimp::MemoryIOStream(buffer, length);
+
+			return Open(fileName, pMode);
+		}
 	}
 
 private:
@@ -50,6 +62,17 @@ private:
 
 namespace
 {
+	GMSkeleton* getSkeleton(GMModel* model, GMModels* models)
+	{
+		GMSkeleton* skeleton = nullptr;
+		if (!(skeleton = models->getSkeleton()))
+		{
+			skeleton = new GMSkeleton();
+			models->setSkeleton(skeleton);
+		}
+		return skeleton;
+	}
+
 	void materialGet(aiMaterial* material, const char* pKey, GMuint32 type, GMuint32 idx, GMfloat& valueRef)
 	{
 		GMfloat f;
@@ -109,28 +132,69 @@ namespace
 
 	void processBones(GMModelReader_Assimp* imp, aiMesh* mesh, GMModel* model, GMModels* models)
 	{
-		GMSkeleton* skeleton = nullptr;
-		if (!(skeleton = models->getSkeleton()))
-		{
-			skeleton = new GMSkeleton();
-			models->setSkeleton(skeleton);
-		}
-
+		GMSkeleton* skeleton = getSkeleton(model, models);
 		for (auto i = 0u; i < mesh->mNumBones; ++i)
 		{
 			aiBone* bone = mesh->mBones[i];
 			GMSkeletonMesh m;
 			m.targetModel = model;
 			m.numWeights = bone->mNumWeights;
-			
+			m.weights.resize(m.numWeights);
+
 			Vector<GMSkeletonWeight> weights;
 			weights.reserve(bone->mNumWeights);
 			for (auto j = 0u; j < bone->mNumWeights; ++j)
 			{
+				const aiVertexWeight& aiWeight = bone->mWeights[j];
+				m.weights[j].jointIndex = j;
+				m.weights[j].weightBias = aiWeight.mWeight;
 			}
 
 			skeleton->getMeshes().push_back(std::move(m));
 		}
+	}
+
+	void processAnimation(GMModelReader_Assimp* imp, const aiScene* scene, GMModel* model, GMModels* models)
+	{
+		GMSkeletalAnimations* animations = new GMSkeletalAnimations();
+		for (auto a = 0u; a < scene->mNumAnimations; ++a)
+		{
+			GMSkeletalAnimation ani;
+			aiAnimation* animation = scene->mAnimations[a];
+			ani.frameRate = animation->mTicksPerSecond;
+			ani.duration = animation->mDuration;
+
+			for (auto i = 0u; i < animation->mNumChannels; ++i)
+			{
+				GMSkeletalAnimationJoint joint;
+				const aiNodeAnim* node = animation->mChannels[i];
+				joint.name = node->mNodeName.C_Str();
+				for (auto j = 0u; j < node->mNumPositionKeys; ++j)
+				{
+					GMDuration time = node->mPositionKeys[i].mTime;
+					const auto& position = node->mPositionKeys[i].mValue;
+					joint.positions.emplace_back(time, GMVec3(position.x, position.y, position.z));
+				}
+				for (auto j = 0u; j < node->mNumRotationKeys; ++j)
+				{
+					GMDuration time = node->mRotationKeys[i].mTime;
+					const auto& quat = node->mRotationKeys[i].mValue;
+					joint.rotations.emplace_back(time, GMQuat(quat.x, quat.y, quat.z, quat.w));
+				}
+				for (auto j = 0u; j < node->mNumScalingKeys; ++j)
+				{
+					GMDuration time = node->mScalingKeys[i].mTime;
+					const auto& scaling = node->mScalingKeys[i].mValue;
+					joint.scalings.emplace_back(time, GMVec3(scaling.x, scaling.y, scaling.z));
+				}
+
+				ani.joints.push_back(std::move(joint));
+			}
+
+			animations->getAnimations().push_back(std::move(ani));
+		}
+
+		models->setAnimations(animations);
 	}
 
 	void processMesh(GMModelReader_Assimp* imp, aiMesh* mesh, const aiScene* scene, GMModel* model, GMModels* models)
@@ -182,6 +246,12 @@ namespace
 			processBones(imp, mesh, model, models);
 		}
 
+		// animations
+		if (scene->HasAnimations())
+		{
+			processAnimation(imp, scene, model, models);
+		}
+
 		// materials
 		if (scene->mMaterials)
 		{
@@ -220,16 +290,14 @@ bool GMModelReader_Assimp::load(const GMModelLoadSettings& settings, GMBuffer& b
 	d->settings = settings;
 
 	Assimp::Importer imp;
-	GMuint32 flag = aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_SortByPType | aiProcess_JoinIdenticalVertices;
-	if (settings.flipTexcoords)
-		flag |= aiProcess_FlipUVs;
+	GMuint32 flag = aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_SortByPType | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs;
 
-	const std::string fileName = GMPath::filename(settings.filename).toStdString();
+	const std::string fileName = GMPath::filename(d->settings.filename).toStdString();
 	const aiScene* scene = imp.ReadFileFromMemory(
 		buffer.buffer, 
 		buffer.size, 
 		flag,
-		new GamePackageIOSystem(settings, (const uint8_t*)buffer.buffer, buffer.size),
+		new GamePackageIOSystem(d->settings, (const uint8_t*)buffer.buffer, buffer.size),
 		fileName.c_str()
 	);
 

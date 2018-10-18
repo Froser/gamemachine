@@ -50,7 +50,6 @@ void Demo_Model::init()
 	gm::GMGamePackage& pk = *GM.getGamePackageManager();
 	gm::GMModelLoadSettings loadSettings(
 		"cat/cat.obj",
-		"cat",
 		getDemoWorldReference()->getContext()
 	);
 

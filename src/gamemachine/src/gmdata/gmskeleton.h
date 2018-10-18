@@ -107,5 +107,78 @@ public:
 	void interpolateSkeletons(GMint32 frame0, GMint32 frame1, GMfloat p);
 };
 
+
+//////////////////////////////////////////////////////////////////////////
+template <typename T>
+struct GMSkeletonAnimationKeyframe
+{
+	GMSkeletonAnimationKeyframe(GMDuration t, T&& v)
+		: time(t)
+		, value(v)
+	{
+	}
+
+	GMDuration time;
+	T value;
+};
+
+GM_ALIGNED_STRUCT(GMSkeletalAnimationJoint)
+{
+	GMString name;
+	AlignedVector<GMSkeletonAnimationKeyframe<GMVec3>> positions;
+	AlignedVector<GMSkeletonAnimationKeyframe<GMVec3>> scalings;
+	AlignedVector<GMSkeletonAnimationKeyframe<GMQuat>> rotations;
+};
+
+GM_ALIGNED_STRUCT(GMSkeletalAnimation)
+{
+	GMfloat frameRate = 25;
+	GMDuration duration;
+	AlignedVector<GMSkeletalAnimationJoint> joints;
+};
+
+GM_PRIVATE_OBJECT(GMSkeletalAnimations)
+{
+	AlignedVector<GMSkeletalAnimation> animations;
+};
+
+GM_ALIGNED_16(class) GMSkeletalAnimations
+{
+	GM_DECLARE_PRIVATE_NGO(GMSkeletalAnimations)
+	GM_DECLARE_ALIGNED_ALLOCATOR()
+	GM_DECLARE_PROPERTY(Animations, animations, AlignedVector<GMSkeletalAnimation>)
+
+public:
+	inline GMSkeletalAnimation* getAnimation(GMsize_t index) GM_NOEXCEPT
+	{
+		D(d);
+		return &d->animations[index];
+	}
+
+	inline GMsize_t getAnimationCount()
+	{
+		D(d);
+		return d->animations.size();
+	}
+};
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMSkeletalAnimationEvaluator)
+{
+	GMSkeletalAnimation* animation = nullptr;
+	GMDuration animationTime = 0;
+	GMMat4 transform = Identity<GMMat4>();
+};
+
+class GMSkeletalAnimationEvaluator
+{
+	GM_DECLARE_PRIVATE_NGO(GMSkeletalAnimationEvaluator)
+
+public:
+	GMSkeletalAnimationEvaluator(GMSkeletalAnimation* animation);
+
+public:
+	void update(GMDuration dt);
+};
+
 END_NS
 #endif
