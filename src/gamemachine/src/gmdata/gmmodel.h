@@ -419,7 +419,7 @@ public:
 	  \param topologyMode 网格拓扑模式。
 	*/
 	void calculateTangentSpace(GMTopologyMode topologyMode);
-	bool calculateNormals(GMTopologyMode topologyMode, GMS_FrontFace frontFace);
+	bool calculateNormals(GMModelDrawMode drawMode, GMTopologyMode topologyMode, GMS_FrontFace frontFace);
 	void clear();
 	void vertex(const GMVertex& vertex);
 	void index(GMuint32 index);

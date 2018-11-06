@@ -328,11 +328,11 @@ void GMPart::calculateTangentSpace(GMTopologyMode topologyMode)
 	}
 }
 
-bool GMPart::calculateNormals(GMTopologyMode topologyMode, GMS_FrontFace frontFace)
+bool GMPart::calculateNormals(GMModelDrawMode drawMode, GMTopologyMode topologyMode, GMS_FrontFace frontFace)
 {
 	D(d);
 	// 一定要是顶点模式，而不是索引模式，不然算出来的法向量没有意义
-	if (topologyMode == GMTopologyMode::Triangles)
+	if (topologyMode == GMTopologyMode::Triangles && drawMode == GMModelDrawMode::Vertex)
 	{
 		// 顶点成三角形拓扑，每个面的法线为它们的Cross Production
 		for (GMsize_t i = 0; i < d->vertices.size(); i += 3)

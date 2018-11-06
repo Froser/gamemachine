@@ -70,8 +70,8 @@ public:
 	};
 
 public:
-	static bool load(const GMModelLoadSettings& settings, REF GMAsset& asset);
-	static bool load(const GMModelLoadSettings& settings, EngineType type, REF GMAsset& asset);
+	static bool load(const GMModelLoadSettings& settings, REF GMSceneAsset& asset);
+	static bool load(const GMModelLoadSettings& settings, EngineType type, REF GMSceneAsset& asset);
 	static IModelReader* getReader(EngineType type);
 
 private:

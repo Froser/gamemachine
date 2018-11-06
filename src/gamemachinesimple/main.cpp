@@ -147,14 +147,9 @@ public:
 			m_world->getContext()
 		);
 
-		GMAsset model;
-		bool b = GMModelReader::load(loadSettings, model);						// 从文件读取模型，创建一个渲染模型
+		GMAsset scene;
+		bool b = GMModelReader::load(loadSettings, scene);						// 从文件读取模型，创建一个渲染模型
 		GM_ASSERT(b);
-		GMModelAsset m = model.getModels()->getModels().front();
-		for (auto& mesh : m.getModel()->getMeshes())
-		{
-			mesh->calculateNormals(m.getModel()->getPrimitiveTopologyMode(), m.getModel()->getShader().getFrontFace()); // teddy.obj是没有法线数据的，需要计算
-		}
 
 		/************************************************************************/
 		/* 创建物理形状。由于这次是先有渲染模型，因此可以根据渲染模型生成物理模型。    */
@@ -168,7 +163,7 @@ public:
 			GMVec3(244.f / 256.f ,194.f / 256.f, 13.f / 256.f),
 		};
 
-		GMPhysicsShapeHelper::createConvexShapeFromTriangleModel(model, modelShape, false, s_modelScaling);
+		GMPhysicsShapeHelper::createConvexShapeFromTriangleModel(scene, modelShape, false, s_modelScaling);
 		GMAsset teddyAsset = m_world->getAssets().addAsset(modelShape);
 
 		for (GMint32 i = 0; i < 2; ++i) // 创建2个对象，一个在上，一个在下
@@ -182,7 +177,7 @@ public:
 			gameObject->setPhysicsObject(rigidBoxObj);
 			rigidBoxObj->setShape(teddyAsset);
 
-			GMModelAsset m = model.getModels()->getModels().front();
+			GMModelAsset m = scene.getScene()->getModels().front();
 			GMModel* duplicateModel = new GMModel(m); // 这里用到的是m所指向的渲染模型，m只创建了一次，因此避免了反复创建模型。
 			duplicateModel->getShader().getMaterial().ka = s_colors[i % GM_array_size(s_colors)];
 			duplicateModel->getShader().getMaterial().kd = GMVec3(.1f);

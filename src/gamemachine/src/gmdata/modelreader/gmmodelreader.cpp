@@ -48,12 +48,12 @@ GMModelReader::EngineType GMModelReader::test(const GMModelLoadSettings& setting
 	return ModelType_End;
 }
 
-bool GMModelReader::load(const GMModelLoadSettings& settings, REF GMAsset& asset)
+bool GMModelReader::load(const GMModelLoadSettings& settings, REF GMSceneAsset& asset)
 {
 	return load(settings, Auto, asset);
 }
 
-bool GMModelReader::load(const GMModelLoadSettings& settings, EngineType type, REF GMAsset& asset)
+bool GMModelReader::load(const GMModelLoadSettings& settings, EngineType type, REF GMSceneAsset& asset)
 {
 	GMModelLoadSettings settingsCache = settings;
 	settingsCache.directory = settings.directory.isEmpty() ? GMPath::directoryName(settings.filename) : settings.directory;
