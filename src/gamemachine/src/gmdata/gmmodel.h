@@ -27,6 +27,8 @@ struct GMVertex
 		TangentDimension = NormalDimension,
 		BitangentDimension = NormalDimension,
 		ColorDimension = 4,
+		BoneIDsDimension = 4,
+		WeightsDimension = 4,
 	};
 
 	Array<GMfloat, PositionDimension> positions;
@@ -36,6 +38,8 @@ struct GMVertex
 	Array<GMfloat, BitangentDimension> bitangents;
 	Array<GMfloat, LightmapDimension> lightmaps;
 	Array<GMfloat, ColorDimension> color;
+	Array<GMint32, BoneIDsDimension> boneIds;
+	Array<GMfloat, WeightsDimension> weights;
 };
 
 typedef Vector<GMPart*> GMParts;
@@ -212,6 +216,8 @@ enum class GMVertexDataType
 	Bitangent,
 	Lightmap,
 	Color,
+	BoneIds,
+	Weights,
 
 	// ---
 	EndOfVertexDataType
@@ -331,12 +337,14 @@ GM_PRIVATE_OBJECT(GMScene)
 	Vector<GMAsset> models;
 	GMOwnedPtr<GMSkeletalAnimations> animations;
 	GMOwnedPtr<GMSkeletalNode> skeletalRoot;
+	AlignedVector<GMMat4> boneTransformations;
 };
 
 class GMScene : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMScene)
 	GM_DECLARE_PROPERTY(Models, models)
+	GM_DECLARE_PROPERTY(BoneTransformations, boneTransformations)
 
 public:
 	static GMSceneAsset createSceneFromSingleModel(GMModelAsset modelAsset);

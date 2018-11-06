@@ -161,12 +161,13 @@ void GMGameObject::endUpdateTransform()
 
 void GMGameObject::drawModel(const IRenderContext* context, GMModel* model)
 {
+	D(d);
 	IGraphicEngine* engine = context->getEngine();
 	if (model->getShader().getDiscard())
 		return;
 
 	ITechnique* technique = engine->getTechnique(model->getType());
-	technique->beginModel(model, this);
+	technique->beginModel(getScene(), model, this);
 	technique->draw(model);
 	technique->endModel();
 }

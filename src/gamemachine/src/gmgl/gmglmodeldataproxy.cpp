@@ -59,6 +59,8 @@ void GMGLModelDataProxy::transfer()
 	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Bitangent),	GMVertex::BitangentDimension,	GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(11));
 	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Lightmap),	GMVertex::LightmapDimension,	GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(14));
 	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Color),		GMVertex::ColorDimension,		GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(16));
+	glVertexAttribIPointer(gmVertexIndex(GMVertexDataType::BoneIds),	GMVertex::BoneIDsDimension,		GL_INT,				sizeof(GMVertex), FLOAT_OFFSET(20));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Weights),		GMVertex::WeightsDimension,		GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(24));
 
 	GM_FOREACH_ENUM_CLASS(type, GMVertexDataType::Position, GMVertexDataType::EndOfVertexDataType)
 	{

@@ -58,7 +58,7 @@ public:
 	~GMDx11Technique() = default;
 
 public:
-	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
+	virtual void beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent) override;
 	virtual void endModel() override;
 	virtual void draw(GMModel* model) override;
 	virtual const char* getTechniqueName() = 0;
@@ -187,7 +187,7 @@ private:
 		return "GMTech_Filter";
 	}
 
-	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
+	virtual void beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent) override;
 	virtual void draw(GMModel* model) override;
 	virtual void passAllAndDraw(GMModel* model) override;
 
@@ -237,7 +237,7 @@ protected:
 		return "GMTech_3D_Shadow";
 	}
 
-	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
+	virtual void beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent) override;
 };
 
 class GMDx11Technique_Particle : public GMDx11Technique

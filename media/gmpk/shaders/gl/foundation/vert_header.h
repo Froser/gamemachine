@@ -6,6 +6,8 @@ layout (location = 3) in vec3 gm_tangent;
 layout (location = 4) in vec3 gm_bitangent;
 layout (location = 5) in vec2 lightmapuv;
 layout (location = 6) in vec4 color;
+layout (location = 7) in ivec4 boneIDs;
+layout (location = 8) in vec4 weights;
 
 out vec4 _position;
 out vec4 _normal;

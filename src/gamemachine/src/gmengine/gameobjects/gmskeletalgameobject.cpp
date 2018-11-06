@@ -10,7 +10,6 @@ namespace
 	GMsize_t findIndex(GMDuration animationTime, const AlignedVector<GMSkeletonAnimationKeyframe<T>>& frames)
 	{
 		GM_ASSERT(frames.size() > 0);
-		//for (auto& frame : frames)
 		for (GMsize_t i = 0; i < frames.size() - 1; ++i)
 		{
 			const GMSkeletonAnimationKeyframe<T>& frame = frames[i + 1];
@@ -187,17 +186,18 @@ void GMSkeletalGameObject::update(GMDuration dt)
 
 					evaluator->setAnimation(animations->getAnimation(d->animationIndex));
 					evaluator->update(dt);
-					updateModel(model.getModel(), evaluator);
+					updateModel(scene, evaluator);
 				}
 			}
 		}
 	}
 }
 
-void GMSkeletalGameObject::updateModel(GMModel* model, GMSkeletalAnimationEvaluator* evaluator)
+void GMSkeletalGameObject::updateModel(GMScene* scene, GMSkeletalAnimationEvaluator* evaluator)
 {
-	const auto& transforms = evaluator->getTransforms();
-
+	auto& transforms = evaluator->getTransforms();
+	scene->getBoneTransformations().swap(transforms);
+	/*
 	// 遍历所有的顶点，找到其对应的骨骼，并乘以它的权重
 	// TODO: 这一步可以在GPU运行，不过先在CPU运行
 	if (model->getUsageHint() == GMUsageHint::StaticDraw)
@@ -250,6 +250,7 @@ void GMSkeletalGameObject::updateModel(GMModel* model, GMSkeletalAnimationEvalua
 
 		modelDataProxy->endUpdateBuffer();
 	}
+	*/
 }
 
 void GMSkeletalGameObject::draw()

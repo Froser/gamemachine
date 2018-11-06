@@ -31,6 +31,7 @@ class GMCamera;
 class GMGameObject;
 class GMGamePackage;
 class GMImage;
+class GMScene;
 class GMModel;
 class GMGamePackage;
 class GMGlyphManager;
@@ -547,7 +548,7 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 
 GM_INTERFACE(ITechnique)
 {
-	virtual void beginModel(GMModel* model, const GMGameObject* parent) = 0;
+	virtual void beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent) = 0;
 	virtual void endModel() = 0;
 	virtual void draw(GMModel* model) = 0;
 };

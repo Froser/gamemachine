@@ -199,7 +199,7 @@ void GMGLTechnique::draw(GMModel* model)
 	GMGLEndGetErrorsAndCheck();
 }
 
-void GMGLTechnique::beginModel(GMModel* model, const GMGameObject* parent)
+void GMGLTechnique::beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent)
 {
 	D(d);
 	d->currentModel = model;
@@ -493,9 +493,9 @@ void GMGLTechnique::prepareDebug(GMModel* model)
 }
 
 //////////////////////////////////////////////////////////////////////////
-void GMGLTechnique_3D::beginModel(GMModel* model, const GMGameObject* parent)
+void GMGLTechnique_3D::beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent)
 {
-	Base::beginModel(model, parent);
+	Base::beginModel(scene, model, parent);
 
 	D(d);
 	D_BASE(db, GMGLTechnique);
@@ -660,9 +660,9 @@ void GMGLTechnique_2D::beforeDraw(GMModel* model)
 }
 
 //////////////////////////////////////////////////////////////////////////
-void GMGLTechnique_CubeMap::beginModel(GMModel* model, const GMGameObject* parent)
+void GMGLTechnique_CubeMap::beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent)
 {
-	Base::beginModel(model, parent);
+	Base::beginModel(scene, model, parent);
 	IShaderProgram* shaderProgram = getShaderProgram();
 	updateCameraMatrices(shaderProgram);
 	shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));
@@ -709,9 +709,9 @@ void GMGLTechnique_Filter::afterDraw(GMModel* model)
 {
 }
 
-void GMGLTechnique_Filter::beginModel(GMModel* model, const GMGameObject* parent)
+void GMGLTechnique_Filter::beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent)
 {
-	Base::beginModel(model, parent);
+	Base::beginModel(scene, model, parent);
 
 	D(d);
 	D_BASE(db, Base);
@@ -764,9 +764,9 @@ IShaderProgram* GMGLTechnique_LightPass::getShaderProgram()
 	return db->engine->getShaderProgram(GMShaderProgramType::DeferredLightPassShaderProgram);
 }
 
-void GMGLTechnique_LightPass::beginModel(GMModel* model, const GMGameObject* parent)
+void GMGLTechnique_LightPass::beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent)
 {
-	GMGLTechnique::beginModel(model, parent);
+	GMGLTechnique::beginModel(scene, model, parent);
 
 	D_BASE(d, GMGLTechnique);
 	IShaderProgram* shaderProgram = getShaderProgram();
@@ -817,9 +817,9 @@ void GMGLTechnique_LightPass::beforeDraw(GMModel* model)
 	}
 }
 
-void GMGLTechnique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* parent)
+void GMGLTechnique_3D_Shadow::beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent)
 {
-	GMGLTechnique_3D::beginModel(model, parent);
+	GMGLTechnique_3D::beginModel(scene, model, parent);
 
 	D_BASE(d, Base);
 	IShaderProgram* shaderProgram = getShaderProgram();

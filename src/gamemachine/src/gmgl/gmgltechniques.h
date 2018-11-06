@@ -40,7 +40,7 @@ public:
 protected:
 	virtual void beforeDraw(GMModel* model) = 0;
 	virtual void afterDraw(GMModel* model) = 0;
-	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
+	virtual void beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent) override;
 	virtual void endModel() override;
 
 protected:
@@ -80,7 +80,7 @@ public:
 	using GMGLTechnique::GMGLTechnique;
 
 public:
-	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
+	virtual void beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent) override;
 	virtual void beforeDraw(GMModel* model) override;
 	virtual void afterDraw(GMModel* model) override;
 	virtual IShaderProgram* getShaderProgram() override;
@@ -108,7 +108,7 @@ public:
 	using GMGLTechnique_3D::GMGLTechnique_3D;
 
 public:
-	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
+	virtual void beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent) override;
 	virtual void beforeDraw(GMModel* model) override;
 	virtual void afterDraw(GMModel* model) override;
 };
@@ -133,7 +133,7 @@ public:
 private:
 	virtual void beforeDraw(GMModel* model) override;
 	virtual void afterDraw(GMModel* model) override;
-	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
+	virtual void beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent) override;
 	virtual IShaderProgram* getShaderProgram() override;
 
 protected:
@@ -152,7 +152,7 @@ protected:
 	virtual IShaderProgram* getShaderProgram() override;
 	virtual void beforeDraw(GMModel* model) override;
 	virtual void afterDraw(GMModel* model) override;
-	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
+	virtual void beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent) override;
 };
 
 class GMGLTechnique_3D_Shadow : public GMGLTechnique_3D
@@ -161,7 +161,7 @@ public:
 	using GMGLTechnique_3D::GMGLTechnique_3D;
 
 protected:
-	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
+	virtual void beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent) override;
 };
 
 class GMGLTechnique_Particle : public GMGLTechnique_2D
