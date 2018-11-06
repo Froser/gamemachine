@@ -5,7 +5,7 @@ BEGIN_NS
 
 struct ITexture;
 class GMModel;
-class GMModels;
+class GMScene;
 class GMPhysicsShape;
 
 // 默认的一些资产路径
@@ -22,7 +22,7 @@ enum class GMAssetType
 	Invalid, //!< 无类型，绝对不会用到
 	Texture, //!< 纹理贴图类型
 	Model, //!< 模型类型
-	Models, //!< 一组模型类型
+	Scene, //!< 一个模型场景，可能包含动画
 	PhysicsShape, //!< 物理形状类型
 };
 
@@ -50,7 +50,7 @@ class GMAsset
 public:
 	GM_DECLARE_ASSET_GETTER(ITexture*, getTexture);
 	GM_DECLARE_ASSET_GETTER(GMModel*, getModel);
-	GM_DECLARE_ASSET_GETTER(GMModels*, getModels);
+	GM_DECLARE_ASSET_GETTER(GMScene*, getModels);
 	GM_DECLARE_ASSET_GETTER(GMPhysicsShape*, getPhysicsShape);
 
 public:

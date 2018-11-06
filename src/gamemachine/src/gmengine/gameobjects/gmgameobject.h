@@ -33,7 +33,7 @@ public:
 
 public:
 	void setAsset(GMModelsAsset asset);
-	GMModels* getModels();
+	GMScene* getScene();
 	GMModel* getModel();
 	void setWorld(GMGameWorld* world);
 	GMGameWorld* getWorld();

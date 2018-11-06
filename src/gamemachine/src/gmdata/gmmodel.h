@@ -326,21 +326,21 @@ public:
 	inline auto& name() { D(d); return d->name; }
 
 
-GM_PRIVATE_OBJECT(GMModels)
+GM_PRIVATE_OBJECT(GMScene)
 {
 	Vector<GMAsset> models;
 	GMOwnedPtr<GMSkeletalAnimations> animations;
 	GMOwnedPtr<GMSkeletalNode> skeletalRoot;
 };
 
-class GMModels : public GMObject
+class GMScene : public GMObject
 {
-	GM_DECLARE_PRIVATE(GMModels)
+	GM_DECLARE_PRIVATE(GMScene)
 	GM_DECLARE_PROPERTY(Models, models)
 
 public:
 	void push_back(GMModelAsset model);
-	void swap(GMModels* models);
+	void swap(GMScene* scene);
 
 public:
 	inline bool isEmpty() GM_NOEXCEPT
@@ -367,6 +367,12 @@ public:
 		d->skeletalRoot.reset(root);
 	}
 
+	bool hasAnimation() GM_NOEXCEPT
+	{
+		D(d);
+		return !!d->animations;
+	}
+
 	GMSkeletalNode* getRootNode()
 	{
 		D(d);
@@ -389,7 +395,7 @@ GM_PRIVATE_OBJECT(GMPart)
 	GMIndices indices;
 };
 
-//! 表示一份网格数据。
+//! 表示模型中的一部分数据。
 /*!
   网格数据可能仅仅是模型中的一段数据。
 */

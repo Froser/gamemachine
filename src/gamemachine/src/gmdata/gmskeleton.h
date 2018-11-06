@@ -173,35 +173,5 @@ public:
 	}
 };
 
-GM_PRIVATE_OBJECT(GMSkeletalAnimationEvaluator)
-{
-	const GMSkeletalAnimation* animation = nullptr;
-	GMDuration duration = 0;
-	AlignedVector<GMMat4> transforms;
-	GMSkeleton* skeleton = nullptr;
-	GMSkeletalNode* rootNode = nullptr;
-	GMMat4 globalInverseTransform;
-};
-
-class GMSkeletalAnimationEvaluator
-{
-	GM_DECLARE_PRIVATE_NGO(GMSkeletalAnimationEvaluator)
-	GM_DECLARE_ALIGNED_ALLOCATOR()
-	GM_DECLARE_PROPERTY(Skeleton, skeleton)
-	GM_DECLARE_PROPERTY(RootNode, rootNode)
-	GM_DECLARE_PROPERTY(Animation, animation)
-	GM_DECLARE_GETTER(Transforms, transforms)
-
-public:
-	GMSkeletalAnimationEvaluator(GMSkeletalNode* root, GMSkeleton* skeleton);
-
-public:
-	void update(GMDuration dt);
-
-private:
-	void updateNode(GMfloat animationTime, GMSkeletalNode* node, const GMMat4& parentTransformation);
-	const GMSkeletalAnimationNode* findAnimationNode(const GMString& name);
-};
-
 END_NS
 #endif

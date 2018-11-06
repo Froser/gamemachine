@@ -21,7 +21,7 @@ void GMGameObject::setAsset(GMAsset asset)
 	d->asset = asset;
 }
 
-GMModels* GMGameObject::getModels()
+GMScene* GMGameObject::getScene()
 {
 	D(d);
 	return d->asset.getModels();
@@ -55,10 +55,10 @@ void GMGameObject::setPhysicsObject(AUTORELEASE GMPhysicsObject* phyObj)
 
 void GMGameObject::foreach(std::function<void(GMModel*)> cb)
 {
-	GMModels* models = getModels();
-	if (models)
+	GMScene* scene = getScene();
+	if (scene)
 	{
-		for (auto& model : models->getModels())
+		for (auto& model : scene->getModels())
 		{
 			cb(model.getModel());
 		}
@@ -80,10 +80,10 @@ void GMGameObject::draw()
 bool GMGameObject::canDeferredRendering()
 {
 	D(d);
-	GMModels* models = getModels();
-	if (models)
+	GMScene* scene = getScene();
+	if (scene)
 	{
-		for (decltype(auto) model : models->getModels())
+		for (decltype(auto) model : scene->getModels())
 		{
 			if (model.getModel()->getShader().getBlend() == true)
 				return false;

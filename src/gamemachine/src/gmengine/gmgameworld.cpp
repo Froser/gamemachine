@@ -10,10 +10,10 @@ namespace
 {
 	bool needBlend(GMGameObject* object)
 	{
-		GMModels* models = object->getModels();
-		if (models)
+		GMScene* scene = object->getScene();
+		if (scene)
 		{
-			for (auto& model : models->getModels())
+			for (auto& model : scene->getModels())
 			{
 				if (model.getModel()->getShader().getBlend())
 					return true;

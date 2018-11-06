@@ -209,14 +209,14 @@ bool GMPhysicsShapeHelper::createConvexShapeFromTriangleModel(
 	if (model.isEmpty())
 		return false;
 
-	GMModels* models = model.getModels();
-	if (!models)
+	GMScene* scene = model.getModels();
+	if (!scene)
 	{
 		gm_warning(gm_dbg_wrap("not a valid models asset."));
 		return false;
 	}
 
-	auto& vecModels = models->getModels();
+	auto& vecModels = scene->getModels();
 	btCollisionShape* btShape = nullptr;
 	if (vecModels.size() == 0)
 	{

@@ -5,7 +5,7 @@
 
 GM_DEFINE_ASSET_GETTER(ITexture*, getTexture, GMAssetType::Texture);
 GM_DEFINE_ASSET_GETTER(GMModel*, getModel, GMAssetType::Model);
-GM_DEFINE_ASSET_GETTER(GMModels*, getModels, GMAssetType::Models);
+GM_DEFINE_ASSET_GETTER(GMScene*, getModels, GMAssetType::Scene);
 GM_DEFINE_ASSET_GETTER(GMPhysicsShape*, getPhysicsShape, GMAssetType::PhysicsShape);
 
 GMAsset::GMAsset()
@@ -106,7 +106,7 @@ void GMAsset::removeData()
 	case GMAssetType::Model:
 		GM_delete(getModel());
 		break;
-	case GMAssetType::Models:
+	case GMAssetType::Scene:
 		GM_delete(getModels());
 		break;
 	case GMAssetType::PhysicsShape:

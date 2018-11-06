@@ -201,9 +201,9 @@ namespace
 		return sn;
 	}
 
-	void processAnimation(GMModelReader_Assimp* imp, const aiScene* scene, GMModels* models)
+	void processAnimation(GMModelReader_Assimp* imp, const aiScene* scene, GMScene* s)
 	{
-		for (auto modelAsset : models->getModels())
+		for (auto modelAsset : s->getModels())
 		{
 			GM_ASSERT(modelAsset.getModel());
 			modelAsset.getModel()->setUsageHint(GMUsageHint::DynamicDraw);
@@ -247,7 +247,7 @@ namespace
 			animations->getAnimations().push_back(std::move(ani));
 		}
 
-		models->setAnimations(animations);
+		s->setAnimations(animations);
 	}
 
 	void processMesh(GMModelReader_Assimp* imp, aiMesh* part, const aiScene* scene, GMModel* model)
@@ -307,7 +307,7 @@ namespace
 		}
 	}
 
-	void processMeshes(GMModelReader_Assimp* imp, const aiScene* scene, GMModels* models)
+	void processMeshes(GMModelReader_Assimp* imp, const aiScene* scene, GMScene* s)
 	{
 		for (auto i = 0u; i < scene->mNumMeshes; i++)
 		{
@@ -321,35 +321,9 @@ namespace
 			if (part->HasBones())
 				processBones(imp, part, model);
 
-			models->push_back(GMAsset(GMAssetType::Model, model));
+			s->push_back(GMAsset(GMAssetType::Model, model));
 		}
 	}
-
-	/*
-	void processNode(GMModelReader_Assimp* imp, aiNode* node, const aiScene* scene, GMModels* models)
-	{
-		for (auto i = 0u; i < node->mNumMeshes; i++)
-		{
-			aiMesh* part = scene->mMeshes[node->mMeshes[i]];
-			GMModel* model = new GMModel();
-
-			// part
-			processMesh(imp, part, scene, model);
-
-			// bones
-			if (part->HasBones())
-				processBones(imp, part, model, models);
-
-			models->push_back(GMAsset(GMAssetType::Model, model));
-		}
-
-		// 接下来对它的子节点重复这一过程
-		for (auto i = 0u; i < node->mNumChildren; i++)
-		{
-			::processNode(imp, node->mChildren[i], scene, models);
-		}
-	}
-	*/
 }
 
 bool GMModelReader_Assimp::load(const GMModelLoadSettings& settings, GMBuffer& buffer, REF GMAsset& asset)
@@ -359,7 +333,7 @@ bool GMModelReader_Assimp::load(const GMModelLoadSettings& settings, GMBuffer& b
 	d->settings = settings;
 
 	Assimp::Importer imp;
-	GMuint32 flag = aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_SortByPType | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs;
+	GMuint32 flag = aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs;
 
 	const std::string fileName = GMPath::filename(d->settings.filename).toStdString();
 	const aiScene* scene = imp.ReadFileFromMemory(
@@ -376,20 +350,20 @@ bool GMModelReader_Assimp::load(const GMModelLoadSettings& settings, GMBuffer& b
 		return false;
 	}
 
-	GMModels* models = new GMModels();
+	GMScene* s = new GMScene();
 	if (scene->HasAnimations())
 	{
-		models->setRootNode(createNodeTree(scene->mRootNode, nullptr));
+		s->setRootNode(createNodeTree(scene->mRootNode, nullptr));
 	}
 
 	// nodes
-	processMeshes(this, scene, models);
+	processMeshes(this, scene, s);
 
 	// animations
 	if (scene->HasAnimations())
-		processAnimation(this, scene, models);
+		processAnimation(this, scene, s);
 
-	asset = GMAsset(GMAssetType::Models, models);
+	asset = GMAsset(GMAssetType::Scene, s);
 
 	return true;
 }

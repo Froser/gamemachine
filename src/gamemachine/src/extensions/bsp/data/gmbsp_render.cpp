@@ -324,16 +324,16 @@ void GMBSPRender::createObject(const GMBSP_Render_Face& face, const GMShader& sh
 	*obj = model;
 }
 
-void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const GMShader& shader, OUT GMModels** obj)
+void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const GMShader& shader, OUT GMScene** obj)
 {
-	GMModels* models = new GMModels();
+	GMScene* scene = new GMScene();
 	GMint32 numVertices = 2 * (biqp.tesselation + 1);
 
 	GMFloat4 f4_position, f4_normal;
 	for (GMint32 row = 0; row < biqp.tesselation; ++row)
 	{
 		GMModel* model = new GMModel();
-		models->push_back(GMAsset(GMAssetType::Model, model));
+		scene->push_back(GMAsset(GMAssetType::Model, model));
 		model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
 		model->setShader(shader);
 		GMPart* part = new GMPart(model);
@@ -371,7 +371,7 @@ void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const 
 			part->vertex(v);
 		}
 	}
-	*obj = models;
+	*obj = scene;
 }
 
 void GMBSPRender::createBox(const GMVec3& extents, const GMVec3& position, const GMShader& shader, OUT GMModel** obj)

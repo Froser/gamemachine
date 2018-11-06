@@ -468,9 +468,9 @@ void GMBSPGameWorld::preparePatch(GMint32 patchNumber, GMint32 drawSurfaceIndex)
 		GMBSP_Render_BiquadraticPatch& biqp = rd.patches[patchNumber].quadraticPatches[i];
 		GM_ASSERT(rd.biquadraticPatchObjects.find(&biqp) == rd.biquadraticPatchObjects.end());
 
-		GMModels* models = nullptr;
-		d->render.createObject(biqp, shader, &models);
-		GMAsset asset = getAssets().addAsset(GMAsset(GMAssetType::Models, models));
+		GMScene* scene = nullptr;
+		d->render.createObject(biqp, shader, &scene);
+		GMAsset asset = getAssets().addAsset(GMAsset(GMAssetType::Scene, scene));
 		GMGameObject* obj = new GMGameObject(asset);
 		rd.biquadraticPatchObjects[&biqp] = obj;
 		addObjectAndInit(obj);
