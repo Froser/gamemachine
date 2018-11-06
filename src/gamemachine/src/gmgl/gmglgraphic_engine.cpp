@@ -196,7 +196,7 @@ ITechnique* GMGLGraphicEngine::getTechnique(GMModelType objectType)
 	case GMModelType::Particle:
 		return newTechnique<GMGLTechnique_Particle>(d->technique_particle, db->context);
 	case GMModelType::Custom:
-		return newTechnique<GMGLTechnique_Custom>(d->technique_particle, db->context);
+		return newTechnique<GMGLTechnique_Custom>(d->technique_custom, db->context);
 	default:
 		GM_ASSERT(false);
 		return nullptr;
