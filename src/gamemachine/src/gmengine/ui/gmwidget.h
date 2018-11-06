@@ -364,17 +364,17 @@ GM_PRIVATE_OBJECT(GMWidget)
 class GMWidget : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMWidget)
-	GM_DECLARE_PROPERTY(Minimum, minimized, bool)
-	GM_DECLARE_PROPERTY(Visible, visible, bool)
-	GM_DECLARE_PROPERTY_WITH_CALLBACK(Overflow, overflow, GMOverflowStyle, noop(), updateVerticalScrollbar())
-	GM_DECLARE_PROPERTY_WITH_CALLBACK(ContentPaddingLeft, contentPaddingLeft, GMint32, noop(), updateVerticalScrollbar())
-	GM_DECLARE_PROPERTY_WITH_CALLBACK(ContentPaddingTop, contentPaddingTop, GMint32, noop(), updateVerticalScrollbar())
-	GM_DECLARE_PROPERTY_WITH_CALLBACK(ContentPaddingRight, contentPaddingRight, GMint32, noop(), updateVerticalScrollbar())
-	GM_DECLARE_PROPERTY_WITH_CALLBACK(ContentPaddingBottom, contentPaddingBottom, GMint32, noop(), updateVerticalScrollbar())
-	GM_DECLARE_PROPERTY(ScrollStep, scrollStep, GMint32)
-	GM_DECLARE_PROPERTY(ScrollOffsetY, scrollOffsetY, GMint32)
-	GM_DECLARE_PROPERTY(VerticalScrollbarWidth, verticalScrollbarWidth, GMint32)
-	GM_DECLARE_PROPERTY(ScrollbarThumbCorner, scrollbarThumbCorner, GMRect)
+	GM_DECLARE_PROPERTY(Minimum, minimized)
+	GM_DECLARE_PROPERTY(Visible, visible)
+	GM_DECLARE_PROPERTY_WITH_CALLBACK(Overflow, overflow, noop(), updateVerticalScrollbar())
+	GM_DECLARE_PROPERTY_WITH_CALLBACK(ContentPaddingLeft, contentPaddingLeft, noop(), updateVerticalScrollbar())
+	GM_DECLARE_PROPERTY_WITH_CALLBACK(ContentPaddingTop, contentPaddingTop, noop(), updateVerticalScrollbar())
+	GM_DECLARE_PROPERTY_WITH_CALLBACK(ContentPaddingRight, contentPaddingRight, noop(), updateVerticalScrollbar())
+	GM_DECLARE_PROPERTY_WITH_CALLBACK(ContentPaddingBottom, contentPaddingBottom, noop(), updateVerticalScrollbar())
+	GM_DECLARE_PROPERTY(ScrollStep, scrollStep)
+	GM_DECLARE_PROPERTY(ScrollOffsetY, scrollOffsetY)
+	GM_DECLARE_PROPERTY(VerticalScrollbarWidth, verticalScrollbarWidth)
+	GM_DECLARE_PROPERTY(ScrollbarThumbCorner, scrollbarThumbCorner)
 
 public:
 	enum OverflowFlag

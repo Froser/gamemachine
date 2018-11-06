@@ -16,7 +16,7 @@ GM_PRIVATE_OBJECT(GMPhysicsShape)
 class GMPhysicsShape : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMPhysicsShape);
-	GM_DECLARE_PROPERTY(ModelCache, modelCache, GMModelAsset)
+	GM_DECLARE_PROPERTY(ModelCache, modelCache)
 
 	friend struct GMPhysicsShapeHelper;
 

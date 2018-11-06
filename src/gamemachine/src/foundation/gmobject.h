@@ -111,31 +111,31 @@ private:
 #define GM_PRIVATE_DESTRUCT(name) ~name##Private()
 #define GM_PRIVATE_OBJECT_UNALIGNED(name) class name; struct name##Private
 
-#define GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, accessor, callback) \
+#define GM_DECLARE_GETTER_ACCESSOR(name, memberName, accessor, callback) \
 	accessor: \
-	inline paramType& get##name() GM_NOEXCEPT { D(d); callback; return d-> memberName; } \
-	inline const paramType& get##name() const GM_NOEXCEPT { D(d); const_cast<std::remove_const_t<std::remove_pointer_t<decltype(this)>>*>(this)->callback; return d-> memberName; }
+	inline auto& get##name() GM_NOEXCEPT { D(d); callback; return d-> memberName; } \
+	inline const auto& get##name() const GM_NOEXCEPT { D(d); const_cast<std::remove_const_t<std::remove_pointer_t<decltype(this)>>*>(this)->callback; return d-> memberName; }
 
-#define GM_DECLARE_SETTER_ACCESSOR(name, memberName, paramType, accessor, callback) \
+#define GM_DECLARE_SETTER_ACCESSOR(name, memberName, accessor, callback) \
 	accessor: \
-	void set##name(const paramType & arg) { D(d); d-> memberName = arg; callback; }
+	template <typename T> void set##name(const T& arg) { D(d); d-> memberName = arg; callback; }
 
-#define GM_DECLARE_GETTER(name, memberName, paramType) GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, public, noop()) 
-#define GM_DECLARE_SETTER(name, memberName, paramType) GM_DECLARE_SETTER_ACCESSOR(name, memberName, paramType, public, noop()) 
-#define GM_DECLARE_GETTER_WITH_CALLBACK(name, memberName, paramType, cb) GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, public, cb)
-#define GM_DECLARE_SETTER_WITH_CALLBACK(name, memberName, paramType, cb) GM_DECLARE_SETTER_ACCESSOR(name, memberName, paramType, public, cb)
+#define GM_DECLARE_GETTER(name, memberName) GM_DECLARE_GETTER_ACCESSOR(name, memberName, public, noop()) 
+#define GM_DECLARE_SETTER(name, memberName) GM_DECLARE_SETTER_ACCESSOR(name, memberName, public, noop()) 
+#define GM_DECLARE_GETTER_WITH_CALLBACK(name, memberName, cb) GM_DECLARE_GETTER_ACCESSOR(name, memberName, public, cb)
+#define GM_DECLARE_SETTER_WITH_CALLBACK(name, memberName, cb) GM_DECLARE_SETTER_ACCESSOR(name, memberName, public, cb)
 
-#define GM_DECLARE_PROPERTY(name, memberName, paramType) \
-	GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, public, noop()) \
-	GM_DECLARE_SETTER_ACCESSOR(name, memberName, paramType, public, noop())
+#define GM_DECLARE_PROPERTY(name, memberName) \
+	GM_DECLARE_GETTER_ACCESSOR(name, memberName, public, noop()) \
+	GM_DECLARE_SETTER_ACCESSOR(name, memberName, public, noop())
 
-#define GM_DECLARE_PROPERTY_WITH_CALLBACK(name, memberName, paramType, getterCb, setterCb) \
-	GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, public, getterCb) \
-	GM_DECLARE_SETTER_ACCESSOR(name, memberName, paramType, public, setterCb)
+#define GM_DECLARE_PROPERTY_WITH_CALLBACK(name, memberName, getterCb, setterCb) \
+	GM_DECLARE_GETTER_ACCESSOR(name, memberName, public, getterCb) \
+	GM_DECLARE_SETTER_ACCESSOR(name, memberName, public, setterCb)
 
-#define GM_DECLARE_PROTECTED_PROPERTY(name, memberName, paramType) \
-	GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, protected, noop()) \
-	GM_DECLARE_SETTER_ACCESSOR(name, memberName, paramType, protected, noop())
+#define GM_DECLARE_PROTECTED_PROPERTY(name, memberName) \
+	GM_DECLARE_GETTER_ACCESSOR(name, memberName, protected, noop()) \
+	GM_DECLARE_SETTER_ACCESSOR(name, memberName, protected, noop())
 
 #define GM_DISABLE_COPY(clsName) public: clsName(const clsName&) = delete; clsName(clsName&&) GM_NOEXCEPT = delete;
 #define GM_DISABLE_ASSIGN(clsName) public: clsName& operator =(const clsName&) = delete; clsName& operator =(clsName&&) GM_NOEXCEPT = delete;

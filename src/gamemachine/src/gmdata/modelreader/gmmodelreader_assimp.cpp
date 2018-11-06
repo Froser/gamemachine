@@ -62,13 +62,27 @@ private:
 
 namespace
 {
-	GMSkeleton* getSkeleton(GMModel* model, GMModels* models)
+	// aiMatrix4x4转换函数
+	GMMat4 fromAiMatrix(const aiMatrix4x4& mat)
+	{
+		GMMat4 m;
+		GMFloat16 f16 = {
+			GMFloat4(mat.a1, mat.b1, mat.c1, mat.d1),
+			GMFloat4(mat.a2, mat.b2, mat.c2, mat.d2),
+			GMFloat4(mat.a3, mat.b3, mat.c3, mat.d3),
+			GMFloat4(mat.a4, mat.b4, mat.c4, mat.d4)
+		};
+		m.setFloat16(f16);
+		return m;
+	}
+
+	GMSkeleton* getSkeleton(GMModel* model)
 	{
 		GMSkeleton* skeleton = nullptr;
-		if (!(skeleton = models->getSkeleton()))
+		if (!(skeleton = model->getSkeleton()))
 		{
 			skeleton = new GMSkeleton();
-			models->setSkeleton(skeleton);
+			model->setSkeleton(skeleton);
 		}
 		return skeleton;
 	}
@@ -130,32 +144,71 @@ namespace
 		materialTextureGet(imp, material, aiTextureType_NORMALS, model, GMTextureType::NormalMap);
 	}
 
-	void processBones(GMModelReader_Assimp* imp, aiMesh* mesh, GMModel* model, GMModels* models)
+	void processBones(GMModelReader_Assimp* imp, aiMesh* part, GMModel* model)
 	{
-		GMSkeleton* skeleton = getSkeleton(model, models);
-		for (auto i = 0u; i < mesh->mNumBones; ++i)
-		{
-			aiBone* bone = mesh->mBones[i];
-			GMSkeletonMesh m;
-			m.targetModel = model;
-			m.numWeights = bone->mNumWeights;
-			m.weights.resize(m.numWeights);
+		GMSkeleton* skeleton = getSkeleton(model);
+		auto& bones = skeleton->getBones();
+		auto& boneMapping = bones.getBoneNameIndexMap();
+		auto& vertexBoneData = bones.getVertexData();
+		vertexBoneData.resize(part->mNumVertices);
+		bones.getBones().resize(part->mNumBones);
 
-			Vector<GMSkeletonWeight> weights;
-			weights.reserve(bone->mNumWeights);
-			for (auto j = 0u; j < bone->mNumWeights; ++j)
+		GMsize_t index = 0;
+		GMsize_t boneIndex = 0;
+		for (GMsize_t i = 0; i < part->mNumBones; ++i)
+		{
+			// 记录骨骼名字和其索引
+			GMString boneName = part->mBones[i]->mName.C_Str();
+			if (boneMapping.find(boneName) == boneMapping.end())
 			{
-				const aiVertexWeight& aiWeight = bone->mWeights[j];
-				m.weights[j].jointIndex = j;
-				m.weights[j].weightBias = aiWeight.mWeight;
+				// 这是一个新的骨骼
+				GMSkeletalBone& bone = bones.getBones()[index];
+				bone.name = boneName;
+				bone.targetModel = model;
+				bone.offsetMatrix = fromAiMatrix(part->mBones[i]->mOffsetMatrix);
+				boneIndex = boneMapping[boneName] = index;
+				++index;
+			}
+			else
+			{
+				boneIndex = index = boneMapping[boneName];
 			}
 
-			skeleton->getMeshes().push_back(std::move(m));
+			// 接下来，记录所有的weight
+			for (GMsize_t j = 0; j < part->mBones[i]->mNumWeights; ++j)
+			{
+				auto& weight = part->mBones[i]->mWeights[j];
+				GMsize_t vertexId = weight.mVertexId;
+				// 将每个顶点与Bones和Weight绑定
+				vertexBoneData[vertexId].addData(boneIndex, weight.mWeight);
+			}
 		}
 	}
 
-	void processAnimation(GMModelReader_Assimp* imp, const aiScene* scene, GMModel* model, GMModels* models)
+	GMSkeletalNode* createNodeTree(aiNode* node, GMSkeletalNode* parent)
 	{
+		GMSkeletalNode* sn = new GMSkeletalNode();
+		sn->setName(node->mName.C_Str());
+		sn->setParent(parent);
+		sn->setTransformToParent(fromAiMatrix(node->mTransformation));
+
+		for (auto i = 0u; i < node->mNumChildren; ++i)
+		{
+			GMSkeletalNode* childNode = createNodeTree(node->mChildren[i], sn);
+			sn->getChildren().push_back(childNode);
+		}
+
+		return sn;
+	}
+
+	void processAnimation(GMModelReader_Assimp* imp, const aiScene* scene, GMModels* models)
+	{
+		for (auto modelAsset : models->getModels())
+		{
+			GM_ASSERT(modelAsset.getModel());
+			modelAsset.getModel()->setUsageHint(GMUsageHint::DynamicDraw);
+		}
+
 		GMSkeletalAnimations* animations = new GMSkeletalAnimations();
 		for (auto a = 0u; a < scene->mNumAnimations; ++a)
 		{
@@ -166,29 +219,29 @@ namespace
 
 			for (auto i = 0u; i < animation->mNumChannels; ++i)
 			{
-				GMSkeletalAnimationJoint joint;
+				GMSkeletalAnimationNode n;
 				const aiNodeAnim* node = animation->mChannels[i];
-				joint.name = node->mNodeName.C_Str();
+				n.name = node->mNodeName.C_Str();
 				for (auto j = 0u; j < node->mNumPositionKeys; ++j)
 				{
-					GMDuration time = node->mPositionKeys[i].mTime;
-					const auto& position = node->mPositionKeys[i].mValue;
-					joint.positions.emplace_back(time, GMVec3(position.x, position.y, position.z));
+					GMDuration time = node->mPositionKeys[j].mTime;
+					const auto& position = node->mPositionKeys[j].mValue;
+					n.positions.emplace_back(time, GMVec3(position.x, position.y, position.z));
 				}
 				for (auto j = 0u; j < node->mNumRotationKeys; ++j)
 				{
-					GMDuration time = node->mRotationKeys[i].mTime;
-					const auto& quat = node->mRotationKeys[i].mValue;
-					joint.rotations.emplace_back(time, GMQuat(quat.x, quat.y, quat.z, quat.w));
+					GMDuration time = node->mRotationKeys[j].mTime;
+					const auto& quat = node->mRotationKeys[j].mValue;
+					n.rotations.emplace_back(time, GMQuat(quat.x, quat.y, quat.z, quat.w));
 				}
 				for (auto j = 0u; j < node->mNumScalingKeys; ++j)
 				{
-					GMDuration time = node->mScalingKeys[i].mTime;
-					const auto& scaling = node->mScalingKeys[i].mValue;
-					joint.scalings.emplace_back(time, GMVec3(scaling.x, scaling.y, scaling.z));
+					GMDuration time = node->mScalingKeys[j].mTime;
+					const auto& scaling = node->mScalingKeys[j].mValue;
+					n.scalings.emplace_back(time, GMVec3(scaling.x, scaling.y, scaling.z));
 				}
 
-				ani.joints.push_back(std::move(joint));
+				ani.nodes.push_back(std::move(n));
 			}
 
 			animations->getAnimations().push_back(std::move(ani));
@@ -197,90 +250,106 @@ namespace
 		models->setAnimations(animations);
 	}
 
-	void processMesh(GMModelReader_Assimp* imp, aiMesh* mesh, const aiScene* scene, GMModel* model, GMModels* models)
+	void processMesh(GMModelReader_Assimp* imp, aiMesh* part, const aiScene* scene, GMModel* model)
 	{
 		model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
-		if (mesh->HasFaces())
+		if (part->HasFaces())
 			model->setDrawMode(GMModelDrawMode::Index);
 		else
 			model->setDrawMode(GMModelDrawMode::Vertex);
 
-		GMMesh* m = new GMMesh(model);
+		GMPart* p = new GMPart(model);
 		// vertices
-		for (auto i = 0u; i < mesh->mNumVertices; ++i)
+		for (auto i = 0u; i < part->mNumVertices; ++i)
 		{
-			Array<GMfloat, 4> colors = mesh->mColors[0] ? 
-				Array<GMfloat, 4>{ mesh->mColors[0][i].r, mesh->mColors[0][i].g, mesh->mColors[0][i].b, mesh->mColors[0][i].a } :
+			Array<GMfloat, 4> colors = part->mColors[0] ? 
+				Array<GMfloat, 4>{ part->mColors[0][i].r, part->mColors[0][i].g, part->mColors[0][i].b, part->mColors[0][i].a } :
 				Array<GMfloat, 4>{0};
-			Array<GMfloat, 2> tex = mesh->mTextureCoords[0] ?
-				Array<GMfloat, 2>{ mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y } :
+			Array<GMfloat, 2> tex = part->mTextureCoords[0] ?
+				Array<GMfloat, 2>{ part->mTextureCoords[0][i].x, part->mTextureCoords[0][i].y } :
 				Array<GMfloat, 2>{ 0 };
 
 			GMVertex v = {
-				{ mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z },
-				{ mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z },
+				{ part->mVertices[i].x, part->mVertices[i].y, part->mVertices[i].z },
+				{ part->mNormals[i].x, part->mNormals[i].y, part->mNormals[i].z },
 				{ tex[0], tex[1] },
 				{ 0, 0, 0 },
 				{ 0, 0, 0 },
 				{ 0, 0 },
 				{ colors[0], colors[1], colors[2], colors[3] }
 			};
-			m->vertex(v);
+			p->vertex(v);
 		}
 
 		// faces
-		if (mesh->HasFaces())
+		if (part->HasFaces())
 		{
-			for (auto i = 0u; i < mesh->mNumFaces; ++i)
+			for (auto i = 0u; i < part->mNumFaces; ++i)
 			{
-				for (auto j = 0u; j < mesh->mFaces[i].mNumIndices; ++j)
+				for (auto j = 0u; j < part->mFaces[i].mNumIndices; ++j)
 				{
-					m->index(mesh->mFaces[i].mIndices[j]);
+					p->index(part->mFaces[i].mIndices[j]);
 				}
 			}
-		}
-
-		// bones
-		if (mesh->HasBones())
-		{
-			processBones(imp, mesh, model, models);
-		}
-
-		// animations
-		if (scene->HasAnimations())
-		{
-			processAnimation(imp, scene, model, models);
 		}
 
 		// materials
 		if (scene->mMaterials)
 		{
-			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+			aiMaterial* material = scene->mMaterials[part->mMaterialIndex];
 			processMaterial(imp, material, model);
 		}
 
 		if (scene->mTextures)
 		{
-			aiTexture* texture = scene->mTextures[mesh->mMaterialIndex];
+			aiTexture* texture = scene->mTextures[part->mMaterialIndex];
 			processTexture(imp, texture, model);
 		}
 	}
 
+	void processMeshes(GMModelReader_Assimp* imp, const aiScene* scene, GMModels* models)
+	{
+		for (auto i = 0u; i < scene->mNumMeshes; i++)
+		{
+			aiMesh* part = scene->mMeshes[i];
+			GMModel* model = new GMModel();
+
+			// part
+			processMesh(imp, part, scene, model);
+
+			// bones
+			if (part->HasBones())
+				processBones(imp, part, model);
+
+			models->push_back(GMAsset(GMAssetType::Model, model));
+		}
+	}
+
+	/*
 	void processNode(GMModelReader_Assimp* imp, aiNode* node, const aiScene* scene, GMModels* models)
 	{
 		for (auto i = 0u; i < node->mNumMeshes; i++)
 		{
-			aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+			aiMesh* part = scene->mMeshes[node->mMeshes[i]];
 			GMModel* model = new GMModel();
-			processMesh(imp, mesh, scene, model, models);
+
+			// part
+			processMesh(imp, part, scene, model);
+
+			// bones
+			if (part->HasBones())
+				processBones(imp, part, model, models);
+
 			models->push_back(GMAsset(GMAssetType::Model, model));
 		}
+
 		// 接下来对它的子节点重复这一过程
 		for (auto i = 0u; i < node->mNumChildren; i++)
 		{
 			::processNode(imp, node->mChildren[i], scene, models);
 		}
 	}
+	*/
 }
 
 bool GMModelReader_Assimp::load(const GMModelLoadSettings& settings, GMBuffer& buffer, REF GMAsset& asset)
@@ -308,7 +377,18 @@ bool GMModelReader_Assimp::load(const GMModelLoadSettings& settings, GMBuffer& b
 	}
 
 	GMModels* models = new GMModels();
-	processNode(this, scene->mRootNode, scene, models);
+	if (scene->HasAnimations())
+	{
+		models->setRootNode(createNodeTree(scene->mRootNode, nullptr));
+	}
+
+	// nodes
+	processMeshes(this, scene, models);
+
+	// animations
+	if (scene->HasAnimations())
+		processAnimation(this, scene, models);
+
 	asset = GMAsset(GMAssetType::Models, models);
 
 	return true;

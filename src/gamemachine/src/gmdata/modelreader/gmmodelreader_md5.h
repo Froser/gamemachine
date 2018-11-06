@@ -135,9 +135,9 @@ GM_PRIVATE_OBJECT(GMModelReader_MD5)
 class GMModelReader_MD5 : public GMObject, public IModelReader
 {
 	GM_DECLARE_PRIVATE(GMModelReader_MD5)
-	GM_DECLARE_PROPERTY(MD5Version, MD5Version, GMint32)
-	GM_DECLARE_PROPERTY(MeshFile, meshFile, GMString)
-	GM_DECLARE_PROPERTY(AnimFile, animFile, GMString)
+	GM_DECLARE_PROPERTY(MD5Version, MD5Version)
+	GM_DECLARE_PROPERTY(MeshFile, meshFile)
+	GM_DECLARE_PROPERTY(AnimFile, animFile)
 
 public:
 	virtual bool load(const GMModelLoadSettings& settings, GMBuffer& buffer, REF GMAsset& asset) override;

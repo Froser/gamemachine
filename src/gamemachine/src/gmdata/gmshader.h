@@ -37,12 +37,12 @@ class GMTextureSampler
 	GM_DECLARE_PRIVATE_NGO(GMTextureSampler)
 
 public:
-	GM_DECLARE_PROPERTY(FrameCount, frameCount, GMsize_t);
-	GM_DECLARE_PROPERTY(AnimationMs, animationMs, GMint32);
-	GM_DECLARE_PROPERTY(MagFilter, magFilter, GMS_TextureFilter);
-	GM_DECLARE_PROPERTY(MinFilter, minFilter, GMS_TextureFilter);
-	GM_DECLARE_PROPERTY(WrapS, wrapS, GMS_Wrap);
-	GM_DECLARE_PROPERTY(WrapT, wrapT, GMS_Wrap);
+	GM_DECLARE_PROPERTY(FrameCount, frameCount);
+	GM_DECLARE_PROPERTY(AnimationMs, animationMs);
+	GM_DECLARE_PROPERTY(MagFilter, magFilter);
+	GM_DECLARE_PROPERTY(MinFilter, minFilter);
+	GM_DECLARE_PROPERTY(WrapS, wrapS);
+	GM_DECLARE_PROPERTY(WrapT, wrapT);
 
 public:
 	GMTextureSampler() = default;
@@ -216,23 +216,23 @@ public:
 	GMShader() = default;
 
 public:
-	GM_DECLARE_PROPERTY(SurfaceFlag, surfaceFlag, GMuint32);
-	GM_DECLARE_PROPERTY(Cull, cull, GMS_Cull);
-	GM_DECLARE_PROPERTY(FrontFace, frontFace, GMS_FrontFace);
-	GM_DECLARE_PROPERTY(BlendFactorSourceRGB, blendFactorSrcRGB, GMS_BlendFunc);
-	GM_DECLARE_PROPERTY(BlendFactorDestRGB, blendFactorDestRGB, GMS_BlendFunc);
-	GM_DECLARE_PROPERTY(BlendOpRGB, blendOpRGB, GMS_BlendOp);
-	GM_DECLARE_PROPERTY(BlendFactorSourceAlpha, blendFactorSrcAlpha, GMS_BlendFunc);
-	GM_DECLARE_PROPERTY(BlendFactorDestAlpha, blendFactorDestAlpha, GMS_BlendFunc);
-	GM_DECLARE_PROPERTY(BlendOpAlpha, blendOpAlpha, GMS_BlendOp);
-	GM_DECLARE_PROPERTY(Blend, blend, bool);
-	GM_DECLARE_PROPERTY(Discard, discard, bool);
-	GM_DECLARE_PROPERTY(NoDepthTest, noDepthTest, bool);
-	GM_DECLARE_PROPERTY(TextureList, textureList, GMTextureList);
-	GM_DECLARE_PROPERTY(LineColor, lineColor, GMVec3);
-	GM_DECLARE_PROPERTY(Material, material, GMMaterial);
-	GM_DECLARE_PROPERTY(IlluminationModel, illuminationModel, GMIlluminationModel);
-	GM_DECLARE_PROPERTY(VertexColorOp, vertexColorOp, GMS_VertexColorOp)
+	GM_DECLARE_PROPERTY(SurfaceFlag, surfaceFlag);
+	GM_DECLARE_PROPERTY(Cull, cull);
+	GM_DECLARE_PROPERTY(FrontFace, frontFace);
+	GM_DECLARE_PROPERTY(BlendFactorSourceRGB, blendFactorSrcRGB);
+	GM_DECLARE_PROPERTY(BlendFactorDestRGB, blendFactorDestRGB);
+	GM_DECLARE_PROPERTY(BlendOpRGB, blendOpRGB);
+	GM_DECLARE_PROPERTY(BlendFactorSourceAlpha, blendFactorSrcAlpha);
+	GM_DECLARE_PROPERTY(BlendFactorDestAlpha, blendFactorDestAlpha);
+	GM_DECLARE_PROPERTY(BlendOpAlpha, blendOpAlpha);
+	GM_DECLARE_PROPERTY(Blend, blend);
+	GM_DECLARE_PROPERTY(Discard, discard);
+	GM_DECLARE_PROPERTY(NoDepthTest, noDepthTest);
+	GM_DECLARE_PROPERTY(TextureList, textureList);
+	GM_DECLARE_PROPERTY(LineColor, lineColor);
+	GM_DECLARE_PROPERTY(Material, material);
+	GM_DECLARE_PROPERTY(IlluminationModel, illuminationModel);
+	GM_DECLARE_PROPERTY(VertexColorOp, vertexColorOp)
 
 public:
 	inline void setBlendFactorSource(GMS_BlendFunc func)

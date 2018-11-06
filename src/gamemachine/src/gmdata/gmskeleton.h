@@ -3,110 +3,121 @@
 #include <gmcommon.h>
 BEGIN_NS
 
-GM_ALIGNED_STRUCT(GMSkeletonVertex)
+class GMSkeletalAnimationEvaluator;
+struct GMSceneAnimatorNode;
+struct GMSkeletalAnimation;
+
+struct GMSkeletonWeight
 {
-	GMVec2 texCoords = Zero<GMVec2>();
-	GMint32 startWeight;
-	GMint32 weightCount;
+	GMuint32 vertexId;
+	GMfloat weight;
 };
 
-GM_ALIGNED_STRUCT(GMSkeletonWeight)
+GM_ALIGNED_STRUCT(GMSkeletalBone)
 {
-	GMint32 jointIndex;
-	GMfloat weightBias;
-	GMVec3 weightPosition;
-};
-
-GM_ALIGNED_STRUCT(GMSkeletonMesh)
-{
-	GMString shader;
-	GMint32 numVertices;
-	GMint32 numTriangles;
-	GMint32 numWeights;
-	AlignedVector<Array<GMint32, 3>> triangleIndices;
-	AlignedVector<GMSkeletonVertex> vertices;
-	AlignedVector<GMSkeletonWeight> weights;
+	GMString name;
+	GMMat4 offsetMatrix; //!< 从模型空间到绑定姿势的变换
 	GMModel* targetModel = nullptr;
+	Vector<GMSkeletonWeight> weights;
+	GMMat4 finalTransformation; //!< 所有的计算结果将会放到这里来
 };
 
-GM_ALIGNED_STRUCT(GMBaseFrame)
+GM_PRIVATE_OBJECT(GMSkeletalNode)
 {
-	GMVec3 position;
-	GMQuat orientation;
+	GMString name;
+	GMSkeletalNode* parent = nullptr;
+	Vector<GMSkeletalNode*> children;
+	GMMat4 transformToParent;
 };
 
-class GMSkeletonJoint;
-GM_PRIVATE_OBJECT(GMSkeletonJoint)
+GM_ALIGNED_16(class) GMSkeletalNode
 {
-	GMint32 parentIndex = -1;
-	GMVec3 position = Zero<GMVec3>();
-	GMQuat orientation = Identity<GMQuat>();
+	GM_DECLARE_PRIVATE_NGO(GMSkeletalNode)
+	GM_DECLARE_ALIGNED_ALLOCATOR()
+	GM_DECLARE_PROPERTY(Name, name)
+	GM_DECLARE_PROPERTY(Parent, parent)
+	GM_DECLARE_PROPERTY(Children, children)
+	GM_DECLARE_PROPERTY(TransformToParent, transformToParent)
+
+public:
+	~GMSkeletalNode()
+	{
+		for (auto& child : getChildren())
+		{
+			GM_delete(child);
+		}
+	}
 };
 
-class GMSkeletonJoint : public GMObject
+GM_PRIVATE_OBJECT_UNALIGNED(GMSkeletalVertexBoneData)
 {
-	GM_DECLARE_PRIVATE(GMSkeletonJoint)
-	GM_ALLOW_COPY_MOVE(GMSkeletonJoint)
-	GM_DECLARE_PROPERTY(Position, position, GMVec3)
-	GM_DECLARE_PROPERTY(Orientation, orientation, GMQuat)
-	GM_DECLARE_PROPERTY(ParentIndex, parentIndex, GMint32)
+	enum
+	{
+		BonesPerVertex = 4 // 每个vertex最大的bone数目
+	};
 
+	GMsize_t ids[BonesPerVertex] = { 0 }; //!< 定点绑定的骨骼索引
+	GMfloat weights[BonesPerVertex] = { 0 };
+};
+
+class GMSkeletalVertexBoneData
+{
 public:
 	enum
 	{
-		RootIndex = -1,
+		BonesPerVertex = GM_PRIVATE_NAME(GMSkeletalVertexBoneData)::BonesPerVertex // 每个vertex最大的bone数目
 	};
 
+	GM_DECLARE_PRIVATE_NGO(GMSkeletalVertexBoneData)
+	
 public:
-	GMSkeletonJoint() = default;
-};
-
-//> 每一帧所有的关节状态
-GM_PRIVATE_OBJECT(GMFrameSkeleton)
-{
-	AlignedVector<GMSkeletonJoint> joints;
-};
-
-class GMFrameSkeleton : public GMObject
-{
-	GM_DECLARE_PRIVATE(GMFrameSkeleton)
-	GM_ALLOW_COPY_MOVE(GMFrameSkeleton)
-	GM_DECLARE_PROPERTY(Joints, joints, AlignedVector<GMSkeletonJoint>)
+	GMSkeletalVertexBoneData() = default;
 
 public:
-	GMFrameSkeleton() = default;
-};
+	void reset();
+	void addData(GMsize_t boneId, GMfloat weight);
 
-//> 所有帧的关节状态
-class GMFrameSkeletons : public AlignedVector<GMFrameSkeleton>
-{
 public:
-	inline GMsize_t getNumFrames() GM_NOEXCEPT
+	inline GMsize_t* getIds() GM_NOEXCEPT
 	{
-		return size();
+		D(d);
+		return d->ids;
 	}
+
+	inline GMfloat* getWeights() GM_NOEXCEPT
+	{
+		D(d);
+		return d->weights;
+	}
+};
+
+GM_PRIVATE_OBJECT(GMSkeletalBones)
+{
+	AlignedVector<GMSkeletalBone> bones;
+	Vector<GMSkeletalVertexBoneData> vertexData;
+	Map<GMString, GMsize_t> boneNameIndexMap;
+};
+
+class GMSkeletalBones
+{
+	GM_DECLARE_PRIVATE_NGO(GMSkeletalBones)
+	GM_DECLARE_ALIGNED_ALLOCATOR()
+	GM_DECLARE_PROPERTY(Bones, bones)
+	GM_DECLARE_PROPERTY(BoneNameIndexMap, boneNameIndexMap)
+	GM_DECLARE_PROPERTY(VertexData, vertexData)
 };
 
 GM_PRIVATE_OBJECT(GMSkeleton)
 {
-	GMFrameSkeletons skeletons;
-	GMFrameSkeleton animatedSkeleton;
-	AlignedVector<GMSkeletonMesh> meshes;
-	GMfloat frameRate = 60;
+	GMSkeletalBones bones;
 };
 
-class GMSkeleton : public GMObject
+class GMSkeleton
 {
-	GM_DECLARE_PRIVATE(GMSkeleton)
-	GM_DECLARE_PROPERTY(Skeletons, skeletons, GMFrameSkeletons)
-	GM_DECLARE_PROPERTY(AnimatedSkeleton, animatedSkeleton, GMFrameSkeleton)
-	GM_DECLARE_PROPERTY(FrameRate, frameRate, GMfloat)
-	GM_DECLARE_PROPERTY(Meshes, meshes, AlignedVector<GMSkeletonMesh>)
-
-public:
-	void interpolateSkeletons(GMint32 frame0, GMint32 frame1, GMfloat p);
+	GM_DECLARE_PRIVATE_NGO(GMSkeleton)
+	GM_DECLARE_ALIGNED_ALLOCATOR()
+	GM_DECLARE_PROPERTY(Bones, bones)
 };
-
 
 //////////////////////////////////////////////////////////////////////////
 template <typename T>
@@ -122,7 +133,7 @@ struct GMSkeletonAnimationKeyframe
 	T value;
 };
 
-GM_ALIGNED_STRUCT(GMSkeletalAnimationJoint)
+GM_ALIGNED_STRUCT(GMSkeletalAnimationNode)
 {
 	GMString name;
 	AlignedVector<GMSkeletonAnimationKeyframe<GMVec3>> positions;
@@ -134,7 +145,7 @@ GM_ALIGNED_STRUCT(GMSkeletalAnimation)
 {
 	GMfloat frameRate = 25;
 	GMDuration duration;
-	AlignedVector<GMSkeletalAnimationJoint> joints;
+	AlignedVector<GMSkeletalAnimationNode> nodes;
 };
 
 GM_PRIVATE_OBJECT(GMSkeletalAnimations)
@@ -146,7 +157,7 @@ GM_ALIGNED_16(class) GMSkeletalAnimations
 {
 	GM_DECLARE_PRIVATE_NGO(GMSkeletalAnimations)
 	GM_DECLARE_ALIGNED_ALLOCATOR()
-	GM_DECLARE_PROPERTY(Animations, animations, AlignedVector<GMSkeletalAnimation>)
+	GM_DECLARE_PROPERTY(Animations, animations)
 
 public:
 	inline GMSkeletalAnimation* getAnimation(GMsize_t index) GM_NOEXCEPT
@@ -162,22 +173,34 @@ public:
 	}
 };
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMSkeletalAnimationEvaluator)
+GM_PRIVATE_OBJECT(GMSkeletalAnimationEvaluator)
 {
-	GMSkeletalAnimation* animation = nullptr;
-	GMDuration animationTime = 0;
-	GMMat4 transform = Identity<GMMat4>();
+	const GMSkeletalAnimation* animation = nullptr;
+	GMDuration duration = 0;
+	AlignedVector<GMMat4> transforms;
+	GMSkeleton* skeleton = nullptr;
+	GMSkeletalNode* rootNode = nullptr;
+	GMMat4 globalInverseTransform;
 };
 
 class GMSkeletalAnimationEvaluator
 {
 	GM_DECLARE_PRIVATE_NGO(GMSkeletalAnimationEvaluator)
+	GM_DECLARE_ALIGNED_ALLOCATOR()
+	GM_DECLARE_PROPERTY(Skeleton, skeleton)
+	GM_DECLARE_PROPERTY(RootNode, rootNode)
+	GM_DECLARE_PROPERTY(Animation, animation)
+	GM_DECLARE_GETTER(Transforms, transforms)
 
 public:
-	GMSkeletalAnimationEvaluator(GMSkeletalAnimation* animation);
+	GMSkeletalAnimationEvaluator(GMSkeletalNode* root, GMSkeleton* skeleton);
 
 public:
 	void update(GMDuration dt);
+
+private:
+	void updateNode(GMfloat animationTime, GMSkeletalNode* node, const GMMat4& parentTransformation);
+	const GMSkeletalAnimationNode* findAnimationNode(const GMString& name);
 };
 
 END_NS

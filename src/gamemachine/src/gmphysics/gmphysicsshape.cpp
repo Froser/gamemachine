@@ -80,7 +80,7 @@ namespace
 			btAlignedObjectArray<GMint32> indices;
 			collisionShape2TriangleMesh(shape, origin, vertexPositions, vertexNormals, indices);
 
-			GMMesh* body = new GMMesh(out);
+			GMPart* body = new GMPart(out);
 			out->getShader().setCull(GMS_Cull::None);
 			GMint32 faceCount = indices.size() / 3;
 			for (GMint32 i = 0; i < faceCount; ++i)
@@ -107,9 +107,9 @@ namespace
 			btConvexHullShape* btShape = new btConvexHullShape();
 			if (model->getDrawMode() == GMModelDrawMode::Vertex)
 			{
-				for (const auto& mesh : model->getMeshes())
+				for (const auto& part : model->getParts())
 				{
-					for (const auto& v : mesh->vertices())
+					for (const auto& v : part->vertices())
 					{
 						btShape->addPoint(btVector3(v.positions[0], v.positions[1], v.positions[2]), false);
 					}
@@ -117,10 +117,10 @@ namespace
 			}
 			else
 			{
-				for (const auto& mesh : model->getMeshes())
+				for (const auto& part : model->getParts())
 				{
-					const auto& vertices = mesh->vertices();
-					for (const auto& i : mesh->indices())
+					const auto& vertices = part->vertices();
+					for (const auto& i : part->indices())
 					{
 						btShape->addPoint(btVector3(vertices[i].positions[0], vertices[i].positions[1], vertices[i].positions[2]), false);
 					}

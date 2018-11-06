@@ -18,25 +18,28 @@ GM_PRIVATE_OBJECT(GMSkeletalGameObject)
 	bool drawBones = true;
 	bool playing = true;
 	GMVec4 skeletonColor = GMVec4(0, 1, 0, 1);
-	GMOwnedPtr<GMSkeletalAnimationEvaluator> evaluator;
+	Map<GMModel*, GMSkeletalAnimationEvaluator*> modelEvaluatorMap;
 };
 
 class GMSkeletalGameObject : public GMGameObject
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMSkeletalGameObject, GMGameObject)
-	GM_DECLARE_PROPERTY(SkeletonColor, skeletonColor, GMVec4)
-	GM_DECLARE_PROPERTY(DrawSkin, drawSkin, bool)
+	GM_DECLARE_PROPERTY(SkeletonColor, skeletonColor)
+	GM_DECLARE_PROPERTY(DrawSkin, drawSkin)
 
 public:
 	enum { AutoPlayFrame = -1 };
 	using GMGameObject::GMGameObject;
+	~GMSkeletalGameObject();
 
 public:
 	virtual void update(GMDuration dt) override;
 	virtual void draw() override;
 
 public:
+	/*
 	GMint32 getFramesCount();
+	*/
 	void createSkeletonBonesObject();
 	void setDrawBones(bool b);
 	void play();
@@ -64,11 +67,9 @@ public:
 	}
 
 private:
-	void initAnimation();
-	void getAdjacentTwoFrames(GMDuration dt, REF GMint32& frame0, REF GMint32& frame1, REF GMfloat& interpolate);
-	void updateMesh(GMSkeletonMesh& mesh, const GMFrameSkeleton& frameSkeleton);
 	void updateSkeleton();
-	void initSkeletonBonesMesh(GMMesh* mesh);
+	void initSkeletonBonesMesh(GMPart* mesh);
+	void updateModel(GMModel* model, GMSkeletalAnimationEvaluator* evaluator);
 };
 
 END_NS

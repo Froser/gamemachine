@@ -53,7 +53,7 @@ void Demo_Assimp::init()
 	);
 
 	gm::GMAsset models;
-	gm::GMModelReader::load(loadSettings, gm::GMModelReader::AnyOther, models);
+	gm::GMModelReader::load(loadSettings, gm::GMModelReader::Assimp, models);
 
 	gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(models);
 	d->gameObject = new gm::GMGameObject(asset);

@@ -399,6 +399,19 @@ inline GMVec4 operator*(const GMVec4& V, gm::GMfloat S)
 	return R;
 }
 
+inline GMMat4 operator+(const GMMat4& M1, const GMMat4& M2)
+{
+	GMMat4 R;
+	R.v_ = M1.v_ + M2.v_;
+	return R;
+}
+
+inline GMMat4 operator+=(GMMat4& M1, const GMMat4& M2)
+{
+	M1 = M1 + M2;
+	return M1;
+}
+
 inline bool operator==(const GMVec2& V1, const GMVec2& V2)
 {
 #if GM_USE_DX11
@@ -530,6 +543,13 @@ inline GMQuat operator*(const GMQuat& V, const GMQuat& Q)
 #else
 	R.v_ = Q.v_ * V.v_;
 #endif
+	return R;
+}
+
+inline GMMat4 operator*(gm::GMfloat V, const GMMat4& M)
+{
+	GMMat4 R;
+	R.v_ = V * M.v_;
 	return R;
 }
 

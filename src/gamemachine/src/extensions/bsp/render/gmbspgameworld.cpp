@@ -126,7 +126,7 @@ void GMBSPSkyGameObject::createSkyBox(OUT GMModel** obj)
 	*obj = model;
 	model->setShader(d->shader);
 
-	GMMesh* mesh = new GMMesh(model);
+	GMPart* part = new GMPart(model);
 	for (GMuint32 i = 0; i < 6; i++)
 	{
 		GMVertex P0 = {
@@ -150,12 +150,12 @@ void GMBSPSkyGameObject::createSkyBox(OUT GMModel** obj)
 			{ texcoord[i * 4 + 3].getX(), texcoord[i * 4 + 3].getY() },
 		};
 
-		mesh->vertex(P0);
-		mesh->vertex(P2);
-		mesh->vertex(P1);
-		mesh->vertex(P1);
-		mesh->vertex(P2);
-		mesh->vertex(P3);
+		part->vertex(P0);
+		part->vertex(P2);
+		part->vertex(P1);
+		part->vertex(P1);
+		part->vertex(P2);
+		part->vertex(P3);
 	}
 }
 

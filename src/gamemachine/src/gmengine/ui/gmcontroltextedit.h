@@ -176,7 +176,7 @@ GM_PRIVATE_OBJECT(GMControlTextArea)
 class GMControlTextArea : public GMControlTextEdit
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMControlTextArea, GMControlTextEdit)
-	GM_DECLARE_PROPERTY(ScrollBarSize, scrollBarSize, GMint32)
+	GM_DECLARE_PROPERTY(ScrollBarSize, scrollBarSize)
 
 public:
 	static GMControlTextArea* createControl(

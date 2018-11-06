@@ -30,11 +30,11 @@ GMModel* GMLine2D::createModel()
 	model->setPrimitiveTopologyMode(GMTopologyMode::Lines);
 	model->getShader().setVertexColorOp(GMS_VertexColorOp::Replace);
 	initShader(model->getShader());
-	GMMesh* mesh = new GMMesh(model);
+	GMPart* part = new GMPart(model);
 	GMsize_t len = VerticesCount; //每个Line，用2个顶点来渲染
 	for (GMsize_t i = 0; i < len; ++i)
 	{
-		mesh->vertex(GMVertex());
+		part->vertex(GMVertex());
 	}
 	getContext()->getEngine()->createModelDataProxy(getContext(), model);
 	return model;
@@ -193,11 +193,11 @@ GMModel* GMLine3D::createModel()
 	model->setPrimitiveTopologyMode(GMTopologyMode::Lines);
 	model->getShader().setVertexColorOp(GMS_VertexColorOp::Replace);
 	initShader(model->getShader());
-	GMMesh* mesh = new GMMesh(model);
+	GMPart* part = new GMPart(model);
 	GMsize_t len = VerticesCount; //每个Line，用2个顶点来渲染
 	for (GMsize_t i = 0; i < len; ++i)
 	{
-		mesh->vertex(GMVertex());
+		part->vertex(GMVertex());
 	}
 	getContext()->getEngine()->createModelDataProxy(getContext(), model);
 	return model;

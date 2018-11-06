@@ -51,7 +51,7 @@ class GMRenderTechnique : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMRenderTechnique)
 	GM_ALLOW_COPY_MOVE(GMRenderTechnique)
-	GM_DECLARE_PROPERTY(ShaderType, shaderType, GMShaderType)
+	GM_DECLARE_PROPERTY(ShaderType, shaderType)
 	GM_FRIEND_CLASS(GMRenderTechniqueManager)
 	GM_FRIEND_CLASS(GMRenderTechniques)
 
@@ -95,7 +95,7 @@ GM_PRIVATE_OBJECT(GMRenderTechniques)
 class GMRenderTechniques : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMRenderTechniques)
-	GM_DECLARE_PROPERTY(Id, id, GMRenderTechinqueID)
+	GM_DECLARE_PROPERTY(Id, id)
 	GM_ALLOW_COPY_MOVE(GMRenderTechniques)
 
 public:

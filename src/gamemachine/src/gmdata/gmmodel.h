@@ -38,7 +38,7 @@ struct GMVertex
 	Array<GMfloat, ColorDimension> color;
 };
 
-typedef Vector<GMMesh*> GMMeshes;
+typedef Vector<GMPart*> GMParts;
 
 enum class GMModelBufferType
 {
@@ -52,7 +52,7 @@ GM_PRIVATE_OBJECT(GMModelDataProxy)
 	GMModel* model = nullptr;
 };
 
-class GMMesh;
+class GMPart;
 class GMModelBuffer;
 class GMModelDataProxy : public GMObject, public IQueriable
 {
@@ -97,7 +97,7 @@ enum class GMUsageHint
 	DynamicDraw,
 };
 
-class GMMesh;
+class GMPart;
 struct GMModelBufferData
 {
 	union
@@ -187,7 +187,7 @@ class GMModel;
 GM_PRIVATE_OBJECT(GMModel)
 {
 	GMUsageHint hint = GMUsageHint::StaticDraw;
-	GMMeshes meshes;
+	GMParts parts;
 	GMOwnedPtr<GMModelDataProxy> modelDataProxy;
 	GMShader shader;
 	GMModelBuffer* modelBuffer = nullptr;
@@ -198,6 +198,8 @@ GM_PRIVATE_OBJECT(GMModel)
 	bool needTransfer = true;
 	GMRenderTechinqueID techniqueId = 0;
 	GMModelAsset parentAsset;
+	GMOwnedPtr<GMSkeleton> skeleton;
+	Vector<GMVertex> packedVertices;
 };
 
 // 所有的顶点属性类型
@@ -230,12 +232,12 @@ public:
 	GMModel(GMModelAsset parentAsset);
 	~GMModel();
 
-	GM_DECLARE_PROPERTY(PrimitiveTopologyMode, mode, GMTopologyMode);
-	GM_DECLARE_PROPERTY(Type, type, GMModelType);
-	GM_DECLARE_PROPERTY(Shader, shader, GMShader);
-	GM_DECLARE_PROPERTY(VerticesCount, verticesCount, GMsize_t);
-	GM_DECLARE_PROPERTY(DrawMode, drawMode, GMModelDrawMode);
-	GM_DECLARE_PROPERTY(TechniqueId, techniqueId, GMRenderTechinqueID);
+	GM_DECLARE_PROPERTY(PrimitiveTopologyMode, mode);
+	GM_DECLARE_PROPERTY(Type, type);
+	GM_DECLARE_PROPERTY(Shader, shader);
+	GM_DECLARE_PROPERTY(VerticesCount, verticesCount);
+	GM_DECLARE_PROPERTY(DrawMode, drawMode);
+	GM_DECLARE_PROPERTY(TechniqueId, techniqueId);
 
 public:
 	inline void setModelDataProxy(AUTORELEASE GMModelDataProxy* modelDataProxy)
@@ -250,10 +252,10 @@ public:
 		return d->modelDataProxy.get();
 	}
 
-	inline GMMeshes& getMeshes() GM_NOEXCEPT
+	inline GMParts& getParts() GM_NOEXCEPT
 	{
 		D(d);
-		return d->meshes;
+		return d->parts;
 	}
 
 	//! 表示此模型是否需要被GMModelDataProxy将顶点数据传输到显卡。
@@ -293,10 +295,28 @@ public:
 		return d->parentAsset.getModel();
 	}
 
+	inline GMSkeleton* getSkeleton() GM_NOEXCEPT
+	{
+		D(d);
+		return d->skeleton.get();
+	}
+
+	void setSkeleton(AUTORELEASE GMSkeleton* skeleton)
+	{
+		D(d);
+		d->skeleton.reset(skeleton);
+	}
+
+	inline Vector<GMVertex>& getPackedVertices() GM_NOEXCEPT
+	{
+		D(d);
+		return d->packedVertices;
+	}
+
 	void setModelBuffer(AUTORELEASE GMModelBuffer* mb);
 	GMModelBuffer* getModelBuffer();
 	void releaseModelBuffer();
-	void addMesh(GMMesh* mesh);
+	void addPart(GMPart* part);
 };
 
 #define GM_DEFINE_VERTEX_DATA(name) \
@@ -309,14 +329,14 @@ public:
 GM_PRIVATE_OBJECT(GMModels)
 {
 	Vector<GMAsset> models;
-	GMOwnedPtr<GMSkeleton> skeleton; //Deprecate soon...
 	GMOwnedPtr<GMSkeletalAnimations> animations;
+	GMOwnedPtr<GMSkeletalNode> skeletalRoot;
 };
 
 class GMModels : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMModels)
-	GM_DECLARE_PROPERTY(Models, models, Vector<GMAsset>)
+	GM_DECLARE_PROPERTY(Models, models)
 
 public:
 	void push_back(GMModelAsset model);
@@ -327,18 +347,6 @@ public:
 	{
 		D(d);
 		return d->models.empty();
-	}
-
-	inline GMSkeleton* getSkeleton() GM_NOEXCEPT
-	{
-		D(d);
-		return d->skeleton.get();
-	}
-
-	void setSkeleton(AUTORELEASE GMSkeleton* skeleton)
-	{
-		D(d);
-		d->skeleton.reset(skeleton);
 	}
 
 	inline GMSkeletalAnimations* getAnimations() GM_NOEXCEPT
@@ -353,6 +361,18 @@ public:
 		d->animations.reset(animations);
 	}
 
+	void setRootNode(GMSkeletalNode* root)
+	{
+		D(d);
+		d->skeletalRoot.reset(root);
+	}
+
+	GMSkeletalNode* getRootNode()
+	{
+		D(d);
+		return d->skeletalRoot.get();
+	}
+
 	GMModel* operator[](GMsize_t i)
 	{
 		D(d);
@@ -363,7 +383,7 @@ public:
 typedef Vector<GMVertex> GMVertices;
 typedef Vector<GMuint32> GMIndices;
 
-GM_PRIVATE_OBJECT(GMMesh)
+GM_PRIVATE_OBJECT(GMPart)
 {
 	GMVertices vertices;
 	GMIndices indices;
@@ -373,12 +393,12 @@ GM_PRIVATE_OBJECT(GMMesh)
 /*!
   网格数据可能仅仅是模型中的一段数据。
 */
-class GMMesh : public GMObject
+class GMPart : public GMObject
 {
-	GM_DECLARE_PRIVATE(GMMesh)
+	GM_DECLARE_PRIVATE(GMPart)
 
 public:
-	GMMesh(GMModel* parent);
+	GMPart(GMModel* parent);
 
 public:
 	//! 计算网格的切线空间。

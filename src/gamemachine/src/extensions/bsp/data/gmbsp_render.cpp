@@ -169,7 +169,7 @@ void GMBSPRender::generateFaces()
 			++currentFace;
 		}
 
-		if (d->bsp->drawSurfaces[i].surfaceType == MST_TRIANGLE_SOUP)		//skip this loadFace if it is not a mesh face
+		if (d->bsp->drawSurfaces[i].surfaceType == MST_TRIANGLE_SOUP)		//skip this loadFace if it is not a part face
 		{
 			d->meshFaces[currentMeshFace].firstVertex = d->bsp->drawSurfaces[i].firstVert;
 			d->meshFaces[currentMeshFace].numVertices = d->bsp->drawSurfaces[i].numVerts;
@@ -290,7 +290,7 @@ void GMBSPRender::createObject(const GMBSP_Render_Face& face, const GMShader& sh
 	GMModel* model = new GMModel();
 	model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
 	model->setShader(shader);
-	GMMesh* mesh = new GMMesh(model);
+	GMPart* part = new GMPart(model);
 
 	GMFloat4 f4_position, f4_normal;
 	GM_ASSERT(face.numIndices % 3 == 0);
@@ -318,7 +318,7 @@ void GMBSPRender::createObject(const GMBSP_Render_Face& face, const GMShader& sh
 				{ vertex.lightmapS, vertex.lightmapT }
 			};
 
-			mesh->vertex(v);
+			part->vertex(v);
 		}
 	}
 	*obj = model;
@@ -336,7 +336,7 @@ void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const 
 		models->push_back(GMAsset(GMAssetType::Model, model));
 		model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
 		model->setShader(shader);
-		GMMesh* mesh = new GMMesh(model);
+		GMPart* part = new GMPart(model);
 
 		const GMuint32* idxStart = &biqp.indices[row * 2 * (biqp.tesselation + 1)];
 		GMVec3 normal;
@@ -368,7 +368,7 @@ void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const 
 				{ vertex.lightmapS, vertex.lightmapT }
 			};
 
-			mesh->vertex(v);
+			part->vertex(v);
 		}
 	}
 	*obj = models;
@@ -404,7 +404,7 @@ void GMBSPRender::createBox(const GMVec3& extents, const GMVec3& position, const
 	GMModel* model = new GMModel();
 	model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
 	model->setShader(shader);
-	GMMesh* mesh = new GMMesh(model);
+	GMPart* part = new GMPart(model);
 
 	GMFloat4 f4_extents, f4_position;
 	extents.loadFloat4(f4_extents);
@@ -438,7 +438,7 @@ void GMBSPRender::createBox(const GMVec3& extents, const GMVec3& position, const
 				{ f4_vertex[0], f4_vertex[1], f4_vertex[2] },
 				{ f4_normal[0], f4_normal[1], f4_normal[2] },
 			};
-			mesh->vertex(v);
+			part->vertex(v);
 
 			//TODO
 			//component->uv(vertex.decalS, vertex.decalT);

@@ -249,11 +249,11 @@ GMModel* GMTextGameObject::createModel()
 	model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
 	initShader(model->getShader());
 
-	GMMesh* mesh = new GMMesh(model);
+	GMPart* part = new GMPart(model);
 	GMsize_t len = d->text.length() * 6; //每个字符，用6个顶点来渲染
 	for (GMsize_t i = 0; i < len; ++i)
 	{
-		mesh->vertex(GMVertex());
+		part->vertex(GMVertex());
 	}
 
 	getContext()->getEngine()->createModelDataProxy(getContext(), model);
@@ -486,11 +486,11 @@ GMModel* GMSprite2DGameObject::createModel()
 	model->setUsageHint(GMUsageHint::DynamicDraw);
 	model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
 	initShader(model->getShader());
-	GMMesh* mesh = new GMMesh(model);
+	GMPart* part = new GMPart(model);
 	GMsize_t len = VerticesCount; //每个Sprite，用4个顶点来渲染
 	for (GMsize_t i = 0; i < len; ++i)
 	{
-		mesh->vertex(GMVertex());
+		part->vertex(GMVertex());
 	}
 	getContext()->getEngine()->createModelDataProxy(getContext(), model);
 	return model;
@@ -567,9 +567,9 @@ void GMSprite2DGameObject::updateTexture(GMModel* model)
 //////////////////////////////////////////////////////////////////////////
 // i1 i2
 // i3 i4
-#define INDICES(mesh, i1, i2, i3, i4) \
-	{ mesh->index(i3); mesh->index(i1); mesh->index(i4); } \
-	{ mesh->index(i4); mesh->index(i1); mesh->index(i2); }
+#define INDICES(part, i1, i2, i3, i4) \
+	{ part->index(i3); part->index(i1); part->index(i4); } \
+	{ part->index(i4); part->index(i1); part->index(i2); }
 
 void GMBorder2DGameObject::setCornerRect(const GMRect& rc)
 {
@@ -591,28 +591,28 @@ GMModel* GMBorder2DGameObject::createModel()
 	model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
 	model->setDrawMode(GMModelDrawMode::Index);
 	initShader(model->getShader());
-	GMMesh* mesh = new GMMesh(model);
+	GMPart* part = new GMPart(model);
 	GMsize_t len = VerticesCount; //9个四边形，使用索引绘制，一共16个顶点
 	for (GMsize_t i = 0; i < len; ++i)
 	{
-		mesh->vertex(GMVertex());
+		part->vertex(GMVertex());
 	}
 
 	// 逆时针方向绘制
 	// 第1行
-	INDICES(mesh, 0, 1, 4, 5);
-	INDICES(mesh, 1, 2, 5, 6);
-	INDICES(mesh, 2, 3, 6, 7);
+	INDICES(part, 0, 1, 4, 5);
+	INDICES(part, 1, 2, 5, 6);
+	INDICES(part, 2, 3, 6, 7);
 
 	// 第2行
-	INDICES(mesh, 4, 5, 8, 9);
-	INDICES(mesh, 5, 6, 9, 10);
-	INDICES(mesh, 6, 7, 10, 11);
+	INDICES(part, 4, 5, 8, 9);
+	INDICES(part, 5, 6, 9, 10);
+	INDICES(part, 6, 7, 10, 11);
 
 	// 第3行
-	INDICES(mesh, 8, 9, 12, 13);
-	INDICES(mesh, 9, 10, 13, 14);
-	INDICES(mesh, 10, 11, 14, 15);
+	INDICES(part, 8, 9, 12, 13);
+	INDICES(part, 9, 10, 13, 14);
+	INDICES(part, 10, 11, 14, 15);
 
 	getContext()->getEngine()->createModelDataProxy(getContext(), model);
 	return model;

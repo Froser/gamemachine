@@ -71,7 +71,7 @@ void Demo_Texture_Index::init()
 	gm::GMModel* quad = new gm::GMModel();
 	quad->setPrimitiveTopologyMode(gm::GMTopologyMode::Triangles);
 	quad->setDrawMode(gm::GMModelDrawMode::Index);
-	gm::GMMesh* mesh = new gm::GMMesh(quad);
+	gm::GMPart* mesh = new gm::GMPart(quad);
 
 	gm::GMVertex V1 = { { -1.f, -.5f, 0 }, { 0, 0, -1 }, { 0, 1 } };
 	gm::GMVertex V2 = { { -1.f, .5f, 0 }, { 0, 0, -1 }, { 0, 0 } };
@@ -85,7 +85,7 @@ void Demo_Texture_Index::init()
 	mesh->index(1);
 	mesh->index(2);
 
-	gm::GMMesh* mesh2 = new gm::GMMesh(quad);
+	gm::GMPart* mesh2 = new gm::GMPart(quad);
 	mesh2->vertex(V3);
 	mesh2->vertex(V2);
 	mesh2->vertex(V4);

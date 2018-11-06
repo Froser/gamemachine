@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmmodelreader_md5.h"
-#include "gmmodelreader_md5mesh.h"
+// #include "gmmodelreader_md5mesh.h"
 #include "foundation/gamemachine.h"
 #include "gmmodelreader_md5anim.h"
 

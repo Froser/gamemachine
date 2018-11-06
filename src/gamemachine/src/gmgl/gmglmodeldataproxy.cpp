@@ -84,10 +84,12 @@ void GMGLModelDataProxy::transfer()
 
 	glBindVertexArray(0);
 
-	for (auto& mesh : model->getMeshes())
+	for (auto& part : model->getParts())
 	{
-		mesh->clear();
+		part->clear();
 	}
+	if (model->getUsageHint() == GMUsageHint::DynamicDraw)
+		model->getPackedVertices().swap(packedVertices);
 
 	GMModelBuffer* modelBuffer = new GMModelBuffer();
 	modelBuffer->setData(bufferData);

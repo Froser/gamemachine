@@ -1,117 +1,178 @@
 ﻿#include "stdafx.h"
 #include <gmskeleton.h>
 
-void GMSkeleton::interpolateSkeletons(GMint32 frame0, GMint32 frame1, GMfloat p)
+namespace
 {
-	// 变换每个Joint
-	D(d);
-	GMSkeletonJoint jointResult;
-	for (GMsize_t i = 0; i < d->animatedSkeleton.getJoints().size(); ++i)
+	template <typename T>
+	GMsize_t findIndex(GMDuration animationTime, const AlignedVector<GMSkeletonAnimationKeyframe<T>>& frames)
 	{
-		GMSkeletonJoint& finalJoint = d->animatedSkeleton.getJoints()[i];
-		const GMSkeletonJoint& joint0 = d->skeletons[frame0].getJoints()[i];
-		const GMSkeletonJoint& joint1 = d->skeletons[frame1].getJoints()[i];
-		finalJoint.setParentIndex(joint0.getParentIndex());
-		finalJoint.setPosition(Lerp(joint0.getPosition(), joint1.getPosition(), p));
-		finalJoint.setOrientation(Lerp(joint0.getOrientation(), joint1.getOrientation(), p));
+		GM_ASSERT(frames.size() > 0);
+		//for (auto& frame : frames)
+		for (GMsize_t i = 0; i < frames.size() - 1; ++i)
+		{
+			const GMSkeletonAnimationKeyframe<T>& frame = frames[i + 1];
+			if (animationTime < frame.time)
+				return i;
+		}
+
+		GM_ASSERT(false);
+		return 0;
 	}
 }
 
-GMSkeletalAnimationEvaluator::GMSkeletalAnimationEvaluator(GMSkeletalAnimation* animation)
+void GMSkeletalVertexBoneData::reset()
 {
 	D(d);
-	d->animation = animation;
+	GM_ZeroMemory(d->ids);
+	GM_ZeroMemory(d->weights);
+}
+
+void GMSkeletalVertexBoneData::addData(GMsize_t boneId, GMfloat weight)
+{
+	D(d);
+	for (GMsize_t i = 0; i < GM_array_size(d->ids); ++i)
+	{
+		if (d->weights[i] == 0.f)
+		{
+			d->ids[i] = boneId;
+			d->weights[i] = weight;
+			return;
+		}
+	}
+
+	// 如果超过了BonesPerVertex骨骼，才会走到这里
+	GM_ASSERT(false);
+}
+
+GMSkeletalAnimationEvaluator::GMSkeletalAnimationEvaluator(GMSkeletalNode* root, GMSkeleton* skeleton)
+{
+	D(d);
+	setRootNode(root);
+	setSkeleton(skeleton);
+	d->globalInverseTransform = Inverse(root->getTransformToParent());
 }
 
 void GMSkeletalAnimationEvaluator::update(GMDuration dt)
 {
 	D(d);
-	GM_ASSERT(d->animation);
+	d->duration += dt;
 
-	d->animationTime += dt;
-	while (d->animationTime > d->animation->duration)
+	GMfloat ticks = d->duration * d->animation->frameRate;
+	GMfloat animationTime = Fmod(ticks, d->animation->duration);
+
+	updateNode(animationTime, d->rootNode, Identity<GMMat4>());
+	AlignedVector<GMMat4>& transforms = d->transforms;
+
+	GMsize_t boneCount = d->skeleton->getBones().getBones().size();
+	transforms.resize(boneCount);
+
+	for (GMsize_t i = 0; i < boneCount; ++i)
 	{
-		d->animationTime -= d->animation->duration;
+		transforms[i] = d->skeleton->getBones().getBones()[i].finalTransformation;
 	}
+}
 
-	while (d->animationTime < 0.0f)
-	{
-		d->animationTime += d->animation->duration;
-	}
+void GMSkeletalAnimationEvaluator::updateNode(GMfloat animationTime, GMSkeletalNode* node, const GMMat4& parentTransformation)
+{
+	D(d);
+	const GMString& nodeName = node->getName();
+	const GMMat4& transformation = node->getTransformToParent();
+	const GMSkeletalAnimationNode* animationNode = findAnimationNode(nodeName);
+	GMMat4 nodeTransformation = node->getTransformToParent();
+	GMuint32 factor = 0;
 
-	// 找到当前所在的相邻两帧
-	GMfloat frameNum = d->animationTime * static_cast<GMfloat>(d->animation->frameRate);
-	GMint32 frame0 = Floor(frameNum);
-	GMint32 frame1 = Ceil(frameNum);
-
-	for (const auto& joint : d->animation->joints)
+	if (animationNode)
 	{
 		// Position
 		GMVec3 currentPosition;
-		if (!joint.positions.empty())
+		if (!animationNode->positions.empty())
 		{
-			GMfloat frameIdx = frame0 % joint.positions.size();
-			GMfloat nextFrameIdx = frame1 % joint.positions.size();
-			const auto& frame = joint.positions[frameIdx];
-			const auto& nextFrame = joint.positions[nextFrameIdx];
-			GMDuration diffTime = nextFrame.time - frame.time;
-			if (diffTime < 0)
-				diffTime += d->animation->duration;
-			if (diffTime > 0)
+			const auto& v = animationNode->positions;
+			if (v.size() > 1)
 			{
-				GMDuration factor = (d->animationTime - frame.time) / diffTime;
+				GMfloat frameIdx = findIndex(animationTime, v);
+				GMfloat nextFrameIdx = frameIdx;
+				const auto& frame = v[frameIdx];
+				const auto& nextFrame = v[nextFrameIdx];
+				factor = (animationTime - frame.time) / (nextFrame.time - frame.time);
 				currentPosition = Lerp(frame.value, nextFrame.value, factor);
 			}
 			else
 			{
-				currentPosition = frame.value;
+				currentPosition = v[0].value;
 			}
 		}
 
 		// Rotation
 		GMQuat currentRotation;
-		if (!joint.rotations.empty())
+		if (!animationNode->rotations.empty())
 		{
-			GMfloat frameIdx = frame0 % joint.rotations.size();
-			GMfloat nextFrameIdx = frame1 % joint.rotations.size();
-			const auto& frame = joint.rotations[frameIdx];
-			const auto& nextFrame = joint.rotations[nextFrameIdx];
-			GMDuration diffTime = nextFrame.time - frame.time;
-			if (diffTime < 0)
-				diffTime += d->animation->duration;
-			if (diffTime > 0)
+			const auto& v = animationNode->rotations;
+			if (v.size() > 1)
 			{
-				GMDuration factor = (d->animationTime - frame.time) / diffTime;
+				GMfloat frameIdx = findIndex(animationTime, v);
+				GMfloat nextFrameIdx = frameIdx + 1;
+				const auto& frame = v[frameIdx];
+				const auto& nextFrame = v[nextFrameIdx];
+				factor = (animationTime - frame.time) / (nextFrame.time - frame.time);
+				GMDuration diffTime = nextFrame.time - frame.time;
 				currentRotation = Lerp(frame.value, nextFrame.value, factor);
 			}
 			else
 			{
-				currentRotation = frame.value;
+				currentRotation = v[0].value;
 			}
 		}
 
 		// Scaling
 		GMVec3 currentScaling;
-		if (!joint.scalings.empty())
+		if (!animationNode->scalings.empty())
 		{
-			GMfloat frameIdx = frame0 % joint.scalings.size();
-			GMfloat nextFrameIdx = frame1 % joint.scalings.size();
-			const auto& frame = joint.scalings[frameIdx];
-			const auto& nextFrame = joint.scalings[nextFrameIdx];
-			GMDuration diffTime = nextFrame.time - frame.time;
-			if (diffTime < 0)
-				diffTime += d->animation->duration;
-			if (diffTime > 0)
+			const auto& v = animationNode->scalings;
+			if (v.size() > 1)
 			{
-				GMDuration factor = (d->animationTime - frame.time) / diffTime;
+				GMfloat frameIdx = findIndex(animationTime, v);
+				GMfloat nextFrameIdx = frameIdx + 1;
+				const auto& frame = v[frameIdx];
+				const auto& nextFrame = v[nextFrameIdx];
+				factor = (animationTime - frame.time) / (nextFrame.time - frame.time);
+				GMDuration diffTime = nextFrame.time - frame.time;
 				currentScaling = Lerp(frame.value, nextFrame.value, factor);
 			}
 			else
 			{
-				currentScaling = frame.value;
+				currentScaling = v[0].value;
 			}
 		}
 
-		d->transform = Scale(currentScaling) * QuatToMatrix(currentRotation) * Translate(currentPosition);
+		nodeTransformation = Scale(currentScaling) * QuatToMatrix(currentRotation) * Translate(currentPosition);
 	}
+
+	GMMat4 globalTransformation = nodeTransformation * parentTransformation;
+	
+	// 把变换结果保存
+	auto& boneMapping = d->skeleton->getBones().getBoneNameIndexMap();
+	auto& boneInfo = d->skeleton->getBones().getBones();
+	if (boneMapping.find(nodeName) != boneMapping.end())
+	{
+		GMsize_t idx = boneMapping[nodeName];
+		auto& bone = boneInfo[idx];
+		bone.finalTransformation = bone.offsetMatrix * globalTransformation * d->globalInverseTransform;
+	}
+
+	for (auto& child : node->getChildren())
+	{
+		updateNode(animationTime, child, globalTransformation);
+	}
+}
+
+const GMSkeletalAnimationNode* GMSkeletalAnimationEvaluator::findAnimationNode(const GMString& name)
+{
+	D(d);
+	for (auto& node : d->animation->nodes)
+	{
+		if (node.name == name)
+			return &node;
+	}
+	return nullptr;
 }

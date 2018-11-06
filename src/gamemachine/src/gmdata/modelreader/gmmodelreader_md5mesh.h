@@ -24,10 +24,10 @@ GM_PRIVATE_OBJECT(GMModelReader_MD5Mesh)
 class GMModelReader_MD5Mesh : public GMModelReader_MD5
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMModelReader_MD5Mesh, GMModelReader_MD5)
-	GM_DECLARE_PROPERTY(MD5Version, MD5Version, GMint32)
-	GM_DECLARE_PROPERTY(Commandline, commandline, GMString)
-	GM_DECLARE_PROPERTY(NumJoints, numJoints, GMint32)
-	GM_DECLARE_PROPERTY(NumMeshes, numMeshes, GMint32)
+	GM_DECLARE_PROPERTY(MD5Version, MD5Version)
+	GM_DECLARE_PROPERTY(Commandline, commandline)
+	GM_DECLARE_PROPERTY(NumJoints, numJoints)
+	GM_DECLARE_PROPERTY(NumMeshes, numMeshes)
 
 public:
 	GMModelReader_MD5Mesh() = default;

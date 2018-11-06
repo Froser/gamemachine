@@ -458,6 +458,10 @@ inline GMVec4 operator-(const GMVec4& V1, const GMVec4& V2);
 
 inline GMVec4 operator*(const GMVec4& V1, gm::GMfloat S);
 
+inline GMMat4 operator+(const GMMat4& M1, const GMMat4& M2);
+
+inline GMMat4 operator+=(GMMat4& M1, const GMMat4& M2);
+
 inline bool operator==(const GMVec2& V1, const GMVec2& V2);
 
 inline bool operator==(const GMVec3& V1, const GMVec3& V2);
@@ -501,6 +505,8 @@ inline GMVec3 operator*(const GMVec3& V, const GMQuat& Q);
 	\return 变换后的四元数。
 */
 inline GMQuat operator*(const GMQuat& V, const GMQuat& Q);
+
+inline GMMat4 operator*(gm::GMfloat V, const GMMat4& M);
 
 inline GMMat4 QuatToMatrix(const GMQuat& quat);
 

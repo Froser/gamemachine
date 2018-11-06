@@ -23,12 +23,12 @@ GM_PRIVATE_OBJECT(GMModelReader_MD5Anim)
 class GMModelReader_MD5Anim : public GMModelReader_MD5
 {
 	GM_DECLARE_PRIVATE(GMModelReader_MD5Anim)
-	GM_DECLARE_PROPERTY(MD5Version, MD5Version, GMint32)
-	GM_DECLARE_PROPERTY(Commandline, commandline, GMString)
-	GM_DECLARE_PROPERTY(NumFrames, numFrames, GMint32)
-	GM_DECLARE_PROPERTY(NumJoints, numJoints, GMint32)
-	GM_DECLARE_PROPERTY(FrameRate, frameRate, GMint32)
-	GM_DECLARE_PROPERTY(NumAnimatedComponents, numAnimatedComponents, GMint32)
+	GM_DECLARE_PROPERTY(MD5Version, MD5Version)
+	GM_DECLARE_PROPERTY(Commandline, commandline)
+	GM_DECLARE_PROPERTY(NumFrames, numFrames)
+	GM_DECLARE_PROPERTY(NumJoints, numJoints)
+	GM_DECLARE_PROPERTY(FrameRate, frameRate)
+	GM_DECLARE_PROPERTY(NumAnimatedComponents, numAnimatedComponents)
 
 public:
 	virtual bool load(const GMModelLoadSettings& settings, GMBuffer& buffer, REF GMAsset& asset) override;

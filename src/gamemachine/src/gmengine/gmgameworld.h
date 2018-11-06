@@ -40,7 +40,7 @@ class GMGameWorld : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMGameWorld)
 	GM_FRIEND_CLASS(GMPhysicsWorld)
-	GM_DECLARE_PROPERTY(RenderPreference, renderPreference, GMRenderPreference)
+	GM_DECLARE_PROPERTY(RenderPreference, renderPreference)
 
 public:
 	GMGameWorld(const IRenderContext* context);

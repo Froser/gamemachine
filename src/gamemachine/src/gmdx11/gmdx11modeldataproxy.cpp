@@ -130,10 +130,12 @@ void GMDx11ModelDataProxy::transfer()
 	mb->releaseRef();
 	model->setVerticesCount(verticesCount);
 
-	for (auto& mesh : model->getMeshes())
+	for (auto& part : model->getParts())
 	{
-		mesh->clear();
+		part->clear();
 	}
+	if (model->getUsageHint() == GMUsageHint::DynamicDraw)
+		model->getPackedVertices().swap(packedVertices);
 
 	d->inited = true;
 	model->doNotTransferAnymore();

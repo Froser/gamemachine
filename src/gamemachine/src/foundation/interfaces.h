@@ -36,7 +36,7 @@ class GMGamePackage;
 class GMGlyphManager;
 class GMShader;
 class GMModelDataProxy;
-class GMMesh;
+class GMPart;
 class GMTextureSampler;
 class GMTextureList;
 class GMAssets;

@@ -101,7 +101,7 @@ void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, REF GMModelAsset&
 	GMModel* m = new GMModel();
 	m->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
 	m->setType(GMModelType::Model3D);
-	GMMesh* face = new GMMesh(m);
+	GMPart* face = new GMPart(m);
 
 	//Front
 	{
@@ -309,7 +309,7 @@ void GMPrimitiveCreator::createQuadrangle(const GMVec2& halfExtents, GMfloat z, 
 
 	GMModel* m = new GMModel();
 	m->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
-	GMMesh* mesh = new GMMesh(m);
+	GMPart* part = new GMPart(m);
 
 	GMVertex V1 = {
 		{ s_vertices[0][0], s_vertices[0][1], s_vertices[0][2] }, //position
@@ -331,10 +331,10 @@ void GMPrimitiveCreator::createQuadrangle(const GMVec2& halfExtents, GMfloat z, 
 		{ 0, 0, -1.f }, //normal
 		{ texcoord[3][0], texcoord[3][1] }, //texcoord
 	};
-	mesh->vertex(V1);
-	mesh->vertex(V2);
-	mesh->vertex(V3);
-	mesh->vertex(V4);
+	part->vertex(V1);
+	part->vertex(V2);
+	part->vertex(V3);
+	part->vertex(V4);
 
 	model = GMAsset(GMAssetType::Model, m);
 }
@@ -345,7 +345,7 @@ void GMPrimitiveCreator::createSphere(GMfloat radius, GMint32 segmentsX, GMint32
 	GMModel* m = new GMModel();
 	m->setDrawMode(GMModelDrawMode::Index);
 	m->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
-	GMMesh* mesh = new GMMesh(m);
+	GMPart* part = new GMPart(m);
 
 	for (GMint32 y = 0; y <= segmentsY; ++y)
 	{
@@ -361,7 +361,7 @@ void GMPrimitiveCreator::createSphere(GMfloat radius, GMint32 segmentsX, GMint32
 				{ xPos, yPos, zPos },
 				{ xSegment, ySegment }
 			};
-			mesh->vertex(v);
+			part->vertex(v);
 		}
 	}
 
@@ -372,16 +372,16 @@ void GMPrimitiveCreator::createSphere(GMfloat radius, GMint32 segmentsX, GMint32
 		{
 			for (GMint32 x = 0; x <= segmentsX; ++x)
 			{
-				mesh->index(y       * (segmentsX + 1) + x);
-				mesh->index((y + 1) * (segmentsX + 1) + x);
+				part->index(y       * (segmentsX + 1) + x);
+				part->index((y + 1) * (segmentsX + 1) + x);
 			}
 		}
 		else
 		{
 			for (GMint32 x = segmentsX; x >= 0; --x)
 			{
-				mesh->index((y + 1) * (segmentsX + 1) + x);
-				mesh->index(y       * (segmentsX + 1) + x);
+				part->index((y + 1) * (segmentsX + 1) + x);
+				part->index(y       * (segmentsX + 1) + x);
 			}
 		}
 		oddRow = !oddRow;
@@ -513,8 +513,8 @@ void GMPrimitiveCreator::createTerrain(
 #undef getAdjVert
 
 	GMModel* m = new GMModel();
-	GMMesh* mesh = new GMMesh(m);
-	mesh->swap(vertices);
+	GMPart* part = new GMPart(m);
+	part->swap(vertices);
 
 	// 顶点数据创建完毕
 	// 接下来创建indices
@@ -524,13 +524,13 @@ void GMPrimitiveCreator::createTerrain(
 	{
 		for (GMsize_t j = 0; j < sliceM; ++j)
 		{
-			mesh->index(getIndex(j, i));
-			mesh->index(getIndex(j, i + 1));
-			mesh->index(getIndex(j + 1, i + 1));
+			part->index(getIndex(j, i));
+			part->index(getIndex(j, i + 1));
+			part->index(getIndex(j + 1, i + 1));
 
-			mesh->index(getIndex(j, i));
-			mesh->index(getIndex(j + 1, i + 1));
-			mesh->index(getIndex(j + 1, i));
+			part->index(getIndex(j, i));
+			part->index(getIndex(j + 1, i + 1));
+			part->index(getIndex(j + 1, i));
 		}
 	}
 
@@ -567,7 +567,7 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 
 	{
 		model->setType(type);
-		GMMesh* body = new GMMesh(model);
+		GMPart* body = new GMPart(model);
 		model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
 
 		GMFloat4 f4_vertex, f4_normal, f4_uv;

@@ -20,7 +20,7 @@ void GMModels::swap(GMModels* models)
 	D_OF(d_rhs, models);
 	using std::swap;
 	d->models.swap(d_rhs->models);
-	d->skeleton.swap(d_rhs->skeleton);
+	d->skeletalRoot.swap(d_rhs->skeletalRoot);
 }
 
 const IRenderContext* GMModelDataProxy::getContext()
@@ -34,17 +34,17 @@ void GMModelDataProxy::prepareTangentSpace()
 	GMModel* model = getModel();
 	if (model->getDrawMode() == GMModelDrawMode::Vertex)
 	{
-		for (auto& mesh : model->getMeshes())
+		for (auto& part : model->getParts())
 		{
 			if (model->getShader().getTextureList().getTextureSampler(GMTextureType::NormalMap).getFrameCount() > 0)
-				mesh->calculateTangentSpace(model->getPrimitiveTopologyMode());
+				part->calculateTangentSpace(model->getPrimitiveTopologyMode());
 		}
 	}
 	else
 	{
-		for (auto& mesh : model->getMeshes())
+		for (auto& part : model->getParts())
 		{
-			mesh->invalidateTangentSpace();
+			part->invalidateTangentSpace();
 		}
 	}
 }
@@ -52,11 +52,11 @@ void GMModelDataProxy::prepareTangentSpace()
 void GMModelDataProxy::packVertices(Vector<GMVertex>& vertices)
 {
 	GMModel* model = getModel();
-	GMMeshes& meshes = model->getMeshes();
+	GMParts& meshes = model->getParts();
 	GMuint32 offset = 0;
-	for (auto& mesh : meshes)
+	for (auto& part : meshes)
 	{
-		for (auto& vertex : mesh->vertices())
+		for (auto& vertex : part->vertices())
 		{
 			vertices.push_back(vertex);
 		}
@@ -66,17 +66,17 @@ void GMModelDataProxy::packVertices(Vector<GMVertex>& vertices)
 void GMModelDataProxy::packIndices(Vector<GMuint32>& indices)
 {
 	GMModel* model = getModel();
-	GMMeshes& meshes = model->getMeshes();
+	GMParts& meshes = model->getParts();
 	GMuint32 offset = 0;
-	for (auto& mesh : meshes)
+	for (auto& part : meshes)
 	{
-		for (GMuint32 index : mesh->indices())
+		for (GMuint32 index : part->indices())
 		{
 			indices.push_back(index + offset);
 		}
 
-		// 每个Mesh按照自己的坐标排序，因此每个Mesh都应该在总缓存里面加上偏移
-		offset += gm_sizet_to_uint(mesh->vertices().size());
+		// 每个part按照自己的坐标排序，因此每个part都应该在总缓存里面加上偏移
+		offset += gm_sizet_to_uint(part->vertices().size());
 	}
 }
 
@@ -127,7 +127,7 @@ GMModel::~GMModel()
 {
 	D(d);
 	releaseModelBuffer();
-	GM_delete(d->meshes);
+	GM_delete(d->parts);
 }
 
 void GMModel::setModelBuffer(AUTORELEASE GMModelBuffer* mb)
@@ -156,10 +156,10 @@ void GMModel::releaseModelBuffer()
 	}
 }
 
-void GMModel::addMesh(GMMesh* mesh)
+void GMModel::addPart(GMPart* part)
 {
 	D(d);
-	d->meshes.push_back(mesh);
+	d->parts.push_back(part);
 }
 
 GMModelBuffer::GMModelBuffer()
@@ -183,31 +183,31 @@ void GMModelBuffer::dispose()
 	d->modelDataProxy->dispose(this);
 }
 
-GMMesh::GMMesh(GMModel* parent)
+GMPart::GMPart(GMModel* parent)
 {
-	parent->addMesh(this);
+	parent->addPart(this);
 }
 
-void GMMesh::clear()
+void GMPart::clear()
 {
 	D(d);
 	GMClearSTLContainer(d->vertices);
 	GMClearSTLContainer(d->indices);
 }
 
-void GMMesh::vertex(const GMVertex& v)
+void GMPart::vertex(const GMVertex& v)
 {
 	D(d);
 	d->vertices.push_back(v);
 }
 
-void GMMesh::index(GMuint32 index)
+void GMPart::index(GMuint32 index)
 {
 	D(d);
 	d->indices.push_back(index);
 }
 
-void GMMesh::invalidateTangentSpace()
+void GMPart::invalidateTangentSpace()
 {
 	D(d);
 	for (auto& vertex : d->vertices)
@@ -218,19 +218,19 @@ void GMMesh::invalidateTangentSpace()
 	}
 }
 
-void GMMesh::swap(GMVertices& vertex)
+void GMPart::swap(GMVertices& vertex)
 {
 	D(d);
 	d->vertices.swap(vertex);
 }
 
-void GMMesh::swap(GMIndices& indices)
+void GMPart::swap(GMIndices& indices)
 {
 	D(d);
 	d->indices.swap(indices);
 }
 
-void GMMesh::calculateTangentSpace(GMTopologyMode topologyMode)
+void GMPart::calculateTangentSpace(GMTopologyMode topologyMode)
 {
 	D(d);
 	if (topologyMode == GMTopologyMode::Lines)
@@ -320,7 +320,7 @@ void GMMesh::calculateTangentSpace(GMTopologyMode topologyMode)
 	}
 }
 
-bool GMMesh::calculateNormals(GMTopologyMode topologyMode, GMS_FrontFace frontFace)
+bool GMPart::calculateNormals(GMTopologyMode topologyMode, GMS_FrontFace frontFace)
 {
 	D(d);
 	// 一定要是顶点模式，而不是索引模式，不然算出来的法向量没有意义

@@ -25,19 +25,19 @@ GMGameObject* GMParticleModel_2D::createGameObject(
 	d->particleModel->setType(GMModelType::Particle);
 
 	d->particleModel->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
-	GMMesh* mesh = new GMMesh(d->particleModel);
+	GMPart* part = new GMPart(d->particleModel);
 
 	// 使用triangles拓扑，一次性填充所有的矩形
 	GMsize_t total = d->system->getEmitter()->getParticleCount();
 	for (GMsize_t i = 0; i < total; ++i)
 	{
 		// 一个particle由6个定点组成
-		mesh->vertex(GMVertex());
-		mesh->vertex(GMVertex());
-		mesh->vertex(GMVertex());
-		mesh->vertex(GMVertex());
-		mesh->vertex(GMVertex());
-		mesh->vertex(GMVertex());
+		part->vertex(GMVertex());
+		part->vertex(GMVertex());
+		part->vertex(GMVertex());
+		part->vertex(GMVertex());
+		part->vertex(GMVertex());
+		part->vertex(GMVertex());
 	}
 
 	context->getEngine()->createModelDataProxy(context, d->particleModel);

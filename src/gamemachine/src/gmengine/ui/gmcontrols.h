@@ -401,8 +401,8 @@ GM_PRIVATE_OBJECT(GMControlBorder)
 class GMControlBorder : public GMControl
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMControlBorder, GMControl);
-	GM_DECLARE_PROPERTY(Corner, corner, GMRect);
-	GM_DECLARE_PROPERTY(BorderStyle, borderStyle, GMStyle);
+	GM_DECLARE_PROPERTY(Corner, corner);
+	GM_DECLARE_PROPERTY(BorderStyle, borderStyle);
 
 public:
 	static GMControlBorder* createControl(
@@ -470,12 +470,12 @@ GM_PRIVATE_OBJECT(GMControlScrollBar)
 class GMControlScrollBar : public GMControl
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMControlScrollBar, GMControl)
-	GM_DECLARE_PROPERTY(PageStep, pageStep, GMint32)
-	GM_DECLARE_PROPERTY(SingleStep, singleStep, GMint32)
-	GM_DECLARE_GETTER(Value, value, GMint32)
-	GM_DECLARE_GETTER(Maximum, maximum, GMint32)
-	GM_DECLARE_GETTER(Minimum, minimum, GMint32)
-	GM_DECLARE_PROPERTY(CanRequestFocus, canRequestFocus, bool)
+	GM_DECLARE_PROPERTY(PageStep, pageStep)
+	GM_DECLARE_PROPERTY(SingleStep, singleStep)
+	GM_DECLARE_GETTER(Value, value)
+	GM_DECLARE_GETTER(Maximum, maximum)
+	GM_DECLARE_GETTER(Minimum, minimum)
+	GM_DECLARE_PROPERTY(CanRequestFocus, canRequestFocus)
 
 	GM_DECLARE_SIGNAL(valueChanged)
 	GM_DECLARE_SIGNAL(startDragThumb)

@@ -315,6 +315,22 @@ void cases::LinearMath::addToUnitTest(UnitTest& ut)
 			VECTOR4_EQUALS(N[3], 0, 0, 0, 1);
 	});
 
+	ut.addTestCase("Matrix * Float", []() {
+		GMFloat16 f16;
+		f16[0] = GMFloat4(1, 2, 3, 4);
+		f16[1] = GMFloat4(5, 6, 7, 8);
+		f16[2] = GMFloat4(9, 10, 11, 12);
+		f16[3] = GMFloat4(13, 14, 15, 16);
+		GMMat4 M;
+		M.setFloat16(f16);
+		M = 2 * M;
+		return
+			VECTOR4_EQUALS(M[0], 2, 4, 6, 8) &&
+			VECTOR4_EQUALS(M[1], 10, 12, 14, 16) &&
+			VECTOR4_EQUALS(M[2], 18, 20, 22, 24) &&
+			VECTOR4_EQUALS(M[3], 26, 28, 30, 32);
+	});
+
 	// Make, Combine
 	ut.addTestCase("MakeVector3", []() {
 		gm::GMfloat A[] = { 1, 2, 3 };
@@ -378,6 +394,28 @@ void cases::LinearMath::addToUnitTest(UnitTest& ut)
 			VECTOR4_EQUALS(R[1], 618, 644, 670, 696) &&
 			VECTOR4_EQUALS(R[2], 986, 1028, 1070, 1112) &&
 			VECTOR4_EQUALS(R[3], 1354, 1412, 1470, 1528);
+	});
+
+	ut.addTestCase("GMMat4 + GMMat4", []() {
+		GMFloat16 f16_1, f16_2;
+		f16_1[0] = GMFloat4(1, 2, 3, 4);
+		f16_1[1] = GMFloat4(5, 6, 7, 8);
+		f16_1[2] = GMFloat4(9, 10, 11, 12);
+		f16_1[3] = GMFloat4(13, 14, 15, 16);
+
+		f16_2[0] = GMFloat4(17, 18, 19, 20);
+		f16_2[1] = GMFloat4(21, 22, 23, 24);
+		f16_2[2] = GMFloat4(25, 26, 27, 28);
+		f16_2[3] = GMFloat4(29, 30, 31, 32);
+		GMMat4 M1, M2;
+		M1.setFloat16(f16_1);
+		M2.setFloat16(f16_2);
+		GMMat4 R = M1 + M2;
+		return
+			VECTOR4_EQUALS(R[0], 18, 20, 22, 24) &&
+			VECTOR4_EQUALS(R[1], 26, 28, 30, 32) &&
+			VECTOR4_EQUALS(R[2], 34, 36, 38, 40) &&
+			VECTOR4_EQUALS(R[3], 42, 44, 46, 48);
 	});
 
 	ut.addTestCase("GMVec4 * GMMat4", []() {

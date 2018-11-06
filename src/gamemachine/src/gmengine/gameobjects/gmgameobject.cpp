@@ -250,15 +250,15 @@ void GMCubeMapGameObject::createCubeMap(GMTextureAsset texture)
 	GMModel* model = new GMModel();
 	model->setType(GMModelType::CubeMap);
 	model->getShader().getTextureList().getTextureSampler(GMTextureType::CubeMap).addFrame(texture);
-	GMMesh* mesh = new GMMesh(model);
+	GMPart* part = new GMPart(model);
 	for (GMuint32 i = 0; i < 12; i++)
 	{
 		GMVertex V0 = { { vertices[i * 9 + 0], vertices[i * 9 + 1], vertices[i * 9 + 2] }, { vertices[i * 9 + 0], vertices[i * 9 + 1], vertices[i * 9 + 2] } };
 		GMVertex V1 = { { vertices[i * 9 + 3], vertices[i * 9 + 4], vertices[i * 9 + 5] },{ vertices[i * 9 + 3], vertices[i * 9 + 4], vertices[i * 9 + 5] } };
 		GMVertex V2 = { { vertices[i * 9 + 6], vertices[i * 9 + 7], vertices[i * 9 + 8] },{ vertices[i * 9 + 6], vertices[i * 9 + 7], vertices[i * 9 + 8] } };
-		mesh->vertex(V0);
-		mesh->vertex(V1);
-		mesh->vertex(V2);
+		part->vertex(V0);
+		part->vertex(V1);
+		part->vertex(V2);
 	}
 
 	setAsset(GMAsset(GMAssetType::Model, model));

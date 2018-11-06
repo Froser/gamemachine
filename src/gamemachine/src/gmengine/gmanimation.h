@@ -12,7 +12,7 @@ GM_PRIVATE_OBJECT(GMAnimationKeyframe)
 class GMAnimationKeyframe : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMAnimationKeyframe)
-	GM_DECLARE_PROPERTY(Time, time, GMfloat);
+	GM_DECLARE_PROPERTY(Time, time);
 
 public:
 	GMAnimationKeyframe() = default;
@@ -60,7 +60,7 @@ class GMAnimation : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMAnimation)
 	GM_ALLOW_COPY_MOVE(GMAnimation)
-	GM_DECLARE_PROPERTY(PlayLoop, playLoop, bool)
+	GM_DECLARE_PROPERTY(PlayLoop, playLoop)
 
 public:
 	template <typename... Objects>
@@ -118,9 +118,9 @@ GM_PRIVATE_OBJECT(GMGameObjectKeyframe)
 class GMGameObjectKeyframe : public GMAnimationKeyframe
 {
 	GM_DECLARE_PRIVATE(GMGameObjectKeyframe)
-	GM_DECLARE_PROPERTY(Translation, translation, GMVec4)
-	GM_DECLARE_PROPERTY(Scaling, scaling, GMVec4)
-	GM_DECLARE_PROPERTY(Rotation, rotation, GMQuat)
+	GM_DECLARE_PROPERTY(Translation, translation)
+	GM_DECLARE_PROPERTY(Scaling, scaling)
+	GM_DECLARE_PROPERTY(Rotation, rotation)
 
 public:
 	GMGameObjectKeyframe(

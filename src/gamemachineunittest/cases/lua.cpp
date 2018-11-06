@@ -23,14 +23,14 @@ namespace
 	class LuaObject : public gm::GMObject
 	{
 		GM_DECLARE_PRIVATE(LuaObject)
-		GM_DECLARE_PROPERTY(i, i, gm::GMint32)
-		GM_DECLARE_PROPERTY(f, f, gm::GMfloat)
-		GM_DECLARE_PROPERTY(b, b, bool)
-		GM_DECLARE_PROPERTY(str, str, gm::GMString)
-		GM_DECLARE_PROPERTY(v2, v2, GMVec2)
-		GM_DECLARE_PROPERTY(v3, v3, GMVec3)
-		GM_DECLARE_PROPERTY(v4, v4, GMVec4)
-		GM_DECLARE_PROPERTY(m, m, GMMat4)
+		GM_DECLARE_PROPERTY(i, i)
+		GM_DECLARE_PROPERTY(f, f)
+		GM_DECLARE_PROPERTY(b, b)
+		GM_DECLARE_PROPERTY(str, str)
+		GM_DECLARE_PROPERTY(v2, v2)
+		GM_DECLARE_PROPERTY(v3, v3)
+		GM_DECLARE_PROPERTY(v4, v4)
+		GM_DECLARE_PROPERTY(m, m)
 
 	public:
 		virtual bool registerMeta() override;

@@ -61,22 +61,21 @@ struct GMModelLoadSettings
 class GMModelReader
 {
 public:
-	enum ModelType
+	enum EngineType
 	{
 		Auto,
 		ModelType_Begin,
-		GMMd5 = ModelType_Begin,
-		AnyOther,
+		Assimp = ModelType_Begin,
 		ModelType_End,
 	};
 
 public:
 	static bool load(const GMModelLoadSettings& settings, REF GMAsset& asset);
-	static bool load(const GMModelLoadSettings& settings, ModelType type, REF GMAsset& asset);
-	static IModelReader* getReader(ModelType type);
+	static bool load(const GMModelLoadSettings& settings, EngineType type, REF GMAsset& asset);
+	static IModelReader* getReader(EngineType type);
 
 private:
-	static ModelType test(const GMModelLoadSettings& settings, const GMBuffer& buffer);
+	static EngineType test(const GMModelLoadSettings& settings, const GMBuffer& buffer);
 };
 
 END_NS

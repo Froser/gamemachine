@@ -257,7 +257,7 @@ class GMSystemEvent : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMSystemEvent)
 	GM_ALLOW_COPY_MOVE(GMSystemEvent)
-	GM_DECLARE_PROPERTY(Type, type, GMSystemEventType);
+	GM_DECLARE_PROPERTY(Type, type);
 
 public:
 	GMSystemEvent() = default;
@@ -274,8 +274,8 @@ class GMSystemKeyEvent : public GMSystemEvent
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMSystemKeyEvent, GMSystemEvent);
 	GM_ALLOW_COPY_MOVE(GMSystemKeyEvent)
-	GM_DECLARE_PROPERTY(Key, key, GMKey)
-	GM_DECLARE_PROPERTY(Modifier, modifier, GMModifier)
+	GM_DECLARE_PROPERTY(Key, key)
+	GM_DECLARE_PROPERTY(Modifier, modifier)
 
 public:
 	GMSystemKeyEvent() = default;
@@ -297,7 +297,7 @@ class GMSystemCharEvent : public GMSystemKeyEvent
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMSystemCharEvent, GMSystemKeyEvent);
 	GM_ALLOW_COPY_MOVE(GMSystemCharEvent)
-	GM_DECLARE_PROPERTY(Character, character, GMwchar)
+	GM_DECLARE_PROPERTY(Character, character)
 
 public:
 	GMSystemCharEvent(GMSystemEventType type, GMKey key, GMwchar character, GMModifier modifier)
@@ -320,10 +320,10 @@ class GMSystemMouseEvent : public GMSystemEvent
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMSystemMouseEvent, GMSystemEvent);
 	GM_ALLOW_COPY_MOVE(GMSystemMouseEvent)
-	GM_DECLARE_PROPERTY(Point, point, GMPoint)
-	GM_DECLARE_PROPERTY(Button, button, GMMouseButton)
-	GM_DECLARE_PROPERTY(Buttons, buttons, GMMouseButton)
-	GM_DECLARE_PROPERTY(Modifier, modifier, GMModifier)
+	GM_DECLARE_PROPERTY(Point, point)
+	GM_DECLARE_PROPERTY(Button, button)
+	GM_DECLARE_PROPERTY(Buttons, buttons)
+	GM_DECLARE_PROPERTY(Modifier, modifier)
 	
 public:
 	GMSystemMouseEvent() = default;
@@ -347,7 +347,7 @@ class GMSystemMouseWheelEvent : public GMSystemMouseEvent
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMSystemMouseWheelEvent, GMSystemMouseEvent)
 	GM_ALLOW_COPY_MOVE(GMSystemMouseWheelEvent)
-	GM_DECLARE_PROPERTY(Delta, delta, GMshort)
+	GM_DECLARE_PROPERTY(Delta, delta)
 
 public:
 	GMSystemMouseWheelEvent() = default;
@@ -368,7 +368,7 @@ GM_PRIVATE_OBJECT(GMSystemCaptureChangedEvent)
 class GMSystemCaptureChangedEvent : public GMSystemEvent
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMSystemCaptureChangedEvent, GMSystemEvent)
-	GM_DECLARE_PROPERTY(CapturedWindow, capturedWnd, GMWindowHandle)
+	GM_DECLARE_PROPERTY(CapturedWindow, capturedWnd)
 
 public:
 	GMSystemCaptureChangedEvent(GMWindowHandle capturedWnd)
