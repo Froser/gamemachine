@@ -38,10 +38,10 @@ void Demo_SpecularMap::init()
 		gm::GMTextureAsset texture = gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "cube_diffuse.png");
 		getDemoWorldReference()->getAssets().addAsset(texture);
 
-		gm::GMModelAsset cube;
+		gm::GMSceneAsset cube;
 		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::one3(), cube);
 
-		gm::GMShader& shader = cube.getModel()->getShader();
+		gm::GMShader& shader = cube.getScene()->getModels()[0].getModel()->getShader();
 		shader.getMaterial().ks = GMVec3(1);
 		shader.getMaterial().kd = GMVec3(1);
 		shader.getMaterial().shininess = 99;
@@ -62,10 +62,10 @@ void Demo_SpecularMap::init()
 		gm::GMTextureAsset texture = gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "cube_diffuse.png");
 		getDemoWorldReference()->getAssets().addAsset(texture);
 
-		gm::GMModelAsset cube;
+		gm::GMSceneAsset cube;
 		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::one3(), cube);
 
-		gm::GMShader& shader = cube.getModel()->getShader();
+		gm::GMShader& shader = cube.getScene()->getModels()[0].getModel()->getShader();
 		shader.getMaterial().ks = GMVec3(1);
 		shader.getMaterial().kd = GMVec3(1);
 		shader.getMaterial().shininess = 99;

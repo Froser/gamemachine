@@ -81,7 +81,7 @@ void Demo_MD5Mesh::init()
 		boblampcleanModel
 	);
 	
-	for (auto& model : boblampcleanModel.getModels()->getModels())
+	for (auto& model : boblampcleanModel.getScene()->getModels())
 	{
 		model.getModel()->getShader().getMaterial().ks = GMVec3(0);
 	}

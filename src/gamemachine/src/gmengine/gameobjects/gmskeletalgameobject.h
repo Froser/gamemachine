@@ -63,6 +63,7 @@ public:
 public:
 	virtual void update(GMDuration dt) override;
 	virtual void draw() override;
+	virtual bool canDeferredRendering() override;
 
 public:
 	void createSkeletonBonesObject();

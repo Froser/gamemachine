@@ -13,10 +13,10 @@ void Demo_Texture::init()
 
 	// 创建一个带纹理的对象
 	GMVec2 extents = GMVec2(1.f, .5f);
-	gm::GMModelAsset asset;
+	gm::GMSceneAsset asset;
 	gm::GMPrimitiveCreator::createQuadrangle(extents, 0, asset);
 	
-	gm::GMModel* model = asset.getModel();
+	gm::GMModel* model = asset.getScene()->getModels()[0].getModel();
 	model->getShader().getMaterial().kd = GMVec3(1, 1, 1);
 	model->getShader().getMaterial().ks = GMVec3(0);
 

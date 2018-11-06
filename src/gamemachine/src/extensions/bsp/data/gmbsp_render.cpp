@@ -333,7 +333,7 @@ void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const 
 	for (GMint32 row = 0; row < biqp.tesselation; ++row)
 	{
 		GMModel* model = new GMModel();
-		scene->push_back(GMAsset(GMAssetType::Model, model));
+		scene->addModelAsset(GMAsset(GMAssetType::Model, model));
 		model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
 		model->setShader(shader);
 		GMPart* part = new GMPart(model);

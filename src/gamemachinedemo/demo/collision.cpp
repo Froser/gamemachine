@@ -341,7 +341,7 @@ void Demo_Collision_Model::createItems()
 				modelObject->setPhysicsObject(rigidBoxObj);
 				rigidBoxObj->setShape(teddyAsset);
 
-				gm::GMModelAsset m = model.getModels()->getModels().front();
+				gm::GMModelAsset m = model.getScene()->getModels().front();
 				gm::GMModel* duplicateModel = new gm::GMModel(m);
 				// Set color
 				duplicateModel->getShader().getMaterial().ka = s_colors[idx % GM_array_size(s_colors)];

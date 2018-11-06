@@ -33,10 +33,10 @@ void Demo_PBR::init()
 	getDemoWorldReference().reset(new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext()));
 
 	{
-		gm::GMModelAsset sphere;
+		gm::GMSceneAsset sphere;
 		gm::GMPrimitiveCreator::createSphere(1.0f, 64, 64, sphere);
 
-		gm::GMShader& shader = sphere.getModel()->getShader();
+		gm::GMShader& shader = sphere.getScene()->getModels()[0].getModel()->getShader();
 		shader.setIlluminationModel(gm::GMIlluminationModel::CookTorranceBRDF);
 
 		gm::GMTextureAsset albedo;

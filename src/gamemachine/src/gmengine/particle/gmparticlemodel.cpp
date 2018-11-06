@@ -42,7 +42,7 @@ GMGameObject* GMParticleModel_2D::createGameObject(
 
 	context->getEngine()->createModelDataProxy(context, d->particleModel);
 	object->setContext(context);
-	object->setAsset(GMAsset(GMAssetType::Model, d->particleModel));
+	object->setAsset(gm::GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, d->particleModel)));
 	return object;
 }
 

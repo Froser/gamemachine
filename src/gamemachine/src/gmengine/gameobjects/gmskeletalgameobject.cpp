@@ -259,6 +259,11 @@ void GMSkeletalGameObject::draw()
 		GMGameObject::draw();
 }
 
+bool GMSkeletalGameObject::canDeferredRendering()
+{
+	return false;
+}
+
 void GMSkeletalGameObject::createSkeletonBonesObject()
 {
 	D(d);

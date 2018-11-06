@@ -24,12 +24,12 @@ void GMGBuffer::createQuad()
 {
 	D(d);
 	GM_ASSERT(!d->quad);
-	GMModelAsset model;
-	GMPrimitiveCreator::createQuadrangle(GMPrimitiveCreator::one2(), 0, model);
-	GM_ASSERT(!model.isEmpty());
-	model.getModel()->setType(GMModelType::LightPassQuad);
-	getContext()->getEngine()->createModelDataProxy(d->context, model.getModel());
-	d->quad = new GMGameObject(model);
+	GMSceneAsset scene;
+	GMPrimitiveCreator::createQuadrangle(GMPrimitiveCreator::one2(), 0, scene);
+	GM_ASSERT(!scene.isEmpty());
+	scene.getScene()->getModels()[0].getModel()->setType(GMModelType::LightPassQuad);
+	getContext()->getEngine()->createModelDataProxy(d->context, scene.getModel());
+	d->quad = new GMGameObject(scene);
 	d->quad->setContext(d->context);
 }
 

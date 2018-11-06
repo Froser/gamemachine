@@ -32,7 +32,7 @@ void Demo_Phong_PBR::init()
 	getDemoWorldReference().reset(new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext()));
 
 	{
-		gm::GMModelAsset sphere;
+		gm::GMSceneAsset sphere;
 		gm::GMPrimitiveCreator::createSphere(1.0f, 64, 64, sphere);
 		gm::GMShader& shader = sphere.getModel()->getShader();
 		shader.setIlluminationModel(gm::GMIlluminationModel::CookTorranceBRDF);
@@ -67,7 +67,7 @@ void Demo_Phong_PBR::init()
 	}
 
 	{
-		gm::GMModelAsset sphere;
+		gm::GMSceneAsset sphere;
 		gm::GMPrimitiveCreator::createSphere(1.0f, 64, 64, sphere);
 		gm::GMShader& shader = sphere.getModel()->getShader();
 		shader.setIlluminationModel(gm::GMIlluminationModel::Phong);

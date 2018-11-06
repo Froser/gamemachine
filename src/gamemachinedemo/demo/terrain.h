@@ -6,7 +6,7 @@
 
 GM_PRIVATE_OBJECT(Demo_Terrain)
 {
-	gm::GMAsset terrainModel;
+	gm::GMAsset terrainScene;
 	gm::GMGameObject* terrain = nullptr;
 	gm::GMint32 mouseDownX;
 	gm::GMint32 mouseDownY;

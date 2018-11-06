@@ -69,7 +69,7 @@ GMfloat* GMPrimitiveCreator::origin()
 	return o;
 }
 
-void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, REF GMModelAsset& model)
+void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, REF GMSceneAsset& scene)
 {
 	static const GMVec3 s_vertices[8] = {
 		GMVec3(-1, -1, -1),
@@ -283,10 +283,10 @@ void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, REF GMModelAsset&
 		face->vertex(V2);
 	}
 
-	model = GMAsset(GMAssetType::Model, m);
+	scene = GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, m));
 }
 
-void GMPrimitiveCreator::createQuadrangle(const GMVec2& halfExtents, GMfloat z, REF GMModelAsset& model)
+void GMPrimitiveCreator::createQuadrangle(const GMVec2& halfExtents, GMfloat z, REF GMSceneAsset& scene)
 {
 	constexpr GMfloat texcoord[4][2] =
 	{
@@ -336,10 +336,10 @@ void GMPrimitiveCreator::createQuadrangle(const GMVec2& halfExtents, GMfloat z, 
 	part->vertex(V3);
 	part->vertex(V4);
 
-	model = GMAsset(GMAssetType::Model, m);
+	scene = GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, m));
 }
 
-void GMPrimitiveCreator::createSphere(GMfloat radius, GMint32 segmentsX, GMint32 segmentsY, REF GMModelAsset& model)
+void GMPrimitiveCreator::createSphere(GMfloat radius, GMint32 segmentsX, GMint32 segmentsY, REF GMSceneAsset& scene)
 {
 	GM_ASSERT(radius > 0 && segmentsX > 1 && segmentsY > 1);
 	GMModel* m = new GMModel();
@@ -387,12 +387,12 @@ void GMPrimitiveCreator::createSphere(GMfloat radius, GMint32 segmentsX, GMint32
 		oddRow = !oddRow;
 	}
 
-	model = GMAsset(GMAssetType::Model, m);
+	scene = GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, m));
 }
 
 void GMPrimitiveCreator::createTerrain(
 	const GMTerrainDescription& desc,
-	REF GMModelAsset& model
+	REF GMSceneAsset& scene
 )
 {
 	// 从灰度图创建地形
@@ -534,85 +534,7 @@ void GMPrimitiveCreator::createTerrain(
 		}
 	}
 
-	model = GMAsset(GMAssetType::Model, m);
-}
-
-void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMModelType type, GMfloat(*customUV)[8])
-{
-	static constexpr GMfloat defaultUV[] = {
-		-1, 1,
-		-1, -1,
-		1, -1,
-		1, 1,
-	};
-
-	const GMfloat(*_pos)[12] = (GMfloat(*)[12])(position);
-	const GMfloat(*_uv)[8] = customUV ? customUV : (GMfloat(*)[8])defaultUV;
-	const GMfloat(&uvArr)[8] = *_uv;
-	const GMfloat(&v)[12] = *_pos;
-
-	static constexpr GMint32 indices[] = {
-		0, 3, 1,
-		2, 1, 3,
-	};
-
-	GMModel* model = new GMModel();
-
-	// 实体
-	GMfloat t[12];
-	for (GMint32 i = 0; i < 12; i++)
-	{
-		t[i] = extents[i % 3] * v[i];
-	}
-
-	{
-		model->setType(type);
-		GMPart* body = new GMPart(model);
-		model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
-
-		GMFloat4 f4_vertex, f4_normal, f4_uv;
-		for (GMint32 i = 0; i < 2; i++)
-		{
-			for (GMint32 j = 0; j < 3; j++) // j表示面的一个顶点
-			{
-				GMint32 idx = i * 3 + j; //顶点的开始
-				GMint32 idx_next = i * 3 + (j + 1) % 3;
-				GMint32 idx_prev = i * 3 + (j + 2) % 3;
-				GMVec2 uv(uvArr[indices[idx] * 2], uvArr[indices[idx] * 2 + 1]);
-				GMVec3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
-				GMVec3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
-					vertex_next(t[indices[idx_next] * 3], t[indices[idx_next] * 3 + 1], t[indices[idx_next] * 3 + 2]);
-				GMVec3 normal = Cross(vertex - vertex_prev, vertex_next - vertex);
-				normal = FastNormalize(normal);
-
-				vertex.loadFloat4(f4_vertex);
-				normal.loadFloat4(f4_normal);
-				uv.loadFloat4(f4_uv);
-
-				GMVertex v = {
-					{ f4_vertex[0], f4_vertex[1], f4_vertex[2] },
-					{ f4_normal[0], f4_normal[1], f4_normal[2] }
-				};
-
-				if (customUV)
-				{
-					v.texcoords[0] = f4_uv[0];
-					v.texcoords[1] = 1 - f4_uv[1];
-				}
-				else
-				{
-					v.texcoords[0] = (f4_uv[0] + 1) / 2;
-					v.texcoords[1] = 1 - (f4_uv[1] + 1) / 2;
-				}
-				v.color[0] = v.color[1] = v.color[2] = v.color[3] = 1.f;
-				body->vertex(v);
-			}
-		}
-		if (shaderCallback)
-			shaderCallback->onCreateShader(model->getShader());
-	}
-
-	*obj = model;
+	scene = GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, m));
 }
 
 GMTextureAsset GMToolUtil::createTexture(const IRenderContext* context, const GMString& filename, REF GMint32* width, REF GMint32* height)

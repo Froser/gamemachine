@@ -61,7 +61,7 @@ GMBSPSkyGameObject::GMBSPSkyGameObject(const GMShader& shader, const GMVec3& min
 
 	GMModel* obj = nullptr;
 	createSkyBox(&obj);
-	setAsset(GMAsset(GMAssetType::Model, obj));
+	setAsset(GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, obj)));
 }
 
 void GMBSPSkyGameObject::createSkyBox(OUT GMModel** obj)
@@ -414,7 +414,7 @@ void GMBSPGameWorld::preparePolygonFace(GMint32 polygonFaceNumber, GMint32 drawS
 	d->render.createObject(polygonFace, shader, &model);
 	GM_ASSERT(model);
 	GMAsset asset = getAssets().addAsset(GMAsset(GMAssetType::Model, model));
-	obj = new GMGameObject(asset);
+	obj = new GMGameObject(GMScene::createSceneFromSingleModel(asset));
 
 	rd.polygonFaceObjects[&polygonFace] = obj;
 	addObjectAndInit(obj);

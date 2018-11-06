@@ -321,7 +321,7 @@ namespace
 			if (part->HasBones())
 				processBones(imp, part, model);
 
-			s->push_back(GMAsset(GMAssetType::Model, model));
+			s->addModelAsset(GMAsset(GMAssetType::Model, model));
 		}
 	}
 }

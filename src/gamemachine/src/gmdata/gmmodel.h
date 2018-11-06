@@ -339,7 +339,10 @@ class GMScene : public GMObject
 	GM_DECLARE_PROPERTY(Models, models)
 
 public:
-	void push_back(GMModelAsset model);
+	static GMSceneAsset createSceneFromSingleModel(GMModelAsset modelAsset);
+
+public:
+	void addModelAsset(GMModelAsset model);
 	void swap(GMScene* scene);
 
 public:

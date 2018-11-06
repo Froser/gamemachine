@@ -65,7 +65,7 @@ struct GMShadowSourceDesc;
 
 class GMAsset;
 typedef GMAsset GMModelAsset;
-typedef GMAsset GMModelsAsset;
+typedef GMAsset GMSceneAsset;
 typedef GMAsset GMPhysicsShapeAsset;
 typedef GMAsset GMTextureAsset;
 

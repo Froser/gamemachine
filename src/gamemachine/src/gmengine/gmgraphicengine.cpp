@@ -324,7 +324,7 @@ void GMGraphicEngine::createFilterFramebuffer()
 		GMModelAsset quad;
 		GMPrimitiveCreator::createQuadrangle(GMPrimitiveCreator::one2(), 0, quad);
 		GM_ASSERT(!quad.isEmpty());
-		GMModel* quadModel = quad.getModel();
+		GMModel* quadModel = quad.getScene()->getModels()[0].getModel();
 		quadModel->setType(GMModelType::Filter);
 
 		GMTextureAsset texture;

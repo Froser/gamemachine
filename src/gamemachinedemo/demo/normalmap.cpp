@@ -19,7 +19,7 @@ void Demo_NormalMap::init()
 	gm::GMModelAsset asset;
 	gm::GMPrimitiveCreator::createQuadrangle(extents, .5f, asset);
 
-	gm::GMModel* model = asset.getModel();
+	gm::GMModel* model = asset.getScene()->getModels()[0].getModel();
 	model->getShader().setCull(gm::GMS_Cull::Cull);
 	model->getShader().getMaterial().kd = GMVec3(.6f, .2f, .3f);
 	model->getShader().getMaterial().ks = GMVec3(.1f, .2f, .3f);

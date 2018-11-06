@@ -8,9 +8,17 @@
 #define TO_VEC3(i) GMVec3((i)[0], (i)[1], (i)[2])
 #define TO_VEC2(i) GMVec2((i)[0], (i)[1])
 
-void GMScene::push_back(GMModelAsset model)
+GMSceneAsset GMScene::createSceneFromSingleModel(GMModelAsset modelAsset)
+{
+	GMScene* scene = new GMScene();
+	scene->addModelAsset(modelAsset);
+	return GMAsset(GMAssetType::Scene, scene);
+}
+
+void GMScene::addModelAsset(GMModelAsset model)
 {
 	D(d);
+	GM_ASSERT(model.getModel());
 	d->models.push_back(model);
 }
 

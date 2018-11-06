@@ -50,7 +50,7 @@ class GMAsset
 public:
 	GM_DECLARE_ASSET_GETTER(ITexture*, getTexture);
 	GM_DECLARE_ASSET_GETTER(GMModel*, getModel);
-	GM_DECLARE_ASSET_GETTER(GMScene*, getModels);
+	GM_DECLARE_ASSET_GETTER(GMScene*, getScene);
 	GM_DECLARE_ASSET_GETTER(GMPhysicsShape*, getPhysicsShape);
 
 public:

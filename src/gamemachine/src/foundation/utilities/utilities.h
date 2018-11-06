@@ -46,16 +46,13 @@ struct GMPrimitiveCreator
 	static const GMVec2& one2();
 	static GMfloat* origin();
 
-	static void createCube(const GMVec3& halfExtents, REF GMModelAsset& model);
-	static void createQuadrangle(const GMVec2& halfExtents, GMfloat z, REF GMModelAsset& model);
-	static void createSphere(GMfloat radius, GMint32 segmentsX, GMint32 segmentsY, REF GMModelAsset& model);
-
+	static void createCube(const GMVec3& halfExtents, REF GMSceneAsset& scene);
+	static void createQuadrangle(const GMVec2& halfExtents, GMfloat z, REF GMSceneAsset& scene);
+	static void createSphere(GMfloat radius, GMint32 segmentsX, GMint32 segmentsY, REF GMSceneAsset& scene);
 	static void createTerrain(
 		const GMTerrainDescription& desc,
-		REF GMModelAsset& model
+		REF GMSceneAsset& scene
 	);
-
-	static void createQuad3D(GMfloat extents[3], GMfloat position[12], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback = nullptr, GMModelType type = GMModelType::Model3D, GMfloat(*customUV)[8] = nullptr);
 };
 
 //! 引擎提供的各种繁琐操作的工具类。

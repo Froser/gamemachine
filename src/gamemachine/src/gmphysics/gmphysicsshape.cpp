@@ -209,7 +209,7 @@ bool GMPhysicsShapeHelper::createConvexShapeFromTriangleModel(
 	if (model.isEmpty())
 		return false;
 
-	GMScene* scene = model.getModels();
+	GMScene* scene = model.getScene();
 	if (!scene)
 	{
 		gm_warning(gm_dbg_wrap("not a valid models asset."));

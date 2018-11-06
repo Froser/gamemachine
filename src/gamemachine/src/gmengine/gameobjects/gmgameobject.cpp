@@ -15,22 +15,41 @@ GMGameObject::GMGameObject(GMAsset asset)
 void GMGameObject::setAsset(GMAsset asset)
 {
 	D(d);
-	GM_ASSERT(asset.getModel() || asset.getModels());
-	if (!asset.getModel() && !asset.getModels())
-		gm_error(gm_dbg_wrap("Asset must be a 'model' or 'models' type."));
+	if (!asset.getScene())
+	{
+		if (!asset.getModel())
+		{
+			GM_ASSERT(false);
+			gm_error(gm_dbg_wrap("Asset must be a 'scene' or a 'model' type."));
+			return;
+		}
+		else
+		{
+			asset = GMScene::createSceneFromSingleModel(asset);
+		}
+	}
 	d->asset = asset;
 }
 
 GMScene* GMGameObject::getScene()
 {
 	D(d);
-	return d->asset.getModels();
+	return d->asset.getScene();
 }
 
 GMModel* GMGameObject::getModel()
 {
-	D(d);
-	return d->asset.getModel();
+	GMScene* scene = getScene();
+	if (!scene)
+		return nullptr;
+
+	if (scene->getModels().size() > 1)
+	{
+		gm_warning(gm_dbg_wrap("Models are more than one. So it will return nothing."));
+		return nullptr;
+	}
+
+	return scene->getModels()[0].getModel();
 }
 
 void GMGameObject::setWorld(GMGameWorld* world)
@@ -63,11 +82,6 @@ void GMGameObject::foreach(std::function<void(GMModel*)> cb)
 			cb(model.getModel());
 		}
 	}
-	else
-	{
-		if (getModel())
-			cb(getModel());
-	}
 }
 
 void GMGameObject::draw()
@@ -93,25 +107,6 @@ bool GMGameObject::canDeferredRendering()
 
 			if (model.getModel()->getType() == GMModelType::Custom)
 				return false;
-		}
-	}
-	else
-	{
-		GMModel* model = getModel();
-		if (model)
-		{
-			if (model->getShader().getBlend() == true)
-				return false;
-
-			if (model->getShader().getVertexColorOp() == GMS_VertexColorOp::Replace)
-				return false;
-
-			if (model->getType() == GMModelType::Custom)
-				return false;
-		}
-		else
-		{
-			gm_warning(gm_dbg_wrap("Game object does not contain any asset."));
 		}
 	}
 	return true;
@@ -261,7 +256,7 @@ void GMCubeMapGameObject::createCubeMap(GMTextureAsset texture)
 		part->vertex(V2);
 	}
 
-	setAsset(GMAsset(GMAssetType::Model, model));
+	setAsset(GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, model)));
 }
 
 bool GMCubeMapGameObject::canDeferredRendering()

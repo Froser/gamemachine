@@ -36,12 +36,13 @@ void Demo_Terrain::init()
 		100
 	};
 
-	gm::GMPrimitiveCreator::createTerrain(desc, d->terrainModel);
+	gm::GMPrimitiveCreator::createTerrain(desc, d->terrainScene);
+	gm::GMModel* terrainModel = d->terrainScene.getScene()->getModels()[0].getModel();
 	gm::GMTextureAsset texture = gm::GMToolUtil::createTexture(db->parentDemonstrationWorld->getContext(), L"grass.jpg");
-	gm::GMToolUtil::addTextureToShader(d->terrainModel.getModel()->getShader(), texture, gm::GMTextureType::Ambient);
-	d->terrainModel.getModel()->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setWrapS(gm::GMS_Wrap::Repeat);
-	d->terrainModel.getModel()->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setWrapT(gm::GMS_Wrap::Repeat);
-	d->terrain = new gm::GMGameObject(d->terrainModel);
+	gm::GMToolUtil::addTextureToShader(terrainModel->getShader(), texture, gm::GMTextureType::Ambient);
+	terrainModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setWrapS(gm::GMS_Wrap::Repeat);
+	terrainModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setWrapT(gm::GMS_Wrap::Repeat);
+	d->terrain = new gm::GMGameObject(d->terrainScene);
 
 	asDemoGameWorld(getDemoWorldReference())->addObject(L"terrain", d->terrain);
 }

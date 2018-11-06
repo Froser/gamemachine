@@ -56,7 +56,7 @@ void Demo_Model::init()
 	gm::GMAsset models;
 	gm::GMModelReader::load(loadSettings, models);
 
-	for (auto& model : models.getModels()->getModels())
+	for (auto& model : models.getScene()->getModels())
 	{
 		model.getModel()->getShader().getMaterial().refractivity = 0.658f;
 		model.getModel()->getShader().getMaterial().ka = 
@@ -72,10 +72,10 @@ void Demo_Model::init()
 
 	// 创建2个Cube，一个有NormalMap，一个无
 	{
-		gm::GMModelAsset cube;
+		gm::GMSceneAsset cube;
 		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::one3(), cube);
 
-		gm::GMShader& shader = cube.getModel()->getShader();
+		gm::GMShader& shader = cube.getScene()->getModels()[0].getModel()->getShader();
 		shader.getMaterial().refractivity = 0.658f;
 		shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
 		gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::NormalMap);
@@ -87,10 +87,10 @@ void Demo_Model::init()
 		d->gameObject2->setRotation(Rotate(PI, GMVec3(0, 1, 0)));
 	}
 	{
-		gm::GMModelAsset cube;
+		gm::GMSceneAsset cube;
 		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::one3(), cube);
 
-		gm::GMShader& shader = cube.getModel()->getShader();
+		gm::GMShader& shader = cube.getScene()->getModels()[0].getModel()->getShader();
 		shader.getMaterial().refractivity = 0.658f;
 		shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
 

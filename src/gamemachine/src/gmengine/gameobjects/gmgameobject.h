@@ -28,11 +28,11 @@ class GMGameObject : public GMObject
 
 public:
 	GMGameObject() = default;
-	GMGameObject(GMModelsAsset asset);
+	GMGameObject(GMSceneAsset asset);
 	~GMGameObject() = default;
 
 public:
-	void setAsset(GMModelsAsset asset);
+	void setAsset(GMSceneAsset asset);
 	GMScene* getScene();
 	GMModel* getModel();
 	void setWorld(GMGameWorld* world);
