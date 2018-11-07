@@ -89,7 +89,6 @@ public:
 private:
 	void updateSkeleton();
 	void initSkeletonBonesMesh(GMPart* mesh);
-	void updateModel(GMScene* scene, GMSkeletalAnimationEvaluator* evaluator);
 };
 
 END_NS

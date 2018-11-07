@@ -16,6 +16,9 @@ static GMShaderVariablesDesc s_defaultShaderVariablesDesc =
 	"GM_InverseTransposeModelMatrix",
 	"GM_InverseViewMatrix",
 
+	"GM_Bones",
+	"GM_UseBoneAnimation",
+
 	"GM_ViewPosition",
 
 	{ "OffsetX", "OffsetY", "ScaleX", "ScaleY", "Enabled", "Texture" },

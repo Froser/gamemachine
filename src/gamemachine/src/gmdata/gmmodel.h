@@ -27,8 +27,8 @@ struct GMVertex
 		TangentDimension = NormalDimension,
 		BitangentDimension = NormalDimension,
 		ColorDimension = 4,
-		BoneIDsDimension = 4,
-		WeightsDimension = 4,
+		BoneIDsDimension = GMSkeletalVertexBoneData::BonesPerVertex,
+		WeightsDimension = GMSkeletalVertexBoneData::BonesPerVertex,
 	};
 
 	Array<GMfloat, PositionDimension> positions;
@@ -203,7 +203,6 @@ GM_PRIVATE_OBJECT(GMModel)
 	GMRenderTechinqueID techniqueId = 0;
 	GMModelAsset parentAsset;
 	GMOwnedPtr<GMSkeleton> skeleton;
-	Vector<GMVertex> packedVertices;
 };
 
 // 所有的顶点属性类型
@@ -313,12 +312,6 @@ public:
 		d->skeleton.reset(skeleton);
 	}
 
-	inline Vector<GMVertex>& getPackedVertices() GM_NOEXCEPT
-	{
-		D(d);
-		return d->packedVertices;
-	}
-
 	void setModelBuffer(AUTORELEASE GMModelBuffer* mb);
 	GMModelBuffer* getModelBuffer();
 	void releaseModelBuffer();
@@ -347,6 +340,11 @@ class GMScene : public GMObject
 	GM_DECLARE_PROPERTY(BoneTransformations, boneTransformations)
 
 public:
+	enum
+	{
+		MaxBoneCount = 128,
+	};
+
 	static GMSceneAsset createSceneFromSingleModel(GMModelAsset modelAsset);
 
 public:

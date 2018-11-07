@@ -7,6 +7,8 @@
 #include "foundation/gamemachine.h"
 #include <linearmath.h>
 
+#define getUniformByName(name) glGetUniformLocation(getProgram(), name)
+
 namespace
 {
 	GMint32 toTechniqueEntranceId(const char* instanceName)
@@ -142,31 +144,31 @@ void GMGLShaderProgram::attachShader(const GMGLShaderInfo& shaderCfgs)
 void GMGLShaderProgram::setMatrix4(const char* name, const GMMat4& value)
 {
 	GM_ASSERT(verify());
-	glUniformMatrix4fv(glGetUniformLocation(getProgram(), name), 1, GL_FALSE, ValuePointer(value));
+	glUniformMatrix4fv(getUniformByName(name), 1, GL_FALSE, ValuePointer(value));
 }
 
 void GMGLShaderProgram::setVec4(const char* name, const GMFloat4& value)
 {
 	GM_ASSERT(verify());
-	glUniform4fv(glGetUniformLocation(getProgram(), name), 1, ValuePointer(value));
+	glUniform4fv(getUniformByName(name), 1, ValuePointer(value));
 }
 
 void GMGLShaderProgram::setVec3(const char* name, const GMfloat value[3])
 {
 	GM_ASSERT(verify());
-	glUniform3fv(glGetUniformLocation(getProgram(), name), 1, value);
+	glUniform3fv(getUniformByName(name), 1, value);
 }
 
 void GMGLShaderProgram::setInt(const char* name, GMint32 value)
 {
 	GM_ASSERT(verify());
-	glUniform1i(glGetUniformLocation(getProgram(), name), value);
+	glUniform1i(getUniformByName(name), value);
 }
 
 void GMGLShaderProgram::setFloat(const char* name, GMfloat value)
 {
 	GM_ASSERT(verify());
-	glUniform1f(glGetUniformLocation(getProgram(), name), value);
+	glUniform1f(getUniformByName(name), value);
 }
 
 void GMGLShaderProgram::setBool(const char* name, bool value)

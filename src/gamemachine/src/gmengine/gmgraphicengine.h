@@ -101,6 +101,10 @@ struct GMShaderVariablesDesc
 	const char* InverseTransposeModelMatrix;
 	const char* InverseViewMatrix;
 
+	// 骨骼
+	const char* Bones;
+	const char* UseBoneAnimation;
+
 	// 位置
 	const char* ViewPosition;
 

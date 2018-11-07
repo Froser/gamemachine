@@ -210,7 +210,18 @@ void GMGLTechnique::beginModel(GMScene* scene, GMModel* model, const GMGameObjec
 	shaderProgram->setInt(GM_VariablesDesc.CubeMapTextureName, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 
 	// 设置顶点颜色运算方式
-	getShaderProgram()->setInt(GM_VariablesDesc.ColorVertexOp, static_cast<GMint32>(model->getShader().getVertexColorOp()));
+	shaderProgram->setInt(GM_VariablesDesc.ColorVertexOp, static_cast<GMint32>(model->getShader().getVertexColorOp()));
+
+	GM_ASSERT(scene);
+	if (scene->hasAnimation())
+	{
+		shaderProgram->setInt(GM_VariablesDesc.UseBoneAnimation, 1);
+		updateBoneTransforms(shaderProgram, scene);
+	}
+	else
+	{
+		shaderProgram->setInt(GM_VariablesDesc.UseBoneAnimation, 0);
+	}
 }
 
 void GMGLTechnique::endModel()
@@ -490,6 +501,26 @@ void GMGLTechnique::prepareDebug(GMModel* model)
 	D(d);
 	GMint32 mode = d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonNormalMode).toInt();
 	getShaderProgram()->setInt(GM_VariablesDesc.Debug.Normal, mode);
+}
+
+void GMGLTechnique::updateBoneTransforms(IShaderProgram* shaderProgram, GMScene* scene)
+{
+	Vector<std::string> boneVarNames;
+	if (boneVarNames.empty())
+	{
+		boneVarNames.resize(GMScene::MaxBoneCount);
+		for (GMint32 i = 0; i < GMScene::MaxBoneCount; ++i)
+		{
+			boneVarNames[i] = (GMString(GM_VariablesDesc.Bones) + "[" + GMString(i) + "]").toStdString();
+		}
+	}
+
+	const auto& transforms = scene->getBoneTransformations();
+	for (GMsize_t i = 0; i < transforms.size(); ++i)
+	{
+		const auto& transform = transforms[i];
+		shaderProgram->setMatrix4(boneVarNames[i].c_str(), transform);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////

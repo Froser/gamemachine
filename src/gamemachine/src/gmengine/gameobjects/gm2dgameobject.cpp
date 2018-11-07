@@ -216,7 +216,9 @@ void GMTextGameObject::draw()
 {
 	D(d);
 	update();
-	drawModel(getContext(), d->model);
+
+	GMModel* model = d->scene->getModels()[0].getModel();
+	drawModel(getContext(), model);
 }
 
 void GMTextGameObject::update()
@@ -224,9 +226,9 @@ void GMTextGameObject::update()
 	D(d);
 	// 如果不存在model，创建一个新model
 	// 如果需要的空间更大，也重新创建一个model
-	if (!d->model || d->length < d->text.length())
+	if (!d->scene || d->length < d->text.length())
 	{
-		d->model = createModel();
+		d->scene = createScene();
 		d->length = d->text.length();
 		markDirty();
 	}
@@ -234,16 +236,17 @@ void GMTextGameObject::update()
 	// 如果字符被更改，则更新其缓存
 	if (isDirty())
 	{
-		updateVertices(d->model);
+		updateVertices(d->scene);
 		cleanDirty();
 	}
 }
 
-GMModel* GMTextGameObject::createModel()
+GMScene* GMTextGameObject::createScene()
 {
 	D(d);
+	D_BASE(db, GMGameObject);
 	GMModel* model = new GMModel();
-	d->modelAsset = GMAsset(GMAssetType::Model, model);
+	db->asset = GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, model));
 	model->setType(GMModelType::Text);
 	model->setUsageHint(GMUsageHint::DynamicDraw);
 	model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
@@ -257,15 +260,16 @@ GMModel* GMTextGameObject::createModel()
 	}
 
 	getContext()->getEngine()->createModelDataProxy(getContext(), model);
-	return model;
+	return db->asset.getScene();
 }
 
-void GMTextGameObject::updateVertices(GMModel* model)
+void GMTextGameObject::updateVertices(GMScene* scene)
 {
 	D(d);
 	if (!d->typoEngine)
 		d->typoEngine = new GMTypoEngine(getContext());
 
+	GMModel* model = scene->getModels()[0].getModel();
 	constexpr GMfloat Z = 0;
 	const GMRect& rect = getRenderRect();
 	GMRectF coord = toViewportRect(getGeometry(), rect);
@@ -396,7 +400,8 @@ void GMSprite2DGameObject::draw()
 {
 	D(d);
 	update();
-	drawModel(getContext(), d->model);
+	GMModel* model = d->scene->getModels()[0].getModel();
+	drawModel(getContext(), model);
 }
 
 void GMSprite2DGameObject::setDepth(GMfloat depth)
@@ -458,30 +463,31 @@ void GMSprite2DGameObject::setColor(const GMVec4& color)
 void GMSprite2DGameObject::update()
 {
 	D(d);
-	if (!d->model)
+	if (!d->scene)
 	{
-		d->model = createModel();
+		d->scene = createScene();
 		markDirty();
 	}
 
 	if (d->needUpdateTexture)
 	{
-		updateTexture(d->model);
+		updateTexture(d->scene);
 		d->needUpdateTexture = false;
 	}
 
 	if (isDirty())
 	{
-		updateVertices(d->model);
+		updateVertices(d->scene);
 		cleanDirty();
 	}
 }
 
-GMModel* GMSprite2DGameObject::createModel()
+GMScene* GMSprite2DGameObject::createScene()
 {
 	D(d);
+	D_BASE(db, GMGameObject);
 	GMModel* model = new GMModel();
-	d->modelAsset = GMAsset(GMAssetType::Model, model);
+	db->asset = GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, model));
 	model->setType(GMModelType::Model2D);
 	model->setUsageHint(GMUsageHint::DynamicDraw);
 	model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
@@ -493,12 +499,15 @@ GMModel* GMSprite2DGameObject::createModel()
 		part->vertex(GMVertex());
 	}
 	getContext()->getEngine()->createModelDataProxy(getContext(), model);
-	return model;
+
+	return db->asset.getScene();
 }
 
-void GMSprite2DGameObject::updateVertices(GMModel* model)
+void GMSprite2DGameObject::updateVertices(GMScene* scene)
 {
 	D(d);
+	GMModel* model = scene->getModels()[0].getModel();
+
 	GM_ASSERT(d->texWidth > 0 && d->texHeight > 0);
 	GMRectF coord = toViewportRect(getGeometry(), getRenderRect());
 	// 按照以下方式组织节点
@@ -555,11 +564,12 @@ void GMSprite2DGameObject::updateVertices(GMModel* model)
 	proxy->endUpdateBuffer();
 }
 
-void GMSprite2DGameObject::updateTexture(GMModel* model)
+void GMSprite2DGameObject::updateTexture(GMScene* scene)
 {
 	D(d);
-	GM_ASSERT(d->model);
-	GMShader& shader = d->model->getShader();
+	GM_ASSERT(d->scene);
+	GMModel* model = d->scene->getModels()[0].getModel();
+	GMShader& shader = model->getShader();
 	GMTextureSampler& texSampler = shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
 	texSampler.setTexture(0, d->texture);
 }
@@ -581,11 +591,12 @@ void GMBorder2DGameObject::setCornerRect(const GMRect& rc)
 	}
 }
 
-GMModel* GMBorder2DGameObject::createModel()
+GMScene* GMBorder2DGameObject::createScene()
 {
 	D(d);
+	D_BASE(db, GMGameObject);
 	GMModel* model = new GMModel();
-	d->modelAsset = GMAsset(GMAssetType::Model, model);
+	db->asset = GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, model));
 	model->setType(GMModelType::Model2D);
 	model->setUsageHint(GMUsageHint::DynamicDraw);
 	model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
@@ -615,13 +626,16 @@ GMModel* GMBorder2DGameObject::createModel()
 	INDICES(part, 10, 11, 14, 15);
 
 	getContext()->getEngine()->createModelDataProxy(getContext(), model);
-	return model;
+	return db->asset.getScene();
 }
 
-void GMBorder2DGameObject::updateVertices(GMModel* model)
+void GMBorder2DGameObject::updateVertices(GMScene* scene)
 {
 	D(d);
 	D_BASE(db, Base);
+
+	GMModel* model = scene->getModels()[0].getModel();
+
 	GM_ASSERT(db->texWidth > 0 && db->texHeight > 0);
 	const GMRect& rc = getGeometry();
 	GMRectF coord = toViewportRect(rc, getRenderRect());

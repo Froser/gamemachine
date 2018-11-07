@@ -144,6 +144,40 @@ namespace
 		materialTextureGet(imp, material, aiTextureType_NORMALS, model, GMTextureType::NormalMap);
 	}
 
+	GMVertex* getMutableVertex(GMModel* model, GMsize_t index)
+	{
+		auto& parts = model->getParts();
+		for (auto& part : parts)
+		{
+			auto& vertices = part->vertices();
+			if (index < vertices.size())
+			{
+				return &const_cast<GMVertex&>(vertices[index]);
+			}
+			else
+			{
+				index -= vertices.size();
+				continue;
+			}
+		}
+		return nullptr;
+	}
+
+	void addVertexBoneAndWeight(GMModel* model, GMsize_t vertexIndex, GMsize_t boneId, GMfloat weight)
+	{
+		GMVertex* vertex = getMutableVertex(model, vertexIndex);
+		GM_ASSERT(vertex);
+		for (GMsize_t i = 0; i < GMSkeletalVertexBoneData::BonesPerVertex; ++i)
+		{
+			if (vertex->weights[i] == 0.f)
+			{
+				vertex->boneIds[i] = boneId;
+				vertex->weights[i] = weight;
+				return;
+			}
+		}
+	}
+
 	void processBones(GMModelReader_Assimp* imp, aiMesh* part, GMModel* model)
 	{
 		GMSkeleton* skeleton = getSkeleton(model);
@@ -175,12 +209,14 @@ namespace
 			}
 
 			// 接下来，记录所有的weight
+
 			for (GMsize_t j = 0; j < part->mBones[i]->mNumWeights; ++j)
 			{
 				auto& weight = part->mBones[i]->mWeights[j];
 				GMsize_t vertexId = weight.mVertexId;
 				// 将每个顶点与Bones和Weight绑定
 				vertexBoneData[vertexId].addData(boneIndex, weight.mWeight);
+				addVertexBoneAndWeight(model, vertexId, boneIndex, weight.mWeight);
 			}
 		}
 	}
@@ -276,7 +312,9 @@ namespace
 				{ 0, 0, 0 },
 				{ 0, 0, 0 },
 				{ 0, 0 },
-				{ colors[0], colors[1], colors[2], colors[3] }
+				{ colors[0], colors[1], colors[2], colors[3] },
+				{ 0, 0, 0, 0 },
+				{ 0, 0, 0, 0 }
 			};
 			p->vertex(v);
 		}

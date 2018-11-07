@@ -134,8 +134,6 @@ void GMDx11ModelDataProxy::transfer()
 	{
 		part->clear();
 	}
-	if (model->getUsageHint() == GMUsageHint::DynamicDraw)
-		model->getPackedVertices().swap(packedVertices);
 
 	d->inited = true;
 	model->doNotTransferAnymore();

@@ -15,16 +15,17 @@ public:
 	using GMSprite2DGameObject::GMSprite2DGameObject;
 
 public:
-	virtual GMModel* createModel() override;
-	virtual void updateVertices(GMModel* model) override;
+	virtual GMScene* createScene() override;
+	virtual void updateVertices(GMScene* scene) override;
 	virtual void initShader(GMShader& shader) override;
 };
 
-GMModel* GMLine2D::createModel()
+GMScene* GMLine2D::createScene()
 {
 	D(d);
+	D_BASE(db, GMGameObject);
 	GMModel* model = new GMModel();
-	d->modelAsset = GMAsset(GMAssetType::Model, model);
+	db->asset = GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, model));
 	model->setType(GMModelType::Model2D);
 	model->setUsageHint(GMUsageHint::DynamicDraw);
 	model->setPrimitiveTopologyMode(GMTopologyMode::Lines);
@@ -37,12 +38,14 @@ GMModel* GMLine2D::createModel()
 		part->vertex(GMVertex());
 	}
 	getContext()->getEngine()->createModelDataProxy(getContext(), model);
-	return model;
+	return db->asset.getScene();
 }
 
-void GMLine2D::updateVertices(GMModel* model)
+void GMLine2D::updateVertices(GMScene* scene)
 {
 	D(d);
+	GMModel* model = scene->getModels()[0].getModel();
+
 	// 绘制对角线
 	GMRectF coord = toViewportRect(getGeometry(), getRenderRect());
 	GMVertex V[] = {

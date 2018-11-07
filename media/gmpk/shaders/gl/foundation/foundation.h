@@ -5,8 +5,9 @@ uniform mat4 GM_ProjectionMatrix;
 uniform mat4 GM_InverseTransposeModelMatrix;
 uniform mat4 GM_InverseViewMatrix;
 
-const int GM_MaxBones = 512;
+const int GM_MaxBones = 128;
 uniform mat4 GM_Bones[GM_MaxBones];
+uniform int GM_UseBoneAnimation = 0;
 
 // 类型变量
 uniform int GM_shader_type;

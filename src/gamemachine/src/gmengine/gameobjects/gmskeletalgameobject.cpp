@@ -186,71 +186,13 @@ void GMSkeletalGameObject::update(GMDuration dt)
 
 					evaluator->setAnimation(animations->getAnimation(d->animationIndex));
 					evaluator->update(dt);
-					updateModel(scene, evaluator);
+
+					auto& transforms = evaluator->getTransforms();
+					scene->getBoneTransformations().swap(transforms);
 				}
 			}
 		}
 	}
-}
-
-void GMSkeletalGameObject::updateModel(GMScene* scene, GMSkeletalAnimationEvaluator* evaluator)
-{
-	auto& transforms = evaluator->getTransforms();
-	scene->getBoneTransformations().swap(transforms);
-	/*
-	// 遍历所有的顶点，找到其对应的骨骼，并乘以它的权重
-	// TODO: 这一步可以在GPU运行，不过先在CPU运行
-	if (model->getUsageHint() == GMUsageHint::StaticDraw)
-	{
-		gm_error(gm_dbg_wrap("Cannot modify vertices because this is a static object."));
-		return;
-	}
-
-	// 临时结构，用于缓存顶点、法线
-	struct Vertex
-	{
-		GMVec4 position = Zero<GMVec4>();
-		GMVec3 normal = Zero<GMVec3>();
-	};
-
-	auto& vertices = model->getPackedVertices();
-
-	auto modelDataProxy = model->getModelDataProxy();
-	if (modelDataProxy)
-	{
-		auto& bones = model->getSkeleton()->getBones();
-		auto& vertexData = bones.getVertexData();
-		GM_ASSERT(vertexData.size() == vertices.size());
-		const auto& transforms = evaluator->getTransforms();
-
-		modelDataProxy->beginUpdateBuffer(GMModelBufferType::VertexBuffer);
-		GMVertex* modelVertices = static_cast<GMVertex*>(modelDataProxy->getBuffer());
-
-		// vertexData一一对应每一个modelVertex
-		static GMMat4 zeroMat;
-		GMFloat16 zeroF16 = { GMFloat4(0, 0, 0, 0), GMFloat4(0, 0, 0, 0), GMFloat4(0, 0, 0, 0), GMFloat4(0, 0, 0, 0) };
-		zeroMat.setFloat16(zeroF16);
-
-		for (GMsize_t i = 0; i < model->getPackedVertices().size(); ++i)
-		{
-			GMMat4 t = zeroMat;
-			for (auto j = 0; j < GMSkeletalVertexBoneData::BonesPerVertex; ++j)
-			{
-				t += vertexData[i].getWeights()[j] * transforms[vertexData[i].getIds()[j]];
-			}
-
-			Vertex v;
-			v.position = GMVec4(vertices[i].positions[0], vertices[i].positions[1], vertices[i].positions[2], 1) * t;
-			v.normal = GMVec4(vertices[i].normals[0], vertices[i].normals[1], vertices[i].normals[2], 0) * t;
-
-			modelVertices[i].positions = { v.position.getX(), v.position.getY(), v.position.getZ() };
-			modelVertices[i].texcoords = vertices[i].texcoords;
-			modelVertices[i].normals = { v.normal.getX(), v.normal.getY(), v.normal.getZ() };
-		}
-
-		modelDataProxy->endUpdateBuffer();
-	}
-	*/
 }
 
 void GMSkeletalGameObject::draw()

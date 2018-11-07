@@ -62,6 +62,9 @@ protected:
 	void prepareLine(GMModel* model);
 	void prepareDebug(GMModel* model);
 
+private:
+	void updateBoneTransforms(IShaderProgram* shaderProgram, GMScene* scene);
+
 public:
 	static void dirtyShadowMapAttributes();
 };

@@ -7,7 +7,8 @@
 #include "gmglgraphic_engine.h"
 #include "foundation/gamemachine.h"
 
-#define FLOAT_OFFSET(i) ((void*)(sizeof(gm::GMfloat) * i))
+GM_STATIC_ASSERT(sizeof(gm::GMfloat) == sizeof(gm::GMint32), "Wrong type size.");
+#define BIT32_OFFSET(i) ((void*)(sizeof(gm::GMfloat) * i))
 
 GMGLModelDataProxy::GMGLModelDataProxy(const IRenderContext* context, GMModel* objs)
 	: GMModelDataProxy(context, objs)
@@ -53,14 +54,14 @@ void GMGLModelDataProxy::transfer()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(GMVertex) * packedVertices.size(), packedVertices.data(), usage);
 
 	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Position),	GMVertex::PositionDimension,	GL_FLOAT, GL_FALSE, sizeof(GMVertex), 0);
-	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Normal),		GMVertex::NormalDimension,		GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(3));
-	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Texcoord),	GMVertex::TexcoordDimension,	GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(6));
-	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Tangent),		GMVertex::TangentDimension,		GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(8));
-	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Bitangent),	GMVertex::BitangentDimension,	GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(11));
-	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Lightmap),	GMVertex::LightmapDimension,	GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(14));
-	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Color),		GMVertex::ColorDimension,		GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(16));
-	glVertexAttribIPointer(gmVertexIndex(GMVertexDataType::BoneIds),	GMVertex::BoneIDsDimension,		GL_INT,				sizeof(GMVertex), FLOAT_OFFSET(20));
-	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Weights),		GMVertex::WeightsDimension,		GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(24));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Normal),		GMVertex::NormalDimension,		GL_FLOAT, GL_FALSE, sizeof(GMVertex), BIT32_OFFSET(3));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Texcoord),	GMVertex::TexcoordDimension,	GL_FLOAT, GL_FALSE, sizeof(GMVertex), BIT32_OFFSET(6));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Tangent),		GMVertex::TangentDimension,		GL_FLOAT, GL_FALSE, sizeof(GMVertex), BIT32_OFFSET(8));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Bitangent),	GMVertex::BitangentDimension,	GL_FLOAT, GL_FALSE, sizeof(GMVertex), BIT32_OFFSET(11));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Lightmap),	GMVertex::LightmapDimension,	GL_FLOAT, GL_FALSE, sizeof(GMVertex), BIT32_OFFSET(14));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Color),		GMVertex::ColorDimension,		GL_FLOAT, GL_FALSE, sizeof(GMVertex), BIT32_OFFSET(16));
+	glVertexAttribIPointer(gmVertexIndex(GMVertexDataType::BoneIds),	GMVertex::BoneIDsDimension,		GL_INT,				sizeof(GMVertex), BIT32_OFFSET(20));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Weights),		GMVertex::WeightsDimension,		GL_FLOAT, GL_FALSE, sizeof(GMVertex), BIT32_OFFSET(24));
 
 	GM_FOREACH_ENUM_CLASS(type, GMVertexDataType::Position, GMVertexDataType::EndOfVertexDataType)
 	{
@@ -90,8 +91,6 @@ void GMGLModelDataProxy::transfer()
 	{
 		part->clear();
 	}
-	if (model->getUsageHint() == GMUsageHint::DynamicDraw)
-		model->getPackedVertices().swap(packedVertices);
 
 	GMModelBuffer* modelBuffer = new GMModelBuffer();
 	modelBuffer->setData(bufferData);
