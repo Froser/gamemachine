@@ -73,9 +73,9 @@ void GM_Model3D()
         vertex.Shininess = GM_Material.Shininess;
         vertex.Refractivity = GM_Material.Refractivity;
         vertex.AmbientLightmapTexture = sampleTextures(GM_AmbientTextureAttribute, _uv).rgb
-             * sampleTextures(GM_LightmapTextureAttribute, _lightmapuv).rgb;
-        vertex.DiffuseTexture = sampleTextures(GM_DiffuseTextureAttribute, _uv).rgb;
-        vertex.SpecularTexture = sampleTextures(GM_SpecularTextureAttribute, _uv).rrr;
+             * sampleTextures(GM_LightmapTextureAttribute, _lightmapuv).rgb * GM_Material.Ka;
+        vertex.DiffuseTexture = sampleTextures(GM_DiffuseTextureAttribute, _uv).rgb * GM_Material.Kd;
+        vertex.SpecularTexture = sampleTextures(GM_SpecularTextureAttribute, _uv).rrr * GM_Material.Ks;
     }
     else if (GM_IlluminationModel == GM_IlluminationModel_CookTorranceBRDF)
     {

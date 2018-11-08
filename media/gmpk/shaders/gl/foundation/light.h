@@ -235,9 +235,9 @@ vec4 GM_Phong_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
                 refractionLight += calculateRefractionByNormalTangent(vertex.WorldPos, vertex.TangentSpace, vertex.Refractivity);
         }
     }
-    vec3 finalColor =   vertex.AmbientLightmapTexture * GM_CalculateGammaCorrectionIfNecessary(ambientLight) * GM_Material.Ka +
-                        vertex.DiffuseTexture * GM_CalculateGammaCorrectionIfNecessary(diffuseLight) * shadowFactor * GM_Material.Kd +
-                        specularLight * GM_CalculateGammaCorrectionIfNecessary(vertex.SpecularTexture) * shadowFactor * GM_Material.Ks +
+    vec3 finalColor =   vertex.AmbientLightmapTexture * GM_CalculateGammaCorrectionIfNecessary(ambientLight) +
+                        vertex.DiffuseTexture * GM_CalculateGammaCorrectionIfNecessary(diffuseLight) * shadowFactor +
+                        specularLight * GM_CalculateGammaCorrectionIfNecessary(vertex.SpecularTexture) * shadowFactor +
                         refractionLight;
     return vec4(finalColor, 1);
 }

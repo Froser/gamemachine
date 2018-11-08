@@ -573,7 +573,7 @@ class GMPhong : IIlluminationModel
             );
         color_Refractivity = color_Refractivity;
 
-        return color_Ambient * GM_Material.Ka + color_Diffuse * GM_Material.Kd + color_Specular * GM_Material.Ks + color_Refractivity;
+        return color_Ambient + color_Diffuse + color_Specular + color_Refractivity;
     }
 
     GMPhongLightProxy PhoneLightProxy;
@@ -800,9 +800,9 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
 
     if (GM_IlluminationModel == GM_IlluminationModel_Phong)
     {
-        commonInput.AmbientLightmapTexture = color_Ambient;
-        commonInput.DiffuseTexture = color_Diffuse;
-        commonInput.SpecularTexture = color_Specular;
+        commonInput.AmbientLightmapTexture = color_Ambient * GM_Material.Ka;
+        commonInput.DiffuseTexture = color_Diffuse * GM_Material.Kd;
+        commonInput.SpecularTexture = color_Specular * GM_Material.Ks;
         commonInput.Shininess = GM_Material.Shininess;
         commonInput.Refractivity = GM_Material.Refractivity;
     }
