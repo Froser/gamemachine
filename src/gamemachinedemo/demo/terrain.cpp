@@ -42,6 +42,7 @@ void Demo_Terrain::init()
 	gm::GMToolUtil::addTextureToShader(terrainModel->getShader(), texture, gm::GMTextureType::Ambient);
 	terrainModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setWrapS(gm::GMS_Wrap::Repeat);
 	terrainModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setWrapT(gm::GMS_Wrap::Repeat);
+	terrainModel->getShader().getMaterial().ka = GMVec3(.7f, .7f, .7f);
 	d->terrain = new gm::GMGameObject(d->terrainScene);
 
 	asDemoGameWorld(getDemoWorldReference())->addObject(L"terrain", d->terrain);

@@ -16,6 +16,8 @@
 #define GMSHADER_SEMANTIC_NAME_BITANGENT "NORMAL"
 #define GMSHADER_SEMANTIC_NAME_LIGHTMAP "TEXCOORD"
 #define GMSHADER_SEMANTIC_NAME_COLOR "COLOR"
+#define GMSHADER_SEMANTIC_NAME_BONES "BONES"
+#define GMSHADER_SEMANTIC_NAME_WEIGHTS "WEIGHTS"
 #define BIT32_OFFSET(i) (sizeof(gm::GMfloat) * i)
 #define CHECK_VAR(var) if (!var->IsValid()) { GM_ASSERT(false); return; }
 
@@ -42,6 +44,12 @@ namespace
 		// 2
 
 		{ GMSHADER_SEMANTIC_NAME_COLOR, 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, BIT32_OFFSET(16), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		// 4
+
+		{ GMSHADER_SEMANTIC_NAME_BONES, 0, DXGI_FORMAT_R32G32B32A32_SINT, 0, BIT32_OFFSET(20), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		// 4
+
+		{ GMSHADER_SEMANTIC_NAME_WEIGHTS, 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, BIT32_OFFSET(24), D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		// 4
 	};
 
@@ -334,6 +342,18 @@ GMTextureAsset GMDx11Technique::getWhiteTexture()
 	return d->whiteTexture;
 }
 
+void GMDx11Technique::updateBoneTransforms(IShaderProgram* shaderProgram, GMModel* model)
+{
+	D(d);
+	auto bones = d->effect->GetVariableByName(GM_VariablesDesc.Bones);
+	const auto& transforms = model->getBoneTransformations();
+	for (GMsize_t i = 0; i < transforms.size(); ++i)
+	{
+		const auto& transform = transforms[i];
+		bones->GetElement(i)->AsMatrix()->SetMatrix(ValuePointer(transform));
+	}
+}
+
 const std::string& GMDx11Technique::getTechniqueNameByTechniqueId(GMRenderTechinqueID id)
 {
 	static Map<GMRenderTechinqueID, std::string> s_map;
@@ -593,6 +613,18 @@ void GMDx11Technique::beginModel(GMModel* model, const GMGameObject* parent)
 
 	// 设置顶点颜色运算方式
 	shaderProgram->setInt(GM_VariablesDesc.ColorVertexOp, static_cast<GMint32>(model->getShader().getVertexColorOp()));
+
+	// 骨骼动画
+	GM_ASSERT(d->techContext.currentScene);
+	if (d->techContext.currentScene->hasAnimation())
+	{
+		shaderProgram->setInt(GM_VariablesDesc.UseBoneAnimation, 1);
+		updateBoneTransforms(shaderProgram, model);
+	}
+	else
+	{
+		shaderProgram->setInt(GM_VariablesDesc.UseBoneAnimation, 0);
+	}
 }
 
 void GMDx11Technique::endModel()

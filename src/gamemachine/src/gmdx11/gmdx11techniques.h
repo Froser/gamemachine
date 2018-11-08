@@ -114,6 +114,7 @@ protected:
 
 private:
 	GMTextureAsset getWhiteTexture();
+	void updateBoneTransforms(IShaderProgram* shaderProgram, GMModel* model);
 
 public:
 	static const std::string& getTechniqueNameByTechniqueId(GMRenderTechinqueID id);

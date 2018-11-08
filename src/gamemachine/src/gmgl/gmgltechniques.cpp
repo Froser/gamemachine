@@ -224,6 +224,7 @@ void GMGLTechnique::beginModel(GMModel* model, const GMGameObject* parent)
 	// 设置顶点颜色运算方式
 	shaderProgram->setInt(GM_VariablesDesc.ColorVertexOp, static_cast<GMint32>(model->getShader().getVertexColorOp()));
 
+	// 骨骼动画
 	GM_ASSERT(d->techContext.currentScene);
 	if (d->techContext.currentScene->hasAnimation())
 	{

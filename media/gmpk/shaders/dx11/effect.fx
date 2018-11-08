@@ -51,6 +51,13 @@ static const int GM_VertexColorOp_Multiply = 2;
 static const int GM_VertexColorOp_Add = 3;
 
 //--------------------------------------------------------------------------------------
+// Bones And Animations
+//--------------------------------------------------------------------------------------
+int GM_UseBoneAnimation = 0;
+static const int GM_MaxBones = 128;
+matrix GM_Bones[GM_MaxBones];
+
+//--------------------------------------------------------------------------------------
 // Textures, GM_LightAttributes, Materials
 //--------------------------------------------------------------------------------------
 Texture2D GM_AmbientTexture;
@@ -342,6 +349,8 @@ struct VS_INPUT
     float3 Bitangent   : NORMAL2;
     float2 Lightmap    : TEXCOORD1;
     float4 Color       : COLOR;
+    int4   BoneIDs     : BONES;
+    float4 Weights     : WEIGHTS;
 };
 
 struct VS_OUTPUT
@@ -690,6 +699,16 @@ VS_OUTPUT VS_3D( VS_INPUT input )
 {
     VS_OUTPUT output;
     output.Position = ToFloat4(input.Position);
+
+    if (GM_UseBoneAnimation != 0)
+    {
+        matrix boneTransform = GM_Bones[input.BoneIDs[0]] * input.Weights[0];
+        boneTransform += GM_Bones[input.BoneIDs[1]] * input.Weights[1];
+        boneTransform += GM_Bones[input.BoneIDs[2]] * input.Weights[2];
+        boneTransform += GM_Bones[input.BoneIDs[3]] * input.Weights[3];
+        output.Position = mul(output.Position, boneTransform);
+    }
+
     output.Position = mul(output.Position, GM_WorldMatrix);
     output.WorldPos = output.Position;
     

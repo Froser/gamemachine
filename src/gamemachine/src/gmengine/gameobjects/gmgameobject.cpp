@@ -15,9 +15,9 @@ GMGameObject::GMGameObject(GMAsset asset)
 void GMGameObject::setAsset(GMAsset asset)
 {
 	D(d);
-	if (!asset.getScene())
+	if (!asset.isScene())
 	{
-		if (!asset.getModel())
+		if (!asset.isModel())
 		{
 			GM_ASSERT(false);
 			gm_error(gm_dbg_wrap("Asset must be a 'scene' or a 'model' type."));

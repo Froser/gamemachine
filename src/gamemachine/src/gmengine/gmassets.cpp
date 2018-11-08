@@ -3,10 +3,10 @@
 #include "gmdata/gmmodel.h"
 #include "gmphysics/gmphysicsshape.h"
 
-GM_DEFINE_ASSET_GETTER(ITexture*, getTexture, GMAssetType::Texture);
-GM_DEFINE_ASSET_GETTER(GMModel*, getModel, GMAssetType::Model);
-GM_DEFINE_ASSET_GETTER(GMScene*, getScene, GMAssetType::Scene);
-GM_DEFINE_ASSET_GETTER(GMPhysicsShape*, getPhysicsShape, GMAssetType::PhysicsShape);
+GM_DEFINE_ASSET_GETTER(ITexture*, Texture, GMAssetType::Texture);
+GM_DEFINE_ASSET_GETTER(GMModel*, Model, GMAssetType::Model);
+GM_DEFINE_ASSET_GETTER(GMScene*, Scene, GMAssetType::Scene);
+GM_DEFINE_ASSET_GETTER(GMPhysicsShape*, PhysicsShape, GMAssetType::PhysicsShape);
 
 GMAsset::GMAsset()
 {

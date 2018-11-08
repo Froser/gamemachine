@@ -27,13 +27,18 @@ enum class GMAssetType
 };
 
 #define GM_DECLARE_ASSET_GETTER(retType, funcName) \
-	retType funcName();
+	retType get##funcName(); \
+	bool is##funcName();
 
 #define GM_DEFINE_ASSET_GETTER(retType, funcName, predictType)		\
-	retType GMAsset::funcName() {									\
+	retType GMAsset::get##funcName() {								\
 		if (getType() == predictType)								\
 			return static_cast<retType>(getAsset());				\
+		GM_ASSERT(GMAssetType::Invalid == getType());				\
 		return nullptr;												\
+	}																\
+	bool GMAsset::is##funcName() {									\
+		return getType() == predictType;							\
 	}
 
 GM_PRIVATE_OBJECT_UNALIGNED(GMAsset)
@@ -48,10 +53,10 @@ class GMAsset
 	GM_DECLARE_PRIVATE_NGO(GMAsset)
 
 public:
-	GM_DECLARE_ASSET_GETTER(ITexture*, getTexture);
-	GM_DECLARE_ASSET_GETTER(GMModel*, getModel);
-	GM_DECLARE_ASSET_GETTER(GMScene*, getScene);
-	GM_DECLARE_ASSET_GETTER(GMPhysicsShape*, getPhysicsShape);
+	GM_DECLARE_ASSET_GETTER(ITexture*, Texture);
+	GM_DECLARE_ASSET_GETTER(GMModel*, Model);
+	GM_DECLARE_ASSET_GETTER(GMScene*, Scene);
+	GM_DECLARE_ASSET_GETTER(GMPhysicsShape*, PhysicsShape);
 
 public:
 	GMAsset();

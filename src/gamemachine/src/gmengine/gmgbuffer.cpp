@@ -27,8 +27,10 @@ void GMGBuffer::createQuad()
 	GMSceneAsset scene;
 	GMPrimitiveCreator::createQuadrangle(GMPrimitiveCreator::one2(), 0, scene);
 	GM_ASSERT(!scene.isEmpty());
-	scene.getScene()->getModels()[0].getModel()->setType(GMModelType::LightPassQuad);
-	getContext()->getEngine()->createModelDataProxy(d->context, scene.getModel());
+	GMModel* model = scene.getScene()->getModels()[0].getModel();
+	GM_ASSERT(model);
+	model->setType(GMModelType::LightPassQuad);
+	getContext()->getEngine()->createModelDataProxy(d->context, model);
 	d->quad = new GMGameObject(scene);
 	d->quad->setContext(d->context);
 }
