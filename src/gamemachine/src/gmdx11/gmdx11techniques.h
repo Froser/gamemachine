@@ -1,5 +1,5 @@
-﻿#ifndef __GMDx11TechniqueS_H__
-#define __GMDx11TechniqueS_H__
+﻿#ifndef __GMDX11TECHNIQUES_H__
+#define __GMDX11TECHNIQUES_H__
 #include <gmcommon.h>
 #include <gamemachine.h>
 #include "gmdx11graphic_engine.h"
@@ -24,8 +24,14 @@ struct GMTextureAttributeBank
 
 GM_PRIVATE_OBJECT(GMDx11Technique)
 {
+	struct TechniqueContext
+	{
+		GMModel* currentModel = nullptr;
+		GMScene* currentScene = nullptr;
+	};
+
+	TechniqueContext techContext;
 	const IRenderContext* context = nullptr;
-	GMModel* currentModel = nullptr;
 	GMTextureAsset whiteTexture;
 	GMOwnedPtr<GMDx11RasterizerStates> rasterizerStates;
 	GMOwnedPtr<GMDx11BlendStates> blendStates;
@@ -58,7 +64,9 @@ public:
 	~GMDx11Technique() = default;
 
 public:
-	virtual void beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent) override;
+	virtual void beginScene(GMScene* scene) override;
+	virtual void endScene() override;
+	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void endModel() override;
 	virtual void draw(GMModel* model) override;
 	virtual const char* getTechniqueName() = 0;
@@ -83,7 +91,7 @@ protected:
 	inline GMModel* getCurrentModel()
 	{
 		D(d);
-		return d->currentModel;
+		return d->techContext.currentModel;
 	}
 
 protected:
@@ -187,7 +195,7 @@ private:
 		return "GMTech_Filter";
 	}
 
-	virtual void beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent) override;
+	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void draw(GMModel* model) override;
 	virtual void passAllAndDraw(GMModel* model) override;
 
@@ -237,7 +245,7 @@ protected:
 		return "GMTech_3D_Shadow";
 	}
 
-	virtual void beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent) override;
+	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 };
 
 class GMDx11Technique_Particle : public GMDx11Technique

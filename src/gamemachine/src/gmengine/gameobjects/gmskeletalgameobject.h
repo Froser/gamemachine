@@ -17,11 +17,11 @@ GM_PRIVATE_OBJECT(GMSkeletalAnimationEvaluator)
 class GMSkeletalAnimationEvaluator
 {
 	GM_DECLARE_PRIVATE_NGO(GMSkeletalAnimationEvaluator)
-		GM_DECLARE_ALIGNED_ALLOCATOR()
-		GM_DECLARE_PROPERTY(Skeleton, skeleton)
-		GM_DECLARE_PROPERTY(RootNode, rootNode)
-		GM_DECLARE_PROPERTY(Animation, animation)
-		GM_DECLARE_GETTER(Transforms, transforms)
+	GM_DECLARE_ALIGNED_ALLOCATOR()
+	GM_DECLARE_PROPERTY(Skeleton, skeleton)
+	GM_DECLARE_PROPERTY(RootNode, rootNode)
+	GM_DECLARE_PROPERTY(Animation, animation)
+	GM_DECLARE_GETTER(Transforms, transforms)
 
 public:
 	GMSkeletalAnimationEvaluator(GMSkeletalNode* root, GMSkeleton* skeleton);

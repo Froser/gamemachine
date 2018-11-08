@@ -167,7 +167,7 @@ namespace
 	{
 		GMVertex* vertex = getMutableVertex(model, vertexIndex);
 		GM_ASSERT(vertex);
-		for (GMsize_t i = 0; i < GMSkeletalVertexBoneData::BonesPerVertex; ++i)
+		for (GMsize_t i = 0; i < GMSkeleton::BonesPerVertex; ++i)
 		{
 			if (vertex->weights[i] == 0.f)
 			{
@@ -176,6 +176,9 @@ namespace
 				return;
 			}
 		}
+
+		// 如果超过了BonesPerVertex骨骼，才会走到这里
+		GM_ASSERT(false);
 	}
 
 	void processBones(GMModelReader_Assimp* imp, aiMesh* part, GMModel* model)
@@ -183,8 +186,6 @@ namespace
 		GMSkeleton* skeleton = getSkeleton(model);
 		auto& bones = skeleton->getBones();
 		auto& boneMapping = bones.getBoneNameIndexMap();
-		auto& vertexBoneData = bones.getVertexData();
-		vertexBoneData.resize(part->mNumVertices);
 		bones.getBones().resize(part->mNumBones);
 
 		GMsize_t index = 0;
@@ -215,7 +216,6 @@ namespace
 				auto& weight = part->mBones[i]->mWeights[j];
 				GMsize_t vertexId = weight.mVertexId;
 				// 将每个顶点与Bones和Weight绑定
-				vertexBoneData[vertexId].addData(boneIndex, weight.mWeight);
 				addVertexBoneAndWeight(model, vertexId, boneIndex, weight.mWeight);
 			}
 		}

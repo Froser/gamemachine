@@ -89,6 +89,7 @@ void GMGameObject::draw()
 	foreach([this](GMModel* m) {
 		drawModel(getContext(), m);
 	});
+	endDraw();
 }
 
 bool GMGameObject::canDeferredRendering()
@@ -121,13 +122,13 @@ const IRenderContext* GMGameObject::getContext()
 void GMGameObject::updateTransformMatrix()
 {
 	D(d);
-	d->transformMatrix = d->scaling * QuatToMatrix(d->rotation) * d->translation;
+	d->transforms.transformMatrix = d->transforms.scaling * QuatToMatrix(d->transforms.rotation) * d->transforms.translation;
 }
 
 void GMGameObject::setScaling(const GMMat4& scaling)
 {
 	D(d);
-	d->scaling = scaling;
+	d->transforms.scaling = scaling;
 	if (d->autoUpdateTransformMatrix)
 		updateTransformMatrix();
 }
@@ -135,7 +136,7 @@ void GMGameObject::setScaling(const GMMat4& scaling)
 void GMGameObject::setTranslation(const GMMat4& translation)
 {
 	D(d);
-	d->translation = translation;
+	d->transforms.translation = translation;
 	if (d->autoUpdateTransformMatrix)
 		updateTransformMatrix();
 }
@@ -143,7 +144,7 @@ void GMGameObject::setTranslation(const GMMat4& translation)
 void GMGameObject::setRotation(const GMQuat& rotation)
 {
 	D(d);
-	d->rotation = rotation;
+	d->transforms.rotation = rotation;
 	if (d->autoUpdateTransformMatrix)
 		updateTransformMatrix();
 }
@@ -167,9 +168,27 @@ void GMGameObject::drawModel(const IRenderContext* context, GMModel* model)
 		return;
 
 	ITechnique* technique = engine->getTechnique(model->getType());
-	technique->beginModel(getScene(), model, this);
+	if (technique != d->drawContext.currentTechnique)
+	{
+		if (d->drawContext.currentTechnique)
+			d->drawContext.currentTechnique->endScene();
+
+		technique->beginScene(getScene());
+		d->drawContext.currentTechnique = technique;
+	}
+
+	technique->beginModel(model, this);
 	technique->draw(model);
 	technique->endModel();
+}
+
+void GMGameObject::endDraw()
+{
+	D(d);
+	if (d->drawContext.currentTechnique)
+		d->drawContext.currentTechnique->endScene();
+
+	d->drawContext.currentTechnique = nullptr;
 }
 
 GMCubeMapGameObject::GMCubeMapGameObject(GMTextureAsset texture)

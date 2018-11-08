@@ -7,7 +7,15 @@
 #include "foundation/gamemachine.h"
 #include <linearmath.h>
 
-#define getUniformByName(name) glGetUniformLocation(getProgram(), name)
+#if GM_DEBUG
+GMint32 GMGLShaderProgram::getUniformByName(const char* name)
+{
+	auto loc = glGetUniformLocation(getProgram(), name);
+	return loc;
+}
+#else
+#	define getUniformByName(name) glGetUniformLocation(getProgram(), name)
+#endif
 
 namespace
 {

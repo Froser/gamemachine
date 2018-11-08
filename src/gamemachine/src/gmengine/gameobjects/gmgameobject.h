@@ -13,13 +13,22 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	GMuint32 id = 0;
 	GMOwnedPtr<GMPhysicsObject> physics;
 	GMGameWorld* world = nullptr;
-	GMMat4 scaling = Identity<GMMat4>();
-	GMMat4 translation = Identity<GMMat4>();
-	GMQuat rotation = Identity<GMQuat>();
-	GMMat4 transformMatrix = Identity<GMMat4>();
 	const IRenderContext* context = nullptr;
 	bool autoUpdateTransformMatrix = true;
 	GMAsset asset;
+
+	GM_ALIGNED_16(struct)
+	{
+		GMMat4 scaling = Identity<GMMat4>();
+		GMMat4 translation = Identity<GMMat4>();
+		GMQuat rotation = Identity<GMQuat>();
+		GMMat4 transformMatrix = Identity<GMMat4>();
+	} transforms;
+
+	struct
+	{
+		ITechnique* currentTechnique = nullptr;
+	} drawContext;
 };
 
 class GMGameObject : public GMObject
@@ -50,6 +59,7 @@ public:
 
 protected:
 	virtual void drawModel(const IRenderContext* context, GMModel* model);
+	virtual void endDraw();
 
 public:
 	void updateTransformMatrix();
@@ -62,23 +72,23 @@ public:
 	inline const GMMat4& getTransform() const GM_NOEXCEPT
 	{
 		D(d);
-		return d->transformMatrix;
+		return d->transforms.transformMatrix;
 	}
 
 	inline const GMMat4& getScaling() const GM_NOEXCEPT {
 		D(d);
-		return d->scaling;
+		return d->transforms.scaling;
 	}
 
 	inline const GMMat4& getTranslation() const GM_NOEXCEPT
 	{
 		D(d);
-		return d->translation;
+		return d->transforms.translation;
 	}
 
 	inline const GMQuat& getRotation() const GM_NOEXCEPT {
 		D(d);
-		return d->rotation;
+		return d->transforms.rotation;
 	}
 
 	inline GMPhysicsObject* getPhysicsObject()

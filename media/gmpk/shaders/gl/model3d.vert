@@ -2,15 +2,15 @@ out vec4 _model3d_position_world;
 
 void model3d_calcCoords()
 {
-	if (GM_UseBoneAnimation != 0)
-	{
-		mat4 boneTransform = GM_Bones[boneIDs[0]] * weights[0];
-		boneTransform += GM_Bones[boneIDs[1]] * weights[1];
-		boneTransform += GM_Bones[boneIDs[2]] * weights[2];
-		boneTransform += GM_Bones[boneIDs[3]] * weights[3];
-		position = boneTransform * position;
-		normal = boneTransform * vec4(normal.xyz, 0);
-	}
+    if (GM_UseBoneAnimation != 0)
+    {
+        mat4 boneTransform = GM_Bones[boneIDs[0]] * weights[0];
+        boneTransform += GM_Bones[boneIDs[1]] * weights[1];
+        boneTransform += GM_Bones[boneIDs[2]] * weights[2];
+        boneTransform += GM_Bones[boneIDs[3]] * weights[3];
+        position = boneTransform * position;
+        normal = boneTransform * vec4(normal.xyz, 0);
+    }
 
     _model3d_position_world = GM_WorldMatrix * position;
     gl_Position = GM_ProjectionMatrix * GM_ViewMatrix * _model3d_position_world;

@@ -61,6 +61,10 @@ private:
 	bool setSubrotinue(const char* funcName, const char*  implement, GMuint32 shaderType);
 	bool verify();
 
+#if GM_DEBUG
+	GMint32 getUniformByName(const char* name);
+#endif;
+
 public:
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
 	virtual bool setInterface(GameMachineInterfaceID id, void* in) override;

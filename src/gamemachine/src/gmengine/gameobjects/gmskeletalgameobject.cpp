@@ -188,7 +188,7 @@ void GMSkeletalGameObject::update(GMDuration dt)
 					evaluator->update(dt);
 
 					auto& transforms = evaluator->getTransforms();
-					scene->getBoneTransformations().swap(transforms);
+					model.getModel()->getBoneTransformations().swap(transforms);
 				}
 			}
 		}

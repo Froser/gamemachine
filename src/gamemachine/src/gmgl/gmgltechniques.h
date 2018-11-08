@@ -17,14 +17,20 @@ private:
 
 GM_PRIVATE_OBJECT(GMGLTechnique)
 {
+	struct TechniqueContext
+	{
+		IShaderProgram* lastShaderProgram_camera = nullptr;
+		IShaderProgram* lastShaderProgram_screenInfo = nullptr;
+		GMModel* currentModel = nullptr;
+		GMScene* currentScene = nullptr;
+	};
+
 	const IRenderContext* context = nullptr;
 	GMGLGraphicEngine* engine = nullptr;
-	IShaderProgram* lastShaderProgram_camera = nullptr;
-	IShaderProgram* lastShaderProgram_screenInfo = nullptr;
 	const GMShaderVariablesDesc* variablesDesc = nullptr;
 	GMDebugConfig debugConfig;
 	GMGammaHelper gammaHelper;
-	GMModel* currentModel = nullptr;
+	TechniqueContext techContext;
 };
 
 class GMGLTechnique : public GMObject, public ITechnique
@@ -40,7 +46,9 @@ public:
 protected:
 	virtual void beforeDraw(GMModel* model) = 0;
 	virtual void afterDraw(GMModel* model) = 0;
-	virtual void beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent) override;
+	virtual void beginScene(GMScene* scene) override;
+	virtual void endScene() override;
+	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void endModel() override;
 
 protected:
@@ -63,7 +71,7 @@ protected:
 	void prepareDebug(GMModel* model);
 
 private:
-	void updateBoneTransforms(IShaderProgram* shaderProgram, GMScene* scene);
+	void updateBoneTransforms(IShaderProgram* shaderProgram, GMModel* model);
 
 public:
 	static void dirtyShadowMapAttributes();
@@ -83,7 +91,7 @@ public:
 	using GMGLTechnique::GMGLTechnique;
 
 public:
-	virtual void beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent) override;
+	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void beforeDraw(GMModel* model) override;
 	virtual void afterDraw(GMModel* model) override;
 	virtual IShaderProgram* getShaderProgram() override;
@@ -111,7 +119,7 @@ public:
 	using GMGLTechnique_3D::GMGLTechnique_3D;
 
 public:
-	virtual void beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent) override;
+	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void beforeDraw(GMModel* model) override;
 	virtual void afterDraw(GMModel* model) override;
 };
@@ -136,7 +144,7 @@ public:
 private:
 	virtual void beforeDraw(GMModel* model) override;
 	virtual void afterDraw(GMModel* model) override;
-	virtual void beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent) override;
+	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual IShaderProgram* getShaderProgram() override;
 
 protected:
@@ -155,7 +163,7 @@ protected:
 	virtual IShaderProgram* getShaderProgram() override;
 	virtual void beforeDraw(GMModel* model) override;
 	virtual void afterDraw(GMModel* model) override;
-	virtual void beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent) override;
+	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 };
 
 class GMGLTechnique_3D_Shadow : public GMGLTechnique_3D
@@ -164,7 +172,7 @@ public:
 	using GMGLTechnique_3D::GMGLTechnique_3D;
 
 protected:
-	virtual void beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent) override;
+	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 };
 
 class GMGLTechnique_Particle : public GMGLTechnique_2D

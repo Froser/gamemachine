@@ -219,6 +219,7 @@ void GMTextGameObject::draw()
 
 	GMModel* model = d->scene->getModels()[0].getModel();
 	drawModel(getContext(), model);
+	endDraw();
 }
 
 void GMTextGameObject::update()
@@ -402,6 +403,7 @@ void GMSprite2DGameObject::draw()
 	update();
 	GMModel* model = d->scene->getModels()[0].getModel();
 	drawModel(getContext(), model);
+	endDraw();
 }
 
 void GMSprite2DGameObject::setDepth(GMfloat depth)

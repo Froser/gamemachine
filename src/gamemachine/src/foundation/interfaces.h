@@ -548,7 +548,9 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 
 GM_INTERFACE(ITechnique)
 {
-	virtual void beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent) = 0;
+	virtual void beginScene(GMScene* scene) = 0;
+	virtual void endScene() = 0;
+	virtual void beginModel(GMModel* model, const GMGameObject* parent) = 0;
 	virtual void endModel() = 0;
 	virtual void draw(GMModel* model) = 0;
 };

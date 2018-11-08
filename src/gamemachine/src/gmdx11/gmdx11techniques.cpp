@@ -519,12 +519,24 @@ GMDx11Technique::GMDx11Technique(const IRenderContext* context)
 	getVarBank().init(d->effect);
 }
 
-void GMDx11Technique::beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent)
+void GMDx11Technique::beginScene(GMScene* scene)
+{
+	D(d);
+	d->techContext.currentScene = scene;
+}
+
+void GMDx11Technique::endScene()
+{
+	D(d);
+	d->techContext.currentScene = nullptr;
+}
+
+void GMDx11Technique::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
 	shaderProgram->useProgram();
-	d->currentModel = model;
+	d->techContext.currentModel = model;
 	if (!d->inputLayout)
 	{
 		D3DX11_PASS_DESC passDesc;
@@ -586,7 +598,7 @@ void GMDx11Technique::beginModel(GMScene* scene, GMModel* model, const GMGameObj
 void GMDx11Technique::endModel()
 {
 	D(d);
-	d->currentModel = nullptr;
+	d->techContext.currentModel = nullptr;
 }
 
 const IRenderContext* GMDx11Technique::getContext()
@@ -1103,10 +1115,10 @@ void GMDx11Technique_Filter::passAllAndDraw(GMModel* model)
 	}
 }
 
-void GMDx11Technique_Filter::beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent)
+void GMDx11Technique_Filter::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
-	GMDx11Technique::beginModel(scene, model, parent);
+	GMDx11Technique::beginModel(model, parent);
 
 	GMDx11EffectVariableBank& bank = getVarBank();
 	ID3DX11EffectScalarVariable* kernelDeltaX = bank.KernelDeltaX();
@@ -1207,7 +1219,7 @@ void GMDx11Technique_Deferred_3D_LightPass::prepareTextures(GMModel* model)
 	}
 }
 
-void GMDx11Technique_3D_Shadow::beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent)
+void GMDx11Technique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
 	const GMWindowStates& windowStates = d->context->getWindow()->getWindowStates();

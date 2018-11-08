@@ -49,52 +49,9 @@ public:
 	}
 };
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMSkeletalVertexBoneData)
-{
-	enum
-	{
-		BonesPerVertex = 4 // 每个vertex最大的bone数目
-	};
-
-	GMsize_t ids[BonesPerVertex] = { 0 }; //!< 定点绑定的骨骼索引
-	GMfloat weights[BonesPerVertex] = { 0 };
-};
-
-class GMSkeletalVertexBoneData
-{
-public:
-	enum
-	{
-		BonesPerVertex = GM_PRIVATE_NAME(GMSkeletalVertexBoneData)::BonesPerVertex // 每个vertex最大的bone数目
-	};
-
-	GM_DECLARE_PRIVATE_NGO(GMSkeletalVertexBoneData)
-	
-public:
-	GMSkeletalVertexBoneData() = default;
-
-public:
-	void reset();
-	void addData(GMsize_t boneId, GMfloat weight);
-
-public:
-	inline GMsize_t* getIds() GM_NOEXCEPT
-	{
-		D(d);
-		return d->ids;
-	}
-
-	inline GMfloat* getWeights() GM_NOEXCEPT
-	{
-		D(d);
-		return d->weights;
-	}
-};
-
 GM_PRIVATE_OBJECT(GMSkeletalBones)
 {
 	AlignedVector<GMSkeletalBone> bones;
-	Vector<GMSkeletalVertexBoneData> vertexData;
 	Map<GMString, GMsize_t> boneNameIndexMap;
 };
 
@@ -104,7 +61,6 @@ class GMSkeletalBones
 	GM_DECLARE_ALIGNED_ALLOCATOR()
 	GM_DECLARE_PROPERTY(Bones, bones)
 	GM_DECLARE_PROPERTY(BoneNameIndexMap, boneNameIndexMap)
-	GM_DECLARE_PROPERTY(VertexData, vertexData)
 };
 
 GM_PRIVATE_OBJECT(GMSkeleton)
@@ -117,6 +73,12 @@ class GMSkeleton
 	GM_DECLARE_PRIVATE_NGO(GMSkeleton)
 	GM_DECLARE_ALIGNED_ALLOCATOR()
 	GM_DECLARE_PROPERTY(Bones, bones)
+
+public:
+	enum
+	{
+		BonesPerVertex = 4
+	};
 };
 
 //////////////////////////////////////////////////////////////////////////

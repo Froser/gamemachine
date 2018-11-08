@@ -27,8 +27,8 @@ struct GMVertex
 		TangentDimension = NormalDimension,
 		BitangentDimension = NormalDimension,
 		ColorDimension = 4,
-		BoneIDsDimension = GMSkeletalVertexBoneData::BonesPerVertex,
-		WeightsDimension = GMSkeletalVertexBoneData::BonesPerVertex,
+		BoneIDsDimension = GMSkeleton::BonesPerVertex,
+		WeightsDimension = GMSkeleton::BonesPerVertex,
 	};
 
 	Array<GMfloat, PositionDimension> positions;
@@ -203,6 +203,7 @@ GM_PRIVATE_OBJECT(GMModel)
 	GMRenderTechinqueID techniqueId = 0;
 	GMModelAsset parentAsset;
 	GMOwnedPtr<GMSkeleton> skeleton;
+	AlignedVector<GMMat4> boneTransformations;
 };
 
 // 所有的顶点属性类型
@@ -243,6 +244,7 @@ public:
 	GM_DECLARE_PROPERTY(VerticesCount, verticesCount);
 	GM_DECLARE_PROPERTY(DrawMode, drawMode);
 	GM_DECLARE_PROPERTY(TechniqueId, techniqueId);
+	GM_DECLARE_PROPERTY(BoneTransformations, boneTransformations)
 
 public:
 	inline void setModelDataProxy(AUTORELEASE GMModelDataProxy* modelDataProxy)
@@ -330,14 +332,12 @@ GM_PRIVATE_OBJECT(GMScene)
 	Vector<GMAsset> models;
 	GMOwnedPtr<GMSkeletalAnimations> animations;
 	GMOwnedPtr<GMSkeletalNode> skeletalRoot;
-	AlignedVector<GMMat4> boneTransformations;
 };
 
 class GMScene : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMScene)
 	GM_DECLARE_PROPERTY(Models, models)
-	GM_DECLARE_PROPERTY(BoneTransformations, boneTransformations)
 
 public:
 	enum

@@ -24,8 +24,8 @@ vec4 bitangent;
 
 void init_layouts()
 {
-	position = vec4(gm_position.xyz, 1);
-	normal = vec4(gm_normal.xyz, 1);
-	tangent = vec4(gm_tangent.xyz, 1);
-	bitangent = vec4(gm_bitangent.xyz, 1);
+    position = vec4(gm_position.xyz, 1);
+    normal = vec4(gm_normal.xyz, 1);
+    tangent = vec4(gm_tangent.xyz, 1);
+    bitangent = vec4(gm_bitangent.xyz, 1);
 }

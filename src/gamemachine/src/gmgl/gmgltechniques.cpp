@@ -199,10 +199,22 @@ void GMGLTechnique::draw(GMModel* model)
 	GMGLEndGetErrorsAndCheck();
 }
 
-void GMGLTechnique::beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent)
+void GMGLTechnique::beginScene(GMScene* scene)
 {
 	D(d);
-	d->currentModel = model;
+	d->techContext.currentScene = scene;
+}
+
+void GMGLTechnique::endScene()
+{
+	D(d);
+	d->techContext.currentScene = nullptr;
+}
+
+void GMGLTechnique::beginModel(GMModel* model, const GMGameObject* parent)
+{
+	D(d);
+	d->techContext.currentModel = model;
 	auto shaderProgram = getShaderProgram();
 	shaderProgram->useProgram();
 
@@ -212,11 +224,11 @@ void GMGLTechnique::beginModel(GMScene* scene, GMModel* model, const GMGameObjec
 	// 设置顶点颜色运算方式
 	shaderProgram->setInt(GM_VariablesDesc.ColorVertexOp, static_cast<GMint32>(model->getShader().getVertexColorOp()));
 
-	GM_ASSERT(scene);
-	if (scene->hasAnimation())
+	GM_ASSERT(d->techContext.currentScene);
+	if (d->techContext.currentScene->hasAnimation())
 	{
 		shaderProgram->setInt(GM_VariablesDesc.UseBoneAnimation, 1);
-		updateBoneTransforms(shaderProgram, scene);
+		updateBoneTransforms(shaderProgram, model);
 	}
 	else
 	{
@@ -227,7 +239,7 @@ void GMGLTechnique::beginModel(GMScene* scene, GMModel* model, const GMGameObjec
 void GMGLTechnique::endModel()
 {
 	D(d);
-	d->currentModel = nullptr;
+	d->techContext.currentModel = nullptr;
 }
 
 void GMGLTechnique::activateTextureTransform(GMModel* model, GMTextureType type)
@@ -373,7 +385,7 @@ void GMGLTechnique::updateCameraMatrices(IShaderProgram* shaderProgram)
 {
 	D(d);
 	GMCamera& camera = d->engine->getCamera();
-	if (d->lastShaderProgram_camera != shaderProgram || camera.isDirty())
+	if (d->techContext.lastShaderProgram_camera != shaderProgram || camera.isDirty())
 	{
 		const GMMat4& viewMatrix = camera.getViewMatrix();
 		const GMCameraLookAt& lookAt = camera.getLookAt();
@@ -385,7 +397,7 @@ void GMGLTechnique::updateCameraMatrices(IShaderProgram* shaderProgram)
 		shaderProgram->setMatrix4(GM_VariablesDesc.ViewMatrix, camera.getViewMatrix());
 		shaderProgram->setMatrix4(GM_VariablesDesc.InverseViewMatrix, camera.getInverseViewMatrix());
 		shaderProgram->setMatrix4(GM_VariablesDesc.ProjectionMatrix, camera.getProjectionMatrix());
-		d->lastShaderProgram_camera = shaderProgram;
+		d->techContext.lastShaderProgram_camera = shaderProgram;
 		camera.cleanDirty();
 	}
 }
@@ -396,13 +408,13 @@ void GMGLTechnique::prepareScreenInfo(IShaderProgram* shaderProgram)
 	static std::string s_multisampling = std::string(GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo) + "." + GM_VariablesDesc.ScreenInfoAttributes.Multisampling;
 	static std::string s_screenWidth = std::string(GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo) + "." + GM_VariablesDesc.ScreenInfoAttributes.ScreenWidth;
 	static std::string s_screenHeight = std::string(GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo) + "." + GM_VariablesDesc.ScreenInfoAttributes.ScreenHeight;
-	if (d->lastShaderProgram_screenInfo != shaderProgram) //或者窗口属性发生改变
+	if (d->techContext.lastShaderProgram_screenInfo != shaderProgram) //或者窗口属性发生改变
 	{
 		const GMWindowStates& windowStates = d->context->getWindow()->getWindowStates();
 		shaderProgram->setInt(s_multisampling.c_str(), windowStates.sampleCount > 1);
 		shaderProgram->setInt(s_screenWidth.c_str(), windowStates.renderRect.width);
 		shaderProgram->setInt(s_screenHeight.c_str(), windowStates.renderRect.height);
-		d->lastShaderProgram_screenInfo = shaderProgram;
+		d->techContext.lastShaderProgram_screenInfo = shaderProgram;
 	}
 }
 
@@ -503,9 +515,9 @@ void GMGLTechnique::prepareDebug(GMModel* model)
 	getShaderProgram()->setInt(GM_VariablesDesc.Debug.Normal, mode);
 }
 
-void GMGLTechnique::updateBoneTransforms(IShaderProgram* shaderProgram, GMScene* scene)
+void GMGLTechnique::updateBoneTransforms(IShaderProgram* shaderProgram, GMModel* model)
 {
-	Vector<std::string> boneVarNames;
+	static Vector<std::string> boneVarNames;
 	if (boneVarNames.empty())
 	{
 		boneVarNames.resize(GMScene::MaxBoneCount);
@@ -515,7 +527,7 @@ void GMGLTechnique::updateBoneTransforms(IShaderProgram* shaderProgram, GMScene*
 		}
 	}
 
-	const auto& transforms = scene->getBoneTransformations();
+	const auto& transforms = model->getBoneTransformations();
 	for (GMsize_t i = 0; i < transforms.size(); ++i)
 	{
 		const auto& transform = transforms[i];
@@ -524,9 +536,9 @@ void GMGLTechnique::updateBoneTransforms(IShaderProgram* shaderProgram, GMScene*
 }
 
 //////////////////////////////////////////////////////////////////////////
-void GMGLTechnique_3D::beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent)
+void GMGLTechnique_3D::beginModel(GMModel* model, const GMGameObject* parent)
 {
-	Base::beginModel(scene, model, parent);
+	Base::beginModel(model, parent);
 
 	D(d);
 	D_BASE(db, GMGLTechnique);
@@ -691,9 +703,9 @@ void GMGLTechnique_2D::beforeDraw(GMModel* model)
 }
 
 //////////////////////////////////////////////////////////////////////////
-void GMGLTechnique_CubeMap::beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent)
+void GMGLTechnique_CubeMap::beginModel(GMModel* model, const GMGameObject* parent)
 {
-	Base::beginModel(scene, model, parent);
+	Base::beginModel(model, parent);
 	IShaderProgram* shaderProgram = getShaderProgram();
 	updateCameraMatrices(shaderProgram);
 	shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));
@@ -740,9 +752,9 @@ void GMGLTechnique_Filter::afterDraw(GMModel* model)
 {
 }
 
-void GMGLTechnique_Filter::beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent)
+void GMGLTechnique_Filter::beginModel(GMModel* model, const GMGameObject* parent)
 {
-	Base::beginModel(scene, model, parent);
+	Base::beginModel(model, parent);
 
 	D(d);
 	D_BASE(db, Base);
@@ -795,9 +807,9 @@ IShaderProgram* GMGLTechnique_LightPass::getShaderProgram()
 	return db->engine->getShaderProgram(GMShaderProgramType::DeferredLightPassShaderProgram);
 }
 
-void GMGLTechnique_LightPass::beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent)
+void GMGLTechnique_LightPass::beginModel(GMModel* model, const GMGameObject* parent)
 {
-	GMGLTechnique::beginModel(scene, model, parent);
+	GMGLTechnique::beginModel(model, parent);
 
 	D_BASE(d, GMGLTechnique);
 	IShaderProgram* shaderProgram = getShaderProgram();
@@ -848,9 +860,9 @@ void GMGLTechnique_LightPass::beforeDraw(GMModel* model)
 	}
 }
 
-void GMGLTechnique_3D_Shadow::beginModel(GMScene* scene, GMModel* model, const GMGameObject* parent)
+void GMGLTechnique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* parent)
 {
-	GMGLTechnique_3D::beginModel(scene, model, parent);
+	GMGLTechnique_3D::beginModel(model, parent);
 
 	D_BASE(d, Base);
 	IShaderProgram* shaderProgram = getShaderProgram();
@@ -878,7 +890,7 @@ IShaderProgram* GMGLTechnique_Custom::getShaderProgram()
 {
 	D_BASE(d, GMGLTechnique);
 	GMRenderTechniqueManager* rtm = d->engine->getRenderTechniqueManager();
-	IShaderProgram* shaderProgram = rtm->getShaderProgram(d->currentModel->getTechniqueId());
+	IShaderProgram* shaderProgram = rtm->getShaderProgram(d->techContext.currentModel->getTechniqueId());
 	GM_ASSERT(shaderProgram);
 	return shaderProgram;
 }

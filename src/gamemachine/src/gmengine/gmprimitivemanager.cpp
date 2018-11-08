@@ -109,6 +109,7 @@ void GMPrimitive3DObject::draw()
 	D(d);
 	update();
 	drawModel(getContext(), d->model);
+	endDraw();
 }
 
 void GMPrimitive3DObject::update()
