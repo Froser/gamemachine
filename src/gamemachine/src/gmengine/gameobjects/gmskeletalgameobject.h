@@ -28,9 +28,10 @@ public:
 
 public:
 	void update(GMDuration dt);
+	void reset();
 
 private:
-	void updateNode(GMfloat animationTime, GMSkeletalNode* node, const GMMat4& parentTransformation);
+	void updateNode(GMDuration animationTime, GMSkeletalNode* node, const GMMat4& parentTransformation);
 	const GMSkeletalAnimationNode* findAnimationNode(const GMString& name);
 };
 
@@ -46,7 +47,6 @@ GM_PRIVATE_OBJECT(GMSkeletalGameObject)
 	GMVec4 skeletonColor = GMVec4(0, 1, 0, 1);
 	Map<GMModel*, GMSkeletalAnimationEvaluator*> modelEvaluatorMap;
 	GMsize_t animationIndex = 0;
-	GMDuration animationTime = 0;
 };
 
 class GMSkeletalGameObject : public GMGameObject

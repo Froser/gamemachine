@@ -36,7 +36,7 @@ void GMSkeletalAnimationEvaluator::update(GMDuration dt)
 	d->duration += dt;
 
 	GMfloat ticks = d->duration * d->animation->frameRate;
-	GMfloat animationTime = Fmod(ticks, d->animation->duration);
+	GMDuration animationTime = Fmod(ticks, d->animation->duration);
 
 	updateNode(animationTime, d->rootNode, Identity<GMMat4>());
 	AlignedVector<GMMat4>& transforms = d->transforms;
@@ -50,14 +50,20 @@ void GMSkeletalAnimationEvaluator::update(GMDuration dt)
 	}
 }
 
-void GMSkeletalAnimationEvaluator::updateNode(GMfloat animationTime, GMSkeletalNode* node, const GMMat4& parentTransformation)
+void GMSkeletalAnimationEvaluator::reset()
+{
+	D(d);
+	d->duration = 0;
+}
+
+void GMSkeletalAnimationEvaluator::updateNode(GMDuration animationTime, GMSkeletalNode* node, const GMMat4& parentTransformation)
 {
 	D(d);
 	const GMString& nodeName = node->getName();
 	const GMMat4& transformation = node->getTransformToParent();
 	const GMSkeletalAnimationNode* animationNode = findAnimationNode(nodeName);
 	GMMat4 nodeTransformation = node->getTransformToParent();
-	GMuint32 factor = 0;
+	GMfloat factor = 0;
 
 	if (animationNode)
 	{
@@ -69,7 +75,7 @@ void GMSkeletalAnimationEvaluator::updateNode(GMfloat animationTime, GMSkeletalN
 			if (v.size() > 1)
 			{
 				GMfloat frameIdx = findIndex(animationTime, v);
-				GMfloat nextFrameIdx = frameIdx;
+				GMfloat nextFrameIdx = frameIdx + 1;
 				const auto& frame = v[frameIdx];
 				const auto& nextFrame = v[nextFrameIdx];
 				factor = (animationTime - frame.time) / (nextFrame.time - frame.time);
@@ -246,7 +252,11 @@ void GMSkeletalGameObject::pause()
 void GMSkeletalGameObject::reset(bool update)
 {
 	D(d);
-	d->animationTime = 0;
+	for (auto& evaluator : d->modelEvaluatorMap)
+	{
+		if (evaluator.second)
+			evaluator.second->reset();
+	}
 
 	if (update)
 	{
