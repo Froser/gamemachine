@@ -334,6 +334,12 @@ inline GMVec3& operator*=(GMVec3& V1, gm::GMfloat S)
 	return V1;
 }
 
+inline GMVec3& operator*=(GMVec3& V1, const GMVec3& V2)
+{
+	V1 = V1 * V2;
+	return V1;
+}
+
 inline GMVec3 operator/(const GMVec3& V1, gm::GMfloat S)
 {
 	GMVec3 V;

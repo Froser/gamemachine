@@ -3,6 +3,7 @@
 #include <gmcommon.h>
 #include <gmmodel.h>
 #include <gmasync.h>
+#include <gmparticle.h>
 
 BEGIN_NS
 
@@ -95,7 +96,12 @@ struct GMToolUtil
 		REF GMTextureAsset& normalTexture
 	);
 
-	static void createCocos2DParticleSystem(const GMString& filename, OUT GMParticleSystem** particleSystem);
+	static void createCocos2DParticleSystem(
+		const GMString& filename,
+		GMParticleModelType modelType,
+		OUT GMParticleSystem** particleSystem,
+		std::function<void(GMParticleDescription&)> descriptionCallback = std::function<void(GMParticleDescription&)>()
+	);
 };
 
 END_NS

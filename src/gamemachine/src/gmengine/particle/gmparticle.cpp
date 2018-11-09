@@ -216,6 +216,8 @@ IParticleModel* GMParticleSystem::createParticleModel(const GMParticleDescriptio
 	{
 	case GMParticleModelType::Particle2D:
 		return new GMParticleModel_2D(this);
+	case GMParticleModelType::Particle3D:
+		return new GMParticleModel_3D(this);
 	default:
 		GM_ASSERT(false);
 		gm_error(gm_dbg_wrap("Undefined particle model type."));
@@ -223,15 +225,15 @@ IParticleModel* GMParticleSystem::createParticleModel(const GMParticleDescriptio
 	}
 }
 
-GMParticleDescription GMParticleSystem::createParticleDescriptionFromCocos2DPlist(const GMString& content)
+GMParticleDescription GMParticleSystem::createParticleDescriptionFromCocos2DPlist(const GMString& content, GMParticleModelType modelType)
 {
 	GMCocos2DParticleDescriptionProxy proxy;
 	GMXML::parsePlist(content, proxy);
 	GMParticleDescription desc;
 
 	// 粒子发射器属性
-	// Cocos2D的发射角度，方向向量为(-1, 0, 0)，GameMachine采用(0, 1, 0)，因此要加上90度。
-	desc.setEmitterEmitAngle(proxy.getAngle() + 90);
+	// Cocos2D的发射角度，方向向量为(-1, 0, 0)，GameMachine采用(0, 1, 0)，因此要减去90度。
+	desc.setEmitterEmitAngle(proxy.getAngle() - 90);
 	desc.setEmitterEmitAngleV(proxy.getAngleVariance());
 
 	desc.setEmitterEmitSpeed(proxy.getSpeed());
@@ -280,7 +282,7 @@ GMParticleDescription GMParticleSystem::createParticleDescriptionFromCocos2DPlis
 	desc.setEndSizeV(proxy.getFinishParticleSizeVariance());
 
 	desc.setMotionMode(proxy.getPositionType());
-	desc.getGravityMode().setGravity(GMVec3(proxy.getGravityx(), proxy.getGravityy(), Z));
+	desc.getGravityMode().setGravity(GMVec3(proxy.getGravityx(), -proxy.getGravityy(), Z)); // Cocos2D重力为正，但是是朝GameMachine坐标系负方向
 	desc.getGravityMode().setRadialAcceleration(proxy.getRadialAcceleration());
 	desc.getGravityMode().setRadialAccelerationV(proxy.getRadialAccelVariance());
 	desc.getGravityMode().setTangentialAcceleration(proxy.getTangentialAcceleration());
@@ -319,8 +321,7 @@ GMParticleDescription GMParticleSystem::createParticleDescriptionFromCocos2DPlis
 			desc.setTextureImageData(std::move(buf));
 	}
 
-	// Cocos2D 使用二维游戏对象渲染粒子
-	desc.setParticleModelType(GMParticleModelType::Particle2D);
+	desc.setParticleModelType(modelType);
 	return desc;
 }
 

@@ -678,7 +678,12 @@ bool GMToolUtil::createPBRTextures(
 	return false;
 }
 
-void GMToolUtil::createCocos2DParticleSystem(const GMString& filename, OUT GMParticleSystem** particleSystem)
+void GMToolUtil::createCocos2DParticleSystem(
+	const GMString& filename,
+	GMParticleModelType modelType,
+	OUT GMParticleSystem** particleSystem,
+	std::function<void(GMParticleDescription&)> descriptionCallback
+)
 {
 	if (particleSystem)
 	{
@@ -687,6 +692,10 @@ void GMToolUtil::createCocos2DParticleSystem(const GMString& filename, OUT GMPar
 		buf.convertToStringBuffer();
 
 		*particleSystem = new GMParticleSystem();
-		(*particleSystem)->setDescription(GMParticleSystem::createParticleDescriptionFromCocos2DPlist(gm::GMString((const char*)buf.buffer)));
+		GMParticleDescription description = GMParticleSystem::createParticleDescriptionFromCocos2DPlist(gm::GMString((const char*)buf.buffer), modelType);
+		if (descriptionCallback)
+			descriptionCallback(description);
+
+		(*particleSystem)->setDescription(description);
 	}
 }

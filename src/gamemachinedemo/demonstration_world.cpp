@@ -58,7 +58,8 @@ namespace
 		world->addDemo(L"PBR: 演示PBR渲染。", new Demo_PBR(world));
 		world->addDemo(L"PBR: 演示同时通过Phong模型和PBR模型渲染。", new Demo_Phong_PBR(world));
 		world->addDemo(L"UI控件: 演示使用GameMachine提供的UI控件。", new Demo_Controls(world));
-		world->addDemo(L"粒子系统: 渲染一个粒子系统。", new Demo_Particle(world));
+		world->addDemo(L"粒子系统: 渲染一个2D粒子系统。", new Demo_Particle2D(world));
+		world->addDemo(L"粒子系统: 渲染一个Billboard 3D粒子系统。", new Demo_ParticleBillboard(world));
 		world->addDemo(L"MD5: 渲染MD5骨骼动画。", new Demo_MD5Mesh(world));
 		world->addDemo(L"地形: 渲染一个地形。", new Demo_Terrain(world));
 		world->addDemo(L"自定义着色器: 使用自定义着色器进行渲染。", new Demo_CustomShader(world));

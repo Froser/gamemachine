@@ -17,6 +17,7 @@ GM_INTERFACE(IParticleModel)
 enum class GMParticleModelType
 {
 	Particle2D,
+	Particle3D,
 };
 
 enum class GMParticleEmitterType
@@ -115,8 +116,16 @@ GM_PRIVATE_OBJECT(GMParticleDescription)
 
 	GMBuffer textureImageData;
 	GMParticleModelType particleModelType = GMParticleModelType::Particle2D;
+
+	GMVec3 gravityDirection = GMVec3(1, 1, 1); //!< 重力方向，-1表示粒子坐标系与左手坐标系相反
 };
 
+//! 表示一个粒子发射器的描述
+/*!
+  对于一个粒子发射器而言，它的重力方向为GameMachine坐标系y轴负方向，朝向地面。<BR>
+  发射的0度角对应GameMachine坐标系(0, 1, 0)。
+  所有Angle的单位为角度，而非弧度。
+*/
 class GMParticleDescription : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMParticleDescription)
@@ -379,7 +388,6 @@ public:
 	}
 
 private:
-	GMGameObject* createGameObject(const IRenderContext* context);
 	void updateData(const IRenderContext* context, void* dataPtr);
 
 private:
@@ -390,7 +398,7 @@ private:
 	}
 
 public:
-	static GMParticleDescription createParticleDescriptionFromCocos2DPlist(const GMString& content);
+	static GMParticleDescription createParticleDescriptionFromCocos2DPlist(const GMString& content, GMParticleModelType modelType);
 };
 
 GM_PRIVATE_OBJECT(GMParticlePool)

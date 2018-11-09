@@ -5,7 +5,7 @@
 
 BEGIN_NS
 
-GM_PRIVATE_OBJECT(GMParticleModel_2D)
+GM_PRIVATE_OBJECT(GMParticleModel)
 {
 	GMOwnedPtr<GMGameObject> particleObject;
 	GMModel* particleModel = nullptr;
@@ -13,24 +13,19 @@ GM_PRIVATE_OBJECT(GMParticleModel_2D)
 };
 
 //! 表示一个2D粒子，是一个四边形
-class GMParticleModel_2D : public GMObject, public IParticleModel
+class GMParticleModel : public GMObject, public IParticleModel
 {
-	GM_DECLARE_PRIVATE(GMParticleModel_2D)
+	GM_DECLARE_PRIVATE(GMParticleModel)
 
 public:
-	GMParticleModel_2D(GMParticleSystem* system);
+	GMParticleModel(GMParticleSystem* system);
 
 public:
 	virtual void render(const IRenderContext* context) override;
 
-private:
+protected:
 	GMGameObject* createGameObject(
 		const IRenderContext* context
-	);
-
-	void updateData(
-		const IRenderContext* context,
-		void* dataPtr
 	);
 
 	void update6Vertices(
@@ -38,12 +33,30 @@ private:
 		const GMVec3& centerPt,
 		const GMVec2& halfExtents,
 		const GMVec4& color,
-		GMfloat rotationRad,
-		const GMVec3& rotationAxis,
+		const GMQuat& quat,
 		GMfloat z = 0
 	);
+
+protected:
+	virtual void updateData(const IRenderContext* context, void* dataPtr) = 0;
 };
 
+class GMParticleModel_2D : public GMParticleModel
+{
+public:
+	using GMParticleModel::GMParticleModel;
+
+	virtual void updateData(const IRenderContext* context, void* dataPtr) override;
+};
+
+class GMParticleModel_3D : public GMParticleModel
+{
+public:
+	using GMParticleModel::GMParticleModel;
+
+public:
+	virtual void updateData(const IRenderContext* context, void* dataPtr) override;
+};
 
 END_NS
 #endif

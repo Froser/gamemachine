@@ -15,10 +15,8 @@ void GMGravityParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticl
 	GMfloat particleSpeed = emitter->getEmitSpeed() + emitter->getEmitSpeedV() * GMRandomMt19937::random_real(-1.f, 1.f);
 	GMfloat angle = emitter->getEmitAngle() + emitter->getEmitAngleV() * GMRandomMt19937::random_real(-1.f, 1.f);
 
-	// Cocos2D 角度0rad从x=-1开始算起
-	// Cocos2D Y轴向下，正交视图Y轴向上，所以乘以-1
 	GMQuat rotationQuat = Rotate(Radians(angle), getRotationAxis());
-	particle->getGravityModeData().initialVelocity = Inhomogeneous(-s_rotateStartVector * rotationQuat) * particleSpeed;
+	particle->getGravityModeData().initialVelocity = Inhomogeneous(s_rotateStartVector * rotationQuat) * particleSpeed;
 	particle->getGravityModeData().tangentialAcceleration = getGravityMode().getTangentialAcceleration() + getGravityMode().getTangentialAccelerationV() * GMRandomMt19937::random_real(-1.f, 1.f);
 	particle->getGravityModeData().radialAcceleration = getGravityMode().getRadialAcceleration() + getGravityMode().getRadialAccelerationV() * GMRandomMt19937::random_real(-1.f, 1.f);
 }
@@ -54,8 +52,6 @@ void GMGravityParticleEffect::update(GMParticleEmitter* emitter, GMDuration dt)
 
 			// 计算合力
 			offset = (radial + tangential + getGravityMode().getGravity()) * dt;
-			// Cocos2D Y轴向下，正交视图Y轴向上，所以乘以-1
-			offset.setY(-offset.getY());
 			
 			// 移动粒子
 			particle->getGravityModeData().initialVelocity += offset;

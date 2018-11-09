@@ -448,6 +448,8 @@ inline GMVec3 operator/(const GMVec3& V1, gm::GMfloat S);
 
 inline GMVec3& operator*=(GMVec3& V1, gm::GMfloat S);
 
+inline GMVec3& operator*=(GMVec3& V1, const GMVec3& V2);
+
 inline GMVec3& operator/=(GMVec3& V1, gm::GMfloat S);
 
 inline GMVec4 operator/(const GMVec4& V1, gm::GMfloat S);

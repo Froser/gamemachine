@@ -3,13 +3,13 @@
 #include "gmparticlemodel.h"
 #include "foundation/gmasync.h"
 
-GMParticleModel_2D::GMParticleModel_2D(GMParticleSystem* system)
+GMParticleModel::GMParticleModel(GMParticleSystem* system)
 {
 	D(d);
 	d->system = system;
 }
 
-GMGameObject* GMParticleModel_2D::createGameObject(
+GMGameObject* GMParticleModel::createGameObject(
 	const IRenderContext* context
 )
 {
@@ -46,13 +46,12 @@ GMGameObject* GMParticleModel_2D::createGameObject(
 	return object;
 }
 
-void GMParticleModel_2D::update6Vertices(
+void GMParticleModel::update6Vertices(
 	GMVertex* vertex,
 	const GMVec3& centerPt,
 	const GMVec2& halfExtents,
 	const GMVec4& color,
-	GMfloat rotationRad,
-	const GMVec3& rotationAxis,
+	const GMQuat& quat,
 	GMfloat z
 )
 {
@@ -65,7 +64,6 @@ void GMParticleModel_2D::update6Vertices(
 	};
 
 	const GMfloat x = halfExtents.getX(), y = halfExtents.getY();
-	GMQuat q = Rotate(rotationRad, rotationAxis);
 	GMVec4 raw[4] = {
 		GMVec4(centerPt.getX() - x, centerPt.getY() - y, z, 1),
 		GMVec4(centerPt.getX() - x, centerPt.getY() + y, z, 1),
@@ -74,10 +72,10 @@ void GMParticleModel_2D::update6Vertices(
 	};
 
 	GMVec4 transformed[4] = {
-		raw[0] * q,
-		raw[1] * q,
-		raw[2] * q,
-		raw[3] * q,
+		raw[0] * quat,
+		raw[1] * quat,
+		raw[2] * quat,
+		raw[3] * quat,
 	};
 
 	// 排列方式：
@@ -147,7 +145,7 @@ void GMParticleModel_2D::update6Vertices(
 	};
 }
 
-void GMParticleModel_2D::render(const IRenderContext* context)
+void GMParticleModel::render(const IRenderContext* context)
 {
 	D(d);
 	if (!d->particleObject)
@@ -213,8 +211,45 @@ void GMParticleModel_2D::updateData(const IRenderContext* context, void* dataPtr
 				particle->getPosition(),
 				he,
 				particle->getColor(),
-				particle->getRotation(),
-				GMVec3(0, 0, 1)
+				Rotate(particle->getRotation(), GMVec3(0, 0, 1))
+			);
+			dataOffset += VerticesPerParticle;
+		}
+	}
+	);
+}
+
+void GMParticleModel_3D::updateData(const IRenderContext* context, void* dataPtr)
+{
+	D(d);
+	auto& particles = d->system->getEmitter()->getParticles();
+	const auto& camera = context->getEngine()->getCamera();
+	const auto& lookAt = camera.getLookAt();
+
+	// 计算出Billboard应该沿着的方向
+	GMVec3 right = Cross(lookAt.up, lookAt.lookAt);
+
+	// 一个粒子有6个顶点，2个三角形，放入并行计算
+	enum { VerticesPerParticle = 6 };
+	GMAsync::blockedAsync(
+		GMAsync::Async,
+		GM.getRunningStates().systemInfo.numberOfProcessors,
+		particles.begin(),
+		particles.end(),
+		[&particles, dataPtr, this](auto begin, auto end) {
+		// 计算一下数据偏移
+		GMVertex* dataOffset = reinterpret_cast<GMVertex*>(dataPtr) + (begin - particles.begin()) * VerticesPerParticle;
+		for (auto iter = begin; iter != end; ++iter)
+		{
+			GMParticle* particle = *iter;
+			GMfloat he = particle->getSize() / 2.f;
+			update6Vertices(
+				dataOffset,
+				particle->getPosition(),
+				he,
+				particle->getColor(),
+				Rotate(particle->getRotation(), GMVec3(0, 0, 1)),
+				particle->getPosition().getZ()
 			);
 			dataOffset += VerticesPerParticle;
 		}
