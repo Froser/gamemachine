@@ -55,7 +55,7 @@ public:
 protected:
 	const gm::GMString& getDescription() const
 	{
-		static gm::GMString desc = L"渲染Billboard粒子。";
+		static gm::GMString desc = L"渲染Billboard粒子。左键拖动视觉。";
 		return desc;
 	}
 

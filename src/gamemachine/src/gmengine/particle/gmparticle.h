@@ -231,6 +231,7 @@ GM_PRIVATE_OBJECT(GMParticleEmitter)
 	GMint32 particleCount = 0;
 	GMDuration emitRate = 0;
 	GMDuration duration = 0;
+	GMVec3 rotationAxis = GMVec3(0, 0, 1);
 	GMOwnedPtr<GMParticleEffect> effect;
 	Vector<GMParticle*> particles;
 	bool canEmit = true;
@@ -251,6 +252,7 @@ class GMParticleEmitter : public GMObject
 	GM_DECLARE_PROPERTY(ParticleCount, particleCount)
 	GM_DECLARE_PROPERTY(EmitRate, emitRate)
 	GM_DECLARE_PROPERTY(Duration, duration)
+	GM_DECLARE_PROPERTY(RotationAxis, rotationAxis)
 
 public:
 	GMParticleEmitter(GMParticleSystem* system);
@@ -303,7 +305,6 @@ GM_PRIVATE_OBJECT(GMParticleEffect)
 	GMfloat beginSpinV = 0;
 	GMfloat endSpin = 0;
 	GMfloat endSpinV = 0;
-	GMVec3 rotationAxis = GMVec3(0, 0, 1);
 };
 
 class GMParticleEffect : public GMObject
@@ -326,7 +327,6 @@ class GMParticleEffect : public GMObject
 	GM_DECLARE_PROPERTY(MotionMode, motionMode)
 	GM_DECLARE_PROPERTY(GravityMode, gravityMode)
 	GM_DECLARE_PROPERTY(RadiusMode, radiusMode)
-	GM_DECLARE_PROPERTY(RotationAxis, rotationAxis)
 
 public:
 	void setParticleDescription(const GMParticleDescription& desc);

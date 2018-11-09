@@ -226,6 +226,7 @@ void GMParticleModel_3D::updateData(const IRenderContext* context, void* dataPtr
 	const auto& camera = context->getEngine()->getCamera();
 	const auto& lookAt = camera.getLookAt();
 
+	// 粒子本身若带有旋转，则会在正对用户视觉后再来应用此旋转
 	// 计算出Billboard应该沿着的方向
 	GMVec3 right = Cross(lookAt.up, lookAt.lookAt);
 
@@ -236,19 +237,23 @@ void GMParticleModel_3D::updateData(const IRenderContext* context, void* dataPtr
 		GM.getRunningStates().systemInfo.numberOfProcessors,
 		particles.begin(),
 		particles.end(),
-		[&particles, dataPtr, this](auto begin, auto end) {
+		[&particles, dataPtr, this, &right](auto begin, auto end) {
 		// 计算一下数据偏移
 		GMVertex* dataOffset = reinterpret_cast<GMVertex*>(dataPtr) + (begin - particles.begin()) * VerticesPerParticle;
 		for (auto iter = begin; iter != end; ++iter)
 		{
 			GMParticle* particle = *iter;
 			GMfloat he = particle->getSize() / 2.f;
+
+			GMQuat q = Rotate(particle->getRotation(), GMVec3(0, 0, 1)); // 这个是计算粒子本身的旋转
+			GM_ASSERT(false); //这里应该计算出面向视觉的四元数
+
 			update6Vertices(
 				dataOffset,
 				particle->getPosition(),
 				he,
 				particle->getColor(),
-				Rotate(particle->getRotation(), GMVec3(0, 0, 1)),
+				q,
 				particle->getPosition().getZ()
 			);
 			dataOffset += VerticesPerParticle;

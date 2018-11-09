@@ -76,7 +76,7 @@ void Demo_Particle2D::event(gm::GameMachineHandlerEvent evt)
 namespace
 {
 	const gm::GMCameraLookAt s_lookAt = gm::GMCameraLookAt(
-		GMVec3(0, 0, 1),
+		GMVec3(.86f, 0, .5f),
 		GMVec3(0, 0, 0)
 	);
 }
@@ -99,7 +99,7 @@ void Demo_ParticleBillboard::init()
 
 	gm::GMParticleSystem* psFire = nullptr;
 	gm::GMToolUtil::createCocos2DParticleSystem(L"fire1.plist", gm::GMParticleModelType::Particle3D, &psFire);
-	psFire->getEmitter()->setEmitPosition(GMVec3(0, 0, 300));
+	psFire->getEmitter()->setEmitPosition(GMVec3(860, 0, 500));
 	psFire->getEmitter()->getEffect()->setMotionMode(gm::GMParticleMotionMode::Free);
 	d->particleSystemManager->addParticleSystem(psFire);
 }
