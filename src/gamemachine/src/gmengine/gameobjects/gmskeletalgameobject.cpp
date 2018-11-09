@@ -201,35 +201,12 @@ void GMSkeletalGameObject::update(GMDuration dt)
 	}
 }
 
-void GMSkeletalGameObject::draw()
-{
-	D(d);
-	if (d->drawSkin)
-		GMGameObject::draw();
-}
-
 void GMSkeletalGameObject::createSkeletonBonesObject()
 {
 	D(d);
 	GMScene* scene = getScene();
 	if (!scene)
 		return;
-}
-
-void GMSkeletalGameObject::setDrawBones(bool b)
-{
-	D(d);
-	d->drawBones = b;
-
-	if (d->skeletonBonesObject)
-	{
-		GMModel* model = d->skeletonBonesObject->getModel();
-		GM_ASSERT(model);
-		if (!model)
-			return;
-
-		model->getShader().setDiscard(!b);
-	}
 }
 
 void GMSkeletalGameObject::play()
@@ -277,67 +254,4 @@ GMsize_t GMSkeletalGameObject::getAnimationCount()
 		return 0;
 
 	return scene->getAnimations()->getAnimationCount();
-}
-
-void GMSkeletalGameObject::updateSkeleton()
-{
-	D(d);
-	GMScene* scene = getScene();
-	if (!scene)
-		return;
-
-	if (!d->drawBones)
-		return;
-
-	if (!d->skeletonBonesObject)
-		createSkeletonBonesObject();
-
-	if (!d->skeletonBonesObject)
-		return;
-
-	GMModel* bonesModel = d->skeletonBonesObject->getModel();
-	if (!bonesModel)
-		return;
-
-	const GMVec4& sc = getSkeletonColor();
-	Array<GMfloat, 4> color;
-	CopyToArray(sc, &color[0]);
-
-	GMModelDataProxy* modelDataProxy = bonesModel->getModelDataProxy();
-	modelDataProxy->beginUpdateBuffer(GMModelBufferType::VertexBuffer);
-	GMVertex* const vertices = static_cast<GMVertex*>(modelDataProxy->getBuffer());
-	GMVertex* verticesPtr = vertices;
-
-	modelDataProxy->endUpdateBuffer();
-
-	// 同步变换
-	d->skeletonBonesObject->beginUpdateTransform();
-	d->skeletonBonesObject->setTranslation(getTranslation());
-	d->skeletonBonesObject->setRotation(getRotation());
-	d->skeletonBonesObject->setScaling(getScaling());
-	d->skeletonBonesObject->endUpdateTransform();
-}
-
-void GMSkeletalGameObject::initSkeletonBonesMesh(GMPart* part)
-{
-	D(d);
-	// 找到所有joint，连接成线
-	GMScene* scene = getScene();
-	GM_ASSERT(scene);
-	if (!scene)
-		return;
-
-	for (auto& model : scene->getModels())
-	{
-		auto skeleton = model.getModel()->getSkeleton();
-		if (!skeleton)
-			return;
-		const auto& bones = skeleton->getBones();
-		for (const auto& bone : bones.getBones())
-		{
-			// 每个关节绑定2个顶点，绘制出一条直线
-			part->vertex(GMVertex());
-			part->vertex(GMVertex());
-		}
-	}
 }

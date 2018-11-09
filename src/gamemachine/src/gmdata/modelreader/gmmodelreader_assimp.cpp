@@ -181,26 +181,26 @@ namespace
 		GM_ASSERT(false);
 	}
 
-	void processBones(GMModelReader_Assimp* imp, aiMesh* part, GMModel* model)
+	void processBones(GMModelReader_Assimp* imp, aiMesh* mesh, GMModel* model)
 	{
 		GMSkeleton* skeleton = getSkeleton(model);
 		auto& bones = skeleton->getBones();
 		auto& boneMapping = bones.getBoneNameIndexMap();
-		bones.getBones().resize(part->mNumBones);
+		bones.getBones().resize(mesh->mNumBones);
 
 		GMsize_t index = 0;
 		GMsize_t boneIndex = 0;
-		for (GMsize_t i = 0; i < part->mNumBones; ++i)
+		for (GMsize_t i = 0; i < mesh->mNumBones; ++i)
 		{
 			// 记录骨骼名字和其索引
-			GMString boneName = part->mBones[i]->mName.C_Str();
+			GMString boneName = mesh->mBones[i]->mName.C_Str();
 			if (boneMapping.find(boneName) == boneMapping.end())
 			{
 				// 这是一个新的骨骼
 				GMSkeletalBone& bone = bones.getBones()[index];
 				bone.name = boneName;
 				bone.targetModel = model;
-				bone.offsetMatrix = fromAiMatrix(part->mBones[i]->mOffsetMatrix);
+				bone.offsetMatrix = fromAiMatrix(mesh->mBones[i]->mOffsetMatrix);
 				boneIndex = boneMapping[boneName] = index;
 				++index;
 			}
@@ -211,9 +211,9 @@ namespace
 
 			// 接下来，记录所有的weight
 
-			for (GMsize_t j = 0; j < part->mBones[i]->mNumWeights; ++j)
+			for (GMsize_t j = 0; j < mesh->mBones[i]->mNumWeights; ++j)
 			{
-				auto& weight = part->mBones[i]->mWeights[j];
+				auto& weight = mesh->mBones[i]->mWeights[j];
 				GMsize_t vertexId = weight.mVertexId;
 				// 将每个顶点与Bones和Weight绑定
 				addVertexBoneAndWeight(model, vertexId, boneIndex, weight.mWeight);
@@ -239,12 +239,6 @@ namespace
 
 	void processAnimation(GMModelReader_Assimp* imp, const aiScene* scene, GMScene* s)
 	{
-		for (auto modelAsset : s->getModels())
-		{
-			GM_ASSERT(modelAsset.getModel());
-			modelAsset.getModel()->setUsageHint(GMUsageHint::DynamicDraw);
-		}
-
 		GMSkeletalAnimations* animations = new GMSkeletalAnimations();
 		for (auto a = 0u; a < scene->mNumAnimations; ++a)
 		{

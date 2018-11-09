@@ -19,32 +19,6 @@ void Demo_MD5Mesh::init()
 	gm::GMControlButton* button = nullptr;
 	widget->addControl(button = gm::GMControlButton::createControl(
 		widget,
-		L"切换绘制皮肤",
-		10,
-		top,
-		250,
-		30,
-		false
-	));
-	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
-		d->boblampclean->setDrawSkin(!d->boblampclean->getDrawSkin());
-	});
-
-	widget->addControl(button = gm::GMControlButton::createControl(
-		widget,
-		L"切换骨骼",
-		10,
-		top += 40,
-		250,
-		30,
-		false
-	));
-	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
-		d->boblampclean->setDrawBones(!d->boblampclean->getDrawBones());
-	});
-
-	widget->addControl(button = gm::GMControlButton::createControl(
-		widget,
 		L"播放/暂停动画",
 		10,
 		top += 40,
