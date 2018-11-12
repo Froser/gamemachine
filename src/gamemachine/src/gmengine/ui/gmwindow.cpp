@@ -21,6 +21,9 @@ bool GMWindow::handleSystemEvent(GMSystemEvent* event, REF GMLResult& result)
 
 	switch (event->getType())
 	{
+	case GMSystemEventType::WindowDestroyed:
+		GM.postMessage({ GameMachineMessageType::WindowDestoryed, 0, static_cast<IWindow*>(this) });
+		break;
 	case GMSystemEventType::WindowSizeChanged:
 		GM.postMessage({ GameMachineMessageType::WindowSizeChanged });
 		break;
@@ -92,7 +95,7 @@ void GMWindow::msgProc(const GMMessage& message)
 	D(d);
 	if (message.msgType == GameMachineMessageType::SystemMessage)
 	{
-		GMSystemEvent* event = static_cast<GMSystemEvent*>(message.objPtr);
+		GMSystemEvent* event = static_cast<GMSystemEvent*>(message.object);
 		for (auto widget : d->widgets)
 		{
 			widget->msgProc(event);
@@ -108,6 +111,14 @@ void GMWindow::msgProc(const GMMessage& message)
 		for (auto widget : d->widgets)
 		{
 			widget->render(elapsed);
+		}
+	}
+	else if (message.msgType == GameMachineMessageType::WindowDestoryed)
+	{
+		if (message.object == this)
+		{
+			// 窗口已经被Destory，因此HWND设置为0
+			setWindowHandle(NULL);
 		}
 	}
 }

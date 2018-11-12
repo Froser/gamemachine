@@ -98,10 +98,25 @@ void Demo_ParticleBillboard::init()
 	widget->setSize(widget->getSize().width, top + 40);
 
 	gm::GMParticleSystem* psFire = nullptr;
-	gm::GMToolUtil::createCocos2DParticleSystem(L"fire1.plist", gm::GMParticleModelType::Particle3D, &psFire);
-	psFire->getEmitter()->setEmitPosition(GMVec3(860, 0, 500));
-	psFire->getEmitter()->getEffect()->setMotionMode(gm::GMParticleMotionMode::Free);
-	d->particleSystemManager->addParticleSystem(psFire);
+
+	GMVec3 positions[] = {
+		GMVec3(860, 250, 500),
+		GMVec3(860, 250, -500),
+		GMVec3(-860, 250, 500),
+		GMVec3(-860, 250, -500),
+		GMVec3(860, -250, 500),
+		GMVec3(860, -250, -500),
+		GMVec3(-860, -250, 500),
+		GMVec3(-860, -250, -500),
+	};
+
+	for (auto position : positions)
+	{
+		gm::GMToolUtil::createCocos2DParticleSystem(L"fire1.plist", gm::GMParticleModelType::Particle3D, &psFire);
+		psFire->getEmitter()->setEmitPosition(position);
+		psFire->getEmitter()->getEffect()->setMotionMode(gm::GMParticleMotionMode::Free);
+		d->particleSystemManager->addParticleSystem(psFire);
+	}
 }
 
 void Demo_ParticleBillboard::setLookAt()

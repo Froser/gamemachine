@@ -572,6 +572,13 @@ inline GMMat4 InverseTranspose(const GMMat4& M);
 
 inline GMQuat Lerp(const GMQuat& Q1, const GMQuat& Q2, gm::GMfloat T);
 
+//! 获取某个向量到另外一个向量的最小旋转四元数。
+/*!
+  如果源向量和目标向量几乎相反，那么会生成一个沿着fallbackAxis旋转180度的四元数。<BR>
+  如果指定的fallbackAxis为零向量，则会生成一个。
+*/
+inline GMQuat RotationTo(const GMVec3& src, const GMVec3& dest, const GMVec3& fallbackAxis);
+
 inline GMVec3 Unproject(
 	const GMVec3& V,
 	gm::GMfloat ViewportX,

@@ -3,6 +3,17 @@
 #include "gmparticlemodel.h"
 #include "foundation/gmasync.h"
 
+namespace
+{
+	bool normalFuzzyEquals(const GMVec3& normal1, const GMVec3& normal2, GMfloat epsilon = .01f)
+	{
+		return (
+			normal1.getX() - normal2.getX() < epsilon &&
+			normal1.getY() - normal2.getY() < epsilon &&
+			normal1.getZ() - normal2.getZ() < epsilon);
+	}
+}
+
 GMParticleModel::GMParticleModel(GMParticleSystem* system)
 {
 	D(d);
@@ -52,9 +63,11 @@ void GMParticleModel::update6Vertices(
 	const GMVec2& halfExtents,
 	const GMVec4& color,
 	const GMQuat& quat,
+	const GMVec3& lookAt,
 	GMfloat z
 )
 {
+	const static GMVec3 s_normal(0, 0, -1.f);
 	constexpr GMfloat texcoord[4][2] =
 	{
 		{ 0, 1 },
@@ -78,6 +91,20 @@ void GMParticleModel::update6Vertices(
 		raw[3] * quat,
 	};
 
+	// 当玩家没有直视粒子时，使用billboard效果
+	if (!normalFuzzyEquals(-lookAt, s_normal))
+	{
+		GMQuat rot = RotationTo(s_normal, -lookAt, Zero<GMVec3>());
+
+		GMMat4 transToOrigin = Translate(-centerPt);
+		GMMat4 transToCenterPt = Translate(centerPt);
+		// 先移回原点，旋转之后再移会原位置
+		transformed[0] = raw[0] * transToOrigin * rot * transToCenterPt;
+		transformed[1] = raw[1] * transToOrigin * rot * transToCenterPt;
+		transformed[2] = raw[2] * transToOrigin * rot * transToCenterPt;
+		transformed[3] = raw[3] * transToOrigin * rot * transToCenterPt;
+	}
+
 	// 排列方式：
 	// 1   | 1 3
 	// 0 2 |   2
@@ -91,7 +118,7 @@ void GMParticleModel::update6Vertices(
 
 	vertex[0] = {
 		{ vertices[0][0], vertices[0][1], vertices[0][2] }, //position
-		{ 0, -1.f, 0 }, //normal
+		{ 0, 0, -1.f }, //normal
 		{ texcoord[0][0], texcoord[0][1] }, //texcoord
 		{ 0 },
 		{ 0 },
@@ -100,7 +127,7 @@ void GMParticleModel::update6Vertices(
 	};
 	vertex[1] = {
 		{ vertices[1][0], vertices[1][1], vertices[1][2] }, //position
-		{ 0, -1.f, 0 }, //normal
+		{ 0, 0, -1.f }, //normal
 		{ texcoord[1][0], texcoord[1][1] }, //texcoord
 		{ 0 },
 		{ 0 },
@@ -109,7 +136,7 @@ void GMParticleModel::update6Vertices(
 	};
 	vertex[2] = {
 		{ vertices[2][0], vertices[2][1], vertices[2][2] }, //position
-		{ 0, -1.f, 0 }, //normal
+		{ 0, 0, -1.f }, //normal
 		{ texcoord[2][0], texcoord[2][1] }, //texcoord
 		{ 0 },
 		{ 0 },
@@ -118,7 +145,7 @@ void GMParticleModel::update6Vertices(
 	};
 	vertex[3] = {
 		{ vertices[2][0], vertices[2][1], vertices[2][2] }, //position
-		{ 0, -1.f, 0 }, //normal
+		{ 0, 0, -1.f }, //normal
 		{ texcoord[2][0], texcoord[2][1] }, //texcoord
 		{ 0 },
 		{ 0 },
@@ -127,7 +154,7 @@ void GMParticleModel::update6Vertices(
 	};
 	vertex[4] = {
 		{ vertices[1][0], vertices[1][1], vertices[1][2] }, //position
-		{ 0, -1.f, 0 }, //normal
+		{ 0, 0, -1.f }, //normal
 		{ texcoord[1][0], texcoord[1][1] }, //texcoord
 		{ 0 },
 		{ 0 },
@@ -136,7 +163,7 @@ void GMParticleModel::update6Vertices(
 	};
 	vertex[5] = {
 		{ vertices[3][0], vertices[3][1], vertices[3][2] }, //position
-		{ 0, -1.f, 0 }, //normal
+		{ 0, 0, -1.f }, //normal
 		{ texcoord[3][0], texcoord[3][1] }, //texcoord
 		{ 0 },
 		{ 0 },
@@ -191,6 +218,7 @@ void GMParticleModel_2D::updateData(const IRenderContext* context, void* dataPtr
 {
 	D(d);
 	auto& particles = d->system->getEmitter()->getParticles();
+	const auto& lookAt = context->getEngine()->getCamera().getLookAt().lookAt;
 
 	// 一个粒子有6个顶点，2个三角形，放入并行计算
 	enum { VerticesPerParticle = 6 };
@@ -199,7 +227,7 @@ void GMParticleModel_2D::updateData(const IRenderContext* context, void* dataPtr
 		GM.getRunningStates().systemInfo.numberOfProcessors,
 		particles.begin(),
 		particles.end(),
-		[&particles, dataPtr, this](auto begin, auto end) {
+		[&particles, dataPtr, this, &lookAt](auto begin, auto end) {
 		// 计算一下数据偏移
 		GMVertex* dataOffset = reinterpret_cast<GMVertex*>(dataPtr) + (begin - particles.begin()) * VerticesPerParticle;
 		for (auto iter = begin; iter != end; ++iter)
@@ -211,7 +239,8 @@ void GMParticleModel_2D::updateData(const IRenderContext* context, void* dataPtr
 				particle->getPosition(),
 				he,
 				particle->getColor(),
-				Rotate(particle->getRotation(), GMVec3(0, 0, 1))
+				Rotate(particle->getRotation(), GMVec3(0, 0, 1)),
+				lookAt
 			);
 			dataOffset += VerticesPerParticle;
 		}
@@ -223,13 +252,9 @@ void GMParticleModel_3D::updateData(const IRenderContext* context, void* dataPtr
 {
 	D(d);
 	auto& particles = d->system->getEmitter()->getParticles();
-	const auto& camera = context->getEngine()->getCamera();
-	const auto& lookAt = camera.getLookAt();
+	const auto& lookAt = context->getEngine()->getCamera().getLookAt().lookAt;
 
 	// 粒子本身若带有旋转，则会在正对用户视觉后再来应用此旋转
-	// 计算出Billboard应该沿着的方向
-	GMVec3 right = Cross(lookAt.up, lookAt.lookAt);
-
 	// 一个粒子有6个顶点，2个三角形，放入并行计算
 	enum { VerticesPerParticle = 6 };
 	GMAsync::blockedAsync(
@@ -237,27 +262,25 @@ void GMParticleModel_3D::updateData(const IRenderContext* context, void* dataPtr
 		GM.getRunningStates().systemInfo.numberOfProcessors,
 		particles.begin(),
 		particles.end(),
-		[&particles, dataPtr, this, &right](auto begin, auto end) {
-		// 计算一下数据偏移
-		GMVertex* dataOffset = reinterpret_cast<GMVertex*>(dataPtr) + (begin - particles.begin()) * VerticesPerParticle;
-		for (auto iter = begin; iter != end; ++iter)
-		{
-			GMParticle* particle = *iter;
-			GMfloat he = particle->getSize() / 2.f;
+		[&particles, dataPtr, this, &lookAt](auto begin, auto end) {
+			// 计算一下数据偏移
+			GMVertex* dataOffset = reinterpret_cast<GMVertex*>(dataPtr) + (begin - particles.begin()) * VerticesPerParticle;
+			for (auto iter = begin; iter != end; ++iter)
+			{
+				GMParticle* particle = *iter;
+				GMfloat he = particle->getSize() / 2.f;
 
-			GMQuat q = Rotate(particle->getRotation(), GMVec3(0, 0, 1)); // 这个是计算粒子本身的旋转
-			GM_ASSERT(false); //这里应该计算出面向视觉的四元数
-
-			update6Vertices(
-				dataOffset,
-				particle->getPosition(),
-				he,
-				particle->getColor(),
-				q,
-				particle->getPosition().getZ()
-			);
-			dataOffset += VerticesPerParticle;
+				update6Vertices(
+					dataOffset,
+					particle->getPosition(),
+					he,
+					particle->getColor(),
+					Rotate(particle->getRotation(), GMVec3(0, 0, 1)),
+					lookAt,
+					particle->getPosition().getZ()
+				);
+				dataOffset += VerticesPerParticle;
+			}
 		}
-	}
 	);
 }

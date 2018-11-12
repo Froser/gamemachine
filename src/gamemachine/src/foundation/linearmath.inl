@@ -879,6 +879,50 @@ inline GMQuat Lerp(const GMQuat& Q1, const GMQuat& Q2, gm::GMfloat T)
 	return R;
 }
 
+inline GMQuat RotationTo(const GMVec3& src, const GMVec3& dest, const GMVec3& fallbackAxis)
+{
+	// 采用Orge的实现
+
+	const static GMQuat s_identity = Identity<GMQuat>();
+	GMQuat q;
+
+	gm::GMfloat d = Dot(src, dest);
+	// If dot == 1, vectors are the same
+	if (d >= 1.0f)
+	{
+		return s_identity;
+	}
+	if (d < (1e-6f - 1.0f))
+	{
+		if (fallbackAxis != Zero<GMVec3>())
+		{
+			// rotate 180 degrees about the fallback axis
+			q = Rotate(Radians(PI), fallbackAxis);
+		}
+		else
+		{
+			// Generate an axis
+			GMVec3 axis = Cross(GMVec3(1, 0, 0), src);
+			if (axis.length() == 0) // pick another if colinear
+				axis = Cross(GMVec3(0, 1, 0), src);
+			axis = Normalize(axis);
+			q = Rotate(Radians(PI), axis);
+		}
+	}
+	else
+	{
+		gm::GMfloat s = Sqrt((1 + d) * 2);
+		gm::GMfloat invs = 1 / s;
+		GMVec3 c = Cross(src, dest);
+		q.setX(c.getX() * invs);
+		q.setY(c.getY() * invs);
+		q.setZ(c.getZ() * invs);
+		q.setW(s * 0.5f);
+		q = Normalize(q);
+	}
+	return q;
+}
+
 inline GMVec3 Unproject(
 	const GMVec3& V,
 	gm::GMfloat ViewportX,

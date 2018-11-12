@@ -300,7 +300,7 @@ void GMWindow_Dx11::onWindowCreated(const GMWindowAttributes& wndAttrs)
 	// 发送事件
 	IRenderContext* context = const_cast<IRenderContext*>(getContext());
 	msg.msgType = GameMachineMessageType::Dx11Ready;
-	msg.objPtr = static_cast<IRenderContext*>(context);
+	msg.object = static_cast<IRenderContext*>(context);
 	GM.postMessage(msg);
 }
 

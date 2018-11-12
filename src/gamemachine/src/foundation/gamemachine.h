@@ -90,7 +90,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GameMachine)
 {
 	GMClock clock;
 
-	Set<GMOwnedPtr<IWindow>> windows;
+	Set<IWindow*> windows;
 	IFactory* factory = nullptr;
 	GMGamePackage* gamePackageManager = nullptr;
 	GMConfigs* statesManager = nullptr;

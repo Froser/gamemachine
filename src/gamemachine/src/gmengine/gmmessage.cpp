@@ -50,5 +50,5 @@ GMSystemEvent::GMSystemEvent(GMSystemEventType type)
 {
 	D(d);
 	setType(type);
-	d->message.objPtr = this;
+	d->message.object = this;
 }

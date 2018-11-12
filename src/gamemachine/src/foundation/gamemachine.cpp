@@ -98,14 +98,19 @@ void GameMachine::startGameMachine()
 void GameMachine::addWindow(AUTORELEASE IWindow* window)
 {
 	D(d);
-	d->windows.insert(GMOwnedPtr<IWindow>(window));
+	d->windows.insert(window);
 }
 
 bool GameMachine::removeWindow(IWindow* window)
 {
 	D(d);
-	GMsize_t count = d->windows.erase(GMOwnedPtr<IWindow>(window));
-	return count > 0;
+	if (window)
+	{
+		GMsize_t count = d->windows.erase(window);
+		GM_delete(window);
+		return count > 0;
+	}
+	return false;
 }
 
 void GameMachine::exit()
@@ -224,6 +229,15 @@ bool GameMachine::handleMessage(const GMMessage& msg)
 	D(d);
 	switch (msg.msgType)
 	{
+	case GameMachineMessageType::WindowDestoryed:
+	{
+		IWindow* window = static_cast<IWindow*>(msg.object);
+		GM_ASSERT(window);
+		removeWindow(window);
+		if (d->windows.empty())
+			exit(); // 如果清理了所有的窗口，程序结束
+		break;
+	}
 	case GameMachineMessageType::QuitGameMachine:
 		return false;
 	case GameMachineMessageType::CrashDown:
@@ -262,6 +276,11 @@ void GameMachine::terminate()
 	{
 		GM_delete(*iter);
 	}
+
+	for (auto window : d->windows)
+	{
+		GM_delete(window);
+	}
 }
 
 void GameMachine::updateGameMachineRunningStates()
@@ -276,6 +295,6 @@ void GameMachine::eachHandler(std::function<void(IWindow*, IGameHandler*)> actio
 	D(d);
 	for (decltype(auto) window : d->windows)
 	{
-		action(window.get(), window->getHandler());
+		action(window, window->getHandler());
 	}
 }

@@ -6,31 +6,32 @@ BEGIN_NS
 enum class GameMachineMessageType
 {
 	Invalid,
-	QuitGameMachine,
-	CrashDown,
-	FrameUpdate,
-	WindowSizeChanged,
-	Dx11Ready,
-	SystemMessage,
+	QuitGameMachine, //!< 准备退出GameMachine的消息
+	CrashDown, //!< GameMachine崩溃时的消息
+	FrameUpdate, //!< 准备更新窗口一帧的消息
+	WindowDestoryed, //!< 当某个原生窗口被销毁时的消息
+	WindowSizeChanged, //!< 当某个原生窗口大小发生变化时的消息
+	Dx11Ready, //!< 如果使用DirectX11，DirectX11就绪时的消息
+	SystemMessage, //!< 操作系统产生消息时的消息
 };
 
 struct GMMessage
 {
-	GMMessage(GameMachineMessageType t = GameMachineMessageType::Invalid, GMint32 tp = 0, GMint32 v = 0, void* objPtr = nullptr)
+	GMMessage(GameMachineMessageType t = GameMachineMessageType::Invalid, GMint32 parameter = 0, void* objectPointer= nullptr)
 		: msgType(t)
-		, type(tp)
-		, value(v)
+		, param(parameter)
+		, object(objectPointer)
 	{}
 
 	GameMachineMessageType msgType = GameMachineMessageType::Invalid;
-	GMint32 type = 0;
-	GMint32 value = 0;
-	void* objPtr = 0;
+	GMint32 param = 0;
+	void* object = 0;
 };
 
 enum class GMSystemEventType
 {
 	Unknown,
+	WindowDestroyed,
 	WindowSizeChanged,
 	KeyDown,
 	KeyUp,

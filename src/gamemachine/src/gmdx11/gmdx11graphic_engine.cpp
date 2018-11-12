@@ -160,7 +160,7 @@ bool GMDx11GraphicEngine::event(const GMMessage& e)
 	{
 	case GameMachineMessageType::Dx11Ready:
 	{
-		const IRenderContext* context = static_cast<IRenderContext*>(e.objPtr);
+		const IRenderContext* context = static_cast<IRenderContext*>(e.object);
 		if (context->getEngine() == this)
 		{
 			IWindow* queriable = context->getWindow();

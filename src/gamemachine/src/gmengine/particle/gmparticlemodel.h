@@ -34,6 +34,7 @@ protected:
 		const GMVec2& halfExtents,
 		const GMVec4& color,
 		const GMQuat& quat,
+		const GMVec3& lookAt,
 		GMfloat z = 0
 	);
 

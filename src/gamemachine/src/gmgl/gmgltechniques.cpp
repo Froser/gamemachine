@@ -390,11 +390,11 @@ void GMGLTechnique::updateCameraMatrices(IShaderProgram* shaderProgram)
 	{
 		const GMMat4& viewMatrix = camera.getViewMatrix();
 		const GMCameraLookAt& lookAt = camera.getLookAt();
-		GMFloat4 vec;
-		lookAt.position.loadFloat4(vec);
+		GMFloat4 viewPosition;
+		lookAt.position.loadFloat4(viewPosition);
 
 		GMGraphicEngine::getDefaultShaderVariablesDesc();
-		shaderProgram->setVec4(GM_VariablesDesc.ViewPosition, vec);
+		shaderProgram->setVec4(GM_VariablesDesc.ViewPosition, viewPosition);
 		shaderProgram->setMatrix4(GM_VariablesDesc.ViewMatrix, camera.getViewMatrix());
 		shaderProgram->setMatrix4(GM_VariablesDesc.InverseViewMatrix, camera.getInverseViewMatrix());
 		shaderProgram->setMatrix4(GM_VariablesDesc.ProjectionMatrix, camera.getProjectionMatrix());
