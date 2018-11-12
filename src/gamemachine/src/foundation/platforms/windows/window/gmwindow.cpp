@@ -123,8 +123,12 @@ GMWindow::GMWindow()
 GMWindow::~GMWindow()
 {
 	D(d);
-	s_hwndMap.erase(getWindowHandle());
-	::DestroyWindow(getWindowHandle());
+	GMWindowHandle hwnd = getWindowHandle();
+	if (hwnd)
+	{
+		onWindowDestroyed();
+		::DestroyWindow(hwnd);
+	}
 }
 
 IInput* GMWindow::getInputMananger()
@@ -246,4 +250,12 @@ void GMWindow::showWindow()
 	GM_ASSERT(::IsWindow(hwnd));
 	if (!::IsWindow(hwnd)) return;
 	::ShowWindow(hwnd, SW_SHOWNORMAL);
+}
+
+void GMWindow::onWindowDestroyed()
+{
+	GMWindowHandle hwnd = getWindowHandle();
+	GM_ASSERT(hwnd);
+	auto s = s_hwndMap.erase(hwnd);
+	GM_ASSERT(s > 0);
 }

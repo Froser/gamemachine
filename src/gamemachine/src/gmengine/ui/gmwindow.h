@@ -79,10 +79,11 @@ public:
 public:
 	virtual bool handleSystemEvent(GMSystemEvent* event, REF GMLResult& result);
 	virtual const GMwchar* getWindowClassName() { return L"GameMachine Window"; }
-	virtual void onWindowCreated(const GMWindowAttributes& wndAttrs) {}
 
 protected:
 	virtual void changeCursor();
+	virtual void onWindowCreated(const GMWindowAttributes& wndAttrs) {}
+	virtual void onWindowDestroyed();
 };
 
 class GMWindowFactory

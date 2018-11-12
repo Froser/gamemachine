@@ -46,9 +46,11 @@ public:
 public:
 	virtual void msgProc(const GMMessage& message) override;
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
-	virtual void onWindowCreated(const GMWindowAttributes& attrs) override;
 	virtual IGraphicEngine* getGraphicEngine() override;
 	virtual const IRenderContext* getContext() override;
+
+protected:
+	virtual void onWindowCreated(const GMWindowAttributes& attrs) override;
 };
 
 GMWindow_Dx11::~GMWindow_Dx11()

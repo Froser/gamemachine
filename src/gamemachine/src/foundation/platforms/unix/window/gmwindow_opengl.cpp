@@ -102,8 +102,10 @@ public:
 public:
 	virtual IGraphicEngine* getGraphicEngine() override;
 	virtual const IRenderContext* getContext() override;
-	virtual void onWindowCreated(const GMWindowAttributes& wndAttrs) override;
 	virtual void msgProc(const GMMessage& message) override;
+
+protected:
+	virtual void onWindowCreated(const GMWindowAttributes& wndAttrs) override;
 
 private:
 	GLXContext createNewContext();

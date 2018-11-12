@@ -115,10 +115,12 @@ void GMWindow::msgProc(const GMMessage& message)
 	}
 	else if (message.msgType == GameMachineMessageType::WindowDestoryed)
 	{
-		if (message.object == this)
+		if (message.object == static_cast<IWindow*>(this))
 		{
+			onWindowDestroyed();
 			// 窗口已经被Destory，因此HWND设置为0
 			setWindowHandle(NULL);
+			GM.removeWindow(this);
 		}
 	}
 }

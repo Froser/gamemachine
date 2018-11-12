@@ -101,16 +101,10 @@ void GameMachine::addWindow(AUTORELEASE IWindow* window)
 	d->windows.insert(window);
 }
 
-bool GameMachine::removeWindow(IWindow* window)
+void GameMachine::removeWindow(IWindow* window)
 {
 	D(d);
-	if (window)
-	{
-		GMsize_t count = d->windows.erase(window);
-		GM_delete(window);
-		return count > 0;
-	}
-	return false;
+	postMessage({ GameMachineMessageType::DeleteWindowLater, 0, window });
 }
 
 void GameMachine::exit()
@@ -229,20 +223,29 @@ bool GameMachine::handleMessage(const GMMessage& msg)
 	D(d);
 	switch (msg.msgType)
 	{
-	case GameMachineMessageType::WindowDestoryed:
-	{
-		IWindow* window = static_cast<IWindow*>(msg.object);
-		GM_ASSERT(window);
-		removeWindow(window);
-		if (d->windows.empty())
-			exit(); // 如果清理了所有的窗口，程序结束
-		break;
-	}
 	case GameMachineMessageType::QuitGameMachine:
 		return false;
 	case GameMachineMessageType::CrashDown:
 	{
 		d->states.crashDown = true;
+		break;
+	}
+	case GameMachineMessageType::DeleteLater:
+	{
+		GMObject* obj = static_cast<GMObject*>(msg.object);
+		GM_delete(obj);
+		break;
+	}
+	case GameMachineMessageType::DeleteWindowLater:
+	{
+		IWindow* window = static_cast<IWindow*>(msg.object);
+		if (window)
+		{
+			d->windows.erase(window);
+			GM_delete(window);
+			if (d->windows.empty())
+				exit();
+		}
 		break;
 	}
 	default:

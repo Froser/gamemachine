@@ -91,6 +91,10 @@ void GMWindow::changeCursor()
 {
 }
 
+void GMWindow::onWindowDestroyed()
+{
+}
+
 GMWindowProcHandler GMWindow::getProcHandler()
 {
 	return &WndProc;

@@ -6,6 +6,8 @@ BEGIN_NS
 enum class GameMachineMessageType
 {
 	Invalid,
+	DeleteLater, //!< 延迟删除某个对象的消息
+	DeleteWindowLater, //!< 延迟删除某个窗口的消息
 	QuitGameMachine, //!< 准备退出GameMachine的消息
 	CrashDown, //!< GameMachine崩溃时的消息
 	FrameUpdate, //!< 准备更新窗口一帧的消息

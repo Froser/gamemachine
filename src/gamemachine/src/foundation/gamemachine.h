@@ -221,9 +221,8 @@ public:
 	//! 为GameMachine移除一个窗口。
 	/*!
 	  移除后的窗口不再响应任何事件。
-	  \return 返回移除是否成功。
 	*/
-	bool removeWindow(IWindow* window);
+	void removeWindow(IWindow* window);
 
 	//! 退出程序。
 	GM_META_METHOD void exit();

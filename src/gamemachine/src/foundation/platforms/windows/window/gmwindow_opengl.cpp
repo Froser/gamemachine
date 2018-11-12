@@ -70,9 +70,11 @@ public:
 
 public:
 	virtual void msgProc(const GMMessage& message) override;
-	virtual void onWindowCreated(const GMWindowAttributes& wndAttrs) override;
 	virtual IGraphicEngine* getGraphicEngine() override;
 	virtual const IRenderContext* getContext() override;
+
+protected:
+	virtual void onWindowCreated(const GMWindowAttributes& wndAttrs) override;
 
 private:
 	void swapBuffers() const;
