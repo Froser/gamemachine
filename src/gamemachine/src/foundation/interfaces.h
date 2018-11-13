@@ -198,7 +198,6 @@ struct GMWindowAttributes
 	GMInstance instance;
 };
 #else
-typedef GMint32 GMUIInstance;
 typedef GMint32 GMWindowHandle;
 typedef GMint32 GMInstance;
 struct GMWindowAttributes
