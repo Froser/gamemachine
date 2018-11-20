@@ -34,7 +34,7 @@ void Demo_Phong_PBR::init()
 	{
 		gm::GMSceneAsset sphere;
 		gm::GMPrimitiveCreator::createSphere(1.0f, 64, 64, sphere);
-		gm::GMShader& shader = sphere.getModel()->getShader();
+		gm::GMShader& shader = sphere.getScene()->getModels()[0].getModel()->getShader();
 		shader.setIlluminationModel(gm::GMIlluminationModel::CookTorranceBRDF);
 		gm::GMTextureAsset albedo;
 		gm::GMTextureAsset metallicRoughnessAO;
@@ -69,11 +69,11 @@ void Demo_Phong_PBR::init()
 	{
 		gm::GMSceneAsset sphere;
 		gm::GMPrimitiveCreator::createSphere(1.0f, 64, 64, sphere);
-		gm::GMShader& shader = sphere.getModel()->getShader();
+		gm::GMShader& shader = sphere.getScene()->getModels()[0].getModel()->getShader();
 		shader.setIlluminationModel(gm::GMIlluminationModel::Phong);
-		shader.getMaterial().ks = GMVec3(0.02f);
-		shader.getMaterial().kd = GMVec3(0.05f);
-		shader.getMaterial().shininess = 99;
+		shader.getMaterial().setSpecular(GMVec3(0.02f));
+		shader.getMaterial().setDiffuse(GMVec3(0.05f));
+		shader.getMaterial().setShininess(99);
 
 		gm::GMTextureAsset albedo = gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "pbr/albedo.png");
 		gm::GMTextureAsset normal = gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "pbr/normal.png");

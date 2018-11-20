@@ -58,10 +58,10 @@ void Demo_Model::init()
 
 	for (auto& model : models.getScene()->getModels())
 	{
-		model.getModel()->getShader().getMaterial().refractivity = 0.658f;
-		model.getModel()->getShader().getMaterial().ka = 
-		model.getModel()->getShader().getMaterial().kd = 
-		model.getModel()->getShader().getMaterial().ks = GMVec3(0);
+		model.getModel()->getShader().getMaterial().setRefractivity(0.658f);
+		model.getModel()->getShader().getMaterial().setAmbient(Zero<GMVec3>());
+		model.getModel()->getShader().getMaterial().setDiffuse(Zero<GMVec3>());
+		model.getModel()->getShader().getMaterial().setSpecular(Zero<GMVec3>());
 	}
 
 	gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(models);
@@ -76,8 +76,10 @@ void Demo_Model::init()
 		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::one3(), cube);
 
 		gm::GMShader& shader = cube.getScene()->getModels()[0].getModel()->getShader();
-		shader.getMaterial().refractivity = 0.658f;
-		shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
+		shader.getMaterial().setRefractivity(0.658f);
+		shader.getMaterial().setDiffuse(Zero<GMVec3>());
+		shader.getMaterial().setSpecular(Zero<GMVec3>());
+		shader.getMaterial().setAmbient(Zero<GMVec3>());
 		gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::NormalMap);
 
 		asset = getDemoWorldReference()->getAssets().addAsset(cube);
@@ -91,8 +93,10 @@ void Demo_Model::init()
 		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::one3(), cube);
 
 		gm::GMShader& shader = cube.getScene()->getModels()[0].getModel()->getShader();
-		shader.getMaterial().refractivity = 0.658f;
-		shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
+		shader.getMaterial().setRefractivity(0.658f);
+		shader.getMaterial().setDiffuse(Zero<GMVec3>());
+		shader.getMaterial().setSpecular(Zero<GMVec3>());
+		shader.getMaterial().setAmbient(Zero<GMVec3>());
 
 		asset = getDemoWorldReference()->getAssets().addAsset(cube);
 		d->gameObject3 = new gm::GMGameObject(asset);

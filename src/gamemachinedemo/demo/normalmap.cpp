@@ -21,10 +21,10 @@ void Demo_NormalMap::init()
 
 	gm::GMModel* model = asset.getScene()->getModels()[0].getModel();
 	model->getShader().setCull(gm::GMS_Cull::Cull);
-	model->getShader().getMaterial().kd = GMVec3(.6f, .2f, .3f);
-	model->getShader().getMaterial().ks = GMVec3(.1f, .2f, .3f);
-	model->getShader().getMaterial().ka = GMVec3(1, 1, 1);
-	model->getShader().getMaterial().shininess = 20;
+	model->getShader().getMaterial().setDiffuse(GMVec3(.6f, .2f, .3f));
+	model->getShader().getMaterial().setSpecular(GMVec3(.1f, .2f, .3f));
+	model->getShader().getMaterial().setAmbient(GMVec3(1, 1, 1));
+	model->getShader().getMaterial().setShininess(20);
 
 	auto pk = gm::GameMachine::instance().getGamePackageManager();
 	gm::GMTextureAsset tex = gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "bnp.png");

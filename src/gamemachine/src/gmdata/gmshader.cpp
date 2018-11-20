@@ -1,6 +1,18 @@
 ﻿#include "stdafx.h"
 #include "gmshader.h"
 
+const GMVariant& GMMaterial::getCustomMaterial(const GMString& name) const
+{
+	D(d);
+	return d->customMaterials[name];
+}
+
+void GMMaterial::setCustomMaterial(const GMString& name, const GMVariant& value)
+{
+	D(d);
+	d->customMaterials[name] = value;
+}
+
 GMS_TextureTransform& GMTextureSampler::getTextureTransform(GMsize_t index)
 {
 	D(d);

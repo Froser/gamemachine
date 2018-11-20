@@ -17,8 +17,8 @@ void Demo_Texture::init()
 	gm::GMPrimitiveCreator::createQuadrangle(extents, 0, asset);
 	
 	gm::GMModel* model = asset.getScene()->getModels()[0].getModel();
-	model->getShader().getMaterial().kd = GMVec3(1, 1, 1);
-	model->getShader().getMaterial().ks = GMVec3(0);
+	model->getShader().getMaterial().setDiffuse(GMVec3(1, 1, 1));
+	model->getShader().getMaterial().setSpecular(GMVec3(0));
 
 	gm::GMTextureAsset tex = gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "gamemachine.png");
 	gm::GMToolUtil::addTextureToShader(model->getShader(), tex, gm::GMTextureType::Diffuse);
@@ -94,8 +94,8 @@ void Demo_Texture_Index::init()
 	mesh2->index(2);
 
 	gm::GMShader& shader = quad->getShader();
-	shader.getMaterial().kd = GMVec3(1, 1, 1);
-	shader.getMaterial().ks = GMVec3(0);
+	shader.getMaterial().setDiffuse(GMVec3(1, 1, 1));
+	shader.getMaterial().setSpecular(Zero<GMVec3>());
 
 	gm::GMTextureAsset tex = gm::GMToolUtil::createTexture(d->demoWorld->getContext(), "gamemachine.png");
 	gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::Diffuse);

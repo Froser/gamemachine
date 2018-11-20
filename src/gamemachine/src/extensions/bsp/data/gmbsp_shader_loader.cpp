@@ -236,8 +236,9 @@ void GMBSPShaderLoader::parseItem(GMXMLElement* elem, GMint32 lightmapId, REF GM
 	d->lightmapId = lightmapId;
 
 	GMShader& shader = *shaderPtr;
-	shader.getMaterial().ks = shader.getMaterial().kd = GMVec3(0);
-	shader.getMaterial().ka = GMVec3(1);
+	shader.getMaterial().setSpecular(Zero<GMVec3>());
+	shader.getMaterial().setDiffuse(Zero<GMVec3>());
+	shader.getMaterial().setAmbient(GMVec3(1));
 	for (GMXMLElement* it = elem->FirstChildElement(); it; it = it->NextSiblingElement())
 	{
 		BEGIN_PARSE(surfaceparm); // surfaceparm一定要在最先
@@ -452,36 +453,36 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, GMXMLElement* elem)
 		if (!k)
 		{
 			readTernaryFloatsFromString("0 0 0", arg);
-			material.ks = MakeVector3(arg);
+			material.setSpecular(MakeVector3(arg));
 		}
 		else
 		{
 			readTernaryFloatsFromString(k, arg);
-			material.ks = MakeVector3(arg);
+			material.setSpecular(MakeVector3(arg));
 		}
 
 		k = elem->Attribute("kd");
 		if (!k)
 		{
 			readTernaryFloatsFromString("0 0 0", arg);
-			material.ks = MakeVector3(arg);
+			material.setDiffuse(MakeVector3(arg));
 		}
 		else
 		{
 			readTernaryFloatsFromString(k, arg);
-			material.ks = MakeVector3(arg);
+			material.setDiffuse(MakeVector3(arg));
 		}
 
 		k = elem->Attribute("shininess");
 		GMfloat shininess = 0;
 		if (!k)
 		{
-			material.shininess = shininess;
+			material.setShininess(shininess);
 		}
 		else
 		{
 			shininess = GMString::parseFloat(k);
-			material.shininess = shininess;
+			material.setShininess(shininess);
 		}
 	}
 

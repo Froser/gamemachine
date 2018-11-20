@@ -865,12 +865,12 @@ void GMDx11Technique::prepareMaterials(GMModel* model)
 	GMDx11EffectVariableBank& bank = getVarBank();
 	const GMShader& shader = model->getShader();
 	const GMMaterial& material = shader.getMaterial();
-	GM_DX_HR(bank.Ka()->SetFloatVector(ValuePointer(material.ka)));
-	GM_DX_HR(bank.Kd()->SetFloatVector(ValuePointer(material.kd)));
-	GM_DX_HR(bank.Ks()->SetFloatVector(ValuePointer(material.ks)));
-	GM_DX_HR(bank.Shininess()->SetFloat(material.shininess));
-	GM_DX_HR(bank.Refreactivity()->SetFloat(material.refractivity));
-	GM_DX_HR(bank.F0()->SetFloatVector(ValuePointer(material.f0)));
+	GM_DX_HR(bank.Ka()->SetFloatVector(ValuePointer(material.getAmbient())));
+	GM_DX_HR(bank.Kd()->SetFloatVector(ValuePointer(material.getDiffuse())));
+	GM_DX_HR(bank.Ks()->SetFloatVector(ValuePointer(material.getSpecular())));
+	GM_DX_HR(bank.Shininess()->SetFloat(material.getShininess()));
+	GM_DX_HR(bank.Refreactivity()->SetFloat(material.getRefractivity()));
+	GM_DX_HR(bank.F0()->SetFloatVector(ValuePointer(material.getF0())));
 
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
 	GMIlluminationModel illuminationModel = shader.getIlluminationModel();

@@ -657,12 +657,12 @@ void GMGLTechnique_3D::activateMaterial(const GMShader& shader)
 	static const std::string GMSHADER_MATERIAL_F0 = std::string(GM_VariablesDesc.MaterialName) + "." + GM_VariablesDesc.MaterialAttributes.F0;
 
 	const GMMaterial& material = shader.getMaterial();
-	shaderProgram->setVec3(GMSHADER_MATERIAL_KA.c_str(), ValuePointer(material.ka));
-	shaderProgram->setVec3(GMSHADER_MATERIAL_KD.c_str(), ValuePointer(material.kd));
-	shaderProgram->setVec3(GMSHADER_MATERIAL_KS.c_str(), ValuePointer(material.ks));
-	shaderProgram->setFloat(GMSHADER_MATERIAL_SHININESS.c_str(), material.shininess);
-	shaderProgram->setFloat(GMSHADER_MATERIAL_REFRACTIVITY.c_str(), material.refractivity);
-	shaderProgram->setVec3(GMSHADER_MATERIAL_F0.c_str(), ValuePointer(material.f0));
+	shaderProgram->setVec3(GMSHADER_MATERIAL_KA.c_str(), ValuePointer(material.getAmbient()));
+	shaderProgram->setVec3(GMSHADER_MATERIAL_KD.c_str(), ValuePointer(material.getDiffuse()));
+	shaderProgram->setVec3(GMSHADER_MATERIAL_KS.c_str(), ValuePointer(material.getSpecular()));
+	shaderProgram->setFloat(GMSHADER_MATERIAL_SHININESS.c_str(), material.getShininess());
+	shaderProgram->setFloat(GMSHADER_MATERIAL_REFRACTIVITY.c_str(), material.getRefractivity());
+	shaderProgram->setVec3(GMSHADER_MATERIAL_F0.c_str(), ValuePointer(material.getF0()));
 }
 
 void GMGLTechnique_3D::drawDebug()

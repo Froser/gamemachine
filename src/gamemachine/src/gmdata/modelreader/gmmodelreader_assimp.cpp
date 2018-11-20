@@ -133,11 +133,11 @@ namespace
 	{
 		GMShader& shader = model->getShader();
 		GMMaterial& mtl = shader.getMaterial();
-		materialGet(material, AI_MATKEY_COLOR_AMBIENT, mtl.ka);
-		materialGet(material, AI_MATKEY_COLOR_DIFFUSE, mtl.kd);
-		materialGet(material, AI_MATKEY_COLOR_SPECULAR, mtl.ks);
-		materialGet(material, AI_MATKEY_SHININESS, mtl.shininess);
-		materialGet(material, AI_MATKEY_COLOR_REFLECTIVE, mtl.refractivity);
+		materialGet(material, AI_MATKEY_COLOR_AMBIENT, mtl.getAmbient());
+		materialGet(material, AI_MATKEY_COLOR_DIFFUSE, mtl.getDiffuse());
+		materialGet(material, AI_MATKEY_COLOR_SPECULAR, mtl.getSpecular());
+		materialGet(material, AI_MATKEY_SHININESS, mtl.getShininess());
+		// materialGet(material, AI_MATKEY_COLOR_REFLECTIVE, mtl.getRefractivity());
 		materialTextureGet(imp, material, aiTextureType_AMBIENT, model, GMTextureType::Ambient);
 		materialTextureGet(imp, material, aiTextureType_DIFFUSE, model, GMTextureType::Diffuse);
 		materialTextureGet(imp, material, aiTextureType_SPECULAR, model, GMTextureType::Specular);

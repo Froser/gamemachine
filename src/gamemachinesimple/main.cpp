@@ -129,10 +129,10 @@ public:
 		GMModelAsset groundShapeAsset;
 		GMPhysicsShapeHelper::createModelFromShape(groundShape.getPhysicsShape(), groundShapeAsset);	// 从物理形状生成一个渲染模型
 		GMMaterial& material = groundShapeAsset.getModel()->getShader().getMaterial();		// 设置地板的渲染模型的参数，如ka, kd, ks等，用于phong着色
-		material.ka = GMVec3(.8125f / .7f, .644f / .7f, .043f / .7f);
-		material.kd = GMVec3(.1f);
-		material.ks = GMVec3(.4f);
-		material.shininess = 9;
+		material.setAmbient(GMVec3(.8125f / .7f, .644f / .7f, .043f / .7f));
+		material.setDiffuse(GMVec3(.1f));
+		material.setSpecular(GMVec3(.4f));
+		material.setShininess(9);
 		ground->setAsset(m_world->getAssets().addAsset(groundShapeAsset));
 		m_world->addObjectAndInit(ground);										// 将地板游戏对象加入游戏世界，它将初始化对象（如传递顶点到GPU），并管理其生命周期
 		m_world->addToRenderList(ground);										// 将地板游戏对象加入渲染列表
@@ -179,10 +179,10 @@ public:
 
 			GMModelAsset m = scene.getScene()->getModels().front();
 			GMModel* duplicateModel = new GMModel(m); // 这里用到的是m所指向的渲染模型，m只创建了一次，因此避免了反复创建模型。
-			duplicateModel->getShader().getMaterial().ka = s_colors[i % GM_array_size(s_colors)];
-			duplicateModel->getShader().getMaterial().kd = GMVec3(.1f);
-			duplicateModel->getShader().getMaterial().ks = GMVec3(.4f);
-			duplicateModel->getShader().getMaterial().shininess = 99;
+			duplicateModel->getShader().getMaterial().setAmbient(s_colors[i % GM_array_size(s_colors)]);
+			duplicateModel->getShader().getMaterial().setDiffuse(GMVec3(.1f));
+			duplicateModel->getShader().getMaterial().setSpecular(GMVec3(.4f));
+			duplicateModel->getShader().getMaterial().setShininess(99);
 
 			gameObject->setAsset(GMAsset(GMAssetType::Model, duplicateModel));
 			physicsWorld->addRigidObject(rigidBoxObj);

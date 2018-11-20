@@ -174,15 +174,31 @@ enum class GMIlluminationModel
 };
 
 // 光照参数
-GM_ALIGNED_STRUCT(GMMaterial)
+GM_PRIVATE_OBJECT(GMMaterial)
 {
 	GMfloat shininess = 1;
 	GMfloat refractivity = 0;
-	GMVec3 ka = GMVec3(0);
-	GMVec3 ks = GMVec3(1);
-	GMVec3 kd = GMVec3(1);
-	
+	GMVec3 ambient = GMVec3(0);
+	GMVec3 specular = GMVec3(1);
+	GMVec3 diffuse = GMVec3(1);
 	GMVec3 f0 = GMVec3(0.04f); //!< 基础反射率，用于PBR(BRDF)模型的渲染。对于金属，这个值为0.04。
+	HashMap<GMString, GMVariant, GMStringHashFunctor> customMaterials;
+};
+
+GM_ALIGNED_16(class) GMMaterial
+{
+	GM_DECLARE_PRIVATE_NGO(GMMaterial)
+	GM_DECLARE_ALIGNED_ALLOCATOR()
+	GM_DECLARE_PROPERTY(Shininess, shininess)
+	GM_DECLARE_PROPERTY(Refractivity, refractivity)
+	GM_DECLARE_PROPERTY(Ambient, ambient)
+	GM_DECLARE_PROPERTY(Specular, specular)
+	GM_DECLARE_PROPERTY(Diffuse, diffuse)
+	GM_DECLARE_PROPERTY(F0, f0)
+
+public:
+	const GMVariant& getCustomMaterial(const GMString& name) const;
+	void setCustomMaterial(const GMString& name, const GMVariant& value);
 };
 
 GM_PRIVATE_OBJECT(GMShader)

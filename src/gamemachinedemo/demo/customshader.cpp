@@ -40,8 +40,8 @@ void Demo_CustomShader::init()
 	mesh2->index(2);
 
 	gm::GMAsset asset = gm::GMAsset(gm::GMAssetType::Model, quad);
-	quad->getShader().getMaterial().kd = GMVec3(1, 1, 1);
-	quad->getShader().getMaterial().ks = GMVec3(0);
+	quad->getShader().getMaterial().setDiffuse(GMVec3(1, 1, 1));
+	quad->getShader().getMaterial().setSpecular(GMVec3(0));
 
 	gm::GMTextureAsset tex;
 	gm::GMAsyncResult* result = nullptr;

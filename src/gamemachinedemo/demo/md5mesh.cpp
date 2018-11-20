@@ -57,7 +57,7 @@ void Demo_MD5Mesh::init()
 	
 	for (auto& model : boblampcleanModel.getScene()->getModels())
 	{
-		model.getModel()->getShader().getMaterial().ks = GMVec3(0);
+		model.getModel()->getShader().getMaterial().setSpecular(GMVec3(0));
 	}
 
 	d->boblampclean = new gm::GMSkeletalGameObject(boblampcleanModel);
