@@ -67,6 +67,7 @@ enum class GMRenderConfigs
 	Gamma_Float,
 	HDR_Bool,
 	ToneMapping,
+	MotionBlur_Bool,
 	Max,
 };
 
@@ -91,6 +92,8 @@ namespace gm_config_guids
 		L"49DF237C-5699-49b3-83D9-E2A523C644CB",
 		L"C2B5725C-55D6-44B5-84EE-67CEC0549C34",
 		L"0A2225BF-2666-491F-B1D9-3C1C8E4627B2",
+		L"89867481-B6DA-4660-B4FD-1121F2D1D99C",
+		L"85556E69-EC64-408e-8783-D1CFE69CDCD6",
 	};
 }
 

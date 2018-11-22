@@ -36,10 +36,8 @@ GM_PRIVATE_OBJECT(Demo_ParticleBillboard)
 {
 	gm::GMFilterMode::Mode mode = gm::GMFilterMode::None;
 	gm::GMOwnedPtr<gm::GMParticleSystemManager> particleSystemManager;
-	gm::GMint32 mouseDownX;
-	gm::GMint32 mouseDownY;
-	bool dragging = false;
-	GMQuat lookAtRotation;
+	gm::GMCameraUtility cameraUtility;
+	bool activated = false;
 };
 
 class Demo_ParticleBillboard : public DemoHandler
@@ -51,17 +49,18 @@ public:
 	virtual void setLookAt() override;
 	virtual void init() override;
 	virtual void event(gm::GameMachineHandlerEvent evt) override;
+	virtual void onActivate() override;
+	virtual void onDeactivate() override;
 
 protected:
 	const gm::GMString& getDescription() const
 	{
-		static gm::GMString desc = L"渲染Billboard粒子。左键拖动视觉。";
+		static gm::GMString desc = L"渲染Billboard粒子。移动鼠标调整视觉。";
 		return desc;
 	}
 
 private:
 	void handleMouseEvent();
-	void handleDragging();
 };
 
 #endif

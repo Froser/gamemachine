@@ -122,13 +122,13 @@ void Demo_ParticleBillboard::init()
 void Demo_ParticleBillboard::setLookAt()
 {
 	D(d);
-	d->lookAtRotation = Identity<GMQuat>();
-
 	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
 	camera.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
 
 	gm::GMCameraLookAt lookAt;
 	camera.lookAt(s_lookAt);
+
+	d->cameraUtility.setCamera(&camera);
 }
 
 void Demo_ParticleBillboard::event(gm::GameMachineHandlerEvent evt)
@@ -145,56 +145,39 @@ void Demo_ParticleBillboard::event(gm::GameMachineHandlerEvent evt)
 		break;
 	case gm::GameMachineHandlerEvent::Activate:
 		handleMouseEvent();
-		handleDragging();
 		break;
 	}
+}
+
+void Demo_ParticleBillboard::onActivate()
+{
+	D(d);
+	d->activated = true;
+	gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
+	gm::IMouseState& mouseState = inputManager->getMouseState();
+	mouseState.setDetectingMode(true);
+	Base::onActivate();
+}
+
+void Demo_ParticleBillboard::onDeactivate()
+{
+	D(d);
+	d->activated = false;
+	gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
+	gm::IMouseState& mouseState = inputManager->getMouseState();
+	mouseState.setDetectingMode(false);
+	Base::onDeactivate();
 }
 
 void Demo_ParticleBillboard::handleMouseEvent()
 {
 	D(d);
-	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputMananger()->getMouseState();
-	gm::GMMouseState state = ms.mouseState();
-	if (state.downButton & gm::GMMouseButton_Left)
+	if (d->activated)
 	{
-		d->mouseDownX = state.posX;
-		d->mouseDownY = state.posY;
-		d->dragging = true;
-		getDemonstrationWorld()->getMainWindow()->setWindowCapture(true);
-	}
-	else if (state.upButton & gm::GMMouseButton_Left)
-	{
-		d->dragging = false;
-		getDemonstrationWorld()->getMainWindow()->setWindowCapture(false);
-	}
-}
-
-void Demo_ParticleBillboard::handleDragging()
-{
-	D(d);
-	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputMananger()->getMouseState();
-	gm::GMMouseState state = ms.mouseState();
-	const gm::GMWindowStates& windowStates = getDemonstrationWorld()->getContext()->getWindow()->getWindowStates();
-	if (d->dragging)
-	{
-		gm::GMfloat rotateX = d->mouseDownX - state.posX;
-		gm::GMfloat rotateY = d->mouseDownY - state.posY;
-		GMVec3 lookAt3 = Normalize(s_lookAt.lookAt);
-		GMVec4 lookAt = GMVec4(lookAt3, 1.f);
-		GMQuat q = Rotate(d->lookAtRotation,
-			PI * rotateX / windowStates.renderRect.width,
-			GMVec3(0, 1, 0));
-		d->lookAtRotation = q;
-		q = Rotate(d->lookAtRotation,
-			PI * rotateY / windowStates.renderRect.width,
-			GMVec3(1, 0, 0));
-		d->lookAtRotation = q;
-		gm::GMCameraLookAt cameraLookAt = {
-			GMVec4(s_lookAt.lookAt, 1.f) * QuatToMatrix(q),
-			s_lookAt.position
-		};
-		getDemonstrationWorld()->getContext()->getEngine()->getCamera().lookAt(cameraLookAt);
-		d->mouseDownX = state.posX;
-		d->mouseDownY = state.posY;
+		const static gm::GMfloat mouseSensitivity = 0.25f;
+		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
+		gm::IMouseState& mouseState = inputManager->getMouseState();
+		auto& ms = mouseState.mouseState();
+		d->cameraUtility.update(Radians(-ms.deltaX * mouseSensitivity), Radians(-ms.deltaY * mouseSensitivity));
 	}
 }

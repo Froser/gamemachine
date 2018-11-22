@@ -530,6 +530,8 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 
 	virtual GMCamera& getCamera() = 0;
 
+	virtual void setCamera(const GMCamera&) = 0;
+
 	virtual GMRenderTechniqueManager* getRenderTechniqueManager() = 0;
 
 	virtual GMPrimitiveManager* getPrimitiveManager() = 0;

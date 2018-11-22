@@ -160,15 +160,7 @@ void GMCamera::setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top
 	d->frustum.setOrtho(left, right, bottom, top, n, f);
 }
 
-void GMCamera::synchronize(GMSpriteGameObject* gameObject)
-{
-	D(d);
-	auto& ps = gameObject->getPositionState();
-	d->lookAt.lookAt = ps.lookAt;
-	d->lookAt.position = ps.position;
-}
-
-void GMCamera::synchronizeLookAt()
+void GMCamera::updateViewMatrix()
 {
 	D(d);
 	d->frustum.updateViewMatrix(::getViewMatrix(d->lookAt));
@@ -207,4 +199,52 @@ void GMCamera::getPlanes(GMFrustumPlanes& planes)
 bool GMCamera::isBoundingBoxInside(const GMFrustumPlanes& planes, const GMVec3(&vertices)[8])
 {
 	return GMFrustum::isBoundingBoxInside(planes, vertices);
+}
+
+//////////////////////////////////////////////////////////////////////////
+GMCameraUtility::GMCameraUtility(GMCamera* camera)
+{
+	setCamera(camera);
+}
+
+void GMCameraUtility::update(GMfloat yaw, GMfloat pitch)
+{
+	D(d);
+	if (d->camera)
+	{
+		GMVec3 lookAt = d->lookAt;
+		GMFloat4 f4_lookAt;
+		lookAt.loadFloat4(f4_lookAt);
+
+		// 不考虑roll，把lookAt投影到世界坐标系平面
+		GMVec3 lookAt_z = GMVec3(f4_lookAt[0], 0, f4_lookAt[2]);
+		// 计算pitch是否超出范围，不考虑roll
+		GMfloat calculatedPitch = Asin(f4_lookAt[1]) + pitch;
+		if (-d->limitPitch < calculatedPitch && calculatedPitch <= d->limitPitch)
+		{
+			// 找到lookAt_z垂直的一个向量，使用与世界坐标相同的坐标系
+			GMVec3 lookAt_x = GMVec3(1, 0, 0) * GMQuat(GMVec3(0, 0, 1), lookAt_z);
+			GMQuat qPitch = Rotate(-pitch, FastNormalize(lookAt_x));
+			lookAt = lookAt * qPitch;
+		}
+
+		GMQuat qYaw = Rotate(-yaw, GMVec3(0, 1, 0));
+		d->lookAt = FastNormalize(lookAt * qYaw);
+		d->camera->lookAt(GMCameraLookAt(d->lookAt, d->position));
+	}
+	else
+	{
+		gm_warning(gm_dbg_wrap("No camera in GMCameraUtility instance."));
+	}
+}
+
+void GMCameraUtility::setCamera(GMCamera* camera)
+{
+	D(d);
+	d->camera = camera;
+	if (camera)
+	{
+		d->position = camera->getLookAt().position;
+		d->lookAt = camera->getLookAt().lookAt;
+	}
 }

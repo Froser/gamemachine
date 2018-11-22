@@ -183,6 +183,12 @@ void GMGraphicEngine::draw(const List<GMGameObject*>& forwardRenderingObjects, c
 		d->isDrawingShadow = false;
 	}
 
+	bool motionBlurEnabled = isMotionBlurEnabled();
+	if (motionBlurEnabled)
+	{
+		// TODO
+	}
+
 	GMFilterMode::Mode filterMode = getCurrentFilterMode();
 	if (filterMode != GMFilterMode::None || needHDR())
 	{
@@ -216,7 +222,7 @@ void GMGraphicEngine::draw(const List<GMGameObject*>& forwardRenderingObjects, c
 	if (!forwardRenderingObjects.empty())
 	{
 		IFramebuffers* filterFramebuffers = getFilterFramebuffers();
-		if (needHDR() || filterMode != GMFilterMode::None)
+		if (needHDR() || filterMode != GMFilterMode::None || motionBlurEnabled)
 		{
 			filterFramebuffers->clear();
 			filterFramebuffers->bind();
@@ -224,7 +230,7 @@ void GMGraphicEngine::draw(const List<GMGameObject*>& forwardRenderingObjects, c
 
 		draw(forwardRenderingObjects);
 
-		if (needHDR() || filterMode != GMFilterMode::None)
+		if (needHDR() || filterMode != GMFilterMode::None || motionBlurEnabled)
 		{
 			filterFramebuffers->unbind();
 			getFilterQuad()->draw();
@@ -245,6 +251,12 @@ const GMFilterMode::Mode GMGraphicEngine::getCurrentFilterMode()
 {
 	D(d);
 	return d->renderConfig.get(GMRenderConfigs::FilterMode).toEnum<GMFilterMode::Mode>();
+}
+
+bool GMGraphicEngine::isMotionBlurEnabled()
+{
+	D(d);
+	return d->renderConfig.get(GMRenderConfigs::MotionBlur_Bool).toBool();
 }
 
 IFramebuffers* GMGraphicEngine::getShadowMapFramebuffers()
@@ -360,6 +372,13 @@ GMCamera& GMGraphicEngine::getCamera()
 {
 	D(d);
 	return d->camera;
+}
+
+void GMGraphicEngine::setCamera(const GMCamera& camera)
+{
+	D(d);
+	d->camera = camera;
+	d->camera.updateViewMatrix();
 }
 
 void GMGraphicEngine::beginBlend(

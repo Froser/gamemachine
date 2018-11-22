@@ -23,20 +23,15 @@ GM_ALIGNED_STRUCT(GMSpriteMovement)
 	GMMovement movement;
 };
 
-GM_ALIGNED_STRUCT(GMPositionState)
-{
-	GMVec3 position;
-	GMVec3 lookAt;
-};
-
 GM_PRIVATE_OBJECT(GMSpriteGameObject)
 {
 	GMfloat radius;
 	GMfloat limitPitch;
-	GMPositionState state;
 	AlignedVector<GMSpriteMovement> movements;
 	GMVec3 moveSpeed = Zero<GMVec3>();
 	GMVec3 jumpSpeed = Zero<GMVec3>();
+	GMCamera camera;
+	GMCameraUtility cameraUtility;
 };
 
 class GMSpriteGameObject : public GMGameObject
@@ -66,11 +61,20 @@ public:
 	  \param yawDegree 偏航角，绕视角坐标系y轴旋转的弧度数。
 	*/
 	void look(GMfloat pitch, GMfloat yaw);
-	const GMPositionState& getPositionState();
+	const GMCamera& getCamera() GM_NOEXCEPT;
 
 public:
-	inline void setMoveSpeed(const GMVec3& speed) { D(d); d->moveSpeed = speed; }
-	inline void setJumpSpeed(const GMVec3& speed) { D(d); d->jumpSpeed = speed; }
+	inline void setMoveSpeed(const GMVec3& speed)
+	{
+		D(d);
+		d->moveSpeed = speed;
+	}
+
+	inline void setJumpSpeed(const GMVec3& speed)
+	{
+		D(d);
+		d->jumpSpeed = speed;
+	}
 };
 
 

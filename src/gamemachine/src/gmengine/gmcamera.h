@@ -119,6 +119,7 @@ class GMCamera : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMCamera)
 	GM_ALLOW_COPY_MOVE(GMCamera)
+	GM_DECLARE_PROPERTY(LookAt, lookAt)
 
 public:
 	GMCamera();
@@ -126,10 +127,7 @@ public:
 public:
 	void setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f);
 	void setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f);
-
-	void synchronize(GMSpriteGameObject* gameObject);
-	void synchronizeLookAt();
-
+	void updateViewMatrix();
 	void lookAt(const GMCameraLookAt& lookAt);
 
 	//! 获取从屏幕出发，变换到世界的一条射线
@@ -155,10 +153,32 @@ public:
 	inline const GMMat4& getProjectionMatrix() const { D(d); return d->frustum.getProjectionMatrix(); }
 	inline const GMMat4& getViewMatrix() const { D(d); return d->frustum.getViewMatrix(); }
 	const GMMat4& getInverseViewMatrix() const { D(d); return d->frustum.getInverseViewMatrix(); }
-	inline const GMCameraLookAt& getLookAt() const { D(d); return d->lookAt; }
 
 public:
 	static bool isBoundingBoxInside(const GMFrustumPlanes& planes, const GMVec3(&vertices)[8]);
+};
+
+//////////////////////////////////////////////////////////////////////////
+GM_PRIVATE_OBJECT_UNALIGNED(GMCameraUtility)
+{
+	GMCamera* camera;
+	GMfloat limitPitch = Radians(85.f);
+	GMVec3 position;
+	GMVec3 lookAt;
+};
+
+//! 用于响应鼠标移动时调整摄像机的一个便捷类
+class GMCameraUtility
+{
+	GM_DECLARE_PRIVATE_NGO(GMCameraUtility)
+	GM_DECLARE_PROPERTY(LimitPitch, limitPitch)
+
+public:
+	GMCameraUtility(GMCamera* camera = nullptr);
+
+public:
+	void update(GMfloat yaw, GMfloat pitch);
+	void setCamera(GMCamera* camera);
 };
 
 END_NS

@@ -27,7 +27,7 @@ void Demo_Quake3_BSP::setLookAt()
 	// 设置一个默认视角
 	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
 	camera.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
-	getDemonstrationWorld()->getContext()->getEngine()->getCamera().synchronizeLookAt();
+	getDemonstrationWorld()->getContext()->getEngine()->getCamera().updateViewMatrix();
 }
 
 void Demo_Quake3_BSP::setDefaultLights()
@@ -147,12 +147,11 @@ void Demo_Quake3_BSP::event(gm::GameMachineHandlerEvent evt)
 	{
 		d->world->updateGameWorld(GM.getRunningStates().lastFrameElpased);
 		// 更新Camera
-		getDemonstrationWorld()->getContext()->getEngine()->getCamera().synchronize(d->sprite);
+		getDemonstrationWorld()->getContext()->getEngine()->setCamera(d->sprite->getCamera());
 		break;
 	}
 	case gm::GameMachineHandlerEvent::Render:
 	{
-		getDemonstrationWorld()->getContext()->getEngine()->getCamera().synchronizeLookAt();
 		d->world->renderScene();
 		break;
 	}

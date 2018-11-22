@@ -7,15 +7,9 @@ GMSpriteGameObject::GMSpriteGameObject(GMfloat radius, const GMVec3& position)
 {
 	D(d);
 	d->radius = radius;
-	d->state.position = position;
-	d->state.lookAt = GMVec3(0, 0, -1);
+	d->camera.setLookAt(GMCameraLookAt(GMVec3(0, 0, -1), position));
 	d->limitPitch = Radians(85.f);
-}
-
-const GMPositionState& GMSpriteGameObject::getPositionState()
-{
-	D(d);
-	return d->state;
+	d->cameraUtility.setCamera(&d->camera);
 }
 
 void GMSpriteGameObject::action(GMMovement movement, const GMVec3& direction, const GMVec3& rate)
@@ -36,24 +30,13 @@ void GMSpriteGameObject::action(GMMovement movement, const GMVec3& direction, co
 void GMSpriteGameObject::look(GMfloat pitch, GMfloat yaw)
 {
 	D(d);
-	GMVec3 lookAt = d->state.lookAt;
-	GMFloat4 f4_lookAt;
-	lookAt.loadFloat4(f4_lookAt);
+	d->cameraUtility.update(yaw, pitch);
+}
 
-	// 不考虑roll，把lookAt投影到世界坐标系平面
-	GMVec3 lookAt_z = GMVec3(f4_lookAt[0], 0, f4_lookAt[2]);
-	// 计算pitch是否超出范围，不考虑roll
-	GMfloat calculatedPitch = Asin(f4_lookAt[1]) + pitch;
-	if (-d->limitPitch < calculatedPitch && calculatedPitch <= d->limitPitch)
-	{
-		// 找到lookAt_z垂直的一个向量，使用与世界坐标相同的坐标系
-		GMVec3 lookAt_x = GMVec3(1, 0, 0) * GMQuat(GMVec3(0, 0, 1), lookAt_z);
-		GMQuat qPitch = Rotate(-pitch, FastNormalize(lookAt_x));
-		lookAt = lookAt * qPitch;
-	}
-
-	GMQuat qYaw = Rotate(-yaw, GMVec3(0, 1, 0));
-	d->state.lookAt = FastNormalize(lookAt * qYaw);
+const GMCamera& GMSpriteGameObject::getCamera() GM_NOEXCEPT
+{
+	D(d);
+	return d->camera;
 }
 
 void GMSpriteGameObject::update(GMDuration dt)
@@ -82,22 +65,23 @@ void GMSpriteGameObject::update(GMDuration dt)
 	}
 	direction = FastNormalize(direction);
 
+	const GMVec3& lookAt = d->camera.getLookAt().lookAt;
 	if (moved)
 	{
-		GMPhysicsMoveArgs args(d->state.lookAt, direction, moveSpeed, rate);
+		GMPhysicsMoveArgs args(lookAt, direction, moveSpeed, rate);
 		GMPhysicsWorld* world = getWorld()->getPhysicsWorld();
 		world->applyMove(getPhysicsObject(), args);
 	}
 
 	if (jumped)
 	{
-		GMPhysicsMoveArgs args(d->state.lookAt, direction, jumpSpeed, rate);
+		GMPhysicsMoveArgs args(lookAt, direction, jumpSpeed, rate);
 		GMPhysicsWorld* world = getWorld()->getPhysicsWorld();
 		world->applyJump(getPhysicsObject(), args);
 	}
 
 	GMFloat4 f4_position;
 	GetTranslationFromMatrix(getPhysicsObject()->getMotionStates().transform, f4_position);
-	d->state.position.setFloat4(f4_position);
+	d->camera.getLookAt().position.setFloat4(f4_position);
 	d->movements.clear();
 }

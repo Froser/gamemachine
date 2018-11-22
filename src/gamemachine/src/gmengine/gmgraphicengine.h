@@ -243,6 +243,7 @@ public:
 	virtual void setShaderLoadCallback(IShaderLoadCallback* cb) override;
 	virtual void setShadowSource(const GMShadowSourceDesc& desc) override;
 	virtual GMCamera& getCamera() override;
+	virtual void setCamera(const GMCamera&) override;
 	virtual void beginBlend(
 		GMS_BlendFunc sfactorRGB,
 		GMS_BlendFunc dfactorRGB,
@@ -258,6 +259,8 @@ public:
 
 public:
 	const GMFilterMode::Mode getCurrentFilterMode();
+	bool isMotionBlurEnabled();
+
 	void draw(const List<GMGameObject*>& objects);
 	IFramebuffers* getShadowMapFramebuffers();
 
