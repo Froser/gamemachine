@@ -59,19 +59,22 @@ protected:
 	virtual bool drawTexture(GMModel* model, GMTextureType type);
 	virtual GMTextureAsset getTexture(GMTextureSampler& frames);
 	virtual void updateCameraMatrices(IShaderProgram* shaderProgram);
-	virtual void prepareScreenInfo(IShaderProgram* shaderProgram);
 
 protected:
-	void applyShader(GMModel* model);
+	void prepareScreenInfo(IShaderProgram* shaderProgram);
+	void prepareShaderAttributes(GMModel* model);
 	void prepareBlend(GMModel* model);
 	void prepareFrontFace(GMModel* model);
 	void prepareCull(GMModel* model);
 	void prepareDepth(GMModel* model);
 	void prepareLine(GMModel* model);
 	void prepareDebug(GMModel* model);
+	void prepareLights();
+	GMIlluminationModel prepareIlluminationModel(GMModel* model);
 
 private:
 	void updateBoneTransforms(IShaderProgram* shaderProgram, GMModel* model);
+	void startDraw(GMModel* model);
 
 public:
 	static void dirtyShadowMapAttributes();
@@ -97,7 +100,8 @@ public:
 	virtual IShaderProgram* getShaderProgram() override;
 
 protected:
-	void activateMaterial(const GMShader& shader);
+	void prepareMaterial(const GMShader& shader);
+	void prepareTextures(GMModel* model, GMIlluminationModel illuminationModel);
 	void drawDebug();
 
 private:
@@ -111,6 +115,9 @@ public:
 
 public:
 	virtual void beforeDraw(GMModel* model) override;
+
+protected:
+	void prepareTextures(GMModel* model);
 };
 
 class GMGLTechnique_CubeMap : public GMGLTechnique_3D
@@ -122,6 +129,9 @@ public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void beforeDraw(GMModel* model) override;
 	virtual void afterDraw(GMModel* model) override;
+
+protected:
+	void prepareTextures(GMModel* model);
 };
 
 GM_PRIVATE_OBJECT(GMGLTechnique_Filter)
@@ -150,6 +160,9 @@ private:
 protected:
 	virtual GMint32 activateTexture(GMModel* model, GMTextureType type);
 
+protected:
+	void prepareTextures(GMModel* model);
+
 private:
 	void setHDR(IShaderProgram* shaderProgram);
 };
@@ -164,6 +177,10 @@ protected:
 	virtual void beforeDraw(GMModel* model) override;
 	virtual void afterDraw(GMModel* model) override;
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
+
+protected:
+	void prepareLights();
+	void prepareTextures(GMModel* model);
 };
 
 class GMGLTechnique_3D_Shadow : public GMGLTechnique_3D

@@ -31,7 +31,7 @@ namespace
 		}
 	}
 
-	inline void applyStencil(GMGLGraphicEngine& engine)
+	inline void prepareStencil(GMGLGraphicEngine& engine)
 	{
 		// 应用模板
 		GLenum compareFunc = GL_ALWAYS;
@@ -183,19 +183,15 @@ void GMGLTechnique::draw(GMModel* model)
 {
 	D(d);
 	GMGLBeginGetErrorsAndCheck();
-
 	glBindVertexArray(model->getModelBuffer()->getMeshBuffer().arrayId);
-	applyStencil(*d->engine);
+
+	prepareStencil(*d->engine);
 	prepareScreenInfo(getShaderProgram());
 	beforeDraw(model);
-	GLenum mode = (d->engine->isWireFrameMode(model)) ? GL_LINE_LOOP : getMode(model->getPrimitiveTopologyMode());
-	if (model->getDrawMode() == GMModelDrawMode::Vertex)
-		glDrawArrays(mode, 0, gm_sizet_to<GLsizei>(model->getVerticesCount()));
-	else
-		glDrawElements(mode, gm_sizet_to<GLsizei>(model->getVerticesCount()), GL_UNSIGNED_INT, 0);
+	startDraw(model);
 	afterDraw(model);
-	glBindVertexArray(0);
 
+	glBindVertexArray(0);
 	GMGLEndGetErrorsAndCheck();
 }
 
@@ -424,7 +420,7 @@ void GMGLTechnique::dirtyShadowMapAttributes()
 	g_shadowDirty = true;
 }
 
-void GMGLTechnique::applyShader(GMModel* model)
+void GMGLTechnique::prepareShaderAttributes(GMModel* model)
 {
 	prepareBlend(model);
 	prepareFrontFace(model);
@@ -516,6 +512,21 @@ void GMGLTechnique::prepareDebug(GMModel* model)
 	getShaderProgram()->setInt(GM_VariablesDesc.Debug.Normal, mode);
 }
 
+void GMGLTechnique::prepareLights()
+{
+	D(d);
+	d->engine->activateLights(this);
+}
+
+GMIlluminationModel GMGLTechnique::prepareIlluminationModel(GMModel* model)
+{
+	IShaderProgram* shaderProgram = getShaderProgram();
+	GMShader& shader = model->getShader();
+	GMIlluminationModel illuminationModel = shader.getIlluminationModel();
+	shaderProgram->setInt(GM_VariablesDesc.IlluminationModel, (GMint32)illuminationModel);
+	return illuminationModel;
+}
+
 void GMGLTechnique::updateBoneTransforms(IShaderProgram* shaderProgram, GMModel* model)
 {
 	static Vector<std::string> boneVarNames;
@@ -534,6 +545,16 @@ void GMGLTechnique::updateBoneTransforms(IShaderProgram* shaderProgram, GMModel*
 		const auto& transform = transforms[i];
 		shaderProgram->setMatrix4(boneVarNames[i].c_str(), transform);
 	}
+}
+
+void GMGLTechnique::startDraw(GMModel* model)
+{
+	D(d);
+	GLenum mode = (d->engine->isWireFrameMode(model)) ? GL_LINE_LOOP : getMode(model->getPrimitiveTopologyMode());
+	if (model->getDrawMode() == GMModelDrawMode::Vertex)
+		glDrawArrays(mode, 0, gm_sizet_to<GLsizei>(model->getVerticesCount()));
+	else
+		glDrawElements(mode, gm_sizet_to<GLsizei>(model->getVerticesCount()), GL_UNSIGNED_INT, 0);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -568,7 +589,7 @@ void GMGLTechnique_3D::beginModel(GMModel* model, const GMGameObject* parent)
 			GMGLShaderProgram::techniqueName(),
 			getTechnique(model->getType()),
 			GMShaderType::Pixel);
-		db->engine->activateLights(this);
+		prepareLights();
 	}
 
 	const GMShadowSourceDesc& shadowSourceDesc = db->engine->getShadowSourceDesc();
@@ -593,34 +614,16 @@ void GMGLTechnique_3D::beforeDraw(GMModel* model)
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	// 材质
-	activateMaterial(model->getShader());
+	prepareMaterial(model->getShader());
 
 	// 应用Shader
-	applyShader(model);
+	prepareShaderAttributes(model);
 	
 	// 设置光照模型
-	IShaderProgram* shaderProgram = getShaderProgram();
-	GMShader& shader = model->getShader();
-	GMIlluminationModel illuminationModel = shader.getIlluminationModel();
-	shaderProgram->setInt(GM_VariablesDesc.IlluminationModel, (GMint32)illuminationModel);
+	GMIlluminationModel illuminationModel = prepareIlluminationModel(model);
 
 	// 纹理
-	GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
-	{
-		if (!drawTexture(model, (GMTextureType)type))
-		{
-			if (illuminationModel == GMIlluminationModel::Phong && (
-				type == GMTextureType::Ambient ||
-				type == GMTextureType::Diffuse ||
-				type == GMTextureType::Specular ||
-				type == GMTextureType::Lightmap
-				))
-			{
-				GMint32 texId = activateTexture(nullptr, (GMTextureType)type);
-				getWhiteTexture().getTexture()->useTexture(texId);
-			}
-		}
-	}
+	prepareTextures(model, illuminationModel);
 
 	// 调试绘制
 	drawDebug();
@@ -645,7 +648,7 @@ IShaderProgram* GMGLTechnique_3D::getShaderProgram()
 	return d->engine->getShaderProgram(GMShaderProgramType::ForwardShaderProgram);
 }
 
-void GMGLTechnique_3D::activateMaterial(const GMShader& shader)
+void GMGLTechnique_3D::prepareMaterial(const GMShader& shader)
 {
 	D(d);
 	auto shaderProgram = getShaderProgram();
@@ -663,6 +666,26 @@ void GMGLTechnique_3D::activateMaterial(const GMShader& shader)
 	shaderProgram->setFloat(GMSHADER_MATERIAL_SHININESS.c_str(), material.getShininess());
 	shaderProgram->setFloat(GMSHADER_MATERIAL_REFRACTIVITY.c_str(), material.getRefractivity());
 	shaderProgram->setVec3(GMSHADER_MATERIAL_F0.c_str(), ValuePointer(material.getF0()));
+}
+
+void GMGLTechnique_3D::prepareTextures(GMModel* model, GMIlluminationModel illuminationModel)
+{
+	GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
+	{
+		if (!drawTexture(model, (GMTextureType)type))
+		{
+			if (illuminationModel == GMIlluminationModel::Phong && (
+				type == GMTextureType::Ambient ||
+				type == GMTextureType::Diffuse ||
+				type == GMTextureType::Specular ||
+				type == GMTextureType::Lightmap
+				))
+			{
+				GMint32 texId = activateTexture(nullptr, (GMTextureType)type);
+				getWhiteTexture().getTexture()->useTexture(texId);
+			}
+		}
+	}
 }
 
 void GMGLTechnique_3D::drawDebug()
@@ -687,8 +710,14 @@ void GMGLTechnique_2D::beforeDraw(GMModel* model)
 {
 	D(d);
 	// 应用Shader
-	applyShader(model);
+	prepareShaderAttributes(model);
 
+	// 纹理
+	prepareTextures(model);
+}
+
+void GMGLTechnique_2D::prepareTextures(GMModel* model)
+{
 	// 只选择环境光纹理
 	GMTextureSampler& sampler = model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient);
 
@@ -718,6 +747,16 @@ void GMGLTechnique_CubeMap::beforeDraw(GMModel* model)
 	D_BASE(db, Base);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+	prepareTextures(model);
+}
+
+void GMGLTechnique_CubeMap::afterDraw(GMModel* model)
+{
+}
+
+void GMGLTechnique_CubeMap::prepareTextures(GMModel* model)
+{
+	D_BASE(db, Base);
 	GMTextureList& texture = model->getShader().getTextureList();
 	GMTextureSampler& sampler = texture.getTextureSampler(GMTextureType::CubeMap);
 	GMTextureAsset glTex = sampler.getFrameByIndex(0);
@@ -733,20 +772,11 @@ void GMGLTechnique_CubeMap::beforeDraw(GMModel* model)
 		db->engine->setCubeMap(glTex);
 	}
 }
-
-void GMGLTechnique_CubeMap::afterDraw(GMModel* model)
-{
-}
-
+//////////////////////////////////////////////////////////////////////////
 void GMGLTechnique_Filter::beforeDraw(GMModel* model)
 {
-	applyShader(model);
-	GMTextureSampler& sampler = model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient);
-	GMTextureAsset texture = getTexture(sampler);
-	GM_ASSERT(!texture.isEmpty());
-	GMint32 texId = activateTexture(model, GMTextureType::Ambient);
-	texture.getTexture()->bindSampler(&sampler);
-	texture.getTexture()->useTexture(texId);
+	prepareShaderAttributes(model);
+	prepareTextures(model);
 }
 
 void GMGLTechnique_Filter::afterDraw(GMModel* model)
@@ -787,6 +817,16 @@ IShaderProgram* GMGLTechnique_Filter::getShaderProgram()
 {
 	D_BASE(db, GMGLTechnique);
 	return db->engine->getShaderProgram(GMShaderProgramType::FilterShaderProgram);
+}
+
+void GMGLTechnique_Filter::prepareTextures(GMModel* model)
+{
+	GMTextureSampler& sampler = model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient);
+	GMTextureAsset texture = getTexture(sampler);
+	GM_ASSERT(!texture.isEmpty());
+	GMint32 texId = activateTexture(model, GMTextureType::Ambient);
+	texture.getTexture()->bindSampler(&sampler);
+	texture.getTexture()->useTexture(texId);
 }
 
 GMint32 GMGLTechnique_Filter::activateTexture(GMModel* model, GMTextureType type)
@@ -837,9 +877,20 @@ void GMGLTechnique_LightPass::afterDraw(GMModel* model)
 
 void GMGLTechnique_LightPass::beforeDraw(GMModel* model)
 {
+	prepareLights();
+	prepareTextures(model);
+}
+
+void GMGLTechnique_LightPass::prepareLights()
+{
+	D_BASE(d, GMGLTechnique);
+	d->engine->activateLights(this);
+}
+
+void GMGLTechnique_LightPass::prepareTextures(GMModel* model)
+{
 	D_BASE(d, GMGLTechnique);
 	IShaderProgram* shaderProgram = getShaderProgram();
-	d->engine->activateLights(this);
 	IGBuffer* gBuffer = d->engine->getGBuffer();
 	IFramebuffers* gBufferFramebuffers = gBuffer->getGeometryFramebuffers();
 	GMsize_t cnt = gBufferFramebuffers->count();
