@@ -257,6 +257,14 @@ public:
 	virtual GMPrimitiveManager* getPrimitiveManager() override;
 	virtual void createModelDataProxy(const IRenderContext* context, GMModel* model, bool transfer = true) override;
 
+protected:
+	virtual void createShadowFramebuffers(OUT IFramebuffers** framebuffers) = 0;
+	virtual void createFilterFramebuffer();
+	virtual void generateShadowBuffer(const List<GMGameObject*>& forwardRenderingObjects, const List<GMGameObject*>& deferredRenderingObjects);
+	virtual bool needUseFilterFramebuffer();
+	virtual void bindFilterFramebufferAndClear();
+	virtual void unbindFilterFramebufferAndDraw();
+
 public:
 	const GMFilterMode::Mode getCurrentFilterMode();
 
@@ -271,9 +279,6 @@ public:
 
 	bool isWireFrameMode(GMModel* model);
 	bool isNeedDiscardTexture(GMModel* model, GMTextureType type);
-
-protected:
-	void createFilterFramebuffer();
 
 public:
 	inline GMFramebuffersStack& getFramebuffersStack()
@@ -303,9 +308,6 @@ protected:
 
 private:
 	IGBuffer* createGBuffer();
-
-private:
-	virtual void createShadowFramebuffers(OUT IFramebuffers** framebuffers) = 0;
 
 public:
 	static constexpr const GMsize_t getMaxLightCount()

@@ -169,66 +169,49 @@ void GMGraphicEngine::draw(const List<GMGameObject*>& forwardRenderingObjects, c
 {
 	GM_PROFILE("draw");
 	D(d);
+	// 如果绘制阴影，先生成阴影缓存
 	if (d->shadow.type != GMShadowSourceDesc::NoShadow)
-	{
-		if (!d->shadowDepthFramebuffers)
-			createShadowFramebuffers(&d->shadowDepthFramebuffers);
-		GM_ASSERT(d->shadowDepthFramebuffers);
-		d->shadowDepthFramebuffers->clear(GMFramebuffersClearType::Depth);
-		d->shadowDepthFramebuffers->bind();
-		d->isDrawingShadow = true;
-		draw(forwardRenderingObjects);
-		draw(deferredRenderingObjects);
-		d->shadowDepthFramebuffers->unbind();
-		d->isDrawingShadow = false;
-	}
+		generateShadowBuffer(forwardRenderingObjects, deferredRenderingObjects);
 
-	GMFilterMode::Mode filterMode = getCurrentFilterMode();
-	if (filterMode != GMFilterMode::None || needHDR())
+	// 是否使用滤镜
+	bool useFilterFramebuffer = needUseFilterFramebuffer();
+	if (useFilterFramebuffer)
 	{
 		createFilterFramebuffer();
 		getFilterFramebuffers()->clear();
 	}
 
+	// 绘制需要延迟渲染的对象
 	if (!deferredRenderingObjects.empty())
 	{
 		IGBuffer* gBuffer = getGBuffer();
 		gBuffer->geometryPass(deferredRenderingObjects);
 
-		if (needHDR() || filterMode != GMFilterMode::None)
-		{
-			IFramebuffers* filterFramebuffers = getFilterFramebuffers();
-			GM_ASSERT(filterFramebuffers);
-			filterFramebuffers->bind();
-			filterFramebuffers->clear();
-		}
+		if (useFilterFramebuffer)
+			bindFilterFramebufferAndClear();
+
 		gBuffer->lightPass();
-		if (needHDR() || filterMode != GMFilterMode::None)
+		if (useFilterFramebuffer)
 		{
-			IFramebuffers* filterFramebuffers = getFilterFramebuffers();
-			filterFramebuffers->unbind();
-			getFilterQuad()->draw();
-			gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(filterFramebuffers);
+			unbindFilterFramebufferAndDraw();
+			gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(getFilterFramebuffers());
 		}
-		gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(getDefaultFramebuffers());
+		else
+		{
+			gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(getDefaultFramebuffers());
+		}
 	}
 
+	// 绘制不需要延迟渲染的对象
 	if (!forwardRenderingObjects.empty())
 	{
-		IFramebuffers* filterFramebuffers = getFilterFramebuffers();
-		if (needHDR() || filterMode != GMFilterMode::None)
-		{
-			filterFramebuffers->clear();
-			filterFramebuffers->bind();
-		}
+		if (useFilterFramebuffer)
+			bindFilterFramebufferAndClear();
 
 		draw(forwardRenderingObjects);
 
-		if (needHDR() || filterMode != GMFilterMode::None)
-		{
-			filterFramebuffers->unbind();
-			getFilterQuad()->draw();
-		}
+		if (useFilterFramebuffer)
+			unbindFilterFramebufferAndDraw();
 	}
 }
 
@@ -337,6 +320,43 @@ void GMGraphicEngine::createFilterFramebuffer()
 		d->filterQuad = new GMGameObject(quad);
 		d->filterQuad->setContext(d->context);
 	}
+}
+
+void GMGraphicEngine::generateShadowBuffer(const List<GMGameObject*>& forwardRenderingObjects, const List<GMGameObject*>& deferredRenderingObjects)
+{
+	D(d);
+	if (!d->shadowDepthFramebuffers)
+		createShadowFramebuffers(&d->shadowDepthFramebuffers);
+	GM_ASSERT(d->shadowDepthFramebuffers);
+	d->shadowDepthFramebuffers->clear(GMFramebuffersClearType::Depth);
+	d->shadowDepthFramebuffers->bind();
+	d->isDrawingShadow = true;
+	draw(forwardRenderingObjects);
+	draw(deferredRenderingObjects);
+	d->shadowDepthFramebuffers->unbind();
+	d->isDrawingShadow = false;
+}
+
+bool GMGraphicEngine::needUseFilterFramebuffer()
+{
+	GMFilterMode::Mode filterMode = getCurrentFilterMode();
+	return (filterMode != GMFilterMode::None || needHDR());
+}
+
+void GMGraphicEngine::bindFilterFramebufferAndClear()
+{
+	IFramebuffers* filterFramebuffers = getFilterFramebuffers();
+	GM_ASSERT(filterFramebuffers);
+	filterFramebuffers->bind();
+	filterFramebuffers->clear();
+}
+
+void GMGraphicEngine::unbindFilterFramebufferAndDraw()
+{
+	IFramebuffers* filterFramebuffers = getFilterFramebuffers();
+	GM_ASSERT(filterFramebuffers);
+	filterFramebuffers->unbind();
+	getFilterQuad()->draw();
 }
 
 IGBuffer* GMGraphicEngine::createGBuffer()
