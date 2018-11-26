@@ -259,7 +259,6 @@ public:
 
 public:
 	const GMFilterMode::Mode getCurrentFilterMode();
-	bool isMotionBlurEnabled();
 
 	void draw(const List<GMGameObject*>& objects);
 	IFramebuffers* getShadowMapFramebuffers();
