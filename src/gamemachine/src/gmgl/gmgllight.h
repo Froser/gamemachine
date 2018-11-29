@@ -14,7 +14,8 @@ class GMGLLight : public GMObject, public ILight
 	GM_DECLARE_PRIVATE(GMGLLight)
 
 public:
-	virtual bool GMGLLight::setLightAttribute3(GMLightAttribute attr, GMfloat value[3]) override;
+	virtual bool setLightAttribute3(GMLightAttribute attr, GMfloat value[3]) override;
+	virtual bool setLightAttribute(GMLightAttribute, GMfloat) override;
 	virtual void activateLight(GMuint32, ITechnique*) override;
 
 protected:

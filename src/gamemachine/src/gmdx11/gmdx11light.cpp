@@ -29,6 +29,11 @@ bool GMDx11Light::setLightAttribute3(GMLightAttribute attr, GMfloat value[3])
 	return true;
 }
 
+bool GMDx11Light::setLightAttribute(GMLightAttribute, GMfloat)
+{
+	return false;
+}
+
 void GMDx11Light::activateLight(GMuint32 index, ITechnique* technique)
 {
 	D(d);

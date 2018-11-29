@@ -17,6 +17,7 @@ class GMDx11Light : public GMObject, public ILight
 
 public:
 	virtual bool setLightAttribute3(GMLightAttribute, GMfloat[3]) override;
+	virtual bool setLightAttribute(GMLightAttribute, GMfloat) override;
 	virtual void activateLight(GMuint32, ITechnique*) override;
 
 protected:

@@ -772,6 +772,7 @@ void DemostrationEntrance::onLoadShaders(const gm::IRenderContext* context)
 {
 	D(d);
 	Demo_CustomShader::initCustomShader(context);
+	Demo_CustomLight::initCustomShader(context);
 	auto& env = GM.getRunningStates().renderEnvironment;
 	if (env == gm::GMRenderEnvironment::OpenGL)
 	{

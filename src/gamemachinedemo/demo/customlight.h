@@ -20,6 +20,12 @@ protected:
 	virtual void setLookAt() override;
 	virtual void setDefaultLights() override;
 
+private:
+	void setSpotLights(const Vector<gm::ILight*>& lights);
+
+public:
+	static void initCustomShader(const gm::IRenderContext* context);
+
 protected:
 	const gm::GMString& getDescription() const
 	{

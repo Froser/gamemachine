@@ -240,7 +240,7 @@ bool GMGLShaderProgram::load()
 			GLchar* log = new GLchar[len + 1];
 			glGetShaderInfoLog(shader, len, &len, log);
 
-			GMStringReader reader(source);
+			GMStringReader reader(entry.source);
 			std::string report;
 			GMint32 ln = 0;
 			auto iter = reader.lineBegin();

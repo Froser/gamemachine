@@ -64,6 +64,11 @@ bool GMGLLight::setLightAttribute3(GMLightAttribute attr, GMfloat value[3])
 	return true;
 }
 
+bool GMGLLight::setLightAttribute(GMLightAttribute, GMfloat)
+{
+	return false;
+}
+
 void GMGLLight::activateLight(GMuint32 index, ITechnique* technique)
 {
 	D(d);

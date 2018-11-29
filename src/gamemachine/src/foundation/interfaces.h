@@ -332,15 +332,18 @@ enum class GMLightType
 
 GM_INTERFACE(ILight)
 {
-	enum GMLightAttribute
+	typedef GMint32 GMLightAttribute;
+
+	enum
 	{
-		Position,
-		Color,
+		Position, // GMfloat[3]
+		Color, // GMfloat[3]
 		CustomStart,
 	};
 
 	virtual bool setLightAttribute3(GMLightAttribute, GMfloat[3]) = 0;
-	virtual void activateLight(GMuint32, ITechnique*) = 0;
+	virtual bool setLightAttribute(GMLightAttribute, GMfloat) = 0;
+	virtual void activateLight(GMuint32 index, ITechnique* technique) = 0;
 };
 
 struct GMStencilOptions

@@ -2,8 +2,8 @@
 #define __GMGLRENDERERS_H__
 #include <gmcommon.h>
 #include <gmenums.h>
-#include "gmdata/gmmodel.h"
-#include "gmgl/gmglgraphic_engine.h"
+#include <gmmodel.h>
+#include "gmglgraphic_engine.h"
 BEGIN_NS
 
 class GMGammaHelper
