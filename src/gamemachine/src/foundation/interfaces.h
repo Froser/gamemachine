@@ -332,10 +332,14 @@ enum class GMLightType
 
 GM_INTERFACE(ILight)
 {
-	virtual void setLightPosition(GMfloat position[4]) = 0;
-	virtual void setLightColor(GMfloat color[4]) = 0;
-	virtual const GMfloat* getLightPosition() const = 0;
-	virtual const GMfloat* getLightColor() const = 0;
+	enum GMLightAttribute
+	{
+		Position,
+		Color,
+		CustomStart,
+	};
+
+	virtual bool setLightAttribute3(GMLightAttribute, GMfloat[3]) = 0;
 	virtual void activateLight(GMuint32, ITechnique*) = 0;
 };
 

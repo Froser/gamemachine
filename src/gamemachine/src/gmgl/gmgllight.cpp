@@ -37,38 +37,36 @@ namespace
 	}
 }
 
-void GMGLLight::setLightPosition(GMfloat position[3])
+bool GMGLLight::setLightAttribute3(GMLightAttribute attr, GMfloat value[3])
 {
 	D(d);
-	d->position[0] = position[0];
-	d->position[1] = position[1];
-	d->position[2] = position[2];
-	d->position[3] = 1.0f;
-}
-
-void GMGLLight::setLightColor(GMfloat color[3])
-{
-	D(d);
-	d->color[0] = color[0];
-	d->color[1] = color[1];
-	d->color[2] = color[2];
-	d->color[3] = 1.0f;
-}
-
-const GMfloat* GMGLLight::getLightPosition() const
-{
-	D(d);
-	return d->position;
-}
-
-const GMfloat* GMGLLight::getLightColor() const
-{
-	D(d);
-	return d->color;
+	switch (attr)
+	{
+	case Position:
+	{
+		d->position[0] = value[0];
+		d->position[1] = value[1];
+		d->position[2] = value[2];
+		d->position[3] = 1.0f;
+		break;
+	}
+	case ILight::Color:
+	{
+		d->color[0] = value[0];
+		d->color[1] = value[1];
+		d->color[2] = value[2];
+		d->color[3] = 1.0f;
+		break;
+	}
+	default:
+		return false;
+	}
+	return true;
 }
 
 void GMGLLight::activateLight(GMuint32 index, ITechnique* technique)
 {
+	D(d);
 	static char light_Position[GMGL_MAX_UNIFORM_NAME_LEN];
 	static char light_Color[GMGL_MAX_UNIFORM_NAME_LEN];
 	static char light_Type[GMGL_MAX_UNIFORM_NAME_LEN];
@@ -78,10 +76,10 @@ void GMGLLight::activateLight(GMuint32 index, ITechnique* technique)
 	const char* strIndex = number(index);
 
 	combineUniform(light_Position, "GM_lights[", strIndex, "].LightColor");
-	shaderProgram->setVec3(light_Position, getLightColor());
+	shaderProgram->setVec3(light_Position, d->color);
 
 	combineUniform(light_Color, "GM_lights[", strIndex, "].LightPosition");
-	shaderProgram->setVec3(light_Color, getLightPosition());
+	shaderProgram->setVec3(light_Color, d->position);
 
 	combineUniform(light_Type, "GM_lights[", strIndex, "].LightType");
 	shaderProgram->setInt(light_Type, getType());

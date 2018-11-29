@@ -16,10 +16,7 @@ class GMDx11Light : public GMObject, public ILight
 	GM_DECLARE_PRIVATE(GMDx11Light)
 
 public:
-	virtual void setLightPosition(GMfloat position[4]) override;
-	virtual void setLightColor(GMfloat color[4]) override;
-	virtual const GMfloat* getLightPosition() const override;
-	virtual const GMfloat* getLightColor() const override;
+	virtual bool setLightAttribute3(GMLightAttribute, GMfloat[3]) override;
 	virtual void activateLight(GMuint32, ITechnique*) override;
 
 protected:

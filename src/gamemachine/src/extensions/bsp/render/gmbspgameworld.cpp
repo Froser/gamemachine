@@ -249,7 +249,7 @@ void GMBSPGameWorld::setDefaultLights()
 		factory->createLight(GMLightType::Ambient, &light);
 		GM_ASSERT(light);
 		GMfloat lightColor[] = { .9f, .9f, .9f };
-		light->setLightColor(lightColor);
+		light->setLightAttribute3(ILight::Color, lightColor);
 		engine->addLight(light);
 	}
 
@@ -258,7 +258,7 @@ void GMBSPGameWorld::setDefaultLights()
 		factory->createLight(GMLightType::Direct, &light);
 		GM_ASSERT(light);
 		GMfloat lightColor[] = { 1, 1, 1 };
-		light->setLightColor(lightColor);
+		light->setLightAttribute3(ILight::Color, lightColor);
 		engine->addLight(light);
 	}
 }

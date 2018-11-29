@@ -2,34 +2,31 @@
 #include "gmdx11light.h"
 #include "gmdx11techniques.h"
 
-void GMDx11Light::setLightPosition(GMfloat position[3])
+bool GMDx11Light::setLightAttribute3(GMLightAttribute attr, GMfloat value[3])
 {
 	D(d);
-	d->position[0] = position[0];
-	d->position[1] = position[1];
-	d->position[2] = position[2];
-	d->position[3] = 1.0f;
-}
-
-void GMDx11Light::setLightColor(GMfloat color[3])
-{
-	D(d);
-	d->color[0] = color[0];
-	d->color[1] = color[1];
-	d->color[2] = color[2];
-	d->color[3] = 1.0f;
-}
-
-const GMfloat* GMDx11Light::getLightPosition() const
-{
-	D(d);
-	return d->position;
-}
-
-const GMfloat* GMDx11Light::getLightColor() const
-{
-	D(d);
-	return d->color;
+	switch (attr)
+	{
+	case Position:
+	{
+		d->position[0] = value[0];
+		d->position[1] = value[1];
+		d->position[2] = value[2];
+		d->position[3] = 1.0f;
+		break;
+	}
+	case ILight::Color:
+	{
+		d->color[0] = value[0];
+		d->color[1] = value[1];
+		d->color[2] = value[2];
+		d->color[3] = 1.0f;
+		break;
+	}
+	default:
+		return false;
+	}
+	return true;
 }
 
 void GMDx11Light::activateLight(GMuint32 index, ITechnique* technique)
@@ -58,11 +55,11 @@ void GMDx11Light::activateLight(GMuint32 index, ITechnique* technique)
 
 	ID3DX11EffectVectorVariable* position = lightStruct->GetMemberByName("Position")->AsVector();
 	GM_ASSERT(position->IsValid());
-	GM_DX_HR(position->SetFloatVector(getLightPosition()));
+	GM_DX_HR(position->SetFloatVector(d->position));
 
 	ID3DX11EffectVectorVariable* color = lightStruct->GetMemberByName("Color")->AsVector();
 	GM_ASSERT(color->IsValid());
-	GM_DX_HR(color->SetFloatVector(getLightColor()));
+	GM_DX_HR(color->SetFloatVector(d->color));
 
 	ID3DX11EffectScalarVariable* type = lightStruct->GetMemberByName("Type")->AsScalar();
 	GM_ASSERT(type->IsValid());

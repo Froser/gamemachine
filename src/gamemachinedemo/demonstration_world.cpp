@@ -28,6 +28,7 @@
 #include "demo/md5mesh.h"
 #include "demo/terrain.h"
 #include "demo/customshader.h"
+#include "demo/customlight.h"
 
 #if GM_USE_DX11
 #include <gmdx11helper.h>
@@ -63,6 +64,7 @@ namespace
 		world->addDemo(L"MD5: 渲染MD5骨骼动画。", new Demo_MD5Mesh(world));
 		world->addDemo(L"地形: 渲染一个地形。", new Demo_Terrain(world));
 		world->addDemo(L"自定义着色器: 使用自定义着色器进行渲染。", new Demo_CustomShader(world));
+		world->addDemo(L"自定义着色器: 实现聚光灯效果。", new Demo_CustomLight(world));
 		world->addDemo(L"LUA: 执行Lua脚本。", new Demo_Lua(world));
 		world->init();
 	}
@@ -212,9 +214,9 @@ void DemoHandler::setDefaultLights()
 		GM.getFactory()->createLight(gm::GMLightType::Direct, &light);
 		GM_ASSERT(light);
 		gm::GMfloat lightPos[] = { 0, 0, -.2f };
-		light->setLightPosition(lightPos);
+		light->setLightAttribute3(gm::ILight::Position, lightPos);
 		gm::GMfloat color[] = { .7f, .7f, .7f };
-		light->setLightColor(color);
+		light->setLightAttribute3(gm::ILight::Color, color);
 		d->engine->addLight(light);
 	}
 }
@@ -646,7 +648,7 @@ void DemonstrationWorld::resetCameraAndLights()
 		gm::ILight* light = nullptr;
 		GM.getFactory()->createLight(gm::GMLightType::Ambient, &light);
 		gm::GMfloat lightClr[] = { .1f, .1f, .1f, 1 };
-		light->setLightColor(lightClr);
+		light->setLightAttribute3(gm::ILight::Color, lightClr);
 		engine->addLight(light);
 	}
 
@@ -654,9 +656,9 @@ void DemonstrationWorld::resetCameraAndLights()
 		gm::ILight* light = nullptr;
 		GM.getFactory()->createLight(gm::GMLightType::Direct, &light);
 		gm::GMfloat lightPos[] = { -5, 5, -5 };
-		light->setLightPosition(lightPos);
+		light->setLightAttribute3(gm::ILight::Position, lightPos);
 		gm::GMfloat lightClr[] = { 2, 2, 2, 1 };
-		light->setLightColor(lightClr);
+		light->setLightAttribute3(gm::ILight::Color, lightClr);
 		engine->addLight(light);
 	}
 }

@@ -446,7 +446,7 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, GMXMLElement* elem)
 		GMScanner s(color);
 		GMfloat vecPosition[3];
 		readTernaryFloatsFromString(position, vecPosition);
-		light->setLightPosition(&vecPosition[0]);
+		light->setLightAttribute3(ILight::Position, vecPosition);
 
 		GMfloat arg[3];
 		const char* k = elem->Attribute("ks");
@@ -489,7 +489,7 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, GMXMLElement* elem)
 	GM_ASSERT(light);
 	GMfloat vecColor[3];
 	readTernaryFloatsFromString(color, vecColor);
-	light->setLightColor(&vecColor[0]);
+	light->setLightAttribute3(ILight::Color, vecColor);
 
 	d->world->getContext()->getEngine()->addLight(light);
 }

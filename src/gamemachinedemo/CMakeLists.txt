@@ -61,6 +61,8 @@ set(SOURCES
 		demo/customshader.cpp
 		demo/assimp.h
 		demo/assimp.cpp
+		demo/customlight.h
+		demo/customlight.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)

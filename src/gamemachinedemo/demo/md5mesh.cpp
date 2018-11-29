@@ -77,9 +77,9 @@ void Demo_MD5Mesh::setDefaultLights()
 			GM.getFactory()->createLight(gm::GMLightType::Direct, &directLight);
 			GM_ASSERT(directLight);
 			gm::GMfloat lightPos[] = { 1, 0, -3 };
-			directLight->setLightPosition(lightPos);
+			directLight->setLightAttribute3(gm::ILight::Position, lightPos);
 			gm::GMfloat color[] = { .7f, .7f, .7f };
-			directLight->setLightColor(color);
+			directLight->setLightAttribute3(gm::ILight::Color, color);
 			getDemonstrationWorld()->getContext()->getEngine()->addLight(directLight);
 		}
 
@@ -88,7 +88,7 @@ void Demo_MD5Mesh::setDefaultLights()
 			GM.getFactory()->createLight(gm::GMLightType::Ambient, &ambientLight);
 			GM_ASSERT(ambientLight);
 			gm::GMfloat color[] = { .1f, .1f, .1f };
-			ambientLight->setLightColor(color);
+			ambientLight->setLightAttribute3(gm::ILight::Color, color);
 			getDemonstrationWorld()->getContext()->getEngine()->addLight(ambientLight);
 		}
 	}
