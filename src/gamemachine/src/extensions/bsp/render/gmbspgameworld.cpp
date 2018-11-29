@@ -13,6 +13,7 @@
 #include "foundation/gmthread.h"
 #include "gmengine/gameobjects/gmgameobject.h"
 #include "extensions/bsp/physics/gmbspphysicsworld.h"
+#include <gmlight.h>
 
 BEGIN_NS
 
@@ -249,7 +250,7 @@ void GMBSPGameWorld::setDefaultLights()
 		factory->createLight(GMLightType::Ambient, &light);
 		GM_ASSERT(light);
 		GMfloat lightColor[] = { .9f, .9f, .9f };
-		light->setLightAttribute3(ILight::Color, lightColor);
+		light->setLightAttribute3(GMLight::Color, lightColor);
 		engine->addLight(light);
 	}
 
@@ -258,7 +259,7 @@ void GMBSPGameWorld::setDefaultLights()
 		factory->createLight(GMLightType::Direct, &light);
 		GM_ASSERT(light);
 		GMfloat lightColor[] = { 1, 1, 1 };
-		light->setLightAttribute3(ILight::Color, lightColor);
+		light->setLightAttribute3(GMLight::Color, lightColor);
 		engine->addLight(light);
 	}
 }

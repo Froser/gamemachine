@@ -1,23 +1,20 @@
 ﻿#ifndef __GMDX11LIGHT_H__
 #define __GMDX11LIGHT_H__
 #include <gmcommon.h>
+#include <gmlight.h>
 BEGIN_NS
 
-GM_PRIVATE_OBJECT(GMDx11Light)
+GM_PRIVATE_OBJECT_UNALIGNED(GMDx11Light)
 {
-	GMfloat position[4];
-	GMfloat color[4];
 	ID3DX11Effect* effect = nullptr;
 	ID3DX11EffectVariable* lightAttributes = nullptr;
 };
 
-class GMDx11Light : public GMObject, public ILight
+class GMDx11Light : public GMLight
 {
-	GM_DECLARE_PRIVATE(GMDx11Light)
+	GM_DECLARE_PRIVATE_NGO(GMDx11Light)
 
 public:
-	virtual bool setLightAttribute3(GMLightAttribute, GMfloat[3]) override;
-	virtual bool setLightAttribute(GMLightAttribute, GMfloat) override;
 	virtual void activateLight(GMuint32, ITechnique*) override;
 
 protected:

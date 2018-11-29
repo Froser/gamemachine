@@ -2,41 +2,10 @@
 #include "gmdx11light.h"
 #include "gmdx11techniques.h"
 
-bool GMDx11Light::setLightAttribute3(GMLightAttribute attr, GMfloat value[3])
-{
-	D(d);
-	switch (attr)
-	{
-	case Position:
-	{
-		d->position[0] = value[0];
-		d->position[1] = value[1];
-		d->position[2] = value[2];
-		d->position[3] = 1.0f;
-		break;
-	}
-	case ILight::Color:
-	{
-		d->color[0] = value[0];
-		d->color[1] = value[1];
-		d->color[2] = value[2];
-		d->color[3] = 1.0f;
-		break;
-	}
-	default:
-		return false;
-	}
-	return true;
-}
-
-bool GMDx11Light::setLightAttribute(GMLightAttribute, GMfloat)
-{
-	return false;
-}
-
 void GMDx11Light::activateLight(GMuint32 index, ITechnique* technique)
 {
 	D(d);
+	D_BASE(db, GMLight);
 	if (!d->effect)
 	{
 		GMDx11Technique* dxTechnique = gm_cast<GMDx11Technique*>(technique);
@@ -60,13 +29,28 @@ void GMDx11Light::activateLight(GMuint32 index, ITechnique* technique)
 
 	ID3DX11EffectVectorVariable* position = lightStruct->GetMemberByName("Position")->AsVector();
 	GM_ASSERT(position->IsValid());
-	GM_DX_HR(position->SetFloatVector(d->position));
+	GM_DX_HR(position->SetFloatVector(db->position));
 
 	ID3DX11EffectVectorVariable* color = lightStruct->GetMemberByName("Color")->AsVector();
 	GM_ASSERT(color->IsValid());
-	GM_DX_HR(color->SetFloatVector(d->color));
+	GM_DX_HR(color->SetFloatVector(db->color));
 
 	ID3DX11EffectScalarVariable* type = lightStruct->GetMemberByName("Type")->AsScalar();
 	GM_ASSERT(type->IsValid());
 	GM_DX_HR(type->SetInt(getLightType()));
+
+	ID3DX11EffectVariable* attenuation = lightStruct->GetMemberByName("Attenuation");
+	GM_ASSERT(attenuation->IsValid());
+
+	ID3DX11EffectScalarVariable* attenuationConstant = attenuation->GetMemberByName("Constant")->AsScalar();
+	GM_ASSERT(attenuationConstant->IsValid());
+	GM_DX_HR(attenuationConstant->SetFloat(db->attenuation.constant));
+
+	ID3DX11EffectScalarVariable* attenuationLinear = attenuation->GetMemberByName("Linear")->AsScalar();
+	GM_ASSERT(attenuationLinear->IsValid());
+	GM_DX_HR(attenuationLinear->SetFloat(db->attenuation.linear));
+
+	ID3DX11EffectScalarVariable* attenuationExp = attenuation->GetMemberByName("Exp")->AsScalar();
+	GM_ASSERT(attenuationExp->IsValid());
+	GM_DX_HR(attenuationExp->SetFloat(db->attenuation.exp));
 }

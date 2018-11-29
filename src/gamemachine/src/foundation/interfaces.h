@@ -334,13 +334,6 @@ GM_INTERFACE(ILight)
 {
 	typedef GMint32 GMLightAttribute;
 
-	enum
-	{
-		Position, // GMfloat[3]
-		Color, // GMfloat[3]
-		CustomStart,
-	};
-
 	virtual bool setLightAttribute3(GMLightAttribute, GMfloat[3]) = 0;
 	virtual bool setLightAttribute(GMLightAttribute, GMfloat) = 0;
 	virtual void activateLight(GMuint32 index, ITechnique* technique) = 0;

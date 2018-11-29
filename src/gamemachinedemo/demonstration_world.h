@@ -8,6 +8,7 @@
 #include <gmanimation.h>
 #include <gmuiconfiguration.h>
 #include <gmprimitivemanager.h>
+#include <gmlight.h>
 
 namespace gm
 {

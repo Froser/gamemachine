@@ -214,9 +214,9 @@ void DemoHandler::setDefaultLights()
 		GM.getFactory()->createLight(gm::GMLightType::Direct, &light);
 		GM_ASSERT(light);
 		gm::GMfloat lightPos[] = { 0, 0, -.2f };
-		light->setLightAttribute3(gm::ILight::Position, lightPos);
+		light->setLightAttribute3(gm::GMLight::Position, lightPos);
 		gm::GMfloat color[] = { .7f, .7f, .7f };
-		light->setLightAttribute3(gm::ILight::Color, color);
+		light->setLightAttribute3(gm::GMLight::Color, color);
 		d->engine->addLight(light);
 	}
 }
@@ -648,7 +648,7 @@ void DemonstrationWorld::resetCameraAndLights()
 		gm::ILight* light = nullptr;
 		GM.getFactory()->createLight(gm::GMLightType::Ambient, &light);
 		gm::GMfloat lightClr[] = { .1f, .1f, .1f, 1 };
-		light->setLightAttribute3(gm::ILight::Color, lightClr);
+		light->setLightAttribute3(gm::GMLight::Color, lightClr);
 		engine->addLight(light);
 	}
 
@@ -656,9 +656,9 @@ void DemonstrationWorld::resetCameraAndLights()
 		gm::ILight* light = nullptr;
 		GM.getFactory()->createLight(gm::GMLightType::Direct, &light);
 		gm::GMfloat lightPos[] = { -5, 5, -5 };
-		light->setLightAttribute3(gm::ILight::Position, lightPos);
+		light->setLightAttribute3(gm::GMLight::Position, lightPos);
 		gm::GMfloat lightClr[] = { 2, 2, 2, 1 };
-		light->setLightAttribute3(gm::ILight::Color, lightClr);
+		light->setLightAttribute3(gm::GMLight::Color, lightClr);
 		engine->addLight(light);
 	}
 }

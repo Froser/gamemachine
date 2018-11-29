@@ -100,7 +100,7 @@ void Demo_Terrain::setDefaultLights()
 			GM.getFactory()->createLight(gm::GMLightType::Ambient, &light);
 			GM_ASSERT(light);
 			gm::GMfloat colorA[] = { .5f, .5f, .5f };
-			light->setLightAttribute3(gm::ILight::Color, colorA);
+			light->setLightAttribute3(gm::GMLight::Color, colorA);
 			getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
 		}
 
@@ -109,10 +109,10 @@ void Demo_Terrain::setDefaultLights()
 			GM.getFactory()->createLight(gm::GMLightType::Direct, &light);
 			GM_ASSERT(light);
 			gm::GMfloat colorD[] = { .3f, .3f, .3f };
-			light->setLightAttribute3(gm::ILight::Color, colorD);
+			light->setLightAttribute3(gm::GMLight::Color, colorD);
 
 			gm::GMfloat lightPos[] = { 100.f, 100.f, 100.f };
-			light->setLightAttribute3(gm::ILight::Position, lightPos);
+			light->setLightAttribute3(gm::GMLight::Position, lightPos);
 			getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
 		}
 	}

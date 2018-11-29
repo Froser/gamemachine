@@ -1,10 +1,17 @@
 // 光照相关
 #define MAX_LIGHT_COUNT 50
+struct GM_Attenuation_t
+{
+    float Constant;
+    float Linear;
+    float Exp;
+};
 struct GM_light_t
 {
-    vec3 LightColor;
-    vec3 LightPosition;
-    int LightType; //0表示环境光，1表示直接光
+    vec3 Color;
+    vec3 Position;
+    GM_Attenuation_t Attenuation;
+    int Type; //0表示环境光，1表示直接光
 };
 
 uniform GM_light_t GM_lights[MAX_LIGHT_COUNT];
@@ -45,7 +52,7 @@ vec3 GM_ReinhardToneMapping(vec3 color)
 // Phong光照实现
 vec3 GMLight_AmbientLightAmbient(GM_light_t light)
 {
-    return light.LightColor;
+    return light.Color;
 }
 
 vec3 GMLight_AmbientLightDiffuse(GM_light_t light, vec3 lightDirection_N, vec3 eyeDirection_N, vec3 normal_N)
@@ -67,7 +74,7 @@ vec3 GMLight_DirectLightDiffuse(GM_light_t light, vec3 lightDirection_N, vec3 ey
 {
     float diffuseFactor = dot(lightDirection_N, normal_N);
     diffuseFactor = diffuseFactor;
-    return max(diffuseFactor * light.LightColor, 0);
+    return max(diffuseFactor * light.Color, 0);
 }
 
 vec3 GMLight_DirectLightSpecular(GM_light_t light, vec3 lightDirection_N, vec3 eyeDirection_N, vec3 normal_N, float shininess)
@@ -76,27 +83,27 @@ vec3 GMLight_DirectLightSpecular(GM_light_t light, vec3 lightDirection_N, vec3 e
     float theta = max(dot(eyeDirection_N, R), 0);
     float specularFactor = (theta == 0 && shininess == 0) ? 0 : pow(theta, shininess);
     specularFactor = specularFactor;
-    return specularFactor * light.LightColor;
+    return specularFactor * light.Color;
 }
 
 // 代理方法
 vec3 GMLight_Ambient(GM_light_t light)
 {
-    if (light.LightType == GM_AmbientLight)
+    if (light.Type == GM_AmbientLight)
         return GMLight_AmbientLightAmbient(light);
     return GMLight_DirectLightAmbient(light);
 }
 
 vec3 GMLight_Diffuse(GM_light_t light, vec3 lightDirection_N, vec3 eyeDirection_N, vec3 normal_N)
 {
-    if (light.LightType == GM_AmbientLight)
+    if (light.Type == GM_AmbientLight)
         return GMLight_AmbientLightDiffuse(light, lightDirection_N, eyeDirection_N, normal_N);
     return GMLight_DirectLightDiffuse(light, lightDirection_N, eyeDirection_N, normal_N);
 }
 
 vec3 GMLight_Specular(GM_light_t light, vec3 lightDirection_N, vec3 eyeDirection_N, vec3 normal_N, float shininess)
 {
-    if (light.LightType == GM_AmbientLight)
+    if (light.Type == GM_AmbientLight)
         return GMLight_AmbientLightSpecular(light, lightDirection_N, eyeDirection_N, normal_N, shininess);
     return GMLight_DirectLightSpecular(light, lightDirection_N, eyeDirection_N, normal_N, shininess);
 }
@@ -210,12 +217,17 @@ vec4 GM_Phong_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
     {
         for (int i = 0; i < GM_LightCount; i++)
         {
-            vec3 lightPosition_eye = (GM_ViewMatrix * vec4(GM_lights[i].LightPosition, 1)).xyz;
+            float distance = length(vertex.WorldPos - GM_lights[i].Position);
+            float attenuation = GM_lights[i].Attenuation.Constant + 
+                                GM_lights[i].Attenuation.Linear * distance +
+                                GM_lights[i].Attenuation.Exp * distance * distance;
+
+            vec3 lightPosition_eye = (GM_ViewMatrix * vec4(GM_lights[i].Position, 1)).xyz;
             vec3 lightDirection_eye_N = normalize(lightPosition_eye + eyeDirection_eye);
-            ambientLight += GMLight_Ambient(GM_lights[i]);
-            diffuseLight += GMLight_Diffuse(GM_lights[i], lightDirection_eye_N, eyeDirection_eye_N, vertex.Normal_Eye_N);
-            specularLight += GMLight_Specular(GM_lights[i], lightDirection_eye_N, eyeDirection_eye_N, vertex.Normal_Eye_N, vertex.Shininess);
-            if (GM_lights[i].LightType == GM_AmbientLight)
+            ambientLight += GMLight_Ambient(GM_lights[i]) / attenuation;
+            diffuseLight += GMLight_Diffuse(GM_lights[i], lightDirection_eye_N, eyeDirection_eye_N, vertex.Normal_Eye_N) / attenuation;
+            specularLight += GMLight_Specular(GM_lights[i], lightDirection_eye_N, eyeDirection_eye_N, vertex.Normal_Eye_N, vertex.Shininess) / attenuation;
+            if (GM_lights[i].Type == GM_AmbientLight)
                 refractionLight += calculateRefractionByNormalWorld(vertex.WorldPos, vertex.Normal_World_N, vertex.Refractivity);
         }
     }
@@ -223,15 +235,20 @@ vec4 GM_Phong_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
     {
         for (int i = 0; i < GM_LightCount; i++)
         {
-            vec3 lightPosition_eye = (GM_ViewMatrix * vec4(GM_lights[i].LightPosition, 1)).xyz;
+            float distance = length(vertex.WorldPos - GM_lights[i].Position);
+            float attenuation = GM_lights[i].Attenuation.Constant + 
+                                GM_lights[i].Attenuation.Linear * distance +
+                                GM_lights[i].Attenuation.Exp * distance * distance;
+
+            vec3 lightPosition_eye = (GM_ViewMatrix * vec4(GM_lights[i].Position, 1)).xyz;
             vec3 lightDirection_eye_N = normalize(lightPosition_eye + eyeDirection_eye);
             vec3 lightDirection_tangent_N = normalize(vertex.TangentSpace.TBN * lightDirection_eye_N);
             vec3 eyeDirection_tangent_N = normalize(vertex.TangentSpace.TBN * eyeDirection_eye_N);
 
-            ambientLight += GMLight_Ambient(GM_lights[i]);
-            diffuseLight += GMLight_Diffuse(GM_lights[i], lightDirection_tangent_N, eyeDirection_tangent_N, vertex.TangentSpace.Normal_Tangent_N);
-            specularLight += GMLight_Specular(GM_lights[i], lightDirection_tangent_N, eyeDirection_tangent_N, vertex.TangentSpace.Normal_Tangent_N, vertex.Shininess);
-            if (GM_lights[i].LightType == GM_AmbientLight)
+            ambientLight += GMLight_Ambient(GM_lights[i]) / attenuation;
+            diffuseLight += GMLight_Diffuse(GM_lights[i], lightDirection_tangent_N, eyeDirection_tangent_N, vertex.TangentSpace.Normal_Tangent_N) / attenuation;
+            specularLight += GMLight_Specular(GM_lights[i], lightDirection_tangent_N, eyeDirection_tangent_N, vertex.TangentSpace.Normal_Tangent_N, vertex.Shininess) / attenuation;
+            if (GM_lights[i].Type == GM_AmbientLight)
                 refractionLight += calculateRefractionByNormalTangent(vertex.WorldPos, vertex.TangentSpace, vertex.Refractivity);
         }
     }
@@ -299,17 +316,17 @@ vec4 GM_CookTorranceBRDF_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
     for (int i = 0; i < GM_LightCount; ++i)
     {
         // 只考虑直接光源
-        if (GM_lights[i].LightType == GM_AmbientLight)
+        if (GM_lights[i].Type == GM_AmbientLight)
         {
-            ambient += GM_lights[i].LightColor * vertex.AlbedoTexture * roughness;
+            ambient += GM_lights[i].Color * vertex.AlbedoTexture * roughness;
         }
-        else if (GM_lights[i].LightType == GM_DirectLight)
+        else if (GM_lights[i].Type == GM_DirectLight)
         {
             // 计算每束光辐射率
-            vec3 L_N = normalize(GM_lights[i].LightPosition - vertex.WorldPos);
+            vec3 L_N = normalize(GM_lights[i].Position - vertex.WorldPos);
             vec3 H_N = normalize(viewDirection_N + L_N);
             float attenuation = 1.0f; //先不计算衰减
-            vec3 radiance = GM_lights[i].LightColor * attenuation;
+            vec3 radiance = GM_lights[i].Color * attenuation;
 
             // Cook-Torrance BRDF
             float NDF = GM_DistributionGGX(normal_World_N, H_N, roughness);

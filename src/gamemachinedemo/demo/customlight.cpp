@@ -3,6 +3,7 @@
 #include <linearmath.h>
 #include <gmwidget.h>
 #include <gmgltechnique.h>
+#include <gmlight.h>
 
 namespace
 {
@@ -27,8 +28,9 @@ namespace
 		GMVec3(0, 0, -1)
 	);
 
-	class Spotlight : public gm::ILight
+	class Spotlight : public gm::GMLight
 	{
+		typedef gm::GMLight Base;
 	public:
 		enum
 		{
@@ -42,22 +44,6 @@ namespace
 		{
 			switch (attr)
 			{
-			case Position:
-			{
-				this->position[0] = value[0];
-				this->position[1] = value[1];
-				this->position[2] = value[2];
-				this->position[3] = 1.0f;
-				break;
-			}
-			case Color:
-			{
-				this->color[0] = value[0];
-				this->color[1] = value[1];
-				this->color[2] = value[2];
-				this->color[3] = 1.0f;
-				break;
-			}
 			case Direction:
 			{
 				this->direction[0] = value[0];
@@ -67,7 +53,7 @@ namespace
 				break;
 			}
 			default:
-				return false;
+				return setLightAttribute3(attr, value);
 			}
 			return true;
 		}
@@ -86,7 +72,7 @@ namespace
 				attenuation.Exp = value;
 				break;
 			default:
-				return false;
+				return Base::setLightAttribute(attr, value);
 			}
 			return true;
 		}

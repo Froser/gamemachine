@@ -185,9 +185,9 @@ void Demo_SpecularMap::setDefaultLights()
 		GM.getFactory()->createLight(gm::GMLightType::Direct, &light);
 		GM_ASSERT(light);
 		gm::GMfloat lightPos[] = { 0, 0, 0 };
-		light->setLightAttribute3(gm::ILight::Position, lightPos);
+		light->setLightAttribute3(gm::GMLight::Position, lightPos);
 		gm::GMfloat color[] = { 1, 1, 1 };
-		light->setLightAttribute3(gm::ILight::Color, color);
+		light->setLightAttribute3(gm::GMLight::Color, color);
 		getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
 	}
 }

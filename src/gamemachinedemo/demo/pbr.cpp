@@ -177,9 +177,9 @@ void Demo_PBR::setDefaultLights()
 			GM.getFactory()->createLight(gm::GMLightType::Direct, &directLight);
 			GM_ASSERT(directLight);
 			gm::GMfloat lightPos[] = { 1, 1, -1 };
-			directLight->setLightAttribute3(gm::ILight::Position, lightPos);
+			directLight->setLightAttribute3(gm::GMLight::Position, lightPos);
 			gm::GMfloat color[] = { 20, 20, 20 };
-			directLight->setLightAttribute3(gm::ILight::Color, color);
+			directLight->setLightAttribute3(gm::GMLight::Color, color);
 			getDemonstrationWorld()->getContext()->getEngine()->addLight(directLight);
 		}
 
@@ -188,7 +188,7 @@ void Demo_PBR::setDefaultLights()
 			GM.getFactory()->createLight(gm::GMLightType::Ambient, &ambientLight);
 			GM_ASSERT(ambientLight);
 			gm::GMfloat color[] = { .05f, .05f, .05f };
-			ambientLight->setLightAttribute3(gm::ILight::Color, color);
+			ambientLight->setLightAttribute3(gm::GMLight::Color, color);
 			getDemonstrationWorld()->getContext()->getEngine()->addLight(ambientLight);
 		}
 	}

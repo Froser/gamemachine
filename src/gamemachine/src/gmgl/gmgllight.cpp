@@ -37,55 +37,35 @@ namespace
 	}
 }
 
-bool GMGLLight::setLightAttribute3(GMLightAttribute attr, GMfloat value[3])
-{
-	D(d);
-	switch (attr)
-	{
-	case Position:
-	{
-		d->position[0] = value[0];
-		d->position[1] = value[1];
-		d->position[2] = value[2];
-		d->position[3] = 1.0f;
-		break;
-	}
-	case ILight::Color:
-	{
-		d->color[0] = value[0];
-		d->color[1] = value[1];
-		d->color[2] = value[2];
-		d->color[3] = 1.0f;
-		break;
-	}
-	default:
-		return false;
-	}
-	return true;
-}
-
-bool GMGLLight::setLightAttribute(GMLightAttribute, GMfloat)
-{
-	return false;
-}
-
 void GMGLLight::activateLight(GMuint32 index, ITechnique* technique)
 {
 	D(d);
-	static char light_Position[GMGL_MAX_UNIFORM_NAME_LEN];
-	static char light_Color[GMGL_MAX_UNIFORM_NAME_LEN];
-	static char light_Type[GMGL_MAX_UNIFORM_NAME_LEN];
+	static char light_Position[GMGL_MAX_UNIFORM_NAME_LEN] = { 0 };
+	static char light_Color[GMGL_MAX_UNIFORM_NAME_LEN] = { 0 };
+	static char light_Type[GMGL_MAX_UNIFORM_NAME_LEN] = { 0 };
+	static char light_Attenuation_Constant[GMGL_MAX_UNIFORM_NAME_LEN] = { 0 };
+	static char light_Attenuation_Linear[GMGL_MAX_UNIFORM_NAME_LEN] = { 0 };
+	static char light_Attenuation_Exp[GMGL_MAX_UNIFORM_NAME_LEN] = { 0 };
 
 	GMGLTechnique* glTechnique = gm_cast<GMGLTechnique*>(technique);
 	IShaderProgram* shaderProgram = glTechnique->getShaderProgram();
 	const char* strIndex = number(index);
 
-	combineUniform(light_Position, "GM_lights[", strIndex, "].LightColor");
+	combineUniform(light_Position, "GM_lights[", strIndex, "].Color");
 	shaderProgram->setVec3(light_Position, d->color);
 
-	combineUniform(light_Color, "GM_lights[", strIndex, "].LightPosition");
+	combineUniform(light_Color, "GM_lights[", strIndex, "].Position");
 	shaderProgram->setVec3(light_Color, d->position);
 
-	combineUniform(light_Type, "GM_lights[", strIndex, "].LightType");
+	combineUniform(light_Type, "GM_lights[", strIndex, "].Type");
 	shaderProgram->setInt(light_Type, getType());
+
+	combineUniform(light_Attenuation_Constant, "GM_lights[", strIndex, "].Attenuation.Constant");
+	shaderProgram->setFloat(light_Attenuation_Constant, d->attenuation.constant);
+
+	combineUniform(light_Attenuation_Linear, "GM_lights[", strIndex, "].Attenuation.Linear");
+	shaderProgram->setFloat(light_Attenuation_Linear, d->attenuation.linear);
+
+	combineUniform(light_Attenuation_Exp, "GM_lights[", strIndex, "].Attenuation.Exp");
+	shaderProgram->setFloat(light_Attenuation_Exp, d->attenuation.exp);
 }

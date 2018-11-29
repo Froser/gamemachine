@@ -8,6 +8,7 @@
 #include "gmengine/gameobjects/gmgameobject.h"
 #include "foundation/gamemachine.h"
 #include "gmdata/xml/gmxml.h"
+#include <gmlight.h>
 
 #define BEGIN_PARSE(name) if ( GMString::stringEquals(it->Value(), #name) ) parse_##name(shader, it)
 #define PARSE(name) else if ( GMString::stringEquals(it->Value(), #name) ) parse_##name(shader, it)
@@ -446,7 +447,7 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, GMXMLElement* elem)
 		GMScanner s(color);
 		GMfloat vecPosition[3];
 		readTernaryFloatsFromString(position, vecPosition);
-		light->setLightAttribute3(ILight::Position, vecPosition);
+		light->setLightAttribute3(GMLight::Position, vecPosition);
 
 		GMfloat arg[3];
 		const char* k = elem->Attribute("ks");
@@ -489,7 +490,7 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, GMXMLElement* elem)
 	GM_ASSERT(light);
 	GMfloat vecColor[3];
 	readTernaryFloatsFromString(color, vecColor);
-	light->setLightAttribute3(ILight::Color, vecColor);
+	light->setLightAttribute3(GMLight::Color, vecColor);
 
 	d->world->getContext()->getEngine()->addLight(light);
 }

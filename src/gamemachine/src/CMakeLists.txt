@@ -66,6 +66,8 @@ set(SOURCES
 		gmengine/gmassets.cpp
 		gmengine/gmgameworld.h
 		gmengine/gmgameworld.cpp
+		gmengine/gmlight.h
+		gmengine/gmlight.cpp
 		gmengine/gmcamera.h
 		gmengine/gmcamera.cpp
 		gmengine/gmdemogameworld.h

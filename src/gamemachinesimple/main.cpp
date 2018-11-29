@@ -11,6 +11,7 @@
 #include <gmmodelreader.h>
 #include <gmdx11.h>
 #include <gmdx11helper.h>
+#include <gmlight.h>
 
 #define USE_OPENGL 1
 
@@ -56,7 +57,8 @@ public:
 			GM.getFactory()->createLight(GMLightType::Ambient, &light);		// 这是一个环境光照
 			GM_ASSERT(light);
 			GMfloat colorA[] = { .7f, .7f, .7f };
-			light->setLightColor(colorA);
+			light->setLightAttribute3(GMLight::Color, colorA);
+			light->setLightAttribute(GMLight::AttenuationLinear, .1f);
 			m_context->getEngine()->addLight(light);
 		}
 
@@ -65,10 +67,11 @@ public:
 			GM.getFactory()->createLight(GMLightType::Direct, &light);		// 这是一个直接光照
 			GM_ASSERT(light);
 			GMfloat colorD[] = { .7f, .7f, .7f };
-			light->setLightColor(colorD);
+			light->setLightAttribute3(GMLight::Color, colorD);
 
 			GMfloat lightPos[] = { -3.f, 3.f, -3.f };
-			light->setLightPosition(lightPos);
+			light->setLightAttribute3(GMLight::Position, lightPos);
+			light->setLightAttribute(GMLight::AttenuationLinear, .1f);
 			m_context->getEngine()->addLight(light);
 		}
 

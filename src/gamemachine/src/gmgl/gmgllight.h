@@ -1,21 +1,12 @@
 ﻿#ifndef __GMGLLIGHT_H__
 #define __GMGLLIGHT_H__
 #include <gmcommon.h>
+#include <gmlight.h>
 BEGIN_NS
 
-GM_PRIVATE_OBJECT(GMGLLight)
+class GMGLLight : public GMLight
 {
-	GMfloat position[4];
-	GMfloat color[4];
-};
-
-class GMGLLight : public GMObject, public ILight
-{
-	GM_DECLARE_PRIVATE(GMGLLight)
-
 public:
-	virtual bool setLightAttribute3(GMLightAttribute attr, GMfloat value[3]) override;
-	virtual bool setLightAttribute(GMLightAttribute, GMfloat) override;
 	virtual void activateLight(GMuint32, ITechnique*) override;
 
 protected:
