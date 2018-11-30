@@ -17,140 +17,153 @@ ITechnique* newTechnique(GMOwnedPtr<ITechnique>& ptr, const IRenderContext* cont
 
 #define GM_VariablesDesc (GMGraphicEngine::getDefaultShaderVariablesDesc())
 
+template <typename T>
 struct GMShaderVariablesTextureDesc
 {
-	const char* OffsetX;
-	const char* OffsetY;
-	const char* ScaleX;
-	const char* ScaleY;
-	const char* Enabled;
-	const char* Texture;
+	T OffsetX;
+	T OffsetY;
+	T ScaleX;
+	T ScaleY;
+	T Enabled;
+	T Texture;
 };
 
+template <typename T>
 struct GMShaderVariablesLightDesc
 {
-	const char* Name;
-	const char* Count;
+	T Name;
+	T Count;
 };
 
+template <typename T>
 struct GMShaderVariablesMaterialDesc
 {
-	const char* Ka;
-	const char* Kd;
-	const char* Ks;
-	const char* Shininess;
-	const char* Refreactivity;
-	const char* F0;
+	T Ka;
+	T Kd;
+	T Ks;
+	T Shininess;
+	T Refreactivity;
+	T F0;
 };
 
 constexpr int GMFilterCount = 6;
+template <typename T>
 struct GMShaderVariablesFilterDesc
 {
-	const char* Filter;
-	const char* KernelDeltaX;
-	const char* KernelDeltaY;
-	const char* Types[GMFilterCount];
+	T Filter;
+	T KernelDeltaX;
+	T KernelDeltaY;
+	T Types[GMFilterCount];
 };
 
+template <typename T>
 struct GMShaderVariablesScreenInfoDesc
 {
-	const char* ScreenInfo;
-	const char* ScreenWidth;
-	const char* ScreenHeight;
-	const char* Multisampling;
+	T ScreenInfo;
+	T ScreenWidth;
+	T ScreenHeight;
+	T Multisampling;
 };
 
+template <typename T>
 struct GMShaderVariableShadowInfoDesc
 {
-	const char* ShadowInfo;
-	const char* HasShadow;
-	const char* ShadowMatrix;
-	const char* Position;
-	const char* ShadowMap;
-	const char* ShadowMapMSAA;
-	const char* ShadowMapWidth;
-	const char* ShadowMapHeight;
-	const char* BiasMin;
-	const char* BiasMax;
+	T ShadowInfo;
+	T HasShadow;
+	T ShadowMatrix;
+	T Position;
+	T ShadowMap;
+	T ShadowMapMSAA;
+	T ShadowMapWidth;
+	T ShadowMapHeight;
+	T BiasMin;
+	T BiasMax;
 };
 
+template <typename T>
 struct GMShaderVariableGammaDesc
 {
-	const char* GammaCorrection;
-	const char* GammaValue;
-	const char* GammaInvValue;
+	T GammaCorrection;
+	T GammaValue;
+	T GammaInvValue;
 };
 
+template <typename T>
 struct GMShaderVariableHDRDesc
 {
-	const char* HDR;
-	const char* ToneMapping;
+	T HDR;
+	T ToneMapping;
 };
 
+template <typename T>
 struct GMShaderVariableDebugDesc
 {
-	const char* Normal;
+	T Normal;
 };
 
-struct GMShaderVariablesDesc
+template <typename T>
+struct GMShaderVariablesDesc_t
 {
 	// 矩阵
-	const char* ModelMatrix;
-	const char* ViewMatrix;
-	const char* ProjectionMatrix;
-	const char* InverseTransposeModelMatrix;
-	const char* InverseViewMatrix;
+	T ModelMatrix;
+	T ViewMatrix;
+	T ProjectionMatrix;
+	T InverseTransposeModelMatrix;
+	T InverseViewMatrix;
 
 	// 骨骼
-	const char* Bones;
-	const char* UseBoneAnimation;
+	T Bones;
+	T UseBoneAnimation;
 
 	// 位置
-	const char* ViewPosition;
+	T ViewPosition;
 
 	// 材质
-	GMShaderVariablesTextureDesc TextureAttributes;
-	const char* AmbientTextureName;
-	const char* DiffuseTextureName;
-	const char* SpecularTextureName;
-	const char* NormalMapTextureName;
-	const char* LightMapTextureName;
-	const char* AlbedoTextureName;
-	const char* MetallicRoughnessAOTextureName;
-	const char* CubeMapTextureName;
+	GMShaderVariablesTextureDesc<T> TextureAttributes;
+	T AmbientTextureName;
+	T DiffuseTextureName;
+	T SpecularTextureName;
+	T NormalMapTextureName;
+	T LightMapTextureName;
+	T AlbedoTextureName;
+	T MetallicRoughnessAOTextureName;
+	T CubeMapTextureName;
 
 	// 光照
-	const char* LightCount;
+	T LightCount;
 
 	// 材质
-	GMShaderVariablesMaterialDesc MaterialAttributes;
-	const char* MaterialName;
+	GMShaderVariablesMaterialDesc<T> MaterialAttributes;
+	T MaterialName;
 
 	// 滤镜
-	GMShaderVariablesFilterDesc FilterAttributes;
+	GMShaderVariablesFilterDesc<T> FilterAttributes;
 
 	// 状态
-	GMShaderVariablesScreenInfoDesc ScreenInfoAttributes;
-	const char* RasterizerState;
-	const char* BlendState;
-	const char* DepthStencilState;
+	GMShaderVariablesScreenInfoDesc<T> ScreenInfoAttributes;
+	T RasterizerState;
+	T BlendState;
+	T DepthStencilState;
 
 	// 阴影
-	GMShaderVariableShadowInfoDesc ShadowInfo;
+	GMShaderVariableShadowInfoDesc<T> ShadowInfo;
 
 	// Gamma校正
-	GMShaderVariableGammaDesc GammaCorrection;
+	GMShaderVariableGammaDesc<T> GammaCorrection;
 
 	// HDR
-	GMShaderVariableHDRDesc HDR;
+	GMShaderVariableHDRDesc<T> HDR;
 
 	// 模型
-	const char* IlluminationModel;
-	const char* ColorVertexOp;
+	T IlluminationModel;
+	T ColorVertexOp;
 
 	// 调试
-	const GMShaderVariableDebugDesc Debug;
+	GMShaderVariableDebugDesc<T> Debug;
 };
+
+using GMShaderVariablesDesc = GMShaderVariablesDesc_t<const GMString>;
+using GMShaderVariablesIndices = GMShaderVariablesDesc_t<GMint32>;
 
 struct GMShadowSourceDesc
 {

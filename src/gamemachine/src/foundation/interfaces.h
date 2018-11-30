@@ -61,7 +61,6 @@ struct IWindow;
 struct IRenderContext;
 struct GraphicSettings;
 struct GMCameraLookAt;
-struct GMShaderVariablesDesc;
 struct GMShadowSourceDesc;
 
 class GMAsset;
@@ -246,13 +245,14 @@ enum class GMMovement
 GM_INTERFACE_FROM(IShaderProgram, IQueriable)
 {
 	virtual void useProgram() = 0;
-	virtual void setMatrix4(const char* name, const GMMat4& value) = 0;
-	virtual void setVec4(const char* name, const GMFloat4&) = 0;
-	virtual void setVec3(const char* name, const GMfloat value[3]) = 0;
-	virtual void setInt(const char* name, GMint32 value) = 0;
-	virtual void setFloat(const char* name, GMfloat value) = 0;
-	virtual void setBool(const char* name, bool value) = 0;
-	virtual bool setInterfaceInstance(const char* interfaceName, const char* instanceName, GMShaderType type) = 0;
+	virtual GMint32 getIndex(const GMString& name) = 0;
+	virtual void setMatrix4(GMint32 index, const GMMat4& value) = 0;
+	virtual void setVec4(GMint32 index, const GMFloat4&) = 0;
+	virtual void setVec3(GMint32 index, const GMfloat value[3]) = 0;
+	virtual void setInt(GMint32 index, GMint32 value) = 0;
+	virtual void setFloat(GMint32 index, GMfloat value) = 0;
+	virtual void setBool(GMint32 index, bool value) = 0;
+	virtual bool setInterfaceInstance(const GMString& interfaceName, const GMString& instanceName, GMShaderType type) = 0;
 };
 
 // 帧缓存

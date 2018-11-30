@@ -70,66 +70,41 @@ enum class GMRenderConfigs
 	Max,
 };
 
-// GUIDs
-namespace gm_config_guids
-{
-	const GMString DebugGUIDs[(GMuint32)GMDebugConfigs::Max] = {
-		L"24D13A91-FB21-446e-A61D-565568586D0F",
-		L"40A50C3C-BD6D-4474-B2CF-64B47079841E",
-		L"FCFDB8C5-5D5D-45e4-B109-CF7B5A6A52A7",
-		L"07029E4E-C12D-4970-B730-5D3CFB288F56",
-		L"28618206-1BBC-42da-BE76-D231FDFB75F7",
-		L"18DFA30F-0754-4c5f-BAD2-7F73B2861594",
-		L"15C7030D-EB76-403e-A232-8615A0DBFCEB",
-		L"2AD9D409-6878-4eca-AFEB-2B391F79C964",
-		L"9D067D16-80E5-442b-B129-2F33AFC9BC9B",
-	};
-
-	const GMString RenderGUIDs[(GMuint32)GMRenderConfigs::Max] = {
-		L"12471560-175E-4eff-B3F2-0569CA14E53D",
-		L"342C6AB2-2830-4338-B30B-167A250558D7",
-		L"49DF237C-5699-49b3-83D9-E2A523C644CB",
-		L"C2B5725C-55D6-44B5-84EE-67CEC0549C34",
-		L"0A2225BF-2666-491F-B1D9-3C1C8E4627B2",
-		L"89867481-B6DA-4660-B4FD-1121F2D1D99C",
-	};
-}
-
 class GMConfig;
 template <typename StateType>
 struct GMConfigWrapperBase
 {
 	GMConfigWrapperBase() = default;
-	GMConfigWrapperBase(const GMConfig& vm, const GMString guids[]) : m_vm(&vm), m_guids(guids) {}
+	GMConfigWrapperBase(const GMConfig& vm) : m_vm(&vm) {}
 	const GMVariant& get(StateType state) const;
 	void set(StateType state, const GMVariant& variant);
 	bool isEmpty() { return !m_vm; }
+	void verify(StateType state) const;
 
 private:
 	const GMConfig* m_vm = nullptr;
-	const GMString* m_guids = nullptr;
 };
 
 template <typename StateType>
 struct GMConfigWrapper : public GMConfigWrapperBase<StateType> {};
 
-#define GM_DEFINE_CONFIG(Enum, GUID, Alias)						\
+#define GM_DEFINE_CONFIG(Enum, Alias)							\
 template<>														\
 struct GMConfigWrapper<Enum> : public GMConfigWrapperBase<Enum>	\
 {																\
 	GMConfigWrapper() = default;								\
 	GMConfigWrapper(const GMConfig& vm)							\
-		: GMConfigWrapperBase(vm, GUID)							\
+		: GMConfigWrapperBase(vm)								\
 	{}															\
 };																\
 typedef GMConfigWrapper<Enum> Alias;
 
-GM_DEFINE_CONFIG(GMDebugConfigs, gm_config_guids::DebugGUIDs, GMDebugConfig);
-GM_DEFINE_CONFIG(GMRenderConfigs, gm_config_guids::RenderGUIDs, GMRenderConfig);
+GM_DEFINE_CONFIG(GMDebugConfigs, GMDebugConfig);
+GM_DEFINE_CONFIG(GMRenderConfigs, GMRenderConfig);
 
-class GMConfig : public HashMap<GMString, GMVariant, GMStringHashFunctor>
+class GMConfig : public Vector<GMVariant>
 {
-	typedef HashMap<GMString, GMVariant, GMStringHashFunctor> Base;
+	typedef Vector<GMVariant> Base;
 
 public:
 	using Base::Base;
@@ -149,7 +124,7 @@ public:
 
 GM_PRIVATE_OBJECT(GMConfigs)
 {
-	HashMap<GMString, GMConfig, GMStringHashFunctor> configs;
+	Vector<GMConfig> configs;
 };
 
 class GMConfigs : public GMObject
@@ -171,18 +146,30 @@ public:
 	
 private:
 	void init();
+	void verify(Category state) const;
 };
+
+template <typename StateType>
+void GMConfigWrapperBase<StateType>::verify(StateType state) const
+{
+	GMConfig& vm = const_cast<GMConfig&>(*m_vm);
+	GMuint32 s = (GMuint32)state;
+	if (vm.size() <= s)
+		vm.resize(s + 1);
+}
 
 template <typename StateType>
 const GMVariant& GMConfigWrapperBase<StateType>::get(StateType state) const
 {
-	return const_cast<GMConfig&>(*m_vm)[m_guids[(GMuint32)state]];
+	verify(state);
+	return const_cast<GMConfig&>(*m_vm)[(GMuint32)state];
 }
 
 template <typename StateType>
 void GMConfigWrapperBase<StateType>::set(StateType state, const GMVariant& variant)
 {
-	const_cast<GMConfig&>(*m_vm)[m_guids[(GMuint32)state]] = variant;
+	verify(state);
+	const_cast<GMConfig&>(*m_vm)[GMuint32(state)] = variant;
 }
 
 END_NS

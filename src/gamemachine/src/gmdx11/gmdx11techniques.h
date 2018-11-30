@@ -46,8 +46,8 @@ GM_PRIVATE_OBJECT(GMDx11Technique)
 	ID3DX11EffectRasterizerVariable* rasterizer = nullptr;
 	ID3DX11EffectBlendVariable* blend = nullptr;
 	ID3DX11EffectDepthStencilVariable* depthStencil = nullptr;
-	HashMap<const char*, ID3DX11EffectVariable*> textureAttributes;
-	HashMap<const char*, GMTextureAttributeBank> textureVariables;
+	HashMap<GMString, ID3DX11EffectVariable*, GMStringHashFunctor> textureAttributes;
+	HashMap<GMString, GMTextureAttributeBank, GMStringHashFunctor> textureVariables;
 	const GMShaderVariablesDesc* variablesDesc = nullptr;
 	bool screenInfoPrepared = false;
 	GMComPtr<ID3D11Resource> shadowMapResource;

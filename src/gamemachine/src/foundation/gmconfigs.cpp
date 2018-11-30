@@ -4,14 +4,6 @@
 #include "assert.h"
 #include "gmstring.h"
 
-namespace
-{
-	const GMString StateGUIDs[] = {
-		L"2E7152F9-53A3-4193-A14D-365736C9F9F6",
-		L"5A7B099F-D7C0-4e10-A0B3-F032824EB7DD"
-	};
-}
-
 GMDebugConfig GMConfig::asDebugConfig()
 {
 	return GMDebugConfig(*this);
@@ -63,11 +55,21 @@ void GMConfigs::init()
 GMConfig& GMConfigs::getConfig(Category state)
 {
 	D(d);
-	return d->configs[StateGUIDs[state]];
+	verify(state);
+	return d->configs[state];
 }
 
 const GMConfig& GMConfigs::getConfig(Category state) const
 {
 	D(d);
-	return d->configs[StateGUIDs[state]];
+	verify(state);
+	return d->configs[state];
+}
+
+void GMConfigs::verify(Category state) const
+{
+	D(d);
+	GMuint32 s = (Category)state;
+	if (d->configs.size() <= s)
+		d->configs.resize(s + 1);
 }

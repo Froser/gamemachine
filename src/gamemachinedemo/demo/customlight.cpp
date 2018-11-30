@@ -11,20 +11,6 @@
 namespace
 {
 	static gm::GMuint32 s_techid;
-	template <typename CharType, size_t ArraySize>
-	void combineUniform(REF CharType(&dest)[ArraySize], const char* srcA, const char* srcB)
-	{
-		gm::GMString::stringCopy(dest, srcA);
-		gm::GMString::stringCat(dest, srcB);
-	}
-
-	template <typename CharType, size_t ArraySize>
-	void combineUniform(REF CharType(&dest)[ArraySize], const char* srcA, const char* srcB, const char* srcC)
-	{
-		gm::GMString::stringCopy(dest, srcA);
-		gm::GMString::stringCat(dest, srcB);
-		gm::GMString::stringCat(dest, srcC);
-	}
 
 	const gm::GMCameraLookAt s_lookAt = gm::GMCameraLookAt(
 		GMVec3(0, 0, 1),
@@ -98,23 +84,21 @@ namespace
 	public:
 		virtual void activateLight(gm::GMuint32 index, gm::ITechnique* technique)
 		{
-			constexpr gm::GMint32 GMGL_MAX_UNIFORM_NAME_LEN = 64; //uniform最长名称
-			static char light_Position[GMGL_MAX_UNIFORM_NAME_LEN];
-			static char light_Color[GMGL_MAX_UNIFORM_NAME_LEN];
-			static char light_Direction[GMGL_MAX_UNIFORM_NAME_LEN];
-			static char light_Attenuation_Constant[GMGL_MAX_UNIFORM_NAME_LEN];
-			static char light_Attenuation_Linear[GMGL_MAX_UNIFORM_NAME_LEN];
-			static char light_Attenuation_Exp[GMGL_MAX_UNIFORM_NAME_LEN];
+			static gm::GMString light_Position;
+			static gm::GMString light_Color;
+			static gm::GMString light_Direction;
+			static gm::GMString light_Attenuation_Constant;
+			static gm::GMString light_Attenuation_Linear;
+			static gm::GMString light_Attenuation_Exp;
 
 			gm::GMGLTechnique* glTechnique = gm::gm_cast<gm::GMGLTechnique*>(technique);
 			gm::IShaderProgram* shaderProgram = glTechnique->getShaderProgram();
-			std::string stdStrIdx = gm::GMString((gm::GMint32)index).toStdString();
-			const char* strIndex = stdStrIdx.c_str();
+			gm::GMString strIndex = gm::GMString((gm::GMint32)index).toStdString();
 
-			combineUniform(light_Position, "lights[", strIndex, "].LightPosition");
+			light_Position = L"lights[" + strIndex + L"].LightPosition";
 			shaderProgram->setVec3(light_Position, position);
 
-			combineUniform(light_Direction, "lights[", strIndex, "].LightDirection");
+			light_Direction = L"lights[" + strIndex + L"].LightDirection";
 			shaderProgram->setVec3(light_Direction, direction);
 		}
 	};

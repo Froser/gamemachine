@@ -10,11 +10,11 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMDx11EffectShaderProgram)
 {
 	GMComPtr<ID3DX11Effect> effect;
 	GMShaderVariablesDesc desc;
-	HashMap<const char*, ID3DX11EffectVectorVariable*> vectors;
-	HashMap<const char*, ID3DX11EffectMatrixVariable*> matrices;
-	HashMap<const char*, ID3DX11EffectScalarVariable*> scalars;
-	HashMap<const char*, ID3DX11EffectInterfaceVariable*> interfaces;
-	HashMap<const char*, ID3DX11EffectClassInstanceVariable*> instances;
+	HashMap<GMString, ID3DX11EffectVectorVariable*, GMStringHashFunctor> vectors;
+	HashMap<GMString, ID3DX11EffectMatrixVariable*, GMStringHashFunctor> matrices;
+	HashMap<GMString, ID3DX11EffectScalarVariable*, GMStringHashFunctor> scalars;
+	HashMap<GMString, ID3DX11EffectInterfaceVariable*, GMStringHashFunctor> interfaces;
+	HashMap<GMString, ID3DX11EffectClassInstanceVariable*, GMStringHashFunctor> instances;
 };
 
 class GMDx11EffectShaderProgram : public IShaderProgram
@@ -26,24 +26,24 @@ public:
 
 public:
 	virtual void useProgram() override;
-	virtual void setMatrix4(const char* name, const GMMat4& value) override;
-	virtual void setVec4(const char* name, const GMFloat4&) override;
-	virtual void setVec3(const char* name, const GMfloat value[3]) override;
-	virtual void setInt(const char* name, GMint32 value) override;
-	virtual void setFloat(const char* name, GMfloat value) override;
-	virtual void setBool(const char* name, bool value) override;
-	virtual bool setInterfaceInstance(const char* interfaceName, const char* instanceName, GMShaderType type) override;
+	virtual void setMatrix4(GMint32 index, const GMMat4& value) override;
+	virtual void setVec4(GMint32 index, const GMFloat4&) override;
+	virtual void setVec3(GMint32 index, const GMfloat value[3]) override;
+	virtual void setInt(GMint32 index, GMint32 value) override;
+	virtual void setFloat(GMint32 index, GMfloat value) override;
+	virtual void setBool(GMint32 index, bool value) override;
+	virtual bool setInterfaceInstance(const GMString& interfaceName, const GMString& instanceName, GMShaderType type) override;
 
 public:
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
 	virtual bool setInterface(GameMachineInterfaceID id, void* in) override;
 
 private:
-	ID3DX11EffectVectorVariable* getVectorVariable(const char* name);
-	ID3DX11EffectMatrixVariable* getMatrixVariable(const char* name);
-	ID3DX11EffectScalarVariable* getScalarVariable(const char* name);
-	ID3DX11EffectInterfaceVariable* getInterfaceVariable(const char* name);
-	ID3DX11EffectClassInstanceVariable* getInstanceVariable(const char* name);
+	ID3DX11EffectVectorVariable* getVectorVariable(const GMString& name);
+	ID3DX11EffectMatrixVariable* getMatrixVariable(const GMString& name);
+	ID3DX11EffectScalarVariable* getScalarVariable(const GMString& name);
+	ID3DX11EffectInterfaceVariable* getInterfaceVariable(const GMString& name);
+	ID3DX11EffectClassInstanceVariable* getInstanceVariable(const GMString& name);
 };
 
 END_NS

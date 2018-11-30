@@ -42,6 +42,17 @@ GMProfile::GMProfile(const GMString& name)
 	startRecord(name);
 }
 
+GMProfile::GMProfile(const GMwchar* name)
+	: GMProfile()
+{
+	D(d);
+	// 这里先判断，阻止赋值GMString
+	if (!d->debugConfig.get(GMDebugConfigs::RunProfile_Bool).toBool())
+		return;
+
+	startRecord(name);
+}
+
 GMProfile::~GMProfile()
 {
 	stopRecord();

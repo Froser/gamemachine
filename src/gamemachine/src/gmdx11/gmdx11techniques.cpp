@@ -236,23 +236,23 @@ namespace
 }
 
 #define EFFECT_VARIABLE(funcName, name) \
-	private: ID3DX11EffectVariable* effect_var_##funcName = nullptr;				\
-	public: ID3DX11EffectVariable* funcName() {										\
-		ID3DX11EffectVariable* effect_var_##funcName = nullptr;						\
-		if (!effect_var_##funcName) {												\
-			effect_var_##funcName = m_effect->GetVariableByName(name);				\
-			GM_ASSERT(effect_var_##funcName->IsValid()); }							\
-		return effect_var_##funcName;												\
+	private: ID3DX11EffectVariable* effect_var_##funcName = nullptr;										\
+	public: ID3DX11EffectVariable* funcName() {																\
+		ID3DX11EffectVariable* effect_var_##funcName = nullptr;												\
+		if (!effect_var_##funcName) {																		\
+			effect_var_##funcName = m_effect->GetVariableByName(name.toStdString().c_str());				\
+			GM_ASSERT(effect_var_##funcName->IsValid()); }													\
+		return effect_var_##funcName;																		\
 	}
 
 #define EFFECT_VARIABLE_AS(funcName, name, retType, to) \
-	private: retType* effect_var_##funcName = nullptr;								\
-	public: retType* funcName() {													\
-		retType* effect_var_##funcName = nullptr;									\
-		if (!effect_var_##funcName) {												\
-			effect_var_##funcName = m_effect->GetVariableByName(name)->to();		\
-			GM_ASSERT(effect_var_##funcName->IsValid()); }							\
-		return effect_var_##funcName;												\
+	private: retType* effect_var_##funcName = nullptr;														\
+	public: retType* funcName() {																			\
+		retType* effect_var_##funcName = nullptr;															\
+		if (!effect_var_##funcName) {																		\
+			effect_var_##funcName = m_effect->GetVariableByName(name.toStdString().c_str())->to();			\
+			GM_ASSERT(effect_var_##funcName->IsValid()); }													\
+		return effect_var_##funcName;																		\
 	}
 
 #define EFFECT_VARIABLE_AS_SHADER_RESOURCE(funcName, name) \
@@ -262,13 +262,13 @@ namespace
 	EFFECT_VARIABLE_AS(funcName, name, ID3DX11EffectScalarVariable, AsScalar)
 
 #define EFFECT_MEMBER_AS(funcName, effect, name, retType, to) \
-	private: retType* effect_var_##funcName = nullptr;								\
-	public: retType* funcName() {													\
-		retType* effect_var_##funcName = nullptr;									\
-		if (!effect_var_##funcName) {												\
-			effect_var_##funcName = effect->GetMemberByName(name)->to();			\
-			GM_ASSERT(effect_var_##funcName->IsValid()); }							\
-		return effect_var_##funcName;												\
+	private: retType* effect_var_##funcName = nullptr;														\
+	public: retType* funcName() {																			\
+		retType* effect_var_##funcName = nullptr;															\
+		if (!effect_var_##funcName) {																		\
+			effect_var_##funcName = effect->GetMemberByName(name.toStdString().c_str())->to();				\
+			GM_ASSERT(effect_var_##funcName->IsValid()); }													\
+		return effect_var_##funcName;																		\
 	}
 
 #define EFFECT_MEMBER_AS_SCALAR(funcName, effect, name) \
@@ -345,7 +345,7 @@ GMTextureAsset GMDx11Technique::getWhiteTexture()
 void GMDx11Technique::updateBoneTransforms(IShaderProgram* shaderProgram, GMModel* model)
 {
 	D(d);
-	auto bones = d->effect->GetVariableByName(GM_VariablesDesc.Bones);
+	auto bones = d->effect->GetVariableByName(GM_VariablesDesc.Bones.toStdString().c_str());
 	const auto& transforms = model->getBoneTransformations();
 	for (GMsize_t i = 0; i < transforms.size(); ++i)
 	{
@@ -647,7 +647,7 @@ void GMDx11Technique::prepareScreenInfo()
 	{
 		GMDx11EffectVariableBank& bank = getVarBank();
 		const GMWindowStates& windowStates = getContext()->getWindow()->getWindowStates();
-		ID3DX11EffectVariable* screenInfo = d->effect->GetVariableByName(GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo);
+		ID3DX11EffectVariable* screenInfo = d->effect->GetVariableByName(GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo.toStdString().c_str());
 		GM_ASSERT(screenInfo->IsValid());
 
 		ID3DX11EffectScalarVariable* screenWidth = bank.ScreenWidth();
@@ -706,38 +706,39 @@ void GMDx11Technique::prepareTextures(GMModel* model)
 void GMDx11Technique::applyTextureAttribute(GMModel* model, GMTextureAsset texture, GMTextureType type)
 {
 	D(d);
-	const char* textureName = nullptr;
+	const GMString* textureNamePtr = nullptr;
 	switch (type)
 	{
 	case GMTextureType::Ambient:
-		textureName = GM_VariablesDesc.AmbientTextureName;
+		textureNamePtr = &GM_VariablesDesc.AmbientTextureName;
 		break;
 	case GMTextureType::Diffuse:
-		textureName = GM_VariablesDesc.DiffuseTextureName;
+		textureNamePtr = &GM_VariablesDesc.DiffuseTextureName;
 		break;
 	case GMTextureType::Specular:
-		textureName = GM_VariablesDesc.SpecularTextureName;
+		textureNamePtr = &GM_VariablesDesc.SpecularTextureName;
 		break;
 	case GMTextureType::NormalMap:
-		textureName = GM_VariablesDesc.NormalMapTextureName;
+		textureNamePtr = &GM_VariablesDesc.NormalMapTextureName;
 		break;
 	case GMTextureType::Lightmap:
-		textureName = GM_VariablesDesc.LightMapTextureName;
+		textureNamePtr = &GM_VariablesDesc.LightMapTextureName;
 		break;
 	case GMTextureType::CubeMap:
-		textureName = GM_VariablesDesc.CubeMapTextureName;
+		textureNamePtr = &GM_VariablesDesc.CubeMapTextureName;
 		break;
 	case GMTextureType::Albedo:
-		textureName = GM_VariablesDesc.AlbedoTextureName;
+		textureNamePtr = &GM_VariablesDesc.AlbedoTextureName;
 		break;
 	case GMTextureType::MetallicRoughnessAO:
-		textureName = GM_VariablesDesc.MetallicRoughnessAOTextureName;
+		textureNamePtr = &GM_VariablesDesc.MetallicRoughnessAOTextureName;
 		break;
 	default:
 		GM_ASSERT(false);
 		return;
 	}
-	GM_ASSERT(textureName);
+	GM_ASSERT(textureNamePtr);
+	const GMString& textureName = *textureNamePtr;
 
 	ID3DX11EffectVariable* textureAttribute = nullptr;
 	{
@@ -748,7 +749,7 @@ void GMDx11Technique::applyTextureAttribute(GMModel* model, GMTextureAsset textu
 		}
 		else
 		{
-			textureAttribute = d->effect->GetVariableByName(textureName);
+			textureAttribute = d->effect->GetVariableByName(textureName.toStdString().c_str());
 			CHECK_VAR(textureAttribute);
 			d->textureAttributes[textureName] = textureAttribute;
 		}
@@ -764,11 +765,11 @@ void GMDx11Technique::applyTextureAttribute(GMModel* model, GMTextureAsset textu
 		else
 		{
 			GMTextureAttributeBank newBank;
-			newBank.enabled = textureAttribute->GetMemberByName(GM_VariablesDesc.TextureAttributes.Enabled)->AsScalar();
-			newBank.offsetX = textureAttribute->GetMemberByName(GM_VariablesDesc.TextureAttributes.OffsetX)->AsScalar();
-			newBank.offsetY = textureAttribute->GetMemberByName(GM_VariablesDesc.TextureAttributes.OffsetY)->AsScalar();
-			newBank.scaleX = textureAttribute->GetMemberByName(GM_VariablesDesc.TextureAttributes.ScaleX)->AsScalar();
-			newBank.scaleY = textureAttribute->GetMemberByName(GM_VariablesDesc.TextureAttributes.ScaleY)->AsScalar();
+			newBank.enabled = textureAttribute->GetMemberByName(GM_VariablesDesc.TextureAttributes.Enabled.toStdString().c_str())->AsScalar();
+			newBank.offsetX = textureAttribute->GetMemberByName(GM_VariablesDesc.TextureAttributes.OffsetX.toStdString().c_str())->AsScalar();
+			newBank.offsetY = textureAttribute->GetMemberByName(GM_VariablesDesc.TextureAttributes.OffsetY.toStdString().c_str())->AsScalar();
+			newBank.scaleX = textureAttribute->GetMemberByName(GM_VariablesDesc.TextureAttributes.ScaleX.toStdString().c_str())->AsScalar();
+			newBank.scaleY = textureAttribute->GetMemberByName(GM_VariablesDesc.TextureAttributes.ScaleY.toStdString().c_str())->AsScalar();
 			CHECK_VAR(newBank.enabled);
 			CHECK_VAR(newBank.offsetX);
 			CHECK_VAR(newBank.offsetY);
@@ -846,7 +847,7 @@ void GMDx11Technique::prepareRasterizer(GMModel* model)
 	bool multisampleEnable = windowStates.sampleCount > 1;
 	if (!d->rasterizer)
 	{
-		d->rasterizer = d->effect->GetVariableByName(GM_VariablesDesc.RasterizerState)->AsRasterizer();
+		d->rasterizer = d->effect->GetVariableByName(GM_VariablesDesc.RasterizerState.toStdString().c_str())->AsRasterizer();
 	}
 
 	if (!d->rasterizerStates)
@@ -882,7 +883,7 @@ void GMDx11Technique::prepareBlend(GMModel* model)
 	D(d);
 	if (!d->blend)
 	{
-		d->blend = d->effect->GetVariableByName(GM_VariablesDesc.BlendState)->AsBlend();
+		d->blend = d->effect->GetVariableByName(GM_VariablesDesc.BlendState.toStdString().c_str())->AsBlend();
 	}
 	GM_ASSERT(d->blend);
 
@@ -958,7 +959,7 @@ void GMDx11Technique::prepareDepthStencil(GMModel* model)
 	D(d);
 	if (!d->depthStencil)
 	{
-		d->depthStencil = d->effect->GetVariableByName(GM_VariablesDesc.DepthStencilState)->AsDepthStencil();
+		d->depthStencil = d->effect->GetVariableByName(GM_VariablesDesc.DepthStencilState.toStdString().c_str())->AsDepthStencil();
 	}
 	GM_ASSERT(d->depthStencil);
 
@@ -1163,7 +1164,7 @@ void GMDx11Technique_Filter::beginModel(GMModel* model, const GMGameObject* pare
 
 	GMFilterMode::Mode filterMode = getEngine()->getCurrentFilterMode();
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
-	bool b = shaderProgram->setInterfaceInstance(GM_VariablesDesc.FilterAttributes.Filter, GM_VariablesDesc.FilterAttributes.Types[filterMode], GMShaderType::Effect);
+	bool b = shaderProgram->setInterfaceInstance(GM_VariablesDesc.FilterAttributes.Filter.toStdString().c_str(), GM_VariablesDesc.FilterAttributes.Types[filterMode].toStdString().c_str(), GMShaderType::Effect);
 	GM_ASSERT(b);
 
 	if (d->state.HDR != getEngine()->needHDR() || d->state.toneMapping != getEngine()->getToneMapping())
@@ -1188,7 +1189,7 @@ void GMDx11Technique_Filter::setHDR(IShaderProgram* shaderProgram)
 	shaderProgram->setBool(GM_VariablesDesc.HDR.HDR, true);
 	if (d->state.toneMapping == GMToneMapping::Reinhard)
 	{
-		bool b = shaderProgram->setInterfaceInstance(GM_VariablesDesc.HDR.ToneMapping, "ReinhardToneMapping", GMShaderType::Effect);
+		bool b = shaderProgram->setInterfaceInstance(GM_VariablesDesc.HDR.ToneMapping.toStdString().c_str(), "ReinhardToneMapping", GMShaderType::Effect);
 		GM_ASSERT(b);
 	}
 	else

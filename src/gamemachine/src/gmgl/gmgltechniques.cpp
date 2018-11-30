@@ -15,6 +15,13 @@ namespace
 {
 	bool g_shadowDirty = true;
 
+	// variable index getter (with shaderProgram)
+#define VI_SP(d, name, shaderProgram) \
+	(d->indexBank. name ? d->indexBank. name : (d->indexBank. name = shaderProgram->getIndex(GM_VariablesDesc. ## name)))
+
+#define VI(name) VI_SP(d, name, shaderProgram)
+#define VI_B(name) VI_SP(db, name, shaderProgram)
+
 	inline GLenum toStencilOp(GMStencilOptions::GMStencilOp stencilOptions)
 	{
 		switch (stencilOptions)
@@ -87,41 +94,48 @@ namespace
 		}
 	}
 
-	inline const char* getTechnique(GMModelType type)
+	const GMString& getTechnique(GMModelType type)
 	{
+		static const GMString s_2D = L"GM_Model2D";
+		static const GMString s_3D = L"GM_Model3D";
+		static const GMString s_text = L"GM_Text";
+		static const GMString s_cubemap = L"GM_CubeMap";
+		static const GMString s_particle = L"GM_Particle";
+		static const GMString s_custom = L"GM_Custom";
+
 		switch (type)
 		{
 		case GMModelType::Model2D:
-			return "GM_Model2D";
+			return s_2D;
 		case GMModelType::Model3D:
-			return "GM_Model3D";
+			return s_3D;
 		case GMModelType::Text:
-			return "GM_Text";
+			return s_text;
 		case GMModelType::CubeMap:
-			return "GM_CubeMap";
+			return s_cubemap;
 		case GMModelType::Particle:
-			return "GM_Particle";
+			return s_particle;
 		case GMModelType::Custom:
-			return "GM_Custom";
+			return s_custom;
 		default:
 			GM_ASSERT(false);
-			return "GM_Model2D";
+			return s_2D;
 		}
 	}
 
-	inline void applyShadow(const GMShadowSourceDesc* shadowSourceDesc, IShaderProgram* shaderProgram, GMGLShadowFramebuffers* shadowFramebuffers, bool hasShadow)
+	void applyShadow(const GMShadowSourceDesc* shadowSourceDesc, IShaderProgram* shaderProgram, GMGLShadowFramebuffers* shadowFramebuffers, bool hasShadow)
 	{
 		static IShaderProgram* lastProgram = nullptr;
 		static GMint64 lastShadowVersion = 0;
-		static const GMString s_shadowInfo = GMString(GM_VariablesDesc.ShadowInfo.ShadowInfo) + ".";
-		static const std::string s_position = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.Position).toStdString();
-		static const std::string s_matrix = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMatrix).toStdString();
-		static const std::string s_width = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMapWidth).toStdString();
-		static const std::string s_height = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMapWidth).toStdString();
-		static const std::string s_biasMin = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.BiasMin).toStdString();
-		static const std::string s_biasMax = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.BiasMax).toStdString();
-		static const std::string s_hasShadow = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.HasShadow).toStdString();
-		static const std::string s_shadowMap = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMap).toStdString();
+		static const GMString s_shadowInfo = GMString(GM_VariablesDesc.ShadowInfo.ShadowInfo) + L".";
+		static const GMString s_position = s_shadowInfo + GM_VariablesDesc.ShadowInfo.Position;
+		static const GMString s_matrix = s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMatrix;
+		static const GMString s_width = s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMapWidth;
+		static const GMString s_height = s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMapWidth;
+		static const GMString s_biasMin = s_shadowInfo + GM_VariablesDesc.ShadowInfo.BiasMin;
+		static const GMString s_biasMax = s_shadowInfo + GM_VariablesDesc.ShadowInfo.BiasMax;
+		static const GMString s_hasShadow = s_shadowInfo + GM_VariablesDesc.ShadowInfo.HasShadow;
+		static const GMString s_shadowMap = s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMap;
 
 		if (hasShadow)
 		{
@@ -130,24 +144,24 @@ namespace
 				lastProgram = shaderProgram;
 				lastShadowVersion = shadowSourceDesc->version;
 
-				shaderProgram->setBool(s_hasShadow.c_str(), 1);
+				shaderProgram->setBool(s_hasShadow, 1);
 				const GMCamera& camera = shadowSourceDesc->camera;
 				GMFloat4 viewPosition;
 				shadowSourceDesc->position.loadFloat4(viewPosition);
-				shaderProgram->setVec4(s_position.c_str(), viewPosition);
-				shaderProgram->setMatrix4(s_matrix.c_str(), camera.getViewMatrix() * camera.getProjectionMatrix());
-				shaderProgram->setFloat(s_biasMin.c_str(), shadowSourceDesc->biasMin);
-				shaderProgram->setFloat(s_biasMax.c_str(), shadowSourceDesc->biasMax);
+				shaderProgram->setVec4(s_position, viewPosition);
+				shaderProgram->setMatrix4(s_matrix, camera.getViewMatrix() * camera.getProjectionMatrix());
+				shaderProgram->setFloat(s_biasMin, shadowSourceDesc->biasMin);
+				shaderProgram->setFloat(s_biasMax, shadowSourceDesc->biasMax);
 
-				shaderProgram->setInt(s_width.c_str(), shadowFramebuffers->getShadowMapWidth());
-				shaderProgram->setInt(s_height.c_str(), shadowFramebuffers->getShadowMapHeight());
-				shaderProgram->setInt(s_shadowMap.c_str(), GMTextureRegisterQuery<GMTextureType::ShadowMap>::Value);
+				shaderProgram->setInt(s_width, shadowFramebuffers->getShadowMapWidth());
+				shaderProgram->setInt(s_height, shadowFramebuffers->getShadowMapHeight());
+				shaderProgram->setInt(s_shadowMap, GMTextureRegisterQuery<GMTextureType::ShadowMap>::Value);
 				g_shadowDirty = false;
 			}
 		}
 		else
 		{
-			shaderProgram->setBool(s_hasShadow.c_str(), 0);
+			shaderProgram->setBool(s_hasShadow, 0);
 		}
 	}
 
@@ -159,14 +173,15 @@ namespace
 	}
 }
 
-void GMGammaHelper::setGamma(GMGraphicEngine* engine, IShaderProgram* shaderProgram)
+void GMGammaHelper::setGamma(GMGLTechnique* tech, GMGraphicEngine* engine, IShaderProgram* shaderProgram)
 {
-	shaderProgram->setBool(GM_VariablesDesc.GammaCorrection.GammaCorrection, engine->needGammaCorrection());
+	D_OF(d, tech);
+	shaderProgram->setBool(VI(GammaCorrection.GammaCorrection), engine->needGammaCorrection());
 	GMfloat gamma = engine->getGammaValue();
 	if (gamma != m_gamma)
 	{
-		shaderProgram->setFloat(GM_VariablesDesc.GammaCorrection.GammaValue, gamma);
-		shaderProgram->setFloat(GM_VariablesDesc.GammaCorrection.GammaInvValue, 1.f / gamma);
+		shaderProgram->setFloat(VI(GammaCorrection.GammaValue), gamma);
+		shaderProgram->setFloat(VI(GammaCorrection.GammaInvValue), 1.f / gamma);
 		m_gamma = gamma;
 	}
 }
@@ -215,21 +230,21 @@ void GMGLTechnique::beginModel(GMModel* model, const GMGameObject* parent)
 	shaderProgram->useProgram();
 
 	// We must init this uniform. Otherwise some X11 (Ubuntu) Windows will be abnormal.
-	shaderProgram->setInt(GM_VariablesDesc.CubeMapTextureName, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
+	shaderProgram->setInt(VI(CubeMapTextureName), GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 
 	// 设置顶点颜色运算方式
-	shaderProgram->setInt(GM_VariablesDesc.ColorVertexOp, static_cast<GMint32>(model->getShader().getVertexColorOp()));
+	shaderProgram->setInt(VI(ColorVertexOp), static_cast<GMint32>(model->getShader().getVertexColorOp()));
 
 	// 骨骼动画
 	GM_ASSERT(d->techContext.currentScene);
 	if (d->techContext.currentScene->hasAnimation())
 	{
-		shaderProgram->setInt(GM_VariablesDesc.UseBoneAnimation, 1);
+		shaderProgram->setInt(VI(UseBoneAnimation), 1);
 		updateBoneTransforms(shaderProgram, model);
 	}
 	else
 	{
-		shaderProgram->setInt(GM_VariablesDesc.UseBoneAnimation, 0);
+		shaderProgram->setInt(VI(UseBoneAnimation), 0);
 	}
 }
 
@@ -241,38 +256,44 @@ void GMGLTechnique::endModel()
 
 void GMGLTechnique::activateTextureTransform(GMModel* model, GMTextureType type)
 {
-	static const std::string u_scrolls_affix = (GMString(".") + GM_VariablesDesc.TextureAttributes.OffsetX).toStdString();
-	static const std::string u_scrollt_affix = (GMString(".") + GM_VariablesDesc.TextureAttributes.OffsetY).toStdString();
-	static const std::string u_scales_affix = (GMString(".") + GM_VariablesDesc.TextureAttributes.ScaleX).toStdString();
-	static const std::string u_scalet_affix = (GMString(".") + GM_VariablesDesc.TextureAttributes.ScaleY).toStdString();
+	static const GMString u_scrolls_affix = L"." + GM_VariablesDesc.TextureAttributes.OffsetX;
+	static const GMString u_scrollt_affix = L"." + GM_VariablesDesc.TextureAttributes.OffsetY;
+	static const GMString u_scales_affix = L"." + GM_VariablesDesc.TextureAttributes.ScaleX;
+	static const GMString u_scalet_affix = L"." + GM_VariablesDesc.TextureAttributes.ScaleY;
 
 	auto shaderProgram = getShaderProgram();
-	const char* uniform = getTextureUniformName(type);
 
-	static char u_scrolls[GMGL_MAX_UNIFORM_NAME_LEN],
-		u_scrollt[GMGL_MAX_UNIFORM_NAME_LEN],
-		u_scales[GMGL_MAX_UNIFORM_NAME_LEN],
-		u_scalet[GMGL_MAX_UNIFORM_NAME_LEN];
+	static GMString u_scrolls[(GMsize_t)GMTextureType::EndOfEnum];
+	static GMString u_scrollt[(GMsize_t)GMTextureType::EndOfEnum];
+	static GMString u_scales[(GMsize_t)GMTextureType::EndOfEnum];
+	static GMString u_scalet[(GMsize_t)GMTextureType::EndOfEnum];
+	GMsize_t typeIndex = (GMsize_t)type;
 
-	combineUniform(u_scrolls, uniform, u_scrolls_affix.c_str());
-	combineUniform(u_scrollt, uniform, u_scrollt_affix.c_str());
-	combineUniform(u_scales, uniform, u_scales_affix.c_str());
-	combineUniform(u_scalet, uniform, u_scalet_affix.c_str());
-	shaderProgram->setFloat(u_scrolls, 0.f);
-	shaderProgram->setFloat(u_scrollt, 0.f);
-	shaderProgram->setFloat(u_scales, 1.f);
-	shaderProgram->setFloat(u_scalet, 1.f);
+	const GMString& uniform = getTextureUniformName(type);
+	if (u_scrolls[typeIndex].isEmpty())
+		u_scrolls[typeIndex] = uniform + u_scrolls_affix;
+	if (u_scrollt[typeIndex].isEmpty())
+		u_scrollt[typeIndex] = uniform + u_scrollt_affix;
+	if (u_scales[typeIndex].isEmpty())
+		u_scales[typeIndex] = uniform + u_scales_affix;
+	if (u_scalet[typeIndex].isEmpty())
+		u_scalet[typeIndex] = uniform + u_scalet_affix;
+
+	shaderProgram->setFloat(u_scrolls[typeIndex], 0.f);
+	shaderProgram->setFloat(u_scrollt[typeIndex], 0.f);
+	shaderProgram->setFloat(u_scales[typeIndex], 1.f);
+	shaderProgram->setFloat(u_scalet[typeIndex], 1.f);
 
 	auto applyCallback = [&](GMS_TextureTransformType type, Pair<GMfloat, GMfloat>&& args) {
 		if (type == GMS_TextureTransformType::Scale)
 		{
-			shaderProgram->setFloat(u_scales, args.first);
-			shaderProgram->setFloat(u_scalet, args.second);
+			shaderProgram->setFloat(u_scales[typeIndex], args.first);
+			shaderProgram->setFloat(u_scalet[typeIndex], args.second);
 		}
 		else if (type == GMS_TextureTransformType::Scroll)
 		{
-			shaderProgram->setFloat(u_scrolls, args.first);
-			shaderProgram->setFloat(u_scrollt, args.second);
+			shaderProgram->setFloat(u_scrolls[typeIndex], args.first);
+			shaderProgram->setFloat(u_scrollt[typeIndex], args.second);
 		}
 		else
 		{
@@ -286,19 +307,24 @@ void GMGLTechnique::activateTextureTransform(GMModel* model, GMTextureType type)
 
 GMint32 GMGLTechnique::activateTexture(GMModel* model, GMTextureType type)
 {
-	static const std::string u_tex_enabled = std::string(".") + GM_VariablesDesc.TextureAttributes.Enabled;
-	static const std::string u_tex_texture = std::string(".") + GM_VariablesDesc.TextureAttributes.Texture;
+	static const GMString u_tex_enabled = L"." + GM_VariablesDesc.TextureAttributes.Enabled;
+	static const GMString u_tex_texture = L"." + GM_VariablesDesc.TextureAttributes.Texture;
 
 	GMint32 idx = (GMint32)type;
 	GMint32 texId = getTextureID(type);
 
 	auto shaderProgram = getShaderProgram();
-	const char* uniform = getTextureUniformName(type);
-	static char u_texture[GMGL_MAX_UNIFORM_NAME_LEN], u_enabled[GMGL_MAX_UNIFORM_NAME_LEN];
-	combineUniform(u_texture, uniform, u_tex_texture.c_str());
-	combineUniform(u_enabled, uniform, u_tex_enabled.c_str());
-	shaderProgram->setInt(u_texture, texId);
-	shaderProgram->setInt(u_enabled, 1);
+	const GMString& uniform = getTextureUniformName(type);
+	static GMString u_texture[(GMsize_t)GMTextureType::EndOfEnum];
+	static GMString u_enabled[(GMsize_t)GMTextureType::EndOfEnum];
+	GMsize_t typeIndex = (GMsize_t)type;
+
+	if (u_texture[typeIndex].isEmpty())
+		u_texture[typeIndex] = uniform + u_tex_texture;
+	if (u_enabled[typeIndex].isEmpty())
+		u_enabled[typeIndex] = uniform + u_tex_enabled;
+	shaderProgram->setInt(u_texture[typeIndex], texId);
+	shaderProgram->setInt(u_enabled[typeIndex], 1);
 
 	activateTextureTransform(model, type);
 	return texId;
@@ -306,15 +332,17 @@ GMint32 GMGLTechnique::activateTexture(GMModel* model, GMTextureType type)
 
 void GMGLTechnique::deactivateTexture(GMTextureType type)
 {
-	static const std::string u_tex_enabled = (GMString(".") + GM_VariablesDesc.TextureAttributes.Enabled).toStdString();
+	static const GMString u_tex_enabled = L"." + GM_VariablesDesc.TextureAttributes.Enabled;
 	GMint32 texId = getTextureID(type);
 
 	auto shaderProgram = getShaderProgram();
 	GMint32 idx = (GMint32)type;
-	const char* uniform = getTextureUniformName(type);
-	static char u[GMGL_MAX_UNIFORM_NAME_LEN];
-	combineUniform(u, uniform, u_tex_enabled.c_str());
-	shaderProgram->setInt(u, 0);
+	const GMString& uniform = getTextureUniformName(type);
+	static GMString u[(GMsize_t)GMTextureType::EndOfEnum];
+	GMsize_t typeIndex = (GMsize_t)type;
+	if (u[typeIndex].isEmpty())
+		u[typeIndex] = uniform + u_tex_enabled;
+	shaderProgram->setInt(u[typeIndex], 0);
 }
 
 GMint32 GMGLTechnique::getTextureID(GMTextureType type)
@@ -390,10 +418,10 @@ void GMGLTechnique::updateCameraMatrices(IShaderProgram* shaderProgram)
 		lookAt.position.loadFloat4(viewPosition);
 
 		GMGraphicEngine::getDefaultShaderVariablesDesc();
-		shaderProgram->setVec4(GM_VariablesDesc.ViewPosition, viewPosition);
-		shaderProgram->setMatrix4(GM_VariablesDesc.ViewMatrix, camera.getViewMatrix());
-		shaderProgram->setMatrix4(GM_VariablesDesc.InverseViewMatrix, camera.getInverseViewMatrix());
-		shaderProgram->setMatrix4(GM_VariablesDesc.ProjectionMatrix, camera.getProjectionMatrix());
+		shaderProgram->setVec4(VI(ViewPosition), viewPosition);
+		shaderProgram->setMatrix4(VI(ViewMatrix), camera.getViewMatrix());
+		shaderProgram->setMatrix4(VI(InverseViewMatrix), camera.getInverseViewMatrix());
+		shaderProgram->setMatrix4(VI(ProjectionMatrix), camera.getProjectionMatrix());
 		d->techContext.lastShaderProgram_camera = shaderProgram;
 		camera.cleanDirty();
 	}
@@ -402,15 +430,15 @@ void GMGLTechnique::updateCameraMatrices(IShaderProgram* shaderProgram)
 void GMGLTechnique::prepareScreenInfo(IShaderProgram* shaderProgram)
 {
 	D(d);
-	static std::string s_multisampling = std::string(GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo) + "." + GM_VariablesDesc.ScreenInfoAttributes.Multisampling;
-	static std::string s_screenWidth = std::string(GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo) + "." + GM_VariablesDesc.ScreenInfoAttributes.ScreenWidth;
-	static std::string s_screenHeight = std::string(GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo) + "." + GM_VariablesDesc.ScreenInfoAttributes.ScreenHeight;
+	static const GMString s_multisampling = GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo + "." + GM_VariablesDesc.ScreenInfoAttributes.Multisampling;
+	static const GMString s_screenWidth = GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo + "." + GM_VariablesDesc.ScreenInfoAttributes.ScreenWidth;
+	static const GMString s_screenHeight = GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo + "." + GM_VariablesDesc.ScreenInfoAttributes.ScreenHeight;
 	if (d->techContext.lastShaderProgram_screenInfo != shaderProgram) //或者窗口属性发生改变
 	{
 		const GMWindowStates& windowStates = d->context->getWindow()->getWindowStates();
-		shaderProgram->setInt(s_multisampling.c_str(), windowStates.sampleCount > 1);
-		shaderProgram->setInt(s_screenWidth.c_str(), windowStates.renderRect.width);
-		shaderProgram->setInt(s_screenHeight.c_str(), windowStates.renderRect.height);
+		shaderProgram->setInt(s_multisampling, windowStates.sampleCount > 1);
+		shaderProgram->setInt(s_screenWidth, windowStates.renderRect.width);
+		shaderProgram->setInt(s_screenHeight, windowStates.renderRect.height);
 		d->techContext.lastShaderProgram_screenInfo = shaderProgram;
 	}
 }
@@ -508,8 +536,9 @@ void GMGLTechnique::prepareDepth(GMModel* model)
 void GMGLTechnique::prepareDebug(GMModel* model)
 {
 	D(d);
+	IShaderProgram* shaderProgram = getShaderProgram();
 	GMint32 mode = d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonNormalMode).toInt();
-	getShaderProgram()->setInt(GM_VariablesDesc.Debug.Normal, mode);
+	shaderProgram->setInt(VI(Debug.Normal), mode);
 }
 
 void GMGLTechnique::prepareLights()
@@ -520,22 +549,23 @@ void GMGLTechnique::prepareLights()
 
 GMIlluminationModel GMGLTechnique::prepareIlluminationModel(GMModel* model)
 {
+	D(d);
 	IShaderProgram* shaderProgram = getShaderProgram();
 	GMShader& shader = model->getShader();
 	GMIlluminationModel illuminationModel = shader.getIlluminationModel();
-	shaderProgram->setInt(GM_VariablesDesc.IlluminationModel, (GMint32)illuminationModel);
+	shaderProgram->setInt(VI(IlluminationModel), (GMint32)illuminationModel);
 	return illuminationModel;
 }
 
 void GMGLTechnique::updateBoneTransforms(IShaderProgram* shaderProgram, GMModel* model)
 {
-	static Vector<std::string> boneVarNames;
+	static Vector<GMString> boneVarNames;
 	if (boneVarNames.empty())
 	{
 		boneVarNames.resize(GMScene::MaxBoneCount);
 		for (GMint32 i = 0; i < GMScene::MaxBoneCount; ++i)
 		{
-			boneVarNames[i] = (GMString(GM_VariablesDesc.Bones) + "[" + GMString(i) + "]").toStdString();
+			boneVarNames[i] = (GMString(GM_VariablesDesc.Bones) + L"[" + GMString(i) + L"]");
 		}
 	}
 
@@ -543,7 +573,7 @@ void GMGLTechnique::updateBoneTransforms(IShaderProgram* shaderProgram, GMModel*
 	for (GMsize_t i = 0; i < transforms.size(); ++i)
 	{
 		const auto& transform = transforms[i];
-		shaderProgram->setMatrix4(boneVarNames[i].c_str(), transform);
+		shaderProgram->setMatrix4(boneVarNames[i], transform);
 	}
 }
 
@@ -569,13 +599,13 @@ void GMGLTechnique_3D::beginModel(GMModel* model, const GMGameObject* parent)
 
 	if (parent)
 	{
-		shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, parent->getTransform());
-		shaderProgram->setMatrix4(GM_VariablesDesc.InverseTransposeModelMatrix, InverseTranspose(parent->getTransform()));
+		shaderProgram->setMatrix4(VI_B(ModelMatrix), parent->getTransform());
+		shaderProgram->setMatrix4(VI_B(InverseTransposeModelMatrix), InverseTranspose(parent->getTransform()));
 	}
 	else
 	{
-		shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, Identity<GMMat4>());
-		shaderProgram->setMatrix4(GM_VariablesDesc.InverseTransposeModelMatrix, Identity<GMMat4>());
+		shaderProgram->setMatrix4(VI_B(ModelMatrix), Identity<GMMat4>());
+		shaderProgram->setMatrix4(VI_B(InverseTransposeModelMatrix), Identity<GMMat4>());
 	}
 
 	GMGeometryPassingState state = db->engine->getGBuffer()->getGeometryPassingState();
@@ -604,7 +634,7 @@ void GMGLTechnique_3D::beginModel(GMModel* model, const GMGameObject* parent)
 		applyShadow(nullptr, shaderProgram, nullptr, false);
 	}
 
-	db->gammaHelper.setGamma(db->engine, shaderProgram);
+	db->gammaHelper.setGamma(this, db->engine, shaderProgram);
 }
 
 void GMGLTechnique_3D::beforeDraw(GMModel* model)
@@ -652,20 +682,20 @@ void GMGLTechnique_3D::prepareMaterial(const GMShader& shader)
 {
 	D(d);
 	auto shaderProgram = getShaderProgram();
-	static const std::string GMSHADER_MATERIAL_KA = std::string(GM_VariablesDesc.MaterialName) + "." + GM_VariablesDesc.MaterialAttributes.Ka;
-	static const std::string GMSHADER_MATERIAL_KD = std::string(GM_VariablesDesc.MaterialName) + "." + GM_VariablesDesc.MaterialAttributes.Kd;
-	static const std::string GMSHADER_MATERIAL_KS = std::string(GM_VariablesDesc.MaterialName) + "." + GM_VariablesDesc.MaterialAttributes.Ks;
-	static const std::string GMSHADER_MATERIAL_SHININESS = std::string(GM_VariablesDesc.MaterialName) + "." + GM_VariablesDesc.MaterialAttributes.Shininess;
-	static const std::string GMSHADER_MATERIAL_REFRACTIVITY = std::string(GM_VariablesDesc.MaterialName) + "." + GM_VariablesDesc.MaterialAttributes.Refreactivity;
-	static const std::string GMSHADER_MATERIAL_F0 = std::string(GM_VariablesDesc.MaterialName) + "." + GM_VariablesDesc.MaterialAttributes.F0;
+	static const GMString GMSHADER_MATERIAL_KA = GM_VariablesDesc.MaterialName + L"." + GM_VariablesDesc.MaterialAttributes.Ka;
+	static const GMString GMSHADER_MATERIAL_KD = GM_VariablesDesc.MaterialName + L"." + GM_VariablesDesc.MaterialAttributes.Kd;
+	static const GMString GMSHADER_MATERIAL_KS = GM_VariablesDesc.MaterialName + L"." + GM_VariablesDesc.MaterialAttributes.Ks;
+	static const GMString GMSHADER_MATERIAL_SHININESS = GM_VariablesDesc.MaterialName + L"." + GM_VariablesDesc.MaterialAttributes.Shininess;
+	static const GMString GMSHADER_MATERIAL_REFRACTIVITY = GM_VariablesDesc.MaterialName + L"." + GM_VariablesDesc.MaterialAttributes.Refreactivity;
+	static const GMString GMSHADER_MATERIAL_F0 = GM_VariablesDesc.MaterialName + L"." + GM_VariablesDesc.MaterialAttributes.F0;
 
 	const GMMaterial& material = shader.getMaterial();
-	shaderProgram->setVec3(GMSHADER_MATERIAL_KA.c_str(), ValuePointer(material.getAmbient()));
-	shaderProgram->setVec3(GMSHADER_MATERIAL_KD.c_str(), ValuePointer(material.getDiffuse()));
-	shaderProgram->setVec3(GMSHADER_MATERIAL_KS.c_str(), ValuePointer(material.getSpecular()));
-	shaderProgram->setFloat(GMSHADER_MATERIAL_SHININESS.c_str(), material.getShininess());
-	shaderProgram->setFloat(GMSHADER_MATERIAL_REFRACTIVITY.c_str(), material.getRefractivity());
-	shaderProgram->setVec3(GMSHADER_MATERIAL_F0.c_str(), ValuePointer(material.getF0()));
+	shaderProgram->setVec3(GMSHADER_MATERIAL_KA, ValuePointer(material.getAmbient()));
+	shaderProgram->setVec3(GMSHADER_MATERIAL_KD, ValuePointer(material.getDiffuse()));
+	shaderProgram->setVec3(GMSHADER_MATERIAL_KS, ValuePointer(material.getSpecular()));
+	shaderProgram->setFloat(GMSHADER_MATERIAL_SHININESS, material.getShininess());
+	shaderProgram->setFloat(GMSHADER_MATERIAL_REFRACTIVITY, material.getRefractivity());
+	shaderProgram->setVec3(GMSHADER_MATERIAL_F0, ValuePointer(material.getF0()));
 }
 
 void GMGLTechnique_3D::prepareTextures(GMModel* model, GMIlluminationModel illuminationModel)
@@ -692,8 +722,9 @@ void GMGLTechnique_3D::drawDebug()
 {
 	D(d);
 	D_BASE(db, Base);
+	static const GMString s_GMSHADER_DEBUG_DRAW_NORMAL = GMSHADER_DEBUG_DRAW_NORMAL;
 	auto shaderProgram = getShaderProgram();
-	shaderProgram->setInt(GMSHADER_DEBUG_DRAW_NORMAL, db->debugConfig.get(GMDebugConfigs::DrawPolygonNormalMode).toInt());
+	shaderProgram->setInt(s_GMSHADER_DEBUG_DRAW_NORMAL, db->debugConfig.get(GMDebugConfigs::DrawPolygonNormalMode).toInt());
 }
 
 GMTextureAsset GMGLTechnique_3D::getWhiteTexture()
@@ -735,10 +766,11 @@ void GMGLTechnique_2D::prepareTextures(GMModel* model)
 //////////////////////////////////////////////////////////////////////////
 void GMGLTechnique_CubeMap::beginModel(GMModel* model, const GMGameObject* parent)
 {
+	D_BASE(db, Base);
 	Base::beginModel(model, parent);
 	IShaderProgram* shaderProgram = getShaderProgram();
 	updateCameraMatrices(shaderProgram);
-	shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));
+	shaderProgram->setMatrix4(VI_B(ModelMatrix), GMMat4(Inhomogeneous(parent->getTransform())));
 }
 
 void GMGLTechnique_CubeMap::beforeDraw(GMModel* model)
@@ -766,7 +798,7 @@ void GMGLTechnique_CubeMap::prepareTextures(GMModel* model)
 		GM_ASSERT(model->getType() == GMModelType::CubeMap);
 		shaderProgram->setInterfaceInstance(GMGLShaderProgram::techniqueName(), getTechnique(model->getType()), GMShaderType::Vertex);
 		shaderProgram->setInterfaceInstance(GMGLShaderProgram::techniqueName(), getTechnique(model->getType()), GMShaderType::Pixel);
-		shaderProgram->setInt(GM_VariablesDesc.CubeMapTextureName, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
+		shaderProgram->setInt(VI_B(CubeMapTextureName), GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 		glTex.getTexture()->bindSampler(&sampler);
 		glTex.getTexture()->useTexture(GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 		db->engine->setCubeMap(glTex);
@@ -796,12 +828,12 @@ void GMGLTechnique_Filter::beginModel(GMModel* model, const GMGameObject* parent
 		d->state.toneMapping = db->engine->getToneMapping();
 		if (d->state.HDR)
 		{
-			db->gammaHelper.setGamma(db->engine, shaderProgram);
+			db->gammaHelper.setGamma(this, db->engine, shaderProgram);
 			setHDR(shaderProgram);
 		}
 		else
 		{
-			shaderProgram->setBool(GM_VariablesDesc.HDR.HDR, false);
+			shaderProgram->setBool(VI_B(HDR.HDR), false);
 		}
 	}
 }
@@ -809,8 +841,9 @@ void GMGLTechnique_Filter::beginModel(GMModel* model, const GMGameObject* parent
 void GMGLTechnique_Filter::setHDR(IShaderProgram* shaderProgram)
 {
 	D(d);
-	shaderProgram->setBool(GM_VariablesDesc.HDR.HDR, true);
-	shaderProgram->setInt(GM_VariablesDesc.HDR.ToneMapping, d->state.toneMapping);
+	D_BASE(db, Base);
+	shaderProgram->setBool(VI_B(HDR.HDR), true);
+	shaderProgram->setInt(VI_B(HDR.ToneMapping), d->state.toneMapping);
 }
 
 IShaderProgram* GMGLTechnique_Filter::getShaderProgram()
@@ -837,7 +870,7 @@ GMint32 GMGLTechnique_Filter::activateTexture(GMModel* model, GMTextureType type
 	IShaderProgram* shaderProgram = getShaderProgram();
 	shaderProgram->setInt(GMSHADER_FRAMEBUFFER, texId);
 
-	bool b = shaderProgram->setInterfaceInstance(GM_VariablesDesc.FilterAttributes.Filter, GM_VariablesDesc.FilterAttributes.Types[db->engine->getCurrentFilterMode()], GMShaderType::Pixel);
+	bool b = shaderProgram->setInterfaceInstance(VI_B(FilterAttributes.Filter), GM_VariablesDesc.FilterAttributes.Types[db->engine->getCurrentFilterMode()], GMShaderType::Pixel);
 	GM_ASSERT(b);
 	return texId;
 }
@@ -868,7 +901,7 @@ void GMGLTechnique_LightPass::beginModel(GMModel* model, const GMGameObject* par
 		applyShadow(nullptr, shaderProgram, nullptr, false);
 	}
 
-	d->gammaHelper.setGamma(d->engine, shaderProgram);
+	d->gammaHelper.setGamma(this, d->engine, shaderProgram);
 }
 
 void GMGLTechnique_LightPass::afterDraw(GMModel* model)
@@ -899,7 +932,7 @@ void GMGLTechnique_LightPass::prepareTextures(GMModel* model)
 		GMTextureAsset texture;
 		gBufferFramebuffers->getFramebuffer(i)->getTexture(texture);
 		const GMsize_t textureIndex = (GMTextureRegisterQuery<GMTextureType::GeometryPasses>::Value + i);
-		shaderProgram->setInt(GMGLGBuffer::GBufferGeometryUniformNames()[i].c_str(), gm_sizet_to_uint(textureIndex));
+		shaderProgram->setInt(GMGLGBuffer::GBufferGeometryUniformNames()[i], gm_sizet_to_uint(textureIndex));
 		texture.getTexture()->useTexture((GMuint32)textureIndex);
 	}
 
@@ -907,7 +940,7 @@ void GMGLTechnique_LightPass::prepareTextures(GMModel* model)
 	if (!cubeMap.isEmpty())
 	{
 		const GMsize_t id = GMTextureRegisterQuery<GMTextureType::GeometryPasses>::Value + 1 + cnt;
-		shaderProgram->setInt(GM_VariablesDesc.CubeMapTextureName, gm_sizet_to_uint(id));
+		shaderProgram->setInt(VI(CubeMapTextureName), gm_sizet_to_uint(id));
 		cubeMap.getTexture()->useTexture((GMuint32)id);
 	}
 }
@@ -918,10 +951,11 @@ void GMGLTechnique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* par
 
 	D_BASE(d, Base);
 	IShaderProgram* shaderProgram = getShaderProgram();
+
 	if (parent)
-		shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, parent->getTransform());
+		shaderProgram->setMatrix4(VI(ModelMatrix), parent->getTransform());
 	else
-		shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, Identity<GMMat4>());
+		shaderProgram->setMatrix4(VI(ModelMatrix), Identity<GMMat4>());
 
 	GMGLShadowFramebuffers* shadowFramebuffers = gm_cast<GMGLShadowFramebuffers*>(d->engine->getShadowMapFramebuffers());
 	applyShadow(&d->engine->getShadowSourceDesc(), shaderProgram, shadowFramebuffers, true);

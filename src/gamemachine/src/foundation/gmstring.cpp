@@ -134,6 +134,11 @@ namespace
 	}
 }
 
+GMString::GMString()
+{
+
+}
+
 GMString::GMString(const GMString& s)
 {
 	*this = s;
@@ -175,6 +180,12 @@ GMString::GMString(const std::wstring& str)
 {
 	D_STR(d);
 	d->data = str;
+}
+
+GMString::GMString(std::wstring&& str) GM_NOEXCEPT
+{
+	D_STR(d);
+	d->data = std::move(str);
 }
 
 GMString::GMString(char ch)
@@ -231,6 +242,7 @@ GMString& GMString::append(const GMwchar* c)
 {
 	D_STR(d);
 	d->data += c;
+	markDirty();
 	return *this;
 }
 
@@ -255,12 +267,21 @@ bool GMString::endsWith(const GMString& string)
 	return memEquals(d->data.data() + pos, string.toStdWString().data(), string.length());
 }
 
+void GMString::markDirty()
+{
+	D_STR(d);
+	rehash();
+	d->stdstringDirty = true;
+}
+
 void GMString::assign(const GMString& s)
 {
 	D_STR(d);
 	d->data = s.data()->data;
 	d->hash = s.data()->hash;
 	d->rehash = s.data()->rehash;
+	d->stdstringDirty = s.data()->stdstringDirty;
+	d->stdstringCache = s.data()->stdstringCache;
 }
 
 GMString& GMString::append(const char* c)
@@ -269,6 +290,7 @@ GMString& GMString::append(const char* c)
 	GMwchar* wch = alloc_convertMultiBytesToWideChar(c);
 	d->data += wch;
 	free_wideChar(wch);
+	markDirty();
 	return *this;
 }
 
@@ -300,13 +322,17 @@ const std::wstring& GMString::toStdWString() const
 	return d->data;
 }
 
-const std::string GMString::toStdString() const
+const std::string& GMString::toStdString() const
 {
 	D_STR(d);
-	char* chs = alloc_convertWideCharToMultiBytes(d->data.c_str());
-	std::string string(chs);
-	free_multibytes(chs);
-	return string;
+	if (d->stdstringDirty)
+	{
+		char* chs = alloc_convertWideCharToMultiBytes(d->data.c_str());
+		d->stdstringCache = std::string(chs);
+		free_multibytes(chs);
+		d->stdstringDirty = false;
+	}
+	return d->stdstringCache;
 }
 
 GMString GMString::replace(const GMString& oldValue, const GMString& newValue) const

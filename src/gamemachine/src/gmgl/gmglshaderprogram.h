@@ -23,6 +23,7 @@ GM_PRIVATE_OBJECT(GMGLShaderProgram)
 	GMGLShaderInfos shaderInfos;
 	GMGLShaderIDList shaders;
 	GMuint32 shaderProgram = 0;
+	GMuint32 techniqueIndex = 0;
 	HashMap<GMString, GMString, GMStringHashFunctor> aliasMap;
 	static GMuint32 lastUsedProgram;
 };
@@ -41,13 +42,14 @@ public:
 
 public:
 	virtual void useProgram();
-	virtual void setMatrix4(const char* name, const GMMat4& value) override;
-	virtual void setVec4(const char* name, const GMFloat4& value) override;
-	virtual void setVec3(const char* name, const GMfloat value[3]) override;
-	virtual void setInt(const char* name, GMint32 value) override;
-	virtual void setFloat(const char* name, GMfloat value) override;
-	virtual void setBool(const char* name, bool value) override;
-	virtual bool setInterfaceInstance(const char* interfaceName, const char* instanceName, GMShaderType type) override;
+	virtual GMint32 getIndex(const GMString& name) override;
+	virtual void setMatrix4(GMint32 index, const GMMat4& value) override;
+	virtual void setVec4(GMint32 index, const GMFloat4& value) override;
+	virtual void setVec3(GMint32 index, const GMfloat value[3]) override;
+	virtual void setInt(GMint32 index, GMint32 value) override;
+	virtual void setFloat(GMint32 index, GMfloat value) override;
+	virtual void setBool(GMint32 index, bool value) override;
+	virtual bool setInterfaceInstance(const GMString& interfaceName, const GMString& instanceName, GMShaderType type) override;
 
 private:
 	void setProgram(GMuint32 program) { D(d); d->shaderProgram = program; }
@@ -58,21 +60,18 @@ private:
 	void expandInclude(const GMString& workingDir, const GMString& fn, IN OUT GMString& source);
 	void expandAlias(const GMString& alias, IN OUT GMString& source);
 	GMString& replaceLine(IN OUT GMString& line);
-	bool setSubrotinue(const char* funcName, const char*  implement, GMuint32 shaderType);
+	bool setSubrotinue(const GMString& interfaceName, const GMString& implement, GMuint32 shaderType);
 	bool verify();
-
-#if GM_DEBUG
-	GMint32 getUniformByName(const char* name);
-#endif;
 
 public:
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
 	virtual bool setInterface(GameMachineInterfaceID id, void* in) override;
 
 public:
-	static constexpr const char* techniqueName()
+	static const GMString& techniqueName()
 	{
-		return "GM_TechniqueEntrance";
+		static GMString techName = L"GM_TechniqueEntrance";
+		return techName;
 	}
 };
 

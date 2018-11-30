@@ -6,10 +6,11 @@
 #include "gmglgraphic_engine.h"
 BEGIN_NS
 
+class GMGLTechnique;
 class GMGammaHelper
 {
 public:
-	void setGamma(GMGraphicEngine* engine, IShaderProgram* shaderProgram);
+	void setGamma(GMGLTechnique* tech, GMGraphicEngine* engine, IShaderProgram* shaderProgram);
 
 private:
 	GMfloat m_gamma = 0.f;
@@ -31,6 +32,7 @@ GM_PRIVATE_OBJECT(GMGLTechnique)
 	GMDebugConfig debugConfig;
 	GMGammaHelper gammaHelper;
 	TechniqueContext techContext;
+	GMShaderVariablesIndices indexBank = { 0 };
 };
 
 class GMGLTechnique : public GMObject, public ITechnique

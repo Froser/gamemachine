@@ -18,6 +18,8 @@ struct GMStringPrivate
 {
 	mutable bool rehash = true;
 	mutable GMsize_t hash = 0;
+	mutable std::string stdstringCache;
+	mutable bool stdstringDirty = true;
 	std::wstring data;
 };
 
@@ -41,7 +43,7 @@ public:
 
 public:
 	//! 初始化一个空白的字符串。
-	GMString() = default;
+	GMString();
 
 	//! 从另外一个字符串中构造一个一模一样的字符串。
 	/*!
@@ -80,6 +82,7 @@ public:
 	  \param str 字符串源。
 	*/
 	GMString(const std::wstring& str);
+	GMString(std::wstring&& str) GM_NOEXCEPT;
 
 	//! 从一个C风格字符中构造一个字符串。
 	/*!
@@ -160,13 +163,15 @@ public:
 	  \param str 目标字符串。
 	  \return 此字符串自身的引用。
 	*/
-	GMString& operator = (GMString&& s) GM_NOEXCEPT
+	GMString& operator= (GMString&& s) GM_NOEXCEPT
 	{
 		D_STR(d);
 		using namespace std;
 		swap(d->data, s.data()->data);
+		swap(d->stdstringCache, s.data()->stdstringCache);
 		d->hash = s.data()->hash;
 		d->rehash = s.data()->rehash;
+		d->stdstringDirty = s.data()->stdstringDirty;
 		return *this;
 	}
 
@@ -334,10 +339,11 @@ public:
 	GMsize_t findLastOf(char c) const;
 	GMString substr(GMsize_t start, GMsize_t count) const;
 	const std::wstring& toStdWString() const;
-	const std::string toStdString() const;
+	const std::string& toStdString() const;
 	GMString replace(const GMString& oldValue, const GMString& newValue) const;
 
 private:
+	void markDirty();
 	void assign(const GMString& s);
 
 	// 提供一些原始的字符串方法

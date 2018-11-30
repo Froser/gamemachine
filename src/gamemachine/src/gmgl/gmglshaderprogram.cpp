@@ -7,19 +7,9 @@
 #include "foundation/gamemachine.h"
 #include <linearmath.h>
 
-#if GM_DEBUG
-GMint32 GMGLShaderProgram::getUniformByName(const char* name)
-{
-	auto loc = glGetUniformLocation(getProgram(), name);
-	return loc;
-}
-#else
-#	define getUniformByName(name) glGetUniformLocation(getProgram(), name)
-#endif
-
 namespace
 {
-	GMint32 toTechniqueEntranceId(const char* instanceName)
+	GMint32 toTechniqueEntranceId(const GMString& instanceName)
 	{
 		enum
 		{
@@ -43,31 +33,39 @@ namespace
 
 		GM_STATIC_ASSERT(Shadow == 8, "If shadow enum value is changed, you have to modify glsl.");
 
-		if (GMString::stringEquals("GM_Model2D", instanceName))
+		static const GMString s_Model2D = L"GM_Model2D";
+		static const GMString s_Model3D = L"GM_Model3D";
+		static const GMString s_Text = L"GM_Text";
+		static const GMString s_CubeMap = L"GM_CubeMap";
+		static const GMString s_Particle = L"GM_Particle";
+		static const GMString s_Custom = L"GM_Custom";
+		static const GMString s_Shadow = L"GM_Shadow";
+
+		if (instanceName == s_Model2D)
 		{
 			return Model2D;
 		}
-		else if (GMString::stringEquals("GM_Model3D", instanceName))
+		else if (instanceName == s_Model3D)
 		{
 			return Model3D;
 		}
-		else if (GMString::stringEquals("GM_Text", instanceName))
+		else if (instanceName == s_Text)
 		{
 			return Text;
 		}
-		else if (GMString::stringEquals("GM_CubeMap", instanceName))
+		else if (instanceName == s_CubeMap)
 		{
 			return CubeMap;
 		}
-		else if (GMString::stringEquals("GM_Particle", instanceName))
+		else if (instanceName == s_Particle)
 		{
 			return Particle;
 		}
-		else if (GMString::stringEquals("GM_Custom", instanceName))
+		else if (instanceName == s_Custom)
 		{
 			return Custom;
 		}
-		else if (GMString::stringEquals("GM_Shadow", instanceName))
+		else if (instanceName == s_Shadow)
 		{
 			return Shadow;
 		}
@@ -75,7 +73,7 @@ namespace
 		{
 			for (GMint32 i = 0; i < GMFilterCount; ++i)
 			{
-				if (GMString::stringEquals(GM_VariablesDesc.FilterAttributes.Types[i], instanceName))
+				if (GM_VariablesDesc.FilterAttributes.Types[i] == instanceName)
 					return i;
 			}
 		}
@@ -149,52 +147,59 @@ void GMGLShaderProgram::attachShader(const GMGLShaderInfo& shaderCfgs)
 	d->shaderInfos.push_back(shaderCfgs);
 }
 
-void GMGLShaderProgram::setMatrix4(const char* name, const GMMat4& value)
+GMint32 GMGLShaderProgram::getIndex(const GMString& name)
+{
+	return glGetUniformLocation(getProgram(), name.toStdString().c_str());
+}
+
+void GMGLShaderProgram::setMatrix4(GMint32 index, const GMMat4& value)
 {
 	GM_ASSERT(verify());
-	glUniformMatrix4fv(getUniformByName(name), 1, GL_FALSE, ValuePointer(value));
+	glUniformMatrix4fv(index, 1, GL_FALSE, ValuePointer(value));
 }
 
-void GMGLShaderProgram::setVec4(const char* name, const GMFloat4& value)
+void GMGLShaderProgram::setVec4(GMint32 index, const GMFloat4& value)
 {
 	GM_ASSERT(verify());
-	glUniform4fv(getUniformByName(name), 1, ValuePointer(value));
+	glUniform4fv(index, 1, ValuePointer(value));
 }
 
-void GMGLShaderProgram::setVec3(const char* name, const GMfloat value[3])
+void GMGLShaderProgram::setVec3(GMint32 index, const GMfloat value[3])
 {
 	GM_ASSERT(verify());
-	glUniform3fv(getUniformByName(name), 1, value);
+	glUniform3fv(index, 1, value);
 }
 
-void GMGLShaderProgram::setInt(const char* name, GMint32 value)
+void GMGLShaderProgram::setInt(GMint32 index, GMint32 value)
 {
 	GM_ASSERT(verify());
-	glUniform1i(getUniformByName(name), value);
+	glUniform1i(index, value);
 }
 
-void GMGLShaderProgram::setFloat(const char* name, GMfloat value)
+void GMGLShaderProgram::setFloat(GMint32 index, GMfloat value)
 {
 	GM_ASSERT(verify());
-	glUniform1f(getUniformByName(name), value);
+	glUniform1f(index, value);
 }
 
-void GMGLShaderProgram::setBool(const char* name, bool value)
+void GMGLShaderProgram::setBool(GMint32 index, bool value)
 {
-	setInt(name, (GMint32)value);
+	setInt(index, (GMint32)value);
 }
 
-bool GMGLShaderProgram::setInterfaceInstance(const char* interfaceName, const char* instanceName, GMShaderType type)
+bool GMGLShaderProgram::setInterfaceInstance(const GMString& interfaceName, const GMString& instanceName, GMShaderType type)
 {
 	GLenum shaderType = GMGLShaderInfo::toGLShaderType(type);
 	return setSubrotinue(interfaceName, instanceName, shaderType);
 }
 
-bool GMGLShaderProgram::setSubrotinue(const char* funcName, const char* implement, GMuint32 shaderType)
+bool GMGLShaderProgram::setSubrotinue(const GMString& interfaceName, const GMString& implement, GMuint32 shaderType)
 {
 	GM_ASSERT(verify());
 	D(d);
-	setInt(funcName, toTechniqueEntranceId(implement));
+	if (!d->techniqueIndex)
+		d->techniqueIndex = getIndex(interfaceName);
+	setInt(d->techniqueIndex, toTechniqueEntranceId(implement));
 	return true;
 }
 

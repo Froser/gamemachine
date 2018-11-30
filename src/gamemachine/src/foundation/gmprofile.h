@@ -47,6 +47,7 @@ public:
 public:
 	GMProfile();
 	GMProfile(const GMString& name);
+	GMProfile(const GMwchar* name);
 	~GMProfile();
 
 public:
