@@ -250,8 +250,8 @@ bool GMGLShaderProgram::load()
 				iter++;
 			} while (iter.hasNextLine());
 
-			gm_error(gm_dbg_wrap("GMGLShaderProgram::load: Shader source: \n{0}"), report);
-			gm_error(gm_dbg_wrap("GMGLShaderProgram::load: Shader compilation failed: {0}"), log);
+			gm_error(gm_dbg_wrap("Shader source: \n{0}"), report);
+			gm_error(gm_dbg_wrap("Shader compilation failed: {0}"), log);
 			gm_error(gm_dbg_wrap("filename: {0} {1}"), GM_CRLF, GMString(entry.filename));
 			GM_ASSERT(false);
 			GMMessage crashMsg(GameMachineMessageType::CrashDown);

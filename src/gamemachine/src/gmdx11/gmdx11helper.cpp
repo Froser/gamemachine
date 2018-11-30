@@ -41,6 +41,17 @@ IShaderProgram* GMDx11Helper::loadEffectShader(
 	);
 	if (FAILED(hr))
 	{
+		GMStringReader reader(code);
+		std::string report;
+		GMint32 ln = 0;
+		auto iter = reader.lineBegin();
+		do
+		{
+			report += std::to_string(++ln) + ":\t" + (*iter).toStdString();
+			iter++;
+		} while (iter.hasNextLine());
+
+		gm_error(gm_dbg_wrap("Shader source: \n{0}"), report);
 		if (errorMessage)
 		{
 			void* ptr = errorMessage->GetBufferPointer();
