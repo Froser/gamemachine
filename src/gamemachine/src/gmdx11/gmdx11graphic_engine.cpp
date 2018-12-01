@@ -59,7 +59,10 @@ void GMDx11GraphicEngine::activateLights(ITechnique* technique)
 		const Vector<ILight*>& lights = getLights();
 		GMsize_t lightCount = lights.size();
 		GM_ASSERT(lightCount <= getMaxLightCount());
-		shaderProgram->setInt(GM_VariablesDesc.LightCount, gm_sizet_to_uint(lightCount));
+
+		if (!d->lightCountIndices)
+			d->lightCountIndices = shaderProgram->getIndex(GM_VariablesDesc.LightCount);
+		shaderProgram->setInt(d->lightCountIndices, gm_sizet_to_uint(lightCount));
 
 		for (GMuint32 i = 0; i < (GMuint32)lightCount; ++i)
 		{

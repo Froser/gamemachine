@@ -20,7 +20,7 @@ public:
 	void drawGeometryBuffer(GMuint32 index, const GMRect& rect);
 
 public:
-	static const std::string* GBufferGeometryUniformNames();
+	static const GMString* GBufferGeometryUniformNames();
 };
 
 

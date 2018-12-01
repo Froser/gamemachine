@@ -136,7 +136,7 @@ void GMGLGraphicEngine::activateLights(ITechnique* technique)
 		const Vector<ILight*>& lights = db->lights;
 		GMsize_t lightCount = lights.size();
 		GM_ASSERT(lightCount <= getMaxLightCount());
-		shaderProgram->setInt(GM_VariablesDesc.LightCount, gm_sizet_to_uint(lightCount));
+		shaderProgram->setInt(getVariableIndex(shaderProgram, d->lightCountIndices[verifyIndicesContainer(d->lightCountIndices, shaderProgram)], GM_VariablesDesc.LightCount) , gm_sizet_to_uint(lightCount));
 
 		for (GMuint32 i = 0; i < (GMuint32)lightCount; ++i)
 		{

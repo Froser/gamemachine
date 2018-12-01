@@ -32,7 +32,33 @@ GM_PRIVATE_OBJECT(GMGLTechnique)
 	GMDebugConfig debugConfig;
 	GMGammaHelper gammaHelper;
 	TechniqueContext techContext;
-	GMShaderVariablesIndices indexBank = { 0 };
+
+	Vector<GMShaderVariablesIndices> indexBank;
+
+	struct TextureIndices
+	{
+		Array<GMint32, (GMsize_t)GMTextureType::EndOfEnum> Texture;
+		Array<GMint32, (GMsize_t)GMTextureType::EndOfEnum> Enabled;
+	};
+	Vector<TextureIndices> textureIndices;
+
+	struct TextureTransformIndices
+	{
+		Array<GMint32, (GMsize_t)GMTextureType::EndOfEnum> ScrollS;
+		Array<GMint32, (GMsize_t)GMTextureType::EndOfEnum> ScrollT;
+		Array<GMint32, (GMsize_t)GMTextureType::EndOfEnum> ScaleS;
+		Array<GMint32, (GMsize_t)GMTextureType::EndOfEnum> ScaleT;
+	};
+	Vector<TextureTransformIndices> textureTransformIndices;
+
+	struct ScreenInfoIndices
+	{
+		GMint32 Multisampling;
+		GMint32 ScreenWidth;
+		GMint32 ScreenHeight;
+	};
+	Vector<ScreenInfoIndices> screenInfoIndices;
+	Array<GMint32, GMScene::MaxBoneCount> boneVariableIndices;
 };
 
 class GMGLTechnique : public GMObject, public ITechnique
@@ -86,6 +112,7 @@ GM_PRIVATE_OBJECT(GMGLTechnique_3D)
 {
 	GMRenderMode renderMode = GMRenderMode::Forward;
 	GMTextureAsset whiteTexture;
+	GMint32 drawDebugNormalIndex = 0;
 };
 
 class GMGLTechnique_3D : public GMGLTechnique
@@ -144,6 +171,7 @@ GM_PRIVATE_OBJECT(GMGLTechnique_Filter)
 		bool HDR = false;
 	};
 	HDRState state;
+	GMint32 framebufferIndex = 0;
 };
 
 class GMGLTechnique_Filter : public GMGLTechnique
@@ -169,8 +197,15 @@ private:
 	void setHDR(IShaderProgram* shaderProgram);
 };
 
+GM_PRIVATE_OBJECT(GMGLTechnique_LightPass)
+{
+	Vector<Vector<GMint32>> gbufferIndices;
+};
+
 class GMGLTechnique_LightPass : public GMGLTechnique
 {
+	GM_DECLARE_PRIVATE_AND_BASE(GMGLTechnique_LightPass, GMGLTechnique)
+
 public:
 	using GMGLTechnique::GMGLTechnique;
 

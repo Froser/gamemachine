@@ -72,6 +72,8 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 
 	GMTextureAsset cubeMap;
 	GMGLLightContext lightContext;
+
+	Vector<GMint32> lightCountIndices;
 };
 
 class GMGLGraphicEngine : public GMGraphicEngine

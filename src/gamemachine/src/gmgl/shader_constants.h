@@ -50,5 +50,30 @@ inline const GMString& getTextureUniformName(GMTextureType t)
 	return empty;
 }
 
+template <typename T>
+inline GMsize_t verifyIndicesContainer(Vector<T>& container, IShaderProgram* shaderProgram)
+{
+	GMsize_t sz = static_cast<GMGLShaderProgram*>(shaderProgram)->getProgram();
+	if (container.size() <= sz)
+	{
+		static T t = { 0 };
+		container.resize(sz + 1, t);
+	}
+	return sz;
+}
+
+template <typename U>
+inline GMsize_t verifyIndicesContainer(Vector<Vector<U>>& container, IShaderProgram* shaderProgram)
+{
+	GMsize_t sz = static_cast<GMGLShaderProgram*>(shaderProgram)->getProgram();
+	if (container.size() <= sz)
+	{
+		container.resize(sz + 1);
+	}
+	return sz;
+}
+
+#define getVariableIndex(shaderProgram, index, name) (index ? index : (index = shaderProgram->getIndex(name)))
+
 END_NS
 #endif

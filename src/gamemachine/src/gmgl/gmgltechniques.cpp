@@ -16,11 +16,19 @@ namespace
 	bool g_shadowDirty = true;
 
 	// variable index getter (with shaderProgram)
-#define VI_SP(d, name, shaderProgram) \
-	(d->indexBank. name ? d->indexBank. name : (d->indexBank. name = shaderProgram->getIndex(GM_VariablesDesc. ## name)))
+#define VI_SP(d, name, shaderProgram, indexBank) \
+	getVariableIndex(shaderProgram, d->indexBank[verifyIndicesContainer(d->indexBank, shaderProgram)]. name, GM_VariablesDesc. ## name)
 
-#define VI(name) VI_SP(d, name, shaderProgram)
-#define VI_B(name) VI_SP(db, name, shaderProgram)
+#define VI(name) VI_SP(d, name, shaderProgram, indexBank)
+
+	// variable index from base
+#define VI_B(name) VI_SP(db, name, shaderProgram, indexBank)
+
+	// variable index from name
+#define VI_C(d, name, str) \
+	getVariableIndex(shaderProgram, d->indexBank[verifyIndicesContainer(d->indexBank, shaderProgram)]. name, str)
+#define VI_N(name, str) VI_C(d, name, str)
+#define VI_NB(name, str) VI_C(db, name, str)
 
 	inline GLenum toStencilOp(GMStencilOptions::GMStencilOp stencilOptions)
 	{
@@ -123,15 +131,16 @@ namespace
 		}
 	}
 
-	void applyShadow(const GMShadowSourceDesc* shadowSourceDesc, IShaderProgram* shaderProgram, GMGLShadowFramebuffers* shadowFramebuffers, bool hasShadow)
+	void applyShadow(GMGLTechnique* tech, const GMShadowSourceDesc* shadowSourceDesc, IShaderProgram* shaderProgram, GMGLShadowFramebuffers* shadowFramebuffers, bool hasShadow)
 	{
+		D_OF(d, tech);
 		static IShaderProgram* lastProgram = nullptr;
 		static GMint64 lastShadowVersion = 0;
 		static const GMString s_shadowInfo = GMString(GM_VariablesDesc.ShadowInfo.ShadowInfo) + L".";
 		static const GMString s_position = s_shadowInfo + GM_VariablesDesc.ShadowInfo.Position;
 		static const GMString s_matrix = s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMatrix;
 		static const GMString s_width = s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMapWidth;
-		static const GMString s_height = s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMapWidth;
+		static const GMString s_height = s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMapHeight;
 		static const GMString s_biasMin = s_shadowInfo + GM_VariablesDesc.ShadowInfo.BiasMin;
 		static const GMString s_biasMax = s_shadowInfo + GM_VariablesDesc.ShadowInfo.BiasMax;
 		static const GMString s_hasShadow = s_shadowInfo + GM_VariablesDesc.ShadowInfo.HasShadow;
@@ -144,24 +153,24 @@ namespace
 				lastProgram = shaderProgram;
 				lastShadowVersion = shadowSourceDesc->version;
 
-				shaderProgram->setBool(s_hasShadow, 1);
+				shaderProgram->setBool(VI_N(ShadowInfo.HasShadow, s_hasShadow), 1);
 				const GMCamera& camera = shadowSourceDesc->camera;
 				GMFloat4 viewPosition;
 				shadowSourceDesc->position.loadFloat4(viewPosition);
-				shaderProgram->setVec4(s_position, viewPosition);
-				shaderProgram->setMatrix4(s_matrix, camera.getViewMatrix() * camera.getProjectionMatrix());
-				shaderProgram->setFloat(s_biasMin, shadowSourceDesc->biasMin);
-				shaderProgram->setFloat(s_biasMax, shadowSourceDesc->biasMax);
+				shaderProgram->setVec4(VI_N(ShadowInfo.Position, s_position), viewPosition);
+				shaderProgram->setMatrix4(VI_N(ShadowInfo.ShadowMatrix, s_matrix), camera.getViewMatrix() * camera.getProjectionMatrix());
+				shaderProgram->setFloat(VI_N(ShadowInfo.BiasMin, s_biasMin), shadowSourceDesc->biasMin);
+				shaderProgram->setFloat(VI_N(ShadowInfo.BiasMax, s_biasMax), shadowSourceDesc->biasMax);
 
-				shaderProgram->setInt(s_width, shadowFramebuffers->getShadowMapWidth());
-				shaderProgram->setInt(s_height, shadowFramebuffers->getShadowMapHeight());
-				shaderProgram->setInt(s_shadowMap, GMTextureRegisterQuery<GMTextureType::ShadowMap>::Value);
+				shaderProgram->setInt(VI_N(ShadowInfo.ShadowMapWidth, s_width), shadowFramebuffers->getShadowMapWidth());
+				shaderProgram->setInt(VI_N(ShadowInfo.ShadowMapHeight, s_height), shadowFramebuffers->getShadowMapHeight());
+				shaderProgram->setInt(VI_N(ShadowInfo.ShadowMap, s_shadowMap), GMTextureRegisterQuery<GMTextureType::ShadowMap>::Value);
 				g_shadowDirty = false;
 			}
 		}
 		else
 		{
-			shaderProgram->setBool(s_hasShadow, 0);
+			shaderProgram->setBool(VI_N(ShadowInfo.HasShadow, s_hasShadow), 0);
 		}
 	}
 
@@ -261,39 +270,35 @@ void GMGLTechnique::activateTextureTransform(GMModel* model, GMTextureType type)
 	static const GMString u_scales_affix = L"." + GM_VariablesDesc.TextureAttributes.ScaleX;
 	static const GMString u_scalet_affix = L"." + GM_VariablesDesc.TextureAttributes.ScaleY;
 
+	D(d);
 	auto shaderProgram = getShaderProgram();
+	GMsize_t index = verifyIndicesContainer(d->textureTransformIndices, shaderProgram);
 
-	static GMString u_scrolls[(GMsize_t)GMTextureType::EndOfEnum];
-	static GMString u_scrollt[(GMsize_t)GMTextureType::EndOfEnum];
-	static GMString u_scales[(GMsize_t)GMTextureType::EndOfEnum];
-	static GMString u_scalet[(GMsize_t)GMTextureType::EndOfEnum];
 	GMsize_t typeIndex = (GMsize_t)type;
+	if (!d->textureTransformIndices[index].ScrollS[typeIndex])
+		d->textureTransformIndices[index].ScrollS[typeIndex] = shaderProgram->getIndex(getTextureUniformName(type) + u_scrolls_affix);
+	if (!d->textureTransformIndices[index].ScrollT[typeIndex])
+		d->textureTransformIndices[index].ScrollT[typeIndex] = shaderProgram->getIndex(getTextureUniformName(type) + u_scrollt_affix);
+	if (!d->textureTransformIndices[index].ScaleS[typeIndex])
+		d->textureTransformIndices[index].ScaleS[typeIndex] = shaderProgram->getIndex(getTextureUniformName(type) + u_scales_affix);
+	if (!d->textureTransformIndices[index].ScaleT[typeIndex])
+		d->textureTransformIndices[index].ScaleT[typeIndex] = shaderProgram->getIndex(getTextureUniformName(type) + u_scalet_affix);
 
-	const GMString& uniform = getTextureUniformName(type);
-	if (u_scrolls[typeIndex].isEmpty())
-		u_scrolls[typeIndex] = uniform + u_scrolls_affix;
-	if (u_scrollt[typeIndex].isEmpty())
-		u_scrollt[typeIndex] = uniform + u_scrollt_affix;
-	if (u_scales[typeIndex].isEmpty())
-		u_scales[typeIndex] = uniform + u_scales_affix;
-	if (u_scalet[typeIndex].isEmpty())
-		u_scalet[typeIndex] = uniform + u_scalet_affix;
-
-	shaderProgram->setFloat(u_scrolls[typeIndex], 0.f);
-	shaderProgram->setFloat(u_scrollt[typeIndex], 0.f);
-	shaderProgram->setFloat(u_scales[typeIndex], 1.f);
-	shaderProgram->setFloat(u_scalet[typeIndex], 1.f);
+	shaderProgram->setFloat(d->textureTransformIndices[index].ScrollS[typeIndex], 0.f);
+	shaderProgram->setFloat(d->textureTransformIndices[index].ScrollT[typeIndex], 0.f);
+	shaderProgram->setFloat(d->textureTransformIndices[index].ScaleS[typeIndex], 1.f);
+	shaderProgram->setFloat(d->textureTransformIndices[index].ScaleT[typeIndex], 1.f);
 
 	auto applyCallback = [&](GMS_TextureTransformType type, Pair<GMfloat, GMfloat>&& args) {
 		if (type == GMS_TextureTransformType::Scale)
 		{
-			shaderProgram->setFloat(u_scales[typeIndex], args.first);
-			shaderProgram->setFloat(u_scalet[typeIndex], args.second);
+			shaderProgram->setFloat(d->textureTransformIndices[index].ScaleS[typeIndex], args.first);
+			shaderProgram->setFloat(d->textureTransformIndices[index].ScaleT[typeIndex], args.second);
 		}
 		else if (type == GMS_TextureTransformType::Scroll)
 		{
-			shaderProgram->setFloat(u_scrolls[typeIndex], args.first);
-			shaderProgram->setFloat(u_scrollt[typeIndex], args.second);
+			shaderProgram->setFloat(d->textureTransformIndices[index].ScrollS[typeIndex], args.first);
+			shaderProgram->setFloat(d->textureTransformIndices[index].ScrollT[typeIndex], args.second);
 		}
 		else
 		{
@@ -307,6 +312,7 @@ void GMGLTechnique::activateTextureTransform(GMModel* model, GMTextureType type)
 
 GMint32 GMGLTechnique::activateTexture(GMModel* model, GMTextureType type)
 {
+	D(d);
 	static const GMString u_tex_enabled = L"." + GM_VariablesDesc.TextureAttributes.Enabled;
 	static const GMString u_tex_texture = L"." + GM_VariablesDesc.TextureAttributes.Texture;
 
@@ -315,16 +321,15 @@ GMint32 GMGLTechnique::activateTexture(GMModel* model, GMTextureType type)
 
 	auto shaderProgram = getShaderProgram();
 	const GMString& uniform = getTextureUniformName(type);
-	static GMString u_texture[(GMsize_t)GMTextureType::EndOfEnum];
-	static GMString u_enabled[(GMsize_t)GMTextureType::EndOfEnum];
-	GMsize_t typeIndex = (GMsize_t)type;
 
-	if (u_texture[typeIndex].isEmpty())
-		u_texture[typeIndex] = uniform + u_tex_texture;
-	if (u_enabled[typeIndex].isEmpty())
-		u_enabled[typeIndex] = uniform + u_tex_enabled;
-	shaderProgram->setInt(u_texture[typeIndex], texId);
-	shaderProgram->setInt(u_enabled[typeIndex], 1);
+	GMsize_t index = verifyIndicesContainer(d->textureIndices, shaderProgram);
+	GMsize_t typeIndex = (GMsize_t)type;
+	if (!d->textureIndices[index].Texture[typeIndex])
+		d->textureIndices[index].Texture[typeIndex] = shaderProgram->getIndex(uniform + u_tex_texture);
+	if (!d->textureIndices[index].Enabled[typeIndex])
+		d->textureIndices[index].Enabled[typeIndex] = shaderProgram->getIndex(uniform + u_tex_enabled);
+	shaderProgram->setInt(d->textureIndices[index].Texture[typeIndex], texId);
+	shaderProgram->setInt(d->textureIndices[index].Enabled[typeIndex], 1);
 
 	activateTextureTransform(model, type);
 	return texId;
@@ -333,16 +338,14 @@ GMint32 GMGLTechnique::activateTexture(GMModel* model, GMTextureType type)
 void GMGLTechnique::deactivateTexture(GMTextureType type)
 {
 	static const GMString u_tex_enabled = L"." + GM_VariablesDesc.TextureAttributes.Enabled;
-	GMint32 texId = getTextureID(type);
-
+	D(d);
 	auto shaderProgram = getShaderProgram();
-	GMint32 idx = (GMint32)type;
+	GMsize_t index = verifyIndicesContainer(d->textureIndices, shaderProgram);
 	const GMString& uniform = getTextureUniformName(type);
-	static GMString u[(GMsize_t)GMTextureType::EndOfEnum];
 	GMsize_t typeIndex = (GMsize_t)type;
-	if (u[typeIndex].isEmpty())
-		u[typeIndex] = uniform + u_tex_enabled;
-	shaderProgram->setInt(u[typeIndex], 0);
+	if (!d->textureIndices[index].Enabled[typeIndex])
+		d->textureIndices[index].Enabled[typeIndex] = shaderProgram->getIndex(uniform + u_tex_enabled);
+	shaderProgram->setInt(d->textureIndices[index].Enabled[typeIndex], 0);
 }
 
 GMint32 GMGLTechnique::getTextureID(GMTextureType type)
@@ -430,15 +433,15 @@ void GMGLTechnique::updateCameraMatrices(IShaderProgram* shaderProgram)
 void GMGLTechnique::prepareScreenInfo(IShaderProgram* shaderProgram)
 {
 	D(d);
-	static const GMString s_multisampling = GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo + "." + GM_VariablesDesc.ScreenInfoAttributes.Multisampling;
-	static const GMString s_screenWidth = GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo + "." + GM_VariablesDesc.ScreenInfoAttributes.ScreenWidth;
-	static const GMString s_screenHeight = GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo + "." + GM_VariablesDesc.ScreenInfoAttributes.ScreenHeight;
+	static const GMString s_multisampling = GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo + L"." + GM_VariablesDesc.ScreenInfoAttributes.Multisampling;
+	static const GMString s_screenWidth = GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo + L"." + GM_VariablesDesc.ScreenInfoAttributes.ScreenWidth;
+	static const GMString s_screenHeight = GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo + L"." + GM_VariablesDesc.ScreenInfoAttributes.ScreenHeight;
 	if (d->techContext.lastShaderProgram_screenInfo != shaderProgram) //或者窗口属性发生改变
 	{
 		const GMWindowStates& windowStates = d->context->getWindow()->getWindowStates();
-		shaderProgram->setInt(s_multisampling, windowStates.sampleCount > 1);
-		shaderProgram->setInt(s_screenWidth, windowStates.renderRect.width);
-		shaderProgram->setInt(s_screenHeight, windowStates.renderRect.height);
+		shaderProgram->setInt(VI_N(ScreenInfoAttributes.Multisampling, s_multisampling), windowStates.sampleCount > 1);
+		shaderProgram->setInt(VI_N(ScreenInfoAttributes.ScreenWidth, s_screenWidth), windowStates.renderRect.width);
+		shaderProgram->setInt(VI_N(ScreenInfoAttributes.ScreenHeight, s_screenHeight), windowStates.renderRect.height);
 		d->techContext.lastShaderProgram_screenInfo = shaderProgram;
 	}
 }
@@ -559,6 +562,7 @@ GMIlluminationModel GMGLTechnique::prepareIlluminationModel(GMModel* model)
 
 void GMGLTechnique::updateBoneTransforms(IShaderProgram* shaderProgram, GMModel* model)
 {
+	D(d);
 	static Vector<GMString> boneVarNames;
 	if (boneVarNames.empty())
 	{
@@ -573,7 +577,7 @@ void GMGLTechnique::updateBoneTransforms(IShaderProgram* shaderProgram, GMModel*
 	for (GMsize_t i = 0; i < transforms.size(); ++i)
 	{
 		const auto& transform = transforms[i];
-		shaderProgram->setMatrix4(boneVarNames[i], transform);
+		shaderProgram->setMatrix4(getVariableIndex(shaderProgram, d->boneVariableIndices[i], boneVarNames[i]), transform);
 	}
 }
 
@@ -627,11 +631,11 @@ void GMGLTechnique_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	{
 		GMGLShadowFramebuffers* shadowFramebuffers = gm_cast<GMGLShadowFramebuffers*>(db->engine->getShadowMapFramebuffers());
 		shadowFramebuffers->getShadowMapTexture().getTexture()->useTexture(0);
-		applyShadow(&shadowSourceDesc, shaderProgram, shadowFramebuffers, true);
+		applyShadow(this, &shadowSourceDesc, shaderProgram, shadowFramebuffers, true);
 	}
 	else
 	{
-		applyShadow(nullptr, shaderProgram, nullptr, false);
+		applyShadow(this, nullptr, shaderProgram, nullptr, false);
 	}
 
 	db->gammaHelper.setGamma(this, db->engine, shaderProgram);
@@ -681,6 +685,7 @@ IShaderProgram* GMGLTechnique_3D::getShaderProgram()
 void GMGLTechnique_3D::prepareMaterial(const GMShader& shader)
 {
 	D(d);
+	D_BASE(db, Base);
 	auto shaderProgram = getShaderProgram();
 	static const GMString GMSHADER_MATERIAL_KA = GM_VariablesDesc.MaterialName + L"." + GM_VariablesDesc.MaterialAttributes.Ka;
 	static const GMString GMSHADER_MATERIAL_KD = GM_VariablesDesc.MaterialName + L"." + GM_VariablesDesc.MaterialAttributes.Kd;
@@ -690,12 +695,12 @@ void GMGLTechnique_3D::prepareMaterial(const GMShader& shader)
 	static const GMString GMSHADER_MATERIAL_F0 = GM_VariablesDesc.MaterialName + L"." + GM_VariablesDesc.MaterialAttributes.F0;
 
 	const GMMaterial& material = shader.getMaterial();
-	shaderProgram->setVec3(GMSHADER_MATERIAL_KA, ValuePointer(material.getAmbient()));
-	shaderProgram->setVec3(GMSHADER_MATERIAL_KD, ValuePointer(material.getDiffuse()));
-	shaderProgram->setVec3(GMSHADER_MATERIAL_KS, ValuePointer(material.getSpecular()));
-	shaderProgram->setFloat(GMSHADER_MATERIAL_SHININESS, material.getShininess());
-	shaderProgram->setFloat(GMSHADER_MATERIAL_REFRACTIVITY, material.getRefractivity());
-	shaderProgram->setVec3(GMSHADER_MATERIAL_F0, ValuePointer(material.getF0()));
+	shaderProgram->setVec3(VI_NB(MaterialAttributes.Ka, GMSHADER_MATERIAL_KA), ValuePointer(material.getAmbient()));
+	shaderProgram->setVec3(VI_NB(MaterialAttributes.Kd, GMSHADER_MATERIAL_KD), ValuePointer(material.getDiffuse()));
+	shaderProgram->setVec3(VI_NB(MaterialAttributes.Ks, GMSHADER_MATERIAL_KS), ValuePointer(material.getSpecular()));
+	shaderProgram->setFloat(VI_NB(MaterialAttributes.Shininess, GMSHADER_MATERIAL_SHININESS), material.getShininess());
+	shaderProgram->setFloat(VI_NB(MaterialAttributes.Refreactivity, GMSHADER_MATERIAL_REFRACTIVITY), material.getRefractivity());
+	shaderProgram->setVec3(VI_NB(MaterialAttributes.F0, GMSHADER_MATERIAL_F0), ValuePointer(material.getF0()));
 }
 
 void GMGLTechnique_3D::prepareTextures(GMModel* model, GMIlluminationModel illuminationModel)
@@ -724,7 +729,7 @@ void GMGLTechnique_3D::drawDebug()
 	D_BASE(db, Base);
 	static const GMString s_GMSHADER_DEBUG_DRAW_NORMAL = GMSHADER_DEBUG_DRAW_NORMAL;
 	auto shaderProgram = getShaderProgram();
-	shaderProgram->setInt(s_GMSHADER_DEBUG_DRAW_NORMAL, db->debugConfig.get(GMDebugConfigs::DrawPolygonNormalMode).toInt());
+	shaderProgram->setInt(getVariableIndex(shaderProgram, d->drawDebugNormalIndex, s_GMSHADER_DEBUG_DRAW_NORMAL), db->debugConfig.get(GMDebugConfigs::DrawPolygonNormalMode).toInt());
 }
 
 GMTextureAsset GMGLTechnique_3D::getWhiteTexture()
@@ -868,9 +873,9 @@ GMint32 GMGLTechnique_Filter::activateTexture(GMModel* model, GMTextureType type
 	D_BASE(db, Base);
 	GMint32 texId = getTextureID(type);
 	IShaderProgram* shaderProgram = getShaderProgram();
-	shaderProgram->setInt(GMSHADER_FRAMEBUFFER, texId);
+	shaderProgram->setInt(getVariableIndex(shaderProgram, d->framebufferIndex, GMSHADER_FRAMEBUFFER), texId);
 
-	bool b = shaderProgram->setInterfaceInstance(VI_B(FilterAttributes.Filter), GM_VariablesDesc.FilterAttributes.Types[db->engine->getCurrentFilterMode()], GMShaderType::Pixel);
+	bool b = shaderProgram->setInterfaceInstance(GM_VariablesDesc.FilterAttributes.Filter, GM_VariablesDesc.FilterAttributes.Types[db->engine->getCurrentFilterMode()], GMShaderType::Pixel);
 	GM_ASSERT(b);
 	return texId;
 }
@@ -894,11 +899,11 @@ void GMGLTechnique_LightPass::beginModel(GMModel* model, const GMGameObject* par
 	{
 		GMGLShadowFramebuffers* shadowFramebuffers = gm_cast<GMGLShadowFramebuffers*>(d->engine->getShadowMapFramebuffers());
 		shadowFramebuffers->getShadowMapTexture().getTexture()->useTexture(0);
-		applyShadow(&shadowSourceDesc, shaderProgram, shadowFramebuffers, true);
+		applyShadow(this, &shadowSourceDesc, shaderProgram, shadowFramebuffers, true);
 	}
 	else
 	{
-		applyShadow(nullptr, shaderProgram, nullptr, false);
+		applyShadow(this, nullptr, shaderProgram, nullptr, false);
 	}
 
 	d->gammaHelper.setGamma(this, d->engine, shaderProgram);
@@ -922,25 +927,31 @@ void GMGLTechnique_LightPass::prepareLights()
 
 void GMGLTechnique_LightPass::prepareTextures(GMModel* model)
 {
-	D_BASE(d, GMGLTechnique);
+	D(d);
+	D_BASE(db, GMGLTechnique);
 	IShaderProgram* shaderProgram = getShaderProgram();
-	IGBuffer* gBuffer = d->engine->getGBuffer();
+	IGBuffer* gBuffer = db->engine->getGBuffer();
 	IFramebuffers* gBufferFramebuffers = gBuffer->getGeometryFramebuffers();
 	GMsize_t cnt = gBufferFramebuffers->count();
+
+	GMsize_t shaderIdx = verifyIndicesContainer(d->gbufferIndices, shaderProgram);
+	if (d->gbufferIndices[shaderIdx].size() <= cnt)
+		d->gbufferIndices[shaderIdx].resize(cnt + 1);
+
 	for (GMsize_t i = 0; i < cnt; ++i)
 	{
 		GMTextureAsset texture;
 		gBufferFramebuffers->getFramebuffer(i)->getTexture(texture);
 		const GMsize_t textureIndex = (GMTextureRegisterQuery<GMTextureType::GeometryPasses>::Value + i);
-		shaderProgram->setInt(GMGLGBuffer::GBufferGeometryUniformNames()[i], gm_sizet_to_uint(textureIndex));
+		shaderProgram->setInt( getVariableIndex(shaderProgram, d->gbufferIndices[shaderIdx][i], GMGLGBuffer::GBufferGeometryUniformNames()[i]), gm_sizet_to_uint(textureIndex));
 		texture.getTexture()->useTexture((GMuint32)textureIndex);
 	}
 
-	GMTextureAsset cubeMap = d->engine->getCubeMap();
+	GMTextureAsset cubeMap = db->engine->getCubeMap();
 	if (!cubeMap.isEmpty())
 	{
 		const GMsize_t id = GMTextureRegisterQuery<GMTextureType::GeometryPasses>::Value + 1 + cnt;
-		shaderProgram->setInt(VI(CubeMapTextureName), gm_sizet_to_uint(id));
+		shaderProgram->setInt(VI_B(CubeMapTextureName), gm_sizet_to_uint(id));
 		cubeMap.getTexture()->useTexture((GMuint32)id);
 	}
 }
@@ -958,16 +969,17 @@ void GMGLTechnique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* par
 		shaderProgram->setMatrix4(VI(ModelMatrix), Identity<GMMat4>());
 
 	GMGLShadowFramebuffers* shadowFramebuffers = gm_cast<GMGLShadowFramebuffers*>(d->engine->getShadowMapFramebuffers());
-	applyShadow(&d->engine->getShadowSourceDesc(), shaderProgram, shadowFramebuffers, true);
+	applyShadow(this, &d->engine->getShadowSourceDesc(), shaderProgram, shadowFramebuffers, true);
 
+	static const GMString& s_shadow = "GM_Shadow";
 	bool b = shaderProgram->setInterfaceInstance(
 		GMGLShaderProgram::techniqueName(),
-		"GM_Shadow",
+		s_shadow,
 		GMShaderType::Vertex);
 	GM_ASSERT(b);
 	b = shaderProgram->setInterfaceInstance(
 		GMGLShaderProgram::techniqueName(),
-		"GM_Shadow",
+		s_shadow,
 		GMShaderType::Pixel);
 	GM_ASSERT(b);
 }

@@ -6,55 +6,41 @@
 template <GMuint32 i>
 struct String {};
 
-namespace
-{
-	const GMString& number(GMint32 index)
-	{
-		static GMString arr[10] = {
-			L"0",
-			L"1",
-			L"2",
-			L"3",
-			L"4",
-			L"5",
-			L"6",
-			L"7",
-			L"8",
-			L"9",
-		};
-		return arr[index];
-	}
-}
-
 void GMGLLight::activateLight(GMuint32 index, ITechnique* technique)
 {
 	D(d);
-	static GMString light_Position;
-	static GMString light_Color;
-	static GMString light_Type;
-	static GMString light_Attenuation_Constant;
-	static GMString light_Attenuation_Linear;
-	static GMString light_Attenuation_Exp;
+	D_BASE(db, Base);
 
 	GMGLTechnique* glTechnique = gm_cast<GMGLTechnique*>(technique);
 	IShaderProgram* shaderProgram = glTechnique->getShaderProgram();
-	GMString strIndex = number(index);
+	GMString strIndex = GMString((GMint32)index);
 
-	light_Position = L"GM_lights[" + strIndex + L"].Color";
-	shaderProgram->setVec3(light_Position, d->color);
+	GMsize_t shaderLightIdx = verifyIndicesContainer(d->lightIndices, shaderProgram);
+	static const Data::LightIndices s_empty = { 0 };
+	if (d->lightIndices[shaderLightIdx].size() <= index)
+		d->lightIndices[shaderLightIdx].resize(index + 1, s_empty);
 
-	light_Color = L"GM_lights[" + strIndex + L"].Position";
-	shaderProgram->setVec3(light_Color, d->position);
+	shaderProgram->setVec3(
+		getVariableIndex(shaderProgram, d->lightIndices[shaderLightIdx][index].Color, L"GM_lights[" + strIndex + L"].Color"),
+		db->color);
 
-	light_Type = L"GM_lights[" + strIndex + L"].Type";
-	shaderProgram->setInt(light_Type, getType());
+	shaderProgram->setVec3(
+		getVariableIndex(shaderProgram, d->lightIndices[shaderLightIdx][index].Position, L"GM_lights[" + strIndex + L"].Position"),
+		db->position);
 
-	light_Attenuation_Constant = L"GM_lights[" + strIndex + L"].Attenuation.Constant";
-	shaderProgram->setFloat(light_Attenuation_Constant, d->attenuation.constant);
+	shaderProgram->setInt(
+		getVariableIndex(shaderProgram, d->lightIndices[shaderLightIdx][index].Type, L"GM_lights[" + strIndex + L"].Type"),
+		getType());
 
-	light_Attenuation_Linear = L"GM_lights[" + strIndex + L"].Attenuation.Linear";
-	shaderProgram->setFloat(light_Attenuation_Linear, d->attenuation.linear);
+	shaderProgram->setFloat(
+		getVariableIndex(shaderProgram, d->lightIndices[shaderLightIdx][index].AttenuationConstant, L"GM_lights[" + strIndex + L"].Attenuation.Constant"),
+		db->attenuation.constant);
 
-	light_Attenuation_Exp = L"GM_lights[" + strIndex = L"].Attenuation.Exp";
-	shaderProgram->setFloat(light_Attenuation_Exp, d->attenuation.exp);
+	shaderProgram->setFloat(
+		getVariableIndex(shaderProgram, d->lightIndices[shaderLightIdx][index].AttenuationLinear, L"GM_lights[" + strIndex + L"].Attenuation.Linear"),
+		db->attenuation.linear);
+
+	shaderProgram->setFloat(
+		getVariableIndex(shaderProgram, d->lightIndices[shaderLightIdx][index].AttenuationExp, L"GM_lights[" + strIndex + L"].Attenuation.Exp"),
+		db->attenuation.exp);
 }

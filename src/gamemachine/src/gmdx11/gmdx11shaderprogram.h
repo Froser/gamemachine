@@ -9,12 +9,8 @@ BEGIN_NS
 GM_PRIVATE_OBJECT_UNALIGNED(GMDx11EffectShaderProgram)
 {
 	GMComPtr<ID3DX11Effect> effect;
-	GMShaderVariablesDesc desc;
-	HashMap<GMString, ID3DX11EffectVectorVariable*, GMStringHashFunctor> vectors;
-	HashMap<GMString, ID3DX11EffectMatrixVariable*, GMStringHashFunctor> matrices;
-	HashMap<GMString, ID3DX11EffectScalarVariable*, GMStringHashFunctor> scalars;
-	HashMap<GMString, ID3DX11EffectInterfaceVariable*, GMStringHashFunctor> interfaces;
-	HashMap<GMString, ID3DX11EffectClassInstanceVariable*, GMStringHashFunctor> instances;
+	Vector<ID3DX11EffectVariable*> variables;
+	GMAtomic<GMint32> nextVariableIndex;
 };
 
 class GMDx11EffectShaderProgram : public IShaderProgram
@@ -26,6 +22,7 @@ public:
 
 public:
 	virtual void useProgram() override;
+	virtual GMint32 getIndex(const GMString& name) override;
 	virtual void setMatrix4(GMint32 index, const GMMat4& value) override;
 	virtual void setVec4(GMint32 index, const GMFloat4&) override;
 	virtual void setVec3(GMint32 index, const GMfloat value[3]) override;
@@ -39,11 +36,11 @@ public:
 	virtual bool setInterface(GameMachineInterfaceID id, void* in) override;
 
 private:
-	ID3DX11EffectVectorVariable* getVectorVariable(const GMString& name);
-	ID3DX11EffectMatrixVariable* getMatrixVariable(const GMString& name);
-	ID3DX11EffectScalarVariable* getScalarVariable(const GMString& name);
-	ID3DX11EffectInterfaceVariable* getInterfaceVariable(const GMString& name);
-	ID3DX11EffectClassInstanceVariable* getInstanceVariable(const GMString& name);
+	ID3DX11EffectVectorVariable* getVectorVariable(GMint32 index);
+	ID3DX11EffectMatrixVariable* getMatrixVariable(GMint32 index);
+	ID3DX11EffectScalarVariable* getScalarVariable(GMint32 index);
+	ID3DX11EffectInterfaceVariable* getInterfaceVariable(GMint32 index);
+	ID3DX11EffectClassInstanceVariable* getInstanceVariable(GMint32 index);
 };
 
 END_NS

@@ -12,6 +12,18 @@ namespace
 {
 	static gm::GMuint32 s_techid;
 
+	template <typename T>
+	inline gm::GMsize_t verifyIndicesContainer(Vector<T>& container, gm::IShaderProgram* shaderProgram)
+	{
+		gm::GMsize_t sz = static_cast<gm::GMGLShaderProgram*>(shaderProgram)->getProgram();
+		if (container.size() <= sz)
+		{
+			static T t = { 0 };
+			container.resize(sz + 1, t);
+		}
+		return sz;
+	}
+
 	const gm::GMCameraLookAt s_lookAt = gm::GMCameraLookAt(
 		GMVec3(0, 0, 1),
 		GMVec3(0, 0, -1)
@@ -77,6 +89,9 @@ namespace
 			gm::GMfloat Linear = 0.0f;
 			gm::GMfloat Exp = 0.0f;
 		} attenuation;
+
+		Vector<gm::GMint32> lightPositionIndices;
+		Vector<gm::GMint32> lightDirectionIndices;
 	};
 
 	class GLSpotlight : public Spotlight
@@ -84,22 +99,20 @@ namespace
 	public:
 		virtual void activateLight(gm::GMuint32 index, gm::ITechnique* technique)
 		{
-			static gm::GMString light_Position;
-			static gm::GMString light_Color;
-			static gm::GMString light_Direction;
-			static gm::GMString light_Attenuation_Constant;
-			static gm::GMString light_Attenuation_Linear;
-			static gm::GMString light_Attenuation_Exp;
-
 			gm::GMGLTechnique* glTechnique = gm::gm_cast<gm::GMGLTechnique*>(technique);
 			gm::IShaderProgram* shaderProgram = glTechnique->getShaderProgram();
 			gm::GMString strIndex = gm::GMString((gm::GMint32)index).toStdString();
 
-			light_Position = L"lights[" + strIndex + L"].LightPosition";
-			shaderProgram->setVec3(light_Position, position);
+			gm::GMsize_t shaderIdx = verifyIndicesContainer(lightPositionIndices, shaderProgram);
+			if (!lightPositionIndices[shaderIdx])
+				lightPositionIndices[shaderIdx] = shaderProgram->getIndex(L"lights[" + strIndex + L"].LightPosition");
 
-			light_Direction = L"lights[" + strIndex + L"].LightDirection";
-			shaderProgram->setVec3(light_Direction, direction);
+			shaderIdx = verifyIndicesContainer(lightDirectionIndices, shaderProgram);
+			if (!lightDirectionIndices[shaderIdx])
+				lightDirectionIndices[shaderIdx] = shaderProgram->getIndex(L"lights[" + strIndex + L"].LightDirection");
+
+			shaderProgram->setVec3(lightPositionIndices[shaderIdx], position);
+			shaderProgram->setVec3(lightDirectionIndices[shaderIdx], direction);
 		}
 	};
 

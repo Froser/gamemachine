@@ -21,6 +21,12 @@
 #define BIT32_OFFSET(i) (sizeof(gm::GMfloat) * i)
 #define CHECK_VAR(var) if (!var->IsValid()) { GM_ASSERT(false); return; }
 
+#define getVariableIndex(shaderProgram, index, name) (index ? index : (index = shaderProgram->getIndex(name)))
+#define VI_SP(d, name, shaderProgram, indexBank) \
+	getVariableIndex(shaderProgram, d->indexBank. name, GM_VariablesDesc. ## name)
+#define VI(name) VI_SP(d, name, shaderProgram, indexBank)
+#define VI_B(name) VI_SP(db, name, shaderProgram, indexBank)
+
 namespace
 {
 	D3D11_INPUT_ELEMENT_DESC GMSHADER_ElementDescriptions[] =
@@ -576,13 +582,13 @@ void GMDx11Technique::beginModel(GMModel* model, const GMGameObject* parent)
 	
 	if (parent)
 	{
-		shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, parent->getTransform());
-		shaderProgram->setMatrix4(GM_VariablesDesc.InverseTransposeModelMatrix, InverseTranspose(parent->getTransform()));
+		shaderProgram->setMatrix4(VI(ModelMatrix), parent->getTransform());
+		shaderProgram->setMatrix4(VI(InverseTransposeModelMatrix), InverseTranspose(parent->getTransform()));
 	}
 	else
 	{
-		shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, Identity<GMMat4>());
-		shaderProgram->setMatrix4(GM_VariablesDesc.InverseTransposeModelMatrix, Identity<GMMat4>());
+		shaderProgram->setMatrix4(VI(ModelMatrix), Identity<GMMat4>());
+		shaderProgram->setMatrix4(VI(InverseTransposeModelMatrix), Identity<GMMat4>());
 	}
 
 	GMCamera& camera = d->engine->getCamera();
@@ -590,10 +596,10 @@ void GMDx11Technique::beginModel(GMModel* model, const GMGameObject* parent)
 	{
 		GMFloat4 viewPosition;
 		camera.getLookAt().position.loadFloat4(viewPosition);
-		shaderProgram->setVec4(GM_VariablesDesc.ViewPosition, viewPosition);
-		shaderProgram->setMatrix4(GM_VariablesDesc.ViewMatrix, camera.getViewMatrix());
-		shaderProgram->setMatrix4(GM_VariablesDesc.ProjectionMatrix, camera.getProjectionMatrix());
-		shaderProgram->setMatrix4(GM_VariablesDesc.InverseViewMatrix, camera.getInverseViewMatrix());
+		shaderProgram->setVec4(VI(ViewPosition), viewPosition);
+		shaderProgram->setMatrix4(VI(ViewMatrix), camera.getViewMatrix());
+		shaderProgram->setMatrix4(VI(ProjectionMatrix), camera.getProjectionMatrix());
+		shaderProgram->setMatrix4(VI(InverseViewMatrix), camera.getInverseViewMatrix());
 		camera.cleanDirty();
 	}
 
@@ -612,18 +618,18 @@ void GMDx11Technique::beginModel(GMModel* model, const GMGameObject* parent)
 	setGamma(shaderProgram);
 
 	// 设置顶点颜色运算方式
-	shaderProgram->setInt(GM_VariablesDesc.ColorVertexOp, static_cast<GMint32>(model->getShader().getVertexColorOp()));
+	shaderProgram->setInt(VI(ColorVertexOp), static_cast<GMint32>(model->getShader().getVertexColorOp()));
 
 	// 骨骼动画
 	GM_ASSERT(d->techContext.currentScene);
 	if (d->techContext.currentScene->hasAnimation())
 	{
-		shaderProgram->setInt(GM_VariablesDesc.UseBoneAnimation, 1);
+		shaderProgram->setInt(VI(UseBoneAnimation), 1);
 		updateBoneTransforms(shaderProgram, model);
 	}
 	else
 	{
-		shaderProgram->setInt(GM_VariablesDesc.UseBoneAnimation, 0);
+		shaderProgram->setInt(VI(UseBoneAnimation), 0);
 	}
 }
 
@@ -875,7 +881,7 @@ void GMDx11Technique::prepareMaterials(GMModel* model)
 
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
 	GMIlluminationModel illuminationModel = shader.getIlluminationModel();
-	shaderProgram->setInt(GM_VariablesDesc.IlluminationModel, (GMint32)illuminationModel);
+	shaderProgram->setInt(VI(IlluminationModel), (GMint32)illuminationModel);
 }
 
 void GMDx11Technique::prepareBlend(GMModel* model)
@@ -983,7 +989,7 @@ void GMDx11Technique::prepareDebug(GMModel* model)
 	GMint32 mode = d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonNormalMode).toInt();
 	
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
-	shaderProgram->setInt(GM_VariablesDesc.Debug.Normal, mode);
+	shaderProgram->setInt(VI(Debug.Normal), mode);
 }
 
 GMTextureAsset GMDx11Technique::getTexture(GMTextureSampler& sampler)
@@ -1006,12 +1012,12 @@ void GMDx11Technique::setGamma(IShaderProgram* shaderProgram)
 {
 	D(d);
 	bool needGammaCorrection = getEngine()->needGammaCorrection();
-	shaderProgram->setBool(GM_VariablesDesc.GammaCorrection.GammaCorrection, needGammaCorrection);
+	shaderProgram->setBool(VI(GammaCorrection.GammaCorrection), needGammaCorrection);
 	GMfloat gamma = getEngine()->getGammaValue();
 	if (gamma != d->gamma)
 	{
-		shaderProgram->setFloat(GM_VariablesDesc.GammaCorrection.GammaValue, gamma);
-		shaderProgram->setFloat(GM_VariablesDesc.GammaCorrection.GammaInvValue, 1.f / gamma);
+		shaderProgram->setFloat(VI(GammaCorrection.GammaValue), gamma);
+		shaderProgram->setFloat(VI(GammaCorrection.GammaInvValue), 1.f / gamma);
 		d->gamma = gamma;
 	}
 }
@@ -1151,6 +1157,7 @@ void GMDx11Technique_Filter::passAllAndDraw(GMModel* model)
 void GMDx11Technique_Filter::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
+	D_BASE(db, Base);
 	GMDx11Technique::beginModel(model, parent);
 
 	GMDx11EffectVariableBank& bank = getVarBank();
@@ -1178,7 +1185,7 @@ void GMDx11Technique_Filter::beginModel(GMModel* model, const GMGameObject* pare
 		}
 		else
 		{
-			shaderProgram->setBool(GM_VariablesDesc.HDR.HDR, false);
+			shaderProgram->setBool(VI_B(HDR.HDR), false);
 		}
 	}
 }
@@ -1186,7 +1193,8 @@ void GMDx11Technique_Filter::beginModel(GMModel* model, const GMGameObject* pare
 void GMDx11Technique_Filter::setHDR(IShaderProgram* shaderProgram)
 {
 	D(d);
-	shaderProgram->setBool(GM_VariablesDesc.HDR.HDR, true);
+	D_BASE(db, Base);
+	shaderProgram->setBool(VI_B(HDR.HDR), true);
 	if (d->state.toneMapping == GMToneMapping::Reinhard)
 	{
 		bool b = shaderProgram->setInterfaceInstance(GM_VariablesDesc.HDR.ToneMapping.toStdString().c_str(), "ReinhardToneMapping", GMShaderType::Effect);
@@ -1277,13 +1285,13 @@ void GMDx11Technique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* p
 
 	if (parent)
 	{
-		shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, parent->getTransform());
-		shaderProgram->setMatrix4(GM_VariablesDesc.InverseTransposeModelMatrix, InverseTranspose(parent->getTransform()));
+		shaderProgram->setMatrix4(VI(ModelMatrix), parent->getTransform());
+		shaderProgram->setMatrix4(VI(InverseTransposeModelMatrix), InverseTranspose(parent->getTransform()));
 	}
 	else
 	{
-		shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, Identity<GMMat4>());
-		shaderProgram->setMatrix4(GM_VariablesDesc.InverseTransposeModelMatrix, Identity<GMMat4>());
+		shaderProgram->setMatrix4(VI(ModelMatrix), Identity<GMMat4>());
+		shaderProgram->setMatrix4(VI(InverseTransposeModelMatrix), Identity<GMMat4>());
 	}
 
 	const GMShadowSourceDesc& shadowSourceDesc = getEngine()->getShadowSourceDesc();

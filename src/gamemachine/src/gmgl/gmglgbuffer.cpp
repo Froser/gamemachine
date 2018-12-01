@@ -11,7 +11,7 @@
 
 namespace
 {
-	Array<std::string, 8> s_GBufferGeometryUniformNames =
+	Array<GMString, 8> s_GBufferGeometryUniformNames =
 	{
 		"deferred_light_pass_gPosition_Refractivity",
 		"deferred_light_pass_gNormal_IlluminationModel",
@@ -117,7 +117,7 @@ void GMGLGBuffer::drawGeometryBuffer(GMuint32 index, const GMRect& rect)
 	glBindFramebuffer(GL_FRAMEBUFFER, dest);
 }
 
-const std::string* GMGLGBuffer::GBufferGeometryUniformNames()
+const GMString* GMGLGBuffer::GBufferGeometryUniformNames()
 {
 	return s_GBufferGeometryUniformNames.data();
 }

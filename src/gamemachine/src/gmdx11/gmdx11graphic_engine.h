@@ -44,6 +44,8 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMOwnedPtr<ITechnique> technique_3d_shadow;
 	GMOwnedPtr<ITechnique> technique_particle;
 	GMOwnedPtr<ITechnique> technique_custom;
+
+	GMint32 lightCountIndices = 0;
 };
 
 class GMDx11GraphicEngine : public GMGraphicEngine
