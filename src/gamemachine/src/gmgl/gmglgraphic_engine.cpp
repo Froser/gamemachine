@@ -138,7 +138,7 @@ void GMGLGraphicEngine::activateLights(ITechnique* technique)
 		GM_ASSERT(lightCount <= getMaxLightCount());
 		shaderProgram->setInt(getVariableIndex(shaderProgram, d->lightCountIndices[verifyIndicesContainer(d->lightCountIndices, shaderProgram)], GM_VariablesDesc.LightCount) , gm_sizet_to_uint(lightCount));
 
-		for (GMuint32 i = 0; i < (GMuint32)lightCount; ++i)
+		for (GMuint32 i = 0; i < gm_sizet_to_uint(lightCount); ++i)
 		{
 			lights[i]->activateLight(i, technique);
 		}

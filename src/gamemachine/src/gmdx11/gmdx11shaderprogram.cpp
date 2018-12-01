@@ -6,6 +6,7 @@ GMDx11EffectShaderProgram::GMDx11EffectShaderProgram(GMComPtr<ID3DX11Effect> eff
 {
 	D(d);
 	d->effect = effect;
+	d->nextVariableIndex.exchange(0);
 }
 
 void GMDx11EffectShaderProgram::useProgram()
