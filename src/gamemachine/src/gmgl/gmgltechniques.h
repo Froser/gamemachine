@@ -20,8 +20,6 @@ GM_PRIVATE_OBJECT(GMGLTechnique)
 {
 	struct TechniqueContext
 	{
-		IShaderProgram* lastShaderProgram_camera = nullptr;
-		IShaderProgram* lastShaderProgram_screenInfo = nullptr;
 		GMModel* currentModel = nullptr;
 		GMScene* currentScene = nullptr;
 	};

@@ -50,8 +50,7 @@ GM_PRIVATE_OBJECT(GMDx11Technique)
 	GMComPtr<ID3D11Resource> shadowMapResource;
 	GMDx11GraphicEngine* engine = nullptr;
 	GMfloat gamma = 0;
-	HashMap<GMString, ID3DX11EffectVariable*, GMStringHashFunctor> textureAttributes;
-	HashMap<GMString, GMTextureAttributeBank, GMStringHashFunctor> textureVariables;
+	Map<ID3DX11EffectVariable*, GMTextureAttributeBank> textureVariables;
 	GMShaderVariablesIndices indexBank = { 0 };
 };
 

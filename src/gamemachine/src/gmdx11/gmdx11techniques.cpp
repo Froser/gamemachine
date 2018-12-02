@@ -326,6 +326,16 @@ public:
 	EFFECT_VARIABLE_AS_SCALAR(KernelDeltaX, GM_VariablesDesc.FilterAttributes.KernelDeltaX)
 	EFFECT_VARIABLE_AS_SCALAR(KernelDeltaY, GM_VariablesDesc.FilterAttributes.KernelDeltaY)
 
+	// Textures
+	EFFECT_VARIABLE(AmbientTexture, GM_VariablesDesc.AmbientTextureName);
+	EFFECT_VARIABLE(DiffuseTexture, GM_VariablesDesc.DiffuseTextureName);
+	EFFECT_VARIABLE(SpecularTexture, GM_VariablesDesc.SpecularTextureName);
+	EFFECT_VARIABLE(NormalMapTexture, GM_VariablesDesc.NormalMapTextureName);
+	EFFECT_VARIABLE(LightMapTexture, GM_VariablesDesc.LightMapTextureName);
+	EFFECT_VARIABLE(CubeMapTexture, GM_VariablesDesc.CubeMapTextureName);
+	EFFECT_VARIABLE(AlbedoTexture, GM_VariablesDesc.AlbedoTextureName);
+	EFFECT_VARIABLE(MetallicRoughnessAOTexture, GM_VariablesDesc.MetallicRoughnessAOTextureName);
+
 private:
 	ID3DX11Effect* m_effect = nullptr;
 };
@@ -712,58 +722,44 @@ void GMDx11Technique::prepareTextures(GMModel* model)
 void GMDx11Technique::applyTextureAttribute(GMModel* model, GMTextureAsset texture, GMTextureType type)
 {
 	D(d);
-	const GMString* textureNamePtr = nullptr;
+	
+	GMDx11EffectVariableBank& effectBank = getVarBank();
+	ID3DX11EffectVariable* textureVariable = nullptr;
+
 	switch (type)
 	{
 	case GMTextureType::Ambient:
-		textureNamePtr = &GM_VariablesDesc.AmbientTextureName;
+		textureVariable = effectBank.AmbientTexture();
 		break;
 	case GMTextureType::Diffuse:
-		textureNamePtr = &GM_VariablesDesc.DiffuseTextureName;
+		textureVariable = effectBank.DiffuseTexture();
 		break;
 	case GMTextureType::Specular:
-		textureNamePtr = &GM_VariablesDesc.SpecularTextureName;
+		textureVariable = effectBank.SpecularTexture();
 		break;
 	case GMTextureType::NormalMap:
-		textureNamePtr = &GM_VariablesDesc.NormalMapTextureName;
+		textureVariable = effectBank.NormalMapTexture();
 		break;
 	case GMTextureType::Lightmap:
-		textureNamePtr = &GM_VariablesDesc.LightMapTextureName;
+		textureVariable = effectBank.LightMapTexture();
 		break;
 	case GMTextureType::CubeMap:
-		textureNamePtr = &GM_VariablesDesc.CubeMapTextureName;
+		textureVariable = effectBank.CubeMapTexture();
 		break;
 	case GMTextureType::Albedo:
-		textureNamePtr = &GM_VariablesDesc.AlbedoTextureName;
+		textureVariable = effectBank.AlbedoTexture();
 		break;
 	case GMTextureType::MetallicRoughnessAO:
-		textureNamePtr = &GM_VariablesDesc.MetallicRoughnessAOTextureName;
+		textureVariable = effectBank.MetallicRoughnessAOTexture();
 		break;
 	default:
 		GM_ASSERT(false);
 		return;
 	}
-	GM_ASSERT(textureNamePtr);
-	const GMString& textureName = *textureNamePtr;
-
-	ID3DX11EffectVariable* textureAttribute = nullptr;
-	{
-		auto iter = d->textureAttributes.find(textureName);
-		if (iter != d->textureAttributes.end())
-		{
-			textureAttribute = iter->second;
-		}
-		else
-		{
-			textureAttribute = d->effect->GetVariableByName(textureName.toStdString().c_str());
-			CHECK_VAR(textureAttribute);
-			d->textureAttributes[textureName] = textureAttribute;
-		}
-	}
 
 	const GMTextureAttributeBank* bank = nullptr;
 	{
-		auto iter = d->textureVariables.find(textureName);
+		auto iter = d->textureVariables.find(textureVariable);
 		if (iter != d->textureVariables.end())
 		{
 			bank = &iter->second;
@@ -771,18 +767,18 @@ void GMDx11Technique::applyTextureAttribute(GMModel* model, GMTextureAsset textu
 		else
 		{
 			GMTextureAttributeBank newBank;
-			newBank.enabled = textureAttribute->GetMemberByName(GM_VariablesDesc.TextureAttributes.Enabled.toStdString().c_str())->AsScalar();
-			newBank.offsetX = textureAttribute->GetMemberByName(GM_VariablesDesc.TextureAttributes.OffsetX.toStdString().c_str())->AsScalar();
-			newBank.offsetY = textureAttribute->GetMemberByName(GM_VariablesDesc.TextureAttributes.OffsetY.toStdString().c_str())->AsScalar();
-			newBank.scaleX = textureAttribute->GetMemberByName(GM_VariablesDesc.TextureAttributes.ScaleX.toStdString().c_str())->AsScalar();
-			newBank.scaleY = textureAttribute->GetMemberByName(GM_VariablesDesc.TextureAttributes.ScaleY.toStdString().c_str())->AsScalar();
+			newBank.enabled = textureVariable->GetMemberByName(GM_VariablesDesc.TextureAttributes.Enabled.toStdString().c_str())->AsScalar();
+			newBank.offsetX = textureVariable->GetMemberByName(GM_VariablesDesc.TextureAttributes.OffsetX.toStdString().c_str())->AsScalar();
+			newBank.offsetY = textureVariable->GetMemberByName(GM_VariablesDesc.TextureAttributes.OffsetY.toStdString().c_str())->AsScalar();
+			newBank.scaleX = textureVariable->GetMemberByName(GM_VariablesDesc.TextureAttributes.ScaleX.toStdString().c_str())->AsScalar();
+			newBank.scaleY = textureVariable->GetMemberByName(GM_VariablesDesc.TextureAttributes.ScaleY.toStdString().c_str())->AsScalar();
 			CHECK_VAR(newBank.enabled);
 			CHECK_VAR(newBank.offsetX);
 			CHECK_VAR(newBank.offsetY);
 			CHECK_VAR(newBank.scaleX);
 			CHECK_VAR(newBank.scaleY);
-			d->textureVariables[textureName] = newBank;
-			bank = &d->textureVariables[textureName];
+			d->textureVariables[textureVariable] = newBank;
+			bank = &newBank;
 		}
 	}
 

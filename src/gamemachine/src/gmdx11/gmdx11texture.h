@@ -21,7 +21,8 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMDx11Texture)
 	GMComPtr<ID3D11ShaderResourceView> shaderResourceView;
 	GMComPtr<ID3D11SamplerState> samplerState;
 	GMComPtr<ID3DX11Effect> effect;
-	HashMap<const char*, GMDx11TextureSamplerVariable> variables;
+	Vector<ID3DX11EffectShaderResourceVariable*> shaderResourceVariables;
+	Vector<ID3DX11EffectSamplerVariable*> samplerVariables;
 };
 
 class GMDx11Texture : public ITexture

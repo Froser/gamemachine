@@ -30,6 +30,13 @@ namespace
 #define VI_N(name, str) VI_C(d, name, str)
 #define VI_NB(name, str) VI_C(db, name, str)
 
+	// global variables
+	struct
+	{
+		IShaderProgram* lastShaderProgram_camera = nullptr;
+		IShaderProgram* lastShaderProgram_screenInfo = nullptr;
+	} s_shaderCaches;
+
 	inline GLenum toStencilOp(GMStencilOptions::GMStencilOp stencilOptions)
 	{
 		switch (stencilOptions)
@@ -413,7 +420,7 @@ void GMGLTechnique::updateCameraMatrices(IShaderProgram* shaderProgram)
 {
 	D(d);
 	GMCamera& camera = d->engine->getCamera();
-	if (d->techContext.lastShaderProgram_camera != shaderProgram || camera.isDirty())
+	if (s_shaderCaches.lastShaderProgram_camera != shaderProgram || camera.isDirty())
 	{
 		const GMMat4& viewMatrix = camera.getViewMatrix();
 		const GMCameraLookAt& lookAt = camera.getLookAt();
@@ -425,7 +432,7 @@ void GMGLTechnique::updateCameraMatrices(IShaderProgram* shaderProgram)
 		shaderProgram->setMatrix4(VI(ViewMatrix), camera.getViewMatrix());
 		shaderProgram->setMatrix4(VI(InverseViewMatrix), camera.getInverseViewMatrix());
 		shaderProgram->setMatrix4(VI(ProjectionMatrix), camera.getProjectionMatrix());
-		d->techContext.lastShaderProgram_camera = shaderProgram;
+		s_shaderCaches.lastShaderProgram_camera = shaderProgram;
 		camera.cleanDirty();
 	}
 }
@@ -436,13 +443,13 @@ void GMGLTechnique::prepareScreenInfo(IShaderProgram* shaderProgram)
 	static const GMString s_multisampling = GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo + L"." + GM_VariablesDesc.ScreenInfoAttributes.Multisampling;
 	static const GMString s_screenWidth = GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo + L"." + GM_VariablesDesc.ScreenInfoAttributes.ScreenWidth;
 	static const GMString s_screenHeight = GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo + L"." + GM_VariablesDesc.ScreenInfoAttributes.ScreenHeight;
-	if (d->techContext.lastShaderProgram_screenInfo != shaderProgram) //或者窗口属性发生改变
+	if (s_shaderCaches.lastShaderProgram_screenInfo != shaderProgram) //或者窗口属性发生改变
 	{
 		const GMWindowStates& windowStates = d->context->getWindow()->getWindowStates();
 		shaderProgram->setInt(VI_N(ScreenInfoAttributes.Multisampling, s_multisampling), windowStates.sampleCount > 1);
 		shaderProgram->setInt(VI_N(ScreenInfoAttributes.ScreenWidth, s_screenWidth), windowStates.renderRect.width);
 		shaderProgram->setInt(VI_N(ScreenInfoAttributes.ScreenHeight, s_screenHeight), windowStates.renderRect.height);
-		d->techContext.lastShaderProgram_screenInfo = shaderProgram;
+		s_shaderCaches.lastShaderProgram_screenInfo = shaderProgram;
 	}
 }
 

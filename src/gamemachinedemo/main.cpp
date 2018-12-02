@@ -81,6 +81,7 @@ int main(int argc, char* argv[])
 
 	/*
 	gm::IWindow* mainWindow2 = nullptr;
+	mainAttrs.windowName = "Window 2";
 	factory->createWindow(hInstance, mainWindow, &mainWindow2);
 	mainWindow2->create(mainAttrs);
 	mainWindow2->centerWindow();

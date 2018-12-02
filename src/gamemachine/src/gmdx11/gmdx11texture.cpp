@@ -100,27 +100,36 @@ void GMDx11Texture::useTexture(GMint32 textureType)
 		GM_ASSERT(b && d->effect);
 	}
 
+#if GM_DEBUG
+	// 必须确保effect没有发生变化（每一个texture对应一个effect），这样获取的Effect变量才准确
+	ID3DX11Effect* effect;
+	d->context->getEngine()->getShaderProgram()->getInterface(GameMachineInterfaceID::D3D11Effect, (void**)&effect);
+	GM_ASSERT(d->effect == effect);
+#endif
+
 	GMTextureType tt = (GMTextureType)textureType;
+	GMsize_t effectId = static_cast<GMsize_t>(tt);
+
+	if (d->shaderResourceVariables.size() <= effectId)
+		d->shaderResourceVariables.resize(effectId + 1);
+	if (d->samplerVariables.size() <= effectId)
+		d->samplerVariables.resize(effectId + 1);
+	
 	const char* textureName = nullptr;
 	const char* samplerName = nullptr;
-	getTextureAndSamplerName(tt, textureName, samplerName);
-
-	ID3DX11EffectShaderResourceVariable* shaderResourceVariable = nullptr;
-	ID3DX11EffectSamplerVariable* samplerVariable = nullptr;
-	auto iter = d->variables.find(textureName);
-	if (iter != d->variables.end())
+	ID3DX11EffectShaderResourceVariable* shaderResourceVariable = d->shaderResourceVariables[effectId];
+	ID3DX11EffectSamplerVariable* samplerVariable = d->samplerVariables[effectId];
+	if (!shaderResourceVariable)
 	{
-		shaderResourceVariable = iter->second.shaderResource;
-		samplerVariable = iter->second.sampler;
+		if (!textureName && !samplerName)
+			getTextureAndSamplerName(tt, textureName, samplerName);
+		d->shaderResourceVariables[effectId] = shaderResourceVariable = d->effect->GetVariableByName(textureName)->AsShaderResource();
 	}
-	else
+	if (!samplerVariable)
 	{
-		shaderResourceVariable = d->effect->GetVariableByName(textureName)->AsShaderResource();
-		samplerVariable = d->effect->GetVariableByName(samplerName)->AsSampler();
-		GM_ASSERT(shaderResourceVariable->IsValid());
-		GM_ASSERT(samplerVariable->IsValid());
-		GMDx11TextureSamplerVariable variable = { shaderResourceVariable, samplerVariable };
-		d->variables[textureName] = variable;
+		if (!textureName && !samplerName)
+			getTextureAndSamplerName(tt, textureName, samplerName);
+		d->samplerVariables[effectId] = samplerVariable = d->effect->GetVariableByName(samplerName)->AsSampler();
 	}
 
 	GM_DX_HR(shaderResourceVariable->SetResource(d->shaderResourceView));
