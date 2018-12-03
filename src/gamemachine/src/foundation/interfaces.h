@@ -573,6 +573,11 @@ struct IRenderContext
 {
 	virtual IWindow* getWindow() const = 0;
 	virtual IGraphicEngine* getEngine() const = 0;
+
+	/*!
+	  切换渲染上下文到当前上下文。它会切换默认的帧缓存，更改渲染引擎上下文。<BR>
+	  每当开始渲染一个窗口时，它将会被调用。
+	*/
 	virtual void switchToContext() const = 0;
 };
 

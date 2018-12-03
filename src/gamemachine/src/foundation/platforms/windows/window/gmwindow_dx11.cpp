@@ -15,6 +15,7 @@ class GMDx11RenderContext : public GMRenderContext
 public:
 	virtual void switchToContext() const override
 	{
+		getEngine()->getDefaultFramebuffers()->bind();
 	}
 };
 
