@@ -171,6 +171,9 @@ struct GMLight
 {
     float4 Position;
     float4 Color;
+    float4 AmbientIntensity;
+    float4 DiffuseIntensity;
+    float SpecularIntensity;
     int Type;
     GM_Attenuation Attenuation;
 };
@@ -191,29 +194,11 @@ float3 GetLightPositionInEyeSpace(float4 pos, float4x4 viewMatrix)
     return (mul(pos, viewMatrix)).xyz;
 }
 
-class GMPhongAmbientLight : ILight
+class GMPhongPointLight : ILight
 {
     float4 IlluminateAmbient()
     {
         return 1;
-    }
-
-    float4 IlluminateDiffuse(float3 lightDirection_N, float3 normal_N)
-    {
-        return 0;
-    }
-
-    float4 IlluminateSpecular(float3 lightDirection_N, float3 eyeDirection_N, float3 normal_N, float shininess)
-    {
-        return 0;
-    }
-};
-
-class GMPhongDirectLight : ILight
-{
-    float4 IlluminateAmbient()
-    {
-        return 0;
     }
 
     float4 IlluminateDiffuse(float3 lightDirection_N, float3 normal_N)
@@ -232,36 +217,34 @@ class GMPhongDirectLight : ILight
 };
 
 //默认的光照实现
-GMPhongAmbientLight GM_PhongAmbientLight; 
-GMPhongDirectLight GM_PhongDirectLight;
+GMPhongPointLight GM_PhongPointLight;
 
-static const int GM_AmbientLight = 0;
-static const int GM_DirectLight = 1;
+static const int GM_PointLight = 0;
 
 class GMPhongLightProxy
 {
     float4 IlluminateAmbient(GMLight light)
     {
-        if (light.Type == GM_AmbientLight)
-            return GM_PhongAmbientLight.IlluminateAmbient();
+        if (light.Type == GM_PointLight)
+            return GM_PhongPointLight.IlluminateAmbient();
 
-        return GM_PhongDirectLight.IlluminateAmbient();
+        return GM_PhongPointLight.IlluminateAmbient();
     }
 
     float4 IlluminateDiffuse(GMLight light, float3 lightDirection_N, float3 normal_N)
     {
-        if (light.Type == GM_AmbientLight)
-            return GM_PhongAmbientLight.IlluminateDiffuse(lightDirection_N, normal_N);
+        if (light.Type == GM_PointLight)
+            return GM_PhongPointLight.IlluminateDiffuse(lightDirection_N, normal_N);
 
-        return GM_PhongDirectLight.IlluminateDiffuse(lightDirection_N, normal_N);
+        return GM_PhongPointLight.IlluminateDiffuse(lightDirection_N, normal_N);
     }
 
     float4 IlluminateSpecular(GMLight light, float3 lightDirection_N, float3 eyeDirection_N, float3 normal_N, float shininess)
     {
-        if (light.Type == GM_AmbientLight)
-            return GM_PhongAmbientLight.IlluminateSpecular(lightDirection_N, eyeDirection_N, normal_N, shininess);
+        if (light.Type == GM_PointLight)
+            return GM_PhongPointLight.IlluminateSpecular(lightDirection_N, eyeDirection_N, normal_N, shininess);
 
-        return GM_PhongDirectLight.IlluminateSpecular(lightDirection_N, eyeDirection_N, normal_N, shininess);
+        return GM_PhongPointLight.IlluminateSpecular(lightDirection_N, eyeDirection_N, normal_N, shininess);
     }
 };
 int GM_LightCount;
@@ -550,21 +533,21 @@ class GMPhong : IIlluminationModel
                                 GM_LightAttributes[i].Attenuation.Exp * distance * distance;
 
             float3 lightPosition_Eye = GetLightPositionInEyeSpace(GM_LightAttributes[i].Position, GM_ViewMatrix);
-            factor_Ambient += PhoneLightProxy.IlluminateAmbient(GM_LightAttributes[i]) * GM_LightAttributes[i].Color / attenuation;
+            factor_Ambient += PhoneLightProxy.IlluminateAmbient(GM_LightAttributes[i]) * GM_LightAttributes[i].Color * GM_LightAttributes[i].AmbientIntensity / attenuation;
 
             if (!input.HasNormalMap)
             {
                 float3 lightDirection_Eye_N = normalize(lightPosition_Eye - position_Eye);
-                factor_Diffuse += PhoneLightProxy.IlluminateDiffuse(GM_LightAttributes[i], lightDirection_Eye_N, input.Normal_Eye_N) * GM_LightAttributes[i].Color / attenuation;
-                factor_Specular += PhoneLightProxy.IlluminateSpecular(GM_LightAttributes[i], lightDirection_Eye_N, -position_Eye_N, input.Normal_Eye_N, input.Shininess) * GM_LightAttributes[i].Color / attenuation;
+                factor_Diffuse += PhoneLightProxy.IlluminateDiffuse(GM_LightAttributes[i], lightDirection_Eye_N, input.Normal_Eye_N) * GM_LightAttributes[i].Color * GM_LightAttributes[i].DiffuseIntensity / attenuation;
+                factor_Specular += PhoneLightProxy.IlluminateSpecular(GM_LightAttributes[i], lightDirection_Eye_N, -position_Eye_N, input.Normal_Eye_N, input.Shininess) * GM_LightAttributes[i].Color * GM_LightAttributes[i].SpecularIntensity / attenuation;
             }
             else
             {
                 float3 lightDirection_Eye = lightPosition_Eye - position_Eye;
                 float3 lightDirection_Tangent_N = normalize(mul(lightDirection_Eye, input.TangentSpace.TBN));
                 float3 eyeDirection_Tangent_N = normalize(mul(-position_Eye, input.TangentSpace.TBN));
-                factor_Diffuse += PhoneLightProxy.IlluminateDiffuse(GM_LightAttributes[i], lightDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N) * GM_LightAttributes[i].Color / attenuation;
-                factor_Specular += PhoneLightProxy.IlluminateSpecular(GM_LightAttributes[i], lightDirection_Tangent_N, eyeDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N, input.Shininess) * GM_LightAttributes[i].Color / attenuation; 
+                factor_Diffuse += PhoneLightProxy.IlluminateDiffuse(GM_LightAttributes[i], lightDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N) * GM_LightAttributes[i].Color * GM_LightAttributes[i].DiffuseIntensity / attenuation;
+                factor_Specular += PhoneLightProxy.IlluminateSpecular(GM_LightAttributes[i], lightDirection_Tangent_N, eyeDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N, input.Shininess) * GM_LightAttributes[i].Color * GM_LightAttributes[i].SpecularIntensity / attenuation; 
             }
         }
         float4 color_Ambient = CalculateGammaCorrectionIfNecessary(factor_Ambient) * ToFloat4(input.AmbientLightmapTexture);
@@ -650,33 +633,32 @@ class GMCookTorranceBRDF : IIlluminationModel
         for (int i = 0; i < GM_LightCount; ++i)
         {
             // 只考虑直接光源
-            if (GM_LightAttributes[i].Type == GM_AmbientLight)
-            {
-                ambient += GM_LightAttributes[i].Color * input.AlbedoTexture * roughness;
-            }
-            else if (GM_LightAttributes[i].Type == GM_DirectLight)
-            {
-                // 计算每束光辐射率
-                float3 L_N = normalize(GM_LightAttributes[i].Position - input.WorldPos);
-                float3 H_N = normalize(viewDirection_N + L_N);
-                float attenuation = 1.0f; //先不计算衰减
-                float3 radiance = GM_LightAttributes[i].Color * attenuation;
+            ambient += GM_LightAttributes[i].Color * GM_LightAttributes[i].AmbientIntensity * input.AlbedoTexture * roughness;
+            // 计算每束光辐射率
+            float3 L_N = normalize(GM_LightAttributes[i].Position - input.WorldPos);
+            float3 H_N = normalize(viewDirection_N + L_N);
 
-                // Cook-Torrance BRDF
-                float NDF = DistributionGGX(normal_World_N, H_N, roughness);
-                float G = GeometrySmith(normal_World_N, viewDirection_N, L_N, roughness);
-                float3 F = FresnelSchlick(max(dot(H_N, viewDirection_N), 0.0f), F0);
-                float3 nominator = NDF * G * F;
-                float denominator = 4 * max(dot(normal_World_N, viewDirection_N), 0.0) * max(dot(normal_World_N, L_N), 0.0) + 0.001; // 0.001 防止除0
-                float3 specular = nominator / denominator;
+            float distance = length(input.WorldPos - GM_LightAttributes[i].Position);
+            float attenuation = GM_LightAttributes[i].Attenuation.Constant + 
+                                GM_LightAttributes[i].Attenuation.Linear * distance +
+                                GM_LightAttributes[i].Attenuation.Exp * distance * distance;
 
-                float3 ks = F;
-                float3 kd = float3(1, 1, 1) - ks;
-                kd *= 1.0f - metallic;
+            float3 radiance = GM_LightAttributes[i].Color * GM_LightAttributes[i].DiffuseIntensity * attenuation;
 
-                float cosTheta = max(dot(normal_World_N, L_N), 0);
-                Lo += (kd * input.AlbedoTexture / PI + specular) * radiance * cosTheta;
-            }
+            // Cook-Torrance BRDF
+            float NDF = DistributionGGX(normal_World_N, H_N, roughness);
+            float G = GeometrySmith(normal_World_N, viewDirection_N, L_N, roughness);
+            float3 F = FresnelSchlick(max(dot(H_N, viewDirection_N), 0.0f), F0);
+            float3 nominator = NDF * G * F;
+            float denominator = 4 * max(dot(normal_World_N, viewDirection_N), 0.0) * max(dot(normal_World_N, L_N), 0.0) + 0.001; // 0.001 防止除0
+            float3 specular = nominator / denominator;
+
+            float3 ks = F;
+            float3 kd = float3(1, 1, 1) - ks;
+            kd *= 1.0f - metallic;
+
+            float cosTheta = max(dot(normal_World_N, L_N), 0);
+            Lo += (kd * input.AlbedoTexture / PI + specular) * radiance * cosTheta;
         }
 
         float4 color = ToFloat4(ambient + Lo) * shadowFactor;

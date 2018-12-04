@@ -35,6 +35,18 @@ void GMDx11Light::activateLight(GMuint32 index, ITechnique* technique)
 	GM_ASSERT(color->IsValid());
 	GM_DX_HR(color->SetFloatVector(db->color));
 
+	ID3DX11EffectVectorVariable* ambientIntensity = lightStruct->GetMemberByName("AmbientIntensity")->AsVector();
+	GM_ASSERT(ambientIntensity->IsValid());
+	GM_DX_HR(ambientIntensity->SetFloatVector(db->ambientIntensity));
+
+	ID3DX11EffectVectorVariable* diffuseIntensity = lightStruct->GetMemberByName("DiffuseIntensity")->AsVector();
+	GM_ASSERT(diffuseIntensity->IsValid());
+	GM_DX_HR(diffuseIntensity->SetFloatVector(db->diffuseIntensity));
+
+	ID3DX11EffectScalarVariable* specularIntensity = lightStruct->GetMemberByName("SpecularIntensity")->AsScalar();
+	GM_ASSERT(specularIntensity->IsValid());
+	GM_DX_HR(specularIntensity->SetFloat(db->specularIntensity));
+
 	ID3DX11EffectScalarVariable* type = lightStruct->GetMemberByName("Type")->AsScalar();
 	GM_ASSERT(type->IsValid());
 	GM_DX_HR(type->SetInt(getLightType()));

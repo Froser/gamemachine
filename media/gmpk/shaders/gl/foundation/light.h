@@ -307,7 +307,11 @@ vec4 GM_CookTorranceBRDF_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
             // 计算每束光辐射率
             vec3 L_N = normalize(GM_lights[i].Position - vertex.WorldPos);
             vec3 H_N = normalize(viewDirection_N + L_N);
-            float attenuation = 1.0f; //先不计算衰减
+
+            float distance = length(vertex.WorldPos - GM_lights[i].Position);
+            float attenuation = GM_lights[i].Attenuation.Constant + 
+                                GM_lights[i].Attenuation.Linear * distance +
+                                GM_lights[i].Attenuation.Exp * distance * distance;
             vec3 radiance = GM_lights[i].Color * GM_lights[i].DiffuseIntensity * attenuation;
 
             // Cook-Torrance BRDF

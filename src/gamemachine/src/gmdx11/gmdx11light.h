@@ -23,12 +23,12 @@ protected:
 
 class GMDx11PointLight : public GMDx11Light
 {
-	enum { LightType = 0 };
+	enum { PointLight = 0 };
 
 public:
 	virtual int getLightType() override
 	{
-		return LightType;
+		return PointLight;
 	}
 };
 

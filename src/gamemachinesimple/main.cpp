@@ -54,20 +54,14 @@ public:
 		/************************************************************************/
 		{
 			ILight* light = nullptr;
-			GM.getFactory()->createLight(GMLightType::Ambient, &light);		// 这是一个环境光照
+			GM.getFactory()->createLight(GMLightType::PointLight, &light);		// 这是一个直接光照
 			GM_ASSERT(light);
-			GMfloat colorA[] = { .7f, .7f, .7f };
-			light->setLightAttribute3(GMLight::Color, colorA);
-			light->setLightAttribute(GMLight::AttenuationLinear, .1f);
-			m_context->getEngine()->addLight(light);
-		}
 
-		{
-			ILight* light = nullptr;
-			GM.getFactory()->createLight(GMLightType::Direct, &light);		// 这是一个直接光照
-			GM_ASSERT(light);
-			GMfloat colorD[] = { .7f, .7f, .7f };
-			light->setLightAttribute3(GMLight::Color, colorD);
+			GMfloat ambientIntensity[] = { .7f, .7f, .7f };
+			light->setLightAttribute3(GMLight::AmbientIntensity, ambientIntensity);
+
+			GMfloat diffuseIntensity[] = { .7f, .7f, .7f };
+			light->setLightAttribute3(GMLight::DiffuseIntensity, diffuseIntensity);
 
 			GMfloat lightPos[] = { -3.f, 3.f, -3.f };
 			light->setLightAttribute3(GMLight::Position, lightPos);

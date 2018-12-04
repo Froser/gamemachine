@@ -219,7 +219,7 @@ void DemoHandler::setDefaultLights()
 		gm::GMfloat diffuseIntensity[] = { .7f, .7f, .7f };
 		light->setLightAttribute3(gm::GMLight::DiffuseIntensity, diffuseIntensity);
 
-		gm::GMfloat ambientIntensity[] = { 0 };
+		gm::GMfloat ambientIntensity[] = { 0, 0, 0 };
 		light->setLightAttribute3(gm::GMLight::AmbientIntensity, ambientIntensity);
 
 		d->engine->addLight(light);

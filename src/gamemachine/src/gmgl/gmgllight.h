@@ -35,12 +35,12 @@ protected:
 
 class GMGLPointLight : public GMGLLight
 {
-	enum { LightType = 0 };
+	enum { PointLight = 0 };
 
 public:
 	virtual int getType() override
 	{
-		return LightType;
+		return PointLight;
 	}
 };
 
