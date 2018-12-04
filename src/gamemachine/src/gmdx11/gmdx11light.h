@@ -21,20 +21,9 @@ protected:
 	virtual int getLightType() = 0;
 };
 
-class GMDx11AmbientLight : public GMDx11Light
+class GMDx11PointLight : public GMDx11Light
 {
 	enum { LightType = 0 };
-
-public:
-	virtual int getLightType() override
-	{
-		return LightType;
-	}
-};
-
-class GMDx11DirectLight : public GMDx11Light
-{
-	enum { LightType = 1 };
 
 public:
 	virtual int getLightType() override

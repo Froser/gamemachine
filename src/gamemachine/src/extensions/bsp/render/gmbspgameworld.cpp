@@ -247,19 +247,14 @@ void GMBSPGameWorld::setDefaultLights()
 
 	{
 		ILight* light = nullptr;
-		factory->createLight(GMLightType::Ambient, &light);
+		factory->createLight(GMLightType::PointLight, &light);
 		GM_ASSERT(light);
-		GMfloat lightColor[] = { .9f, .9f, .9f };
-		light->setLightAttribute3(GMLight::Color, lightColor);
-		engine->addLight(light);
-	}
+		GMfloat ambientIntensity[] = { .9f, .9f, .9f };
+		light->setLightAttribute3(GMLight::AmbientIntensity, ambientIntensity);
 
-	{
-		ILight* light = nullptr;
-		factory->createLight(GMLightType::Direct, &light);
-		GM_ASSERT(light);
-		GMfloat lightColor[] = { 1, 1, 1 };
-		light->setLightAttribute3(GMLight::Color, lightColor);
+		GMfloat diffuseIntensity[] = { 1, 1, 1 };
+		light->setLightAttribute3(GMLight::DiffuseIntensity, diffuseIntensity);
+
 		engine->addLight(light);
 	}
 }

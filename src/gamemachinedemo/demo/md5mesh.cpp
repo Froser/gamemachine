@@ -73,23 +73,16 @@ void Demo_MD5Mesh::setDefaultLights()
 	if (isInited())
 	{
 		{
-			gm::ILight* directLight = nullptr;
-			GM.getFactory()->createLight(gm::GMLightType::Direct, &directLight);
-			GM_ASSERT(directLight);
+			gm::ILight* light = nullptr;
+			GM.getFactory()->createLight(gm::GMLightType::PointLight, &light);
+			GM_ASSERT(light);
 			gm::GMfloat lightPos[] = { 1, 0, -3 };
-			directLight->setLightAttribute3(gm::GMLight::Position, lightPos);
-			gm::GMfloat color[] = { .7f, .7f, .7f };
-			directLight->setLightAttribute3(gm::GMLight::Color, color);
-			getDemonstrationWorld()->getContext()->getEngine()->addLight(directLight);
-		}
-
-		{
-			gm::ILight* ambientLight = nullptr;
-			GM.getFactory()->createLight(gm::GMLightType::Ambient, &ambientLight);
-			GM_ASSERT(ambientLight);
-			gm::GMfloat color[] = { .1f, .1f, .1f };
-			ambientLight->setLightAttribute3(gm::GMLight::Color, color);
-			getDemonstrationWorld()->getContext()->getEngine()->addLight(ambientLight);
+			light->setLightAttribute3(gm::GMLight::Position, lightPos);
+			gm::GMfloat ambientIntensity[] = { .1f, .1f, .1f };
+			light->setLightAttribute3(gm::GMLight::AmbientIntensity, ambientIntensity);
+			gm::GMfloat diffuseIntensity[] = { .7f, .7f, .7f };
+			light->setLightAttribute3(gm::GMLight::DiffuseIntensity, diffuseIntensity);
+			getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
 		}
 	}
 }

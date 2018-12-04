@@ -211,12 +211,17 @@ void DemoHandler::setDefaultLights()
 	if (isInited())
 	{
 		gm::ILight* light = nullptr;
-		GM.getFactory()->createLight(gm::GMLightType::Direct, &light);
+		GM.getFactory()->createLight(gm::GMLightType::PointLight, &light);
 		GM_ASSERT(light);
 		gm::GMfloat lightPos[] = { 0, 0, -.2f };
 		light->setLightAttribute3(gm::GMLight::Position, lightPos);
-		gm::GMfloat color[] = { .7f, .7f, .7f };
-		light->setLightAttribute3(gm::GMLight::Color, color);
+
+		gm::GMfloat diffuseIntensity[] = { .7f, .7f, .7f };
+		light->setLightAttribute3(gm::GMLight::DiffuseIntensity, diffuseIntensity);
+
+		gm::GMfloat ambientIntensity[] = { 0 };
+		light->setLightAttribute3(gm::GMLight::AmbientIntensity, ambientIntensity);
+
 		d->engine->addLight(light);
 	}
 }
@@ -646,19 +651,16 @@ void DemonstrationWorld::resetCameraAndLights()
 
 	{
 		gm::ILight* light = nullptr;
-		GM.getFactory()->createLight(gm::GMLightType::Ambient, &light);
-		gm::GMfloat lightClr[] = { .1f, .1f, .1f, 1 };
-		light->setLightAttribute3(gm::GMLight::Color, lightClr);
-		engine->addLight(light);
-	}
+		GM.getFactory()->createLight(gm::GMLightType::PointLight, &light);
+		gm::GMfloat ambientIntensity[] = { .1f, .1f, .1f, 1 };
+		light->setLightAttribute3(gm::GMLight::AmbientIntensity, ambientIntensity);
 
-	{
-		gm::ILight* light = nullptr;
-		GM.getFactory()->createLight(gm::GMLightType::Direct, &light);
+		gm::GMfloat diffuseIntensity[] = { 2, 2, 2 };
+		light->setLightAttribute3(gm::GMLight::DiffuseIntensity, diffuseIntensity);
+
 		gm::GMfloat lightPos[] = { -5, 5, -5 };
 		light->setLightAttribute3(gm::GMLight::Position, lightPos);
-		gm::GMfloat lightClr[] = { 2, 2, 2, 1 };
-		light->setLightAttribute3(gm::GMLight::Color, lightClr);
+
 		engine->addLight(light);
 	}
 }

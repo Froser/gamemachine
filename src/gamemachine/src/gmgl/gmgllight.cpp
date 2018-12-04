@@ -32,6 +32,18 @@ void GMGLLight::activateLight(GMuint32 index, ITechnique* technique)
 		getVariableIndex(shaderProgram, d->lightIndices[shaderLightIdx][index].Type, L"GM_lights[" + strIndex + L"].Type"),
 		getType());
 
+	shaderProgram->setVec3(
+		getVariableIndex(shaderProgram, d->lightIndices[shaderLightIdx][index].AmbientIntensity, L"GM_lights[" + strIndex + L"].AmbientIntensity"),
+		db->ambientIntensity);
+
+	shaderProgram->setVec3(
+		getVariableIndex(shaderProgram, d->lightIndices[shaderLightIdx][index].DiffuseIntensity, L"GM_lights[" + strIndex + L"].DiffuseIntensity"),
+		db->diffuseIntensity);
+
+	shaderProgram->setFloat(
+		getVariableIndex(shaderProgram, d->lightIndices[shaderLightIdx][index].SpecularIntensity, L"GM_lights[" + strIndex + L"].SpecularIntensity"),
+		db->specularIntensity);
+
 	shaderProgram->setFloat(
 		getVariableIndex(shaderProgram, d->lightIndices[shaderLightIdx][index].AttenuationConstant, L"GM_lights[" + strIndex + L"].Attenuation.Constant"),
 		db->attenuation.constant);

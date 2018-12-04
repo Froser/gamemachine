@@ -299,21 +299,16 @@ void Demo_Model::setDefaultLights()
 	{
 		{
 			gm::ILight* light = nullptr;
-			GM.getFactory()->createLight(gm::GMLightType::Direct, &light);
+			GM.getFactory()->createLight(gm::GMLightType::PointLight, &light);
 			GM_ASSERT(light);
 			gm::GMfloat lightPos[] = { .7f, .7f, -.7f };
 			light->setLightAttribute3(gm::GMLight::Position, lightPos);
-			gm::GMfloat color[] = { .7f, .7f, .7f };
-			light->setLightAttribute3(gm::GMLight::Color, color);
-			getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
-		}
 
-		{
-			gm::ILight* light = nullptr;
-			GM.getFactory()->createLight(gm::GMLightType::Ambient, &light);
-			GM_ASSERT(light);
-			gm::GMfloat color[] = { .8f, .8f, .8f };
-			light->setLightAttribute3(gm::GMLight::Color, color);
+			gm::GMfloat ambientIntensity[] = { .8f, .8f, .8f };
+			light->setLightAttribute3(gm::GMLight::AmbientIntensity, ambientIntensity);
+
+			gm::GMfloat diffuseIntensity[] = { .7f, .7f, .7f };
+			light->setLightAttribute3(gm::GMLight::DiffuseIntensity, diffuseIntensity);
 			getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
 		}
 	}

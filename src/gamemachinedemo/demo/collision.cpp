@@ -158,22 +158,17 @@ void Demo_Collision::setDefaultLights()
 
 		{
 			gm::ILight* light = nullptr;
-			GM.getFactory()->createLight(gm::GMLightType::Ambient, &light);
+			GM.getFactory()->createLight(gm::GMLightType::PointLight, &light);
 			GM_ASSERT(light);
-			gm::GMfloat colorA[] = { .7f, .7f, .7f };
-			light->setLightAttribute3(gm::GMLight::Color, colorA);
-			getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
-		}
+			gm::GMfloat ambientIntensity[] = { .7f, .7f, .7f };
+			light->setLightAttribute3(gm::GMLight::AmbientIntensity, ambientIntensity);
 
-		{
-			gm::ILight* light = nullptr;
-			GM.getFactory()->createLight(gm::GMLightType::Direct, &light);
-			GM_ASSERT(light);
-			gm::GMfloat colorD[] = { .7f, .7f, .7f };
-			light->setLightAttribute3(gm::GMLight::Color, colorD);
+			gm::GMfloat diffuseIntensity[] = { .7f, .7f, .7f };
+			light->setLightAttribute3(gm::GMLight::DiffuseIntensity, diffuseIntensity);
 
 			gm::GMfloat lightPos[] = { -3.f, 3.f, -3.f };
 			light->setLightAttribute3(gm::GMLight::Position, lightPos);
+
 			getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
 		}
 

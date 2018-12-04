@@ -326,8 +326,7 @@ GM_INTERFACE(IShaderLoadCallback)
 
 enum class GMLightType
 {
-	Ambient,
-	Direct,
+	PointLight,
 };
 
 GM_INTERFACE(ILight)

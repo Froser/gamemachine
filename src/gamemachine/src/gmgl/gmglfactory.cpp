@@ -51,14 +51,9 @@ void GMGLFactory::createGBuffer(const IRenderContext* context, OUT IGBuffer** g)
 
 void GMGLFactory::createLight(GMLightType type, OUT ILight** out)
 {
-	if (type == GMLightType::Ambient)
+	if (type == GMLightType::PointLight)
 	{
-		*out = new GMGLAmbientLight();
-	}
-	else
-	{
-		GM_ASSERT(type == GMLightType::Direct);
-		*out = new GMGLDirectLight();
+		*out = new GMGLPointLight();
 	}
 }
 

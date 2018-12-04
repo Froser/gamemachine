@@ -97,19 +97,13 @@ void Demo_Terrain::setDefaultLights()
 
 		{
 			gm::ILight* light = nullptr;
-			GM.getFactory()->createLight(gm::GMLightType::Ambient, &light);
+			GM.getFactory()->createLight(gm::GMLightType::PointLight, &light);
 			GM_ASSERT(light);
-			gm::GMfloat colorA[] = { .5f, .5f, .5f };
-			light->setLightAttribute3(gm::GMLight::Color, colorA);
-			getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
-		}
-
-		{
-			gm::ILight* light = nullptr;
-			GM.getFactory()->createLight(gm::GMLightType::Direct, &light);
-			GM_ASSERT(light);
-			gm::GMfloat colorD[] = { .3f, .3f, .3f };
-			light->setLightAttribute3(gm::GMLight::Color, colorD);
+			gm::GMfloat ambientIntensity[] = { .5f, .5f, .5f };
+			gm::GMfloat diffuseIntensity[] = { .3f, .3f, .3f };
+			light->setLightAttribute3(gm::GMLight::AmbientIntensity, ambientIntensity);
+			light->setLightAttribute3(gm::GMLight::DiffuseIntensity, diffuseIntensity);
+			light->setLightAttribute(gm::GMLight::SpecularIntensity, .3f);
 
 			gm::GMfloat lightPos[] = { 100.f, 100.f, 100.f };
 			light->setLightAttribute3(gm::GMLight::Position, lightPos);

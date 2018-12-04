@@ -54,14 +54,9 @@ void GMDx11Factory::createGBuffer(const IRenderContext* context, OUT IGBuffer** 
 
 void GMDx11Factory::createLight(GMLightType type, OUT ILight** out)
 {
-	if (type == GMLightType::Ambient)
+	if (type == GMLightType::PointLight)
 	{
-		*out = new GMDx11AmbientLight();
-	}
-	else
-	{
-		GM_ASSERT(type == GMLightType::Direct);
-		*out = new GMDx11DirectLight();
+		*out = new GMDx11PointLight();
 	}
 }
 

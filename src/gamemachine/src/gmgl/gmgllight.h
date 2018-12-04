@@ -14,6 +14,9 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLLight)
 		GMint32 AttenuationConstant;
 		GMint32 AttenuationLinear;
 		GMint32 AttenuationExp;
+		GMint32 AmbientIntensity;
+		GMint32 DiffuseIntensity;
+		GMint32 SpecularIntensity;
 	};
 	Vector<Vector<LightIndices>> lightIndices;
 };
@@ -30,7 +33,7 @@ protected:
 	virtual int getType() = 0;
 };
 
-class GMGLAmbientLight : public GMGLLight
+class GMGLPointLight : public GMGLLight
 {
 	enum { LightType = 0 };
 
@@ -40,18 +43,6 @@ public:
 		return LightType;
 	}
 };
-
-class GMGLDirectLight : public GMGLLight
-{
-	enum { LightType = 1 };
-
-public:
-	virtual int getType() override
-	{
-		return LightType;
-	}
-};
-
 
 END_NS
 #endif

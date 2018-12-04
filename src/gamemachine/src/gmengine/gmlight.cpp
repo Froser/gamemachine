@@ -22,6 +22,22 @@ bool GMLight::setLightAttribute3(GMLightAttribute attr, GMfloat value[3])
 		d->color[3] = 1.0f;
 		break;
 	}
+	case AmbientIntensity:
+	{
+		d->ambientIntensity[0] = value[0];
+		d->ambientIntensity[1] = value[1];
+		d->ambientIntensity[2] = value[2];
+		d->ambientIntensity[3] = 1.0f;
+		break;
+	}
+	case DiffuseIntensity:
+	{
+		d->diffuseIntensity[0] = value[0];
+		d->diffuseIntensity[1] = value[1];
+		d->diffuseIntensity[2] = value[2];
+		d->diffuseIntensity[3] = 1.0f;
+		break;
+	}
 	default:
 		return false;
 	}
@@ -33,6 +49,9 @@ bool GMLight::setLightAttribute(GMLightAttribute attr, GMfloat value)
 	D(d);
 	switch (attr)
 	{
+	case SpecularIntensity:
+		d->specularIntensity = value;
+		break;
 	case AttenuationConstant:
 		d->attenuation.constant = value;
 		break;

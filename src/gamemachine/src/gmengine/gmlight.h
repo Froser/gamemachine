@@ -5,8 +5,11 @@ BEGIN_NS
 
 GM_PRIVATE_OBJECT_UNALIGNED(GMLight)
 {
-	GMfloat position[4];
-	GMfloat color[4];
+	GMfloat position[4] = { 1, 1, 1, 1 };
+	GMfloat color[4] = { 1, 1, 1, 1 };
+	GMfloat ambientIntensity[4] = { 1, 1, 1, 1 };
+	GMfloat diffuseIntensity[4] = { 1, 1, 1, 1 };
+	GMfloat specularIntensity = 1;
 
 	struct
 	{
@@ -25,6 +28,9 @@ public:
 	{
 		Position, // GMfloat[3]
 		Color, // GMfloat[3]
+		AmbientIntensity, // GMfloat[3]
+		DiffuseIntensity, // GMfloat[3]
+		SpecularIntensity, // GMfloat
 		AttenuationConstant, // GMfloat
 		AttenuationLinear, // GMfloat
 		AttenuationExp, // GMfloat

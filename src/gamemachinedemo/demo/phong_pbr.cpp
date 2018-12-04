@@ -196,23 +196,19 @@ void Demo_Phong_PBR::setDefaultLights()
 	if (isInited())
 	{
 		{
-			gm::ILight* directLight = nullptr;
-			GM.getFactory()->createLight(gm::GMLightType::Direct, &directLight);
-			GM_ASSERT(directLight);
+			gm::ILight* light = nullptr;
+			GM.getFactory()->createLight(gm::GMLightType::PointLight, &light);
+			GM_ASSERT(light);
 			gm::GMfloat lightPos[] = { 1, 1, -1 };
-			directLight->setLightAttribute3(gm::GMLight::Position, lightPos);
-			gm::GMfloat color[] = { 20, 20, 20 };
-			directLight->setLightAttribute3(gm::GMLight::Color, color);
-			getDemonstrationWorld()->getContext()->getEngine()->addLight(directLight);
-		}
+			light->setLightAttribute3(gm::GMLight::Position, lightPos);
 
-		{
-			gm::ILight* ambientLight = nullptr;
-			GM.getFactory()->createLight(gm::GMLightType::Ambient, &ambientLight);
-			GM_ASSERT(ambientLight);
-			gm::GMfloat color[] = { .05f, .05f, .05f };
-			ambientLight->setLightAttribute3(gm::GMLight::Color, color);
-			getDemonstrationWorld()->getContext()->getEngine()->addLight(ambientLight);
+			gm::GMfloat ambientIntensity[] = { .05f, .05f, .05f };
+			light->setLightAttribute3(gm::GMLight::AmbientIntensity, ambientIntensity);
+
+			gm::GMfloat diffuseIntensity[] = { 20, 20, 20 };
+			light->setLightAttribute3(gm::GMLight::DiffuseIntensity, diffuseIntensity);
+			light->setLightAttribute(gm::GMLight::SpecularIntensity, 20);
+			getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
 		}
 	}
 }

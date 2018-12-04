@@ -433,11 +433,11 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, GMXMLElement* elem)
 
 	if (GMString::stringEquals(type, "ambient"))
 	{
-		factory->createLight(GMLightType::Ambient, &light);
+		factory->createLight(GMLightType::PointLight, &light);
 	}
 	else if (GMString::stringEquals(type, "specular"))
 	{
-		factory->createLight(GMLightType::Direct, &light);
+		factory->createLight(GMLightType::PointLight, &light);
 		const char* position = elem->Attribute("position");
 		if (!position)
 		{
