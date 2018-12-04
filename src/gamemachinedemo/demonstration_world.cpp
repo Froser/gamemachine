@@ -14,6 +14,7 @@
 #include "demo/normalmap.h"
 #include "demo/effects.h"
 #include "demo/quake3_bsp.h"
+#include "demo/light.h"
 #include "demo/sound.h"
 #include "demo/literature.h"
 #include "demo/model.h"
@@ -45,6 +46,7 @@ namespace
 		world->addDemo(L"高级纹理：使用法线贴图。", new Demo_NormalMap(world));
 		world->addDemo(L"效果：使用自带的各种滤镜。", new Demo_Effects(world));
 		world->addDemo(L"BSP: 渲染一个雷神之锤3的场景。", new Demo_Quake3_BSP(world));
+		world->addDemo(L"光照: 渲染一个点光源场景。", new Demo_Light_Point(world));
 		world->addDemo(L"声音: 演示播放音乐。", new Demo_Sound(world));
 		world->addDemo(L"文字: 使用排版引擎实现排版。", new Demo_Literature(world));
 		world->addDemo(L"模型: 读取模型文件。", new Demo_Model(world));

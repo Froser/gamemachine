@@ -1315,3 +1315,12 @@ void GMDx11Technique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* p
 	ID3DX11EffectShaderResourceVariable* shadowMap = windowStates.sampleCount > 1 ? bank.ShadowMapMSAA() : bank.ShadowMap();
 	GM_DX_HR(shadowMap->SetResource(shadowFramebuffers->getShadowMapShaderResourceView()));
 }
+
+ID3DX11EffectTechnique* GMDx11Technique_Custom::getTechnique()
+{
+	GMComPtr<ID3DX11Effect> effect;
+	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
+	shaderProgram->getInterface(GameMachineInterfaceID::D3D11Effect, (void**)&effect);
+	GM_ASSERT(effect);
+	return effect->GetTechniqueByName(getTechniqueName());
+}

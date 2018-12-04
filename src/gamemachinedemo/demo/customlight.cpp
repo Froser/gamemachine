@@ -223,8 +223,8 @@ void Demo_CustomLight::setDefaultLights()
 		gm::ILight* light = new GLSpotlight();
 #endif
 		gm::GMfloat lightPos[] = { 0, 2, 0 };
-		light->setLightAttribute3(GLSpotlight::Position, lightPos);
-		light->setLightAttribute(GLSpotlight::AttenuationLinear, .1f);
+		light->setLightAttribute3(Spotlight::Position, lightPos);
+		light->setLightAttribute(Spotlight::AttenuationLinear, .1f);
 		Vector<gm::ILight*> lights;
 		lights.push_back(light);
 		setSpotLights(lights);

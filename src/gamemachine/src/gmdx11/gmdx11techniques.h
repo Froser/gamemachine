@@ -105,8 +105,7 @@ protected:
 	virtual void prepareDepthStencil(GMModel* model);
 	virtual void prepareDebug(GMModel* model);
 	virtual void applyTextureAttribute(GMModel* model, GMTextureAsset texture, GMTextureType type);
-
-	ID3DX11EffectTechnique* getTechnique();
+	virtual ID3DX11EffectTechnique* getTechnique();
 	GMTextureAsset getTexture(GMTextureSampler& sampler);
 	void setGamma(IShaderProgram* shaderProgram);
 	GMDx11EffectVariableBank& getVarBank();
@@ -264,6 +263,9 @@ class GMDx11Technique_Custom : public GMDx11Technique
 {
 public:
 	using GMDx11Technique::GMDx11Technique;
+
+protected:
+	virtual ID3DX11EffectTechnique* getTechnique() override;
 
 protected:
 	virtual const char* getTechniqueName() override
