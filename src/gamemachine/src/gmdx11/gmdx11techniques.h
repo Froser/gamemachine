@@ -259,8 +259,15 @@ protected:
 	}
 };
 
+GM_PRIVATE_OBJECT(GMDx11Technique_Custom)
+{
+	Vector<GMString> techniqueNames;
+};
+
 class GMDx11Technique_Custom : public GMDx11Technique
 {
+	GM_DECLARE_PRIVATE_AND_BASE(GMDx11Technique_Custom, GMDx11Technique)
+
 public:
 	using GMDx11Technique::GMDx11Technique;
 
@@ -268,11 +275,7 @@ protected:
 	virtual ID3DX11EffectTechnique* getTechnique() override;
 
 protected:
-	virtual const char* getTechniqueName() override
-	{
-		GM_ASSERT(getCurrentModel());
-		return getTechniqueNameByTechniqueId(getCurrentModel()->getTechniqueId()).c_str();
-	}
+	virtual const char* getTechniqueName() override;
 };
 
 END_NS

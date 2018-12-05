@@ -21,6 +21,12 @@ class GMRenderTechniqueManager : public GMObject
 	GM_DECLARE_PRIVATE(GMRenderTechniqueManager)
 
 public:
+	enum
+	{
+		StartupTechinqueID = 10000,
+	};
+
+public:
 	GMRenderTechniqueManager(const IRenderContext* context);
 
 public:

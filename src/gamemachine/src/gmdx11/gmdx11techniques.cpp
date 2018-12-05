@@ -372,16 +372,21 @@ void GMDx11Technique::updateBoneTransforms(IShaderProgram* shaderProgram, GMMode
 
 const std::string& GMDx11Technique::getTechniqueNameByTechniqueId(GMRenderTechinqueID id)
 {
-	static Map<GMRenderTechinqueID, std::string> s_map;
-	auto iter = s_map.find(id);
-	if (iter == s_map.end())
-	{
-		auto insertResult = s_map.insert({ id, "GMTech_Custom" + GMString(id).toStdString() });
-		GM_ASSERT(insertResult.second);
-		return insertResult.first->second;
-	}
+	static Vector<std::string> s_names;
 
-	return iter->second;
+	GM_ASSERT(id - GMRenderTechniqueManager::StartupTechinqueID - 1 >= 0);
+	GMsize_t index = id - GMRenderTechniqueManager::StartupTechinqueID - 1;
+	if (index < s_names.size())
+		return s_names[index];
+
+	std::string* result = nullptr;
+	GMMutex s_mutex;
+	s_mutex.lock();
+	s_names.resize(index + 1);
+	s_names[index] = "GMTech_Custom" + GMString(id).toStdString();
+	result = &s_names[index];
+	s_mutex.unlock();
+	return *result;
 }
 
 BEGIN_NS
@@ -1323,4 +1328,10 @@ ID3DX11EffectTechnique* GMDx11Technique_Custom::getTechnique()
 	shaderProgram->getInterface(GameMachineInterfaceID::D3D11Effect, (void**)&effect);
 	GM_ASSERT(effect);
 	return effect->GetTechniqueByName(getTechniqueName());
+}
+
+const char* GMDx11Technique_Custom::getTechniqueName()
+{
+	GM_ASSERT(getCurrentModel());
+	return getTechniqueNameByTechniqueId(getCurrentModel()->getTechniqueId()).c_str();
 }
