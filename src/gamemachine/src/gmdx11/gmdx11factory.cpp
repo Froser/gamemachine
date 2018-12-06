@@ -60,6 +60,8 @@ void GMDx11Factory::createLight(GMLightType type, OUT ILight** out)
 			*out = new GMDx11PointLight();
 		else if (type == GMLightType::DirectionalLight)
 			*out = new GMDx11DirectionalLight();
+		else if (type == GMLightType::Spotlight)
+			*out = new GMDx11Spotlight();
 	}
 }
 

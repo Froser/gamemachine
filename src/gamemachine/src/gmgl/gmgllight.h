@@ -71,5 +71,32 @@ public:
 	virtual void activateLight(GMuint32, ITechnique*) override;
 };
 
+GM_PRIVATE_OBJECT_UNALIGNED_FROM(GMGLSpotlight, GMSpotlight_t)
+{
+	struct LightIndices
+	{
+		GMint32 CutOff;
+	};
+
+	Vector<Vector<LightIndices>> lightIndices;
+};
+
+class GMGLSpotlight : public GMGLDirectionalLight
+{
+	GM_DECLARE_PRIVATE_NGO(GMGLSpotlight)
+	typedef GMGLDirectionalLight Base;
+
+	enum { Spotlight = 2 };
+
+public:
+	virtual int getLightType() override
+	{
+		return Spotlight;
+	}
+
+	virtual bool setLightAttribute(GMLightAttribute attr, GMfloat value) override;
+	virtual void activateLight(GMuint32, ITechnique*) override;
+};
+
 END_NS
 #endif

@@ -328,6 +328,7 @@ enum class GMLightType
 {
 	PointLight,
 	DirectionalLight,
+	Spotlight,
 };
 
 GM_INTERFACE(ILight)

@@ -92,3 +92,36 @@ void GMGLDirectionalLight::activateLight(GMuint32 index, ITechnique* technique)
 		getVariableIndex(shaderProgram, d->lightIndices[shaderLightIdx][index].Direction, L"GM_lights[" + strIndex + L"].Direction"),
 		d->direction);
 }
+
+bool GMGLSpotlight::setLightAttribute(GMLightAttribute attr, GMfloat value)
+{
+	D(d);
+	switch (attr)
+	{
+	case CutOff:
+		d->cutOff = value;
+		break;
+	default:
+		return Base::setLightAttribute(attr, value);
+	}
+	return true;
+}
+
+void GMGLSpotlight::activateLight(GMuint32 index, ITechnique* technique)
+{
+	Base::activateLight(index, technique);
+	
+	D(d);
+	GMGLTechnique* glTechnique = gm_cast<GMGLTechnique*>(technique);
+	IShaderProgram* shaderProgram = glTechnique->getShaderProgram();
+	GMString strIndex = GMString((GMint32)index);
+
+	GMsize_t shaderLightIdx = verifyIndicesContainer(d->lightIndices, shaderProgram);
+	static const Data::LightIndices s_empty = { 0 };
+	if (d->lightIndices[shaderLightIdx].size() <= index)
+		d->lightIndices[shaderLightIdx].resize(index + 1, s_empty);
+
+	shaderProgram->setFloat(
+		getVariableIndex(shaderProgram, d->lightIndices[shaderLightIdx][index].CutOff, L"GM_lights[" + strIndex + L"].CutOff"),
+		Cos(Radians(d->cutOff)));
+}

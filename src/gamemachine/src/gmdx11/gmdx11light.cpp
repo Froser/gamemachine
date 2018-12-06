@@ -98,3 +98,32 @@ void GMDx11DirectionalLight::activateLight(GMuint32 index, ITechnique* tech)
 	GM_ASSERT(direction->IsValid());
 	GM_DX_HR(direction->SetFloatVector(d->direction));
 }
+
+bool GMDx11Spotlight::setLightAttribute(GMLightAttribute attr, GMfloat value)
+{
+	D(d);
+	switch (attr)
+	{
+	case CutOff:
+		d->cutOff = value;
+		break;
+	default:
+		return Base::setLightAttribute(attr, value);
+	}
+	return true;
+}
+
+void GMDx11Spotlight::activateLight(GMuint32 index, ITechnique* tech)
+{
+	Base::activateLight(index, tech);
+
+	D(d);
+	D_BASE(db, GMDx11Light);
+	GM_ASSERT(db->lightAttributes);
+	ID3DX11EffectVariable* lightStruct = db->lightAttributes->GetElement(index);
+	GM_ASSERT(lightStruct->IsValid());
+
+	ID3DX11EffectScalarVariable* cutOff = lightStruct->GetMemberByName("CutOff")->AsScalar();
+	GM_ASSERT(cutOff->IsValid());
+	GM_DX_HR(cutOff->SetFloat(Cos(Radians(d->cutOff))));
+}

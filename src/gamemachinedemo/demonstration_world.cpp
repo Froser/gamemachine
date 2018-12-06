@@ -50,6 +50,7 @@ namespace
 		world->addDemo(L"光照: 渲染一个点光源法线贴图场景。", new Demo_Light_Point_NormalMap(world));
 		world->addDemo(L"光照: 渲染一个方向光源场景。", new Demo_Light_Directional(world));
 		world->addDemo(L"光照: 渲染一个方向光源法线贴图场景。", new Demo_Light_Directional_Normalmap(world));
+		world->addDemo(L"光照: 渲染一个聚光灯场景。", new Demo_Light_Spotlight(world));
 		world->addDemo(L"声音: 演示播放音乐。", new Demo_Sound(world));
 		world->addDemo(L"文字: 使用排版引擎实现排版。", new Demo_Literature(world));
 		world->addDemo(L"模型: 读取模型文件。", new Demo_Model(world));

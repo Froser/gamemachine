@@ -203,3 +203,24 @@ void Demo_Light_Directional_Normalmap::setDefaultLights()
 	light->setLightAttribute3(gm::GMLight::Direction, lightDirection);
 	getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
 }
+
+void Demo_Light_Spotlight::setDefaultLights()
+{
+	gm::ILight* light = nullptr;
+	GM.getFactory()->createLight(gm::GMLightType::Spotlight, &light);
+	GM_ASSERT(light);
+	gm::GMfloat lightPos[] = { 0, 2, 0 };
+	light->setLightAttribute3(gm::GMLight::Position, lightPos);
+
+	gm::GMfloat ambientIntensity[] = { .8f, .8f, .8f };
+	light->setLightAttribute3(gm::GMLight::AmbientIntensity, ambientIntensity);
+
+	gm::GMfloat diffuseIntensity[] = { .7f, .7f, .7f };
+	light->setLightAttribute3(gm::GMLight::DiffuseIntensity, diffuseIntensity);
+	light->setLightAttribute(gm::GMLight::AttenuationLinear, .1f);
+
+	gm::GMfloat lightDirection[] = { 0, -1, 0 };
+	light->setLightAttribute3(gm::GMLight::Direction, lightDirection);
+	light->setLightAttribute(gm::GMLight::CutOff, 10.f);
+	getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
+}

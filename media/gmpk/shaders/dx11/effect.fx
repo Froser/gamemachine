@@ -179,6 +179,9 @@ struct GMLight
 
     // Directional
     float4 Direction;
+
+    // Spotlight
+    float CutOff;
 };
 GMLight GM_LightAttributes[50];
 
@@ -222,6 +225,24 @@ class GMPhongPointLight : ILight
 
 GMPhongPointLight GM_PhongPointLight;
 
+class GMPhongSpotlight
+{
+    float3 IlluminateSpotlightFactor(GMLight light, float3 lightDirection_World_N)
+    {
+        float spotFactor = dot(lightDirection_World_N, light.Direction); //light.Direction is world direction, we can use dot here
+        if (spotFactor > light.CutOff)
+        {
+            float f = (1.0f - (1.0f - spotFactor) / (1.0f - light.CutOff));
+            return float3(f, f, f);
+        }
+        else
+        {
+            return float3(0, 0, 0);
+        }
+    }
+};
+GMPhongSpotlight GM_PhongSpotlight;
+
 static const int GM_PointLight = 0;
 static const int GM_DirectionalLight = 1;
 static const int GM_Spotlight = 2;
@@ -254,7 +275,7 @@ class GMPhongLightProxy
 
     float3 GetLightDirection_eye_N(GMLight light, float3 position_Eye)
     {
-        if (light.Type == GM_PointLight)
+        if (light.Type == GM_PointLight || light.Type == GM_Spotlight)
         {
             return normalize(GetLightPosition_eye(light.Position, GM_ViewMatrix) - position_Eye);
         }
@@ -263,6 +284,16 @@ class GMPhongLightProxy
             return mul(-light.Direction, ToFloat3x3(GM_ViewMatrix));
         }
         return float3(0,0,0);
+    }
+
+    float3 LightFactor(GMLight light, float3 lightDirection_World_N)
+    {
+        // 计算聚光灯下的因子
+        if (light.Type == GM_Spotlight)
+        {
+            return GM_PhongSpotlight.IlluminateSpotlightFactor(light, lightDirection_World_N);
+        }
+        return float3(1, 1, 1);
     }
 };
 int GM_LightCount;
@@ -549,22 +580,24 @@ class GMPhong : IIlluminationModel
             float attenuation = GM_LightAttributes[i].Attenuation.Constant + 
                                 GM_LightAttributes[i].Attenuation.Linear * distance +
                                 GM_LightAttributes[i].Attenuation.Exp * distance * distance;
+            float3 lightDirection_World_N = normalize(input.WorldPos - GM_LightAttributes[i].Position);
+            float spotFactor = PhoneLightProxy.LightFactor(GM_LightAttributes[i], lightDirection_World_N);
 
-            factor_Ambient += PhoneLightProxy.IlluminateAmbient(GM_LightAttributes[i]) * GM_LightAttributes[i].Color * GM_LightAttributes[i].AmbientIntensity / attenuation;
+            factor_Ambient += spotFactor * PhoneLightProxy.IlluminateAmbient(GM_LightAttributes[i]) * GM_LightAttributes[i].Color * GM_LightAttributes[i].AmbientIntensity / attenuation;
 
             if (!input.HasNormalMap)
             {
                 float3 lightDirection_Eye_N = PhoneLightProxy.GetLightDirection_eye_N(GM_LightAttributes[i], position_Eye);
-                factor_Diffuse += PhoneLightProxy.IlluminateDiffuse(GM_LightAttributes[i], lightDirection_Eye_N, input.Normal_Eye_N) * GM_LightAttributes[i].Color * GM_LightAttributes[i].DiffuseIntensity / attenuation;
-                factor_Specular += PhoneLightProxy.IlluminateSpecular(GM_LightAttributes[i], lightDirection_Eye_N, -position_Eye_N, input.Normal_Eye_N, input.Shininess) * GM_LightAttributes[i].Color * GM_LightAttributes[i].SpecularIntensity / attenuation;
+                factor_Diffuse += spotFactor * PhoneLightProxy.IlluminateDiffuse(GM_LightAttributes[i], lightDirection_Eye_N, input.Normal_Eye_N) * GM_LightAttributes[i].Color * GM_LightAttributes[i].DiffuseIntensity / attenuation;
+                factor_Specular += spotFactor * PhoneLightProxy.IlluminateSpecular(GM_LightAttributes[i], lightDirection_Eye_N, -position_Eye_N, input.Normal_Eye_N, input.Shininess) * GM_LightAttributes[i].Color * GM_LightAttributes[i].SpecularIntensity / attenuation;
             }
             else
             {
                 float3 lightDirection_Eye_N = PhoneLightProxy.GetLightDirection_eye_N(GM_LightAttributes[i], position_Eye);
                 float3 lightDirection_Tangent_N = normalize(mul(lightDirection_Eye_N, input.TangentSpace.TBN));
                 float3 eyeDirection_Tangent_N = normalize(mul(-position_Eye, input.TangentSpace.TBN));
-                factor_Diffuse += PhoneLightProxy.IlluminateDiffuse(GM_LightAttributes[i], lightDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N) * GM_LightAttributes[i].Color * GM_LightAttributes[i].DiffuseIntensity / attenuation;
-                factor_Specular += PhoneLightProxy.IlluminateSpecular(GM_LightAttributes[i], lightDirection_Tangent_N, eyeDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N, input.Shininess) * GM_LightAttributes[i].Color * GM_LightAttributes[i].SpecularIntensity / attenuation; 
+                factor_Diffuse += spotFactor * PhoneLightProxy.IlluminateDiffuse(GM_LightAttributes[i], lightDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N) * GM_LightAttributes[i].Color * GM_LightAttributes[i].DiffuseIntensity / attenuation;
+                factor_Specular += spotFactor * PhoneLightProxy.IlluminateSpecular(GM_LightAttributes[i], lightDirection_Tangent_N, eyeDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N, input.Shininess) * GM_LightAttributes[i].Color * GM_LightAttributes[i].SpecularIntensity / attenuation; 
             }
         }
         float4 color_Ambient = CalculateGammaCorrectionIfNecessary(factor_Ambient) * ToFloat4(input.AmbientLightmapTexture);

@@ -24,6 +24,11 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMDirectionalLight_t)
 	GMfloat direction[4] = { 0, -1, 0, 0 };
 };
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMSpotlight_t)
+{
+	GMfloat cutOff; //!< 切光角，单位是角度。
+};
+
 class GMLight : public ILight
 {
 	GM_DECLARE_PRIVATE_NGO(GMLight)
@@ -40,22 +45,13 @@ public:
 		AttenuationLinear, // GMfloat
 		AttenuationExp, // GMfloat
 		Direction, // GMfloat[3]
+		CutOff, // GMfloat
 		CustomStart = 0x1000,
 	};
 
 public:
 	virtual bool setLightAttribute3(GMLightAttribute attr, GMfloat value[3]) override;
 	virtual bool setLightAttribute(GMLightAttribute, GMfloat) override;
-};
-
-GM_PRIVATE_OBJECT_UNALIGNED(GMDirectionalLight)
-{
-	struct LightIndices
-	{
-		GMint32 Direction;
-	};
-
-	Vector<Vector<LightIndices>> lightIndices;
 };
 
 END_NS

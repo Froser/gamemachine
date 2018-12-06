@@ -57,6 +57,8 @@ void GMGLFactory::createLight(GMLightType type, OUT ILight** out)
 			*out = new GMGLPointLight();
 		else if (type == GMLightType::DirectionalLight)
 			*out = new GMGLDirectionalLight();
+		else if (type == GMLightType::Spotlight)
+			*out = new GMGLSpotlight();
 	}
 }
 

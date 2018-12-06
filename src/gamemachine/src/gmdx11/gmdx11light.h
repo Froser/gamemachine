@@ -53,5 +53,25 @@ public:
 	virtual void activateLight(GMuint32, ITechnique*) override;
 };
 
+GM_PRIVATE_OBJECT_UNALIGNED_FROM(GMDx11Spotlight, GMSpotlight_t)
+{
+};
+
+class GMDx11Spotlight : public GMDx11DirectionalLight
+{
+	GM_DECLARE_PRIVATE_NGO(GMDx11Spotlight)
+	typedef GMDx11DirectionalLight Base;
+
+	enum { Spotlight = 2 };
+
+public:
+	virtual int getLightType() override
+	{
+		return Spotlight;
+	}
+
+	virtual bool setLightAttribute(GMLightAttribute attr, GMfloat value) override;
+	virtual void activateLight(GMuint32, ITechnique*) override;
+};
 END_NS
 #endif

@@ -90,4 +90,21 @@ protected:
 	virtual void event(gm::GameMachineHandlerEvent evt) override;
 	virtual void setDefaultLights() override;
 };
+
+class Demo_Light_Spotlight : public Demo_Light_Directional
+{
+	typedef Demo_Light_Directional Base;
+
+public:
+	using Base::Base;
+
+protected:
+	const gm::GMString& getDescription() const
+	{
+		static gm::GMString desc = L"渲染一个带衰减的聚光灯场景。";
+		return desc;
+	}
+
+	virtual void setDefaultLights() override;
+};
 #endif
