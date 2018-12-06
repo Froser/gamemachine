@@ -66,3 +66,35 @@ void GMDx11Light::activateLight(GMuint32 index, ITechnique* technique)
 	GM_ASSERT(attenuationExp->IsValid());
 	GM_DX_HR(attenuationExp->SetFloat(db->attenuation.exp));
 }
+
+bool GMDx11DirectionalLight::setLightAttribute3(GMLightAttribute attr, GMfloat value[3])
+{
+	D(d);
+	switch (attr)
+	{
+	case Direction:
+		d->direction[0] = value[0];
+		d->direction[1] = value[1];
+		d->direction[2] = value[2];
+		d->direction[3] = 1;
+		break;
+	default:
+		return Base::setLightAttribute3(attr, value);
+	}
+	return true;
+}
+
+void GMDx11DirectionalLight::activateLight(GMuint32 index, ITechnique* tech)
+{
+	Base::activateLight(index, tech);
+
+	D(d);
+	D_BASE(db, Base);
+	GM_ASSERT(db->lightAttributes);
+	ID3DX11EffectVariable* lightStruct = db->lightAttributes->GetElement(index);
+	GM_ASSERT(lightStruct->IsValid());
+
+	ID3DX11EffectVectorVariable* direction = lightStruct->GetMemberByName("Direction")->AsVector();
+	GM_ASSERT(direction->IsValid());
+	GM_DX_HR(direction->SetFloatVector(d->direction));
+}

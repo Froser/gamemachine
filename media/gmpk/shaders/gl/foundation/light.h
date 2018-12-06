@@ -15,6 +15,9 @@ struct GM_light_t
     float SpecularIntensity;
     GM_Attenuation_t Attenuation;
     int Type; //0: point, 1: directional, 2: spot
+
+    // Directional light
+    vec3 Direction;
 };
 
 uniform GM_light_t GM_lights[MAX_LIGHT_COUNT];
@@ -59,7 +62,7 @@ vec3 GMLight_PointLightAmbient(GM_light_t light)
     return max(light.Color * light.AmbientIntensity, 0);
 }
 
-vec3 GMLight_PointLightDiffuse(GM_light_t light, vec3 lightDirection_N, vec3 eyeDirection_N, vec3 normal_N)
+vec3 GMLight_PointLightDiffuse(GM_light_t light, vec3 lightDirection_N, vec3 normal_N)
 {
     float diffuseFactor = dot(lightDirection_N, normal_N);
     return max(diffuseFactor * light.Color * light.DiffuseIntensity, 0);
@@ -74,24 +77,41 @@ vec3 GMLight_PointLightSpecular(GM_light_t light, vec3 lightDirection_N, vec3 ey
 }
 
 // 代理方法
-vec3 GMLight_Ambient(GM_light_t light)
+vec3 GMLight_GetDirection_eye_N(GM_light_t light, vec3 eyeDirection_eye)
 {
     if (light.Type == GM_PointLight)
+    {
+        vec3 lightPosition_eye = (GM_ViewMatrix * vec4(light.Position, 1)).xyz;
+        vec3 lightDirection_eye_N = normalize(lightPosition_eye + eyeDirection_eye);
+        return lightDirection_eye_N;
+    }
+    else if (light.Type == GM_DirectionalLight)
+    {
+        return mat3(GM_ViewMatrix) * -light.Direction;
+    }
+}
+
+vec3 GMLight_Ambient(GM_light_t light)
+{
+    if (light.Type == GM_PointLight || light.Type == GM_DirectionalLight)
         return GMLight_PointLightAmbient(light);
+
     return GMLight_PointLightAmbient(light);
 }
 
-vec3 GMLight_Diffuse(GM_light_t light, vec3 lightDirection_N, vec3 eyeDirection_N, vec3 normal_N)
+vec3 GMLight_Diffuse(GM_light_t light, vec3 lightDirection_N, vec3 normal_N)
 {
-    if (light.Type == GM_PointLight)
-        return GMLight_PointLightDiffuse(light, lightDirection_N, eyeDirection_N, normal_N);
-    return GMLight_PointLightDiffuse(light, lightDirection_N, eyeDirection_N, normal_N);
+    if (light.Type == GM_PointLight || light.Type == GM_DirectionalLight)
+        return GMLight_PointLightDiffuse(light, lightDirection_N, normal_N);
+
+    return GMLight_PointLightDiffuse(light, lightDirection_N, normal_N);
 }
 
 vec3 GMLight_Specular(GM_light_t light, vec3 lightDirection_N, vec3 eyeDirection_N, vec3 normal_N, float shininess)
 {
-    if (light.Type == GM_PointLight)
+    if (light.Type == GM_PointLight || light.Type == GM_DirectionalLight)
         return GMLight_PointLightSpecular(light, lightDirection_N, eyeDirection_N, normal_N, shininess);
+
     return GMLight_PointLightSpecular(light, lightDirection_N, eyeDirection_N, normal_N, shininess);
 }
 
@@ -209,10 +229,9 @@ vec4 GM_Phong_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
                                 GM_lights[i].Attenuation.Linear * distance +
                                 GM_lights[i].Attenuation.Exp * distance * distance;
 
-            vec3 lightPosition_eye = (GM_ViewMatrix * vec4(GM_lights[i].Position, 1)).xyz;
-            vec3 lightDirection_eye_N = normalize(lightPosition_eye + eyeDirection_eye);
+            vec3 lightDirection_eye_N = GMLight_GetDirection_eye_N(GM_lights[i], eyeDirection_eye);
             ambientLight += GMLight_Ambient(GM_lights[i]) / attenuation;
-            diffuseLight += GMLight_Diffuse(GM_lights[i], lightDirection_eye_N, eyeDirection_eye_N, vertex.Normal_Eye_N) / attenuation;
+            diffuseLight += GMLight_Diffuse(GM_lights[i], lightDirection_eye_N, vertex.Normal_Eye_N) / attenuation;
             specularLight += GMLight_Specular(GM_lights[i], lightDirection_eye_N, eyeDirection_eye_N, vertex.Normal_Eye_N, vertex.Shininess) / attenuation;
             refractionLight += calculateRefractionByNormalWorld(vertex.WorldPos, vertex.Normal_World_N, vertex.Refractivity);
         }
@@ -227,12 +246,12 @@ vec4 GM_Phong_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
                                 GM_lights[i].Attenuation.Exp * distance * distance;
 
             vec3 lightPosition_eye = (GM_ViewMatrix * vec4(GM_lights[i].Position, 1)).xyz;
-            vec3 lightDirection_eye_N = normalize(lightPosition_eye + eyeDirection_eye);
+            vec3 lightDirection_eye_N = GMLight_GetDirection_eye_N(GM_lights[i], eyeDirection_eye);
             vec3 lightDirection_tangent_N = normalize(vertex.TangentSpace.TBN * lightDirection_eye_N);
             vec3 eyeDirection_tangent_N = normalize(vertex.TangentSpace.TBN * eyeDirection_eye_N);
 
             ambientLight += GMLight_Ambient(GM_lights[i]) / attenuation;
-            diffuseLight += GMLight_Diffuse(GM_lights[i], lightDirection_tangent_N, eyeDirection_tangent_N, vertex.TangentSpace.Normal_Tangent_N) / attenuation;
+            diffuseLight += GMLight_Diffuse(GM_lights[i], lightDirection_tangent_N, vertex.TangentSpace.Normal_Tangent_N) / attenuation;
             specularLight += GMLight_Specular(GM_lights[i], lightDirection_tangent_N, eyeDirection_tangent_N, vertex.TangentSpace.Normal_Tangent_N, vertex.Shininess) / attenuation;
             refractionLight += calculateRefractionByNormalTangent(vertex.WorldPos, vertex.TangentSpace, vertex.Refractivity);
         }

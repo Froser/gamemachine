@@ -30,7 +30,7 @@ void GMGLLight::activateLight(GMuint32 index, ITechnique* technique)
 
 	shaderProgram->setInt(
 		getVariableIndex(shaderProgram, d->lightIndices[shaderLightIdx][index].Type, L"GM_lights[" + strIndex + L"].Type"),
-		getType());
+		getLightType());
 
 	shaderProgram->setVec3(
 		getVariableIndex(shaderProgram, d->lightIndices[shaderLightIdx][index].AmbientIntensity, L"GM_lights[" + strIndex + L"].AmbientIntensity"),
@@ -55,4 +55,40 @@ void GMGLLight::activateLight(GMuint32 index, ITechnique* technique)
 	shaderProgram->setFloat(
 		getVariableIndex(shaderProgram, d->lightIndices[shaderLightIdx][index].AttenuationExp, L"GM_lights[" + strIndex + L"].Attenuation.Exp"),
 		db->attenuation.exp);
+}
+
+bool GMGLDirectionalLight::setLightAttribute3(GMLightAttribute attr, GMfloat value[3])
+{
+	D(d);
+	switch (attr)
+	{
+	case Direction:
+		d->direction[0] = value[0];
+		d->direction[1] = value[1];
+		d->direction[2] = value[2];
+		d->direction[3] = 1;
+		break;
+	default:
+		return Base::setLightAttribute3(attr, value);
+	}
+	return true;
+}
+
+void GMGLDirectionalLight::activateLight(GMuint32 index, ITechnique* technique)
+{
+	Base::activateLight(index, technique);
+
+	D(d);
+	GMGLTechnique* glTechnique = gm_cast<GMGLTechnique*>(technique);
+	IShaderProgram* shaderProgram = glTechnique->getShaderProgram();
+	GMString strIndex = GMString((GMint32)index);
+
+	GMsize_t shaderLightIdx = verifyIndicesContainer(d->lightIndices, shaderProgram);
+	static const Data::LightIndices s_empty = { 0 };
+	if (d->lightIndices[shaderLightIdx].size() <= index)
+		d->lightIndices[shaderLightIdx].resize(index + 1, s_empty);
+
+	shaderProgram->setVec3(
+		getVariableIndex(shaderProgram, d->lightIndices[shaderLightIdx][index].Direction, L"GM_lights[" + strIndex + L"].Direction"),
+		d->direction);
 }

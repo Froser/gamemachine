@@ -110,6 +110,7 @@ private:
 #define GM_PRIVATE_NAME(name) name##Private
 #define GM_PRIVATE_DESTRUCT(name) ~name##Private()
 #define GM_PRIVATE_OBJECT_UNALIGNED(name) class name; struct name##Private
+#define GM_PRIVATE_OBJECT_UNALIGNED_FROM(name, extends) class name; struct name##Private : public extends##Private
 
 #define GM_DECLARE_GETTER_ACCESSOR(name, memberName, accessor, callback) \
 	accessor: \

@@ -176,6 +176,9 @@ struct GMLight
     float SpecularIntensity;
     int Type;
     GM_Attenuation Attenuation;
+
+    // Directional
+    float4 Direction;
 };
 GMLight GM_LightAttributes[50];
 
@@ -189,11 +192,12 @@ interface ILight
     float4 IlluminateSpecular(float3 lightDirection_N, float3 eyeDirection_N, float3 normal_N, float shininess);
 };
 
-float3 GetLightPositionInEyeSpace(float4 pos, float4x4 viewMatrix)
+float3 GetLightPosition_eye(float4 pos, float4x4 viewMatrix)
 {
     return (mul(pos, viewMatrix)).xyz;
 }
 
+//默认的光照实现
 class GMPhongPointLight : ILight
 {
     float4 IlluminateAmbient()
@@ -216,16 +220,17 @@ class GMPhongPointLight : ILight
     }
 };
 
-//默认的光照实现
 GMPhongPointLight GM_PhongPointLight;
 
 static const int GM_PointLight = 0;
+static const int GM_DirectionalLight = 1;
+static const int GM_Spotlight = 2;
 
 class GMPhongLightProxy
 {
     float4 IlluminateAmbient(GMLight light)
     {
-        if (light.Type == GM_PointLight)
+        if (light.Type == GM_PointLight || light.Type == GM_DirectionalLight)
             return GM_PhongPointLight.IlluminateAmbient();
 
         return GM_PhongPointLight.IlluminateAmbient();
@@ -233,7 +238,7 @@ class GMPhongLightProxy
 
     float4 IlluminateDiffuse(GMLight light, float3 lightDirection_N, float3 normal_N)
     {
-        if (light.Type == GM_PointLight)
+        if (light.Type == GM_PointLight || light.Type == GM_DirectionalLight)
             return GM_PhongPointLight.IlluminateDiffuse(lightDirection_N, normal_N);
 
         return GM_PhongPointLight.IlluminateDiffuse(lightDirection_N, normal_N);
@@ -241,10 +246,23 @@ class GMPhongLightProxy
 
     float4 IlluminateSpecular(GMLight light, float3 lightDirection_N, float3 eyeDirection_N, float3 normal_N, float shininess)
     {
-        if (light.Type == GM_PointLight)
+        if (light.Type == GM_PointLight || light.Type == GM_DirectionalLight)
             return GM_PhongPointLight.IlluminateSpecular(lightDirection_N, eyeDirection_N, normal_N, shininess);
 
         return GM_PhongPointLight.IlluminateSpecular(lightDirection_N, eyeDirection_N, normal_N, shininess);
+    }
+
+    float3 GetLightDirection_eye_N(GMLight light, float3 position_Eye)
+    {
+        if (light.Type == GM_PointLight)
+        {
+            return normalize(GetLightPosition_eye(light.Position, GM_ViewMatrix) - position_Eye);
+        }
+        else if (light.Type == GM_DirectionalLight)
+        {
+            return mul(-light.Direction, ToFloat3x3(GM_ViewMatrix));
+        }
+        return float3(0,0,0);
     }
 };
 int GM_LightCount;
@@ -532,19 +550,18 @@ class GMPhong : IIlluminationModel
                                 GM_LightAttributes[i].Attenuation.Linear * distance +
                                 GM_LightAttributes[i].Attenuation.Exp * distance * distance;
 
-            float3 lightPosition_Eye = GetLightPositionInEyeSpace(GM_LightAttributes[i].Position, GM_ViewMatrix);
             factor_Ambient += PhoneLightProxy.IlluminateAmbient(GM_LightAttributes[i]) * GM_LightAttributes[i].Color * GM_LightAttributes[i].AmbientIntensity / attenuation;
 
             if (!input.HasNormalMap)
             {
-                float3 lightDirection_Eye_N = normalize(lightPosition_Eye - position_Eye);
+                float3 lightDirection_Eye_N = PhoneLightProxy.GetLightDirection_eye_N(GM_LightAttributes[i], position_Eye);
                 factor_Diffuse += PhoneLightProxy.IlluminateDiffuse(GM_LightAttributes[i], lightDirection_Eye_N, input.Normal_Eye_N) * GM_LightAttributes[i].Color * GM_LightAttributes[i].DiffuseIntensity / attenuation;
                 factor_Specular += PhoneLightProxy.IlluminateSpecular(GM_LightAttributes[i], lightDirection_Eye_N, -position_Eye_N, input.Normal_Eye_N, input.Shininess) * GM_LightAttributes[i].Color * GM_LightAttributes[i].SpecularIntensity / attenuation;
             }
             else
             {
-                float3 lightDirection_Eye = lightPosition_Eye - position_Eye;
-                float3 lightDirection_Tangent_N = normalize(mul(lightDirection_Eye, input.TangentSpace.TBN));
+                float3 lightDirection_Eye_N = PhoneLightProxy.GetLightDirection_eye_N(GM_LightAttributes[i], position_Eye);
+                float3 lightDirection_Tangent_N = normalize(mul(lightDirection_Eye_N, input.TangentSpace.TBN));
                 float3 eyeDirection_Tangent_N = normalize(mul(-position_Eye, input.TangentSpace.TBN));
                 factor_Diffuse += PhoneLightProxy.IlluminateDiffuse(GM_LightAttributes[i], lightDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N) * GM_LightAttributes[i].Color * GM_LightAttributes[i].DiffuseIntensity / attenuation;
                 factor_Specular += PhoneLightProxy.IlluminateSpecular(GM_LightAttributes[i], lightDirection_Tangent_N, eyeDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N, input.Shininess) * GM_LightAttributes[i].Color * GM_LightAttributes[i].SpecularIntensity / attenuation; 

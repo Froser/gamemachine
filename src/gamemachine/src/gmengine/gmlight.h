@@ -19,6 +19,11 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMLight)
 	} attenuation;
 };
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMDirectionalLight_t)
+{
+	GMfloat direction[4] = { 0, -1, 0, 0 };
+};
+
 class GMLight : public ILight
 {
 	GM_DECLARE_PRIVATE_NGO(GMLight)
@@ -34,12 +39,23 @@ public:
 		AttenuationConstant, // GMfloat
 		AttenuationLinear, // GMfloat
 		AttenuationExp, // GMfloat
-		CustomStart,
+		Direction, // GMfloat[3]
+		CustomStart = 0x1000,
 	};
 
 public:
 	virtual bool setLightAttribute3(GMLightAttribute attr, GMfloat value[3]) override;
 	virtual bool setLightAttribute(GMLightAttribute, GMfloat) override;
+};
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMDirectionalLight)
+{
+	struct LightIndices
+	{
+		GMint32 Direction;
+	};
+
+	Vector<Vector<LightIndices>> lightIndices;
 };
 
 END_NS

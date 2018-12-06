@@ -32,5 +32,26 @@ public:
 	}
 };
 
+GM_PRIVATE_OBJECT_UNALIGNED_FROM(GMDx11DirectionalLight, GMDirectionalLight_t)
+{
+};
+
+class GMDx11DirectionalLight : public GMDx11Light
+{
+	GM_DECLARE_PRIVATE_NGO(GMDx11DirectionalLight)
+	typedef GMDx11Light Base;
+
+	enum { DirectionalLight = 1 };
+
+public:
+	virtual int getLightType() override
+	{
+		return DirectionalLight;
+	}
+
+	virtual bool setLightAttribute3(GMLightAttribute attr, GMfloat value[3]) override;
+	virtual void activateLight(GMuint32, ITechnique*) override;
+};
+
 END_NS
 #endif

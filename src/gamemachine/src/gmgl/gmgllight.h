@@ -30,7 +30,7 @@ public:
 	virtual void activateLight(GMuint32, ITechnique*) override;
 
 protected:
-	virtual int getType() = 0;
+	virtual int getLightType() = 0;
 };
 
 class GMGLPointLight : public GMGLLight
@@ -38,10 +38,37 @@ class GMGLPointLight : public GMGLLight
 	enum { PointLight = 0 };
 
 public:
-	virtual int getType() override
+	virtual int getLightType() override
 	{
 		return PointLight;
 	}
+};
+
+GM_PRIVATE_OBJECT_UNALIGNED_FROM(GMGLDirectionalLight, GMDirectionalLight_t)
+{
+	struct LightIndices
+	{
+		GMint32 Direction;
+	};
+
+	Vector<Vector<LightIndices>> lightIndices;
+};
+
+class GMGLDirectionalLight : public GMGLLight
+{
+	GM_DECLARE_PRIVATE_NGO(GMGLDirectionalLight)
+	typedef GMGLLight Base;
+
+	enum { DirectionalLight = 1 };
+
+public:
+	virtual int getLightType() override
+	{
+		return DirectionalLight;
+	}
+
+	virtual bool setLightAttribute3(GMLightAttribute attr, GMfloat value[3]) override;
+	virtual void activateLight(GMuint32, ITechnique*) override;
 };
 
 END_NS
