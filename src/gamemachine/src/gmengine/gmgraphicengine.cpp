@@ -445,11 +445,20 @@ void GMGraphicEngine::createModelDataProxy(const IRenderContext* context, GMMode
 	}
 }
 
-void GMGraphicEngine::addLight(AUTORELEASE ILight* light)
+GMLightIndex GMGraphicEngine::addLight(AUTORELEASE ILight* light)
 {
 	D(d);
 	d->lights.push_back(light);
 	update(GMUpdateDataType::LightChanged);
+	return d->lights.size();
+}
+
+ILight* GMGraphicEngine::getLight(GMLightIndex index)
+{
+	D(d);
+	if (index <= 0 || index > d->lights.size())
+		return nullptr;
+	return d->lights[index - 1];
 }
 
 void GMGraphicEngine::removeLights()

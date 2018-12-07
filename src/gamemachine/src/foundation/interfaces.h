@@ -390,6 +390,8 @@ struct GMStencilOptions
 	GMStencilOp stencilPassOp = Replace;
 };
 
+typedef GMsize_t GMLightIndex;
+
 //! 图形绘制引擎接口
 /*!
   提供最基本的绘制功能。
@@ -453,8 +455,16 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	  将一个光源添加到全局绘制引擎中。<BR>
 	  光源的表现行为与着色器程序有关，有些图元可能不会使用到光源，有些图元则可能会。
 	  \param light 需要添加的光源。
+	  \return 光源的索引。
 	*/
-	virtual void addLight(AUTORELEASE ILight* light) = 0;
+	virtual GMLightIndex addLight(AUTORELEASE ILight* light) = 0;
+
+	//! 获取一个光源。
+	/*!
+	  根据索引返回一个光源。如果索引非法，返回一个空指针。
+	  \return 目标光源。
+	*/
+	virtual ILight* getLight(GMLightIndex index) = 0;
 
 	//! 移除所有光源。
 	/*!

@@ -9,9 +9,6 @@ namespace
 		GMVec3(0, 0, 1),
 		GMVec3(0, 0, -1)
 	);
-
-	static gm::GMfloat s_factor = 0;
-	static gm::GMfloat s_lightDirection[3] = { -1, -1, -1 };
 }
 
 void Demo_Light::init()
@@ -106,6 +103,8 @@ void Demo_Light_Point::setDefaultLights()
 	getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
 }
 
+//////////////////////////////////////////////////////////////////////////
+
 void Demo_Light_Point_NormalMap::onGameObjectAdded(gm::GMGameObject* obj)
 {
 	obj->setRotation(Rotate(Radians(20.f), GMVec3(1, 0, 0)));
@@ -127,6 +126,44 @@ void Demo_Light_Point_NormalMap::setDefaultLights()
 	light->setLightAttribute3(gm::GMLight::DiffuseIntensity, diffuseIntensity);
 	light->setLightAttribute(gm::GMLight::AttenuationLinear, .1f);
 	getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
+}
+
+//////////////////////////////////////////////////////////////////////////
+void Demo_Light_Directional_Normalmap::setDefaultLights()
+{
+	D(d);
+	gm::ILight* light = nullptr;
+	{
+		GM.getFactory()->createLight(gm::GMLightType::DirectionalLight, &light);
+		GM_ASSERT(light);
+		gm::GMfloat lightPos[] = { 0, 0, -1 };
+		light->setLightAttribute3(gm::GMLight::Position, lightPos);
+
+		gm::GMfloat ambientIntensity[] = { 0, 0, 0 };
+		light->setLightAttribute3(gm::GMLight::AmbientIntensity, ambientIntensity);
+
+		gm::GMfloat diffuseIntensity[] = { .4f, .4f, .4f };
+		light->setLightAttribute3(gm::GMLight::DiffuseIntensity, diffuseIntensity);
+		light->setLightAttribute(gm::GMLight::AttenuationLinear, .1f);
+
+		gm::GMfloat lightDirection[] = { 0, 0, 1 };
+		light->setLightAttribute3(gm::GMLight::Direction, lightDirection);
+		d->light = getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
+	}
+
+	{
+		GM.getFactory()->createLight(gm::GMLightType::PointLight, &light);
+		GM_ASSERT(light);
+
+		gm::GMfloat ambientIntensity[] = { .1f, .1f, .1f };
+		light->setLightAttribute3(gm::GMLight::AmbientIntensity, ambientIntensity);
+		d->ambientLight = getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
+	}
+}
+
+void Demo_Light_Directional_Normalmap::onGameObjectAdded(gm::GMGameObject* obj)
+{
+	asDemoGameWorld(getDemoWorldReference())->addObject("texture", obj);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -166,42 +203,30 @@ void Demo_Light_Point_NormalMap::onAssetAdded(gm::GMModelAsset asset)
 
 void Demo_Light_Directional_Normalmap::event(gm::GameMachineHandlerEvent evt)
 {
+	D(d);
 	Base::event(evt);
 	switch (evt)
 	{
 	case gm::GameMachineHandlerEvent::Update:
 	{
-		getDemonstrationWorld()->getContext()->getEngine()->removeLights();
-		setDefaultLights();
+		auto im = getDemonstrationWorld()->getContext()->getWindow()->getInputMananger();
+		gm::IWindow* window = getDemonstrationWorld()->getContext()->getWindow();
+		const auto& rc = window->getRenderRect();
+		auto hw = rc.width / 2, hh = rc.height / 2;
 
-		// 更新光照方向，效果更加明显
-		for (auto i = 0; i < 3; ++i)
+		auto ms = im->getMouseState().mouseState();
+		gm::GMfloat x = ((gm::GMfloat)ms.posX / rc.width) - .5f;
+		gm::GMfloat y = .5f - ((gm::GMfloat)ms.posY / rc.width);
+		GMVec3 lightDirection = Normalize(GMVec3(x, y, 1));
+		gm::ILight* light = getDemonstrationWorld()->getContext()->getEngine()->getLight(d->light);
+		if (light)
 		{
-			s_factor += .02f;
+			gm::GMfloat direction[] = { lightDirection.getX(), lightDirection.getY(), lightDirection.getZ() };
+			light->setLightAttribute3(gm::GMLight::Direction, direction);
+			getDemonstrationWorld()->getContext()->getEngine()->update(gm::GMUpdateDataType::LightChanged); // Don't forget this !!!
 		}
-		break;
 	}
 	}
-}
-
-void Demo_Light_Directional_Normalmap::setDefaultLights()
-{
-	gm::ILight* light = nullptr;
-	GM.getFactory()->createLight(gm::GMLightType::DirectionalLight, &light);
-	GM_ASSERT(light);
-	gm::GMfloat lightPos[] = { 0, 1, -1 };
-	light->setLightAttribute3(gm::GMLight::Position, lightPos);
-
-	gm::GMfloat ambientIntensity[] = { 0, 0, 0 };
-	light->setLightAttribute3(gm::GMLight::AmbientIntensity, ambientIntensity);
-
-	gm::GMfloat diffuseIntensity[] = { .7f, .7f, .7f };
-	light->setLightAttribute3(gm::GMLight::DiffuseIntensity, diffuseIntensity);
-	light->setLightAttribute(gm::GMLight::AttenuationLinear, .1f);
-
-	gm::GMfloat lightDirection[] = { s_lightDirection[0] * Sin(s_factor), s_lightDirection[1] ,s_lightDirection[2] * Sin(s_factor) };
-	light->setLightAttribute3(gm::GMLight::Direction, lightDirection);
-	getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
 }
 
 void Demo_Light_Spotlight::setDefaultLights()
@@ -223,4 +248,37 @@ void Demo_Light_Spotlight::setDefaultLights()
 	light->setLightAttribute3(gm::GMLight::Direction, lightDirection);
 	light->setLightAttribute(gm::GMLight::CutOff, 10.f);
 	getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
+}
+
+void Demo_Light_Spotlight_Normalmap::setDefaultLights()
+{
+	D(d);
+	gm::ILight* light = nullptr;
+	{
+		GM.getFactory()->createLight(gm::GMLightType::Spotlight, &light);
+		GM_ASSERT(light);
+		gm::GMfloat lightPos[] = { 0, 0, -1 };
+		light->setLightAttribute3(gm::GMLight::Position, lightPos);
+
+		gm::GMfloat ambientIntensity[] = { .5f, .5f, .5f };
+		light->setLightAttribute3(gm::GMLight::AmbientIntensity, ambientIntensity);
+
+		gm::GMfloat diffuseIntensity[] = { .4f, .4f, .4f };
+		light->setLightAttribute3(gm::GMLight::DiffuseIntensity, diffuseIntensity);
+		light->setLightAttribute(gm::GMLight::AttenuationLinear, .1f);
+
+		gm::GMfloat lightDirection[] = { 0, 0, 1 };
+		light->setLightAttribute3(gm::GMLight::Direction, lightDirection);
+		light->setLightAttribute(gm::GMLight::CutOff, 15.f);
+		d->light = getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
+	}
+
+	{
+		GM.getFactory()->createLight(gm::GMLightType::PointLight, &light);
+		GM_ASSERT(light);
+
+		gm::GMfloat ambientIntensity[] = { .1f, .1f, .1f };
+		light->setLightAttribute3(gm::GMLight::AmbientIntensity, ambientIntensity);
+		d->ambientLight = getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
+	}
 }
