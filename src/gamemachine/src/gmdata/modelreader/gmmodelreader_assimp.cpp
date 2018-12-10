@@ -171,7 +171,7 @@ namespace
 		{
 			if (vertex->weights[i] == 0.f)
 			{
-				vertex->boneIds[i] = boneId;
+				vertex->boneIds[i] = gm_sizet_to_int(boneId);
 				vertex->weights[i] = weight;
 				return;
 			}

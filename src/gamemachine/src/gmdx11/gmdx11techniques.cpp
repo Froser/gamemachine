@@ -363,7 +363,7 @@ void GMDx11Technique::updateBoneTransforms(IShaderProgram* shaderProgram, GMMode
 	D(d);
 	auto bones = d->effect->GetVariableByName(GM_VariablesDesc.Bones.toStdString().c_str());
 	const auto& transforms = model->getBoneTransformations();
-	for (GMsize_t i = 0; i < transforms.size(); ++i)
+	for (UINT i = 0; i < gm_sizet_to_uint(transforms.size()); ++i)
 	{
 		const auto& transform = transforms[i];
 		bones->GetElement(i)->AsMatrix()->SetMatrix(ValuePointer(transform));

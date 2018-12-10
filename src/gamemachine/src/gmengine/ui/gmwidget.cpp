@@ -59,7 +59,7 @@ namespace
 			parentCanvas = parentCanvas->getPrevCanvas();
 			if (!parentCanvas)
 				parentCanvas = control->getParent();
-			index = parentCanvas->getControls().size() - 1;
+			index = gm_sizet_to_int(parentCanvas->getControls().size() - 1);
 		}
 		return parentCanvas->getControls()[index];
 	}
