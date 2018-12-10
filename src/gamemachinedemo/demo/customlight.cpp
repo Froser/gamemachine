@@ -116,6 +116,7 @@ namespace
 		}
 	};
 
+#if GM_USE_DX11
 	class DxSpotlight : public Spotlight
 	{
 	public:
@@ -140,6 +141,7 @@ namespace
 			GM_DX_HR(pLightDirection->SetFloatVector(direction));
 		}
 	};
+#endif
 }
 
 void Demo_CustomLight::init()
