@@ -36,7 +36,7 @@ GM_PRIVATE_OBJECT(GMGameWorld)
 	GMRenderList renderList;
 };
 
-class GMGameWorld : public GMObject
+class GM_EXPORT GMGameWorld : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMGameWorld)
 	GM_FRIEND_CLASS(GMPhysicsWorld)

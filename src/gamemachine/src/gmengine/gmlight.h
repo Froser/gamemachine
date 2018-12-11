@@ -29,7 +29,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMSpotlight_t)
 	GMfloat cutOff; //!< 切光角，单位是角度。
 };
 
-class GMLight : public ILight
+class GM_EXPORT GMLight : public ILight
 {
 	GM_DECLARE_PRIVATE_NGO(GMLight)
 

@@ -16,7 +16,7 @@ GM_PRIVATE_OBJECT(GMRenderTechniqueManager)
 	bool inited = false;
 };
 
-class GMRenderTechniqueManager : public GMObject
+class GM_EXPORT GMRenderTechniqueManager : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMRenderTechniqueManager)
 
@@ -53,7 +53,7 @@ GM_PRIVATE_OBJECT(GMRenderTechnique)
 };
 
 //! 表示一种渲染技术的类，它可以让GMGameObject在渲染时，调用到指定的着色器代码，完成预预设流程不一样的渲染。
-class GMRenderTechnique : public GMObject
+class GM_EXPORT GMRenderTechnique : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMRenderTechnique)
 	GM_ALLOW_COPY_MOVE(GMRenderTechnique)
@@ -98,7 +98,7 @@ GM_PRIVATE_OBJECT(GMRenderTechniques)
 	Vector<GMRenderTechnique> techniques;
 };
 
-class GMRenderTechniques : public GMObject
+class GM_EXPORT GMRenderTechniques : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMRenderTechniques)
 	GM_DECLARE_PROPERTY(Id, id)

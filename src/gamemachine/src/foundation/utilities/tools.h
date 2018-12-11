@@ -153,7 +153,7 @@ GM_ALIGNED_STRUCT(GMFrustumPlanes)
 };
 
 //GMMemoryStream
-GM_PRIVATE_OBJECT(GMMemoryStream)
+GM_PRIVATE_OBJECT_UNALIGNED(GMMemoryStream)
 {
 	const GMbyte* ptr;
 	const GMbyte* start;
@@ -161,9 +161,9 @@ GM_PRIVATE_OBJECT(GMMemoryStream)
 	GMsize_t size;
 };
 
-class GMMemoryStream : public GMObject
+class GM_EXPORT GMMemoryStream
 {
-	GM_DECLARE_PRIVATE(GMMemoryStream)
+	GM_DECLARE_PRIVATE_NGO(GMMemoryStream)
 
 public:
 	enum SeekMode
@@ -289,9 +289,9 @@ GM_PRIVATE_OBJECT(GMEvent)
 };
 
 // 表示一个Wait之后能够自动Set的事件
-class GMEvent : public GMObject
+class GM_EXPORT GMEvent
 {
-	GM_DECLARE_PRIVATE(GMEvent)
+	GM_DECLARE_PRIVATE_NGO(GMEvent)
 
 protected:
 	GMEvent(bool manualReset, bool initialState);
@@ -305,19 +305,19 @@ public:
 	void reset();
 };
 
-class GMAutoResetEvent : public GMEvent
+class GM_EXPORT GMAutoResetEvent : public GMEvent
 {
 public:
 	GMAutoResetEvent(bool initialState = false);
 };
 
-class GMManualResetEvent : public GMEvent
+class GM_EXPORT GMManualResetEvent : public GMEvent
 {
 public:
 	GMManualResetEvent(bool initialState = false);
 };
 
-struct GMConvertion
+struct GM_EXPORT GMConvertion
 {
 	static GMfloat pointToInch(GMint32 pt);
 	static GMfloat pointToPixel(GMint32 pt, bool horizontal = true);

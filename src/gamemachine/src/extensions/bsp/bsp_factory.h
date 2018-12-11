@@ -4,7 +4,7 @@
 BEGIN_NS
 
 class GMBSPGameWorld;
-struct GMBSPFactory
+struct GM_EXPORT GMBSPFactory
 {
 	static void createBSPGameWorld(const IRenderContext* context, const GMString& map, OUT GMBSPGameWorld** gameWorld);
 };

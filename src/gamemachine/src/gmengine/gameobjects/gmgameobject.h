@@ -31,7 +31,7 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	} drawContext;
 };
 
-class GMGameObject : public GMObject
+class GM_EXPORT GMGameObject : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMGameObject)
 
@@ -120,7 +120,7 @@ GM_PRIVATE_OBJECT(GMBSPSkyGameObject)
 	GMShader shader;
 };
 
-class GMCubeMapGameObject : public GMGameObject
+class GM_EXPORT GMCubeMapGameObject : public GMGameObject
 {
 public:
 	GMCubeMapGameObject(GMTextureAsset texture);

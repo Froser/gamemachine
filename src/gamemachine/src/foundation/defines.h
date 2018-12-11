@@ -19,6 +19,44 @@
 #	endif
 #endif
 
+// 导入导出
+#pragma warning( disable: 4251 )
+
+#ifndef GM_DECL_EXPORT
+#	ifdef GM_WINDOWS
+#		define GM_DECL_EXPORT __declspec(dllexport)
+#	elif GM_GCC
+#		define GM_DECL_EXPORT __attribute__((visibility("default")))
+#	endif
+#	ifndef GM_DECL_EXPORT
+#		define GM_DECL_EXPORT
+#	endif
+#endif
+#ifndef GM_DECL_IMPORT
+#	if GM_WINDOWS
+#		define GM_DECL_IMPORT __declspec(dllimport)
+#	else
+#		define GM_DECL_IMPORT
+#	endif
+#endif
+
+#ifdef GM_DLL
+#	ifndef GM_EXPORT
+#		define GM_EXPORT GM_DECL_EXPORT
+#	endif
+#else
+#	if GM_USE_DLL
+#		ifndef GM_EXPORT
+#			define GM_EXPORT GM_DECL_IMPORT
+#		endif
+#	else
+#		ifndef GM_EXPORT
+#			define GM_EXPORT
+#		endif
+#	endif
+#endif
+
+
 // 容器别名
 #if GM_WINDOWS
 #	include <wtypes.h>

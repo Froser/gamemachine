@@ -32,7 +32,7 @@ static inline GMString operator +(const GMString& left, const GMString& right);
   如果传入的是一个窄字符，GMString将认为它，则转换为UTF-16宽字符。<br>
   任何时候都要尽量使用宽字符，以提高效率。如果不是UTF-16编码，则应该使用UTF-8编码。
 */
-class GMString
+class GM_EXPORT GMString
 {
 	DECLARE_STRING_PRIVATE(GMString)
 

@@ -45,7 +45,7 @@ GM_PRIVATE_OBJECT(GMSkeletalGameObject)
 	GMsize_t animationIndex = 0;
 };
 
-class GMSkeletalGameObject : public GMGameObject
+class GM_EXPORT GMSkeletalGameObject : public GMGameObject
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMSkeletalGameObject, GMGameObject)
 	GM_DECLARE_PROPERTY(SkeletonColor, skeletonColor)

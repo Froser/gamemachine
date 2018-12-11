@@ -26,7 +26,7 @@ void Demo_MD5Mesh::init()
 		30,
 		false
 	));
-	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		if (d->boblampclean->isPlaying())
 			d->boblampclean->pause();
 		else
@@ -42,7 +42,7 @@ void Demo_MD5Mesh::init()
 		30,
 		false
 	));
-	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->boblampclean->reset(true);
 	});
 

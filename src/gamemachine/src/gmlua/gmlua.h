@@ -102,7 +102,7 @@ GM_PRIVATE_OBJECT(GMLua)
 	bool libraryLoaded = false;
 };
 
-class GMLua : public GMObject
+class GM_EXPORT GMLua : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMLua)
 	friend struct luaapi::GMArgumentHelper;

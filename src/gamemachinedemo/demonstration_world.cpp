@@ -77,9 +77,6 @@ namespace
 	}
 }
 
-GM_DEFINE_SIGNAL(DemoHandler::renderingChanged);
-GM_DEFINE_SIGNAL(DemoHandler::gammaCorrectionChanged);
-
 DemoHandler::DemoHandler(DemonstrationWorld* parentDemonstrationWorld)
 {
 	D(d);
@@ -318,7 +315,7 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 		30,
 		false
 	));
-	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		backToEntrance();
 	});
 
@@ -376,7 +373,7 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 		false
 	));
 
-	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		if (getDemoWorldReference()->getRenderPreference() == gm::GMRenderPreference::PreferDeferredRendering)
 			getDemoWorldReference()->setRenderPreference(gm::GMRenderPreference::PreferForwardRendering);
 		else
@@ -392,7 +389,7 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 		30,
 		false
 	));
-	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->renderConfig.set(gm::GMRenderConfigs::GammaCorrection_Bool, !d->renderConfig.get(gm::GMRenderConfigs::GammaCorrection_Bool).toBool());
 	});
 
@@ -416,7 +413,7 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 		30,
 		false
 	));
-	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		switchNormal();
 	});
 
@@ -429,7 +426,7 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 		30,
 		false
 	));
-	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->debugConfig.set(gm::GMDebugConfigs::WireFrameMode_Bool, !d->debugConfig.get(gm::GMDebugConfigs::WireFrameMode_Bool).toBool());
 	});
 
@@ -528,7 +525,7 @@ void DemonstrationWorld::init()
 		));
 		Y += 30 + marginY;
 		GM_ASSERT(button);
-		button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		button->connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 			d->nextDemo = demo.second;
 			getMainWidget()->setVisible(false);
 			getBillboardWidget()->setVisible(false);
@@ -547,7 +544,7 @@ void DemonstrationWorld::init()
 	));
 	Y += 30 + marginY;
 	GM_ASSERT(exitButton);
-	exitButton->connect(*exitButton, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+	exitButton->connect(*exitButton, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		GM.exit();
 	});
 

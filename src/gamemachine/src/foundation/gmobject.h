@@ -18,7 +18,7 @@ BEGIN_NS
 /*!
   继承此接口，将自动获得一个虚析构函数。
 */
-struct IVirtualFunctionObject
+struct GM_EXPORT IVirtualFunctionObject
 {
 	virtual ~IVirtualFunctionObject() = default;
 };
@@ -271,9 +271,8 @@ using GMConnectionTargets = Vector<GMConnectionTarget>;
 
 using GMSlots = HashMap<GMSignal, Vector<GMCallbackTarget>, GMStringHashFunctor>;
 
-#define GM_SIGNAL(signal) signal
-#define GM_DECLARE_SIGNAL(signal) public: static gm::GMString GM_SIGNAL(signal);
-#define GM_DEFINE_SIGNAL(signal) gm::GMString GM_SIGNAL(signal) = #signal ;
+#define GM_SIGNAL(host, signal) host::sig_##signal()
+#define GM_DECLARE_SIGNAL(signal) public: inline static const gm::GMString& sig_##signal() { static gm::GMString s_sig(#signal); return s_sig; }
 
 #define GM_BEGIN_META_MAP \
 	protected: \
@@ -316,7 +315,7 @@ GM_DECLARE_PRIVATE(子类名)来将子类的数据指针成员添加到子类中
 使用GM_ALLOW_COPY_MOVE宏来允许对象之间相互拷贝，它会生成一套左值和右值拷贝、赋值函数。<BR>
 另外，GMObject的数据将会在GMObject构造时被新建，在GMObject析构时被释放。
 */
-class GMObject : public IVirtualFunctionObject
+class GM_EXPORT GMObject : public IVirtualFunctionObject
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMObject, IVirtualFunctionObject)
 	GM_DISABLE_COPY(GMObject)
@@ -413,29 +412,11 @@ inline TargetType gm_cast(SourceType obj)
 }
 
 // 接口统一定义
-#define GM_INTERFACE(name) struct name : public gm::IVirtualFunctionObject
-#define GM_INTERFACE_FROM(name, base) struct name : public base 
-
-template <typename T>
-class GMSingleton
-{
-public:
-	static inline T& instance()
-	{
-		static T _instance;
-		return _instance;
-	}
-
-protected:
-	GMSingleton() {}
-	~GMSingleton() {}
-};
-
-// 定义一个单例类，它将生成一个Private构造函数，并将GMSingleton<>设置为其友元
-#define DECLARE_SINGLETON(className) friend class GMSingleton<className>;
+#define GM_INTERFACE(name) struct GM_EXPORT name : public gm::IVirtualFunctionObject
+#define GM_INTERFACE_FROM(name, base) struct GM_EXPORT name : public base 
 
 // 缓存类，用于存储缓存数据
-struct GMBuffer
+struct GM_EXPORT GMBuffer
 {
 	GMBuffer() = default;
 	~GMBuffer();

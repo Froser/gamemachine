@@ -46,7 +46,7 @@ GM_PRIVATE_OBJECT(GMGlyphManager)
 	GMFontHandle defaultEN = GMInvalidFontHandle;
 };
 
-class GMGlyphManager : public GMObject
+class GM_EXPORT GMGlyphManager : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMGlyphManager);
 

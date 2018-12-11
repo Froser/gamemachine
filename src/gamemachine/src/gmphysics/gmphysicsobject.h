@@ -53,7 +53,7 @@ GM_PRIVATE_OBJECT(GMPhysicsObject)
   物理对象拥有一些物理性质，如边界大小等。你不能直接创建它，而是应该根据GMPhysicsWorld::newPhysicsObject()来创建相应的GMPhysicsObject。
   \sa GMPhysicsWorld
 */
-class GMPhysicsObject : public GMObject
+class GM_EXPORT GMPhysicsObject : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMPhysicsObject)
 	GM_FRIEND_CLASS(GMPhysicsWorld);
@@ -124,7 +124,7 @@ GM_PRIVATE_OBJECT(GMRigidPhysicsObject)
 	GMPhysicsActivationState state = GMPhysicsActivationState::ActiveTag;
 };
 
-class GMRigidPhysicsObject : public GMPhysicsObject
+class GM_EXPORT GMRigidPhysicsObject : public GMPhysicsObject
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMRigidPhysicsObject, GMPhysicsObject)
 

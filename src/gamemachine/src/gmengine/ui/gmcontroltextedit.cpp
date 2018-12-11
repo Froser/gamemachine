@@ -5,7 +5,6 @@
 
 BEGIN_NS
 
-GM_DEFINE_SIGNAL(GMControlTextEdit::textChanged)
 GM_PRIVATE_OBJECT(GMMultiLineTypoTextBuffer)
 {
 	GMint32 lineSpacing = 5;
@@ -618,7 +617,7 @@ bool GMControlTextEdit::onChar(GMSystemCharEvent* event)
 		if (event->getCharacter() == GMFunctionCharacter_Ctrl_X)
 		{
 			deleteSelectionText();
-			emit(textChanged);
+			emit(GM_SIGNAL(GMControlTextEdit, textChanged));
 		}
 		return true;
 	}
@@ -684,7 +683,7 @@ bool GMControlTextEdit::onChar(GMSystemCharEvent* event)
 	}
 
 	resetCaretBlink();
-	emit(textChanged);
+	emit(GM_SIGNAL(GMControlTextEdit, textChanged));
 
 	return true;
 }
@@ -780,7 +779,7 @@ bool GMControlTextEdit::onKey_Delete(GMSystemKeyEvent* event)
 		// 删除一个选区
 		if (deleteSelectionText())
 		{
-			emit(textChanged);
+			emit(GM_SIGNAL(GMControlTextEdit, textChanged));
 		}
 		else
 		{
@@ -793,7 +792,7 @@ bool GMControlTextEdit::onKey_Delete(GMSystemKeyEvent* event)
 		if (d->buffer->removeChar(d->cp))
 		{
 			d->buffer->analyze(d->cp);
-			emit(textChanged);
+			emit(GM_SIGNAL(GMControlTextEdit, textChanged));
 		}
 		else
 		{
@@ -810,7 +809,7 @@ bool GMControlTextEdit::onKey_Back(GMSystemKeyEvent* event)
 	if (d->selectionStartCP != d->cp)
 	{
 		deleteSelectionText();
-		emit(textChanged);
+		emit(GM_SIGNAL(GMControlTextEdit, textChanged));
 	}
 	else if (d->cp > 0)
 	{
@@ -820,7 +819,7 @@ bool GMControlTextEdit::onKey_Back(GMSystemKeyEvent* event)
 		if (d->buffer->removeChar(d->cp))
 		{
 			d->buffer->analyze(d->cp);
-			emit(textChanged);
+			emit(GM_SIGNAL(GMControlTextEdit, textChanged));
 		}
 
 		resetCaretBlink();
@@ -1812,7 +1811,7 @@ bool GMControlTextArea::onKey_Back(GMSystemKeyEvent* event)
 	if (d->selectionStartCP != d->cp)
 	{
 		deleteSelectionText();
-		emit(textChanged);
+		emit(GM_SIGNAL(GMControlTextArea, textChanged));
 	}
 	else if (d->cp > 0)
 	{
@@ -1821,7 +1820,7 @@ bool GMControlTextArea::onKey_Back(GMSystemKeyEvent* event)
 		if (d->buffer->removeChar(d->cp))
 		{
 			d->buffer->analyze(d->cp);
-			emit(textChanged);
+			emit(GM_SIGNAL(GMControlTextArea, textChanged));
 		}
 
 		resetCaretBlink();
@@ -1872,13 +1871,13 @@ void GMControlTextArea::updateScrollBar()
 			));
 			d->scrollBar->setCanRequestFocus(false);
 			updateScrollBarPageStep();
-			connect(*d->scrollBar, GMControlScrollBar::valueChanged, [](auto sender, auto receiver) {
+			connect(*d->scrollBar, GM_SIGNAL(GMControlScrollBar, valueChanged), [](auto sender, auto receiver) {
 				gm_cast<GMControlTextArea*>(receiver)->onScrollBarValueChanged(gm_cast<GMControlScrollBar*>(sender));
 			});
-			connect(*d->scrollBar, GMControlScrollBar::startDragThumb, [](auto sender, auto receiver) {
+			connect(*d->scrollBar, GM_SIGNAL(GMControlScrollBar, startDragThumb), [](auto sender, auto receiver) {
 				gm_cast<GMControlTextArea*>(receiver)->lockScrollBar();
 			});
-			connect(*d->scrollBar, GMControlScrollBar::endDragThumb, [](auto sender, auto receiver) {
+			connect(*d->scrollBar, GM_SIGNAL(GMControlScrollBar, endDragThumb), [](auto sender, auto receiver) {
 				gm_cast<GMControlTextArea*>(receiver)->unlockScrollBar();
 			});
 		}

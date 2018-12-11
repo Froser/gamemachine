@@ -48,7 +48,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMAsset)
 	void* asset = nullptr;
 };
 
-class GMAsset
+class GM_EXPORT GMAsset
 {
 	GM_DECLARE_PRIVATE_NGO(GMAsset)
 
@@ -124,7 +124,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMAssets)
 	HashMap<GMString, GMAsset, GMStringHashFunctor> childs;
 };
 
-class GMAssets
+class GM_EXPORT GMAssets
 {
 	GM_DECLARE_PRIVATE_NGO(GMAssets)
 

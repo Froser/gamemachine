@@ -62,7 +62,7 @@ GM_PRIVATE_OBJECT(GMThread)
 /*!
   通过继承此类来定义一个线程。
 */
-class GMThread : public GMObject
+class GM_EXPORT GMThread : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMThread)
 

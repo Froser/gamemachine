@@ -7,7 +7,7 @@
 
 BEGIN_MEDIA_NS
 
-class GMMFactory
+class GM_MEDIA_EXPORT GMMFactory
 {
 public:
 	static gm::IAudioReader* getAudioReader();

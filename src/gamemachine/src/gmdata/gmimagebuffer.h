@@ -26,7 +26,7 @@ private:
 };
 
 // 表示一个mipmap level=0的Cubemap
-class GMCubeMapBuffer : public GMImage
+class GM_EXPORT GMCubeMapBuffer : public GMImage
 {
 public:
 	GMCubeMapBuffer(

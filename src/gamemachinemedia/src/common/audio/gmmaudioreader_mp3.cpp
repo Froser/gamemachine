@@ -37,7 +37,7 @@ private:
 	}
 };
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMMAudioFile_MP3)
+GM_PRIVATE_OBJECT(GMMAudioFile_MP3)
 {
 	typedef GMMAudioFile_Stream Base;
 
@@ -47,9 +47,10 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMMAudioFile_MP3)
 	Base::Data* baseData = nullptr;
 };
 
-class GMMAudioFile_MP3 : public GMMAudioFile_Stream
+class GM_MEDIA_EXPORT GMMAudioFile_MP3 : public GMMAudioFile_Stream
 {
 	GM_DECLARE_PRIVATE_NGO(GMMAudioFile_MP3)
+	GM_DECLARE_ALIGNED_ALLOCATOR()
 	typedef GMMAudioFile_Stream Base;
 
 public:

@@ -11,7 +11,7 @@
 
 namespace gm
 {
-	class Assert
+	class GM_EXPORT Assert
 	{
 	public:
 		static void noop();

@@ -6,7 +6,7 @@
 #include <gmassets.h>
 BEGIN_NS
 
-class GMBSPSkyGameObject : public GMGameObject
+class GM_EXPORT GMBSPSkyGameObject : public GMGameObject
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMBSPSkyGameObject, GMGameObject)
 
@@ -17,7 +17,7 @@ private:
 	void createSkyBox(OUT GMModel** obj);
 };
 
-class GMBSPGameWorld : public GMGameWorld
+class GM_EXPORT GMBSPGameWorld : public GMGameWorld
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMBSPGameWorld, GMGameWorld);
 

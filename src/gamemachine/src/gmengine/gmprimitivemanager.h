@@ -73,7 +73,7 @@ GM_PRIVATE_OBJECT(GMPrimitiveManager)
 	GMOwnedPtr<GMPrimitive3DObject> line3D;
 };
 
-class GMPrimitiveManager : public GMObject
+class GM_EXPORT GMPrimitiveManager : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMPrimitiveManager)
 

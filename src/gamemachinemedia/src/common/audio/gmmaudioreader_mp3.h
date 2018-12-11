@@ -6,7 +6,7 @@
 
 BEGIN_MEDIA_NS
 
-class GMMAudioReader_MP3 : public gm::GMObject, public IAudioFormatReader
+class GMMAudioReader_MP3 : public IAudioFormatReader
 {
 public:
 	virtual bool load(gm::GMBuffer& buffer, OUT gm::IAudioFile** f) override;

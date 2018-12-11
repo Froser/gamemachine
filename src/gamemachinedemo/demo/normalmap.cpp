@@ -3,8 +3,6 @@
 #include <linearmath.h>
 #include <gmcontrols.h>
 
-GM_DEFINE_SIGNAL(Demo_NormalMap::rotateStateChanged);
-
 void Demo_NormalMap::init()
 {
 	D(d);
@@ -90,15 +88,15 @@ void Demo_NormalMap::init()
 		false
 	));
 
-	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		if (d->animation.isPlaying())
 			d->animation.pause();
 		else
 			d->animation.play();
-		emit(rotateStateChanged);
+		emit(GM_SIGNAL(Demo_NormalMap, rotateStateChanged));
 	});
 
-	connect(*this, GM_SIGNAL(rotateStateChanged), [=](auto, auto) {
+	connect(*this, GM_SIGNAL(Demo_NormalMap, rotateStateChanged), [=](auto, auto) {
 		if (d->animation.isPlaying())
 			stateLabel->setText(L"状态：旋转中");
 		else

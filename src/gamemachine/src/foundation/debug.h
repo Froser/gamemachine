@@ -23,10 +23,12 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMDebugger)
 	IDebugOutput* debugger;
 };
 
-class GMDebugger : public GMSingleton<GMDebugger>
+class GM_EXPORT GMDebugger
 {
 	GM_DECLARE_PRIVATE_NGO(GMDebugger)
-	DECLARE_SINGLETON(GMDebugger)
+
+public:
+	static GMDebugger& instance();
 
 private:
 	GMDebugger()

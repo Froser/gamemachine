@@ -32,7 +32,7 @@ GM_PRIVATE_OBJECT(GMControlTextEdit)
 	GMint32 padding[2] = { 5, 10 };
 };
 
-class GMControlTextEdit : public GMControl
+class GM_EXPORT GMControlTextEdit : public GMControl
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMControlTextEdit, GMControl)
 
@@ -173,7 +173,7 @@ GM_PRIVATE_OBJECT(GMControlTextArea)
 	GMOwnedPtr<GMControlScrollBar> scrollBar;
 };
 
-class GMControlTextArea : public GMControlTextEdit
+class GM_EXPORT GMControlTextArea : public GMControlTextEdit
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMControlTextArea, GMControlTextEdit)
 	GM_DECLARE_PROPERTY(ScrollBarSize, scrollBarSize)

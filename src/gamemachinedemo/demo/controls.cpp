@@ -92,7 +92,7 @@ gm::GMWidget* Demo_Controls::createDefaultWidget()
 		30,
 		false
 	));
-	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		backToEntrance();
 	});
 

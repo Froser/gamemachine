@@ -28,7 +28,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMMAudioFile_Stream)
 	GMAtomic<gm::GMlong> chunkNum; //表示当前应该写入多少个chunk
 };
 
-class GMMAudioFile_Stream : public gm::IAudioFile, public gm::IAudioStream
+class GM_MEDIA_EXPORT GMMAudioFile_Stream : public gm::IAudioFile, public gm::IAudioStream
 {
 	GM_DECLARE_PRIVATE_NGO(GMMAudioFile_Stream)
 

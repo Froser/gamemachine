@@ -225,7 +225,7 @@ enum class GMVertexDataType
 
 #define gmVertexIndex(i) ((GMuint32)i)
 
-GM_ALIGNED_16(class) GMModel
+GM_ALIGNED_16(class) GM_EXPORT GMModel
 {
 	GM_DECLARE_PRIVATE_NGO(GMModel)
 	GM_DECLARE_ALIGNED_ALLOCATOR()
@@ -408,7 +408,7 @@ GM_PRIVATE_OBJECT(GMPart)
 /*!
   网格数据可能仅仅是模型中的一段数据。
 */
-class GMPart : public GMObject
+class GM_EXPORT GMPart : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMPart)
 

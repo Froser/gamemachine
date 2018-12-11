@@ -1322,7 +1322,7 @@ void GMWidget::createVerticalScrollbar()
 		));
 
 		d->verticalScrollbar->setPositionFlag(GMControlPositionFlag::Fixed); // 不随Widget滚动条而移动
-		connect(*d->verticalScrollbar, GMControlScrollBar::valueChanged, [=](auto sender, auto receiver) {
+		connect(*d->verticalScrollbar, GM_SIGNAL(GMControlScrollBar, valueChanged), [=](auto sender, auto receiver) {
 			this->verticalScrollTo(-gm_cast<GMControlScrollBar*>(sender)->getValue());
 		});
 		updateVerticalScrollbar();

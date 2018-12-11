@@ -12,7 +12,7 @@ GM_PRIVATE_OBJECT(GMPhysicsWorld)
 	GMfloat gravity;
 };
 
-class GMPhysicsWorld : public GMObject
+class GM_EXPORT GMPhysicsWorld : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMPhysicsWorld)
 

@@ -9,7 +9,7 @@ GM_PRIVATE_OBJECT(GMAnimationKeyframe)
 };
 
 //! 动画的关键帧。
-class GMAnimationKeyframe : public GMObject
+class GM_EXPORT GMAnimationKeyframe : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMAnimationKeyframe)
 	GM_DECLARE_PROPERTY(Time, time);
@@ -56,7 +56,7 @@ GM_PRIVATE_OBJECT(GMAnimation)
 	GMAnimationKeyframe* lastKeyframe = nullptr;
 };
 
-class GMAnimation : public GMObject
+class GM_EXPORT GMAnimation : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMAnimation)
 	GM_ALLOW_COPY_MOVE(GMAnimation)
@@ -115,7 +115,7 @@ GM_PRIVATE_OBJECT(GMGameObjectKeyframe)
 	GMfloat timeStart = 0;
 };
 
-class GMGameObjectKeyframe : public GMAnimationKeyframe
+class GM_EXPORT GMGameObjectKeyframe : public GMAnimationKeyframe
 {
 	GM_DECLARE_PRIVATE(GMGameObjectKeyframe)
 	GM_DECLARE_PROPERTY(Translation, translation)

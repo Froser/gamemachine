@@ -7,15 +7,15 @@
 struct GMVec3;
 BEGIN_NS
 
-GM_PRIVATE_OBJECT(GMPhysicsShape)
+GM_PRIVATE_OBJECT_UNALIGNED(GMPhysicsShape)
 {
 	btCollisionShape* shape = nullptr;
 	GMModelAsset modelCache;
 };
 
-class GMPhysicsShape : public GMObject
+class GM_EXPORT GMPhysicsShape
 {
-	GM_DECLARE_PRIVATE(GMPhysicsShape);
+	GM_DECLARE_PRIVATE_NGO(GMPhysicsShape);
 	GM_DECLARE_PROPERTY(ModelCache, modelCache)
 
 	friend struct GMPhysicsShapeHelper;
@@ -32,7 +32,7 @@ public:
 	const btCollisionShape* getBulletShape() const;
 };
 
-struct GMPhysicsShapeHelper
+struct GM_EXPORT GMPhysicsShapeHelper
 {
 	static void createCubeShape(const GMVec3& halfExtents, REF GMPhysicsShapeAsset& physicsShape);
 	static void createCylinderShape(const GMVec3& halfExtents, REF GMPhysicsShapeAsset& physicsShape);

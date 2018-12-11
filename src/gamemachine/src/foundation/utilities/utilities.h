@@ -35,7 +35,7 @@ struct GMTerrainDescription
 	GMfloat textureHeight; //!< 一块地形纹理在z轴的长度。
 };
 
-struct GMPrimitiveCreator
+struct GM_EXPORT GMPrimitiveCreator
 {
 	enum GMCreateAnchor
 	{
@@ -60,7 +60,7 @@ struct GMPrimitiveCreator
 /*!
   此工具类其实是对一些固有流程的方法调用进行了封装，和单独调用那些方法效果一样。
 */
-struct GMToolUtil
+struct GM_EXPORT GMToolUtil
 {
 	//! 创建一个纹理，它来源于某路径。返回一个该纹理的资产。
 	/*!

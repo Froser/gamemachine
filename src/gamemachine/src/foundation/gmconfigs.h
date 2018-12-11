@@ -86,11 +86,11 @@ private:
 };
 
 template <typename StateType>
-struct GMConfigWrapper : public GMConfigWrapperBase<StateType> {};
+struct GM_EXPORT GMConfigWrapper : public GMConfigWrapperBase<StateType> {};
 
 #define GM_DEFINE_CONFIG(Enum, Alias)							\
 template<>														\
-struct GMConfigWrapper<Enum> : public GMConfigWrapperBase<Enum>	\
+struct GM_EXPORT GMConfigWrapper<Enum> : public GMConfigWrapperBase<Enum>	\
 {																\
 	GMConfigWrapper() = default;								\
 	GMConfigWrapper(const GMConfig& vm)							\
@@ -102,7 +102,7 @@ typedef GMConfigWrapper<Enum> Alias;
 GM_DEFINE_CONFIG(GMDebugConfigs, GMDebugConfig);
 GM_DEFINE_CONFIG(GMRenderConfigs, GMRenderConfig);
 
-class GMConfig : public Vector<GMVariant>
+class GM_EXPORT GMConfig : public Vector<GMVariant>
 {
 	typedef Vector<GMVariant> Base;
 
@@ -127,7 +127,7 @@ GM_PRIVATE_OBJECT(GMConfigs)
 	Vector<GMConfig> configs;
 };
 
-class GMConfigs : public GMObject
+class GM_EXPORT GMConfigs : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMConfigs)
 

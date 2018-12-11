@@ -115,7 +115,7 @@ GM_PRIVATE_OBJECT(GMCamera)
 	GMCameraLookAt lookAt;
 };
 
-class GMCamera : public GMObject
+class GM_EXPORT GMCamera : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMCamera)
 	GM_ALLOW_COPY_MOVE(GMCamera)
@@ -168,7 +168,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMCameraUtility)
 };
 
 //! 用于响应鼠标移动时调整摄像机的一个便捷类
-class GMCameraUtility
+class GM_EXPORT GMCameraUtility
 {
 	GM_DECLARE_PRIVATE_NGO(GMCameraUtility)
 	GM_DECLARE_PROPERTY(LimitPitch, limitPitch)

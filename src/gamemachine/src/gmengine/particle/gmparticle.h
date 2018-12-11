@@ -431,7 +431,7 @@ GM_PRIVATE_OBJECT(GMParticleSystemManager)
 	GMParticlePool pool;
 };
 
-class GMParticleSystemManager : public GMObject
+class GM_EXPORT GMParticleSystemManager : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMParticleSystemManager)
 

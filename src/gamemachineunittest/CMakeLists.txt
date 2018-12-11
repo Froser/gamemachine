@@ -58,5 +58,6 @@ endif(MSVC)
 
 gm_add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
 
-target_link_libraries(${PROJECT_NAME} gamemachine)
+gm_gamemachine_project(${PROJECT_NAME} TRUE)
+
 gm_end_project(${PROJECT_NAME})

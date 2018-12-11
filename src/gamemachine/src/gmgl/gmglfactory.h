@@ -7,7 +7,7 @@ BEGIN_NS
 class GMImage;
 class GMModelDataProxy;
 class GMRenderTechniques;
-class GMGLFactory : public IFactory
+class GM_EXPORT GMGLFactory : public IFactory
 {
 public:
 	virtual void createWindow(GMInstance instance, IWindow* parent, OUT IWindow** window) override;

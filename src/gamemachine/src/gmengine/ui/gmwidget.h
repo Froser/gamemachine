@@ -121,7 +121,7 @@ GM_PRIVATE_OBJECT(GMWidgetResourceManager)
 	GMlong whiteTextureId = 0;
 };
 
-class GMWidgetResourceManager : public GMObject
+class GM_EXPORT GMWidgetResourceManager : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMWidgetResourceManager)
 
@@ -217,7 +217,7 @@ GM_PRIVATE_OBJECT(GMStyle)
 	GMShadowStyle shadowStyle;
 };
 
-class GMStyle : public GMObject
+class GM_EXPORT GMStyle : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMStyle)
 	GM_ALLOW_COPY_MOVE(GMStyle)
@@ -361,7 +361,7 @@ GM_PRIVATE_OBJECT(GMWidget)
 	GMRect scrollbarThumbCorner = { 0 };
 };
 
-class GMWidget : public GMObject
+class GM_EXPORT GMWidget : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMWidget)
 	GM_DECLARE_PROPERTY(Minimum, minimized)

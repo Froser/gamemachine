@@ -10,10 +10,10 @@ typedef void (gmFreeFunc)(void *memblock);
 void gmAlignedAllocSetCustom(gmAllocFunc *allocFunc, gmFreeFunc *freeFunc);
 void gmAlignedAllocSetCustomAligned(gmAlignedAllocFunc *allocFunc, gmAlignedFreeFunc *freeFunc);
 
-#define gmAlignedAlloc(size,alignment) AlignedMemoryAlloc::gmAlignedAllocInternal(size,alignment)
-#define gmAlignedFree(ptr) AlignedMemoryAlloc::gmAlignedFreeInternal(ptr)
+#define gmAlignedAlloc(size,alignment) gm::AlignedMemoryAlloc::gmAlignedAllocInternal(size,alignment)
+#define gmAlignedFree(ptr) gm::AlignedMemoryAlloc::gmAlignedFreeInternal(ptr)
 
-class AlignedMemoryAlloc
+class GM_EXPORT AlignedMemoryAlloc
 {
 public:
 	static void* gmAlignedAllocInternal(size_t size, GMint32 alignment);

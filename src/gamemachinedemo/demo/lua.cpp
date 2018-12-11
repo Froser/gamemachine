@@ -44,7 +44,7 @@ void Demo_Lua::init()
 		30,
 		false
 	));
-	connect(*btnRun, GM_SIGNAL(gm::GMControlButton::click), [=](auto, auto) {
+	connect(*btnRun, GM_SIGNAL(gm::GMControlButton, click), [=](auto, auto) {
 		runScript();
 	});
 
@@ -141,7 +141,7 @@ gm::GMWidget* Demo_Lua::createDefaultWidget()
 		30,
 		false
 	));
-	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		backToEntrance();
 	});
 

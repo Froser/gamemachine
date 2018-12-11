@@ -81,7 +81,7 @@ void Demo_Sound::init()
 		30,
 		false
 	));
-	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->wavSource->play(false);
 	});
 
@@ -94,7 +94,7 @@ void Demo_Sound::init()
 		30,
 		false
 	));
-	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->wavSource->pause();
 	});
 
@@ -107,7 +107,7 @@ void Demo_Sound::init()
 		30,
 		false
 	));
-	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->wavSource->stop();
 	});
 
@@ -120,7 +120,7 @@ void Demo_Sound::init()
 		30,
 		false
 	));
-	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->mp3Source->play(false);
 	});
 
@@ -133,7 +133,7 @@ void Demo_Sound::init()
 		30,
 		false
 	));
-	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->mp3Source->stop();
 	});
 
@@ -146,7 +146,7 @@ void Demo_Sound::init()
 		30,
 		false
 	));
-	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->mp3Source->stop();
 	});
 

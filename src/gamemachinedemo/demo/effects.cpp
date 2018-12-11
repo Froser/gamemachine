@@ -13,7 +13,7 @@ top+=(offset),		\
 30,					\
 false				\
 ));					\
-connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) { setEffect(effect); });
+connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) { setEffect(effect); });
 
 void Demo_Effects::init()
 {

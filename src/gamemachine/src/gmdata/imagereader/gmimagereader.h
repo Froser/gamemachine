@@ -12,7 +12,7 @@ struct IImageReader
 	virtual bool test(const GMbyte* data) = 0;
 };
 
-class GMImageReader
+class GM_EXPORT GMImageReader
 {
 public:
 	enum ImageType

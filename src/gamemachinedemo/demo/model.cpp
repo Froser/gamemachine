@@ -126,7 +126,7 @@ void Demo_Model::init()
 		false
 	));
 
-	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		if (d->gameObject2 && d->gameObject3)
 		{
 			GMMat4 t = d->gameObject2->getTranslation();

@@ -8,7 +8,7 @@
 
 extern "C"
 {
-	bool GMQueryCapability(GMCapability cp)
+	GM_EXPORT bool GMQueryCapability(GMCapability cp)
 	{
 		if (cp == GMCapability::SupportOpenGL)
 			return true;
@@ -27,6 +27,12 @@ extern "C"
 namespace
 {
 	static GMMessage s_frameUpdateMsg(GameMachineMessageType::FrameUpdate);
+}
+
+GameMachine& GameMachine::instance()
+{
+	static GameMachine s_instance;
+	return s_instance;
 }
 
 GameMachine::GameMachine()

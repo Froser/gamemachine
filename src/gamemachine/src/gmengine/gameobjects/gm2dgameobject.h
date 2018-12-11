@@ -17,7 +17,7 @@ GM_PRIVATE_OBJECT(GM2DGameObjectBase)
 	GMRect geometry = { 0 };
 };
 
-class GM2DGameObjectBase : public GMGameObject
+class GM_EXPORT GM2DGameObjectBase : public GMGameObject
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GM2DGameObjectBase, GMGameObject)
 
@@ -99,7 +99,7 @@ GM_PRIVATE_OBJECT(GMTextGameObject)
 	GMTextDrawMode drawMode = GMTextDrawMode::Immediate;
 };
 
-class GMTextGameObject : public GM2DGameObjectBase
+class GM_EXPORT GMTextGameObject : public GM2DGameObjectBase
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMTextGameObject, GM2DGameObjectBase)
 
@@ -163,7 +163,7 @@ GM_PRIVATE_OBJECT(GMSprite2DGameObject)
 	GMFloat4 color = GMFloat4(1, 1, 1, 1);
 };
 
-class GMSprite2DGameObject : public GM2DGameObjectBase
+class GM_EXPORT GMSprite2DGameObject : public GM2DGameObjectBase
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMSprite2DGameObject, GM2DGameObjectBase)
 

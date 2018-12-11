@@ -58,7 +58,7 @@ struct GMModelLoadSettings
 	GMModelPathType type; //!< 目录路径参考类型
 };
 
-class GMModelReader
+class GM_EXPORT GMModelReader
 {
 public:
 	enum EngineType

@@ -19,7 +19,7 @@ GM_PRIVATE_OBJECT(GMDiscreteDynamicsWorld)
 	GM_OWNED Vector<btRigidBody*> bulletRigidPool;
 };
 
-class GMDiscreteDynamicsWorld : public GMPhysicsWorld
+class GM_EXPORT GMDiscreteDynamicsWorld : public GMPhysicsWorld
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMDiscreteDynamicsWorld, GMPhysicsWorld);
 

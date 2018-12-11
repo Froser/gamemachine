@@ -3,7 +3,7 @@
 
 extern "C"
 {
-	GMKey GM_ASCIIToKey(GMbyte key)
+	GM_EXPORT GMKey GM_ASCIIToKey(GMbyte key)
 	{
 		switch (key)
 		{
@@ -24,7 +24,7 @@ extern "C"
 		}
 	}
 
-	GMbyte GM_KeyToASCII(GMKey key)
+	GM_EXPORT GMbyte GM_KeyToASCII(GMKey key)
 	{
 		switch (key)
 		{

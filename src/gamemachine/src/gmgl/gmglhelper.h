@@ -3,7 +3,7 @@
 #include <gmcommon.h>
 BEGIN_NS
 
-struct GMGLHelper
+struct GM_EXPORT GMGLHelper
 {
 	struct GMGLShaderContent
 	{

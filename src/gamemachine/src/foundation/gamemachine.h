@@ -106,10 +106,12 @@ GM_PRIVATE_OBJECT_UNALIGNED(GameMachine)
   GameMachine掌控整个进程的生命周期，提供对绘制、IO、内存和资源的管理。<BR>
   不要试图构造GameMachine，因为它是一个单例。请用GM宏来获取GameMachine单例。
 */
-class GameMachine : public GMSingleton<GameMachine>
+class GM_EXPORT GameMachine
 {
 	GM_DECLARE_PRIVATE_NGO(GameMachine)
-	DECLARE_SINGLETON(GameMachine)
+
+public:
+	static GameMachine& instance();
 
 	enum
 	{

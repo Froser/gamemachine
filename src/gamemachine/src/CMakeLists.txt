@@ -34,12 +34,6 @@ set(SOURCES
 		gmdata/imagereader/gmimagereader_tga.cpp
 		gmdata/modelreader/gmmodelreader.h
 		gmdata/modelreader/gmmodelreader.cpp
-		# gmdata/modelreader/gmmodelreader_md5.h
-		# gmdata/modelreader/gmmodelreader_md5.cpp
-		# gmdata/modelreader/gmmodelreader_md5mesh.h
-		# gmdata/modelreader/gmmodelreader_md5mesh.cpp
-		# gmdata/modelreader/gmmodelreader_md5anim.h
-		# gmdata/modelreader/gmmodelreader_md5anim.cpp
 		gmdata/modelreader/gmmodelreader_assimp.h
 		gmdata/modelreader/gmmodelreader_assimp.cpp
 		gmdata/gamepackage/gmgamepackage.h
@@ -308,21 +302,22 @@ endif(GM_USE_DX11)
 gm_source_group_by_dir(SOURCES)
 gm_add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
 
-add_library(${PROJECT_NAME}
+set (gm_static_name gamemachine_static)
+set (gm_shared_name gamemachine)
+
+add_library(${gm_static_name} STATIC
 		${SOURCES}
 	)
 
-if(MSVC)
-	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/W3" )
-	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/WX" )
-endif(MSVC)
+add_library(${gm_shared_name} SHARED
+	${SOURCES}
+)
 
-target_link_libraries(${PROJECT_NAME} glew_s)
-target_link_libraries(${PROJECT_NAME} lua)
-target_link_libraries(${PROJECT_NAME} png_static)
-target_link_libraries(${PROJECT_NAME} zlibstatic)
-target_link_libraries(${PROJECT_NAME} libjpeg)
-target_link_libraries(${PROJECT_NAME} freetype)
-target_link_libraries(${PROJECT_NAME} assimp)
+# a dll(dynamic) gamemachine project should define GM_DLL and links every library.
+set_target_properties(${gm_shared_name} PROPERTIES DEFINE_SYMBOL GM_DLL)
+gm_link_gamemachine_libraries(${gm_shared_name})
 
-gm_end_project(${PROJECT_NAME})
+gm_set_target_properties(${gm_static_name})
+gm_set_target_properties(${gm_shared_name})
+gm_end_project(${gm_static_name})
+gm_end_project(${gm_shared_name})

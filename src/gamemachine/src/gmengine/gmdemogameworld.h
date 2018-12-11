@@ -14,7 +14,7 @@ GM_PRIVATE_OBJECT(GMDemoGameWorld)
 	bool sorted = false;
 };
 
-class GMDemoGameWorld : public GMGameWorld
+class GM_EXPORT GMDemoGameWorld : public GMGameWorld
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMDemoGameWorld, GMGameWorld)
 

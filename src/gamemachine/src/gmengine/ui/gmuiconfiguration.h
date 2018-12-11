@@ -30,7 +30,7 @@ GM_PRIVATE_OBJECT(GMUIConfiguration)
 	Map<GMlong, GMlong> textureMap;
 };
 
-class GMUIConfiguration : public GMObject
+class GM_EXPORT GMUIConfiguration : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMUIConfiguration)
 

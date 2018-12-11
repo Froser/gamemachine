@@ -13,7 +13,7 @@ GM_PRIVATE_OBJECT(GMConstraint)
 	btTypedConstraint* constraint = nullptr;
 };
 
-class GMConstraint : public GMObject
+class GM_EXPORT GMConstraint : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMConstraint)
 
@@ -52,7 +52,7 @@ GM_PRIVATE_OBJECT(GMPoint2PointConstraint)
 	GMRigidPhysicsObject* bodyB = nullptr;
 };
 
-class GMPoint2PointConstraint : public GMConstraint
+class GM_EXPORT GMPoint2PointConstraint : public GMConstraint
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMPoint2PointConstraint, GMConstraint)
 

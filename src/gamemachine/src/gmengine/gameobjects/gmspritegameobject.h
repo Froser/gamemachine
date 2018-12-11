@@ -34,7 +34,7 @@ GM_PRIVATE_OBJECT(GMSpriteGameObject)
 	GMCameraUtility cameraUtility;
 };
 
-class GMSpriteGameObject : public GMGameObject
+class GM_EXPORT GMSpriteGameObject : public GMGameObject
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMSpriteGameObject, GMGameObject)
 

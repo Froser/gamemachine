@@ -34,7 +34,7 @@ GM_PRIVATE_OBJECT(GMControl)
 	GMControlPositionFlag positionFlag = GMControlPositionFlag::Auto;
 };
 
-class GMControl : public GMObject
+class GM_EXPORT GMControl : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMControl)
 
@@ -289,7 +289,7 @@ GM_PRIVATE_OBJECT(GMControlLabel)
 	GMStyle foreStyle;
 };
 
-class GMControlLabel : public GMControl
+class GM_EXPORT GMControlLabel : public GMControl
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMControlLabel, GMControl)
 
@@ -344,7 +344,7 @@ GM_PRIVATE_OBJECT(GMControlButton)
 	GMStyle fillStyle;
 };
 
-class GMControlButton : public GMControlLabel
+class GM_EXPORT GMControlButton : public GMControlLabel
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMControlButton, GMControlLabel)
 
@@ -467,7 +467,7 @@ GM_PRIVATE_OBJECT(GMControlScrollBar)
 	GMfloat allowClickRepeat = .05f;
 };
 
-class GMControlScrollBar : public GMControl
+class GM_EXPORT GMControlScrollBar : public GMControl
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMControlScrollBar, GMControl)
 	GM_DECLARE_PROPERTY(PageStep, pageStep)

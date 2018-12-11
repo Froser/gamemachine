@@ -54,7 +54,7 @@ class GMBSPGameWorld;
   使用游戏资源包管理器，可以很方便在资源包中读取原始数据。
   资源包可以是一个文件夹，也可以是一个zip压缩包，取决于读取资源包时传入的资源类型。
 */
-class GMGamePackage : public GMObject
+class GM_EXPORT GMGamePackage : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMGamePackage)
 

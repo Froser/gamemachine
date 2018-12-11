@@ -6,7 +6,7 @@ BEGIN_NS
 
 class GMString;
 class GMObject;
-struct GMVariant
+class GM_EXPORT GMVariant
 {
 public:
 	enum Type

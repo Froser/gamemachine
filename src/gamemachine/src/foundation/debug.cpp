@@ -23,6 +23,12 @@ namespace
 	}
 }
 
+GMDebugger& GMDebugger::instance()
+{
+	static GMDebugger s_debugger;
+	return s_debugger;
+}
+
 void GMDebugger::info(const GMString& string, const std::initializer_list<GMString>& arguments)
 {
 	print(string, L"info", &IDebugOutput::info, arguments);
