@@ -315,7 +315,7 @@ add_library(${gm_shared_name} SHARED
 
 # a dll(dynamic) gamemachine project should define GM_DLL and links every library.
 set_target_properties(${gm_shared_name} PROPERTIES DEFINE_SYMBOL GM_DLL)
-gm_link_gamemachine_libraries(${gm_shared_name})
+gm_link_gamemachine_libraries(${gm_shared_name} PRIVATE)
 
 gm_set_target_properties(${gm_static_name})
 gm_set_target_properties(${gm_shared_name})

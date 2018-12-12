@@ -53,7 +53,6 @@ add_library(${gm_static_name} STATIC
 add_library(${gm_shared_name} SHARED
 	${SOURCES}
 )
-target_link_libraries(${gm_shared_name} gamemachine)
 set_target_properties(${gm_shared_name} PROPERTIES DEFINE_SYMBOL GM_MEDIA_DLL)
 
 add_definitions(-DFPM_DEFAULT)
@@ -65,5 +64,6 @@ add_definitions(-DAL_LIBTYPE_STATIC)
 gm_set_target_properties(${gm_static_name})
 gm_set_target_properties(${gm_shared_name})
 
-target_link_libraries(${gm_shared_name} libmad)
-target_link_libraries(${gm_shared_name} OpenAL)
+target_link_libraries(${gm_shared_name} PRIVATE gamemachine)
+target_link_libraries(${gm_shared_name} PRIVATE libmad)
+target_link_libraries(${gm_shared_name} PRIVATE OpenAL)

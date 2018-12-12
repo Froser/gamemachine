@@ -29,12 +29,18 @@ add_executable(${PROJECT_NAME}
 		${SOURCES}
 	)
 
+add_executable(${PROJECT_NAME}_dll
+	${SOURCES}
+)
+
 if(MSVC)
 	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS") 
+	set_target_properties(${PROJECT_NAME}_dll PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS") 
 endif(MSVC)
 
 gm_add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
 
 gm_gamemachine_project(${PROJECT_NAME} TRUE)
+gm_gamemachine_project(${PROJECT_NAME}_dll FALSE)
 
 gm_end_project(${PROJECT_NAME})
