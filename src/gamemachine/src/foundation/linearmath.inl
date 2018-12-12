@@ -897,7 +897,7 @@ inline GMQuat RotationTo(const GMVec3& src, const GMVec3& dest, const GMVec3& fa
 		if (fallbackAxis != Zero<GMVec3>())
 		{
 			// rotate 180 degrees about the fallback axis
-			q = Rotate(Radians(PI), fallbackAxis);
+			q = Rotate(Radian(PI), fallbackAxis);
 		}
 		else
 		{
@@ -906,7 +906,7 @@ inline GMQuat RotationTo(const GMVec3& src, const GMVec3& dest, const GMVec3& fa
 			if (axis.length() == 0) // pick another if colinear
 				axis = Cross(GMVec3(0, 1, 0), src);
 			axis = Normalize(axis);
-			q = Rotate(Radians(PI), axis);
+			q = Rotate(Radian(PI), axis);
 		}
 	}
 	else

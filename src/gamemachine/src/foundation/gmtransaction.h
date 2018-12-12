@@ -84,18 +84,8 @@ private:
 class GMScopeTransaction
 {
 public:
-	GMScopeTransaction(GMTransactionContext* context = nullptr)
-		: m_context(context)
-		, m_mgr(&GMTransactionManager::getTransactionManager())
-	{
-		m_mgr->beginTransaction(m_context);
-	}
-
-	~GMScopeTransaction()
-	{
-		m_mgr->endTransaction();
-		m_mgr->commitTransaction();
-	}
+	GMScopeTransaction(GMTransactionContext* context = nullptr);
+	~GMScopeTransaction();
 
 	inline GMTransactionManager* getManager() GM_NOEXCEPT
 	{

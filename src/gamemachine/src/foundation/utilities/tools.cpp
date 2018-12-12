@@ -292,6 +292,19 @@ void GMMemoryStream::seek(GMsize_t cnt, SeekMode mode)
 		GM_ASSERT(false);
 }
 
+gm::Bitset::~Bitset()
+{
+	D(d);
+	GM_delete_array(d->bits);
+}
+
+gm::Bitset::Bitset()
+{
+	D(d);
+	d->numBytes = 0;
+	d->bits = nullptr;
+}
+
 //Bitset
 bool Bitset::init(GMint32 numberOfBits)
 {
@@ -313,6 +326,44 @@ bool Bitset::init(GMint32 numberOfBits)
 	clearAll();
 
 	return true;
+}
+
+void Bitset::clearAll()
+{
+	D(d);
+	memset(d->bits, 0, d->numBytes);
+}
+
+void Bitset::setAll()
+{
+	D(d);
+	memset(d->bits, 0xFF, d->numBytes);
+}
+
+void Bitset::clear(GMint32 bitNumber)
+{
+	D(d);
+	d->bits[bitNumber >> 3] &= ~(1 << (bitNumber & 7));
+}
+
+void Bitset::set(GMint32 bitNumber)
+{
+	D(d);
+	d->bits[bitNumber >> 3] |= 1 << (bitNumber & 7);
+}
+
+GMbyte Bitset::isSet(GMint32 bitNumber)
+{
+	D(d);
+	return d->bits[bitNumber >> 3] & 1 << (bitNumber & 7);
+}
+
+void Bitset::toggle(GMint32 bitNumber)
+{
+	if (isSet(bitNumber))
+		clear(bitNumber);
+	else
+		set(bitNumber);
 }
 
 //Convertion

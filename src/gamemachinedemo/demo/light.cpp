@@ -39,7 +39,7 @@ void Demo_Light::setLookAt()
 {
 	D(d);
 	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
-	camera.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
+	camera.setPerspective(Radian(75.f), 1.333f, .1f, 3200);
 	camera.lookAt(s_lookAt);
 }
 
@@ -53,7 +53,7 @@ void Demo_Light::onAssetAdded(gm::GMModelAsset asset)
 
 void Demo_Light::onGameObjectAdded(gm::GMGameObject* obj)
 {
-	obj->setRotation(Rotate(Radians(80.f), GMVec3(1, 0, 0)));
+	obj->setRotation(Rotate(Radian(80.f), GMVec3(1, 0, 0)));
 	asDemoGameWorld(getDemoWorldReference())->addObject("texture", obj);
 }
 
@@ -107,7 +107,7 @@ void Demo_Light_Point::setDefaultLights()
 
 void Demo_Light_Point_NormalMap::onGameObjectAdded(gm::GMGameObject* obj)
 {
-	obj->setRotation(Rotate(Radians(20.f), GMVec3(1, 0, 0)));
+	obj->setRotation(Rotate(Radian(20.f), GMVec3(1, 0, 0)));
 	asDemoGameWorld(getDemoWorldReference())->addObject("texture", obj);
 }
 

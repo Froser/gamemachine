@@ -15,7 +15,7 @@ void GMGravityParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticl
 	GMfloat particleSpeed = emitter->getEmitSpeed() + emitter->getEmitSpeedV() * GMRandomMt19937::random_real(-1.f, 1.f);
 	GMfloat angle = emitter->getEmitAngle() + emitter->getEmitAngleV() * GMRandomMt19937::random_real(-1.f, 1.f);
 
-	GMQuat rotationQuat = Rotate(Radians(angle), emitter->getRotationAxis());
+	GMQuat rotationQuat = Rotate(Radian(angle), emitter->getRotationAxis());
 	particle->getGravityModeData().initialVelocity = Inhomogeneous(s_rotateStartVector * rotationQuat) * particleSpeed;
 	particle->getGravityModeData().tangentialAcceleration = getGravityMode().getTangentialAcceleration() + getGravityMode().getTangentialAccelerationV() * GMRandomMt19937::random_real(-1.f, 1.f);
 	particle->getGravityModeData().radialAcceleration = getGravityMode().getRadialAcceleration() + getGravityMode().getRadialAccelerationV() * GMRandomMt19937::random_real(-1.f, 1.f);
@@ -93,7 +93,7 @@ void GMRadialParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle
 	particle->getRadiusModeData().delatRadius = (endRadius - beginRadius) / particle->getRemainingLife();
 
 	particle->getRadiusModeData().angle = emitter->getEmitAngle() + emitter->getEmitAngleV() * GMRandomMt19937::random_real(-1.f, 1.f);
-	particle->getRadiusModeData().degressPerSecond = Radians(getRadiusMode().getSpinPerSecond() + getRadiusMode().getSpinPerSecondV() * GMRandomMt19937::random_real(-1.f, 1.f));
+	particle->getRadiusModeData().degressPerSecond = Radian(getRadiusMode().getSpinPerSecond() + getRadiusMode().getSpinPerSecondV() * GMRandomMt19937::random_real(-1.f, 1.f));
 }
 
 void GMRadialParticleEffect::update(GMParticleEmitter* emitter, GMDuration dt)

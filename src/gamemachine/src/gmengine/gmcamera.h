@@ -162,7 +162,7 @@ public:
 GM_PRIVATE_OBJECT_UNALIGNED(GMCameraUtility)
 {
 	GMCamera* camera;
-	GMfloat limitPitch = Radians(85.f);
+	GMfloat limitPitch = Radian(85.f);
 	GMVec3 position;
 	GMVec3 lookAt;
 };

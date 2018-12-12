@@ -123,7 +123,7 @@ void Demo_ParticleBillboard::setLookAt()
 {
 	D(d);
 	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
-	camera.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
+	camera.setPerspective(Radian(75.f), 1.333f, .1f, 3200);
 
 	gm::GMCameraLookAt lookAt;
 	camera.lookAt(s_lookAt);
@@ -178,6 +178,6 @@ void Demo_ParticleBillboard::handleMouseEvent()
 		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
 		gm::IMouseState& mouseState = inputManager->getMouseState();
 		auto& ms = mouseState.mouseState();
-		d->cameraUtility.update(Radians(-ms.deltaX * mouseSensitivity), Radians(-ms.deltaY * mouseSensitivity));
+		d->cameraUtility.update(Radian(-ms.deltaX * mouseSensitivity), Radian(-ms.deltaY * mouseSensitivity));
 	}
 }

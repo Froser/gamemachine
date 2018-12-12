@@ -143,7 +143,7 @@ const GMMat4& GMFrustum::getInverseViewMatrix() const
 GMCamera::GMCamera()
 {
 	D(d);
-	d->frustum.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
+	d->frustum.setPerspective(Radian(75.f), 1.333f, .1f, 3200);
 	d->lookAt.position = GMVec3(0);
 	d->lookAt.lookAt = GMVec3(0, 0, 1);
 }

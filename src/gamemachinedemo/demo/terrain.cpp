@@ -79,7 +79,7 @@ void Demo_Terrain::event(gm::GameMachineHandlerEvent evt)
 void Demo_Terrain::setLookAt()
 {
 	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
-	camera.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
+	camera.setPerspective(Radian(75.f), 1.333f, .1f, 3200);
 
 	gm::GMCameraLookAt lookAt;
 	lookAt.lookAt = Normalize(GMVec3(0, -.5f, 1));

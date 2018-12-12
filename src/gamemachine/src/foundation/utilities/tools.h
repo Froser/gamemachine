@@ -192,67 +192,25 @@ GM_PRIVATE_OBJECT(Bitset)
 	GMbyte* bits;
 };
 
-class Bitset : public GMObject
+class GM_EXPORT Bitset : public GMObject
 {
 	GM_DECLARE_PRIVATE(Bitset)
 
 public:
-	Bitset()
-	{
-		D(d);
-		d->numBytes = 0;
-		d->bits = nullptr;
-	}
-	~Bitset()
-	{
-		D(d);
-		GM_delete_array(d->bits);
-	}
+	Bitset();
+	~Bitset();
 
 	bool init(GMint32 numberOfBits);
-
-	inline void clearAll()
-	{
-		D(d);
-		memset(d->bits, 0, d->numBytes);
-	}
-
-	inline void setAll()
-	{
-		D(d);
-		memset(d->bits, 0xFF, d->numBytes);
-	}
-
-	inline void clear(GMint32 bitNumber)
-	{
-		D(d);
-		d->bits[bitNumber >> 3] &= ~(1 << (bitNumber & 7));
-	}
-
-	inline void set(GMint32 bitNumber)
-	{
-		D(d);
-		d->bits[bitNumber >> 3] |= 1 << (bitNumber & 7);
-	}
-
-	inline GMbyte isSet(GMint32 bitNumber)
-	{
-		D(d);
-		return d->bits[bitNumber >> 3] & 1 << (bitNumber & 7);
-	}
-
-	inline void toggle(GMint32 bitNumber)
-	{
-		if (isSet(bitNumber))
-			clear(bitNumber);
-		else
-			set(bitNumber);
-	}
-
+	void clearAll();
+	void setAll();
+	void clear(GMint32 bitNumber);
+	void set(GMint32 bitNumber);
+	GMbyte isSet(GMint32 bitNumber);
+	void toggle(GMint32 bitNumber);
 };
 
 //GMPath: platforms/[os]/path.cpp
-struct GMPath
+struct GM_EXPORT GMPath
 {
 	enum SpecialFolder
 	{
@@ -270,7 +228,7 @@ struct GMPath
 };
 
 //GMPath: platforms/[os]/screen.cpp
-struct GMScreen
+struct GM_EXPORT GMScreen
 {
 	static GMint32 horizontalResolutionDpi();
 	static GMint32 verticalResolutionDpi();

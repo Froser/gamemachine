@@ -38,7 +38,7 @@ template <typename T>T* gmAlignPointer(T* unalignedPtr, size_t alignment)
 	return converter.ptr;
 }
 
-static inline void *gmAlignedAllocDefault(size_t size, GMint32 alignment)
+static void *gmAlignedAllocDefault(size_t size, GMint32 alignment)
 {
 	void *ret;
 	char *real;
@@ -53,7 +53,7 @@ static inline void *gmAlignedAllocDefault(size_t size, GMint32 alignment)
 	return (ret);
 }
 
-static inline void gmAlignedFreeDefault(void *ptr)
+static void gmAlignedFreeDefault(void *ptr)
 {
 	void* real;
 

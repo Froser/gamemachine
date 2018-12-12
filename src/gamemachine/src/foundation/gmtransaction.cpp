@@ -200,3 +200,15 @@ GMTransactionManager& GMTransactionManager::getTransactionManager()
 		return *(iter->second.get());
 	}
 }
+
+GMScopeTransaction::~GMScopeTransaction()
+{
+	m_mgr->endTransaction();
+	m_mgr->commitTransaction();
+}
+
+GMScopeTransaction::GMScopeTransaction(GMTransactionContext* context /*= nullptr*/) : m_context(context)
+, m_mgr(&GMTransactionManager::getTransactionManager())
+{
+	m_mgr->beginTransaction(m_context);
+}

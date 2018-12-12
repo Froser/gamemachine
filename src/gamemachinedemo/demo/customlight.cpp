@@ -167,7 +167,7 @@ void Demo_CustomLight::init()
 
 	gm::GMAsset quadAsset = getDemoWorldReference()->getAssets().addAsset(asset);
 	gm::GMGameObject* obj = new gm::GMGameObject(quadAsset);
-	obj->setRotation(Rotate(Radians(80.f), GMVec3(1, 0, 0)));
+	obj->setRotation(Rotate(Radian(80.f), GMVec3(1, 0, 0)));
 	asDemoGameWorld(getDemoWorldReference())->addObject("texture", obj);
 
 	gm::GMWidget* widget = createDefaultWidget();
@@ -206,7 +206,7 @@ void Demo_CustomLight::setLookAt()
 {
 	D(d);
 	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
-	camera.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
+	camera.setPerspective(Radian(75.f), 1.333f, .1f, 3200);
 	camera.lookAt(s_lookAt);
 }
 

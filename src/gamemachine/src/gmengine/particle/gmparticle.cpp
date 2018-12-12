@@ -545,8 +545,8 @@ void GMParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle* part
 	particle->setSize(beginSize);
 	particle->setDeltaSize((endSize - beginSize) / particle->getRemainingLife());
 
-	GMfloat beginSpin = Radians(Max(0, getBeginSpin() + getBeginSpinV() * GMRandomMt19937::random_real(-1.f, 1.f)));
-	GMfloat endSpin = Radians(Max(0, getEndSpin() + getEndSpin() * GMRandomMt19937::random_real(-1.f, 1.f)));
+	GMfloat beginSpin = Radian(Max(0, getBeginSpin() + getBeginSpinV() * GMRandomMt19937::random_real(-1.f, 1.f)));
+	GMfloat endSpin = Radian(Max(0, getEndSpin() + getEndSpin() * GMRandomMt19937::random_real(-1.f, 1.f)));
 	particle->setRotation(beginSpin);
 	particle->setDeltaRotation((endSpin - beginSpin) * remainingLifeRev);
 }

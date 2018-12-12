@@ -129,7 +129,7 @@ using HookMap = Map<GMString, Vector<std::function<void(Args...)> > >;
   \sa installHook()
 */
 template <typename... Args>
-inline void hook(const GMString& hookName, Args... args)
+void hook(const GMString& hookName, Args... args)
 {
 	typedef std::function<void(Args...)> _FnType;
 	typedef Vector<_FnType> _FnListType;
@@ -157,7 +157,7 @@ inline void hook(const GMString& hookName, Args... args)
   \sa hook()
 */
 template <typename... Args>
-inline void installHook(const GMString& hookName, std::function<void(Args...)> callback)
+void installHook(const GMString& hookName, std::function<void(Args...)> callback)
 {
 	typedef Vector<std::function<void(Args...)>> _FnListType;
 

@@ -42,7 +42,7 @@ public:
 		/* 设置摄像机位置                                                        */
 		/************************************************************************/
 		GMCamera& camera = m_context->getEngine()->getCamera();
-		camera.setPerspective(Radians(75.f), 1.333f, .1f, 3200);				// 设置一个透视视图
+		camera.setPerspective(Radian(75.f), 1.333f, .1f, 3200);				// 设置一个透视视图
 
 		GMCameraLookAt lookAt;
 		lookAt.lookAt = Normalize(GMVec3(.5f, -.3f, 1));						// 摄像机朝向

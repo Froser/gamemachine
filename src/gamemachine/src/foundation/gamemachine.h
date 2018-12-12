@@ -152,7 +152,7 @@ public:
 	  所有程序的资产，如音乐、贴图、字体的原始数据，都可以从资源管理器中获取。
 	  \return 程序资源管理器。
 	*/
-	GMGamePackage* getGamePackageManager() { D(d); return d->gamePackageManager; }
+	inline GMGamePackage* getGamePackageManager() { D(d); return d->gamePackageManager; }
 
 	//! 获取程序当前的运行时状态。
 	/*!

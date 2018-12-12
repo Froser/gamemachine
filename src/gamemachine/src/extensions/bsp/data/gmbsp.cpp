@@ -11,7 +11,7 @@
 
 namespace
 {
-	inline const char* getValue(const GMBSPEntity* entity, const char* key)
+	const char* getValue(const GMBSPEntity* entity, const char* key)
 	{
 		GMBSPEPair* e = entity->epairs;
 		while (e)
@@ -23,7 +23,7 @@ namespace
 		return nullptr;
 	}
 
-	inline GMint32 copyLump(GMBSPHeader* header, GMint32 lump, void *dest, GMint32 size)
+	GMint32 copyLump(GMBSPHeader* header, GMint32 lump, void *dest, GMint32 size)
 	{
 		GMint32 length, ofs;
 
@@ -38,7 +38,7 @@ namespace
 		return length / size;
 	}
 
-	inline char* copyString(const char *s)
+	char* copyString(const char *s)
 	{
 		char *b;
 		GMsize_t len = strlen(s) + 1;
@@ -47,7 +47,7 @@ namespace
 		return b;
 	}
 
-	inline void stripTrailing(GMString& e)
+	void stripTrailing(GMString& e)
 	{
 		std::wstring wstr = e.toStdWString();
 		for (auto& c : wstr)
@@ -58,20 +58,20 @@ namespace
 		e = wstr;
 	}
 
-	inline GMString expandPath(const char *path)
+	GMString expandPath(const char *path)
 	{
 		GMString strPath = GMPath::getCurrentPath();
 		strPath.append(path);
 		return strPath;
 	}
 
-	inline void safeRead(FILE *f, void *buffer, GMint32 count)
+	void safeRead(FILE *f, void *buffer, GMint32 count)
 	{
 		if (fread(buffer, 1, count, f) != (size_t)count)
 			gm_error(gm_dbg_wrap("File read failure"));
 	}
 
-	inline FILE *safeOpenRead(const char *filename)
+	FILE *safeOpenRead(const char *filename)
 	{
 		FILE *f = nullptr;
 
@@ -83,7 +83,7 @@ namespace
 		return f;
 	}
 
-	inline GMint32 filelength(FILE *f)
+	GMint32 filelength(FILE *f)
 	{
 		GMint32 pos;
 		GMint32 end;
@@ -96,7 +96,7 @@ namespace
 		return end;
 	}
 
-	inline GMint32 loadFile(const char *filename, void **bufferptr)
+	GMint32 loadFile(const char *filename, void **bufferptr)
 	{
 		FILE *f;
 		GMint32 length;
