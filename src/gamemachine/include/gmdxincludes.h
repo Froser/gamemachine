@@ -47,5 +47,8 @@
 #			define GM_DX_HR_RET(x) { if FAILED(x) return false; }
 #			endif
 #		endif
+#		ifndef GM_DX_TRY
+#		define GM_DX_TRY(v, statement) if (v->IsValid()) { GM_DX_HR(statement); }
+#		endif
 #	endif
 #endif

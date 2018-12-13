@@ -13,7 +13,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMDx11EffectShaderProgram)
 	GMAtomic<GMint32> nextVariableIndex;
 };
 
-class GMDx11EffectShaderProgram : public IShaderProgram
+class GM_EXPORT GMDx11EffectShaderProgram : public IShaderProgram
 {
 	GM_DECLARE_PRIVATE_NGO(GMDx11EffectShaderProgram)
 

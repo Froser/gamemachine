@@ -33,6 +33,8 @@ GM_PRIVATE_OBJECT(GMWindow)
 	GMOwnedPtr<IRenderContext> context;
 
 	GMWindowHandle handle = 0;
+	bool ownedHandle = true; //!< 是否控制原生窗口句柄生命周期
+
 	Vector<GMWidget*> widgets;
 	GMWindowStates windowStates;
 	GMCursorType cursor = GMCursorType::Arrow;
@@ -69,10 +71,11 @@ public:
 	virtual bool setInterface(GameMachineInterfaceID id, void* in) override;
 
 public:
-	inline void setWindowHandle(GMWindowHandle handle)
+	inline void setWindowHandle(GMWindowHandle handle, bool autoRelease)
 	{
 		D(d);
 		d->handle = handle;
+		d->ownedHandle = autoRelease;
 	}
 
 	// 以下是由GMWindow子类override的

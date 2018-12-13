@@ -211,6 +211,7 @@ namespace
 
 void GameMachine::runEventLoop()
 {
+	D(d);
 	MSG msg;
 	msg.message = WM_NULL;
 	PeekMessage(&msg, NULL, 0U, 0U, PM_NOREMOVE);
@@ -227,8 +228,21 @@ void GameMachine::runEventLoop()
 		}
 		else
 		{
-			if (!renderFrame())
-				break;
+			if (d->runningMode == GMGameMachineRunningMode::GameMode)
+			{
+				// 处理GameMachine消息
+				if (!handleMessages())
+					break;
+
+				if (!renderFrame())
+					break;
+			}
+			else
+			{
+				// Application模式下，虽然不进行渲染，但是还是有消息处理
+				if (!handleMessages())
+					break;
+			}
 		}
 	}
 	terminate();
@@ -355,6 +369,11 @@ void GameMachine::translateSystemEvent(GMuint32 uMsg, GMWParam wParam, GMLParam 
 	case WM_CAPTURECHANGED:
 	{
 		newSystemEvent = new GMSystemCaptureChangedEvent((GMWindowHandle)lParam);
+		break;
+	}
+	case WM_PAINT:
+	{
+		newSystemEvent = new GMSystemPaintEvent();
 		break;
 	}
 	}

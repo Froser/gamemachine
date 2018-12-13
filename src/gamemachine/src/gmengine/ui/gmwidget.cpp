@@ -703,7 +703,7 @@ void GMWidget::addArea(GMTextureArea::Area area, GMlong textureId, const GMRect&
 	d->areas[area] = { textureId, rc };
 }
 
-bool GMWidget::msgProc(GMSystemEvent* event)
+bool GMWidget::handleSystemEvent(GMSystemEvent* event)
 {
 	D(d);
 	if (!getVisible())
@@ -713,7 +713,7 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 		s_controlFocus->getParent() == this &&
 		s_controlFocus->getEnabled())
 	{
-		if (s_controlFocus->msgProc(event))
+		if (s_controlFocus->handleSystemEvent(event))
 			return true;
 	}
 
@@ -726,7 +726,7 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 			s_controlFocus->getParent() == this &&
 			s_controlFocus->getEnabled())
 		{
-			if (s_controlFocus->onCaptureChanged(gm_cast<GMSystemCaptureChangedEvent*>(event)))
+			if (s_controlFocus->onCaptureChanged(static_cast<GMSystemCaptureChangedEvent*>(event)))
 				return true;
 		}
 		break;
@@ -734,7 +734,7 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 	case GMSystemEventType::KeyDown:
 	case GMSystemEventType::KeyUp:
 	{
-		GMSystemKeyEvent* keyEvent = gm_cast<GMSystemKeyEvent*>(event);
+		GMSystemKeyEvent* keyEvent = static_cast<GMSystemKeyEvent*>(event);
 		if (s_controlFocus &&
 			s_controlFocus->getParent() == this &&
 			s_controlFocus->getEnabled())
@@ -773,7 +773,7 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 	}
 	case GMSystemEventType::Char:
 	{
-		GMSystemCharEvent* keyEvent = gm_cast<GMSystemCharEvent*>(event);
+		GMSystemCharEvent* keyEvent = static_cast<GMSystemCharEvent*>(event);
 		if (s_controlFocus &&
 			s_controlFocus->getParent() == this &&
 			s_controlFocus->getEnabled())
@@ -789,7 +789,7 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 	case GMSystemEventType::MouseDblClick:
 	case GMSystemEventType::MouseWheel:
 	{
-		GMSystemMouseEvent* mouseEvent = gm_cast<GMSystemMouseEvent*>(event);
+		GMSystemMouseEvent* mouseEvent = static_cast<GMSystemMouseEvent*>(event);
 		GMPoint pt = mouseEvent->getPoint();
 		pt.x -= d->x;
 		pt.y -= d->y;
@@ -800,7 +800,7 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 		GMSystemMouseEvent* pControlEvent = nullptr;
 		if (type == GMSystemEventType::MouseWheel)
 		{
-			cacheWheelEvent = *(gm_cast<GMSystemMouseWheelEvent*>(mouseEvent));
+			cacheWheelEvent = *(static_cast<GMSystemMouseWheelEvent*>(mouseEvent));
 			cacheWheelEvent.setPoint(pt);
 			pControlEvent = &cacheWheelEvent;
 		}
@@ -920,7 +920,7 @@ bool GMWidget::onTitleMouseUp(const GMSystemMouseEvent* event)
 bool GMWidget::onMouseWheel(const GMSystemMouseEvent* event)
 {
 	D(d);
-	const GMSystemMouseWheelEvent* wheelEvent = gm_cast<const GMSystemMouseWheelEvent*>(event);
+	const GMSystemMouseWheelEvent* wheelEvent = static_cast<const GMSystemMouseWheelEvent*>(event);
 	// wheelStep为负数，表示滚轮向下滚动，为正数表示向上
 	GMint32 wheelStep = wheelEvent->getDelta() / GM_WHEEL_DELTA * getScrollStep();
 	return verticalScroll(wheelStep);
@@ -1323,7 +1323,7 @@ void GMWidget::createVerticalScrollbar()
 
 		d->verticalScrollbar->setPositionFlag(GMControlPositionFlag::Fixed); // 不随Widget滚动条而移动
 		connect(*d->verticalScrollbar, GM_SIGNAL(GMControlScrollBar, valueChanged), [=](auto sender, auto receiver) {
-			this->verticalScrollTo(-gm_cast<GMControlScrollBar*>(sender)->getValue());
+			this->verticalScrollTo(-static_cast<GMControlScrollBar*>(sender)->getValue());
 		});
 		updateVerticalScrollbar();
 	}

@@ -21,50 +21,39 @@ void GMDx11Light::activateLight(GMuint32 index, ITechnique* technique)
 	if (!d->lightAttributes)
 	{
 		d->lightAttributes = d->effect->GetVariableByName("GM_LightAttributes");
-		GM_ASSERT(d->lightAttributes->IsValid());
 	}
 
 	ID3DX11EffectVariable* lightStruct = d->lightAttributes->GetElement(index);
 	GM_ASSERT(lightStruct->IsValid());
 
 	ID3DX11EffectVectorVariable* position = lightStruct->GetMemberByName("Position")->AsVector();
-	GM_ASSERT(position->IsValid());
-	GM_DX_HR(position->SetFloatVector(db->position));
+	GM_DX_TRY(position, position->SetFloatVector(db->position));
 
 	ID3DX11EffectVectorVariable* color = lightStruct->GetMemberByName("Color")->AsVector();
-	GM_ASSERT(color->IsValid());
-	GM_DX_HR(color->SetFloatVector(db->color));
+	GM_DX_TRY(color, color->SetFloatVector(db->color));
 
 	ID3DX11EffectVectorVariable* ambientIntensity = lightStruct->GetMemberByName("AmbientIntensity")->AsVector();
-	GM_ASSERT(ambientIntensity->IsValid());
-	GM_DX_HR(ambientIntensity->SetFloatVector(db->ambientIntensity));
+	GM_DX_TRY(ambientIntensity, ambientIntensity->SetFloatVector(db->ambientIntensity));
 
 	ID3DX11EffectVectorVariable* diffuseIntensity = lightStruct->GetMemberByName("DiffuseIntensity")->AsVector();
-	GM_ASSERT(diffuseIntensity->IsValid());
-	GM_DX_HR(diffuseIntensity->SetFloatVector(db->diffuseIntensity));
+	GM_DX_TRY(diffuseIntensity, diffuseIntensity->SetFloatVector(db->diffuseIntensity));
 
 	ID3DX11EffectScalarVariable* specularIntensity = lightStruct->GetMemberByName("SpecularIntensity")->AsScalar();
-	GM_ASSERT(specularIntensity->IsValid());
-	GM_DX_HR(specularIntensity->SetFloat(db->specularIntensity));
+	GM_DX_TRY(specularIntensity, specularIntensity->SetFloat(db->specularIntensity));
 
 	ID3DX11EffectScalarVariable* type = lightStruct->GetMemberByName("Type")->AsScalar();
-	GM_ASSERT(type->IsValid());
-	GM_DX_HR(type->SetInt(getLightType()));
+	GM_DX_TRY(type, type->SetInt(getLightType()));
 
 	ID3DX11EffectVariable* attenuation = lightStruct->GetMemberByName("Attenuation");
-	GM_ASSERT(attenuation->IsValid());
 
 	ID3DX11EffectScalarVariable* attenuationConstant = attenuation->GetMemberByName("Constant")->AsScalar();
-	GM_ASSERT(attenuationConstant->IsValid());
-	GM_DX_HR(attenuationConstant->SetFloat(db->attenuation.constant));
+	GM_DX_TRY(attenuationConstant, attenuationConstant->SetFloat(db->attenuation.constant));
 
 	ID3DX11EffectScalarVariable* attenuationLinear = attenuation->GetMemberByName("Linear")->AsScalar();
-	GM_ASSERT(attenuationLinear->IsValid());
-	GM_DX_HR(attenuationLinear->SetFloat(db->attenuation.linear));
+	GM_DX_TRY(attenuationLinear, attenuationLinear->SetFloat(db->attenuation.linear));
 
 	ID3DX11EffectScalarVariable* attenuationExp = attenuation->GetMemberByName("Exp")->AsScalar();
-	GM_ASSERT(attenuationExp->IsValid());
-	GM_DX_HR(attenuationExp->SetFloat(db->attenuation.exp));
+	GM_DX_TRY(attenuationExp, attenuationExp->SetFloat(db->attenuation.exp));
 }
 
 bool GMDx11DirectionalLight::setLightAttribute3(GMLightAttribute attr, GMfloat value[3])
@@ -92,11 +81,9 @@ void GMDx11DirectionalLight::activateLight(GMuint32 index, ITechnique* tech)
 	D_BASE(db, Base);
 	GM_ASSERT(db->lightAttributes);
 	ID3DX11EffectVariable* lightStruct = db->lightAttributes->GetElement(index);
-	GM_ASSERT(lightStruct->IsValid());
 
 	ID3DX11EffectVectorVariable* direction = lightStruct->GetMemberByName("Direction")->AsVector();
-	GM_ASSERT(direction->IsValid());
-	GM_DX_HR(direction->SetFloatVector(d->direction));
+	GM_DX_TRY(direction, direction->SetFloatVector(d->direction));
 }
 
 bool GMDx11Spotlight::setLightAttribute(GMLightAttribute attr, GMfloat value)
@@ -121,9 +108,7 @@ void GMDx11Spotlight::activateLight(GMuint32 index, ITechnique* tech)
 	D_BASE(db, GMDx11Light);
 	GM_ASSERT(db->lightAttributes);
 	ID3DX11EffectVariable* lightStruct = db->lightAttributes->GetElement(index);
-	GM_ASSERT(lightStruct->IsValid());
 
 	ID3DX11EffectScalarVariable* cutOff = lightStruct->GetMemberByName("CutOff")->AsScalar();
-	GM_ASSERT(cutOff->IsValid());
-	GM_DX_HR(cutOff->SetFloat(Cos(Radian(d->cutOff))));
+	GM_DX_TRY(cutOff, cutOff->SetFloat(Cos(Radian(d->cutOff))));
 }

@@ -94,7 +94,7 @@ public:
 	  如果返回true，表示此消息已经被处理，之后的消息函数将不会被调用。
 	  \return 是否已经处理此消息。
 	*/
-	virtual bool msgProc(GMSystemEvent* event);
+	virtual bool handleSystemEvent(GMSystemEvent* event);
 
 	// Events
 	virtual bool onKeyDown(GMSystemKeyEvent* event)

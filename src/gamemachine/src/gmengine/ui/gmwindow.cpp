@@ -31,7 +31,7 @@ bool GMWindow::handleSystemEvent(GMSystemEvent* event, REF GMLResult& result)
 	case GMSystemEventType::MouseMove:
 	case GMSystemEventType::MouseDown:
 	case GMSystemEventType::MouseUp:
-		getInputMananger()->msgProc(event);
+		getInputMananger()->handleSystemEvent(event);
 		break;
 	case GMSystemEventType::SetCursor:
 		changeCursor();
@@ -41,7 +41,7 @@ bool GMWindow::handleSystemEvent(GMSystemEvent* event, REF GMLResult& result)
 	D(d);
 	for (auto& widget : d->widgets)
 	{
-		if (widget->msgProc(event))
+		if (widget->handleSystemEvent(event))
 			return true;
 	}
 	return false;
@@ -98,7 +98,7 @@ void GMWindow::msgProc(const GMMessage& message)
 		GMSystemEvent* event = static_cast<GMSystemEvent*>(message.object);
 		for (auto widget : d->widgets)
 		{
-			widget->msgProc(event);
+			widget->handleSystemEvent(event);
 		}
 	}
 	else if (message.msgType == GameMachineMessageType::FrameUpdate)
@@ -119,7 +119,7 @@ void GMWindow::msgProc(const GMMessage& message)
 		{
 			onWindowDestroyed();
 			// 窗口已经被Destory，因此HWND设置为0
-			setWindowHandle(NULL);
+			setWindowHandle(NULL, false);
 			GM.removeWindow(this);
 		}
 	}

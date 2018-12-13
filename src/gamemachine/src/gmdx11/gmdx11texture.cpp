@@ -132,8 +132,8 @@ void GMDx11Texture::useTexture(GMint32 textureType)
 		d->samplerVariables[effectId] = samplerVariable = d->effect->GetVariableByName(samplerName)->AsSampler();
 	}
 
-	GM_DX_HR(shaderResourceVariable->SetResource(d->shaderResourceView));
-	GM_DX_HR(samplerVariable->SetSampler(0, d->samplerState));
+	GM_DX_TRY(shaderResourceVariable, shaderResourceVariable->SetResource(d->shaderResourceView));
+	GM_DX_TRY(samplerVariable, samplerVariable->SetSampler(0, d->samplerState));
 }
 
 const IRenderContext* GMDx11Texture::getContext()

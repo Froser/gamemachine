@@ -23,7 +23,7 @@ namespace
 		{
 			LPCREATESTRUCT lpcs = reinterpret_cast<LPCREATESTRUCT>(lParam);
 			pGMWindow = static_cast<GMWindow*>(lpcs->lpCreateParams);
-			pGMWindow->setWindowHandle(hWnd);
+			pGMWindow->setWindowHandle(hWnd, true);
 			s_hwndMap[hWnd] = pGMWindow;
 		}
 		else
@@ -123,11 +123,14 @@ GMWindow::GMWindow()
 GMWindow::~GMWindow()
 {
 	D(d);
-	GMWindowHandle hwnd = getWindowHandle();
-	if (hwnd)
+	if (d->ownedHandle)
 	{
-		onWindowDestroyed();
-		::DestroyWindow(hwnd);
+		GMWindowHandle hwnd = getWindowHandle();
+		if (hwnd)
+		{
+			onWindowDestroyed();
+			::DestroyWindow(hwnd);
+		}
 	}
 }
 
@@ -211,30 +214,37 @@ void GMWindow::setWindowCapture(bool capture)
 GMWindowHandle GMWindow::create(const GMWindowAttributes& wndAttrs)
 {
 	D(d);
-	// 在非全屏的时候才有效，计算出客户窗口（渲染窗口）大小
-	GMWindowAttributes attrs = wndAttrs;
-	::AdjustWindowRectEx(&attrs.rc, attrs.dwStyle, FALSE, attrs.dwExStyle);
-	const GMwchar* className = getWindowClassName();
-	registerClass(attrs, this, className);
-	GMWindowHandle hwnd = ::CreateWindowEx(
-		attrs.dwExStyle,
-		className,
-		attrs.windowName.toStdWString().c_str(),
-		attrs.dwStyle,
-		attrs.rc.left,
-		attrs.rc.top,
-		attrs.rc.right - attrs.rc.left,
-		attrs.rc.bottom - attrs.rc.top,
-		attrs.hwndParent,
-		attrs.hMenu,
-		attrs.instance,
-		this);
-	GM_ASSERT(hwnd);
+	if (wndAttrs.createNewWindow)
+	{
+		// 在非全屏的时候才有效，计算出客户窗口（渲染窗口）大小
+		GMWindowAttributes attrs = wndAttrs;
+		::AdjustWindowRectEx(&attrs.rc, attrs.dwStyle, FALSE, attrs.dwExStyle);
+		const GMwchar* className = getWindowClassName();
+		registerClass(attrs, this, className);
+		GMWindowHandle hwnd = ::CreateWindowEx(
+			attrs.dwExStyle,
+			className,
+			attrs.windowName.toStdWString().c_str(),
+			attrs.dwStyle,
+			attrs.rc.left,
+			attrs.rc.top,
+			attrs.rc.right - attrs.rc.left,
+			attrs.rc.bottom - attrs.rc.top,
+			attrs.hwndParent,
+			attrs.hMenu,
+			attrs.instance,
+			this);
+		GM_ASSERT(hwnd);
+	}
+	else
+	{
+		setWindowHandle(wndAttrs.existWindowHandle, false);
+	}
 
 	onWindowCreated(wndAttrs);
 
 	d->windowStates.renderRect = getRenderRect();
-	return hwnd;
+	return wndAttrs.existWindowHandle;
 }
 
 void GMWindow::changeCursor()
@@ -254,8 +264,12 @@ void GMWindow::showWindow()
 
 void GMWindow::onWindowDestroyed()
 {
-	GMWindowHandle hwnd = getWindowHandle();
-	GM_ASSERT(hwnd);
-	auto s = s_hwndMap.erase(hwnd);
-	GM_ASSERT(s > 0);
+	D(d);
+	if (d->ownedHandle)
+	{
+		GMWindowHandle hwnd = getWindowHandle();
+		GM_ASSERT(hwnd);
+		auto s = s_hwndMap.erase(hwnd);
+		GM_ASSERT(s > 0);
+	}
 }

@@ -65,7 +65,7 @@ GM_INTERFACE(IInput)
 	virtual IKeyboardState& getKeyboardState() = 0;
 	virtual IJoystickState& getJoystickState() = 0;
 	virtual IMouseState& getMouseState() = 0;
-	virtual void msgProc(GMSystemEvent* event) = 0;
+	virtual void handleSystemEvent(GMSystemEvent* event) = 0;
 };
 END_NS
 #endif

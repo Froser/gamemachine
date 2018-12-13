@@ -15,9 +15,11 @@ add_subdirectory(gamemachinemedia gamemachinemedia)
 
 if (GM_BUILD_DEMO)
 	add_subdirectory(gamemachinedemo gamemachinedemo)
+	add_subdirectory(gamemachinesimple gamemachinesimple)
+	if(WIN32)
+		add_subdirectory(gamemachinedemo_window gamemachinedemo_window)
+	endif(WIN32)
 endif(GM_BUILD_DEMO)
-
-add_subdirectory(gamemachinesimple gamemachinesimple)
 
 if (GM_BUILD_UNITTEST)
 	add_subdirectory(gamemachineunittest gamemachineunittest)

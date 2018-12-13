@@ -26,8 +26,6 @@ GMint32 GMDx11EffectShaderProgram::getIndex(const GMString& name)
 	}
 	else
 	{
-		GM_ASSERT(false);
-		gm_error(gm_dbg_wrap("Wrong effect variable type"));
 		return -1; //wrong type
 	}
 }
@@ -35,6 +33,9 @@ GMint32 GMDx11EffectShaderProgram::getIndex(const GMString& name)
 void GMDx11EffectShaderProgram::setMatrix4(GMint32 index, const GMMat4& value)
 {
 	D(d);
+	if (index < 0)
+		return;
+
 	ID3DX11EffectMatrixVariable* var = getMatrixVariable(index);
 	GM_DX_HR(var->SetMatrix(ValuePointer(value)));
 }
@@ -42,6 +43,9 @@ void GMDx11EffectShaderProgram::setMatrix4(GMint32 index, const GMMat4& value)
 void GMDx11EffectShaderProgram::setVec4(GMint32 index, const GMFloat4& vector)
 {
 	D(d);
+	if (index < 0)
+		return;
+
 	ID3DX11EffectVectorVariable* var = getVectorVariable(index);
 	GM_DX_HR(var->SetFloatVector(ValuePointer(vector)));
 }
@@ -55,6 +59,9 @@ void GMDx11EffectShaderProgram::setVec3(GMint32 index, const GMfloat value[3])
 void GMDx11EffectShaderProgram::setInt(GMint32 index, GMint32 value)
 {
 	D(d);
+	if (index < 0)
+		return;
+
 	ID3DX11EffectScalarVariable* var = getScalarVariable(index);
 	GM_DX_HR(var->SetInt(value));
 }
@@ -62,6 +69,9 @@ void GMDx11EffectShaderProgram::setInt(GMint32 index, GMint32 value)
 void GMDx11EffectShaderProgram::setFloat(GMint32 index, GMfloat value)
 {
 	D(d);
+	if (index < 0)
+		return;
+
 	ID3DX11EffectScalarVariable* var = getScalarVariable(index);
 	GM_DX_HR(var->SetFloat(value));
 }
@@ -69,6 +79,9 @@ void GMDx11EffectShaderProgram::setFloat(GMint32 index, GMfloat value)
 void GMDx11EffectShaderProgram::setBool(GMint32 index, bool value)
 {
 	D(d);
+	if (index < 0)
+		return;
+
 	ID3DX11EffectScalarVariable* var = getScalarVariable(index);
 	GM_DX_HR(var->SetBool(value));
 }

@@ -476,7 +476,7 @@ public:
 	bool verticalScrollTo(GMint32 value);
 
 public:
-	virtual bool msgProc(GMSystemEvent* event);
+	virtual bool handleSystemEvent(GMSystemEvent* event);
 	virtual void onInit() {}
 	virtual bool onTitleMouseDown(const GMSystemMouseEvent* event);
 	virtual bool onTitleMouseMove(const GMSystemMouseEvent* event);

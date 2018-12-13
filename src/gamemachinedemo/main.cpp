@@ -90,10 +90,11 @@ int main(int argc, char* argv[])
 	GM.addWindow(mainWindow2);
 	*/
 
-	GM.init(
-		factory,
-		GetRenderEnv()
-	);
+	gm::GMGameMachineDesc desc;
+	desc.factory = factory;
+	desc.renderEnvironment = GetRenderEnv();
+
+	GM.init(desc);
 
 	GM.startGameMachine();
 	return 0;

@@ -187,6 +187,9 @@ typedef HINSTANCE GMInstance;
 typedef HWND GMWindowHandle;
 struct GMWindowAttributes
 {
+	bool createNewWindow = true; //!< 是否创建一个新窗口，或者是使用已经存在的窗口来渲染
+	GMWindowHandle existWindowHandle = NULL;
+
 	GMWindowHandle hwndParent = NULL;
 	GMString windowName = L"Default GameMachine Main Window";
 	GMDWord dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME;

@@ -9,7 +9,7 @@ GMControl::GMControl(GMWidget* widget)
 	d->widget = widget;
 }
 
-bool GMControl::msgProc(GMSystemEvent* event)
+bool GMControl::handleSystemEvent(GMSystemEvent* event)
 {
 	return false;
 }
@@ -26,7 +26,7 @@ bool GMControl::handleKeyboard(GMSystemKeyEvent* event)
 		handled = onKeyUp(event);
 		break;
 	case GMSystemEventType::Char:
-		handled = onChar(gm_cast<GMSystemCharEvent*>(event));
+		handled = onChar(static_cast<GMSystemCharEvent*>(event));
 		break;
 	}
 	return handled;
@@ -50,7 +50,7 @@ bool GMControl::handleMouse(GMSystemMouseEvent* event)
 		handled = onMouseDblClick(event);
 		break;
 	case GMSystemEventType::MouseWheel:
-		handled = onMouseWheel(gm_cast<GMSystemMouseWheelEvent*>(event));
+		handled = onMouseWheel(static_cast<GMSystemMouseWheelEvent*>(event));
 		break;
 	}
 	return handled;

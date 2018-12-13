@@ -277,14 +277,14 @@ IKeyboardState& GMInput::getKeyboardState()
 	return *this;
 }
 
-void GMInput::msgProc(GMSystemEvent* event)
+void GMInput::handleSystemEvent(GMSystemEvent* event)
 {
 	GMSystemEventType type = event->getType();
 	switch (type)
 	{
 	case GMSystemEventType::MouseWheel:
 	{
-		GMSystemMouseWheelEvent* e = gm_cast<GMSystemMouseWheelEvent*>(event);
+		GMSystemMouseWheelEvent* e = static_cast<GMSystemMouseWheelEvent*>(event);
 		recordWheel(true, e->getDelta());
 		break;
 	}
@@ -292,7 +292,7 @@ void GMInput::msgProc(GMSystemEvent* event)
 	case GMSystemEventType::MouseDown:
 	case GMSystemEventType::MouseUp:
 	{
-		GMSystemMouseEvent* e = gm_cast<GMSystemMouseEvent*>(event);
+		GMSystemMouseEvent* e = static_cast<GMSystemMouseEvent*>(event);
 		if (type == GMSystemEventType::MouseMove)
 		{
 			recordMouseMove();

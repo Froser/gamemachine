@@ -267,11 +267,14 @@ int main(int argc, char* argv[])
 	/************************************************************************/
 	/* 初始化GameMachine                                                     */
 	/************************************************************************/
+	gm::GMGameMachineDesc desc;
+	desc.factory = factory;
 #if USE_OPENGL
-	GM.init(factory, GMRenderEnvironment::OpenGL);
+	desc.renderEnvironment = GMRenderEnvironment::OpenGL;
 #else
-	GM.init(factory, GMRenderEnvironment::DirectX11);
+	desc.renderEnvironment = GMRenderEnvironment::DirectX11;
 #endif
+	GM.init(desc);
 
 	/************************************************************************/
 	/* 运行GameMachine                                                      */

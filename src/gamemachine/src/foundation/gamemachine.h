@@ -86,10 +86,25 @@ struct GMGameMachineRunningStates
 	GMfloat nearZ = 0; //!< 近平面的Z坐标。
 };
 
+//! 描述GameMachine运行时的模式。
+enum class GMGameMachineRunningMode
+{
+	GameMode, //!< 游戏模式。游戏模式下，GameMachine会按照固定帧率刷新画面。
+	ApplicationMode, //!< 应用模式。应用模式下，需要手动调用GameMachine更新方法才可以更新一帧画面。
+};
+
+//! 描述一个GameMachine的执行环境。
+struct GMGameMachineDesc
+{
+	AUTORELEASE IFactory* factory = nullptr; //!< 当前环境下的工厂类，用于创建纹理、字体管理器等绘制相关的对象。如果是在OpenGL下，可以直接创建GMGLFactory对象。此对象生命周期由GameMachine管理。
+	GMRenderEnvironment renderEnvironment = GMRenderEnvironment::OpenGL; //!< 运行时的渲染环境。可以选择用OpenGL或DirectX11来进行渲染。此后的版本，也可能会增加更多的渲染环境。渲染环境一旦确立，将会影响工厂类返回的环境相关的实例。
+	GMGameMachineRunningMode runningMode = GMGameMachineRunningMode::GameMode;
+};
+
 GM_PRIVATE_OBJECT_UNALIGNED(GameMachine)
 {
 	GMClock clock;
-
+	bool inited = false;
 	Set<IWindow*> windows;
 	IFactory* factory = nullptr;
 	GMGamePackage* gamePackageManager = nullptr;
@@ -98,6 +113,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GameMachine)
 	Queue<GMMessage> messageQueue;
 	Vector<IVirtualFunctionObject*> managerQueue;
 	GMGameMachineRunningStates states;
+	GMGameMachineRunningMode runningMode;
 	GMConfigs configs;
 };
 
@@ -129,16 +145,10 @@ protected:
 public:
 	//! 初始化GameMachine。
 	/*!
-	  开发者应该在程序运行的最开始就初始化GameMachine，给GameMachine赋予绘制环境下的窗体、控制台处理器、
-	当前环境下的工厂类，以及程序流程处理器。
-	  \param mainWindow 程序运行的主窗口。它会自动加入GameMachine管理的窗口列表中。
-	  \param factory 当前环境下的工厂类，用于创建纹理、字体管理器等绘制相关的对象。如果是在OpenGL下，可以直接创建GMGLFactory对象。此对象生命周期由GameMachine管理。
-	  \param renderEnv 运行时的渲染环境。可以选择用OpenGL或DirectX11来进行渲染。此后的版本，也可能会增加更多的渲染环境。渲染环境一旦确立，将会影响工厂类返回的环境相关的实例。
+	  开发者应该在程序添加窗体后就初始化GameMachine，给GameMachine赋予绘制环境下的窗体、控制台处理器、当前环境下的工厂类，以及程序流程处理器。
+	  \param desc GameMachine的描述信息。
 	*/
-	void init(
-		AUTORELEASE IFactory* factory,
-		GMRenderEnvironment renderEnv
-	);
+	void init(const GMGameMachineDesc& desc = GMGameMachineDesc());
 
 	//! 获取初始化时的工厂类。
 	/*!
@@ -226,13 +236,21 @@ public:
 	*/
 	void removeWindow(IWindow* window);
 
+	//! 渲染一帧画面。
+	/*!
+		在不同的描述设置下，GameMachine有不一样的行为：<BR>
+		游戏模式: 游戏模式下，GameMachine会按照固定帧率刷新画面。不得在这种模式下手动调用此方法。<BR>
+		应用模式: 应用模式下，需要手动调用此方法才可以更新一帧画面。
+		\sa GameMachineDesc
+	*/
+	bool renderFrame();
+
 	//! 退出程序。
 	GM_META_METHOD void exit();
 
 private:
 	void initSystemInfo();
 	void runEventLoop();
-	bool renderFrame();
 	template <typename T, typename U> void registerManager(T* newObject, OUT U** manager);
 	void terminate();
 	bool handleMessages();

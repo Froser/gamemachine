@@ -66,7 +66,7 @@ public:
 	virtual IKeyboardState& getKeyboardState() override;
 	virtual IJoystickState& getJoystickState() override { return *this; }
 	virtual IMouseState& getMouseState() override { return *this; }
-	virtual void msgProc(GMSystemEvent* event) override;
+	virtual void handleSystemEvent(GMSystemEvent* event) override;
 
 	// IKeyboardState
 public:

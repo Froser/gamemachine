@@ -45,6 +45,7 @@ enum class GMSystemEventType
 	MouseWheel,
 	SetCursor,
 	CaptureChanged,
+	Paint,
 };
 
 enum GMKey
@@ -250,16 +251,15 @@ enum GMModifierType
 
 typedef GMuint32 GMModifier;
 
-GM_PRIVATE_OBJECT(GMSystemEvent)
+GM_PRIVATE_OBJECT_UNALIGNED(GMSystemEvent)
 {
 	GMMessage message = { GameMachineMessageType::SystemMessage };
 	GMSystemEventType type;
 };
 
-class GMSystemEvent : public GMObject
+class GMSystemEvent
 {
-	GM_DECLARE_PRIVATE(GMSystemEvent)
-	GM_ALLOW_COPY_MOVE(GMSystemEvent)
+	GM_DECLARE_PRIVATE_NGO(GMSystemEvent)
 	GM_DECLARE_PROPERTY(Type, type);
 
 public:
@@ -275,15 +275,14 @@ GM_PRIVATE_OBJECT(GMSystemKeyEvent)
 
 class GMSystemKeyEvent : public GMSystemEvent
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMSystemKeyEvent, GMSystemEvent);
-	GM_ALLOW_COPY_MOVE(GMSystemKeyEvent)
+	GM_DECLARE_PRIVATE_NGO(GMSystemKeyEvent);
 	GM_DECLARE_PROPERTY(Key, key)
 	GM_DECLARE_PROPERTY(Modifier, modifier)
 
 public:
 	GMSystemKeyEvent() = default;
 	GMSystemKeyEvent(GMSystemEventType type, GMKey key, GMModifier modifier)
-		: Base(type)
+		: GMSystemEvent(type)
 	{
 		D(d);
 		d->key = key;
@@ -298,13 +297,12 @@ GM_PRIVATE_OBJECT(GMSystemCharEvent)
 
 class GMSystemCharEvent : public GMSystemKeyEvent
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMSystemCharEvent, GMSystemKeyEvent);
-	GM_ALLOW_COPY_MOVE(GMSystemCharEvent)
+	GM_DECLARE_PRIVATE_NGO(GMSystemCharEvent);
 	GM_DECLARE_PROPERTY(Character, character)
 
 public:
 	GMSystemCharEvent(GMSystemEventType type, GMKey key, GMwchar character, GMModifier modifier)
-	: Base(type, key, modifier)
+	: GMSystemKeyEvent(type, key, modifier)
 	{
 		D(d);
 		d->character = character;
@@ -321,8 +319,7 @@ GM_PRIVATE_OBJECT(GMSystemMouseEvent)
 
 class GMSystemMouseEvent : public GMSystemEvent
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMSystemMouseEvent, GMSystemEvent);
-	GM_ALLOW_COPY_MOVE(GMSystemMouseEvent)
+	GM_DECLARE_PRIVATE_NGO(GMSystemMouseEvent);
 	GM_DECLARE_PROPERTY(Point, point)
 	GM_DECLARE_PROPERTY(Button, button)
 	GM_DECLARE_PROPERTY(Buttons, buttons)
@@ -331,7 +328,7 @@ class GMSystemMouseEvent : public GMSystemEvent
 public:
 	GMSystemMouseEvent() = default;
 	GMSystemMouseEvent(GMSystemEventType type, const GMPoint& pt, GMMouseButton button, GMMouseButton buttons, GMModifier modifier)
-		: Base(type)
+		: GMSystemEvent(type)
 	{
 		D(d);
 		d->point = pt;
@@ -348,15 +345,14 @@ GM_PRIVATE_OBJECT(GMSystemMouseWheelEvent)
 
 class GMSystemMouseWheelEvent : public GMSystemMouseEvent
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMSystemMouseWheelEvent, GMSystemMouseEvent)
-	GM_ALLOW_COPY_MOVE(GMSystemMouseWheelEvent)
+	GM_DECLARE_PRIVATE_NGO(GMSystemMouseWheelEvent)
 	GM_DECLARE_PROPERTY(Delta, delta)
 
 public:
 	GMSystemMouseWheelEvent() = default;
 
 	GMSystemMouseWheelEvent(const GMPoint& pt, GMMouseButton button, GMMouseButton buttons, GMModifier modifier, GMshort delta)
-		: Base(GMSystemEventType::MouseWheel, pt, button, buttons, modifier)
+		: GMSystemMouseEvent(GMSystemEventType::MouseWheel, pt, button, buttons, modifier)
 	{
 		D(d);
 		d->delta = delta;
@@ -370,15 +366,23 @@ GM_PRIVATE_OBJECT(GMSystemCaptureChangedEvent)
 
 class GMSystemCaptureChangedEvent : public GMSystemEvent
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMSystemCaptureChangedEvent, GMSystemEvent)
+	GM_DECLARE_PRIVATE_NGO(GMSystemCaptureChangedEvent)
 	GM_DECLARE_PROPERTY(CapturedWindow, capturedWnd)
 
 public:
 	GMSystemCaptureChangedEvent(GMWindowHandle capturedWnd)
-		: Base(GMSystemEventType::CaptureChanged)
+		: GMSystemEvent(GMSystemEventType::CaptureChanged)
 	{
 		setCapturedWindow(capturedWnd);
 	}
+};
+
+class GMSystemPaintEvent : public GMSystemEvent
+{
+public:
+	GMSystemPaintEvent()
+		: GMSystemEvent(GMSystemEventType::Paint)
+	{}
 };
 
 END_NS

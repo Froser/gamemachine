@@ -42,15 +42,15 @@ GameMachine::GameMachine()
 }
 
 void GameMachine::init(
-	AUTORELEASE IFactory* factory,
-	GMRenderEnvironment renderEnv
+	const GMGameMachineDesc& desc
 )
 {
 	D(d);
 	initSystemInfo();
 
-	setRenderEnvironment(renderEnv);
-	registerManager(factory, &d->factory);
+	d->runningMode = desc.runningMode;
+	setRenderEnvironment(desc.renderEnvironment);
+	registerManager(desc.factory, &d->factory);
 	registerManager(new GMGamePackage(), &d->gamePackageManager);
 	registerManager(new GMConfigs(), &d->statesManager);
 
@@ -59,8 +59,11 @@ void GameMachine::init(
 	updateGameMachineRunningStates();
 
 	eachHandler([=](auto window, auto handler) {
-		handler->init(window->getContext());
+		if (handler)
+			handler->init(window->getContext());
 	});
+
+	d->inited = true;
 }
 
 void GameMachine::postMessage(GMMessage msg)
@@ -89,7 +92,8 @@ void GameMachine::startGameMachine()
 	{
 		eachHandler([](auto, auto handler)
 		{
-			handler->start();
+			if (handler)
+				handler->start();
 		});
 	}
 	else
@@ -104,6 +108,12 @@ void GameMachine::startGameMachine()
 void GameMachine::addWindow(AUTORELEASE IWindow* window)
 {
 	D(d);
+	if (d->inited)
+	{
+		GM_ASSERT(false);
+		gm_error(gm_dbg_wrap("Please init GameMachine after addWindow."));
+	}
+
 	d->windows.insert(window);
 }
 
@@ -113,21 +123,12 @@ void GameMachine::removeWindow(IWindow* window)
 	postMessage({ GameMachineMessageType::DeleteWindowLater, 0, window });
 }
 
-void GameMachine::exit()
-{
-	postMessage({ gm::GameMachineMessageType::QuitGameMachine });
-}
-
 bool GameMachine::renderFrame()
 {
 	D(d);
 	GMClock frameCounter;
 	// 记录帧率
 	frameCounter.begin();
-
-	// 处理GameMachine消息
-	if (!handleMessages())
-		return false;
 
 	// 检查是否崩溃
 	if (checkCrashDown())
@@ -144,10 +145,16 @@ bool GameMachine::renderFrame()
 
 	// 本帧结束
 	eachHandler([](auto, auto handler) {
-		handler->event(GameMachineHandlerEvent::FrameEnd);
+		if (handler)
+			handler->event(GameMachineHandlerEvent::FrameEnd);
 	});
 	d->states.lastFrameElpased = frameCounter.elapsedFromStart();
 	return true;
+}
+
+void GameMachine::exit()
+{
+	postMessage({ gm::GameMachineMessageType::QuitGameMachine });
 }
 
 void GameMachine::setRenderEnvironment(GMRenderEnvironment renv)
@@ -193,14 +200,17 @@ void GameMachine::handlerEvents()
 	D(d);
 	eachHandler([](auto window, auto handler) {
 		window->getContext()->switchToContext();
-		handler->event(GameMachineHandlerEvent::FrameStart);
-		if (window->isWindowActivate())
-			handler->event(GameMachineHandlerEvent::Activate);
-		else
-			handler->event(GameMachineHandlerEvent::Deactivate);
+		if (handler)
+		{
+			handler->event(GameMachineHandlerEvent::FrameStart);
+			if (window->isWindowActivate())
+				handler->event(GameMachineHandlerEvent::Activate);
+			else
+				handler->event(GameMachineHandlerEvent::Deactivate);
 
-		handler->event(GameMachineHandlerEvent::Update);
-		handler->event(GameMachineHandlerEvent::Render);
+			handler->event(GameMachineHandlerEvent::Update);
+			handler->event(GameMachineHandlerEvent::Render);
+		}
 		window->msgProc(s_frameUpdateMsg);
 	});
 }

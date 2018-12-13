@@ -19,7 +19,7 @@
 #define GMSHADER_SEMANTIC_NAME_BONES "BONES"
 #define GMSHADER_SEMANTIC_NAME_WEIGHTS "WEIGHTS"
 #define BIT32_OFFSET(i) (sizeof(gm::GMfloat) * i)
-#define CHECK_VAR(var) if (!var->IsValid()) { GM_ASSERT(false); return; }
+#define CHECK_VAR(var) if (!var->IsValid()) { return; }
 
 #define getVariableIndex(shaderProgram, index, name) (index ? index : (index = shaderProgram->getIndex(name)))
 #define VI_SP(d, name, shaderProgram, indexBank) \
@@ -246,8 +246,7 @@ namespace
 	public: ID3DX11EffectVariable* funcName() {																\
 		ID3DX11EffectVariable* effect_var_##funcName = nullptr;												\
 		if (!effect_var_##funcName) {																		\
-			effect_var_##funcName = m_effect->GetVariableByName(name.toStdString().c_str());				\
-			GM_ASSERT(effect_var_##funcName->IsValid()); }													\
+			effect_var_##funcName = m_effect->GetVariableByName(name.toStdString().c_str());}				\
 		return effect_var_##funcName;																		\
 	}
 
@@ -256,8 +255,7 @@ namespace
 	public: retType* funcName() {																			\
 		retType* effect_var_##funcName = nullptr;															\
 		if (!effect_var_##funcName) {																		\
-			effect_var_##funcName = m_effect->GetVariableByName(name.toStdString().c_str())->to();			\
-			GM_ASSERT(effect_var_##funcName->IsValid()); }													\
+			effect_var_##funcName = m_effect->GetVariableByName(name.toStdString().c_str())->to(); }		\
 		return effect_var_##funcName;																		\
 	}
 
@@ -272,8 +270,7 @@ namespace
 	public: retType* funcName() {																			\
 		retType* effect_var_##funcName = nullptr;															\
 		if (!effect_var_##funcName) {																		\
-			effect_var_##funcName = effect->GetMemberByName(name.toStdString().c_str())->to();				\
-			GM_ASSERT(effect_var_##funcName->IsValid()); }													\
+			effect_var_##funcName = effect->GetMemberByName(name.toStdString().c_str())->to();}				\
 		return effect_var_##funcName;																		\
 	}
 
@@ -621,13 +618,16 @@ void GMDx11Technique::beginModel(GMModel* model, const GMGameObject* parent)
 	const GMShadowSourceDesc& shadowSourceDesc = getEngine()->getShadowSourceDesc();
 	GMDx11EffectVariableBank& bank = getVarBank();
 	ID3DX11EffectScalarVariable* hasShadow = bank.HasShadow();
-	if (shadowSourceDesc.type != GMShadowSourceDesc::NoShadow)
+	if (hasShadow->IsValid())
 	{
-		GM_DX_HR(hasShadow->SetBool(true));
-	}
-	else
-	{
-		GM_DX_HR(hasShadow->SetBool(false));
+		if (shadowSourceDesc.type != GMShadowSourceDesc::NoShadow)
+		{
+			GM_DX_HR(hasShadow->SetBool(true));
+		}
+		else
+		{
+			GM_DX_HR(hasShadow->SetBool(false));
+		}
 	}
 
 	setGamma(shaderProgram);
@@ -669,16 +669,16 @@ void GMDx11Technique::prepareScreenInfo()
 		GMDx11EffectVariableBank& bank = getVarBank();
 		const GMWindowStates& windowStates = getContext()->getWindow()->getWindowStates();
 		ID3DX11EffectVariable* screenInfo = d->effect->GetVariableByName(GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo.toStdString().c_str());
-		GM_ASSERT(screenInfo->IsValid());
+		CHECK_VAR(screenInfo);
 
 		ID3DX11EffectScalarVariable* screenWidth = bank.ScreenWidth();
-		GM_DX_HR(screenWidth->SetInt(windowStates.renderRect.width));
+		GM_DX_TRY(screenWidth, screenWidth->SetInt(windowStates.renderRect.width));
 
 		ID3DX11EffectScalarVariable* screenHeight = bank.ScreenHeight();
-		GM_DX_HR(screenHeight->SetInt(windowStates.renderRect.height));
+		GM_DX_TRY(screenHeight, screenHeight->SetInt(windowStates.renderRect.height));
 
 		ID3DX11EffectScalarVariable* multisampling = bank.ScreenMultiSampling();
-		GM_DX_HR(multisampling->SetBool(windowStates.sampleCount > 1));
+		GM_DX_TRY(multisampling, multisampling->SetBool(windowStates.sampleCount > 1));
 		d->screenInfoPrepared = true;
 	}
 }
@@ -777,11 +777,6 @@ void GMDx11Technique::applyTextureAttribute(GMModel* model, GMTextureAsset textu
 			newBank.offsetY = textureVariable->GetMemberByName(GM_VariablesDesc.TextureAttributes.OffsetY.toStdString().c_str())->AsScalar();
 			newBank.scaleX = textureVariable->GetMemberByName(GM_VariablesDesc.TextureAttributes.ScaleX.toStdString().c_str())->AsScalar();
 			newBank.scaleY = textureVariable->GetMemberByName(GM_VariablesDesc.TextureAttributes.ScaleY.toStdString().c_str())->AsScalar();
-			CHECK_VAR(newBank.enabled);
-			CHECK_VAR(newBank.offsetX);
-			CHECK_VAR(newBank.offsetY);
-			CHECK_VAR(newBank.scaleX);
-			CHECK_VAR(newBank.scaleY);
 			d->textureVariables[textureVariable] = newBank;
 			bank = &newBank;
 		}
@@ -789,22 +784,22 @@ void GMDx11Technique::applyTextureAttribute(GMModel* model, GMTextureAsset textu
 
 	if (!texture.isEmpty())
 	{
-		GM_DX_HR(bank->enabled->SetBool(TRUE));
-		GM_DX_HR(bank->offsetX->SetFloat(0.f));
-		GM_DX_HR(bank->offsetY->SetFloat(0.f));
-		GM_DX_HR(bank->scaleX->SetFloat(1.f));
-		GM_DX_HR(bank->scaleY->SetFloat(1.f));
+		GM_DX_TRY(bank->enabled, bank->enabled->SetBool(TRUE));
+		GM_DX_TRY(bank->offsetX, bank->offsetX->SetFloat(0.f));
+		GM_DX_TRY(bank->offsetY, bank->offsetY->SetFloat(0.f));
+		GM_DX_TRY(bank->scaleX, bank->scaleX->SetFloat(1.f));
+		GM_DX_TRY(bank->scaleY, bank->scaleY->SetFloat(1.f));
 
 		auto applyCallback = [&](GMS_TextureTransformType type, Pair<GMfloat, GMfloat>&& args) {
 			if (type == GMS_TextureTransformType::Scale)
 			{
-				GM_DX_HR(bank->scaleX->SetFloat(args.first));
-				GM_DX_HR(bank->scaleY->SetFloat(args.second));
+				GM_DX_TRY(bank->scaleX, bank->scaleX->SetFloat(args.first));
+				GM_DX_TRY(bank->scaleY, bank->scaleY->SetFloat(args.second));
 			}
 			else if (type == GMS_TextureTransformType::Scroll)
 			{
-				GM_DX_HR(bank->offsetX->SetFloat(args.first));
-				GM_DX_HR(bank->offsetY->SetFloat(args.second));
+				GM_DX_TRY(bank->offsetX, bank->offsetX->SetFloat(args.first));
+				GM_DX_TRY(bank->offsetY, bank->offsetY->SetFloat(args.second));
 			}
 			else
 			{
@@ -817,7 +812,7 @@ void GMDx11Technique::applyTextureAttribute(GMModel* model, GMTextureAsset textu
 	else
 	{
 		// 将这个Texture的Enabled设置为false
-		GM_DX_HR(bank->enabled->SetBool(FALSE));
+		GM_DX_TRY(bank->enabled, bank->enabled->SetBool(FALSE));
 	}
 }
 
@@ -873,12 +868,12 @@ void GMDx11Technique::prepareMaterials(GMModel* model)
 	GMDx11EffectVariableBank& bank = getVarBank();
 	const GMShader& shader = model->getShader();
 	const GMMaterial& material = shader.getMaterial();
-	GM_DX_HR(bank.Ka()->SetFloatVector(ValuePointer(material.getAmbient())));
-	GM_DX_HR(bank.Kd()->SetFloatVector(ValuePointer(material.getDiffuse())));
-	GM_DX_HR(bank.Ks()->SetFloatVector(ValuePointer(material.getSpecular())));
-	GM_DX_HR(bank.Shininess()->SetFloat(material.getShininess()));
-	GM_DX_HR(bank.Refreactivity()->SetFloat(material.getRefractivity()));
-	GM_DX_HR(bank.F0()->SetFloatVector(ValuePointer(material.getF0())));
+	GM_DX_TRY(bank.Ka(), bank.Ka()->SetFloatVector(ValuePointer(material.getAmbient())));
+	GM_DX_TRY(bank.Kd(), bank.Kd()->SetFloatVector(ValuePointer(material.getDiffuse())));
+	GM_DX_TRY(bank.Ks(), bank.Ks()->SetFloatVector(ValuePointer(material.getSpecular())));
+	GM_DX_TRY(bank.Shininess(), bank.Shininess()->SetFloat(material.getShininess()));
+	GM_DX_TRY(bank.Refreactivity(), bank.Refreactivity()->SetFloat(material.getRefractivity()));
+	GM_DX_TRY(bank.F0(), bank.F0()->SetFloatVector(ValuePointer(material.getF0())));
 
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
 	GMIlluminationModel illuminationModel = shader.getIlluminationModel();

@@ -4,7 +4,7 @@
 #include <gamemachine.h>
 BEGIN_NS
 
-struct GMGLShaderInfo
+struct GM_EXPORT GMGLShaderInfo
 {
 	GMuint32 type;
 	GMString source;
@@ -28,7 +28,7 @@ GM_PRIVATE_OBJECT(GMGLShaderProgram)
 	static GMuint32 lastUsedProgram;
 };
 
-class GMGLShaderProgram : public GMObject, public IShaderProgram
+class GM_EXPORT GMGLShaderProgram : public GMObject, public IShaderProgram
 {
 	GM_DECLARE_PRIVATE(GMGLShaderProgram);
 
