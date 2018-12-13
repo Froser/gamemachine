@@ -145,6 +145,7 @@ namespace
 	void FlowHandler::onLoadShaders(const IRenderContext* context)
 	{
 		static const char* s_gl_vs =
+			"#version 330\n"
 			"layout (location = 0) in vec3 gm_position;\n"
 			"layout (location = 1) in vec3 gm_normal;\n"
 			"\n"

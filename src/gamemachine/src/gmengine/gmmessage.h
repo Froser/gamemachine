@@ -267,7 +267,7 @@ public:
 	GMSystemEvent(GMSystemEventType type);
 };
 
-GM_PRIVATE_OBJECT(GMSystemKeyEvent)
+GM_PRIVATE_OBJECT_UNALIGNED(GMSystemKeyEvent)
 {
 	GMKey key = GMKey_Unknown;
 	GMModifier modifier;
@@ -290,7 +290,7 @@ public:
 	}
 };
 
-GM_PRIVATE_OBJECT(GMSystemCharEvent)
+GM_PRIVATE_OBJECT_UNALIGNED(GMSystemCharEvent)
 {
 	GMwchar character;
 };
@@ -309,7 +309,7 @@ public:
 	}
 };
 
-GM_PRIVATE_OBJECT(GMSystemMouseEvent)
+GM_PRIVATE_OBJECT_UNALIGNED(GMSystemMouseEvent)
 {
 	GMPoint point;
 	GMMouseButton buttons; //!< 表示当前事件产生时，鼠标按键的状态。
@@ -338,7 +338,7 @@ public:
 	}
 };
 
-GM_PRIVATE_OBJECT(GMSystemMouseWheelEvent)
+GM_PRIVATE_OBJECT_UNALIGNED(GMSystemMouseWheelEvent)
 {
 	GMshort delta;
 };
@@ -359,7 +359,7 @@ public:
 	}
 };
 
-GM_PRIVATE_OBJECT(GMSystemCaptureChangedEvent)
+GM_PRIVATE_OBJECT_UNALIGNED(GMSystemCaptureChangedEvent)
 {
 	GMWindowHandle capturedWnd = 0;
 };
