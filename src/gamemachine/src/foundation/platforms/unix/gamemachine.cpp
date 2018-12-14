@@ -52,12 +52,12 @@ namespace
 		return GMEndiannessMode::BigEndian;
 	}
 
-	IWindow* findWindow(const Set<GMOwnedPtr<IWindow>>& windows, Window window)
+	IWindow* findWindow(const Set<IWindow*>& windows, Window window)
 	{
 		for (const auto& w : windows)
 		{
 			if (w->getWindowHandle() == window)
-				return w.get();
+				return w;
 		}
 		return nullptr;
 	}
@@ -189,7 +189,7 @@ void GameMachine::runEventLoop()
 	const GMXRenderContext* context = nullptr;
 	if (d->windows.size() > 0)
 	{
-		IWindow* window = d->windows.begin()->get();
+		IWindow* window = *d->windows.begin();
 		context = gm_cast<const GMXRenderContext*>(window->getContext());
 	}
 

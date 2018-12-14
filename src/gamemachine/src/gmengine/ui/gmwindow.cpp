@@ -119,7 +119,7 @@ void GMWindow::msgProc(const GMMessage& message)
 		{
 			onWindowDestroyed();
 			// 窗口已经被Destory，因此HWND设置为0
-			setWindowHandle(NULL, false);
+			setWindowHandle(0, false);
 			GM.removeWindow(this);
 		}
 	}

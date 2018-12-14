@@ -4,6 +4,7 @@
 #include <gmshader.h>
 #include "foundation/assert.h"
 #include <gmgraphicengine.h>
+#include "gmglshaderprogram.h"
 
 BEGIN_NS
 

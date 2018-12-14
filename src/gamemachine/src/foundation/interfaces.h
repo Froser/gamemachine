@@ -204,6 +204,9 @@ typedef GMint32 GMWindowHandle;
 typedef GMint32 GMInstance;
 struct GMWindowAttributes
 {
+	bool createNewWindow = true; //!< 是否创建一个新窗口，或者是使用已经存在的窗口来渲染
+	GMWindowHandle existWindowHandle = 0;
+
 	GMWindowHandle hwndParent = 0;
 	GMString windowName = L"Default GameMachine Main Window";
 	GMulong dwStyle = 0;

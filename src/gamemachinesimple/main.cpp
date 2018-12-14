@@ -9,9 +9,11 @@
 #include <gmphysicsshape.h>
 #include <gmgraphicengine.h>
 #include <gmmodelreader.h>
+#include <gmlight.h>
+#if GM_USE_DX11
 #include <gmdx11.h>
 #include <gmdx11helper.h>
-#include <gmlight.h>
+#endif
 
 #define USE_OPENGL 1
 
@@ -250,7 +252,12 @@ int main(int argc, char* argv[])
 #else
 	IFactory* factory = new GMDx11Factory();
 #endif
+	
 	GMWindowAttributes mainAttrs;
+
+#if !GM_WINDOWS
+	auto hInstance = 0;
+#endif
 	mainAttrs.instance = hInstance;
 
 	/************************************************************************/

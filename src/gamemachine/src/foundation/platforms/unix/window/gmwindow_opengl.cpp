@@ -161,24 +161,32 @@ void GMWindow_OpenGL::onWindowCreated(const GMWindowAttributes& wndAttrs)
 	winAttr.colormap = XCreateColormap(context->getDisplay(), context->getRootWindow(), visualInfo->visual, AllocNone);
 
 	// Create window and set handle
-	GMulong mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask | wndAttrs.dwStyle;
-	Window window = XCreateWindow(
-		context->getDisplay(),
-		d->parent ? d->parent->getWindowHandle() : context->getRootWindow(),
-		wndAttrs.rc.x,
-		wndAttrs.rc.y,
-		wndAttrs.rc.width,
-		wndAttrs.rc.height,
-		0,
-		visualInfo->depth,
-		InputOutput,
-		visualInfo->visual,
-		mask,
-		&winAttr
-	);
+	Window window = 0;
+	if (wndAttrs.createNewWindow)
+	{
+		GMulong mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask | wndAttrs.dwStyle;
+		window = XCreateWindow(
+			context->getDisplay(),
+			d->parent ? d->parent->getWindowHandle() : context->getRootWindow(),
+			wndAttrs.rc.x,
+			wndAttrs.rc.y,
+			wndAttrs.rc.width,
+			wndAttrs.rc.height,
+			0,
+			visualInfo->depth,
+			InputOutput,
+			visualInfo->visual,
+			mask,
+			&winAttr
+		);
+	}
+	else
+	{
+		window = wndAttrs.existWindowHandle;
+	}
 
 	Display* display = context->getDisplay();
-	setWindowHandle(window);
+	setWindowHandle(window, true);
 
 	// CreateContext
 	GLXContext glxContext = createNewContext();
@@ -343,7 +351,7 @@ void GMWindow_OpenGL::dispose()
 	if (getWindowHandle())
 	{
 		XDestroyWindow(context->getDisplay(), getWindowHandle());
-		setWindowHandle(0);
+		setWindowHandle(0, false);
 	}
 }
 

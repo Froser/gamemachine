@@ -14,7 +14,9 @@
 #			define GM_DEBUG 1
 #			undef NDEBUG
 #		else
-#			define NDEBUG
+#			ifndef NDEBUG
+#				define NDEBUG
+#			endif
 #		endif
 #	endif
 #endif

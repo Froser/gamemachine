@@ -17,7 +17,7 @@ namespace
 
 	// variable index getter (with shaderProgram)
 #define VI_SP(d, name, shaderProgram, indexBank) \
-	getVariableIndex(shaderProgram, d->indexBank[verifyIndicesContainer(d->indexBank, shaderProgram)]. name, GM_VariablesDesc. ## name)
+	getVariableIndex(shaderProgram, d->indexBank[verifyIndicesContainer(d->indexBank, shaderProgram)].name, GM_VariablesDesc.name)
 
 #define VI(name) VI_SP(d, name, shaderProgram, indexBank)
 
@@ -26,7 +26,7 @@ namespace
 
 	// variable index from name
 #define VI_C(d, name, str) \
-	getVariableIndex(shaderProgram, d->indexBank[verifyIndicesContainer(d->indexBank, shaderProgram)]. name, str)
+	getVariableIndex(shaderProgram, d->indexBank[verifyIndicesContainer(d->indexBank, shaderProgram)].name, str)
 #define VI_N(name, str) VI_C(d, name, str)
 #define VI_NB(name, str) VI_C(db, name, str)
 

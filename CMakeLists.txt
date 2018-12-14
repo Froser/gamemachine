@@ -65,6 +65,12 @@ else(CMAKE_SIZEOF_VOID_P EQUAL 8)
 	set(GM_TARGET_64 FALSE)
 endif(CMAKE_SIZEOF_VOID_P EQUAL 8)
 
+if (NOT MSVC)
+	set(CMAKE_POSITION_INDEPENDENT_CODE OFF)
+	set(CMAKE_CXX_FLAGS "-fPIC")
+	set(CMAKE_C_FLAGS "-fPIC")
+endif (NOT MSVC)
+
 macro(gm_use_gamemachine_dll libraryName)
 	set_target_properties(${libraryName} PROPERTIES DEFINE_SYMBOL GM_USE_DLL)
 	set_target_properties(${libraryName} PROPERTIES DEFINE_SYMBOL GM_USE_MEDIA_DLL)

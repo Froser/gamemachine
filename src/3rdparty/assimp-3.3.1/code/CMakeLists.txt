@@ -182,6 +182,14 @@ IF ( ASSIMP_BUILD_NONFREE_C4D_IMPORTER )
   SOURCE_GROUP( C4D FILES ${C4D_SRCS})
 ENDIF ( ASSIMP_BUILD_NONFREE_C4D_IMPORTER )
 
+IF (NOT MSVC) # MSVC SUPPORTS BIG OBJECT
+  SET(name IFC)
+  SET(${name}_SRC "")
+  SET(ASSIMP_IMPORTERS_DISABLED "${ASSIMP_IMPORTERS_DISABLED} ${name}")
+  add_definitions(-DASSIMP_BUILD_NO_${name}_IMPORTER)
+  SET(ASSIMP_BUILD_${name}_IMPORTER FALSE)
+ENDIF (MSVC)
+
 # macro to add the CMake Option ADD_ASSIMP_IMPORTER_<name> which enables compile of loader
 # this way selective loaders can be compiled (reduces filesize + compile time)
 MACRO(ADD_ASSIMP_IMPORTER name)
@@ -430,25 +438,28 @@ ADD_ASSIMP_IMPORTER( BLEND
   BlenderTessellator.cpp
 )
 
-ADD_ASSIMP_IMPORTER( IFC
-  IFCLoader.cpp
-  IFCLoader.h
-  IFCReaderGen.cpp
-  IFCReaderGen.h
-  IFCUtil.h
-  IFCUtil.cpp
-  IFCGeometry.cpp
-  IFCMaterial.cpp
-  IFCProfile.cpp
-  IFCCurve.cpp
-  IFCBoolean.cpp
-  IFCOpenings.cpp
-  STEPFile.h
-  STEPFileReader.h
-  STEPFileReader.cpp
-  STEPFileEncoding.cpp
-  STEPFileEncoding.h
-)
+IF (NOT MSVC)
+  ADD_ASSIMP_IMPORTER( IFC
+    IFCLoader.cpp
+    IFCLoader.h
+    IFCReaderGen.cpp
+    IFCReaderGen.h
+    IFCUtil.h
+    IFCUtil.cpp
+    IFCGeometry.cpp
+    IFCMaterial.cpp
+    IFCProfile.cpp
+    IFCCurve.cpp
+    IFCBoolean.cpp
+    IFCOpenings.cpp
+    STEPFile.h
+    STEPFileReader.h
+    STEPFileReader.cpp
+    STEPFileEncoding.cpp
+    STEPFileEncoding.h
+  )
+ENDIF (NOT MSVC)
+
 if (MSVC AND ASSIMP_BUILD_IFC_IMPORTER)
   set_source_files_properties(IFCReaderGen.cpp PROPERTIES COMPILE_FLAGS "/bigobj")
 endif (MSVC AND ASSIMP_BUILD_IFC_IMPORTER)

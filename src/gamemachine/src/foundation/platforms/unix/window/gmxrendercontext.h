@@ -28,14 +28,14 @@ GM_PRIVATE_OBJECT(GMXRenderContext)
 class GMXRenderContext : public GMObject, public GMRenderContext
 {
 	GM_DECLARE_PRIVATE(GMXRenderContext)
-	GM_DECLARE_PROPERTY(GlxContext, glxContext, GLXContext)
-	GM_DECLARE_PROPERTY(ScreenWidth, screenWidth, GMint32)
-	GM_DECLARE_PROPERTY(ScreenHeight, screenHeight, GMint32)
-	GM_DECLARE_GETTER(NetWMSupported, netWMSupported, bool)
-	GM_DECLARE_GETTER(AtomDeleteWindow, aDeleteWindow, Atom)
-	GM_DECLARE_GETTER(AtomNetWMPid, aNetWMPid, Atom)
-	GM_DECLARE_GETTER(AtomClientMachine, aClientMachine, Atom)
-	GM_DECLARE_GETTER(IC, ic, XIC)
+	GM_DECLARE_PROPERTY(GlxContext, glxContext)
+	GM_DECLARE_PROPERTY(ScreenWidth, screenWidth)
+	GM_DECLARE_PROPERTY(ScreenHeight, screenHeight)
+	GM_DECLARE_GETTER(NetWMSupported, netWMSupported)
+	GM_DECLARE_GETTER(AtomDeleteWindow, aDeleteWindow)
+	GM_DECLARE_GETTER(AtomNetWMPid, aNetWMPid)
+	GM_DECLARE_GETTER(AtomClientMachine, aClientMachine)
+	GM_DECLARE_GETTER(IC, ic)
 
 public:
 	GMXRenderContext(IWindow* window, const char* displayName = nullptr);
