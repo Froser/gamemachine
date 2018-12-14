@@ -438,7 +438,7 @@ ADD_ASSIMP_IMPORTER( BLEND
   BlenderTessellator.cpp
 )
 
-IF (NOT MSVC)
+IF (MSVC)
   ADD_ASSIMP_IMPORTER( IFC
     IFCLoader.cpp
     IFCLoader.h
