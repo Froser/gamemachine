@@ -241,9 +241,10 @@ public:
 		在不同的描述设置下，GameMachine有不一样的行为：<BR>
 		游戏模式: 游戏模式下，GameMachine会按照固定帧率刷新画面。不得在这种模式下手动调用此方法。<BR>
 		应用模式: 应用模式下，需要手动调用此方法才可以更新一帧画面。
+		\param window 需要渲染的window。如果为空指针，则更新每一个注册的window。
 		\sa GameMachineDesc
 	*/
-	bool renderFrame();
+	bool renderFrame(IWindow* window = nullptr);
 
 	//! 退出程序。
 	GM_META_METHOD void exit();
@@ -258,7 +259,8 @@ private:
 	void updateGameMachineRunningStates();
 	void setRenderEnvironment(GMRenderEnvironment renv);
 	bool checkCrashDown();
-	void handlerEvents();
+	void beginHandlerEvents(IWindow* window);
+	void endHandlerEvents(IWindow* window);
 	void eachHandler(std::function<void(IWindow*, IGameHandler*)> action);
 };
 

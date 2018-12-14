@@ -104,6 +104,10 @@ namespace
 
 	public:
 		void setRotation(GMfloat degree);
+		const IRenderContext* getContext()
+		{
+			return m_context;
+		}
 
 	private:
 		const IRenderContext* m_context = nullptr;
@@ -139,7 +143,7 @@ namespace
 		m_world->addObjectAndInit(m_obj);
 		m_world->addToRenderList(m_obj);
 
-		GM.renderFrame();
+		GM.renderFrame(m_context->getWindow());
 	}
 
 	void FlowHandler::onLoadShaders(const IRenderContext* context)
@@ -161,7 +165,7 @@ namespace
 			"void init_layouts()\n"
 			"{\n"
 			"	position = vec4(gm_position.xyz, 1);\n"
-			"	normal = vec4(gm_normal.xyz, 1);\n"
+			"	normal = normalize(vec4(mat3(GM_WorldMatrix) * gm_normal.xyz, 1));\n"
 			"}\n"
 			"\n"
 			"void main()\n"
@@ -179,15 +183,15 @@ namespace
 			"\n"
 			"uniform mat4 GM_ViewMatrix;\n"
 			"uniform mat4 GM_WorldMatrix;\n"
-			"vec3 lightDirection_N = normalize(vec3(1, 1, 1));\n"
+			"vec3 lightDirection_N = normalize(vec3(2, 1, 1));\n"
 			"vec3 lightColor = vec3(0, .5, .5);\n"
 			"vec3 ambient() { return lightColor; }\n"
 			"vec3 diffuse() {\n"
-			"	vec3 eyeDirection_eye = -(GM_ViewMatrix * GM_WorldMatrix * _position).xyz;\n"
-			"	vec3 eyeDirection_eye_N = normalize(eyeDirection_eye);\n"
-			"	vec3 lightPosition_eye = (GM_ViewMatrix * vec4(lightDirection_N, 1)).xyz;\n"
-			"	vec3 lightDirection_eye_N = normalize(lightPosition_eye + eyeDirection_eye);\n"
-			"	return max(dot(lightDirection_eye_N, _normal.xyz) * lightColor, 0);\n"
+			"	vec3 eyeDirection_world = (GM_WorldMatrix * _position).xyz;\n"
+			"	vec3 eyeDirection_world_N = normalize(eyeDirection_world);\n"
+			"	vec3 lightPosition_world = (vec4(lightDirection_N, 1)).xyz;\n"
+			"	vec3 lightDirection_world_N = normalize(lightPosition_world + eyeDirection_world);\n"
+			"	return max(dot(lightDirection_world_N, _normal.xyz) * lightColor, 0);\n"
 			"}\n"
 			"\n"
 			"void main() {\n"
@@ -207,6 +211,14 @@ namespace
 			"BlendState GM_BlendState{};\n"
 			"DepthStencilState GM_DepthStencilState{};\n"
 			"\n"
+			"float3x3 ToFloat3x3(float4x4 m)\n"
+			"{\n"
+			"	return float3x3(\n"
+			"		m[0].xyz,\n"
+			"		m[1].xyz,\n"
+			"		m[2].xyz\n"
+			"	);\n"
+			"}\n"
 			"struct VS_INPUT\n"
 			"{\n"
 			"	float3 Position    : POSITION;\n"
@@ -231,13 +243,13 @@ namespace
 			"	output.Position = mul(output.Position, GM_ViewMatrix);\n"
 			"	output.Position = mul(output.Position, GM_ProjectionMatrix);\n"
 			"\n"
-			"	output.Normal = input.Normal;\n"
+			"	output.Normal = normalize(mul(input.Normal, ToFloat3x3(GM_WorldMatrix)));\n"
 			"	return output;\n"
 			"}\n"
 			"\n"
 			"typedef VS_OUTPUT PS_INPUT;\n"
 			"\n"
-			"float3 lightDirection_N = normalize(float3(1, 1, 1));\n"
+			"float3 lightDirection_N = normalize(float3(2, 1, 1));\n"
 			"float3 lightColor = float3(0, .5, .5);\n"
 			"float3 ambient()\n"
 			"{\n"
@@ -246,9 +258,9 @@ namespace
 			"\n"
 			"float3 diffuse(PS_INPUT input)\n"
 			"{\n"
-			"	float3 eyeDirection_eye_N = normalize(-(mul(input.WorldPos, GM_ViewMatrix)).xyz);\n"
-			"	float3 lightDirection_eye_N = normalize(mul(float4(lightDirection_N.x, lightDirection_N.y, lightDirection_N.z, 1), GM_ViewMatrix).xyz); \n"
-			"	return max(dot(lightDirection_eye_N, input.Normal) * lightColor, 0);\n"
+			"	float3 eyeDirection_world_N = normalize((input.WorldPos).xyz);\n"
+			"	float3 lightDirection_world_N = normalize(float4(lightDirection_N.x, lightDirection_N.y, lightDirection_N.z, 1).xyz); \n"
+			"	return max(dot(lightDirection_world_N, input.Normal) * lightColor, 0);\n"
 			"}\n"
 			"\n"
 			"float4 PS_3D(PS_INPUT input) : SV_TARGET\n"
@@ -351,13 +363,14 @@ namespace
 				INT angle = (INT)SendDlgItemMessage(g_hDlg, IDC_SLIDER1, TBM_GETPOS, 0, 0);
 				s_flow->setRotation(-angle);
 				HWND hContainer = GetDlgItem(g_hDlg, ID_CONTAINER);
-				GM.renderFrame();
+				GM.renderFrame(s_flow->getContext()->getWindow());
 			}
 			break;
 		}
 		case WM_PAINT:
 		{
-			GM.renderFrame();
+			if (s_flow)
+				GM.renderFrame(s_flow->getContext()->getWindow());
 			break;
 		}
 		}

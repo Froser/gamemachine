@@ -90,7 +90,7 @@ void GameMachine::startGameMachine()
 	// 初始化gameHandler
 	if (!d->states.crashDown)
 	{
-		eachHandler([](auto, auto handler)
+		eachHandler([](auto window, auto handler)
 		{
 			if (handler)
 				handler->start();
@@ -123,7 +123,7 @@ void GameMachine::removeWindow(IWindow* window)
 	postMessage({ GameMachineMessageType::DeleteWindowLater, 0, window });
 }
 
-bool GameMachine::renderFrame()
+bool GameMachine::renderFrame(IWindow* window)
 {
 	D(d);
 	GMClock frameCounter;
@@ -135,7 +135,7 @@ bool GameMachine::renderFrame()
 		return true;
 
 	// 调用Handler
-	handlerEvents();
+	beginHandlerEvents(window);
 
 	// 更新时钟
 	d->clock.update();
@@ -144,10 +144,8 @@ bool GameMachine::renderFrame()
 	updateGameMachineRunningStates();
 
 	// 本帧结束
-	eachHandler([](auto, auto handler) {
-		if (handler)
-			handler->event(GameMachineHandlerEvent::FrameEnd);
-	});
+	endHandlerEvents(window);
+
 	d->states.lastFrameElpased = frameCounter.elapsedFromStart();
 	return true;
 }
@@ -195,10 +193,10 @@ bool GameMachine::checkCrashDown()
 	return false;
 }
 
-void GameMachine::handlerEvents()
+void GameMachine::beginHandlerEvents(IWindow* window)
 {
 	D(d);
-	eachHandler([](auto window, auto handler) {
+	auto action = [](auto window, auto handler) {
 		window->getContext()->switchToContext();
 		if (handler)
 		{
@@ -212,7 +210,25 @@ void GameMachine::handlerEvents()
 			handler->event(GameMachineHandlerEvent::Render);
 		}
 		window->msgProc(s_frameUpdateMsg);
-	});
+	};
+
+	if (window)
+		action(window, window->getHandler());
+	else
+		eachHandler(action);
+}
+
+void GameMachine::endHandlerEvents(IWindow* window)
+{
+	auto action = [](auto, auto handler) {
+		if (handler)
+			handler->event(GameMachineHandlerEvent::FrameEnd);
+	};
+
+	if (window)
+		action(window, window->getHandler());
+	else
+		eachHandler(action);
 }
 
 bool GameMachine::handleMessages()

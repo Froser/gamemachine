@@ -214,14 +214,15 @@ void GMWindow::setWindowCapture(bool capture)
 GMWindowHandle GMWindow::create(const GMWindowAttributes& wndAttrs)
 {
 	D(d);
+	GMWindowHandle hwnd = NULL;
+	GMWindowAttributes attrs = wndAttrs;
 	if (wndAttrs.createNewWindow)
 	{
 		// 在非全屏的时候才有效，计算出客户窗口（渲染窗口）大小
-		GMWindowAttributes attrs = wndAttrs;
 		::AdjustWindowRectEx(&attrs.rc, attrs.dwStyle, FALSE, attrs.dwExStyle);
 		const GMwchar* className = getWindowClassName();
 		registerClass(attrs, this, className);
-		GMWindowHandle hwnd = ::CreateWindowEx(
+		hwnd = ::CreateWindowEx(
 			attrs.dwExStyle,
 			className,
 			attrs.windowName.toStdWString().c_str(),
@@ -238,13 +239,15 @@ GMWindowHandle GMWindow::create(const GMWindowAttributes& wndAttrs)
 	}
 	else
 	{
-		setWindowHandle(wndAttrs.existWindowHandle, false);
+		hwnd = attrs.existWindowHandle;
+		setWindowHandle(attrs.existWindowHandle, false);
+		const GMRect& rc = getRenderRect();
+		attrs.rc = { rc.x, rc.y, rc.x + rc.width, rc.y + rc.height };
 	}
 
-	onWindowCreated(wndAttrs);
-
+	onWindowCreated(attrs);
 	d->windowStates.renderRect = getRenderRect();
-	return wndAttrs.existWindowHandle;
+	return hwnd;
 }
 
 void GMWindow::changeCursor()

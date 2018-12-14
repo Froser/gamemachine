@@ -127,8 +127,9 @@ void GMWindow_Dx11::onWindowCreated(const GMWindowAttributes& wndAttrs)
 	GMComPtr<ID3D11DepthStencilState> depthStencilState;
 	GMComPtr<ID3D11RasterizerState> rasterizerState;
 
-	UINT renderWidth = wndAttrs.rc.right - wndAttrs.rc.left;
-	UINT renderHeight = wndAttrs.rc.bottom - wndAttrs.rc.top;
+	const GMRect& renderRc = getRenderRect();
+	UINT renderWidth = renderRc.width;
+	UINT renderHeight = renderRc.height;
 	GMuint32 numerator = 0, denominator = 0;
 
 	// 1.枚举设备属性
