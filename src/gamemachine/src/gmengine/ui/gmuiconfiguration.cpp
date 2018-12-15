@@ -114,6 +114,10 @@ bool GMUIParser<0>::Parse(GMUIConfiguration& configuration, GMXMLElement* root)
 				area.rc.y = GMString::parseInt(areaElement->Attribute("y"));
 				area.rc.width = GMString::parseInt(areaElement->Attribute("width"));
 				area.rc.height = GMString::parseInt(areaElement->Attribute("height"));
+				area.cornerRc.x = GMString::parseInt(areaElement->Attribute("cornerX"));
+				area.cornerRc.y = GMString::parseInt(areaElement->Attribute("cornerY"));
+				area.cornerRc.width = GMString::parseInt(areaElement->Attribute("cornerWidth"));
+				area.cornerRc.height = GMString::parseInt(areaElement->Attribute("cornerHeight"));
 				configuration.addArea(area);
 				areaElement = areaElement->NextSiblingElement();
 			}
@@ -143,7 +147,7 @@ void GMUIConfiguration::initWidget(GMWidget* widget)
 	D(d);
 	for (const auto& area : d->areas)
 	{
-		widget->addArea(area.area, d->textureMap[area.textureId], area.rc);
+		widget->addArea(area.area, d->textureMap[area.textureId], area.rc, area.cornerRc);
 	}
 }
 

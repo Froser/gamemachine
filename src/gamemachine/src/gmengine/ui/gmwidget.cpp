@@ -697,10 +697,10 @@ void GMWidget::setPrevCanvas(GMWidget* prevWidget)
 	d->prevWidget= prevWidget;
 }
 
-void GMWidget::addArea(GMTextureArea::Area area, GMlong textureId, const GMRect& rc)
+void GMWidget::addArea(GMTextureArea::Area area, GMlong textureId, const GMRect& rc, const GMRect& cornerRc)
 {
 	D(d);
-	d->areas[area] = { textureId, rc };
+	d->areas[area] = { textureId, rc, cornerRc };
 }
 
 bool GMWidget::handleSystemEvent(GMSystemEvent* event)
@@ -1307,9 +1307,6 @@ void GMWidget::createVerticalScrollbar()
 		if (d->verticalScrollbarWidth == 0)
 			gm_warning(gm_dbg_wrap("verticalScrollbarWidth is zero while rendering vertical scroll bar."));
 
-		if (d->scrollbarThumbCorner == s_invalidRect)
-			gm_warning(gm_dbg_wrap("scrollbarThumbCorner is invalid while rendering vertical scroll bar."));
-
 		GMRect contentRect = getContentRect();
 		d->verticalScrollbar.reset(GMControlScrollBar::createControl(
 			this,
@@ -1317,8 +1314,7 @@ void GMWidget::createVerticalScrollbar()
 			contentRect.y,
 			d->verticalScrollbarWidth,
 			contentRect.height,
-			false,
-			d->scrollbarThumbCorner
+			false
 		));
 
 		d->verticalScrollbar->setPositionFlag(GMControlPositionFlag::Fixed); // 不随Widget滚动条而移动

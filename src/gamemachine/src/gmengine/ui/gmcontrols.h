@@ -342,6 +342,7 @@ GM_PRIVATE_OBJECT(GMControlButton)
 {
 	bool pressed = false;
 	GMStyle fillStyle;
+	GMOwnedPtr<GMControlBorder> border;
 };
 
 class GM_EXPORT GMControlButton : public GMControlLabel
@@ -497,8 +498,7 @@ public:
 		GMint32 y,
 		GMint32 width,
 		GMint32 height,
-		bool isDefault,
-		const GMRect& scrollBarThumbCornerRect
+		bool isDefault
 	);
 
 protected:

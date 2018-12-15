@@ -53,8 +53,7 @@ public:
 		GMint32 y,
 		GMint32 width,
 		GMint32 height,
-		bool isDefault,
-		const GMRect& cornerRect
+		bool isDefault
 	);
 
 protected:
@@ -187,9 +186,7 @@ public:
 		GMint32 width,
 		GMint32 height,
 		bool isDefault,
-		bool hasScrollBar,
-		const GMRect& textAreaCornerRect,
-		const GMRect& scrollBarThumbCornerRect
+		bool hasScrollBar
 	);
 
 protected:

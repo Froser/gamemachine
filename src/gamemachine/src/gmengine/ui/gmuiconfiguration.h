@@ -20,6 +20,7 @@ struct GMUIArea
 	GMTextureArea::Area area;
 	GMlong textureId;
 	GMRect rc;
+	GMRect cornerRc;
 };
 
 GM_PRIVATE_OBJECT(GMUIConfiguration)

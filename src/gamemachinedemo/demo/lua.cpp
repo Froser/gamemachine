@@ -16,8 +16,6 @@ void Demo_Lua::init()
 	gm::GMWidget* widget = createDefaultWidget();
 	auto top = getClientAreaTop();
 
-	gm::GMRect txtCorner = { 0, 0, 6, 8 };
-	gm::GMRect thumbCorner = { 0, 0, 7, 15 };
 	d->textCode = nullptr;
 	widget->addControl(d->textCode = gm::GMControlTextArea::createControl(
 		widget,
@@ -27,9 +25,7 @@ void Demo_Lua::init()
 		600,
 		500,
 		false,
-		true,
-		txtCorner,
-		thumbCorner
+		true
 	));
 	d->textCode->setPadding(5, 10);
 	d->textCode->setScrollBar(true);

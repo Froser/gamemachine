@@ -269,8 +269,6 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 	d->mainWidget->setTitle(L"选项菜单");
 	d->mainWidget->setTitleVisible(true);
 	d->mainWidget->setVerticalScrollbarWidth(20);
-	gm::GMRect thumbCorner = { 0, 0, 7, 15 };
-	d->mainWidget->setScrollbarThumbCorner(thumbCorner);
 
 	if (stxingka != gm::GMInvalidFontHandle)
 	{
@@ -507,8 +505,6 @@ void DemonstrationWorld::init()
 	d->mainWidget->setTitleVisible(true);
 	d->mainWidget->setKeyboardInput(true);
 	d->mainWidget->setVerticalScrollbarWidth(20);
-	gm::GMRect thumbCorner = { 0, 0, 7, 15 };
-	d->mainWidget->setScrollbarThumbCorner(thumbCorner);
 
 	gm::GMint32 Y = 10, marginY = 10;
 	for (auto& demo : d->demos)

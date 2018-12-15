@@ -160,6 +160,22 @@ void GMControlLabel::setFontColor(const GMVec4& color)
 	style.getFontColor().init(color);
 }
 
+class GMControlButtonBorder : public GMControlBorder
+{
+public:
+	GMControlButtonBorder(GMWidget* widget) : GMControlBorder(widget) { initStyles(widget); }
+
+private:
+	void initStyles(GMWidget* widget);
+};
+
+void GMControlButtonBorder::initStyles(GMWidget* widget)
+{
+	D(d);
+	d->borderStyle.setTexture(widget->getArea(GMTextureArea::ButtonArea));
+	d->borderStyle.setTextureColor(GMControlState::Normal, GMVec4(1.f, 1.f, 1.f, 1.f));
+}
+
 GMControlButton* GMControlButton::createControl(
 	GMWidget* widget,
 	const GMString& text,
@@ -409,7 +425,9 @@ bool GMControlBorder::containsPoint(GMPoint point)
 void GMControlBorder::initStyles(GMWidget* widget)
 {
 	D(d);
-	d->borderStyle.setTexture(widget->getArea(GMTextureArea::BorderArea));
+	const auto& area = widget->getArea(GMTextureArea::BorderArea);
+	setCorner(area.cornerRc);
+	d->borderStyle.setTexture(area);
 	d->borderStyle.setTextureColor(GMControlState::Normal, GMVec4(1.f, 1.f, 1.f, 1.f));
 }
 
@@ -643,15 +661,14 @@ GMControlScrollBar* GMControlScrollBar::createControl(
 	GMint32 y,
 	GMint32 width,
 	GMint32 height,
-	bool isDefault,
-	const GMRect& scrollBarThumbCornerRect
+	bool isDefault
 )
 {
 	GMControlScrollBar* scrollBar = new GMControlScrollBar(widget);
 	scrollBar->setPosition(x, y);
 	scrollBar->setSize(width, height);
 	scrollBar->setIsDefault(isDefault);
-	scrollBar->setThumbCorner(scrollBarThumbCornerRect);
+	scrollBar->setThumbCorner(widget->getArea(GMTextureArea::ScrollBarThumb).cornerRc);
 	return scrollBar;
 }
 

@@ -290,6 +290,7 @@ struct GMWidgetTextureArea
 {
 	GMlong textureId;
 	GMRect rc;
+	GMRect cornerRc;
 };
 
 enum class GMOverflowStyle
@@ -358,7 +359,6 @@ GM_PRIVATE_OBJECT(GMWidget)
 	GMRect controlBoundingBox = { 0 };
 	GMOwnedPtr<GMControlScrollBar> verticalScrollbar;
 	GMint32 verticalScrollbarWidth;
-	GMRect scrollbarThumbCorner = { 0 };
 };
 
 class GM_EXPORT GMWidget : public GMObject
@@ -374,7 +374,6 @@ class GM_EXPORT GMWidget : public GMObject
 	GM_DECLARE_PROPERTY(ScrollStep, scrollStep)
 	GM_DECLARE_PROPERTY(ScrollOffsetY, scrollOffsetY)
 	GM_DECLARE_PROPERTY(VerticalScrollbarWidth, verticalScrollbarWidth)
-	GM_DECLARE_PROPERTY(ScrollbarThumbCorner, scrollbarThumbCorner)
 
 public:
 	enum OverflowFlag
@@ -389,7 +388,7 @@ public:
 	~GMWidget();
 
 public:
-	void addArea(GMTextureArea::Area area, GMlong textureId, const GMRect& rc);
+	void addArea(GMTextureArea::Area area, GMlong textureId, const GMRect& rc, const GMRect& cornerRc);
 	void render(GMfloat elpasedTime);
 	void setNextWidget(GMWidget* nextWidget);
 	void addControl(GMControl* control);

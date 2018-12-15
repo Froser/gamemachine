@@ -359,8 +359,7 @@ GMControlTextEdit* GMControlTextEdit::createControl(
 	GMint32 y,
 	GMint32 width,
 	GMint32 height,
-	bool isDefault,
-	const GMRect& cornerRect
+	bool isDefault
 )
 {
 	GMControlTextEdit* textEdit = new GMControlTextEdit(widget);
@@ -368,9 +367,6 @@ GMControlTextEdit* GMControlTextEdit::createControl(
 	textEdit->setPosition(x, y);
 	textEdit->setSize(width, height);
 	textEdit->setIsDefault(isDefault);
-
-	GMControlBorder* border = textEdit->getBorder();
-	border->setCorner(cornerRect);
 	return textEdit;
 }
 
@@ -389,7 +385,9 @@ GMControlTextEdit::~GMControlTextEdit() = default;
 void GMControlTextEditBorder::initStyles(GMWidget* widget)
 {
 	D(d);
-	d->borderStyle.setTexture(widget->getArea(GMTextureArea::TextEditBorderArea));
+	const auto& area = widget->getArea(GMTextureArea::TextEditBorderArea);
+	setCorner(area.cornerRc);
+	d->borderStyle.setTexture(area);
 	d->borderStyle.setTextureColor(GMControlState::Normal, GMVec4(1.f, 1.f, 1.f, 1.f));
 }
 
@@ -1213,9 +1211,7 @@ GMControlTextArea* GMControlTextArea::createControl(
 	GMint32 width,
 	GMint32 height,
 	bool isDefault,
-	bool hasScrollBar,
-	const GMRect& textAreaCornerRect,
-	const GMRect& scrollBarThumbCornerRect
+	bool hasScrollBar
 )
 {
 	GMControlTextArea* textArea = new GMControlTextArea(widget);
@@ -1225,10 +1221,8 @@ GMControlTextArea* GMControlTextArea::createControl(
 	textArea->setIsDefault(isDefault);
 	textArea->setScrollBar(hasScrollBar);
 	if (hasScrollBar)
-		textArea->getScrollBar()->setThumbCorner(scrollBarThumbCornerRect);
+		textArea->getScrollBar()->setThumbCorner(widget->getArea(GMTextureArea::ScrollBarThumb).cornerRc);
 
-	GMControlBorder* border = textArea->getBorder();
-	border->setCorner(textAreaCornerRect);
 	return textArea;
 }
 
@@ -1866,8 +1860,7 @@ void GMControlTextArea::updateScrollBar()
 				db->rcText.y - 1,
 				d->scrollBarSize,
 				db->rcText.height + 2,
-				false,
-				GMRect()
+				false
 			));
 			d->scrollBar->setCanRequestFocus(false);
 			updateScrollBarPageStep();
