@@ -303,21 +303,23 @@ gm_source_group_by_dir(SOURCES)
 gm_add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
 
 set (gm_static_name gamemachine_static)
-set (gm_shared_name gamemachine)
-
 add_library(${gm_static_name} STATIC
 		${SOURCES}
 	)
-
-add_library(${gm_shared_name} SHARED
-	${SOURCES}
-)
-
-# a dll(dynamic) gamemachine project should define GM_DLL and links every library.
-set_target_properties(${gm_shared_name} PROPERTIES DEFINE_SYMBOL GM_DLL)
-gm_link_gamemachine_libraries(${gm_shared_name} PRIVATE)
-
+gm_link_gamemachine_libraries(${gm_static_name} PRIVATE)
 gm_set_target_properties(${gm_static_name})
-gm_set_target_properties(${gm_shared_name})
+
 gm_end_project(${gm_static_name})
+
+if(MSVC)
+	set (gm_shared_name gamemachine)
+	add_library(${gm_shared_name} SHARED
+		${SOURCES}
+	)
+	gm_set_target_properties(${gm_shared_name})
+
+	# a dll(dynamic) gamemachine project should define GM_DLL and links every library.
+	set_target_properties(${gm_shared_name} PROPERTIES DEFINE_SYMBOL GM_DLL)
+	gm_link_gamemachine_libraries(${gm_shared_name} PRIVATE)
 gm_end_project(${gm_shared_name})
+endif(MSVC)

@@ -42,28 +42,29 @@ if(WIN32)
 	gm_add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
 endif(WIN32)
 
-set (gm_static_name gamemachinemedia_static)
-set (gm_shared_name gamemachinemedia)
-
-add_library(${gm_static_name} STATIC
-		${SOURCES}
-	)
-
-
-add_library(${gm_shared_name} SHARED
-	${SOURCES}
-)
-set_target_properties(${gm_shared_name} PROPERTIES DEFINE_SYMBOL GM_MEDIA_DLL)
-
 add_definitions(-DFPM_DEFAULT)
 add_definitions(-DUNICODE -D_UNICODE)
 
 # Use openal static library
 add_definitions(-DAL_LIBTYPE_STATIC)
 
+set (gm_static_name gamemachinemedia_static)
+add_library(${gm_static_name} STATIC
+		${SOURCES}
+	)
 gm_set_target_properties(${gm_static_name})
-gm_set_target_properties(${gm_shared_name})
 
-target_link_libraries(${gm_shared_name} PRIVATE gamemachine)
-target_link_libraries(${gm_shared_name} PRIVATE libmad)
-target_link_libraries(${gm_shared_name} PRIVATE OpenAL)
+if(MSVC)
+	set (gm_shared_name gamemachinemedia)
+	add_library(${gm_shared_name} SHARED
+		${SOURCES}
+	)
+	set_target_properties(${gm_shared_name} PROPERTIES DEFINE_SYMBOL GM_MEDIA_DLL)
+	gm_set_target_properties(${gm_shared_name})
+	target_link_libraries(${gm_shared_name} PRIVATE gamemachine)
+	target_link_libraries(${gm_shared_name} PRIVATE libmad)
+	target_link_libraries(${gm_shared_name} PRIVATE OpenAL)
+else(MSVC)
+	# GCC requires link following library
+	target_link_libraries(${gm_static_name} gamemachine_static)
+endif(MSVC)

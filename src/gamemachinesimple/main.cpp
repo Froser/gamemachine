@@ -30,7 +30,11 @@ public:
 		/* 先将gm.pk0解压到D:/的gmpk，然后指定游戏资源从这里读取                    */
 		/************************************************************************/
 		GMGamePackage* pk = GM.getGamePackageManager();
+#if GM_WINDOWS
 		pk->loadPackage("D:/gmpk");
+#else
+		pk->loadPackage("/home/froser/Documents/gmpk");
+#endif
 
 		/************************************************************************/
 		/* 游戏的着色器读取时，回调onLoadShaders                                  */
