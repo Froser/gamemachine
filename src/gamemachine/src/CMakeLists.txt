@@ -308,7 +308,6 @@ add_library(${gm_static_name} STATIC
 	)
 gm_link_gamemachine_libraries(${gm_static_name} PRIVATE)
 gm_set_target_properties(${gm_static_name})
-
 gm_end_project(${gm_static_name})
 
 if(MSVC)
