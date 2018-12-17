@@ -163,17 +163,21 @@ void GMControlLabel::setFontColor(const GMVec4& color)
 class GMControlButtonBorder : public GMControlBorder
 {
 public:
-	GMControlButtonBorder(GMWidget* widget) : GMControlBorder(widget) { initStyles(widget); }
+	GMControlButtonBorder(GMWidget* widget) : GMControlBorder(widget) { }
 
 private:
-	void initStyles(GMWidget* widget);
+	virtual void render(GMDuration elapsed) override;
 };
 
-void GMControlButtonBorder::initStyles(GMWidget* widget)
+void GMControlButtonBorder::render(GMDuration elapsed)
 {
+	if (!getVisible())
+		return;
+
 	D(d);
-	d->borderStyle.setTexture(widget->getArea(GMTextureArea::ButtonArea));
-	d->borderStyle.setTextureColor(GMControlState::Normal, GMVec4(1.f, 1.f, 1.f, 1.f));
+	D_BASE(db, Base);
+	GMWidget* widget = getParent();
+	widget->drawBorder(getPositionFlag(), d->borderStyle, db->boundingBox, .8f);
 }
 
 GMControlButton* GMControlButton::createControl(
@@ -192,6 +196,14 @@ GMControlButton* GMControlButton::createControl(
 	buttonControl->setSize(width, height);
 	buttonControl->setIsDefault(isDefault);
 	return buttonControl;
+}
+
+GMControlButton::GMControlButton(GMWidget* widget) : Base(widget)
+{
+	D(d);
+	d->fillBorder = gm_makeOwnedPtr<GMControlButtonBorder>(widget);
+	d->foreBorder = gm_makeOwnedPtr<GMControlButtonBorder>(widget);
+	initStyles(widget);
 }
 
 void GMControlButton::refresh()
@@ -310,13 +322,19 @@ void GMControlButton::render(GMDuration elapsed)
 	GMStyle& foreStyle = getStyle((GMControl::StyleType)ForeStyle);
 	foreStyle.getTextureColor().blend(state, elapsed, blendRate);
 	foreStyle.getFontColor().blend(state, elapsed, blendRate);
-	widget->drawSprite(getPositionFlag(), foreStyle, rc, .8f);
+	d->foreBorder->setPosition(rc.x, rc.y);
+	d->foreBorder->setSize(rc.width, rc.height);
+	d->foreBorder->setBorderStyle(foreStyle);
+	d->foreBorder->render(elapsed);
 	widget->drawText(getPositionFlag(), getText(), foreStyle, rc, foreStyle.getShadowStyle().hasShadow, true);
 
 	GMStyle& fillStyle = getStyle((GMControl::StyleType)FillStyle);
 	fillStyle.getTextureColor().blend(state, elapsed, blendRate);
 	fillStyle.getFontColor().blend(state, elapsed, blendRate);
-	widget->drawSprite(getPositionFlag(), fillStyle, rc, .8f);
+	d->fillBorder->setPosition(rc.x, rc.y);
+	d->fillBorder->setSize(rc.width, rc.height);
+	d->fillBorder->setBorderStyle(fillStyle);
+	d->fillBorder->render(elapsed);
 	widget->drawText(getPositionFlag(), getText(), fillStyle, rc, fillStyle.getShadowStyle().hasShadow, true);
 }
 
@@ -401,7 +419,6 @@ GMControlBorder* GMControlBorder::createControl(
 	GMControlBorder* borderControl = new GMControlBorder(widget);
 	borderControl->setPosition(x, y);
 	borderControl->setSize(width, height);
-	borderControl->setCorner(cornerRect);
 	return borderControl;
 }
 
@@ -414,7 +431,7 @@ void GMControlBorder::render(GMDuration elapsed)
 	D_BASE(db, Base);
 	d->borderStyle.getTextureColor().blend(GMControlState::Normal, elapsed);
 	GMWidget* widget = getParent();
-	widget->drawBorder(getPositionFlag(), d->borderStyle, d->corner, db->boundingBox, .8f);
+	widget->drawBorder(getPositionFlag(), d->borderStyle, db->boundingBox, .8f);
 }
 
 bool GMControlBorder::containsPoint(GMPoint point)
@@ -425,9 +442,7 @@ bool GMControlBorder::containsPoint(GMPoint point)
 void GMControlBorder::initStyles(GMWidget* widget)
 {
 	D(d);
-	const auto& area = widget->getArea(GMTextureArea::BorderArea);
-	setCorner(area.cornerRc);
-	d->borderStyle.setTexture(area);
+	d->borderStyle.setTexture(widget->getArea(GMTextureArea::BorderArea));
 	d->borderStyle.setTextureColor(GMControlState::Normal, GMVec4(1.f, 1.f, 1.f, 1.f));
 }
 
@@ -578,7 +593,7 @@ void GMControlScrollBar::render(GMDuration elapsed)
 	widget->drawSprite(getPositionFlag(), d->styleTrack, d->rcTrack, .99f);
 	if (d->showThumb)
 	{
-		const GMRect& thumbCorner = d->thumb->getCorner();
+		const GMRect& thumbCorner = d->thumb->getBorderStyle().getCornerRc();
 		if (thumbCorner.width * 2 < d->rcThumb.width && thumbCorner.height * 2 < d->rcThumb.height)
 		{
 			d->thumb->setPositionFlag(getPositionFlag());
@@ -668,7 +683,6 @@ GMControlScrollBar* GMControlScrollBar::createControl(
 	scrollBar->setPosition(x, y);
 	scrollBar->setSize(width, height);
 	scrollBar->setIsDefault(isDefault);
-	scrollBar->setThumbCorner(widget->getArea(GMTextureArea::ScrollBarThumb).cornerRc);
 	return scrollBar;
 }
 
@@ -709,12 +723,6 @@ void GMControlScrollBar::setValue(GMint32 value)
 	}
 
 	updateThumbRect();
-}
-
-void GMControlScrollBar::setThumbCorner(const GMRect& corner)
-{
-	D(d);
-	d->thumb->setCorner(corner);
 }
 
 void GMControlScrollBar::updateRect()

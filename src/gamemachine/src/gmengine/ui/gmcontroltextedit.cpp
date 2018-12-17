@@ -385,9 +385,7 @@ GMControlTextEdit::~GMControlTextEdit() = default;
 void GMControlTextEditBorder::initStyles(GMWidget* widget)
 {
 	D(d);
-	const auto& area = widget->getArea(GMTextureArea::TextEditBorderArea);
-	setCorner(area.cornerRc);
-	d->borderStyle.setTexture(area);
+	d->borderStyle.setTexture(widget->getArea(GMTextureArea::TextEditBorderArea));
 	d->borderStyle.setTextureColor(GMControlState::Normal, GMVec4(1.f, 1.f, 1.f, 1.f));
 }
 
@@ -1220,9 +1218,6 @@ GMControlTextArea* GMControlTextArea::createControl(
 	textArea->setSize(width, height);
 	textArea->setIsDefault(isDefault);
 	textArea->setScrollBar(hasScrollBar);
-	if (hasScrollBar)
-		textArea->getScrollBar()->setThumbCorner(widget->getArea(GMTextureArea::ScrollBarThumb).cornerRc);
-
 	return textArea;
 }
 

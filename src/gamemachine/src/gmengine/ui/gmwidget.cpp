@@ -127,6 +127,7 @@ void GMStyle::setTexture(const GMWidgetTextureArea& idRc)
 	D(d);
 	d->texture = idRc.textureId;
 	d->rc = idRc.rc;
+	d->cornerRc = idRc.cornerRc;
 }
 
 void GMStyle::setFont(GMFontHandle font)
@@ -494,7 +495,6 @@ void GMWidget::drawRect(
 void GMWidget::drawBorder(
 	GMControlPositionFlag positionFlag,
 	GMStyle& style,
-	const GMRect& cornerRc,
 	const GMRect& rc,
 	GMfloat depth
 )
@@ -517,7 +517,7 @@ void GMWidget::drawBorder(
 	borderObject->setTextureRect(textureRc);
 	borderObject->setTextureSize(texInfo.width, texInfo.height);
 	borderObject->setColor(style.getTextureColor().getCurrent());
-	borderObject->setCornerRect(cornerRc);
+	borderObject->setCornerRect(style.getCornerRc());
 	borderObject->draw();
 }
 
@@ -1263,7 +1263,7 @@ void GMWidget::initStyles()
 	titleStyle.setTextureColor(GMControlState::Normal, GMVec4(1, 1, 1, 1));
 	titleStyle.setFontColor(GMControlState::Normal, GMVec4(1, 1, 1, 1));
 	titleStyle.getTextureColor().blend(GMControlState::Normal, .5f);
-	titleStyle.getFontColor().blend(GMControlState::Normal, 1.f);
+	titleStyle.getFontColor().setCurrent(1.f);
 	d->titleStyle = std::move(titleStyle);
 
 	GMStyle shadowStyle;

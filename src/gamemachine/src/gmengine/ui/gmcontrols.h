@@ -342,7 +342,8 @@ GM_PRIVATE_OBJECT(GMControlButton)
 {
 	bool pressed = false;
 	GMStyle fillStyle;
-	GMOwnedPtr<GMControlBorder> border;
+	GMOwnedPtr<GMControlBorder> fillBorder;
+	GMOwnedPtr<GMControlBorder> foreBorder;
 };
 
 class GM_EXPORT GMControlButton : public GMControlLabel
@@ -370,7 +371,7 @@ public:
 	);
 
 protected:
-	GMControlButton(GMWidget* widget) : Base(widget) { initStyles(widget); }
+	GMControlButton(GMWidget* widget);
 
 public:
 	virtual void refresh() override;

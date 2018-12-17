@@ -50,10 +50,10 @@ GM_PRIVATE_OBJECT(GMElementBlendColor)
 	GMVec4 current;
 };
 
-class GMElementBlendColor : public GMObject
+class GMElementBlendColor
 {
-	GM_DECLARE_PRIVATE(GMElementBlendColor)
-	GM_ALLOW_COPY_MOVE(GMElementBlendColor)
+	GM_DECLARE_ALIGNED_ALLOCATOR()
+	GM_DECLARE_PRIVATE_NGO(GMElementBlendColor)
 
 public:
 	GMElementBlendColor() = default;
@@ -212,15 +212,17 @@ GM_PRIVATE_OBJECT(GMStyle)
 	GMlong texture;
 	GMFontHandle font = 0;
 	GMRect rc;
+	GMRect cornerRc;
 	GMElementBlendColor textureColor;
 	GMElementBlendColor fontColor;
 	GMShadowStyle shadowStyle;
 };
 
-class GM_EXPORT GMStyle : public GMObject
+class GM_EXPORT GMStyle
 {
-	GM_DECLARE_PRIVATE(GMStyle)
-	GM_ALLOW_COPY_MOVE(GMStyle)
+	GM_DECLARE_ALIGNED_ALLOCATOR()
+	GM_DECLARE_PRIVATE_NGO(GMStyle)
+	GM_DECLARE_PROPERTY(CornerRc, cornerRc)
 
 public:
 	GMStyle(
@@ -450,7 +452,6 @@ public:
 	void drawBorder(
 		GMControlPositionFlag positionFlag,
 		GMStyle& style,
-		const GMRect& cornerRc,
 		const GMRect& rc,
 		GMfloat depth
 	);

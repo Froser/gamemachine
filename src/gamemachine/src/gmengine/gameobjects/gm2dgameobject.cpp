@@ -849,6 +849,27 @@ void GMBorder2DGameObject::updateVertices(GMScene* scene)
 		}
 	};
 
+	// 处理重叠的情况
+	// 宽度重叠
+	if (V[2].positions[0] < V[1].positions[0])
+	{
+		GMfloat mid = (V[3].positions[0] - V[0].positions[0]) / 2;
+		GMfloat adjusted = V[0].positions[0] + mid;
+		V[1].positions[0] = V[2].positions[0] = V[5].positions[0] = V[6].positions[0] =
+		V[9].positions[0] = V[10].positions[0] = V[13].positions[0] = V[14].positions[0] = adjusted;
+	}
+
+	// 高度重叠
+	if (V[4].positions[1] < V[8].positions[1])
+	{
+		GMfloat mid = (V[12].positions[1] - V[0].positions[1]) / 2;
+		GMfloat adjusted = V[0].positions[1] + mid;
+		for (auto i = 4; i <= 11; ++i)
+		{
+			V[i].positions[1] = adjusted;
+		}
+	}
+
 	GMsize_t sz = sizeof(V);
 	GMModelDataProxy* proxy = model->getModelDataProxy();
 	proxy->beginUpdateBuffer();
