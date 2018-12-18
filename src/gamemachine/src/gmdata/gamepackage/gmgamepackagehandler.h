@@ -31,24 +31,6 @@ class GMZipGamePackageHandler : public GMDefaultGamePackageHandler
 {
 	typedef GMDefaultGamePackageHandler Base;
 
-	struct ZipBuffer
-	{
-		ZipBuffer()
-			: buffer(nullptr)
-			, size(0)
-		{
-		}
-
-		~ZipBuffer()
-		{
-			if (buffer)
-				delete buffer;
-		}
-
-		GMuint32 size;
-		GMbyte* buffer;
-	};
-
 public:
 	GMZipGamePackageHandler(GMGamePackage* pk);
 	~GMZipGamePackageHandler();
@@ -63,11 +45,12 @@ private:
 	bool loadZip();
 	void releaseUnzFile();
 	void releaseBuffers();
-	GMString toRelativePath(const GMString& in);
+	GMString fromRelativePath(const GMString& in);
+	bool loadBuffer(const GMString& path, REF GMBuffer* buffer);
 
 private:
-	unzFile m_uf;
-	Map<GMString, ZipBuffer*> m_buffers;
+	unzFile m_uf = nullptr;
+	HashMap<GMString, GMBuffer*, GMStringHashFunctor> m_buffers;
 };
 
 END_NS

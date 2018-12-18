@@ -131,23 +131,13 @@ GMZipGamePackageHandler::~GMZipGamePackageHandler()
 
 bool GMZipGamePackageHandler::readFileFromPath(const GMString& path, REF GMBuffer* buffer)
 {
-	if (m_buffers.find(path) != m_buffers.end())
+	bool isRelativePath = (path.findLastOf('.') != GMString::npos);
+	GMString fileName = isRelativePath ? fromRelativePath(path).toStdString() : path.toStdString();
+	std::string stdFileName = fileName.toStdString();
+	if (UNZ_OK == unzLocateFile(m_uf, stdFileName.c_str(), false))
 	{
-		ZipBuffer* buf = m_buffers[path];
-		buffer->needRelease = false;
-		buffer->buffer = buf->buffer;
-		buffer->size = buf->size;
-		return true;
-	}
-
-	GMString r = toRelativePath(path);
-	if (m_buffers.find(toRelativePath(r)) != m_buffers.end())
-	{
-		ZipBuffer* buf = m_buffers[r];
-		buffer->needRelease = false;
-		buffer->buffer = buf->buffer;
-		buffer->size = buf->size;
-		return true;
+		if (loadBuffer(fileName, buffer))
+			return true;
 	}
 
 	gm_warning(gm_dbg_wrap("cannot find path {0} "), GMString(path));
@@ -156,16 +146,16 @@ bool GMZipGamePackageHandler::readFileFromPath(const GMString& path, REF GMBuffe
 
 bool GMZipGamePackageHandler::loadZip()
 {
-	const GMuint32 bufSize = 4096;
-
 	PKD(d);
 	releaseUnzFile();
 
+	// 打开zip
 	m_uf = unzOpen64(d->packagePath.toStdString().c_str());
+
+	// 获取文件名
 	unz_global_info64 gi;
 	GMint32 err = unzGetGlobalInfo64(m_uf, &gi);
 	CHECK(err);
-
 	for (GMint32 i = 0; i < gi.number_entry; i++)
 	{
 		while (true)
@@ -175,32 +165,14 @@ bool GMZipGamePackageHandler::loadZip()
 			err = unzGetCurrentFileInfo64(m_uf, &file_info, filename, sizeof(filename), NULL, 0, NULL, 0);
 			CHECK(err);
 
-			err = unzOpenCurrentFilePassword(m_uf, nullptr);
-			CHECK(err);
-
 #if GM_WINDOWS
 			// 跳过文件夹
 			if (file_info.external_fa & FILE_ATTRIBUTE_DIRECTORY)
 				break;
 #endif
-
-			GMbyte* buffer = new GMbyte[file_info.uncompressed_size];
-			GMbyte* ptr = buffer;
-			do
-			{
-				err = unzReadCurrentFile(m_uf, ptr, bufSize);
-				if (err < 0)
-					return false;
-				if (err > 0)
-					ptr += err;
-			} while (err > 0);
-			GM_ASSERT(m_buffers.find(filename) == m_buffers.end());
-
-			ZipBuffer* buf = new ZipBuffer();
-			buf->buffer = buffer;
-			buf->size = file_info.uncompressed_size;
+			GMBuffer* buf = new GMBuffer();
+			buf->needRelease = false;
 			m_buffers[filename] = buf;
-
 			break;
 		}
 		if ((i + 1) < gi.number_entry)
@@ -209,8 +181,6 @@ bool GMZipGamePackageHandler::loadZip()
 			CHECK(err);
 		}
 	}
-
-	releaseUnzFile();
 	return true;
 }
 
@@ -227,11 +197,13 @@ void GMZipGamePackageHandler::releaseBuffers()
 {
 	for (auto iter = m_buffers.begin(); iter != m_buffers.end(); iter++)
 	{
-		delete (*iter).second;
+		auto buffer = iter->second;
+		GM_delete(buffer->buffer);
+		GM_delete(buffer);
 	}
 }
 
-GMString GMZipGamePackageHandler::toRelativePath(const GMString& in)
+GMString GMZipGamePackageHandler::fromRelativePath(const GMString& in)
 {
 	Deque<std::wstring> deque;
 
@@ -269,13 +241,65 @@ GMString GMZipGamePackageHandler::toRelativePath(const GMString& in)
 	return result;
 }
 
+bool GMZipGamePackageHandler::loadBuffer(const GMString& path, REF GMBuffer* buffer)
+{
+	constexpr GMuint32 bufSize = 4096;
+
+	// 如果已经有数据了，不需要从zip中读取
+	auto iter = m_buffers.find(path);
+	if (iter == m_buffers.end())
+		return false;
+
+	GMBuffer* targetBuffer = iter->second;
+	if (targetBuffer->size > 0)
+	{
+		*buffer = *targetBuffer;
+		return true;
+	}
+
+	// 获取文件属性，跳过目录
+	char filename[FILENAME_MAX];
+	unz_file_info64 file_info;
+	GMint32 err = unzGetCurrentFileInfo64(m_uf, &file_info, filename, sizeof(filename), NULL, 0, NULL, 0);
+	CHECK(err);
+
+	err = unzOpenCurrentFilePassword(m_uf, nullptr);
+	CHECK(err);
+
+#if GM_WINDOWS
+	// 跳过文件夹
+	if (file_info.external_fa & FILE_ATTRIBUTE_DIRECTORY)
+		return false;
+#endif
+
+	// 构建数据
+	GMbyte* data = new GMbyte[file_info.uncompressed_size];
+	GMbyte* ptr = data;
+	do
+	{
+		err = unzReadCurrentFile(m_uf, ptr, bufSize);
+		if (err < 0)
+			return false;
+		if (err > 0)
+			ptr += err;
+	} while (err > 0);
+
+	targetBuffer->needRelease = false;
+	targetBuffer->buffer = data;
+	targetBuffer->size = file_info.uncompressed_size;
+	m_buffers[filename] = targetBuffer;
+	*buffer = *targetBuffer;
+	return true;
+}
+
 Vector<GMString> GMZipGamePackageHandler::getAllFiles(const GMString& directory)
 {
 	Vector<GMString> result;
-	GMString d = directory;
+	const std::wstring& d = directory.toStdWString();
+
 	for (auto& buffer : m_buffers)
 	{
-		if (buffer.first.toStdWString().compare(0, d.length(), d.toStdWString()) == 0)
+		if (buffer.first.toStdWString().compare(0, d.length(), d) == 0)
 		{
 			result.push_back(buffer.first);
 		}

@@ -148,9 +148,17 @@ GMBuffer& GMBuffer::operator =(GMBuffer&& rhs) GM_NOEXCEPT
 GMBuffer& GMBuffer::operator =(const GMBuffer& rhs)
 {
 	this->needRelease = rhs.needRelease;
-	this->size = rhs.size;
-	buffer = new GMbyte[this->size];
-	memcpy_s(buffer, size, rhs.buffer, this->size);
+	if (rhs.needRelease)
+	{
+		this->size = rhs.size;
+		buffer = new GMbyte[this->size];
+		memcpy_s(buffer, size, rhs.buffer, this->size);
+	}
+	else
+	{
+		this->size = rhs.size;
+		this->buffer = rhs.buffer;
+	}
 	return *this;
 }
 

@@ -294,6 +294,7 @@ void GMTextGameObject::updateVertices(GMScene* scene)
 
 			typoEngine = d->typoEngine;
 			typoEngine->setFont(d->font);
+			typoEngine->setLineHeight(0);
 			iter = typoEngine->begin(d->text, options);
 		}
 		else
