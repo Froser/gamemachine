@@ -415,7 +415,7 @@ int WINAPI wWinMain(
 			pFactory = new gm::GMGLFactory();
 #else
 		SetRenderEnv(gm::GMRenderEnvironment::OpenGL);
-		factory = new gm::GMGLFactory();
+		pFactory = new gm::GMGLFactory();
 #endif
 	}
 
