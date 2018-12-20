@@ -21,7 +21,7 @@
 
 namespace
 {
-	void setAttributes(GMint32* attributes, const GMWindowAttributes& wndAttrs, bool useSample)
+	void setAttributes(GMint32* attributes, const GMWindowDesc& wndAttrs, bool useSample)
 	{
 		int where = 0;
 		ATTRIB_VAL(GLX_X_RENDERABLE, True);
@@ -43,7 +43,7 @@ namespace
 		ATTRIB(None);
 	}
 
-	bool chooseConfig(GLXFBConfig* config, const GMWindowAttributes& wndAttrs, const GMXRenderContext* context)
+	bool chooseConfig(GLXFBConfig* config, const GMWindowDesc& wndAttrs, const GMXRenderContext* context)
 	{
 		INIT_ATTRIBS();
 		setAttributes(ATTRIBS, wndAttrs, true);
@@ -105,7 +105,7 @@ public:
 	virtual void msgProc(const GMMessage& message) override;
 
 protected:
-	virtual void onWindowCreated(const GMWindowAttributes& wndAttrs) override;
+	virtual void onWindowCreated(const GMWindowDesc& wndAttrs) override;
 
 private:
 	GLXContext createNewContext();
@@ -129,7 +129,7 @@ GMWindow_OpenGL::~GMWindow_OpenGL()
 	dispose();
 }
 
-void GMWindow_OpenGL::onWindowCreated(const GMWindowAttributes& wndAttrs)
+void GMWindow_OpenGL::onWindowCreated(const GMWindowDesc& wndAttrs)
 {
 	D(d);
 	D_BASE(db, Base);

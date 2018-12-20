@@ -124,3 +124,9 @@ void GMWindow::msgProc(const GMMessage& message)
 		}
 	}
 }
+
+GMRect GMWindow::getFramebufferRect()
+{
+	D(d);
+	return d->windowStates.framebufferRect;
+}

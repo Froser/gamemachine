@@ -287,7 +287,7 @@ bool GameMachine::handleMessage(const GMMessage& msg)
 	for (decltype(auto) window : d->windows)
 	{
 		window->msgProc(msg);
-		window->getContext()->getEngine()->event(msg);
+		window->getContext()->getEngine()->msgProc(msg);
 	}
 	return true;
 }

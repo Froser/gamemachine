@@ -45,7 +45,7 @@ namespace
 		return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
 	}
 
-	bool registerClass(const GMWindowAttributes& wndAttrs, GMWindow* window, const GMwchar* className)
+	bool registerClass(const GMWindowDesc& wndAttrs, GMWindow* window, const GMwchar* className)
 	{
 		WNDCLASS wc = { 0 };
 		wc.style = 0;
@@ -211,11 +211,11 @@ void GMWindow::setWindowCapture(bool capture)
 		::ReleaseCapture();
 }
 
-GMWindowHandle GMWindow::create(const GMWindowAttributes& wndAttrs)
+GMWindowHandle GMWindow::create(const GMWindowDesc& wndAttrs)
 {
 	D(d);
 	GMWindowHandle hwnd = NULL;
-	GMWindowAttributes attrs = wndAttrs;
+	GMWindowDesc attrs = wndAttrs;
 	if (wndAttrs.createNewWindow)
 	{
 		// 在非全屏的时候才有效，计算出客户窗口（渲染窗口）大小
@@ -232,7 +232,7 @@ GMWindowHandle GMWindow::create(const GMWindowAttributes& wndAttrs)
 			attrs.rc.right - attrs.rc.left,
 			attrs.rc.bottom - attrs.rc.top,
 			attrs.hwndParent,
-			attrs.hMenu,
+			NULL,
 			attrs.instance,
 			this);
 		GM_ASSERT(hwnd);
@@ -247,6 +247,7 @@ GMWindowHandle GMWindow::create(const GMWindowAttributes& wndAttrs)
 
 	onWindowCreated(attrs);
 	d->windowStates.renderRect = getRenderRect();
+	d->windowStates.framebufferRect = d->windowStates.renderRect;
 	return hwnd;
 }
 

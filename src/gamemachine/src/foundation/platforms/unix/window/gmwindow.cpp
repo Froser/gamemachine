@@ -38,11 +38,12 @@ void GMWindow::showWindow()
 	XFlush(context->getDisplay());
 }
 
-GMWindowHandle GMWindow::create(const GMWindowAttributes& wndAttrs)
+GMWindowHandle GMWindow::create(const GMWindowDesc& wndAttrs)
 {
 	D(d);
 	onWindowCreated(wndAttrs);
 	d->windowStates.renderRect = getRenderRect();
+	d->windowStates.framebufferRect = d->windowStates.renderRect;
 	return getWindowHandle();
 }
 

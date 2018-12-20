@@ -88,7 +88,7 @@ public:
 	virtual void init() override;
 	virtual void update(GMUpdateDataType type) override;
 	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type) override;
-	virtual bool event(const GMMessage& e) override { return false; }
+	virtual bool msgProc(const GMMessage& e) override { return false; }
 	virtual IFramebuffers* getDefaultFramebuffers() override;
 	virtual ITechnique* getTechnique(GMModelType objectType) override;
 	virtual GMGlyphManager* getGlyphManager() override;

@@ -253,6 +253,7 @@ GMWidget::GMWidget(GMWidgetResourceManager* manager)
 	d->manager = manager;
 	d->nextWidget = d->prevWidget = this;
 	initStyles();
+	updateScaling();
 }
 
 GMWidget::~GMWidget()
@@ -789,10 +790,13 @@ bool GMWidget::handleSystemEvent(GMSystemEvent* event)
 	case GMSystemEventType::MouseDblClick:
 	case GMSystemEventType::MouseWheel:
 	{
+		GM_ASSERT(!FuzzyCompare(d->scaling[0], 0) && !FuzzyCompare(d->scaling[1], 0));
 		GMSystemMouseEvent* mouseEvent = static_cast<GMSystemMouseEvent*>(event);
 		GMPoint pt = mouseEvent->getPoint();
-		pt.x -= d->x;
-		pt.y -= d->y;
+		pt.x -= d->x * d->scaling[0];
+		pt.y -= d->y * d->scaling[1];
+		pt.x /= d->scaling[0];
+		pt.y /= d->scaling[1];
 
 		GMSystemMouseWheelEvent cacheWheelEvent;
 		GMSystemMouseEvent cacheEvent;
@@ -879,6 +883,11 @@ bool GMWidget::handleSystemEvent(GMSystemEvent* event)
 
 		break;
 	}
+	case GMSystemEventType::WindowSizeChanged:
+	{
+		updateScaling();
+		break;
+	}
 	}
 	return false;
 }
@@ -961,6 +970,16 @@ void GMWidget::calculateControlBoundingRect()
 		d->controlBoundingBox = b;
 		updateVerticalScrollbar();
 	}
+}
+
+void GMWidget::updateScaling()
+{
+	D(d);
+	auto window = d->manager->getContext()->getWindow();
+	GMRect fbrc = window->getFramebufferRect();
+	GMRect winRc = window->getRenderRect();
+	d->scaling[0] = static_cast<GMfloat>(winRc.width) / fbrc.width;
+	d->scaling[1] = static_cast<GMfloat>(winRc.height) / fbrc.height;
 }
 
 void GMWidget::render(GMfloat elpasedTime)
@@ -1106,6 +1125,8 @@ void GMWidget::removeAllControls()
 GMControl* GMWidget::getControlAtPoint(const GMPoint& pt)
 {
 	D(d);
+	GM_ASSERT(!FuzzyCompare(d->scaling[0], 0) && !FuzzyCompare(d->scaling[1], 0));
+
 	// 响应scrollbars
 	if (d->verticalScrollbar)
 	{

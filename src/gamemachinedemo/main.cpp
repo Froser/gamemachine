@@ -67,8 +67,12 @@ int main(int argc, char* argv[])
 #endif
 	}
 
-	gm::GMWindowAttributes mainAttrs;
+	gm::GMWindowDesc mainAttrs;
 	mainAttrs.instance = hInstance;
+
+#if GM_WINDOWS
+	mainAttrs.dwStyle = WS_OVERLAPPEDWINDOW | WS_SIZEBOX;
+#endif
 	//mainAttrs.samples = 1;
 
 	gm::IWindow* mainWindow = nullptr;

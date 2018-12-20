@@ -185,7 +185,7 @@ GM_INTERFACE(IQueriable)
 #if GM_WINDOWS
 typedef HINSTANCE GMInstance;
 typedef HWND GMWindowHandle;
-struct GMWindowAttributes
+struct GMWindowDesc
 {
 	bool createNewWindow = true; //!< 是否创建一个新窗口，或者是使用已经存在的窗口来渲染
 	GMWindowHandle existWindowHandle = NULL;
@@ -195,14 +195,13 @@ struct GMWindowAttributes
 	GMDWord dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME;
 	GMDWord dwExStyle = NULL;
 	RECT rc = { 0, 0, 1024, 768 };
-	HMENU hMenu = NULL;
 	GMint32 samples = 8;
 	GMInstance instance;
 };
 #else
 typedef GMint32 GMWindowHandle;
 typedef GMint32 GMInstance;
-struct GMWindowAttributes
+struct GMWindowDesc
 {
 	bool createNewWindow = true; //!< 是否创建一个新窗口，或者是使用已经存在的窗口来渲染
 	GMWindowHandle existWindowHandle = 0;
@@ -212,7 +211,6 @@ struct GMWindowAttributes
 	GMulong dwStyle = 0;
 	GMulong dwExStyle = 0;
 	GMRect rc = { 0, 0, 1024, 768 };
-	GMint32 hMenu = 0;
 	GMint32 samples = 8;
 	GMInstance instance;
 };
@@ -418,7 +416,7 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	  \return 如果此事件被处理，返回true，否则返回false。
 	  \sa GameMachineMessage
 	*/
-	virtual bool event(const GMMessage& e) = 0;
+	virtual bool msgProc(const GMMessage& e) = 0;
 
 	//! 获取引擎G缓存。
 	/*!
@@ -584,6 +582,7 @@ struct GMWindowStates
 	GMint32 sampleQuality; //!< 多重采样质量。
 	bool vsyncEnabled = false; //!< 是否垂直同步。
 	GMRect renderRect; //!< 当前窗口渲染窗口位置信息。
+	GMRect framebufferRect; //!< 帧缓存矩形区域。它不随窗口大小而改变。它表示默认帧缓存的区域。
 };
 
 struct IRenderContext
@@ -614,11 +613,12 @@ GM_INTERFACE_FROM(IWindow, IQueriable)
 {
 	virtual IInput* getInputMananger() = 0;
 	virtual void msgProc(const GMMessage& message) = 0;
-	virtual GMWindowHandle create(const GMWindowAttributes& attrs) = 0;
+	virtual GMWindowHandle create(const GMWindowDesc& attrs) = 0;
 	virtual void centerWindow() = 0;
 	virtual void showWindow() = 0;
 	virtual GMRect getWindowRect() = 0;
 	virtual GMRect getRenderRect() = 0;
+	virtual GMRect getFramebufferRect() = 0;
 	virtual GMWindowHandle getWindowHandle() const = 0;
 	virtual bool isWindowActivate() = 0;
 	virtual void setWindowCapture(bool capture) = 0;

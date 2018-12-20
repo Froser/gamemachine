@@ -51,7 +51,7 @@ public:
 	virtual const IRenderContext* getContext() override;
 
 protected:
-	virtual void onWindowCreated(const GMWindowAttributes& attrs) override;
+	virtual void onWindowCreated(const GMWindowDesc& attrs) override;
 };
 
 GMWindow_Dx11::~GMWindow_Dx11()
@@ -103,7 +103,7 @@ bool GMWindow_Dx11::getInterface(GameMachineInterfaceID id, void** out)
 	return true;
 }
 
-void GMWindow_Dx11::onWindowCreated(const GMWindowAttributes& wndAttrs)
+void GMWindow_Dx11::onWindowCreated(const GMWindowDesc& wndAttrs)
 {
 	D(d);
 	D_BASE(db, GMWindow);

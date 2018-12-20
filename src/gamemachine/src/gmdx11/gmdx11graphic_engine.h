@@ -60,7 +60,7 @@ public:
 	virtual void init() override;
 	virtual void update(GMUpdateDataType type) override;
 	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type = GMShaderProgramType::DefaultShaderProgram) override;
-	virtual bool event(const GMMessage& e) override;
+	virtual bool msgProc(const GMMessage& e) override;
 	virtual IFramebuffers* getDefaultFramebuffers() override;
 	virtual ITechnique* getTechnique(GMModelType objectType) override;
 	virtual GMGlyphManager* getGlyphManager() override;

@@ -340,7 +340,7 @@ namespace
 
 		pWindow->setHandler(s_flow = new FlowHandler());
 
-		GMWindowAttributes wndAttrs;
+		GMWindowDesc wndAttrs;
 		wndAttrs.createNewWindow = false;
 		wndAttrs.existWindowHandle = hContainer;
 		pWindow->create(wndAttrs);

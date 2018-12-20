@@ -257,7 +257,7 @@ int main(int argc, char* argv[])
 	IFactory* factory = new GMDx11Factory();
 #endif
 	
-	GMWindowAttributes mainAttrs;
+	GMWindowDesc mainAttrs;
 
 #if !GM_WINDOWS
 	auto hInstance = 0;

@@ -361,6 +361,8 @@ GM_PRIVATE_OBJECT(GMWidget)
 	GMRect controlBoundingBox = { 0 };
 	GMOwnedPtr<GMControlScrollBar> verticalScrollbar;
 	GMint32 verticalScrollbarWidth;
+
+	GMfloat scaling[2] = { 0 };
 };
 
 class GM_EXPORT GMWidget : public GMObject
@@ -514,6 +516,7 @@ private:
 	bool needShowVerticalScrollbar();
 	GMSystemMouseEvent* adjustMouseEvent(GMSystemMouseEvent* event, const GMControl* control);
 	void calculateControlBoundingRect();
+	void updateScaling();
 
 public:
 	inline IWindow* getParentWindow()

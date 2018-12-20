@@ -53,11 +53,12 @@ public:
 	virtual void msgProc(const GMMessage& message) override;
 	virtual GMRect getWindowRect() override;
 	virtual GMRect getRenderRect() override;
+	virtual GMRect getFramebufferRect() override;
 	virtual void centerWindow() override;
 	virtual bool isWindowActivate() override;
 	virtual void setWindowCapture(bool capture) override;
 	virtual void showWindow() override;
-	virtual GMWindowHandle create(const GMWindowAttributes& wndAttrs) override;
+	virtual GMWindowHandle create(const GMWindowDesc& wndAttrs) override;
 	virtual GMWindowHandle getWindowHandle() const override { D(d); return d->handle; }
 	virtual bool addWidget(GMWidget* widget) override;
 	virtual void setHandler(AUTORELEASE IGameHandler* handler) override;
@@ -85,7 +86,7 @@ public:
 
 protected:
 	virtual void changeCursor();
-	virtual void onWindowCreated(const GMWindowAttributes& wndAttrs) {}
+	virtual void onWindowCreated(const GMWindowDesc& wndAttrs) {}
 	virtual void onWindowDestroyed();
 };
 
