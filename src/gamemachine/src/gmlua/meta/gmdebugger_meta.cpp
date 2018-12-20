@@ -13,32 +13,36 @@ namespace
 	// {{BEGIN META FUNCTION}}
 	LUA_API GMLuaFunctionReturn info(GMLuaCoreState* L)
 	{
+		static const GMString s_invoker(L"info");
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".info");
-		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, "info");
+		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, s_invoker);
 		gm_info(arg0);
 		return GMReturnValues();
 	}
 
 	LUA_API GMLuaFunctionReturn error(GMLuaCoreState* L)
 	{
+		static const GMString s_invoker(L"error");
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".error");
-		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, "error");
+		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, s_invoker);
 		gm_error(arg0);
 		return GMReturnValues();
 	}
 
 	LUA_API GMLuaFunctionReturn warning(GMLuaCoreState* L)
 	{
+		static const GMString s_invoker(L"warning");
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".warning");
-		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, "warning");
+		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, s_invoker);
 		gm_warning(arg0);
 		return GMReturnValues();
 	}
 
 	LUA_API GMLuaFunctionReturn debug(GMLuaCoreState* L)
 	{
+		static const GMString s_invoker(L"debug");
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".debug");
-		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, "debug");
+		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, s_invoker);
 		gm_debug(arg0);
 		return GMReturnValues();
 	}

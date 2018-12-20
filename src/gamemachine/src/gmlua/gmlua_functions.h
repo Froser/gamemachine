@@ -20,13 +20,13 @@ namespace luaapi
 		  \return 返回当前未被获取的参数数量。
 		*/
 		static GMint32 getArgumentsCount(GMLuaCoreState* L);
-		static const char* popArgumentAsString(GMLuaCoreState* L, const char* invoker);
-		static GMVariant popArgument(GMLuaCoreState* L, const char* invoker);
-		static GMVariant popArgumentAsVec2(GMLuaCoreState* L, const char* invoker);
-		static GMVariant popArgumentAsVec3(GMLuaCoreState* L, const char* invoker);
-		static GMVariant popArgumentAsVec4(GMLuaCoreState* L, const char* invoker);
-		static GMVariant popArgumentAsMat4(GMLuaCoreState* L, const char* invoker);
-		static bool popArgumentAsObject(GMLuaCoreState* L, REF GMObject& obj, const char* invoker);
+		static const char* popArgumentAsString(GMLuaCoreState* L, const GMString& invoker);
+		static GMVariant popArgument(GMLuaCoreState* L, const GMString& invoker);
+		static GMVariant popArgumentAsVec2(GMLuaCoreState* L, const GMString& invoker);
+		static GMVariant popArgumentAsVec3(GMLuaCoreState* L, const GMString& invoker);
+		static GMVariant popArgumentAsVec4(GMLuaCoreState* L, const GMString& invoker);
+		static GMVariant popArgumentAsMat4(GMLuaCoreState* L, const GMString& invoker);
+		static bool popArgumentAsObject(GMLuaCoreState* L, REF GMObject& obj, const GMString& invoker);
 	};
 
 	struct GMReturnValues

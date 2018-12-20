@@ -18,7 +18,7 @@ GMint32 GMArgumentHelper::getArgumentsCount(GMLuaCoreState* L)
 	return lua_gettop(L);
 }
 
-const char* GMArgumentHelper::popArgumentAsString(GMLuaCoreState* L, const char* invoker)
+const char* GMArgumentHelper::popArgumentAsString(GMLuaCoreState* L, const GMString& invoker)
 {
 	GM_CHECK_LUA_STACK_BALANCE(-1);
 	POP_GUARD();
@@ -27,7 +27,7 @@ const char* GMArgumentHelper::popArgumentAsString(GMLuaCoreState* L, const char*
 	return luaL_optstring(L, -1, "");
 }
 
-GMVariant GMArgumentHelper::popArgument(GMLuaCoreState* L, const char* invoker)
+GMVariant GMArgumentHelper::popArgument(GMLuaCoreState* L, const GMString& invoker)
 {
 	GM_CHECK_LUA_STACK_BALANCE(-1);
 	POP_GUARD();
@@ -37,7 +37,7 @@ GMVariant GMArgumentHelper::popArgument(GMLuaCoreState* L, const char* invoker)
 	return v;
 }
 
-GMVariant GMArgumentHelper::popArgumentAsVec2(GMLuaCoreState* L, const char* invoker)
+GMVariant GMArgumentHelper::popArgumentAsVec2(GMLuaCoreState* L, const GMString& invoker)
 {
 	GM_CHECK_LUA_STACK_BALANCE(-1);
 	POP_GUARD();
@@ -50,7 +50,7 @@ GMVariant GMArgumentHelper::popArgumentAsVec2(GMLuaCoreState* L, const char* inv
 	return GMVariant(std::move(v));
 }
 
-GMVariant GMArgumentHelper::popArgumentAsVec3(GMLuaCoreState* L, const char* invoker)
+GMVariant GMArgumentHelper::popArgumentAsVec3(GMLuaCoreState* L, const GMString& invoker)
 {
 	GM_CHECK_LUA_STACK_BALANCE(-1);
 	POP_GUARD();
@@ -63,7 +63,7 @@ GMVariant GMArgumentHelper::popArgumentAsVec3(GMLuaCoreState* L, const char* inv
 	return GMVariant(std::move(v));
 }
 
-GMVariant GMArgumentHelper::popArgumentAsVec4(GMLuaCoreState* L, const char* invoker)
+GMVariant GMArgumentHelper::popArgumentAsVec4(GMLuaCoreState* L, const GMString& invoker)
 {
 	GM_CHECK_LUA_STACK_BALANCE(-1);
 	POP_GUARD();
@@ -76,7 +76,7 @@ GMVariant GMArgumentHelper::popArgumentAsVec4(GMLuaCoreState* L, const char* inv
 	return GMVariant(std::move(v));
 }
 
-GMVariant GMArgumentHelper::popArgumentAsMat4(GMLuaCoreState* L, const char* invoker)
+GMVariant GMArgumentHelper::popArgumentAsMat4(GMLuaCoreState* L, const GMString& invoker)
 {
 	GM_CHECK_LUA_STACK_BALANCE(-1);
 	POP_GUARD();
@@ -89,7 +89,7 @@ GMVariant GMArgumentHelper::popArgumentAsMat4(GMLuaCoreState* L, const char* inv
 	return GMVariant(std::move(v));
 }
 
-bool GMArgumentHelper::popArgumentAsObject(GMLuaCoreState* L, REF GMObject& obj, const char* invoker)
+bool GMArgumentHelper::popArgumentAsObject(GMLuaCoreState* L, REF GMObject& obj, const GMString& invoker)
 {
 	GM_CHECK_LUA_STACK_BALANCE(-1);
 	POP_GUARD();

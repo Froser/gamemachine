@@ -1,12 +1,12 @@
-﻿#ifndef __GM_LUA_TEMPLATE_META_H__
-#define __GM_LUA_TEMPLATE_META_H__
+﻿#ifndef __GM_LUA_IFACTORY_META_H__
+#define __GM_LUA_IFACTORY_META_H__
 #include <gmcommon.h>
 #include <gmlua.h>
 BEGIN_NS
 
 namespace luaapi
 {
-	class GMLuaTemplate_Meta : public GMLuaFunctionRegister
+	class IFactory_Meta : public GMLuaFunctionRegister
 	{
 	public:
 		virtual void registerFunctions(GMLua* L) override;

@@ -1,9 +1,9 @@
 ﻿#include "stdafx.h"
-#include "gmdebugger_meta.h"
-
-
+#include "template_meta.h"
 #include <gamemachine.h>
 #include <gmlua.h>
+
+#define NAME "Template"
 
 using namespace gm::luaapi;
 
@@ -19,13 +19,15 @@ namespace
 	};
 }
 
-const char* GMLuaTemplate_Meta::Name = "GM";
+const char* GMLuaTemplate_Meta::Name = NAME;
 
-void GMLuaTemplate_Meta::registerFunctions(GMLuaCoreState* L)
+void GMLuaTemplate_Meta::registerFunctions(GMLua* L)
 {
+	setRegisterFunction(L, Name, regCallback, true);
 }
 
 int GMLuaTemplate_Meta::regCallback(GMLuaCoreState *L)
 {
+	newLibrary(L, g_meta);
 	return 1;
 }

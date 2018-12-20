@@ -175,10 +175,14 @@ set(SOURCES
 		gmlua/gmlua_functions.h
 		gmlua/gmlua_functions.cpp
 		gmlua/gmluameta.h
+		gmlua/runtime/gmluaruntime.h
+		gmlua/runtime/gmluaruntime.cpp
 		gmlua/meta/gamemachine_meta.h
 		gmlua/meta/gamemachine_meta.cpp
 		gmlua/meta/gmdebugger_meta.h
 		gmlua/meta/gmdebugger_meta.cpp
+		gmlua/meta/ifactory_meta.h
+		gmlua/meta/ifactory_meta.cpp
 
 		extensions/bsp/bsp_factory.h
 		extensions/bsp/bsp_factory.cpp
