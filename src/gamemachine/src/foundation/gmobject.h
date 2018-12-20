@@ -180,6 +180,7 @@ enum class GMMetaMemberType
 	String,
 	Boolean,
 	Object,
+	Function,
 };
 
 struct GMObjectMember
@@ -292,6 +293,9 @@ using GMSlots = HashMap<GMSignal, Vector<GMCallbackTarget>, GMStringHashFunctor>
 
 #define GM_META_WITH_TYPE(memberName, type) \
 	gm::GMObject::data()->meta[#memberName] = { type, sizeof(data()-> memberName), &data()->memberName };
+
+#define GM_META_FUNCTION(memberName) \
+	gm::GMObject::data()->meta[#memberName] = { GMMetaMemberType::Function, 0, &data()->memberName };
 
 #define GM_END_META_MAP \
 	return true; }

@@ -2107,6 +2107,8 @@ PREDEFINED             = "GM_INTERFACE(name)=struct name : public gm::IVirtualFu
                          "BEGIN_NS=namespace gm {" \
                          END_NS=}
 
+PREDEFINED            += "GM_META_METHOD=public :"
+
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
 # macro definition that is found in the sources will be used. Use the PREDEFINED
@@ -2114,7 +2116,7 @@ PREDEFINED             = "GM_INTERFACE(name)=struct name : public gm::IVirtualFu
 # definition found in the source code.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-EXPAND_AS_DEFINED      = 
+EXPAND_AS_DEFINED      =
 
 # If the SKIP_FUNCTION_MACROS tag is set to YES then doxygen's preprocessor will
 # remove all references to function-like macros that are alone on a line, have

@@ -495,38 +495,41 @@ void GMLua::setTable(const char* key, const GMObjectMember& value)
 		{
 			std::string s = (static_cast<GMString*>(value.ptr))->toStdString();
 			lua_pushstring(L, s.c_str());
+			break;
 		}
-		break;
 	case GMMetaMemberType::Vector2:
 		{
 			GMVec2& vec2 = *static_cast<GMVec2*>(value.ptr);
 			pushVector(vec2);
 			GM_ASSERT(lua_istable(L, -1));
+			break;
 		}
-		break;
 	case GMMetaMemberType::Vector3:
 		{
 			GMVec3& vec3 = *static_cast<GMVec3*>(value.ptr);
 			pushVector(vec3);
 			GM_ASSERT(lua_istable(L, -1));
+			break;
 		}
-		break;
 	case GMMetaMemberType::Vector4:
 		{
 			GMVec4& vec4 = *static_cast<GMVec4*>(value.ptr);
 			pushVector(vec4);
 			GM_ASSERT(lua_istable(L, -1));
+			break;
 		}
-		break;
 	case GMMetaMemberType::Matrix4x4:
 		{
 			GMMat4& mat= *static_cast<GMMat4*>(value.ptr);
 			pushMatrix(mat);
 			GM_ASSERT(lua_istable(L, -1));
+			break;
 		}
-		break;
 	case GMMetaMemberType::Object:
 		pushTable(*static_cast<GMObject*>(value.ptr));
+		break;
+	case GMMetaMemberType::Function:
+		lua_pushcfunction(L, static_cast<GMLuaCFunction>(value.ptr));
 		break;
 	default:
 		GM_ASSERT(false);

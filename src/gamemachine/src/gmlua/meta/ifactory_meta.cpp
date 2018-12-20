@@ -2,6 +2,7 @@
 #include "ifactory_meta.h"
 #include <gamemachine.h>
 #include <gmlua.h>
+#include "iwindow_meta.h"
 
 using namespace gm::luaapi;
 
@@ -9,34 +10,15 @@ using namespace gm::luaapi;
 
 namespace
 {
-	class GMWindowDescProxy : public GMObject
-	{
-		GM_DECLARE_PRIVATE_FROM_STRUCT(GMWindowDescProxy, GMWindowDesc)
-
-	protected:
-		virtual bool registerMeta() override
-		{
-			GM_META(createNewWindow);
-			GM_META(windowName);
-			GM_META_WITH_TYPE(dwStyle, GMMetaMemberType::Int);
-			GM_META_WITH_TYPE(dwExStyle, GMMetaMemberType::Int);
-			// GM_META(rc);
-			GM_META(samples);
-			return true;
-		}
-	};
-
 	// {{BEGIN META FUNCTION}}
 	LUA_API GMLuaFunctionReturn createWindow(GMLuaCoreState* L)
 	{
 		static const GMString s_invoker(L".createWindow");
-		static GMWindowDescProxy proxy;
-		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".createWindow");
-		bool b = GMArgumentHelper::popArgumentAsObject(L, proxy, s_invoker);
-		//TODO
-		return GMReturnValues();
+		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".createWindow");
+		IWindow* window = nullptr;
+		GM.getFactory()->createWindow(0, nullptr, &window);
+		return GMReturnValues(L, GMWindowProxy(window));
 	}
-
 
 	// {{END META FUNCTION}}
 

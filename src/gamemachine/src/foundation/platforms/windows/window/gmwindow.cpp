@@ -211,12 +211,12 @@ void GMWindow::setWindowCapture(bool capture)
 		::ReleaseCapture();
 }
 
-GMWindowHandle GMWindow::create(const GMWindowDesc& wndAttrs)
+GMWindowHandle GMWindow::create(const GMWindowDesc& desc)
 {
 	D(d);
 	GMWindowHandle hwnd = NULL;
-	GMWindowDesc attrs = wndAttrs;
-	if (wndAttrs.createNewWindow)
+	GMWindowDesc attrs = desc;
+	if (desc.createNewWindow)
 	{
 		// 在非全屏的时候才有效，计算出客户窗口（渲染窗口）大小
 		::AdjustWindowRectEx(&attrs.rc, attrs.dwStyle, FALSE, attrs.dwExStyle);

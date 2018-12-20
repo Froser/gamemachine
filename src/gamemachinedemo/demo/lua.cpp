@@ -23,7 +23,7 @@ void Demo_Lua::init()
 		10,
 		top,
 		600,
-		500,
+		450,
 		false,
 		true
 	));
@@ -35,7 +35,7 @@ void Demo_Lua::init()
 		widget,
 		L"运行",
 		10,
-		top += 520,
+		top += 470,
 		250,
 		30,
 		false
@@ -49,7 +49,7 @@ void Demo_Lua::init()
 		L"",
 		GMVec4(1, 1, 1, 1),
 		10,
-		top += 40,
+		top += 90,
 		250,
 		30,
 		false

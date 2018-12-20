@@ -58,7 +58,7 @@ public:
 	virtual bool isWindowActivate() override;
 	virtual void setWindowCapture(bool capture) override;
 	virtual void showWindow() override;
-	virtual GMWindowHandle create(const GMWindowDesc& wndAttrs) override;
+	virtual GMWindowHandle create(const GMWindowDesc& desc) override;
 	virtual GMWindowHandle getWindowHandle() const override { D(d); return d->handle; }
 	virtual bool addWidget(GMWidget* widget) override;
 	virtual void setHandler(AUTORELEASE IGameHandler* handler) override;
