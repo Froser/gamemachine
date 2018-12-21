@@ -72,6 +72,13 @@ namespace
 		return GMReturnValues();
 	}
 
+	GM_LUA_META_FUNCTION_IMPL(startGameMachine, L)
+	{
+		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".startGameMachine");
+		GM.startGameMachine();
+		return GMReturnValues();
+	}
+
 	// {{END META FUNCTION}}
 
 	GMLuaReg g_meta[] = {
@@ -79,6 +86,7 @@ namespace
 		GM_LUA_DECLARATIONS(exit),
 		GM_LUA_DECLARATIONS(getRunningStates),
 		GM_LUA_DECLARATIONS(addWindow),
+		GM_LUA_DECLARATIONS(startGameMachine),
 		// {{END META DECLARATIONS}}
 		{ 0, 0 }
 	};

@@ -219,6 +219,7 @@ private:
 	void loadLibrary();
 	GMLuaResult pcall(const char* functionName, const std::initializer_list<GMVariant>& args, GMint32 nRet);
 	void setTable(const char* key, const GMObjectMember& value);
+	void setMetatable(const GMObject& obj);
 };
 
 #undef L

@@ -11,6 +11,7 @@ namespace luaapi
 		IWindow* window = nullptr;
 
 		GMString __name = "GMWindowProxy";
+		GM_LUA_META_FUNCTION(__index);
 		GM_LUA_META_FUNCTION(__gc);
 		GM_LUA_META_FUNCTION(create);
 		GM_LUA_META_FUNCTION(centerWindow);
@@ -45,6 +46,21 @@ namespace luaapi
 			return !!d->window;
 		}
 
+		void detach()
+		{
+			D(d);
+			d->window = nullptr;
+		}
+
+		void release()
+		{
+			D(d);
+			if (d->window)
+			{
+				GM_delete(d->window);
+				detach();
+			}
+		}
 	};
 }
 

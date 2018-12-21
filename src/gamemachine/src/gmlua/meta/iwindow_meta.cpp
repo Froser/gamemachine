@@ -60,6 +60,10 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(GMWindowProxy, __gc, L)
 	/************************************************************************/
 	static const GMString s_invoker(L"__gc");
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
+	GMWindowProxy window;
+	GMArgumentHelper::popArgumentAsObject(L, window, s_invoker); //self
+	if (window)
+		window.release();
 	return GMReturnValues();
 }
 

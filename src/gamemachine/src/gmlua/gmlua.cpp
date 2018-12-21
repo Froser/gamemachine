@@ -286,6 +286,7 @@ void GMLua::pushTable(const GMObject& obj)
 	D(d);
 	GM_CHECK_LUA_STACK_BALANCE(1);
 	lua_newtable(L);
+	auto tableId = lua_gettop(L);
 
 	auto meta = obj.meta();
 	GM_ASSERT(meta);
@@ -294,6 +295,43 @@ void GMLua::pushTable(const GMObject& obj)
 		// 不将'__'开头的函数放入普通表
 		if (!member.first.startsWith(L"__") || member.second.type != GMMetaMemberType::Function)
 			setTable(member.first.toStdString().c_str(), member.second);
+	}
+
+	setMetatable(obj);
+}
+
+void GMLua::setMetatable(const GMObject& obj)
+{
+	D(d);
+	GM_CHECK_LUA_STACK_BALANCE(0);
+	auto tableIdx = lua_gettop(L);
+
+	static const GMString s_metatableNameKw = L"__name";
+	static const GMString s_metaStart = L"__";
+	GMString metatableName;
+	auto meta = obj.meta();
+	GM_ASSERT(meta);
+	for (const auto& member : *meta)
+	{
+		if (member.first == s_metatableNameKw)
+			metatableName = *static_cast<GMString*>(member.second.ptr);
+	}
+
+	if (!metatableName.isEmpty())
+	{
+		// 存在meta数据
+		luaL_newmetatable(L, metatableName.toStdString().c_str());
+		for (const auto& member : *meta)
+		{
+			if (member.first.startsWith(s_metaStart) && member.second.type == GMMetaMemberType::Function)
+			{
+				std::string name = member.first.toStdString();
+				lua_pushstring(L, name.c_str());
+				lua_pushcfunction(L, static_cast<GMLuaCFunction>(member.second.ptr));
+				lua_rawset(L, -3);
+			}
+		}
+		lua_setmetatable(L, tableIdx);
 	}
 }
 
