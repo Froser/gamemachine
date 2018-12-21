@@ -16,11 +16,11 @@ private:					\
 
 struct GMStringPrivate
 {
+	std::wstring data;
 	mutable bool rehash = true;
 	mutable GMsize_t hash = 0;
 	mutable std::string stdstringCache;
 	mutable bool stdstringDirty = true;
-	std::wstring data;
 };
 
 class GMString;

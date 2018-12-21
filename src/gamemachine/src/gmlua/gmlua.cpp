@@ -340,39 +340,48 @@ bool GMLua::popTable(GMObject& obj, GMint32 index)
 					*(static_cast<GMint32*>(member.second.ptr)) = lua_tointeger(L, -1);
 					break;
 				case GMMetaMemberType::Vector2:
-					{
-						GMVec2& v = *static_cast<GMVec2*>(member.second.ptr);
-						if (!popVector(v))
-							return false;
-					}
+				{
+					GMVec2& v = *static_cast<GMVec2*>(member.second.ptr);
+					if (!popVector(v))
+						return false;
 					break;
+				}
 				case GMMetaMemberType::Vector3:
-					{
-						GMVec3& v = *static_cast<GMVec3*>(member.second.ptr);
-						if (!popVector(v))
-							return false;
-					}
+				{
+					GMVec3& v = *static_cast<GMVec3*>(member.second.ptr);
+					if (!popVector(v))
+						return false;
 					break;
+				}
 				case GMMetaMemberType::Vector4:
-					{
-						GMVec4& v = *static_cast<GMVec4*>(member.second.ptr);
-						if (!popVector(v))
-							return false;
-					}
+				{
+					GMVec4& v = *static_cast<GMVec4*>(member.second.ptr);
+					if (!popVector(v))
+						return false;
 					break;
+				}
 				case GMMetaMemberType::Matrix4x4:
-					{
-						GMMat4& mat = *static_cast<GMMat4*>(member.second.ptr);
-						if (!popMatrix(mat))
-							return false;
-					}
+				{
+					GMMat4& mat = *static_cast<GMMat4*>(member.second.ptr);
+					if (!popMatrix(mat))
+						return false;
 					break;
+				}
 				case GMMetaMemberType::Object:
-					{
-						GMObject* obj = static_cast<GMObject*>(member.second.ptr);
-						if (!popTable(*obj))
-							return false;
-					}
+				{
+					GMObject* obj = static_cast<GMObject*>(member.second.ptr);
+					if (!popTable(*obj))
+						return false;
+					break;
+				}
+				case GMMetaMemberType::Pointer:
+				{
+					GM_STATIC_ASSERT_SIZE(GMsize_t, sizeof(void*));
+					lua_Integer address = lua_tointeger(L, -1);
+					*(static_cast<GMsize_t*>(member.second.ptr)) = address;
+					break;
+				}
+				case GMMetaMemberType::Function:
 					break;
 				default:
 					GM_ASSERT(false);
@@ -467,6 +476,11 @@ void GMLua::push(const GMVariant& var)
 	{
 		pushTable(*var.toObject());
 	}
+	else if (var.isPointer())
+	{
+		GM_STATIC_ASSERT(sizeof(lua_Integer) >= sizeof(void*), "Pointer size incompatible.");
+		lua_pushinteger(L, (lua_Integer)var.toPointer());
+	}
 	else
 	{
 		gm_error(gm_dbg_wrap("GMLua (push): variant type not supported"));
@@ -492,45 +506,53 @@ void GMLua::setTable(const char* key, const GMObjectMember& value)
 		lua_pushboolean(L, *static_cast<bool*>(value.ptr));
 		break;
 	case GMMetaMemberType::String:
-		{
-			std::string s = (static_cast<GMString*>(value.ptr))->toStdString();
-			lua_pushstring(L, s.c_str());
-			break;
-		}
+	{
+		std::string s = (static_cast<GMString*>(value.ptr))->toStdString();
+		lua_pushstring(L, s.c_str());
+		break;
+	}
 	case GMMetaMemberType::Vector2:
-		{
-			GMVec2& vec2 = *static_cast<GMVec2*>(value.ptr);
-			pushVector(vec2);
-			GM_ASSERT(lua_istable(L, -1));
-			break;
-		}
+	{
+		GMVec2& vec2 = *static_cast<GMVec2*>(value.ptr);
+		pushVector(vec2);
+		GM_ASSERT(lua_istable(L, -1));
+		break;
+	}
 	case GMMetaMemberType::Vector3:
-		{
-			GMVec3& vec3 = *static_cast<GMVec3*>(value.ptr);
-			pushVector(vec3);
-			GM_ASSERT(lua_istable(L, -1));
-			break;
-		}
+	{
+		GMVec3& vec3 = *static_cast<GMVec3*>(value.ptr);
+		pushVector(vec3);
+		GM_ASSERT(lua_istable(L, -1));
+		break;
+	}
 	case GMMetaMemberType::Vector4:
-		{
-			GMVec4& vec4 = *static_cast<GMVec4*>(value.ptr);
-			pushVector(vec4);
-			GM_ASSERT(lua_istable(L, -1));
-			break;
-		}
+	{
+		GMVec4& vec4 = *static_cast<GMVec4*>(value.ptr);
+		pushVector(vec4);
+		GM_ASSERT(lua_istable(L, -1));
+		break;
+	}
 	case GMMetaMemberType::Matrix4x4:
-		{
-			GMMat4& mat= *static_cast<GMMat4*>(value.ptr);
-			pushMatrix(mat);
-			GM_ASSERT(lua_istable(L, -1));
-			break;
-		}
+	{
+		GMMat4& mat = *static_cast<GMMat4*>(value.ptr);
+		pushMatrix(mat);
+		GM_ASSERT(lua_istable(L, -1));
+		break;
+	}
 	case GMMetaMemberType::Object:
 		pushTable(*static_cast<GMObject*>(value.ptr));
 		break;
 	case GMMetaMemberType::Function:
 		lua_pushcfunction(L, static_cast<GMLuaCFunction>(value.ptr));
 		break;
+	case GMMetaMemberType::Pointer:
+	{
+		GM_STATIC_ASSERT(sizeof(lua_Integer) >= sizeof(void*), "Pointer size incompatible.");
+		GM_STATIC_ASSERT_SIZE(GMsize_t, sizeof(void*));
+		lua_Integer address = lua_tointeger(L, -1);
+		lua_pushinteger(L, *static_cast<GMsize_t*>(value.ptr));
+		break;
+	}
 	default:
 		GM_ASSERT(false);
 		break;

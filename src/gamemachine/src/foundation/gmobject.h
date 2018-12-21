@@ -180,6 +180,7 @@ enum class GMMetaMemberType
 	String,
 	Boolean,
 	Object,
+	Pointer,
 	Function,
 };
 
@@ -250,6 +251,12 @@ template <>
 struct GMMetaMemberTypeGetter<GMObject*>
 {
 	enum { Type = (GMint32) GMMetaMemberType::Object };
+};
+
+template <typename T>
+struct GMMetaMemberTypeGetter<T*>
+{
+	enum { Type = (GMint32)GMMetaMemberType::Pointer };
 };
 
 // 信号目标，表示一个GMObject被多少信号连接

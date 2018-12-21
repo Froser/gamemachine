@@ -22,6 +22,9 @@ namespace luaapi
 
 	protected:
 		virtual bool registerMeta() override;
+
+	public:
+		void create(const GMWindowDesc& desc);
 	};
 
 	class IWindow_Meta : public GMLuaFunctionRegister

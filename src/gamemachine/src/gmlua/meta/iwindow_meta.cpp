@@ -7,28 +7,6 @@
 
 using namespace luaapi;
 
-//////////////////////////////////////////////////////////////////////////
-GMWindowProxy::GMWindowProxy(IWindow* window)
-{
-	D(d);
-	d->window = window;
-}
-
-bool GMWindowProxy::registerMeta()
-{
-	D(d);
-	GM_META_FUNCTION(create);
-	return true;
-}
-
-GMLuaFunctionReturn GM_PRIVATE_NAME(GMWindowProxy)::create(GMLuaCoreState* L)
-{
-	static const GMString s_invoker(L".create");
-	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".create");
-	return GMReturnValues();
-}
-//////////////////////////////////////////////////////////////////////////
-
 namespace
 {
 	struct GMWindowDescEx : public GMWindowDesc
@@ -39,6 +17,14 @@ namespace
 	class GMWindowDescProxy : public GMObject
 	{
 		GM_DECLARE_PRIVATE_FROM_STRUCT(GMWindowDescProxy, GMWindowDescEx)
+
+	public:
+		const GMWindowDesc& get()
+		{
+			D(d);
+			GM_ASSERT(false);
+			return *d;
+		}
 
 	protected:
 		virtual bool registerMeta() override
@@ -75,3 +61,41 @@ int IWindow_Meta::regCallback(GMLuaCoreState *L)
 	newLibrary(L, g_meta);
 	return 1;
 }
+
+//////////////////////////////////////////////////////////////////////////
+GMWindowProxy::GMWindowProxy(IWindow* window)
+{
+	D(d);
+	d->window = window;
+}
+
+bool GMWindowProxy::registerMeta()
+{
+	D(d);
+	GM_META(window);
+	GM_META_FUNCTION(create);
+	return true;
+}
+
+void GMWindowProxy::create(const GMWindowDesc& desc)
+{
+	D(d);
+	if (d->window)
+		d->window->create(desc);
+}
+
+GMLuaFunctionReturn GM_PRIVATE_NAME(GMWindowProxy)::create(GMLuaCoreState* L)
+{
+	/************************************************************************/
+	/* create([self], GMWindowDesc)                                         */
+	/************************************************************************/
+	static const GMString s_invoker(L".create");
+	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".create");
+	GMWindowProxy window(nullptr);
+	GMWindowDescProxy desc;
+	GMArgumentHelper::popArgumentAsObject(L, desc, s_invoker); //GMWindowDesc
+	GMArgumentHelper::popArgumentAsObject(L, window, s_invoker); //self
+	window.create(desc.get());
+	return GMReturnValues();
+}
+//////////////////////////////////////////////////////////////////////////
