@@ -246,7 +246,7 @@ GMString& GMString::append(const GMwchar* c)
 	return *this;
 }
 
-bool GMString::startsWith(const GMString& string)
+bool GMString::startsWith(const GMString& string) const
 {
 	D_STR(d);
 	if (length() == 0)
@@ -256,7 +256,7 @@ bool GMString::startsWith(const GMString& string)
 	return memEquals(d->data.data(), string.toStdWString().data(), string.length());
 }
 
-bool GMString::endsWith(const GMString& string)
+bool GMString::endsWith(const GMString& string) const
 {
 	D_STR(d);
 	if (length() == 0)

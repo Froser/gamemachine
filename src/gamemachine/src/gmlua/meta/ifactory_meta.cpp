@@ -11,7 +11,7 @@ using namespace gm::luaapi;
 namespace
 {
 	// {{BEGIN META FUNCTION}}
-	LUA_API GMLuaFunctionReturn createWindow(GMLuaCoreState* L)
+	GM_LUA_META_FUNCTION_IMPL(createWindow, L)
 	{
 		static const GMString s_invoker(L".createWindow");
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".createWindow");
@@ -19,7 +19,6 @@ namespace
 		GM.getFactory()->createWindow(0, nullptr, &window);
 		return GMReturnValues(L, GMWindowProxy(window));
 	}
-
 	// {{END META FUNCTION}}
 
 	GMLuaReg g_meta[] = {

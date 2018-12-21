@@ -210,8 +210,7 @@ using GMAtomic = std::atomic<T>;
 #define IN
 
 // 表示一个方法是个元方法
-#define GM_META_METHOD public:
-#define GM_META_METHOD_IMPL static
+#define GM_META_METHOD static
 
 // 用于枚举的宏
 #define GM_FOREACH_ENUM(var, start, end) for (auto var = start; var < end; var = (decltype(var))(((gm::GMint32)var)+1) )

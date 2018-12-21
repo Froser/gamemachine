@@ -194,7 +194,7 @@ struct GMWindowDesc
 	GMString windowName = L"Default GameMachine Main Window";
 	GMDWord dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME;
 	GMDWord dwExStyle = NULL;
-	RECT rc = { 0, 0, 1024, 768 };
+	GMRectF rc = { 0, 0, 1024, 768 };
 	GMint32 samples = 8;
 	GMInstance instance;
 };
@@ -210,7 +210,7 @@ struct GMWindowDesc
 	GMString windowName = L"Default GameMachine Main Window";
 	GMulong dwStyle = 0;
 	GMulong dwExStyle = 0;
-	GMRect rc = { 0, 0, 1024, 768 };
+	GMRectF rc = { 0, 0, 1024, 768 };
 	GMint32 samples = 8;
 	GMInstance instance;
 };
@@ -611,25 +611,25 @@ enum class GMCursorType
 typedef GMLResult (GM_SYSTEM_CALLBACK *GMWindowProcHandler)(GMWindowHandle hWnd, GMuint32 uMsg, GMWParam wParam, GMLParam lParam);
 GM_INTERFACE_FROM(IWindow, IQueriable)
 {
-	GM_META_METHOD virtual IInput* getInputMananger() = 0;
-	GM_META_METHOD virtual void msgProc(const GMMessage& message) = 0;
-	GM_META_METHOD virtual GMWindowHandle create(const GMWindowDesc& desc) = 0;
-	GM_META_METHOD virtual void centerWindow() = 0;
-	GM_META_METHOD virtual void showWindow() = 0;
-	GM_META_METHOD virtual GMRect getWindowRect() = 0;
-	GM_META_METHOD virtual GMRect getRenderRect() = 0;
-	GM_META_METHOD virtual GMRect getFramebufferRect() = 0;
-	GM_META_METHOD virtual GMWindowHandle getWindowHandle() const = 0;
-	GM_META_METHOD virtual bool isWindowActivate() = 0;
-	GM_META_METHOD virtual void setWindowCapture(bool capture) = 0;
-	GM_META_METHOD virtual bool addWidget(GMWidget* widget) = 0;
-	GM_META_METHOD virtual void setHandler(AUTORELEASE IGameHandler* handler) = 0;
-	GM_META_METHOD virtual IGameHandler* getHandler() = 0;
-	GM_META_METHOD virtual const GMWindowStates& getWindowStates() = 0;
-	GM_META_METHOD virtual IGraphicEngine* getGraphicEngine() = 0;
-	GM_META_METHOD virtual const IRenderContext* getContext() = 0;
-	GM_META_METHOD virtual void setCursor(GMCursorType type) = 0;
-	GM_META_METHOD virtual GMWindowProcHandler getProcHandler() = 0;
+	virtual IInput* getInputMananger() = 0;
+	virtual void msgProc(const GMMessage& message) = 0;
+	virtual GMWindowHandle create(const GMWindowDesc& desc) = 0;
+	virtual void centerWindow() = 0;
+	virtual void showWindow() = 0;
+	virtual GMRect getWindowRect() = 0;
+	virtual GMRect getRenderRect() = 0;
+	virtual GMRect getFramebufferRect() = 0;
+	virtual GMWindowHandle getWindowHandle() const = 0;
+	virtual bool isWindowActivate() = 0;
+	virtual void setWindowCapture(bool capture) = 0;
+	virtual bool addWidget(GMWidget* widget) = 0;
+	virtual void setHandler(AUTORELEASE IGameHandler* handler) = 0;
+	virtual IGameHandler* getHandler() = 0;
+	virtual const GMWindowStates& getWindowStates() = 0;
+	virtual IGraphicEngine* getGraphicEngine() = 0;
+	virtual const IRenderContext* getContext() = 0;
+	virtual void setCursor(GMCursorType type) = 0;
+	virtual GMWindowProcHandler getProcHandler() = 0;
 };
 
 GM_INTERFACE(IFactory)

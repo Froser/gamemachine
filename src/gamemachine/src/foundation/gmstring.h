@@ -291,9 +291,9 @@ public:
 	*/
 	GMString& append(const char* c);
 
-	bool startsWith(const GMString& string);
+	bool startsWith(const GMString& string) const;
 
-	bool endsWith(const GMString& string);
+	bool endsWith(const GMString& string) const;
 
 	//! 清除一个字符串中的所有字符。
 	void clear()

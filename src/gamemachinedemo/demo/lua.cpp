@@ -49,13 +49,13 @@ void Demo_Lua::init()
 		L"",
 		GMVec4(1, 1, 1, 1),
 		10,
-		top += 90,
+		top += 40,
 		250,
 		30,
 		false
 	));
 
-	widget->setSize(800, top);
+	widget->setSize(800, top + 50);
 }
 
 void Demo_Lua::event(gm::GameMachineHandlerEvent evt)

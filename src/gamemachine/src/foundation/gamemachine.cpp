@@ -110,8 +110,9 @@ void GameMachine::addWindow(AUTORELEASE IWindow* window)
 	D(d);
 	if (d->inited)
 	{
-		GM_ASSERT(false);
-		gm_error(gm_dbg_wrap("Please init GameMachine after addWindow."));
+		auto handler = window->getHandler();
+		if (handler)
+			handler->init(window->getContext());
 	}
 
 	d->windows.insert(window);

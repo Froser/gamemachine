@@ -3,26 +3,20 @@
 #include <gamemachine.h>
 #include <gmlua.h>
 
-#define NAME "GMWindow"
-
 using namespace luaapi;
+
+#define NAME "GMWindow"
 
 namespace
 {
-	struct GMWindowDescEx : public GMWindowDesc
-	{
-		GMRectF rc;
-	};
-
 	class GMWindowDescProxy : public GMObject
 	{
-		GM_DECLARE_PRIVATE_FROM_STRUCT(GMWindowDescProxy, GMWindowDescEx)
+		GM_DECLARE_PRIVATE_FROM_STRUCT(GMWindowDescProxy, GMWindowDesc)
 
 	public:
 		const GMWindowDesc& get()
 		{
 			D(d);
-			GM_ASSERT(false);
 			return *d;
 		}
 
@@ -38,28 +32,6 @@ namespace
 			return true;
 		}
 	};
-
-	// {{BEGIN META FUNCTION}}
-	// {{END META FUNCTION}}
-
-	GMLuaReg g_meta[] = {
-		// {{BEGIN META DECLARATIONS}}
-		// {{END META DECLARATIONS}}
-		{ 0, 0 }
-	};
-}
-
-const char* IWindow_Meta::Name = NAME;
-
-void IWindow_Meta::registerFunctions(GMLua* L)
-{
-	setRegisterFunction(L, Name, regCallback, true);
-}
-
-int IWindow_Meta::regCallback(GMLuaCoreState *L)
-{
-	newLibrary(L, g_meta);
-	return 1;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -73,29 +45,65 @@ bool GMWindowProxy::registerMeta()
 {
 	D(d);
 	GM_META(window);
+	GM_META(__name);
+	GM_META_FUNCTION(__gc);
 	GM_META_FUNCTION(create);
+	GM_META_FUNCTION(centerWindow);
+	GM_META_FUNCTION(showWindow);
 	return true;
 }
 
-void GMWindowProxy::create(const GMWindowDesc& desc)
+GM_LUA_META_FUNCTION_PROXY_IMPL(GMWindowProxy, __gc, L)
 {
-	D(d);
-	if (d->window)
-		d->window->create(desc);
+	/************************************************************************/
+	/* __gc([self])                                                         */
+	/************************************************************************/
+	static const GMString s_invoker(L"__gc");
+	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
+	return GMReturnValues();
 }
 
-GMLuaFunctionReturn GM_PRIVATE_NAME(GMWindowProxy)::create(GMLuaCoreState* L)
+GM_LUA_META_FUNCTION_PROXY_IMPL(GMWindowProxy, create, L)
 {
 	/************************************************************************/
 	/* create([self], GMWindowDesc)                                         */
 	/************************************************************************/
-	static const GMString s_invoker(L".create");
+	static const GMString s_invoker(L"create");
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".create");
-	GMWindowProxy window(nullptr);
+	GMWindowProxy window;
 	GMWindowDescProxy desc;
 	GMArgumentHelper::popArgumentAsObject(L, desc, s_invoker); //GMWindowDesc
 	GMArgumentHelper::popArgumentAsObject(L, window, s_invoker); //self
-	window.create(desc.get());
+	if (window)
+		window->create(desc.get());
+	return GMReturnValues();
+}
+
+GM_LUA_META_FUNCTION_PROXY_IMPL(GMWindowProxy, centerWindow, L)
+{
+	/************************************************************************/
+	/* centerWindow([self])                                                 */
+	/************************************************************************/
+	static const GMString s_invoker(L"centerWindow");
+	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".centerWindow");
+	GMWindowProxy window;
+	GMArgumentHelper::popArgumentAsObject(L, window, s_invoker); //self
+	if (window)
+		window->centerWindow();
+	return GMReturnValues();
+}
+
+GM_LUA_META_FUNCTION_PROXY_IMPL(GMWindowProxy, showWindow, L)
+{
+	/************************************************************************/
+	/* showWindow([self])                                                   */
+	/************************************************************************/
+	static const GMString s_invoker(L"showWindow");
+	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".showWindow");
+	GMWindowProxy window;
+	GMArgumentHelper::popArgumentAsObject(L, window, s_invoker); //self
+	if (window)
+		window->showWindow();
 	return GMReturnValues();
 }
 //////////////////////////////////////////////////////////////////////////

@@ -24,11 +24,11 @@ struct __PopGuard							\
 typedef luaL_Reg GMLuaReg;
 typedef lua_State GMLuaCoreState;
 typedef lua_CFunction GMLuaCFunction;
-typedef GMint32 GMLuaFunctionReturn;
 
 class GMLua;
 namespace luaapi
 {
+	typedef GMint32 GMFunctionReturn;
 	struct GMArgumentHelper;
 	struct GMReturnValues;
 }
@@ -223,5 +223,9 @@ private:
 
 #undef L
 #undef POP_GUARD
+
+#define GM_LUA_META_FUNCTION_IMPL(FuncName, L) gm::luaapi::GMFunctionReturn FuncName(GMLuaCoreState* L)
+#define GM_LUA_META_FUNCTION_PROXY_IMPL(Proxy, FuncName, L) gm::luaapi::GMFunctionReturn GM_PRIVATE_NAME(Proxy)::FuncName(GMLuaCoreState* L)
+#define GM_LUA_META_FUNCTION(FuncName) GM_META_METHOD gm::luaapi::GMFunctionReturn FuncName(GMLuaCoreState*);
 END_NS
 #endif

@@ -67,17 +67,22 @@ int main(int argc, char* argv[])
 #endif
 	}
 
-	gm::GMWindowDesc mainAttrs;
-	mainAttrs.instance = hInstance;
+	gm::GMGameMachineDesc desc;
+	desc.factory = factory;
+	desc.renderEnvironment = GetRenderEnv();
+	GM.init(desc);
+
+	gm::GMWindowDesc windowDesc;
+	windowDesc.instance = hInstance;
 
 #if GM_WINDOWS
-	mainAttrs.dwStyle = WS_OVERLAPPEDWINDOW | WS_SIZEBOX;
+	windowDesc.dwStyle = WS_OVERLAPPEDWINDOW | WS_SIZEBOX;
 #endif
 	//mainAttrs.samples = 1;
 
 	gm::IWindow* mainWindow = nullptr;
 	factory->createWindow(hInstance, nullptr, &mainWindow);
-	mainWindow->create(mainAttrs);
+	mainWindow->create(windowDesc);
 	mainWindow->centerWindow();
 	mainWindow->showWindow();
 	mainWindow->setHandler(new DemostrationEntrance(mainWindow));
@@ -93,12 +98,6 @@ int main(int argc, char* argv[])
 	mainWindow2->setHandler(new DemostrationEntrance(mainWindow2));
 	GM.addWindow(mainWindow2);
 	*/
-
-	gm::GMGameMachineDesc desc;
-	desc.factory = factory;
-	desc.renderEnvironment = GetRenderEnv();
-
-	GM.init(desc);
 
 	GM.startGameMachine();
 	return 0;

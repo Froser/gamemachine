@@ -286,11 +286,14 @@ void GMLua::pushTable(const GMObject& obj)
 	D(d);
 	GM_CHECK_LUA_STACK_BALANCE(1);
 	lua_newtable(L);
+
 	auto meta = obj.meta();
 	GM_ASSERT(meta);
 	for (const auto& member : *meta)
 	{
-		setTable(member.first.toStdString().c_str(), member.second);
+		// 不将'__'开头的函数放入普通表
+		if (!member.first.startsWith(L"__") || member.second.type != GMMetaMemberType::Function)
+			setTable(member.first.toStdString().c_str(), member.second);
 	}
 }
 

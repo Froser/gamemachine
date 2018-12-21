@@ -169,7 +169,7 @@ public:
 	  如当前窗口大小、上一帧执行时间等。
 	  \return 程序当前运行状态。
 	*/
-	GM_META_METHOD inline const GMGameMachineRunningStates& getRunningStates() const { D(d); return d->states; }
+	inline const GMGameMachineRunningStates& getRunningStates() const { D(d); return d->states; }
 
 	//! 获取程序当前的配置。
 	/*!
@@ -247,7 +247,7 @@ public:
 	bool renderFrame(IWindow* window = nullptr);
 
 	//! 退出程序。
-	GM_META_METHOD void exit();
+	void exit();
 
 private:
 	void initSystemInfo();

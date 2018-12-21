@@ -10,7 +10,11 @@ namespace luaapi
 	{
 		IWindow* window = nullptr;
 
-		GM_META_METHOD_IMPL GMLuaFunctionReturn create(GMLuaCoreState* L);
+		GMString __name = "GMWindowProxy";
+		GM_LUA_META_FUNCTION(__gc);
+		GM_LUA_META_FUNCTION(create);
+		GM_LUA_META_FUNCTION(centerWindow);
+		GM_LUA_META_FUNCTION(showWindow);
 	};
 
 	class GMWindowProxy : public GMObject
@@ -18,23 +22,29 @@ namespace luaapi
 		GM_DECLARE_PRIVATE(GMWindowProxy)
 
 	public:
-		GMWindowProxy(IWindow* window);
+		GMWindowProxy(IWindow* window = nullptr);
 
 	protected:
 		virtual bool registerMeta() override;
 
 	public:
-		void create(const GMWindowDesc& desc);
-	};
+		IWindow* get()
+		{
+			D(d);
+			return d->window;
+		}
 
-	class IWindow_Meta : public GMLuaFunctionRegister
-	{
-	public:
-		virtual void registerFunctions(GMLua* L) override;
+		IWindow* operator->()
+		{
+			return get();
+		}
 
-	private:
-		static int regCallback(GMLuaCoreState *L);
-		static const char* Name;
+		operator bool() const
+		{
+			D(d);
+			return !!d->window;
+		}
+
 	};
 }
 

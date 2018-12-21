@@ -3,6 +3,7 @@
 #include <gamemachine.h>
 #include <gmlua.h>
 #include "../gmlua_functions.h"
+#include "iwindow_meta.h"
 
 using namespace gm::luaapi;
 
@@ -47,26 +48,37 @@ namespace
 	};
 
 	// {{BEGIN META FUNCTION}}
-	LUA_API GMLuaFunctionReturn exit(GMLuaCoreState* L)
+	GM_LUA_META_FUNCTION_IMPL(exit, L)
 	{
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".exit");
 		GM.exit();
 		return GMReturnValues();
 	}
 
-	LUA_API GMLuaFunctionReturn getRunningStates(GMLuaCoreState* L)
+	GM_LUA_META_FUNCTION_IMPL(getRunningStates, L)
 	{
-		static GMGameMachineRunningStatesProxy proxy;
-		proxy = GMGameMachineRunningStatesProxy();
+		GMGameMachineRunningStatesProxy proxy;
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".getRunningStates");
 		return GMReturnValues (L, GMVariant(proxy));
 	}
+
+	GM_LUA_META_FUNCTION_IMPL(addWindow, L)
+	{
+		GMWindowProxy window;
+		static const GMString s_invoker = L"addWindow";
+		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".addWindow");
+		GMArgumentHelper::popArgumentAsObject(L, window, s_invoker);
+		GM.addWindow(window.get());
+		return GMReturnValues();
+	}
+
 	// {{END META FUNCTION}}
 
 	GMLuaReg g_meta[] = {
 		// {{BEGIN META DECLARATIONS}}
 		GM_LUA_DECLARATIONS(exit),
 		GM_LUA_DECLARATIONS(getRunningStates),
+		GM_LUA_DECLARATIONS(addWindow),
 		// {{END META DECLARATIONS}}
 		{ 0, 0 }
 	};

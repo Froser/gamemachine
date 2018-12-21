@@ -219,7 +219,8 @@ GMWindowHandle GMWindow::create(const GMWindowDesc& desc)
 	if (desc.createNewWindow)
 	{
 		// 在非全屏的时候才有效，计算出客户窗口（渲染窗口）大小
-		::AdjustWindowRectEx(&attrs.rc, attrs.dwStyle, FALSE, attrs.dwExStyle);
+		RECT rc = { (LONG) attrs.rc.x, (LONG) attrs.rc.y, (LONG) (attrs.rc.x + attrs.rc.width), (LONG) (attrs.rc.y + attrs.rc.height) };
+		::AdjustWindowRectEx(&rc, attrs.dwStyle, FALSE, attrs.dwExStyle);
 		const GMwchar* className = getWindowClassName();
 		registerClass(attrs, this, className);
 		hwnd = ::CreateWindowEx(
@@ -227,10 +228,10 @@ GMWindowHandle GMWindow::create(const GMWindowDesc& desc)
 			className,
 			attrs.windowName.toStdWString().c_str(),
 			attrs.dwStyle,
-			attrs.rc.left,
-			attrs.rc.top,
-			attrs.rc.right - attrs.rc.left,
-			attrs.rc.bottom - attrs.rc.top,
+			rc.left,
+			rc.top,
+			rc.right - rc.left,
+			rc.bottom - rc.top,
 			attrs.hwndParent,
 			NULL,
 			attrs.instance,
@@ -242,7 +243,7 @@ GMWindowHandle GMWindow::create(const GMWindowDesc& desc)
 		hwnd = attrs.existWindowHandle;
 		setWindowHandle(attrs.existWindowHandle, false);
 		const GMRect& rc = getRenderRect();
-		attrs.rc = { rc.x, rc.y, rc.x + rc.width, rc.y + rc.height };
+		attrs.rc = { (GMfloat) rc.x, (GMfloat) rc.y, (GMfloat) rc.width, (GMfloat) rc.height };
 	}
 
 	onWindowCreated(attrs);

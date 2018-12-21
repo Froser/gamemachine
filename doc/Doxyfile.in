@@ -2062,8 +2062,7 @@ PREDEFINED             = "GM_INTERFACE(name)=struct name : public gm::IVirtualFu
                          GM_PRIVATE_OBJECT= \
                          "BEGIN_NS=namespace gm {" \
                          END_NS=} \
-                         "GM_META_METHOD=public :" \
-                         "GM_META_METHOD_IMPL=static"
+                         GM_META_METHOD=static
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
