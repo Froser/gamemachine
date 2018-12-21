@@ -50,6 +50,7 @@ bool GMWindowProxy::registerMeta()
 	GM_META_FUNCTION(create);
 	GM_META_FUNCTION(centerWindow);
 	GM_META_FUNCTION(showWindow);
+	GM_META_FUNCTION(setHandler);
 	return true;
 }
 
@@ -108,6 +109,18 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(GMWindowProxy, showWindow, L)
 	GMArgumentHelper::popArgumentAsObject(L, window, s_invoker); //self
 	if (window)
 		window->showWindow();
+	return GMReturnValues();
+}
+
+GM_LUA_META_FUNCTION_PROXY_IMPL(GMWindowProxy, setHandler, L)
+{
+	/************************************************************************/
+	/* setHandler([self], IGameHandler)                                     */
+	/************************************************************************/
+	static const GMString s_invoker(L"setHandler");
+	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setHandler");
+	GMWindowProxy window;
+	GMArgumentHelper::popArgumentAsObject(L, window, s_invoker); //self
 	return GMReturnValues();
 }
 //////////////////////////////////////////////////////////////////////////

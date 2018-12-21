@@ -183,6 +183,8 @@ set(SOURCES
 		gmlua/meta/ifactory_meta.cpp
 		gmlua/meta/iwindow_meta.h
 		gmlua/meta/iwindow_meta.cpp
+		gmlua/meta/igamehandler_meta.h
+		gmlua/meta/igamehandler_meta.cpp
 
 		extensions/bsp/bsp_factory.h
 		extensions/bsp/bsp_factory.cpp

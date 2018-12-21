@@ -69,6 +69,7 @@ namespace
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".addWindow");
 		GMArgumentHelper::popArgumentAsObject(L, window, s_invoker);
 		GM.addWindow(window.get());
+		window.detach();
 		return GMReturnValues();
 	}
 
