@@ -185,6 +185,12 @@ set(SOURCES
 		gmlua/meta/iwindow_meta.cpp
 		gmlua/meta/igamehandler_meta.h
 		gmlua/meta/igamehandler_meta.cpp
+		gmlua/meta/irendercontext_meta.h
+		gmlua/meta/irendercontext_meta.cpp
+		gmlua/meta/gmgamepackage_meta.h
+		gmlua/meta/gmgamepackage_meta.cpp
+		gmlua/meta/igraphicengine_meta.h
+		gmlua/meta/igraphicengine_meta.cpp
 
 		extensions/bsp/bsp_factory.h
 		extensions/bsp/bsp_factory.cpp

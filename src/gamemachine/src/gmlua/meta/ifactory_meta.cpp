@@ -17,7 +17,7 @@ namespace
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".createWindow");
 		IWindow* window = nullptr;
 		GM.getFactory()->createWindow(0, nullptr, &window);
-		return GMReturnValues(L, GMWindowProxy(window));
+		return GMReturnValues(L, IWindowProxy(window));
 	}
 	// {{END META FUNCTION}}
 

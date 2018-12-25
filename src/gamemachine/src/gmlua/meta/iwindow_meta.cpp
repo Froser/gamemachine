@@ -2,10 +2,11 @@
 #include "iwindow_meta.h"
 #include <gamemachine.h>
 #include <gmlua.h>
+#include "igamehandler_meta.h"
 
 using namespace luaapi;
 
-#define NAME "GMWindow"
+#define NAME "IWindow"
 
 namespace
 {
@@ -35,13 +36,13 @@ namespace
 }
 
 //////////////////////////////////////////////////////////////////////////
-GMWindowProxy::GMWindowProxy(IWindow* window)
+IWindowProxy::IWindowProxy(IWindow* window)
 {
 	D(d);
 	d->window = window;
 }
 
-bool GMWindowProxy::registerMeta()
+bool IWindowProxy::registerMeta()
 {
 	D(d);
 	GM_META(window);
@@ -54,73 +55,81 @@ bool GMWindowProxy::registerMeta()
 	return true;
 }
 
-GM_LUA_META_FUNCTION_PROXY_IMPL(GMWindowProxy, __gc, L)
+/*
+ * __gc([self], GMWindowDesc)
+ */
+GM_LUA_META_FUNCTION_PROXY_IMPL(IWindowProxy, __gc, L)
 {
-	/************************************************************************/
-	/* __gc([self])                                                         */
-	/************************************************************************/
 	static const GMString s_invoker(L"__gc");
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
-	GMWindowProxy window;
-	GMArgumentHelper::popArgumentAsObject(L, window, s_invoker); //self
-	if (window)
-		window.release();
+	IWindowProxy self;
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+		self.release();
 	return GMReturnValues();
 }
 
-GM_LUA_META_FUNCTION_PROXY_IMPL(GMWindowProxy, create, L)
+/*
+ * create([self], GMWindowDesc)
+ */
+GM_LUA_META_FUNCTION_PROXY_IMPL(IWindowProxy, create, L)
 {
-	/************************************************************************/
-	/* create([self], GMWindowDesc)                                         */
-	/************************************************************************/
 	static const GMString s_invoker(L"create");
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".create");
-	GMWindowProxy window;
+	IWindowProxy self;
 	GMWindowDescProxy desc;
 	GMArgumentHelper::popArgumentAsObject(L, desc, s_invoker); //GMWindowDesc
-	GMArgumentHelper::popArgumentAsObject(L, window, s_invoker); //self
-	if (window)
-		window->create(desc.get());
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+		self->create(desc.get());
 	return GMReturnValues();
 }
 
-GM_LUA_META_FUNCTION_PROXY_IMPL(GMWindowProxy, centerWindow, L)
+/*
+ * centerWindow([self])
+ */
+GM_LUA_META_FUNCTION_PROXY_IMPL(IWindowProxy, centerWindow, L)
 {
-	/************************************************************************/
-	/* centerWindow([self])                                                 */
-	/************************************************************************/
 	static const GMString s_invoker(L"centerWindow");
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".centerWindow");
-	GMWindowProxy window;
-	GMArgumentHelper::popArgumentAsObject(L, window, s_invoker); //self
-	if (window)
-		window->centerWindow();
+	IWindowProxy self;
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+		self->centerWindow();
 	return GMReturnValues();
 }
 
-GM_LUA_META_FUNCTION_PROXY_IMPL(GMWindowProxy, showWindow, L)
+/*
+ * showWindow([self])
+ */
+GM_LUA_META_FUNCTION_PROXY_IMPL(IWindowProxy, showWindow, L)
 {
-	/************************************************************************/
-	/* showWindow([self])                                                   */
-	/************************************************************************/
 	static const GMString s_invoker(L"showWindow");
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".showWindow");
-	GMWindowProxy window;
-	GMArgumentHelper::popArgumentAsObject(L, window, s_invoker); //self
-	if (window)
-		window->showWindow();
+	IWindowProxy self;
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+		self->showWindow();
 	return GMReturnValues();
 }
 
-GM_LUA_META_FUNCTION_PROXY_IMPL(GMWindowProxy, setHandler, L)
+/*
+ * setHandler([self], IGameHandler)
+ */
+GM_LUA_META_FUNCTION_PROXY_IMPL(IWindowProxy, setHandler, L)
 {
-	/************************************************************************/
-	/* setHandler([self], IGameHandler)                                     */
-	/************************************************************************/
 	static const GMString s_invoker(L"setHandler");
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setHandler");
-	GMWindowProxy window;
-	GMArgumentHelper::popArgumentAsObject(L, window, s_invoker); //self
+	IWindowProxy self;
+	IGameHandlerProxy gameHandler(L);
+	GMArgumentHelper::popArgumentAsObject(L, gameHandler, s_invoker); //IGameHandler
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+	{
+		gameHandler.init();
+		self->setHandler(gameHandler.get());
+		self->getGraphicEngine()->setShaderLoadCallback(gameHandler.getShaderLoadCallback());
+	}
 	return GMReturnValues();
 }
 //////////////////////////////////////////////////////////////////////////

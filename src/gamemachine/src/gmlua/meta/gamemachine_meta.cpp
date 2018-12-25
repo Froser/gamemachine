@@ -4,6 +4,7 @@
 #include <gmlua.h>
 #include "../gmlua_functions.h"
 #include "iwindow_meta.h"
+#include "gmgamepackage_meta.h"
 
 using namespace gm::luaapi;
 
@@ -62,9 +63,16 @@ namespace
 		return GMReturnValues (L, GMVariant(proxy));
 	}
 
+	GM_LUA_META_FUNCTION_IMPL(getGamePackageManager, L)
+	{
+		GMGamePackageProxy proxy(GM.getGamePackageManager());
+		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".getGamePackageManager");
+		return GMReturnValues(L, GMVariant(proxy));
+	}
+
 	GM_LUA_META_FUNCTION_IMPL(addWindow, L)
 	{
-		GMWindowProxy window;
+		IWindowProxy window;
 		static const GMString s_invoker = L"addWindow";
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".addWindow");
 		GMArgumentHelper::popArgumentAsObject(L, window, s_invoker);
@@ -86,6 +94,7 @@ namespace
 		// {{BEGIN META DECLARATIONS}}
 		GM_LUA_DECLARATIONS(exit),
 		GM_LUA_DECLARATIONS(getRunningStates),
+		GM_LUA_DECLARATIONS(getGamePackageManager),
 		GM_LUA_DECLARATIONS(addWindow),
 		GM_LUA_DECLARATIONS(startGameMachine),
 		// {{END META DECLARATIONS}}

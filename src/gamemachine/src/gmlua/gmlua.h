@@ -24,6 +24,7 @@ struct __PopGuard							\
 typedef luaL_Reg GMLuaReg;
 typedef lua_State GMLuaCoreState;
 typedef lua_CFunction GMLuaCFunction;
+typedef int GMLuaReference;
 
 class GMLua;
 namespace luaapi
@@ -157,7 +158,7 @@ public:
 	*/
 	bool getFromGlobal(const char* name, GMObject& obj);
 
-	GMLuaResult protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args, GMVariant* returns = nullptr, GMint32 nRet = 0);
+	GMLuaResult protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args = {}, GMVariant* returns = nullptr, GMint32 nRet = 0);
 
 // 针对堆栈的操作，提供给友元
 private:
@@ -228,5 +229,41 @@ private:
 #define GM_LUA_META_FUNCTION_IMPL(FuncName, L) gm::luaapi::GMFunctionReturn FuncName(GMLuaCoreState* L)
 #define GM_LUA_META_FUNCTION_PROXY_IMPL(Proxy, FuncName, L) gm::luaapi::GMFunctionReturn GM_PRIVATE_NAME(Proxy)::FuncName(GMLuaCoreState* L)
 #define GM_LUA_META_FUNCTION(FuncName) GM_META_METHOD gm::luaapi::GMFunctionReturn FuncName(GMLuaCoreState*);
+#define GM_LUA_META_PROXY_FUNCTIONS(type, handler) \
+	public:											\
+		typedef type RealType;						\
+		RealType* get()								\
+		{											\
+			D(d);									\
+			return d->handler;						\
+		}											\
+													\
+		RealType* operator->()						\
+		{											\
+			return get();							\
+		}											\
+													\
+		operator bool() const						\
+		{											\
+			D(d);									\
+			return !!d->handler;					\
+		}											\
+													\
+		void detach()								\
+		{											\
+			D(d);									\
+			d->handler = nullptr;					\
+		}											\
+													\
+		void release()								\
+		{											\
+			D(d);									\
+			if (d->handler)							\
+			{										\
+				GM_delete(d->handler);				\
+				detach();							\
+			}										\
+		}
+
 END_NS
 #endif

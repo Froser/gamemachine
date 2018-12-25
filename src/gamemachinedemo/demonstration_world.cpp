@@ -669,7 +669,6 @@ void DemonstrationWorld::resetCameraAndLights()
 void DemostrationEntrance::init(const gm::IRenderContext* context)
 {
 	D(d);
-	auto rc = context->getWindow()->getRenderRect();
 	gm::GMGamePackage* pk = GM.getGamePackageManager();
 
 #if GM_WINDOWS

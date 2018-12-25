@@ -24,6 +24,7 @@ struct __PopGuard							\
 	if (lr.state != GMLuaStates::Ok)		\
 	{										\
 		lr.message = lua_tostring(L, -1);	\
+		lua_pop(L, 1);						\
 		return lr;							\
 	}
 
@@ -242,16 +243,25 @@ bool GMLua::getFromGlobal(const char* name, GMObject& obj)
 GMLuaResult GMLua::protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args, GMVariant* returns, GMint32 nRet)
 {
 	D(d);
-	GM_CHECK_LUA_STACK_BALANCE(nRet);
 	GMLuaResult lr = pcall(functionName, args, nRet);
-	CHECK(lr);
-	for (GMint32 i = 0; i < nRet; i++)
+
+	GM_CHECK_LUA_STACK_BALANCE(nRet);
+	if (returns)
 	{
-		if (returns[i].isObject())
-			popTable(*returns[i].toObject());
-		else
-			returns[i] = getTop();
+		for (GMint32 i = 0; i < nRet; i++)
+		{
+			if (returns[i].isObject())
+				popTable(*returns[i].toObject());
+			else
+				returns[i] = getTop();
+		}
 	}
+
+	if (lr.state != GMLuaStates::Ok)
+	{
+		gm_warning(gm_dbg_wrap("{0}"), lr.message);
+	}
+
 	return lr;
 }
 
@@ -269,8 +279,14 @@ void GMLua::loadLibrary()
 GMLuaResult GMLua::pcall(const char* functionName, const std::initializer_list<GMVariant>& args, GMint32 nRet)
 {
 	D(d);
-	GM_CHECK_LUA_STACK_BALANCE(nRet);
-	lua_getglobal(L, functionName);
+	auto offset = nRet;
+	if (functionName)
+		lua_getglobal(L, functionName);
+	else
+		offset--; // 没有functionName，说明它已经在顶部，到时候一起弹出，所以offset要减1
+
+	GM_CHECK_LUA_STACK_BALANCE(offset);
+
 	for (const auto& var : args)
 	{
 		push(var);
@@ -378,8 +394,19 @@ bool GMLua::popTable(GMObject& obj, GMint32 index)
 					*(static_cast<bool*>(member.second.ptr)) = !!lua_toboolean(L, -1);
 					break;
 				case GMMetaMemberType::Int:
-					*(static_cast<GMint32*>(member.second.ptr)) = lua_tointeger(L, -1);
+				{
+					if (lua_isfunction(L, -1))
+					{
+						int r = luaL_ref(L, LUA_REGISTRYINDEX);
+						*(static_cast<GMLuaReference*>(member.second.ptr)) = r;
+						lua_pushnil(L); // 最开始的POP_GUARD强行pop，所以我们这里push一个nil
+					}
+					else
+					{
+						*(static_cast<GMint32*>(member.second.ptr)) = lua_tointeger(L, -1);
+					}
 					break;
+				}
 				case GMMetaMemberType::Vector2:
 				{
 					GMVec2& v = *static_cast<GMVec2*>(member.second.ptr);
@@ -425,7 +452,6 @@ bool GMLua::popTable(GMObject& obj, GMint32 index)
 				case GMMetaMemberType::Function:
 					break;
 				default:
-					GM_ASSERT(false);
 					break;
 				}
 			}

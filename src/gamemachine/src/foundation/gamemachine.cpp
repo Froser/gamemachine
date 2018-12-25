@@ -82,6 +82,7 @@ void GameMachine::startGameMachine()
 {
 	D(d);
 	updateGameMachineRunningStates();
+	handleMessages();
 	eachHandler([](auto window, auto)
 	{
 		window->getContext()->getEngine()->init();
