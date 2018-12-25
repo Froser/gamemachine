@@ -170,6 +170,7 @@ set(SOURCES
 		foundation/gmtransaction.cpp
 		foundation/gmasync.h
 		foundation/gmasync.cpp
+
 		gmlua/gmlua.h
 		gmlua/gmlua.cpp
 		gmlua/gmlua_functions.h
@@ -191,6 +192,12 @@ set(SOURCES
 		gmlua/meta/gmgamepackage_meta.cpp
 		gmlua/meta/igraphicengine_meta.h
 		gmlua/meta/igraphicengine_meta.cpp
+		gmlua/meta/gmshaderhelper_meta.h
+		gmlua/meta/gmshaderhelper_meta.cpp
+		gmlua/meta/gmmodelreader_meta.h
+		gmlua/meta/gmmodelreader_meta.cpp
+		gmlua/meta/gmasset_meta.h
+		gmlua/meta/gmasset_meta.cpp
 
 		extensions/bsp/bsp_factory.h
 		extensions/bsp/bsp_factory.cpp

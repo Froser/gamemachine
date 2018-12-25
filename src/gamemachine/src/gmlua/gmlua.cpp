@@ -437,7 +437,7 @@ bool GMLua::popTable(GMObject& obj, GMint32 index)
 				}
 				case GMMetaMemberType::Object:
 				{
-					GMObject* obj = static_cast<GMObject*>(member.second.ptr);
+					GMObject* obj = *static_cast<GMObject**>(member.second.ptr);
 					if (!popTable(*obj))
 						return false;
 					break;

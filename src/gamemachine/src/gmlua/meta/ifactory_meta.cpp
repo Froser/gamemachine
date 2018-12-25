@@ -13,7 +13,7 @@ namespace
 	// {{BEGIN META FUNCTION}}
 	GM_LUA_META_FUNCTION_IMPL(createWindow, L)
 	{
-		static const GMString s_invoker(L".createWindow");
+		static const GMString s_invoker = NAME ".createWindow";
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".createWindow");
 		IWindow* window = nullptr;
 		GM.getFactory()->createWindow(0, nullptr, &window);

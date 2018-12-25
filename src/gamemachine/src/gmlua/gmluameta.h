@@ -5,6 +5,8 @@
 #include "meta/gamemachine_meta.h"
 #include "meta/gmdebugger_meta.h"
 #include "meta/ifactory_meta.h"
+#include "meta/gmshaderhelper_meta.h"
+#include "meta/gmmodelreader_meta.h"
 // {{END META INCLUDES}}
 
 BEGIN_NS
@@ -16,6 +18,8 @@ namespace luaapi
 		GameMachine_Meta().registerFunctions(L);
 		GMDebugger_Meta().registerFunctions(L);
 		IFactory_Meta().registerFunctions(L);
+		GMShaderHelper_Meta().registerFunctions(L);
+		GMModelReader_Meta().registerFunctions(L);
 		// {{END META REGISTER}}
 	}
 }

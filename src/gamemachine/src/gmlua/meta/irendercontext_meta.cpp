@@ -27,7 +27,7 @@ bool IRenderContextProxy::registerMeta()
  */
 GM_LUA_META_FUNCTION_PROXY_IMPL(IRenderContextProxy, getWindow, L)
 {
-	static const GMString s_invoker(L"getWindow");
+	static const GMString s_invoker = NAME ".getWindow";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getWindow");
 	IRenderContextProxy self;
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
@@ -40,7 +40,7 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(IRenderContextProxy, getWindow, L)
  */
 GM_LUA_META_FUNCTION_PROXY_IMPL(IRenderContextProxy, getEngine, L)
 {
-	static const GMString s_invoker(L"getEngine");
+	static const GMString s_invoker = NAME ".getEngine";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getEngine");
 	IRenderContextProxy self;
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self

@@ -13,7 +13,7 @@ namespace
 	// {{BEGIN META FUNCTION}}
 	GM_LUA_META_FUNCTION_IMPL(info, L)
 	{
-		static const GMString s_invoker(L"info");
+		static const GMString s_invoker = NAME ".info";
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".info");
 		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, s_invoker);
 		gm_info(arg0);
@@ -22,7 +22,7 @@ namespace
 
 	GM_LUA_META_FUNCTION_IMPL(error, L)
 	{
-		static const GMString s_invoker(L"error");
+		static const GMString s_invoker = NAME ".error";
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".error");
 		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, s_invoker);
 		gm_error(arg0);
@@ -31,7 +31,7 @@ namespace
 
 	GM_LUA_META_FUNCTION_IMPL(warning, L)
 	{
-		static const GMString s_invoker(L"warning");
+		static const GMString s_invoker = NAME ".warning";
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".warning");
 		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, s_invoker);
 		gm_warning(arg0);
@@ -40,7 +40,7 @@ namespace
 
 	GM_LUA_META_FUNCTION_IMPL(debug, L)
 	{
-		static const GMString s_invoker(L"debug");
+		static const GMString s_invoker = NAME ".debug";
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".debug");
 		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, s_invoker);
 		gm_debug(arg0);

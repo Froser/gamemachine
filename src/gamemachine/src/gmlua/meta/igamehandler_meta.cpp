@@ -69,7 +69,7 @@ namespace
 		virtual void event(GameMachineHandlerEvent evt) override
 		{
 			D(d);
-			lua_rawgeti(d->L, LUA_REGISTRYINDEX, d->start);
+			lua_rawgeti(d->L, LUA_REGISTRYINDEX, d->event);
 			d->lua->protectedCall(nullptr, { static_cast<GMint32>(evt) });
 		}
 
@@ -129,7 +129,7 @@ IShaderLoadCallback* IGameHandlerProxy::getShaderLoadCallback() GM_NOEXCEPT
  */
 GM_LUA_META_FUNCTION_PROXY_IMPL(IGameHandlerProxy, __gc, L)
 {
-	static const GMString s_invoker(L"__gc");
+	static const GMString s_invoker = NAME ".__gc";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
 	IGameHandlerProxy handler(L);
 	GMArgumentHelper::popArgumentAsObject(L, handler, s_invoker); //self

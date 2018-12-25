@@ -73,7 +73,7 @@ namespace
 	GM_LUA_META_FUNCTION_IMPL(addWindow, L)
 	{
 		IWindowProxy window;
-		static const GMString s_invoker = L"addWindow";
+		static const GMString s_invoker = NAME ".addWindow";
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".addWindow");
 		GMArgumentHelper::popArgumentAsObject(L, window, s_invoker);
 		GM.addWindow(window.get());
