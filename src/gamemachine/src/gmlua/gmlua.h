@@ -168,7 +168,7 @@ private:
 	  \param obj 待传入的对象。此对象必须要注册元对象。
 	  \sa GMObject::registerMeta()
 	*/
-	void pushTable(const GMObject& obj);
+	void pushTable(const GMObject& obj, bool setMetatable = true);
 
 	//! 从Lua虚拟堆栈中取出一个Table，并赋值给指定对象。
 	/*!

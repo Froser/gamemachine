@@ -56,7 +56,7 @@ bool IWindowProxy::registerMeta()
 }
 
 /*
- * __gc([self], GMWindowDesc)
+ * __gc([self])
  */
 GM_LUA_META_FUNCTION_PROXY_IMPL(IWindowProxy, __gc, L)
 {

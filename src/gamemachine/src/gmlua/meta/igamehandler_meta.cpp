@@ -131,10 +131,10 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(IGameHandlerProxy, __gc, L)
 {
 	static const GMString s_invoker = NAME ".__gc";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
-	IGameHandlerProxy handler(L);
-	GMArgumentHelper::popArgumentAsObject(L, handler, s_invoker); //self
-	if (handler)
-		handler.release();
+	IGameHandlerProxy self(L);
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+		self.release();
 	return GMReturnValues();
 }
 

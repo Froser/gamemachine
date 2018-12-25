@@ -198,6 +198,8 @@ set(SOURCES
 		gmlua/meta/gmmodelreader_meta.cpp
 		gmlua/meta/gmasset_meta.h
 		gmlua/meta/gmasset_meta.cpp
+		gmlua/meta/gmgameworld_meta.h
+		gmlua/meta/gmgameworld_meta.cpp
 
 		extensions/bsp/bsp_factory.h
 		extensions/bsp/bsp_factory.cpp

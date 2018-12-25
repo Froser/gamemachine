@@ -10,7 +10,7 @@ namespace luaapi
 	{
 		IWindow* window = nullptr;
 
-		GMString __name = "IWindowProxy";
+		GMString __name = "IWindow";
 		GM_LUA_META_FUNCTION(__gc);
 		GM_LUA_META_FUNCTION(create);
 		GM_LUA_META_FUNCTION(centerWindow);
