@@ -8,6 +8,7 @@ namespace luaapi
 {
 	GM_PRIVATE_OBJECT(IGraphicEngineProxy)
 	{
+		GM_LUA_PROXY;
 		IGraphicEngine* engine = nullptr;
 	};
 

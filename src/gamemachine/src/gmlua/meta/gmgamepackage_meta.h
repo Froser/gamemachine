@@ -8,6 +8,7 @@ namespace luaapi
 {
 	GM_PRIVATE_OBJECT(GMGamePackageProxy)
 	{
+		GM_LUA_PROXY;
 		GMGamePackage* package = nullptr;
 
 		GM_LUA_META_FUNCTION(loadPackage)

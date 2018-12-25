@@ -45,6 +45,7 @@ IWindowProxy::IWindowProxy(IWindow* window)
 bool IWindowProxy::registerMeta()
 {
 	D(d);
+	GM_LUA_PROXY_META;
 	GM_META(window);
 	GM_META(__name);
 	GM_META_FUNCTION(__gc);
@@ -64,8 +65,7 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(IWindowProxy, __gc, L)
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
 	IWindowProxy self;
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
-	if (self)
-		self.release();
+	self.release();
 	return GMReturnValues();
 }
 

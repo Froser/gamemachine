@@ -9,8 +9,8 @@ namespace luaapi
 {
 	GM_PRIVATE_OBJECT(GMAssetProxy)
 	{
+		GM_LUA_PROXY;
 		GMAsset* asset = nullptr;
-		GMAsset ref;
 		GMString __name = L"GMAsset";
 		GM_LUA_META_FUNCTION(__gc);
 	};

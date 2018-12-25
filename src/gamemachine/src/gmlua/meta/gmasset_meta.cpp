@@ -16,13 +16,13 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(GMAssetProxy, __gc, L)
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
 	GMAssetProxy asset;
 	GMArgumentHelper::popArgumentAsObject(L, asset, s_invoker); //self
-	if (asset)
-		asset.release();
+	asset.release();
 	return GMReturnValues();
 }
 
 bool GMAssetProxy::registerMeta()
 {
+	GM_LUA_PROXY_META;
 	GM_META(asset);
 	GM_META(__name);
 	GM_META_FUNCTION(__gc)
@@ -32,6 +32,6 @@ bool GMAssetProxy::registerMeta()
 GMAssetProxy::GMAssetProxy(GMAsset asset)
 {
 	D(d);
-	d->ref = asset;
-	d->asset = &d->ref;
+	d->asset = new GMAsset();
+	*(d->asset) = asset;
 }

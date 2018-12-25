@@ -8,6 +8,7 @@ namespace luaapi
 {
 	GM_PRIVATE_OBJECT(IGameHandlerProxy)
 	{
+		GM_LUA_PROXY;
 		IGameHandler* handler = nullptr;
 		IShaderLoadCallback* shaderCallback = nullptr;
 

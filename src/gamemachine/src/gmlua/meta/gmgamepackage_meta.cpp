@@ -30,6 +30,7 @@ GMGamePackageProxy::GMGamePackageProxy(GMGamePackage* package)
 
 bool GMGamePackageProxy::registerMeta()
 {
+	GM_LUA_PROXY_META;
 	GM_META(package)
 	GM_META_FUNCTION(loadPackage)
 	return true;

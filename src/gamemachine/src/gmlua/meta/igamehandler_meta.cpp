@@ -95,6 +95,7 @@ IGameHandlerProxy::IGameHandlerProxy(GMLuaCoreState* L)
 bool IGameHandlerProxy::registerMeta()
 {
 	D(d);
+	GM_LUA_PROXY_META;
 	GM_META(handler);
 	GM_META(__name);
 	GM_META_FUNCTION(__gc);
@@ -133,8 +134,7 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(IGameHandlerProxy, __gc, L)
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
 	IGameHandlerProxy self(L);
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
-	if (self)
-		self.release();
+	self.release();
 	return GMReturnValues();
 }
 

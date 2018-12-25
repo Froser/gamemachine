@@ -16,6 +16,7 @@ IRenderContextProxy::IRenderContextProxy(const IRenderContext* context)
 
 bool IRenderContextProxy::registerMeta()
 {
+	GM_LUA_PROXY_META;
 	GM_META(context);
 	GM_META_FUNCTION(getWindow);
 	GM_META_FUNCTION(getEngine);

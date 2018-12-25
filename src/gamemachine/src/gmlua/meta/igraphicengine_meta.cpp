@@ -15,6 +15,7 @@ IGraphicEngineProxy::IGraphicEngineProxy(IGraphicEngine* engine /*= nullptr*/)
 
 bool IGraphicEngineProxy::registerMeta()
 {
+	GM_LUA_PROXY_META;
 	GM_META(engine);
 	return true;
 }

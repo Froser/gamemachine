@@ -168,7 +168,7 @@ private:
 	  \param obj 待传入的对象。此对象必须要注册元对象。
 	  \sa GMObject::registerMeta()
 	*/
-	void pushTable(const GMObject& obj, bool setMetatable = true);
+	void pushNewTable(const GMObject& obj, bool setMetatable = true);
 
 	//! 从Lua虚拟堆栈中取出一个Table，并赋值给指定对象。
 	/*!
@@ -219,6 +219,7 @@ public:
 private:
 	void loadLibrary();
 	GMLuaResult pcall(const char* functionName, const std::initializer_list<GMVariant>& args, GMint32 nRet);
+	void setEachMetaMember(const GMObject& obj);
 	void setTable(const char* key, const GMObjectMember& value);
 	void setMetatable(const GMObject& obj);
 };
@@ -229,6 +230,10 @@ private:
 #define GM_LUA_META_FUNCTION_IMPL(FuncName, L) gm::luaapi::GMFunctionReturn FuncName(GMLuaCoreState* L)
 #define GM_LUA_META_FUNCTION_PROXY_IMPL(Proxy, FuncName, L) gm::luaapi::GMFunctionReturn GM_PRIVATE_NAME(Proxy)::FuncName(GMLuaCoreState* L)
 #define GM_LUA_META_FUNCTION(FuncName) GM_META_METHOD gm::luaapi::GMFunctionReturn FuncName(GMLuaCoreState*);
+
+// lua类成员函数，需要带以下宏
+#define GM_LUA_PROXY bool detached = false;
+#define GM_LUA_PROXY_META GM_META(detached)
 #define GM_LUA_META_PROXY_FUNCTIONS(type, handler) \
 	public:											\
 		typedef type RealType;						\
@@ -252,13 +257,13 @@ private:
 		void detach()								\
 		{											\
 			D(d);									\
-			d->handler = nullptr;					\
+			d->detached = true;						\
 		}											\
 													\
 		void release()								\
 		{											\
 			D(d);									\
-			if (d->handler)							\
+			if (!d->detached)						\
 			{										\
 				GM_delete(d->handler);				\
 				detach();							\

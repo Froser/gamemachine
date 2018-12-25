@@ -200,6 +200,8 @@ set(SOURCES
 		gmlua/meta/gmasset_meta.cpp
 		gmlua/meta/gmgameworld_meta.h
 		gmlua/meta/gmgameworld_meta.cpp
+		gmlua/meta/gmgameobject_meta.h
+		gmlua/meta/gmgameobject_meta.cpp
 
 		extensions/bsp/bsp_factory.h
 		extensions/bsp/bsp_factory.cpp

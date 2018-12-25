@@ -3,6 +3,7 @@
 #include <gamemachine.h>
 #include <gmlua.h>
 #include "irendercontext_meta.h"
+#include "gmgameobject_meta.h"
 
 using namespace gm::luaapi;
 
@@ -16,8 +17,11 @@ GMGameWorldProxy::GMGameWorldProxy(GMGameWorld* gameworld /*= nullptr*/)
 
 bool GMGameWorldProxy::registerMeta()
 {
+	GM_LUA_PROXY_META;
 	GM_META(gameworld);
 	GM_META_FUNCTION(renderScene);
+	GM_META_FUNCTION(addObjectAndInit);
+	GM_META_FUNCTION(addToRenderList);
 	return true;
 }
 
@@ -30,8 +34,7 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(GMGameWorldProxy, __gc, L)
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
 	GMGameWorldProxy self;
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
-	if (self)
-		self.release();
+	self.release();
 	return GMReturnValues();
 }
 
@@ -49,6 +52,37 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(GMGameWorldProxy, renderScene, L)
 	return GMReturnValues();
 }
 
+/*
+ * addObjectAndInit([self], GMObject)
+ */
+GM_LUA_META_FUNCTION_PROXY_IMPL(GMGameWorldProxy, addObjectAndInit, L)
+{
+	static const GMString s_invoker = NAME ".addObjectAndInit";
+	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".addObjectAndInit");
+	GMGameWorldProxy self;
+	GMGameObjectProxy gameobject;
+	GMArgumentHelper::popArgumentAsObject(L, gameobject, s_invoker); //GMObject
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+		self->addObjectAndInit(gameobject.get());
+	return GMReturnValues();
+}
+
+/*
+ * addToRenderList([self], GMObject)
+ */
+GM_LUA_META_FUNCTION_PROXY_IMPL(GMGameWorldProxy, addToRenderList, L)
+{
+	static const GMString s_invoker = NAME ".addToRenderList";
+	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".addToRenderList");
+	GMGameWorldProxy self;
+	GMGameObjectProxy gameobject;
+	GMArgumentHelper::popArgumentAsObject(L, gameobject, s_invoker); //GMObject
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+		self->addToRenderList(gameobject.get());
+	return GMReturnValues();
+}
 //////////////////////////////////////////////////////////////////////////
 namespace
 {

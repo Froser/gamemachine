@@ -75,9 +75,11 @@ namespace
 		IWindowProxy window;
 		static const GMString s_invoker = NAME ".addWindow";
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".addWindow");
-		GMArgumentHelper::popArgumentAsObject(L, window, s_invoker);
-		GM.addWindow(window.get());
+		GMArgumentHelper::beginArgumentReference(L, window, s_invoker);
 		window.detach();
+		GMArgumentHelper::endArgumentReference(L, window);
+
+		GM.addWindow(window.get());
 		return GMReturnValues();
 	}
 

@@ -8,6 +8,7 @@
 #include "meta/gmshaderhelper_meta.h"
 #include "meta/gmmodelreader_meta.h"
 #include "meta/gmgameworld_meta.h"
+#include "meta/gmgameobject_meta.h"
 // {{END META INCLUDES}}
 
 BEGIN_NS
@@ -22,6 +23,7 @@ namespace luaapi
 		GMShaderHelper_Meta().registerFunctions(L);
 		GMModelReader_Meta().registerFunctions(L);
 		GMGameWorld_Meta().registerFunctions(L);
+		GMGameObject_Meta().registerFunctions(L);
 		// {{END META REGISTER}}
 	}
 }

@@ -9,6 +9,7 @@ namespace luaapi
 {
 	GM_PRIVATE_OBJECT(IRenderContextProxy)
 	{
+		GM_LUA_PROXY;
 		const IRenderContext* context = nullptr;
 		GM_LUA_META_FUNCTION(getWindow);
 		GM_LUA_META_FUNCTION(getEngine);

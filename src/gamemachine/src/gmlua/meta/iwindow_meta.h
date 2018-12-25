@@ -8,6 +8,7 @@ namespace luaapi
 {
 	GM_PRIVATE_OBJECT(IWindowProxy)
 	{
+		GM_LUA_PROXY;
 		IWindow* window = nullptr;
 
 		GMString __name = "IWindow";

@@ -27,6 +27,8 @@ namespace luaapi
 		static GMVariant popArgumentAsVec4(GMLuaCoreState* L, const GMString& invoker);
 		static GMVariant popArgumentAsMat4(GMLuaCoreState* L, const GMString& invoker);
 		static bool popArgumentAsObject(GMLuaCoreState* L, REF GMObject& obj, const GMString& invoker);
+		static bool beginArgumentReference(GMLuaCoreState* L, REF GMObject& obj, const GMString& invoker);
+		static void endArgumentReference(GMLuaCoreState* L, const GMObject& obj);
 	};
 
 	struct GMReturnValues

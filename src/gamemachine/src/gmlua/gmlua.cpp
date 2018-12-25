@@ -212,7 +212,7 @@ bool GMLua::setToGlobal(const char* name, GMObject& obj)
 	if (!meta)
 		return false;
 	
-	pushTable(obj);
+	pushNewTable(obj);
 	lua_setglobal(L, name);
 	return true;
 }
@@ -297,13 +297,10 @@ GMLuaResult GMLua::pcall(const char* functionName, const std::initializer_list<G
 	return lr;
 }
 
-void GMLua::pushTable(const GMObject& obj, bool setmt)
+void GMLua::setEachMetaMember(const GMObject& obj)
 {
 	D(d);
-	GM_CHECK_LUA_STACK_BALANCE(1);
-	lua_newtable(L);
-	auto tableId = lua_gettop(L);
-
+	GM_CHECK_LUA_STACK_BALANCE(0);
 	auto meta = obj.meta();
 	GM_ASSERT(meta);
 	for (const auto& member : *meta)
@@ -312,7 +309,14 @@ void GMLua::pushTable(const GMObject& obj, bool setmt)
 		if (!member.first.startsWith(L"__") || member.second.type != GMMetaMemberType::Function)
 			setTable(member.first.toStdString().c_str(), member.second);
 	}
+}
 
+void GMLua::pushNewTable(const GMObject& obj, bool setmt)
+{
+	D(d);
+	GM_CHECK_LUA_STACK_BALANCE(1);
+	lua_newtable(L);
+	setEachMetaMember(obj);
 	if (setmt)
 		setMetatable(obj);
 }
@@ -351,7 +355,7 @@ void GMLua::setMetatable(const GMObject& obj)
 	}
 
 	lua_pushstring(L, "__index");
-	pushTable(obj, false);
+	pushNewTable(obj, false);
 	lua_rawset(L, -3);
 
 	lua_setmetatable(L, tableIdx);
@@ -547,7 +551,7 @@ void GMLua::push(const GMVariant& var)
 	}
 	else if (var.isObject())
 	{
-		pushTable(*var.toObject());
+		pushNewTable(*var.toObject());
 	}
 	else if (var.isPointer())
 	{
@@ -613,7 +617,7 @@ void GMLua::setTable(const char* key, const GMObjectMember& value)
 		break;
 	}
 	case GMMetaMemberType::Object:
-		pushTable(*static_cast<GMObject*>(value.ptr));
+		pushNewTable(*static_cast<GMObject*>(value.ptr));
 		break;
 	case GMMetaMemberType::Function:
 		lua_pushcfunction(L, static_cast<GMLuaCFunction>(value.ptr));

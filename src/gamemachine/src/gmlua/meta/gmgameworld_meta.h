@@ -9,10 +9,14 @@ namespace luaapi
 {
 	GM_PRIVATE_OBJECT(GMGameWorldProxy)
 	{
+		GM_LUA_PROXY;
+
 		GMGameWorld* gameworld = nullptr;
 		GMString __name = "GMGameWorld";
 		GM_LUA_META_FUNCTION(__gc);
 		GM_LUA_META_FUNCTION(renderScene);
+		GM_LUA_META_FUNCTION(addObjectAndInit);
+		GM_LUA_META_FUNCTION(addToRenderList);
 	};
 
 	class GMGameWorldProxy : public GMObject
