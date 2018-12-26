@@ -61,7 +61,9 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(GMGameWorldProxy, addObjectAndInit, L)
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".addObjectAndInit");
 	GMGameWorldProxy self;
 	GMGameObjectProxy gameobject;
-	GMArgumentHelper::popArgumentAsObject(L, gameobject, s_invoker); //GMObject
+	GMArgumentHelper::beginArgumentReference(L, gameobject, s_invoker); //GMObject
+	gameobject.detach();
+	GMArgumentHelper::endArgumentReference(L, gameobject);
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
 		self->addObjectAndInit(gameobject.get());

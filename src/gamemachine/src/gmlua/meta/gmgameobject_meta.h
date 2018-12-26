@@ -11,7 +11,7 @@ namespace luaapi
 	{
 		GM_LUA_PROXY;
 		GMGameObject* gameObj = nullptr;
-		GMString __name = "GMGameWorld";
+		GMString __name = "GMGameObject";
 		GM_LUA_META_FUNCTION(__gc);
 		GM_LUA_META_FUNCTION(setAsset);
 		GM_LUA_META_FUNCTION(setTranslation);

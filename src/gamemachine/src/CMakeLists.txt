@@ -204,6 +204,8 @@ set(SOURCES
 		gmlua/meta/gmgameobject_meta.cpp
 		gmlua/meta/ilight_meta.h
 		gmlua/meta/ilight_meta.cpp
+		gmlua/meta/gmskeletalgameobject_meta.h
+		gmlua/meta/gmskeletalgameobject_meta.cpp
 
 		extensions/bsp/bsp_factory.h
 		extensions/bsp/bsp_factory.cpp

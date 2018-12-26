@@ -9,6 +9,7 @@
 #include "meta/gmmodelreader_meta.h"
 #include "meta/gmgameworld_meta.h"
 #include "meta/gmgameobject_meta.h"
+#include "meta/gmskeletalgameobject_meta.h"
 // {{END META INCLUDES}}
 
 BEGIN_NS
@@ -24,6 +25,7 @@ namespace luaapi
 		GMModelReader_Meta().registerFunctions(L);
 		GMGameWorld_Meta().registerFunctions(L);
 		GMGameObject_Meta().registerFunctions(L);
+		GMSkeletalGameObject_Meta().registerFunctions(L);
 		// {{END META REGISTER}}
 	}
 }

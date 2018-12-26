@@ -330,6 +330,10 @@ void GMLua::setMetatable(const GMObject& obj)
 	static const GMString s_metatableNameKw = L"__name";
 	GMString metatableName;
 	auto meta = obj.meta();
+
+	// TODO 看看成员是否有GM_LUA_PROXY_METATABLE_NAME，如果有，设置它为元表，否则，设置自己为元表
+	// 次行为也影响到__index
+
 	GM_ASSERT(meta);
 	for (const auto& member : *meta)
 	{

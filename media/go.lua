@@ -1,6 +1,28 @@
+function radian(degrees)
+	return degrees * 0.017453292
+end
+
+function translate(x, y, z)
+	return {
+		{ 1, 0, 0, 0 },
+		{ 0, 1, 0, 0 },
+		{ 0, 0, 1, 0 },
+		{ x, y, z, 1 }
+	}
+end
+
+function scale(x, y, z)
+	return {
+		{ x, 0, 0, 0 },
+		{ 0, y, 0, 0 },
+		{ 0, 0, z, 0 },
+		{ 0, 0, 0, 1 }
+	}
+end
+
 -- 准备窗口
 t = {}
-t.rc = { 0, 0, 800, 600}
+t.rc = { 0, 0, 1024, 768}
 window = GMFactory.createWindow()
 window:create(t)
 window:centerWindow()
@@ -31,8 +53,29 @@ handler.start = function()
 	local asset = GMModelReader.load(settings)
 	local gameobject = GMGameObject.new()
 	gameobject:setAsset(asset)
+	gameobject:setTranslation(translate(0, -.5, 0))
+	gameobject:setScaling(scale(.02, .02, .02))
+	gameobject:setRotation({0, 0.707106650, 0.707106709, 0})
 	handler.world:addObjectAndInit(gameobject)
 	handler.world:addToRenderList(gameobject)
+
+	-- 创建灯光
+	local engine = handler.context:getEngine()
+	local light = GMFactory.createLight(0) -- 点光
+	light:setLightAttribute3(0, {1, 0, -3}) -- 位置
+	light:setLightAttribute3(2, {.1, .1, .1}) -- 漫反射
+	light:setLightAttribute3(3, {.7, .7, .7}) -- 镜面反射
+	engine:addLight(light) -- 添加光源
+
+	-- 设置相机
+	local lookAt = {
+		lookAt = { 0, 0, 1 },
+		position = { 0, 0, -1 },
+		up = { 0, 1, 0}
+	};
+	local camera = engine:getCamera()
+	camera:lookAt(lookAt)
+	camera:setPerspective(radian(75), 1.333, .1, 3200)
 end
 
 handler.onLoadShaders = function(context)
