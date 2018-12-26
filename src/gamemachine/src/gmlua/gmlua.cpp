@@ -338,6 +338,8 @@ void GMLua::setMetatable(const GMObject& obj)
 	}
 
 	luaL_newmetatable(L, metatableName.toStdString().c_str());
+
+	bool hasIndexField = false;
 	if (!metatableName.isEmpty())
 	{
 		// 存在meta数据
@@ -346,6 +348,9 @@ void GMLua::setMetatable(const GMObject& obj)
 			if (member.second.type == GMMetaMemberType::Function)
 			{
 				std::string name = member.first.toStdString();
+				if (name == "__index")
+					hasIndexField = true;
+
 				lua_pushstring(L, name.c_str());
 				lua_pushcfunction(L, static_cast<GMLuaCFunction>(member.second.ptr));
 				lua_rawset(L, -3);
@@ -354,9 +359,12 @@ void GMLua::setMetatable(const GMObject& obj)
 
 	}
 
-	lua_pushstring(L, "__index");
-	pushNewTable(obj, false);
-	lua_rawset(L, -3);
+	if (!hasIndexField)
+	{
+		lua_pushstring(L, "__index");
+		pushNewTable(obj, false);
+		lua_rawset(L, -3);
+	}
 
 	lua_setmetatable(L, tableIdx);
 }

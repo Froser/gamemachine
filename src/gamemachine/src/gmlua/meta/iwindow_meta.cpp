@@ -122,7 +122,9 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(IWindowProxy, setHandler, L)
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setHandler");
 	IWindowProxy self;
 	IGameHandlerProxy gameHandler(L);
-	GMArgumentHelper::popArgumentAsObject(L, gameHandler, s_invoker); //IGameHandler
+	GMArgumentHelper::beginArgumentReference(L, gameHandler, s_invoker); //IGameHandler
+	gameHandler.detach();
+	GMArgumentHelper::endArgumentReference(L, gameHandler);
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
 	{

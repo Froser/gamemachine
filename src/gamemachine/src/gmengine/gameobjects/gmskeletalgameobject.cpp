@@ -201,6 +201,11 @@ void GMSkeletalGameObject::update(GMDuration dt)
 	}
 }
 
+bool GMSkeletalGameObject::isAnimationObject() const
+{
+	return true;
+}
+
 void GMSkeletalGameObject::createSkeletonBonesObject()
 {
 	D(d);

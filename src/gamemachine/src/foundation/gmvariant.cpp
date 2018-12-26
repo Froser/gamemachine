@@ -68,6 +68,14 @@ const T& GMVariant::get(const void* const data) const
 	return defaultValue;
 }
 
+template <typename T>
+const T& GMVariant::rawGet(const void* const data) const
+{
+	enum { Type = TypeEnumMap<T>::Value };
+	GM_STATIC_ASSERT(Type != Unknown, "Unknown type");
+	return reinterpret_cast<const T&>(*reinterpret_cast<const T*>(data));
+}
+
 void GMVariant::clearOwned()
 {
 	if (
@@ -277,6 +285,11 @@ GMuint32 GMVariant::toUInt() const
 
 GMfloat GMVariant::toFloat() const
 {
+	if (m_type == I32 || m_type == I64)
+		return rawGet<GMint32>(&m_data.i32);
+	if (m_type == UInt)
+		return rawGet<GMuint32>(&m_data.u);
+
 	return get<GMfloat>(&m_data.f);
 }
 

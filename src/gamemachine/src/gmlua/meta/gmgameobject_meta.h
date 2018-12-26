@@ -14,6 +14,9 @@ namespace luaapi
 		GMString __name = "GMGameWorld";
 		GM_LUA_META_FUNCTION(__gc);
 		GM_LUA_META_FUNCTION(setAsset);
+		GM_LUA_META_FUNCTION(setTranslation);
+		GM_LUA_META_FUNCTION(setRotation);
+		GM_LUA_META_FUNCTION(setScaling);
 	};
 
 	class GMGameObjectProxy : public GMObject

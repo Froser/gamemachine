@@ -57,6 +57,7 @@ public:
 
 public:
 	virtual void update(GMDuration dt) override;
+	virtual bool isAnimationObject() const override;
 
 public:
 	void createSkeletonBonesObject();

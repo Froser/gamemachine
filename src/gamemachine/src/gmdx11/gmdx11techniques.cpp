@@ -637,7 +637,7 @@ void GMDx11Technique::beginModel(GMModel* model, const GMGameObject* parent)
 
 	// 骨骼动画
 	GM_ASSERT(d->techContext.currentScene);
-	if (d->techContext.currentScene->hasAnimation())
+	if (d->techContext.currentScene->hasAnimation() && parent->isAnimationObject())
 	{
 		shaderProgram->setInt(VI(UseBoneAnimation), 1);
 		updateBoneTransforms(shaderProgram, model);

@@ -56,6 +56,7 @@ public:
 	virtual void update(GMDuration dt) {}
 	virtual bool canDeferredRendering();
 	virtual const IRenderContext* getContext();
+	virtual bool isAnimationObject() const;
 
 protected:
 	virtual void drawModel(const IRenderContext* context, GMModel* model);

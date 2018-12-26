@@ -119,6 +119,12 @@ const IRenderContext* GMGameObject::getContext()
 	return d->context;
 }
 
+
+bool GMGameObject::isAnimationObject() const
+{
+	return false;
+}
+
 void GMGameObject::updateTransformMatrix()
 {
 	D(d);

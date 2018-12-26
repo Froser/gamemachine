@@ -19,6 +19,9 @@ bool GMGameObjectProxy::registerMeta()
 	GM_LUA_PROXY_META;
 	GM_META(gameObj);
 	GM_META_FUNCTION(setAsset);
+	GM_META_FUNCTION(setTranslation);
+	GM_META_FUNCTION(setRotation);
+	GM_META_FUNCTION(setScaling);
 	return true;
 }
 
@@ -50,6 +53,54 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(GMGameObjectProxy, setAsset, L)
 		self->setAsset(*asset.get());
 	return GMReturnValues();
 }
+
+/*
+ * setTranslation([self], matrix)
+ */
+GM_LUA_META_FUNCTION_PROXY_IMPL(GMGameObjectProxy, setTranslation, L)
+{
+	static const GMString s_invoker = NAME ".setTranslation";
+	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setTranslation");
+	GMGameObjectProxy self;
+	GMMat4 mat = GMArgumentHelper::popArgumentAsMat4(L, s_invoker).toMat4(); //matrix
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+		self->setTranslation(mat);
+	return GMReturnValues();
+}
+
+/*
+* setTranslation([self], quat)
+*/
+GM_LUA_META_FUNCTION_PROXY_IMPL(GMGameObjectProxy, setRotation, L)
+{
+	static const GMString s_invoker = NAME ".setRotation";
+	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setRotation");
+	GMGameObjectProxy self;
+	GMVec3 v = GMArgumentHelper::popArgumentAsVec4(L, s_invoker).toVec4(); //quat
+	GMQuat quat(v.getX(), v.getY(), v.getZ(), v.getW());
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+		self->setRotation(quat);
+	return GMReturnValues();
+}
+
+
+/*
+* setTranslation([self], matrix)
+*/
+GM_LUA_META_FUNCTION_PROXY_IMPL(GMGameObjectProxy, setScaling, L)
+{
+	static const GMString s_invoker = NAME ".setScaling";
+	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setScaling");
+	GMGameObjectProxy self;
+	GMMat4 mat = GMArgumentHelper::popArgumentAsMat4(L, s_invoker).toMat4(); //matrix
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+		self->setScaling(mat);
+	return GMReturnValues();
+}
+
 namespace
 {
 	// {{BEGIN META FUNCTION}}

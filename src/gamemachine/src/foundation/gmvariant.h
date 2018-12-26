@@ -123,6 +123,7 @@ private:
 	template <GMVariant::Type Type> void copyOwned(const GMVariant& rhs);
 	template <typename T> bool deleteOwned();
 	template <typename T> const T& get(const void* const data) const;
+	template <typename T> const T& rawGet(const void* const data) const;
 	void clearOwned();
 
 private:

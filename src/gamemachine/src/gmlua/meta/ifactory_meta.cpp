@@ -3,6 +3,7 @@
 #include <gamemachine.h>
 #include <gmlua.h>
 #include "iwindow_meta.h"
+#include "ilight_meta.h"
 
 using namespace gm::luaapi;
 
@@ -19,11 +20,22 @@ namespace
 		GM.getFactory()->createWindow(0, nullptr, &window);
 		return GMReturnValues(L, IWindowProxy(window));
 	}
+
+	GM_LUA_META_FUNCTION_IMPL(createLight, L)
+	{
+		static const GMString s_invoker = NAME ".createLight";
+		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".createLight");
+		ILight* light = nullptr;
+		GMLightType type = static_cast<GMLightType>(GMArgumentHelper::popArgument(L, s_invoker).toInt());
+		GM.getFactory()->createLight(type, &light);
+		return GMReturnValues(L, ILightProxy(light));
+	}
 	// {{END META FUNCTION}}
 
 	GMLuaReg g_meta[] = {
 		// {{BEGIN META DECLARATIONS}}
 		GM_LUA_DECLARATIONS(createWindow),
+		GM_LUA_DECLARATIONS(createLight),
 		// {{END META DECLARATIONS}}
 		{ 0, 0 }
 	};
