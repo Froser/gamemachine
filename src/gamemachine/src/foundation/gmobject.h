@@ -310,6 +310,7 @@ using GMSlots = HashMap<GMSignal, Vector<GMCallbackTarget>, GMStringHashFunctor>
 // 所有GM对象的基类，如果可以用SSE指令，那么它是16字节对齐的
 GM_PRIVATE_OBJECT(GMObject)
 {
+	bool metaRegistered = false;
 	GMMeta meta;
 	GMSlots slots;
 	GMConnectionTargets connectionTargets;
@@ -352,7 +353,7 @@ public:
 	  对象的元数据将会在第一次返回前构造。元数据反应了此对象的数据成员中的数据类型，提供一种反射机制。
 	  \return 此对象的元数据。
 	*/
-	const GMMeta* meta() const { D(d); if (!const_cast<GMObject*>(this)->registerMeta()) return nullptr; return &d->meta; }
+	const GMMeta* meta() const;
 
 	//! 为此对象绑定一个信号。
 	/*!

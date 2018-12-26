@@ -38,7 +38,10 @@ handler.init = function(context)
 end
 
 handler.event = function(evt)
-	if (evt == 3) then -- render
+	if (evt == 2) then -- update
+		local dt = GM.getRunningStates().lastFrameElpased
+		handler.gameobject:update(dt)
+	elseif (evt == 3) then -- render
 		handler.world:renderScene()
 	end
 end
@@ -51,11 +54,12 @@ handler.start = function()
 		type = 0
 	}
 	local asset = GMModelReader.load(settings)
-	local gameobject = GMGameObject.new()
+	local gameobject = GMSkeletalGameObject.new()
 	gameobject:setAsset(asset)
 	gameobject:setTranslation(translate(0, -.5, 0))
 	gameobject:setScaling(scale(.02, .02, .02))
 	gameobject:setRotation({0, 0.707106650, 0.707106709, 0})
+	handler.gameobject = gameobject
 	handler.world:addObjectAndInit(gameobject)
 	handler.world:addToRenderList(gameobject)
 

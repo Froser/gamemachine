@@ -12,6 +12,7 @@ namespace luaapi
 		IGraphicEngine* engine = nullptr;
 		GM_LUA_META_FUNCTION(addLight);
 		GM_LUA_META_FUNCTION(getCamera);
+		GM_LUA_META_FUNCTION(getDefaultFramebuffers);
 	};
 
 	class IGraphicEngineProxy : public GMObject
@@ -26,15 +27,7 @@ namespace luaapi
 		virtual bool registerMeta() override;
 	};
 
-	GM_PRIVATE_OBJECT(GMCameraProxy)
-	{
-		GM_LUA_PROXY;
-		GMCamera* camera = nullptr;
-		GM_LUA_META_FUNCTION(lookAt);
-		GM_LUA_META_FUNCTION(setPerspective);
-		GM_LUA_META_FUNCTION(setOrtho);
-	};
-
+	//////////////////////////////////////////////////////////////////////////
 	GM_PRIVATE_OBJECT(GMCameraLookAtProxy)
 	{
 		GMVec3 lookAt;
@@ -53,6 +46,15 @@ namespace luaapi
 		GMCameraLookAt toCameraLookAt();
 	};
 
+	GM_PRIVATE_OBJECT(GMCameraProxy)
+	{
+		GM_LUA_PROXY;
+		GMCamera* camera = nullptr;
+		GM_LUA_META_FUNCTION(lookAt);
+		GM_LUA_META_FUNCTION(setPerspective);
+		GM_LUA_META_FUNCTION(setOrtho);
+	};
+
 	class GMCameraProxy : public GMObject
 	{
 		GM_DECLARE_PRIVATE(GMCameraProxy)
@@ -64,6 +66,8 @@ namespace luaapi
 	protected:
 		virtual bool registerMeta() override;
 	};
+
+	//////////////////////////////////////////////////////////////////////////
 }
 
 END_NS

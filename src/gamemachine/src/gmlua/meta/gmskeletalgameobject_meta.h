@@ -15,6 +15,7 @@ namespace luaapi
 		GM_LUA_PROXY_METATABLE(GMGameObjectProxy);
 		GMSkeletalGameObject* gameObj = nullptr;
 		GMString __name = "GMSkeletalGameObject";
+		GM_LUA_META_FUNCTION(update);
 	};
 
 	class GMSkeletalGameObjectProxy : public GMObject

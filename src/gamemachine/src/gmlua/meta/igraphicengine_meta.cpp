@@ -43,6 +43,25 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(IGraphicEngineProxy, getCamera, L)
 	return GMReturnValues();
 }
 
+/*
+* getCamera([self])
+*/
+GM_LUA_META_FUNCTION_PROXY_IMPL(IGraphicEngineProxy, getDefaultFramebuffers, L)
+{
+	static const GMString s_invoker = NAME ".getDefaultFramebuffers";
+	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getDefaultFramebuffers");
+	IGraphicEngineProxy self;
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+
+	// TODO
+	//if (self)
+	//{
+	//	GMCamera& camera = self->getDefaultFramebuffers();
+	//	return GMReturnValues(L, GMCameraProxy(&camera));
+	//}
+	return GMReturnValues();
+}
+
 IGraphicEngineProxy::IGraphicEngineProxy(IGraphicEngine* engine /*= nullptr*/)
 {
 	D(d);
@@ -55,6 +74,7 @@ bool IGraphicEngineProxy::registerMeta()
 	GM_META(engine);
 	GM_META_FUNCTION(addLight);
 	GM_META_FUNCTION(getCamera);
+	GM_META_FUNCTION(getDefaultFramebuffers);
 	return true;
 }
 

@@ -118,6 +118,25 @@ namespace
 		v.setFloat16(f16);
 		return true;
 	}
+
+	void getMetaTableAndName(const GMObject& obj, GMString& metatableName, const GMObject** metatable)
+	{
+		// 看看成员是否有GM_LUA_PROXY_METATABLE_NAME，如果有，设置它为元表，否则，设置自己为元表
+		static const GMString s_metatableNameKw = L"__name";
+		static const GMString s_metatableTag = GM_LUA_PROXY_METATABLE_NAME;
+
+		auto meta = obj.meta();
+		for (const auto& member : *meta)
+		{
+			if (member.first == s_metatableNameKw)
+				metatableName = *static_cast<GMString*>(member.second.ptr);
+			if (member.first == s_metatableTag)
+				if (member.second.type == GMMetaMemberType::Object)
+					return getMetaTableAndName(**static_cast<GMObject**>(member.second.ptr), metatableName, metatable);
+		}
+		if (metatable)
+			*metatable = &obj;
+	}
 }
 
 void GMLuaFunctionRegister::setRegisterFunction(GMLua *l, const GMString& modname, GMLuaCFunction openf, bool isGlobal)
@@ -327,34 +346,20 @@ void GMLua::setMetatable(const GMObject& obj)
 	GM_CHECK_LUA_STACK_BALANCE(0);
 	auto tableIdx = lua_gettop(L);
 
-	static const GMString s_metatableNameKw = L"__name";
 	GMString metatableName;
-	auto meta = obj.meta();
-
-	// TODO 看看成员是否有GM_LUA_PROXY_METATABLE_NAME，如果有，设置它为元表，否则，设置自己为元表
-	// 次行为也影响到__index
-
-	GM_ASSERT(meta);
-	for (const auto& member : *meta)
-	{
-		if (member.first == s_metatableNameKw)
-			metatableName = *static_cast<GMString*>(member.second.ptr);
-	}
+	const GMObject* metaTable = nullptr;
+	getMetaTableAndName(obj, metatableName, &metaTable);
+	GM_ASSERT(metaTable);
 
 	luaL_newmetatable(L, metatableName.toStdString().c_str());
-
-	bool hasIndexField = false;
 	if (!metatableName.isEmpty())
 	{
 		// 存在meta数据
-		for (const auto& member : *meta)
+		for (const auto& member : *metaTable->meta())
 		{
 			if (member.second.type == GMMetaMemberType::Function)
 			{
 				std::string name = member.first.toStdString();
-				if (name == "__index")
-					hasIndexField = true;
-
 				lua_pushstring(L, name.c_str());
 				lua_pushcfunction(L, static_cast<GMLuaCFunction>(member.second.ptr));
 				lua_rawset(L, -3);
@@ -363,13 +368,10 @@ void GMLua::setMetatable(const GMObject& obj)
 
 	}
 
-	if (!hasIndexField)
-	{
-		lua_pushstring(L, "__index");
-		pushNewTable(obj, false);
-		lua_rawset(L, -3);
-	}
-
+	// TODO 如果元表也有元表，应该依次setmetatable
+	lua_pushstring(L, "__index");
+	pushNewTable(*metaTable, false);
+	lua_rawset(L, -3);
 	lua_setmetatable(L, tableIdx);
 }
 
@@ -629,7 +631,7 @@ void GMLua::setTable(const char* key, const GMObjectMember& value)
 		break;
 	}
 	case GMMetaMemberType::Object:
-		pushNewTable(*static_cast<GMObject*>(value.ptr));
+		pushNewTable(**static_cast<GMObject**>(value.ptr));
 		break;
 	case GMMetaMemberType::Function:
 		lua_pushcfunction(L, static_cast<GMLuaCFunction>(value.ptr));

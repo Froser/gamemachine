@@ -18,8 +18,25 @@ bool GMSkeletalGameObjectProxy::registerMeta()
 {
 	GM_LUA_PROXY_META;
 	GM_LUA_PROXY_METATABLE_META;
+	GM_META(__name);
 	GM_META(gameObj);
+	GM_META_FUNCTION(update);
 	return true;
+}
+
+/*
+ * update([self], dt)
+ */
+GM_LUA_META_FUNCTION_PROXY_IMPL(GMSkeletalGameObjectProxy, update, L)
+{
+	static const GMString s_invoker = NAME ".update";
+	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".update");
+	GMGameObjectProxy self;
+	GMfloat dt = GMArgumentHelper::popArgument(L, s_invoker).toFloat(); //duration
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+		self->update(dt);
+	return GMReturnValues();
 }
 
 namespace

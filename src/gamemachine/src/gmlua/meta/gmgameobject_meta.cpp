@@ -17,6 +17,7 @@ GMGameObjectProxy::GMGameObjectProxy(GMGameObject* gameObj /*= nullptr*/)
 bool GMGameObjectProxy::registerMeta()
 {
 	GM_LUA_PROXY_META;
+	GM_META(__name);
 	GM_META(gameObj);
 	GM_META_FUNCTION(setAsset);
 	GM_META_FUNCTION(setTranslation);

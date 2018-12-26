@@ -26,6 +26,18 @@ GMObject::~GMObject()
 	releaseConnections();
 }
 
+const GMMeta* GMObject::meta() const
+{
+	D(d);
+	if (!d->metaRegistered)
+	{
+		d->metaRegistered = true;
+		if (!const_cast<GMObject*>(this)->registerMeta())
+			return nullptr;
+	}
+	return &d->meta;
+}
+
 void GMObject::connect(GMObject& sender, GMSignal signal, const GMEventCallback& callback)
 {
 	sender.addConnection(std::move(signal), *this, callback);
