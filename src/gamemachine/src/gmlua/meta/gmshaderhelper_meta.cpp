@@ -19,7 +19,7 @@ namespace
 	GM_LUA_META_FUNCTION_IMPL(loadShaderOpenGL, L)
 	{
 		static const GMString s_invoker = NAME ".loadShaderOpenGL";
-		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".loadShaderOpenGL");
+		GM_LUA_CHECK_ARG_COUNT(L, 9, NAME ".loadShaderOpenGL");
 		IRenderContextProxy context;
 		GMString filtersPixelFilePath = GMArgumentHelper::popArgumentAsString(L, s_invoker);
 		GMString filtersVertexFilePath = GMArgumentHelper::popArgumentAsString(L, s_invoker);

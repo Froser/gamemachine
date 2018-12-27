@@ -368,9 +368,10 @@ void GMLua::setMetatable(const GMObject& obj)
 
 	}
 
-	// TODO 如果元表也有元表，应该依次setmetatable
 	lua_pushstring(L, "__index");
-	pushNewTable(*metaTable, false);
+	// 当元表不为本身，说明obj这个表拥有一个基类（元表）。
+	// 此时应该为其基类递归设置元表。
+	pushNewTable(*metaTable, metaTable != &obj);
 	lua_rawset(L, -3);
 	lua_setmetatable(L, tableIdx);
 }

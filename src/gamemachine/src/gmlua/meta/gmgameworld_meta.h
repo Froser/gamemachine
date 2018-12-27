@@ -22,7 +22,7 @@ namespace luaapi
 	class GMGameWorldProxy : public GMObject
 	{
 		GM_DECLARE_PRIVATE(GMGameWorldProxy)
-		GM_LUA_META_PROXY_FUNCTIONS(GMGameWorld, gameworld)
+		GM_LUA_PROXY_FUNCTIONS(GMGameWorld, gameworld)
 
 	public:
 		GMGameWorldProxy(GMGameWorld* gameworld = nullptr);

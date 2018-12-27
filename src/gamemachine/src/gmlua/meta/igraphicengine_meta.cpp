@@ -52,13 +52,11 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(IGraphicEngineProxy, getDefaultFramebuffers, L)
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getDefaultFramebuffers");
 	IGraphicEngineProxy self;
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
-
-	// TODO
-	//if (self)
-	//{
-	//	GMCamera& camera = self->getDefaultFramebuffers();
-	//	return GMReturnValues(L, GMCameraProxy(&camera));
-	//}
+	if (self)
+	{
+		IFramebuffers* defaultFramebuffers = self->getDefaultFramebuffers();
+		return GMReturnValues(L, IFramebuffersProxy(defaultFramebuffers));
+	}
 	return GMReturnValues();
 }
 
@@ -164,5 +162,39 @@ bool GMCameraProxy::registerMeta()
 	GM_META_FUNCTION(lookAt);
 	GM_META_FUNCTION(setPerspective);
 	GM_META_FUNCTION(setOrtho);
+	return true;
+}
+
+//////////////////////////////////////////////////////////////////////////
+#define IFRAMEBUFFERS_NAME "IFramebuffers"
+
+/*
+* clear([self], clearType)
+*/
+GM_LUA_META_FUNCTION_PROXY_IMPL(IFramebuffersProxy, clear, L)
+{
+	static const GMString s_invoker = IFRAMEBUFFERS_NAME ".clear";
+	GM_LUA_CHECK_ARG_COUNT_GT(L, 1, IFRAMEBUFFERS_NAME ".clear");
+	IFramebuffersProxy self;
+	GMFramebuffersClearType type = (GMArgumentHelper::getArgumentsCount(L) == 2) ? 
+		(static_cast<GMFramebuffersClearType>(GMArgumentHelper::popArgument(L, s_invoker).toInt())) : 
+		(GMFramebuffersClearType::All); // clearType
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+		self->clear(type);
+	return GMReturnValues();
+}
+
+IFramebuffersProxy::IFramebuffersProxy(IFramebuffers* framebuffers /*= nullptr*/)
+{
+	D(d);
+	d->framebuffers = framebuffers;
+}
+
+bool IFramebuffersProxy::registerMeta()
+{
+	GM_LUA_PROXY_META;
+	GM_META(framebuffers);
+	GM_META_FUNCTION(clear);
 	return true;
 }

@@ -78,7 +78,7 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(GMGameObjectProxy, setRotation, L)
 	static const GMString s_invoker = NAME ".setRotation";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setRotation");
 	GMGameObjectProxy self;
-	GMVec3 v = GMArgumentHelper::popArgumentAsVec4(L, s_invoker).toVec4(); //quat
+	GMVec4 v = GMArgumentHelper::popArgumentAsVec4(L, s_invoker).toVec4(); //quat
 	GMQuat quat(v.getX(), v.getY(), v.getZ(), v.getW());
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)

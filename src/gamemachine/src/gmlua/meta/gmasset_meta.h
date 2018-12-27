@@ -18,7 +18,7 @@ namespace luaapi
 	class GMAssetProxy : public GMObject
 	{
 		GM_DECLARE_PRIVATE(GMAssetProxy)
-		GM_LUA_META_PROXY_FUNCTIONS(GMAsset, asset)
+		GM_LUA_PROXY_FUNCTIONS(GMAsset, asset)
 
 	public:
 		GMAssetProxy() = default;

@@ -286,9 +286,9 @@ GMuint32 GMVariant::toUInt() const
 GMfloat GMVariant::toFloat() const
 {
 	if (m_type == I32 || m_type == I64)
-		return rawGet<GMint32>(&m_data.i32);
+		return static_cast<GMfloat>(rawGet<GMint32>(&m_data.i32));
 	if (m_type == UInt)
-		return rawGet<GMuint32>(&m_data.u);
+		return static_cast<GMfloat>(rawGet<GMuint32>(&m_data.u));
 
 	return get<GMfloat>(&m_data.f);
 }

@@ -5,8 +5,12 @@
 BEGIN_NS
 
 #define GM_LUA_CHECK_ARG_COUNT(L, count, invoker) \
-	if (gm::luaapi::GMArgumentHelper::getArgumentsCount(L) != count) \
-	{ gm_error(gm_dbg_wrap(" Error occurs while invoking {0}. Reason: Wrong argument count. {1} is expected."), invoker, gm::GMString(count) ); return 0; }
+	{ auto argc = gm::luaapi::GMArgumentHelper::getArgumentsCount(L); if ( argc != count) \
+	{ gm_error(gm_dbg_wrap(" Error occurs while invoking {0}. Reason: Wrong argument count. {1} is expected but argument count is {2}."), invoker, gm::GMString(count), gm::GMString(argc) ); return 0; } }
+
+#define GM_LUA_CHECK_ARG_COUNT_GT(L, count, invoker) \
+	{ auto argc = gm::luaapi::GMArgumentHelper::getArgumentsCount(L); if ( argc != count) \
+	{ gm_error(gm_dbg_wrap(" Error occurs while invoking {0}. Reason: Wrong argument count. More than {1} is expected but argument count is {2}."), invoker, gm::GMString(count), gm::GMString(argc) ); return 0; } }
 
 namespace luaapi
 {

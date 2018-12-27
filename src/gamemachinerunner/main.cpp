@@ -68,12 +68,16 @@ int main(int argc, char* argv[])
 	}
 
 #if GM_WINDOWS
+#if GM_USE_DX11
 	gm::GMRenderEnvironment env = gm::GMRenderEnvironment::DirectX11;
 	if (args.size() >= 3)
 	{
 		if (args[2] == L"-opengl")
 			env = gm::GMRenderEnvironment::OpenGL;
 	}
+#else
+	gm::GMRenderEnvironment env = gm::GMRenderEnvironment::OpenGL;
+#endif
 
 #elif GM_UNIX
 	gm::GMRenderEnvironment env = gm::GMRenderEnvironment::OpenGL;

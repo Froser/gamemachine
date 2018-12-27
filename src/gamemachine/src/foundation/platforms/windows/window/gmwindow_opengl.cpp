@@ -215,10 +215,12 @@ EXIT:
 IGraphicEngine* GMWindow_OpenGL::getGraphicEngine()
 {
 	D_BASE(d, Base);
+	if (!d->context)
+		return getContext()->getEngine();
+
 	if (!d->engine)
-	{
 		d->engine = gm_makeOwnedPtr<GMGLGraphicEngine>(getContext());
-	}
+
 	return d->engine.get();
 }
 

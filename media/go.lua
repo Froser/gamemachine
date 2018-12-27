@@ -42,6 +42,7 @@ handler.event = function(evt)
 		local dt = GM.getRunningStates().lastFrameElpased
 		handler.gameobject:update(dt)
 	elseif (evt == 3) then -- render
+		handler.context:getEngine():getDefaultFramebuffers():clear()
 		handler.world:renderScene()
 	end
 end
@@ -85,7 +86,7 @@ end
 handler.onLoadShaders = function(context)
 	if (GM.getRunningStates().renderEnvironment == 1) then--opengl
 		GMDebugger.info('OpenGL detected.')
-		-- todo
+		GMShaderHelper.loadShaderOpenGL(context, 'gl/main.vert','gl/main.frag','gl/deferred/geometry_pass_main.vert','gl/deferred/geometry_pass_main.frag','gl/deferred/light_pass_main.vert','gl/deferred/light_pass_main.frag','gl/filters/filters.vert','gl/filters/filters.frag')
 	else
 		GMDebugger.info('DirectX11 detected.')
 		GMShaderHelper.loadShaderDx11(context, 'dx11/effect.fx')

@@ -21,7 +21,7 @@ namespace luaapi
 	class GMSkeletalGameObjectProxy : public GMObject
 	{
 		GM_DECLARE_PRIVATE(GMSkeletalGameObjectProxy)
-		GM_LUA_META_PROXY_FUNCTIONS(GMSkeletalGameObject, gameObj)
+		GM_LUA_PROXY_FUNCTIONS(GMSkeletalGameObject, gameObj)
 
 	public:
 		GMSkeletalGameObjectProxy(GMSkeletalGameObject* gameObj = nullptr);

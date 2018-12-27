@@ -311,10 +311,12 @@ void GMWindow_Dx11::onWindowCreated(const GMWindowDesc& wndAttrs)
 IGraphicEngine* GMWindow_Dx11::getGraphicEngine()
 {
 	D_BASE(d, Base);
+	if (!d->context)
+		return getContext()->getEngine();
+
 	if (!d->engine)
-	{
 		d->engine = gm_makeOwnedPtr<GMDx11GraphicEngine>(getContext());
-	}
+
 	return d->engine.get();
 }
 

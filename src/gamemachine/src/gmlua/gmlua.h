@@ -237,7 +237,7 @@ private:
 #define GM_LUA_PROXY_METATABLE_NAME "__gm_metatable"
 #define GM_LUA_PROXY_METATABLE(clsName) clsName __gm_metatableinstance; gm::GMObject* __gm_metatable = nullptr; // 指定一个表为元表（继承）
 #define GM_LUA_PROXY_METATABLE_META { data()->__gm_metatableinstance.set(get()); data()->__gm_metatable = &(data()->__gm_metatableinstance); GM_META(__gm_metatable); } // registerMeta中加入此宏，像会应用元表
-#define GM_LUA_META_PROXY_FUNCTIONS(type, handler) \
+#define GM_LUA_PROXY_FUNCTIONS(type, handler) \
 	public:											\
 		typedef type RealType;						\
 		RealType* get()								\

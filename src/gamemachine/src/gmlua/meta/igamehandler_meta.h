@@ -24,7 +24,7 @@ namespace luaapi
 	class IGameHandlerProxy : public GMObject
 	{
 		GM_DECLARE_PRIVATE(IGameHandlerProxy)
-		GM_LUA_META_PROXY_FUNCTIONS(IGameHandler, handler)
+		GM_LUA_PROXY_FUNCTIONS(IGameHandler, handler)
 
 	public:
 		IGameHandlerProxy(GMLuaCoreState* L);
