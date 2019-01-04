@@ -11,7 +11,7 @@ using namespace gm::luaapi;
 /*
  * addLight([self], IGameHandler)
  */
-GM_LUA_META_FUNCTION_PROXY_IMPL(IGraphicEngineProxy, addLight, L)
+GM_LUA_PROXY_IMPL(IGraphicEngineProxy, addLight, L)
 {
 	static const GMString s_invoker = NAME ".addLight";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".addLight");
@@ -29,7 +29,7 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(IGraphicEngineProxy, addLight, L)
 /*
  * getCamera([self])
  */
-GM_LUA_META_FUNCTION_PROXY_IMPL(IGraphicEngineProxy, getCamera, L)
+GM_LUA_PROXY_IMPL(IGraphicEngineProxy, getCamera, L)
 {
 	static const GMString s_invoker = NAME ".getCamera";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getCamera");
@@ -46,7 +46,7 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(IGraphicEngineProxy, getCamera, L)
 /*
 * getCamera([self])
 */
-GM_LUA_META_FUNCTION_PROXY_IMPL(IGraphicEngineProxy, getDefaultFramebuffers, L)
+GM_LUA_PROXY_IMPL(IGraphicEngineProxy, getDefaultFramebuffers, L)
 {
 	static const GMString s_invoker = NAME ".getDefaultFramebuffers";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getDefaultFramebuffers");
@@ -98,7 +98,7 @@ GMCameraLookAt GMCameraLookAtProxy::toCameraLookAt()
 /*
  * lookAt([self], GMCameraLookAt)
  */
-GM_LUA_META_FUNCTION_PROXY_IMPL(GMCameraProxy, lookAt, L)
+GM_LUA_PROXY_IMPL(GMCameraProxy, lookAt, L)
 {
 	static const GMString s_invoker = CAMERA_NAME ".lookAt";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, CAMERA_NAME ".lookAt");
@@ -114,7 +114,7 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(GMCameraProxy, lookAt, L)
 /*
  * setPerspective([self], fovy, aspect, near, far)
  */
-GM_LUA_META_FUNCTION_PROXY_IMPL(GMCameraProxy, setPerspective, L)
+GM_LUA_PROXY_IMPL(GMCameraProxy, setPerspective, L)
 {
 	static const GMString s_invoker = CAMERA_NAME ".setPerspective";
 	GM_LUA_CHECK_ARG_COUNT(L, 5, CAMERA_NAME ".setPerspective");
@@ -132,7 +132,7 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(GMCameraProxy, setPerspective, L)
 /*
  * setOrtho([self], left, right, bottom, top, near, far)
  */
-GM_LUA_META_FUNCTION_PROXY_IMPL(GMCameraProxy, setOrtho, L)
+GM_LUA_PROXY_IMPL(GMCameraProxy, setOrtho, L)
 {
 	static const GMString s_invoker = CAMERA_NAME ".setPerspective";
 	GM_LUA_CHECK_ARG_COUNT(L, 7, CAMERA_NAME ".setPerspective");
@@ -171,7 +171,7 @@ bool GMCameraProxy::registerMeta()
 /*
 * clear([self], clearType)
 */
-GM_LUA_META_FUNCTION_PROXY_IMPL(IFramebuffersProxy, clear, L)
+GM_LUA_PROXY_IMPL(IFramebuffersProxy, clear, L)
 {
 	static const GMString s_invoker = IFRAMEBUFFERS_NAME ".clear";
 	GM_LUA_CHECK_ARG_COUNT_GT(L, 1, IFRAMEBUFFERS_NAME ".clear");

@@ -11,7 +11,7 @@ using namespace gm::luaapi;
 namespace
 {
 	// {{BEGIN META FUNCTION}}
-	GM_LUA_META_FUNCTION_IMPL(info, L)
+	GM_LUA_FUNC(info, L)
 	{
 		static const GMString s_invoker = NAME ".info";
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".info");
@@ -20,7 +20,7 @@ namespace
 		return GMReturnValues();
 	}
 
-	GM_LUA_META_FUNCTION_IMPL(error, L)
+	GM_LUA_FUNC(error, L)
 	{
 		static const GMString s_invoker = NAME ".error";
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".error");
@@ -29,7 +29,7 @@ namespace
 		return GMReturnValues();
 	}
 
-	GM_LUA_META_FUNCTION_IMPL(warning, L)
+	GM_LUA_FUNC(warning, L)
 	{
 		static const GMString s_invoker = NAME ".warning";
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".warning");
@@ -38,7 +38,7 @@ namespace
 		return GMReturnValues();
 	}
 
-	GM_LUA_META_FUNCTION_IMPL(debug, L)
+	GM_LUA_FUNC(debug, L)
 	{
 		static const GMString s_invoker = NAME ".debug";
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".debug");

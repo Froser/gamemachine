@@ -12,7 +12,7 @@ namespace luaapi
 		GM_LUA_PROXY;
 		GMShader* shader = nullptr;
 		GMString __name = "GMShader";
-		GM_LUA_META_FUNCTION(__index);
+		GM_LUA_PROXY_FUNC(__index);
 	};
 
 	class GMShaderProxy : public GMObject
@@ -32,7 +32,8 @@ namespace luaapi
 		GM_LUA_PROXY;
 		GMMaterial* material = nullptr;
 		GMString __name = "GMMaterial";
-		GM_LUA_META_FUNCTION(__index);
+		GM_LUA_PROXY_FUNC(__index);
+		GM_LUA_PROXY_FUNC(__newindex);
 	};
 
 	class GMMaterialProxy : public GMObject

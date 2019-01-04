@@ -25,6 +25,7 @@ namespace luaapi
 		*/
 		static GMint32 getArgumentsCount(GMLuaCoreState* L);
 		static const char* popArgumentAsString(GMLuaCoreState* L, const GMString& invoker);
+		static GMVariant peekArgument(GMLuaCoreState* L, GMint32 index, const GMString& invoker);
 		static GMVariant popArgument(GMLuaCoreState* L, const GMString& invoker);
 		static GMVariant popArgumentAsVec2(GMLuaCoreState* L, const GMString& invoker);
 		static GMVariant popArgumentAsVec3(GMLuaCoreState* L, const GMString& invoker);

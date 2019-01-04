@@ -11,7 +11,7 @@ namespace luaapi
 		GM_LUA_PROXY;
 		GMGamePackage* package = nullptr;
 
-		GM_LUA_META_FUNCTION(loadPackage)
+		GM_LUA_PROXY_FUNC(loadPackage)
 	};
 
 	class GMGamePackageProxy : public GMObject

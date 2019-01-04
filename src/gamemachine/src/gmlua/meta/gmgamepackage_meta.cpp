@@ -10,7 +10,7 @@ using namespace gm::luaapi;
 /*
 * loadPackage([self], path)
 */
-GM_LUA_META_FUNCTION_PROXY_IMPL(GMGamePackageProxy, loadPackage, L)
+GM_LUA_PROXY_IMPL(GMGamePackageProxy, loadPackage, L)
 {
 	static const GMString s_invoker(L"loadPackage");
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".loadPackage");

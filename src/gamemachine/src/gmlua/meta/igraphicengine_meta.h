@@ -10,9 +10,9 @@ namespace luaapi
 	{
 		GM_LUA_PROXY;
 		IGraphicEngine* engine = nullptr;
-		GM_LUA_META_FUNCTION(addLight);
-		GM_LUA_META_FUNCTION(getCamera);
-		GM_LUA_META_FUNCTION(getDefaultFramebuffers);
+		GM_LUA_PROXY_FUNC(addLight);
+		GM_LUA_PROXY_FUNC(getCamera);
+		GM_LUA_PROXY_FUNC(getDefaultFramebuffers);
 	};
 
 	class IGraphicEngineProxy : public GMObject
@@ -49,9 +49,9 @@ namespace luaapi
 	{
 		GM_LUA_PROXY;
 		GMCamera* camera = nullptr;
-		GM_LUA_META_FUNCTION(lookAt);
-		GM_LUA_META_FUNCTION(setPerspective);
-		GM_LUA_META_FUNCTION(setOrtho);
+		GM_LUA_PROXY_FUNC(lookAt);
+		GM_LUA_PROXY_FUNC(setPerspective);
+		GM_LUA_PROXY_FUNC(setOrtho);
 	};
 
 	class GMCameraProxy : public GMObject
@@ -70,7 +70,7 @@ namespace luaapi
 	{
 		GM_LUA_PROXY;
 		IFramebuffers* framebuffers = nullptr;
-		GM_LUA_META_FUNCTION(clear);
+		GM_LUA_PROXY_FUNC(clear);
 	};
 
 	class IFramebuffersProxy : public GMObject

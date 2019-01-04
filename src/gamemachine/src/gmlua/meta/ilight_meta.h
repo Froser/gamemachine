@@ -12,9 +12,9 @@ namespace luaapi
 		ILight* light = nullptr;
 
 		GMString __name = "ILight";
-		GM_LUA_META_FUNCTION(__gc);
-		GM_LUA_META_FUNCTION(setLightAttribute3);
-		GM_LUA_META_FUNCTION(setLightAttribute);
+		GM_LUA_PROXY_FUNC(__gc);
+		GM_LUA_PROXY_FUNC(setLightAttribute3);
+		GM_LUA_PROXY_FUNC(setLightAttribute);
 	};
 
 	class ILightProxy : public GMObject

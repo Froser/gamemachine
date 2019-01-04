@@ -17,19 +17,13 @@ bool GMModelProxy::registerMeta()
 	GM_LUA_PROXY_META;
 	GM_META(model);
 	GM_META(__name);
-	GM_META_FUNCTION(getShader)
+	GM_META_FUNCTION(__index)
 	return true;
 }
 
-/*
- * getShader([self])
- */
-GM_LUA_META_FUNCTION_PROXY_IMPL(GMModelProxy, getShader, L)
+GM_LUA_PROXY_IMPL(GMModelProxy, __index, L)
 {
-	static const GMString s_invoker = "GMModelProxy.getShader";
-	GM_LUA_CHECK_ARG_COUNT(L, 1, "GMModelProxy.getShader");
-	GMModelProxy self;
-	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
-	GMShaderProxy shader(&self->getShader());
-	return GMReturnValues(L, shader);
+	GM_LUA_BEGIN_PROPERTY(GMModelProxy)
+		GM_LUA_PROPERTY_PROXY_GETTER(GMShaderProxy, Shader, shader)
+	GM_LUA_END_PROPERTY()
 }

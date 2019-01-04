@@ -29,7 +29,7 @@ bool GMGameObjectProxy::registerMeta()
 /*
  * __gc([self])
  */
-GM_LUA_META_FUNCTION_PROXY_IMPL(GMGameObjectProxy, __gc, L)
+GM_LUA_PROXY_IMPL(GMGameObjectProxy, __gc, L)
 {
 	static const GMString s_invoker = NAME ".__gc";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
@@ -42,7 +42,7 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(GMGameObjectProxy, __gc, L)
 /*
  * setAsset([self], GMAsset)
  */
-GM_LUA_META_FUNCTION_PROXY_IMPL(GMGameObjectProxy, setAsset, L)
+GM_LUA_PROXY_IMPL(GMGameObjectProxy, setAsset, L)
 {
 	static const GMString s_invoker = NAME ".setAsset";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setAsset");
@@ -58,7 +58,7 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(GMGameObjectProxy, setAsset, L)
 /*
  * setTranslation([self], matrix)
  */
-GM_LUA_META_FUNCTION_PROXY_IMPL(GMGameObjectProxy, setTranslation, L)
+GM_LUA_PROXY_IMPL(GMGameObjectProxy, setTranslation, L)
 {
 	static const GMString s_invoker = NAME ".setTranslation";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setTranslation");
@@ -73,7 +73,7 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(GMGameObjectProxy, setTranslation, L)
 /*
 * setTranslation([self], quat)
 */
-GM_LUA_META_FUNCTION_PROXY_IMPL(GMGameObjectProxy, setRotation, L)
+GM_LUA_PROXY_IMPL(GMGameObjectProxy, setRotation, L)
 {
 	static const GMString s_invoker = NAME ".setRotation";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setRotation");
@@ -90,7 +90,7 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(GMGameObjectProxy, setRotation, L)
 /*
 * setTranslation([self], matrix)
 */
-GM_LUA_META_FUNCTION_PROXY_IMPL(GMGameObjectProxy, setScaling, L)
+GM_LUA_PROXY_IMPL(GMGameObjectProxy, setScaling, L)
 {
 	static const GMString s_invoker = NAME ".setScaling";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setScaling");
@@ -105,7 +105,7 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(GMGameObjectProxy, setScaling, L)
 namespace
 {
 	// {{BEGIN META FUNCTION}}
-	GM_LUA_META_FUNCTION_IMPL(New, L)
+	GM_LUA_FUNC(New, L)
 	{
 		static const GMString s_invoker = NAME ".new";
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".new");

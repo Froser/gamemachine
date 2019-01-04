@@ -11,7 +11,7 @@ using namespace gm::luaapi;
 /*
  * __gc([self])
  */
-GM_LUA_META_FUNCTION_PROXY_IMPL(GMAssetProxy, __gc, L)
+GM_LUA_PROXY_IMPL(GMAssetProxy, __gc, L)
 {
 	static const GMString s_invoker = NAME ".__gc";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
@@ -24,7 +24,7 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(GMAssetProxy, __gc, L)
 /*
  * getScene([self])
  */
-GM_LUA_META_FUNCTION_PROXY_IMPL(GMAssetProxy, getScene, L)
+GM_LUA_PROXY_IMPL(GMAssetProxy, getScene, L)
 {
 	static const GMString s_invoker = NAME ".getScene";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getScene");
@@ -38,7 +38,7 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(GMAssetProxy, getScene, L)
 /*
  * getModel([self])
  */
-GM_LUA_META_FUNCTION_PROXY_IMPL(GMAssetProxy, getModel, L)
+GM_LUA_PROXY_IMPL(GMAssetProxy, getModel, L)
 {
 	static const GMString s_invoker = "GMScene.getModel";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, "GMScene.getModel");
@@ -87,7 +87,7 @@ bool GMSceneProxy::registerMeta()
 /*
  * getModels([self])
  */
-GM_LUA_META_FUNCTION_PROXY_IMPL(GMSceneProxy, getModels, L)
+GM_LUA_PROXY_IMPL(GMSceneProxy, getModels, L)
 {
 	static const GMString s_invoker = "GMScene.getModels";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, "GMScene.getModels");

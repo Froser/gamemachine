@@ -55,6 +55,17 @@ handler.start = function()
 		type = 0
 	}
 	local asset = GMModelReader.load(settings)
+	local models = asset:getScene():getModels()
+	local modelsCount = models:size()
+
+	-- 修改材质参数
+	for i = 1, modelsCount do
+		local model = models[i]:getModel()
+		local shader = model.shader
+		local material = shader.material
+		material.specular = { 0, 0, 0 }
+	end
+
 	local gameobject = GMSkeletalGameObject.new()
 	gameobject:setAsset(asset)
 	gameobject:setTranslation(translate(0, -.5, 0))

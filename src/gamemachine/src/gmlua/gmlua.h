@@ -207,6 +207,7 @@ private:
 	  \return Lua栈顶转化为GMVariant后的值。
 	*/
 	GMVariant getTop();
+	GMVariant get(GMint32 index);
 	void push(const GMVariant& var);
 
 public:
@@ -227,9 +228,9 @@ private:
 #undef L
 #undef POP_GUARD
 
-#define GM_LUA_META_FUNCTION_IMPL(FuncName, L) gm::luaapi::GMFunctionReturn FuncName(GMLuaCoreState* L)
-#define GM_LUA_META_FUNCTION_PROXY_IMPL(Proxy, FuncName, L) gm::luaapi::GMFunctionReturn GM_PRIVATE_NAME(Proxy)::FuncName(GMLuaCoreState* L)
-#define GM_LUA_META_FUNCTION(FuncName) GM_META_METHOD gm::luaapi::GMFunctionReturn FuncName(GMLuaCoreState*);
+#define GM_LUA_FUNC(FuncName, L) gm::luaapi::GMFunctionReturn FuncName(GMLuaCoreState* L)
+#define GM_LUA_PROXY_IMPL(Proxy, FuncName, L) gm::luaapi::GMFunctionReturn GM_PRIVATE_NAME(Proxy)::FuncName(GMLuaCoreState* L)
+#define GM_LUA_PROXY_FUNC(FuncName) GM_META_METHOD gm::luaapi::GMFunctionReturn FuncName(GMLuaCoreState*);
 
 // lua类成员函数，需要带以下宏
 #define GM_LUA_PROXY bool detached = false;
@@ -291,24 +292,86 @@ private:
 		}
 
 // Lua indexer，用于模拟GMObject的属性
-#define GM_LUA_BEGIN_PROPERTY_GETTER(proxyClass) \
+#define GM_LUA_BEGIN_PROPERTY(proxyClass) \
 	{																							\
 		static const GMString s_invoker = #proxyClass ".__index";								\
 		proxyClass self;																		\
-		auto key = GMArgumentHelper::popArgument(L, s_invoker); /*key*/							\
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/						\
+		GMVariant key = GMArgumentHelper::peekArgument(L, 2, s_invoker); /*key*/				\
 		HashMap<GMString, std::function<GMReturnValues()>, GMStringHashFunctor> __s_indexMap;	\
 		if (__s_indexMap.empty())																\
 		{
 
 #define GM_LUA_PROPERTY_PROXY_GETTER(targetProxy, name, memberName) \
-		{ __s_indexMap[#memberName] = [&]() { return GMReturnValues(L, targetProxy(&self->get##name())); }; }
+		{ __s_indexMap[#memberName] = [&]() {													\
+			GMArgumentHelper::popArgument(L, s_invoker); /*key*/								\
+			GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/					\
+			return GMReturnValues(L, targetProxy(&self->get##name())); }; }
 
 #define GM_LUA_PROPERTY_GETTER(name, memberName) \
-		{ __s_indexMap[#memberName] = [&]() { return GMReturnValues(L, self->get##name()); }; }
+		{ __s_indexMap[#memberName] = [&]() {													\
+			GMArgumentHelper::popArgument(L, s_invoker); /*key*/								\
+			GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/					\
+			return GMReturnValues(L, (self->get##name())); }; }
 
+#define GM_LUA_PROPERTY_TYPE_INT toInt
+#define GM_LUA_PROPERTY_TYPE_INT64 toInt64
+#define GM_LUA_PROPERTY_TYPE_UINT toInt
+#define GM_LUA_PROPERTY_TYPE_FLOAT toFloat
+#define GM_LUA_PROPERTY_TYPE_VEC2 toVec2
+#define GM_LUA_PROPERTY_TYPE_VEC3 toVec3
+#define GM_LUA_PROPERTY_TYPE_VEC4 toVec4
+#define GM_LUA_PROPERTY_TYPE_MAT4 toMat4
+#define GM_LUA_PROPERTY_TYPE_NAME(X) GM_LUA_PROPERTY_TYPE_NAME_DUMMY(X)
+#define GM_LUA_PROPERTY_TYPE_NAME_DUMMY(X) #X
 
-#define GM_LUA_END_PROPERTY_GETTER() \
+#define GM_LUA_PROPERTY_SETTER(name, memberName, propertyType) \
+		{ __s_indexMap[#memberName] = [&]() {																									\
+			if (GMString::stringEquals(GM_LUA_PROPERTY_TYPE_NAME(propertyType), GM_LUA_PROPERTY_TYPE_NAME(GM_LUA_PROPERTY_TYPE_INT)) ||			\
+				GMString::stringEquals(GM_LUA_PROPERTY_TYPE_NAME(propertyType), GM_LUA_PROPERTY_TYPE_NAME(GM_LUA_PROPERTY_TYPE_INT64)) ||		\
+				GMString::stringEquals(GM_LUA_PROPERTY_TYPE_NAME(propertyType), GM_LUA_PROPERTY_TYPE_NAME(GM_LUA_PROPERTY_TYPE_UINT)) ||		\
+				GMString::stringEquals(GM_LUA_PROPERTY_TYPE_NAME(propertyType), GM_LUA_PROPERTY_TYPE_NAME(GM_LUA_PROPERTY_TYPE_FLOAT)))			\
+			{																																	\
+				auto value = GMArgumentHelper::popArgument(L, s_invoker); /*value*/																\
+				GMArgumentHelper::popArgument(L, s_invoker); /*key*/																			\
+				GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/																\
+				if (self) self->set##name(value.propertyType());																				\
+			}																																	\
+			else if (GMString::stringEquals(GM_LUA_PROPERTY_TYPE_NAME(propertyType), GM_LUA_PROPERTY_TYPE_NAME(GM_LUA_PROPERTY_TYPE_VEC2)))		\
+			{																																	\
+				GMVariant value = GMArgumentHelper::popArgumentAsVec2(L, s_invoker); /*value*/													\
+				GMArgumentHelper::popArgument(L, s_invoker); /*key*/																			\
+				GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/																\
+				if (self) self->set##name(value.propertyType());																				\
+			}																																	\
+			else if (GMString::stringEquals(GM_LUA_PROPERTY_TYPE_NAME(propertyType), GM_LUA_PROPERTY_TYPE_NAME(GM_LUA_PROPERTY_TYPE_VEC3)))		\
+			{																																	\
+				GMVariant value = GMArgumentHelper::popArgumentAsVec3(L, s_invoker); /*value*/													\
+				GMArgumentHelper::popArgument(L, s_invoker); /*key*/																			\
+				GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/																\
+				if (self) self->set##name(value.propertyType());																				\
+			}																																	\
+			else if (GMString::stringEquals(GM_LUA_PROPERTY_TYPE_NAME(propertyType), GM_LUA_PROPERTY_TYPE_NAME(GM_LUA_PROPERTY_TYPE_VEC4)))		\
+			{																																	\
+				GMVariant value = GMArgumentHelper::popArgumentAsVec4(L, s_invoker); /*value*/													\
+				GMArgumentHelper::popArgument(L, s_invoker); /*key*/																			\
+				GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/																\
+				if (self) self->set##name(value.propertyType());																				\
+			}																																	\
+			else if (GMString::stringEquals(GM_LUA_PROPERTY_TYPE_NAME(propertyType), GM_LUA_PROPERTY_TYPE_NAME(GM_LUA_PROPERTY_TYPE_MAT4)))		\
+			{																																	\
+				GMVariant value = GMArgumentHelper::popArgumentAsMat4(L, s_invoker); /*value*/													\
+				GMArgumentHelper::popArgument(L, s_invoker); /*key*/																			\
+				GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/																\
+				if (self) self->set##name(value.propertyType());																				\
+			}																																	\
+			else																																\
+			{																																	\
+				gm_error(gm_dbg_wrap("wrong lua property type."));																				\
+			}																																	\
+			return GMReturnValues();																											\
+		}; }
+
+#define GM_LUA_END_PROPERTY() \
 		}																						\
 		if (key.isString())																		\
 		{																						\

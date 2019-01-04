@@ -58,7 +58,7 @@ GMModelLoadSettings GMModelLoadSettingsProxy::toModelLoadSettings()
 namespace
 {
 	// {{BEGIN META FUNCTION}}
-	GM_LUA_META_FUNCTION_IMPL(load, L)
+	GM_LUA_FUNC(load, L)
 	{
 		static const GMString s_invoker = NAME ".load";
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".load");

@@ -11,7 +11,7 @@ namespace luaapi
 		GM_LUA_PROXY;
 		GMModel* model = nullptr;
 		GMString __name = "GMModel";
-		GM_LUA_META_FUNCTION(getShader);
+		GM_LUA_PROXY_FUNC(__index);
 	};
 
 	class GMModelProxy : public GMObject

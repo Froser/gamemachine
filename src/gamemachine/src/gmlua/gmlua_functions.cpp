@@ -27,6 +27,15 @@ const char* GMArgumentHelper::popArgumentAsString(GMLuaCoreState* L, const GMStr
 	return luaL_optstring(L, -1, "");
 }
 
+GMVariant GMArgumentHelper::peekArgument(GMLuaCoreState* L, GMint32 index, const GMString& invoker)
+{
+	GM_CHECK_LUA_STACK_BALANCE(0);
+	GMVariant v = GMLua(L).get(index);
+	if (v.isInvalid())
+		gm_error(gm_dbg_wrap("GMArgumentHelper::popArgument: {0}: Cannot match the type of the argument. The type of the argument is {1}."), invoker, lua_typename(L, -1));
+	return v;
+}
+
 GMVariant GMArgumentHelper::popArgument(GMLuaCoreState* L, const GMString& invoker)
 {
 	GM_CHECK_LUA_STACK_BALANCE(-1);

@@ -18,7 +18,7 @@ namespace luaapi
 		GMLuaReference onLoadShaders = 0;
 
 		GMString __name = L"IGameHandler";
-		GM_LUA_META_FUNCTION(__gc);
+		GM_LUA_PROXY_FUNC(__gc);
 	};
 
 	class IGameHandlerProxy : public GMObject

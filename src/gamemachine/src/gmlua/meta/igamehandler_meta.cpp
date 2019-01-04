@@ -128,7 +128,7 @@ IShaderLoadCallback* IGameHandlerProxy::getShaderLoadCallback() GM_NOEXCEPT
 /*
  * __gc([self])
  */
-GM_LUA_META_FUNCTION_PROXY_IMPL(IGameHandlerProxy, __gc, L)
+GM_LUA_PROXY_IMPL(IGameHandlerProxy, __gc, L)
 {
 	static const GMString s_invoker = NAME ".__gc";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");

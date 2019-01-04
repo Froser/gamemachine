@@ -12,9 +12,9 @@ namespace luaapi
 		GM_LUA_PROXY;
 		GMAsset* asset = nullptr;
 		GMString __name = L"GMAsset";
-		GM_LUA_META_FUNCTION(__gc);
-		GM_LUA_META_FUNCTION(getScene);
-		GM_LUA_META_FUNCTION(getModel);
+		GM_LUA_PROXY_FUNC(__gc);
+		GM_LUA_PROXY_FUNC(getScene);
+		GM_LUA_PROXY_FUNC(getModel);
 	};
 
 	class GMAssetProxy : public GMObject
@@ -35,7 +35,7 @@ namespace luaapi
 		GM_LUA_PROXY;
 		GMScene* scene = nullptr;
 		GMString __name = L"GMScene";
-		GM_LUA_META_FUNCTION(getModels);
+		GM_LUA_PROXY_FUNC(getModels);
 	};
 
 	class GMSceneProxy : public GMObject

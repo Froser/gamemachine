@@ -59,7 +59,7 @@ bool IWindowProxy::registerMeta()
 /*
  * __gc([self])
  */
-GM_LUA_META_FUNCTION_PROXY_IMPL(IWindowProxy, __gc, L)
+GM_LUA_PROXY_IMPL(IWindowProxy, __gc, L)
 {
 	static const GMString s_invoker = NAME ".__gc";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
@@ -72,7 +72,7 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(IWindowProxy, __gc, L)
 /*
  * create([self], GMWindowDesc)
  */
-GM_LUA_META_FUNCTION_PROXY_IMPL(IWindowProxy, create, L)
+GM_LUA_PROXY_IMPL(IWindowProxy, create, L)
 {
 	static const GMString s_invoker = NAME ".create";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".create");
@@ -88,7 +88,7 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(IWindowProxy, create, L)
 /*
  * centerWindow([self])
  */
-GM_LUA_META_FUNCTION_PROXY_IMPL(IWindowProxy, centerWindow, L)
+GM_LUA_PROXY_IMPL(IWindowProxy, centerWindow, L)
 {
 	static const GMString s_invoker = NAME ".centerWindow";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".centerWindow");
@@ -102,7 +102,7 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(IWindowProxy, centerWindow, L)
 /*
  * showWindow([self])
  */
-GM_LUA_META_FUNCTION_PROXY_IMPL(IWindowProxy, showWindow, L)
+GM_LUA_PROXY_IMPL(IWindowProxy, showWindow, L)
 {
 	static const GMString s_invoker = NAME ".showWindow";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".showWindow");
@@ -116,7 +116,7 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(IWindowProxy, showWindow, L)
 /*
  * setHandler([self], IGameHandler)
  */
-GM_LUA_META_FUNCTION_PROXY_IMPL(IWindowProxy, setHandler, L)
+GM_LUA_PROXY_IMPL(IWindowProxy, setHandler, L)
 {
 	static const GMString s_invoker = NAME ".setHandler";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setHandler");

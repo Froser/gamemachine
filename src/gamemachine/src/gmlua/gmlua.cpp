@@ -587,6 +587,18 @@ void GMLua::push(const GMVariant& var)
 		GM_STATIC_ASSERT(sizeof(lua_Integer) >= sizeof(void*), "Pointer size incompatible.");
 		lua_pushinteger(L, (lua_Integer)var.toPointer());
 	}
+	else if (var.isVec2())
+	{
+		pushVector(var.toVec2());
+	}
+	else if (var.isVec3())
+	{
+		pushVector(var.toVec3());
+	}
+	else if (var.isVec4())
+	{
+		pushVector(var.toVec4());
+	}
 	else
 	{
 		gm_error(gm_dbg_wrap("GMLua (push): variant type not supported"));
@@ -670,16 +682,21 @@ void GMLua::setTable(const char* key, const GMObjectMember& value)
 
 GMVariant GMLua::getTop()
 {
+	return get(-1);
+}
+
+GMVariant GMLua::get(GMint32 index)
+{
 	D(d);
 	GM_CHECK_LUA_STACK_BALANCE(0);
-	if (lua_isinteger(L, -1))
-		return static_cast<GMint32>(lua_tointeger(L, -1));
-	if (lua_isnumber(L, -1))
-		return lua_tonumber(L, -1);
-	if (lua_isstring(L, -1))
-		return GMString(lua_tostring(L, -1));
-	if (lua_isboolean(L, -1))
-		return lua_toboolean(L, -1) ? true : false;
+	if (lua_isinteger(L, index))
+		return static_cast<GMint32>(lua_tointeger(L, index));
+	if (lua_isnumber(L, index))
+		return lua_tonumber(L, index);
+	if (lua_isstring(L, index))
+		return GMString(lua_tostring(L, index));
+	if (lua_isboolean(L, index))
+		return lua_toboolean(L, index) ? true : false;
 	gm_error(gm_dbg_wrap("GMLua (pop): type not supported"));
 	return GMVariant();
 }

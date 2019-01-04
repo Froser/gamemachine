@@ -12,11 +12,11 @@ namespace luaapi
 		IWindow* window = nullptr;
 
 		GMString __name = "IWindow";
-		GM_LUA_META_FUNCTION(__gc);
-		GM_LUA_META_FUNCTION(create);
-		GM_LUA_META_FUNCTION(centerWindow);
-		GM_LUA_META_FUNCTION(showWindow);
-		GM_LUA_META_FUNCTION(setHandler);
+		GM_LUA_PROXY_FUNC(__gc);
+		GM_LUA_PROXY_FUNC(create);
+		GM_LUA_PROXY_FUNC(centerWindow);
+		GM_LUA_PROXY_FUNC(showWindow);
+		GM_LUA_PROXY_FUNC(setHandler);
 	};
 
 	class IWindowProxy : public GMObject

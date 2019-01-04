@@ -27,7 +27,7 @@ bool GMSkeletalGameObjectProxy::registerMeta()
 /*
  * update([self], dt)
  */
-GM_LUA_META_FUNCTION_PROXY_IMPL(GMSkeletalGameObjectProxy, update, L)
+GM_LUA_PROXY_IMPL(GMSkeletalGameObjectProxy, update, L)
 {
 	static const GMString s_invoker = NAME ".update";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".update");
@@ -42,7 +42,7 @@ GM_LUA_META_FUNCTION_PROXY_IMPL(GMSkeletalGameObjectProxy, update, L)
 namespace
 {
 	// {{BEGIN META FUNCTION}}
-	GM_LUA_META_FUNCTION_IMPL(New, L)
+	GM_LUA_FUNC(New, L)
 	{
 		static const GMString s_invoker = NAME ".new";
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".new");
