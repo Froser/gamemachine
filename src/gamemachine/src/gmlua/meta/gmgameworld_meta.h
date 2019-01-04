@@ -21,8 +21,7 @@ namespace luaapi
 
 	class GMGameWorldProxy : public GMObject
 	{
-		GM_DECLARE_PRIVATE(GMGameWorldProxy)
-		GM_LUA_PROXY_FUNCTIONS(GMGameWorld, gameworld)
+		GM_LUA_PROXY_OBJECT(GMGameWorldProxy, GMGameWorld, gameworld)
 
 	public:
 		GMGameWorldProxy(GMGameWorld* gameworld = nullptr);

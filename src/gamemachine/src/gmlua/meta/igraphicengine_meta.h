@@ -17,8 +17,7 @@ namespace luaapi
 
 	class IGraphicEngineProxy : public GMObject
 	{
-		GM_DECLARE_PRIVATE(IGraphicEngineProxy)
-		GM_LUA_PROXY_FUNCTIONS(IGraphicEngine, engine)
+		GM_LUA_PROXY_OBJECT(IGraphicEngineProxy, IGraphicEngine, engine)
 
 	public:
 		IGraphicEngineProxy(IGraphicEngine* engine = nullptr);
@@ -57,8 +56,7 @@ namespace luaapi
 
 	class GMCameraProxy : public GMObject
 	{
-		GM_DECLARE_PRIVATE(GMCameraProxy)
-		GM_LUA_PROXY_FUNCTIONS(GMCamera, camera)
+		GM_LUA_PROXY_OBJECT(GMCameraProxy, GMCamera, camera)
 
 	public:
 		GMCameraProxy(GMCamera* camera = nullptr);
@@ -77,8 +75,7 @@ namespace luaapi
 
 	class IFramebuffersProxy : public GMObject
 	{
-		GM_DECLARE_PRIVATE(IFramebuffersProxy)
-		GM_LUA_PROXY_FUNCTIONS(IFramebuffers, framebuffers)
+		GM_LUA_PROXY_OBJECT(IFramebuffersProxy, IFramebuffers, framebuffers)
 
 	public:
 		IFramebuffersProxy(IFramebuffers* framebuffers = nullptr);

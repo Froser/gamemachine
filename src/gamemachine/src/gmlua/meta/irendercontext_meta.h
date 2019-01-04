@@ -17,8 +17,7 @@ namespace luaapi
 
 	class IRenderContextProxy : public GMObject
 	{
-		GM_DECLARE_PRIVATE(IRenderContextProxy)
-		GM_LUA_PROXY_FUNCTIONS(const IRenderContext, context)
+		GM_LUA_PROXY_OBJECT(IRenderContextProxy, const IRenderContext, context)
 
 	public:
 		IRenderContextProxy(const IRenderContext* context = nullptr);

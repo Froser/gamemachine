@@ -343,9 +343,12 @@ void GMLua::pushNewTable(const GMObject& obj, bool setmt)
 void GMLua::setMetatable(const GMObject& obj)
 {
 	D(d);
+	static const GMString s_index = L"__index";
+
 	GM_CHECK_LUA_STACK_BALANCE(0);
 	auto tableIdx = lua_gettop(L);
 
+	bool hasIndex = false;
 	GMString metatableName;
 	const GMObject* metaTable = nullptr;
 	getMetaTableAndName(obj, metatableName, &metaTable);
@@ -357,6 +360,9 @@ void GMLua::setMetatable(const GMObject& obj)
 		// 存在meta数据
 		for (const auto& member : *metaTable->meta())
 		{
+			if (member.first == s_index)
+				hasIndex = true;
+
 			if (member.second.type == GMMetaMemberType::Function)
 			{
 				std::string name = member.first.toStdString();
@@ -368,11 +374,15 @@ void GMLua::setMetatable(const GMObject& obj)
 
 	}
 
-	lua_pushstring(L, "__index");
-	// 当元表不为本身，说明obj这个表拥有一个基类（元表）。
-	// 此时应该为其基类递归设置元表。
-	pushNewTable(*metaTable, metaTable != &obj);
-	lua_rawset(L, -3);
+	if (!hasIndex)
+	{
+		lua_pushstring(L, "__index");
+		// 当元表不为本身，说明obj这个表拥有一个基类（元表）。
+		// 此时应该为其基类递归设置元表。
+		pushNewTable(*metaTable, metaTable != &obj);
+		lua_rawset(L, -3);
+	}
+
 	lua_setmetatable(L, tableIdx);
 }
 
@@ -547,9 +557,13 @@ void GMLua::push(const GMVariant& var)
 {
 	D(d);
 	GM_CHECK_LUA_STACK_BALANCE(1);
-	if (var.isInt())
+	if (var.isInt() || var.isInt64())
 	{
-		lua_pushinteger(L, var.toInt());
+		lua_pushinteger(L, var.toInt64());
+	}
+	else if (var.isUInt())
+	{
+		lua_pushinteger(L, var.toUInt());
 	}
 	else if (var.isFloat())
 	{

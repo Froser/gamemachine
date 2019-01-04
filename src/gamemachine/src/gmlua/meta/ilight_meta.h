@@ -19,8 +19,7 @@ namespace luaapi
 
 	class ILightProxy : public GMObject
 	{
-		GM_DECLARE_PRIVATE(ILightProxy)
-		GM_LUA_PROXY_FUNCTIONS(ILight, light)
+		GM_LUA_PROXY_OBJECT(ILightProxy, ILight, light)
 
 	public:
 		ILightProxy(ILight* light = nullptr);

@@ -13,16 +13,38 @@ namespace luaapi
 		GMAsset* asset = nullptr;
 		GMString __name = L"GMAsset";
 		GM_LUA_META_FUNCTION(__gc);
+		GM_LUA_META_FUNCTION(getScene);
+		GM_LUA_META_FUNCTION(getModel);
 	};
 
 	class GMAssetProxy : public GMObject
 	{
-		GM_DECLARE_PRIVATE(GMAssetProxy)
-		GM_LUA_PROXY_FUNCTIONS(GMAsset, asset)
+		GM_LUA_PROXY_OBJECT(GMAssetProxy, GMAsset, asset)
 
 	public:
 		GMAssetProxy() = default;
 		GMAssetProxy(GMAsset asset);
+
+	protected:
+		virtual bool registerMeta() override;
+	};
+
+	//////////////////////////////////////////////////////////////////////////
+	GM_PRIVATE_OBJECT(GMSceneProxy)
+	{
+		GM_LUA_PROXY;
+		GMScene* scene = nullptr;
+		GMString __name = L"GMScene";
+		GM_LUA_META_FUNCTION(getModels);
+	};
+
+	class GMSceneProxy : public GMObject
+	{
+		GM_LUA_PROXY_OBJECT(GMSceneProxy, GMScene, scene)
+
+	public:
+		GMSceneProxy() = default;
+		GMSceneProxy(GMScene* scene);
 
 	protected:
 		virtual bool registerMeta() override;

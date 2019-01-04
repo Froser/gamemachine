@@ -21,8 +21,7 @@ namespace luaapi
 
 	class IWindowProxy : public GMObject
 	{
-		GM_DECLARE_PRIVATE(IWindowProxy)
-		GM_LUA_PROXY_FUNCTIONS(IWindow, window)
+		GM_LUA_PROXY_OBJECT(IWindowProxy, IWindow, window)
 
 	public:
 		IWindowProxy(IWindow* window = nullptr);

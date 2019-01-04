@@ -206,6 +206,10 @@ set(SOURCES
 		gmlua/meta/ilight_meta.cpp
 		gmlua/meta/gmskeletalgameobject_meta.h
 		gmlua/meta/gmskeletalgameobject_meta.cpp
+		gmlua/meta/gmshader_meta.h
+		gmlua/meta/gmshader_meta.cpp
+		gmlua/meta/gmmodel_meta.h
+		gmlua/meta/gmmodel_meta.cpp
 
 		extensions/bsp/bsp_factory.h
 		extensions/bsp/bsp_factory.cpp
