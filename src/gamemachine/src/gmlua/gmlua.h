@@ -290,6 +290,36 @@ private:
 			d->handler = handler;					\
 		}
 
+// Lua indexer，用于模拟GMObject的属性
+#define GM_LUA_BEGIN_PROPERTY_GETTER(proxyClass) \
+	{																							\
+		static const GMString s_invoker = #proxyClass ".__index";								\
+		proxyClass self;																		\
+		auto key = GMArgumentHelper::popArgument(L, s_invoker); /*key*/							\
+		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/						\
+		HashMap<GMString, std::function<GMReturnValues()>, GMStringHashFunctor> __s_indexMap;	\
+		if (__s_indexMap.empty())																\
+		{
+
+#define GM_LUA_PROPERTY_PROXY_GETTER(targetProxy, name, memberName) \
+		{ __s_indexMap[#memberName] = [&]() { return GMReturnValues(L, targetProxy(&self->get##name())); }; }
+
+#define GM_LUA_PROPERTY_GETTER(name, memberName) \
+		{ __s_indexMap[#memberName] = [&]() { return GMReturnValues(L, self->get##name()); }; }
+
+
+#define GM_LUA_END_PROPERTY_GETTER() \
+		}																						\
+		if (key.isString())																		\
+		{																						\
+			auto itemIter = __s_indexMap.find(key.toString());									\
+			if (itemIter != __s_indexMap.end())													\
+				if (itemIter->second)															\
+					return itemIter->second();													\
+		}																						\
+	}																							\
+	return GMReturnValues();
+
 // Lua模板类，用于模拟一些容器
 #define __META(memberName) \
 { \

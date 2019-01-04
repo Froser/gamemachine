@@ -50,6 +50,11 @@ namespace luaapi
 			: m_size(0)
 		{}
 
+		GMReturnValues(const GMReturnValues& rhs)
+			: m_size(rhs.m_size)
+			, m_L(const_cast<GMReturnValues&>(rhs).m_L.getLuaCoreState())
+		{}
+
 		operator GMint32()
 		{
 			return gm_sizet_to_int(m_size);
