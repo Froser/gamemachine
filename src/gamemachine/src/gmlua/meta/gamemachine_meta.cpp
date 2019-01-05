@@ -49,28 +49,28 @@ namespace
 	};
 
 	// {{BEGIN META FUNCTION}}
-	GM_LUA_FUNC(exit, L)
+	GM_LUA_FUNC(exit)
 	{
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".exit");
 		GM.exit();
 		return GMReturnValues();
 	}
 
-	GM_LUA_FUNC(getRunningStates, L)
+	GM_LUA_FUNC(getRunningStates)
 	{
 		GMGameMachineRunningStatesProxy proxy;
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".getRunningStates");
 		return GMReturnValues (L, GMVariant(proxy));
 	}
 
-	GM_LUA_FUNC(getGamePackageManager, L)
+	GM_LUA_FUNC(getGamePackageManager)
 	{
 		GMGamePackageProxy proxy(GM.getGamePackageManager());
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".getGamePackageManager");
 		return GMReturnValues(L, GMVariant(proxy));
 	}
 
-	GM_LUA_FUNC(addWindow, L)
+	GM_LUA_FUNC(addWindow)
 	{
 		IWindowProxy window;
 		static const GMString s_invoker = NAME ".addWindow";
@@ -83,7 +83,7 @@ namespace
 		return GMReturnValues();
 	}
 
-	GM_LUA_FUNC(startGameMachine, L)
+	GM_LUA_FUNC(startGameMachine)
 	{
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".startGameMachine");
 		GM.startGameMachine();

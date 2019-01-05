@@ -9,9 +9,7 @@ namespace luaapi
 {
 	GM_PRIVATE_OBJECT(GMGameObjectProxy)
 	{
-		GM_LUA_PROXY;
-		GMGameObject* gameObj = nullptr;
-		GMString __name = "GMGameObject";
+		GM_LUA_PROXY(GMGameObject);
 		GM_LUA_PROXY_FUNC(__gc);
 		GM_LUA_PROXY_FUNC(setAsset);
 		GM_LUA_PROXY_FUNC(setTranslation);
@@ -21,10 +19,7 @@ namespace luaapi
 
 	class GMGameObjectProxy : public GMObject
 	{
-		GM_LUA_PROXY_OBJECT(GMGameObjectProxy, GMGameObject, gameObj)
-
-	public:
-		GMGameObjectProxy(GMGameObject* gameObj = nullptr);
+		GM_LUA_PROXY_OBJECT(GMGameObjectProxy, GMGameObject)
 
 	protected:
 		virtual bool registerMeta() override;

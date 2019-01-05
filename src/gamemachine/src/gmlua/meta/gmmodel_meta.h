@@ -8,18 +8,13 @@ namespace luaapi
 {
 	GM_PRIVATE_OBJECT(GMModelProxy)
 	{
-		GM_LUA_PROXY;
-		GMModel* model = nullptr;
-		GMString __name = "GMModel";
+		GM_LUA_PROXY(GMModel);
 		GM_LUA_PROXY_FUNC(__index);
 	};
 
 	class GMModelProxy : public GMObject
 	{
-		GM_LUA_PROXY_OBJECT(GMModelProxy, GMModel, model)
-
-	public:
-		GMModelProxy(GMModel* model = nullptr);
+		GM_LUA_PROXY_OBJECT(GMModelProxy, GMModel)
 
 	protected:
 		virtual bool registerMeta() override;

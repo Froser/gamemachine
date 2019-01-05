@@ -8,17 +8,9 @@
 
 using namespace gm::luaapi;
 
-GMGameObjectProxy::GMGameObjectProxy(GMGameObject* gameObj /*= nullptr*/)
-{
-	D(d);
-	d->gameObj = gameObj;
-}
-
 bool GMGameObjectProxy::registerMeta()
 {
 	GM_LUA_PROXY_META;
-	GM_META(__name);
-	GM_META(gameObj);
 	GM_META_FUNCTION(setAsset);
 	GM_META_FUNCTION(setTranslation);
 	GM_META_FUNCTION(setRotation);
@@ -29,7 +21,7 @@ bool GMGameObjectProxy::registerMeta()
 /*
  * __gc([self])
  */
-GM_LUA_PROXY_IMPL(GMGameObjectProxy, __gc, L)
+GM_LUA_PROXY_IMPL(GMGameObjectProxy, __gc)
 {
 	static const GMString s_invoker = NAME ".__gc";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
@@ -42,7 +34,7 @@ GM_LUA_PROXY_IMPL(GMGameObjectProxy, __gc, L)
 /*
  * setAsset([self], GMAsset)
  */
-GM_LUA_PROXY_IMPL(GMGameObjectProxy, setAsset, L)
+GM_LUA_PROXY_IMPL(GMGameObjectProxy, setAsset)
 {
 	static const GMString s_invoker = NAME ".setAsset";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setAsset");
@@ -58,7 +50,7 @@ GM_LUA_PROXY_IMPL(GMGameObjectProxy, setAsset, L)
 /*
  * setTranslation([self], matrix)
  */
-GM_LUA_PROXY_IMPL(GMGameObjectProxy, setTranslation, L)
+GM_LUA_PROXY_IMPL(GMGameObjectProxy, setTranslation)
 {
 	static const GMString s_invoker = NAME ".setTranslation";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setTranslation");
@@ -73,7 +65,7 @@ GM_LUA_PROXY_IMPL(GMGameObjectProxy, setTranslation, L)
 /*
 * setTranslation([self], quat)
 */
-GM_LUA_PROXY_IMPL(GMGameObjectProxy, setRotation, L)
+GM_LUA_PROXY_IMPL(GMGameObjectProxy, setRotation)
 {
 	static const GMString s_invoker = NAME ".setRotation";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setRotation");
@@ -90,7 +82,7 @@ GM_LUA_PROXY_IMPL(GMGameObjectProxy, setRotation, L)
 /*
 * setTranslation([self], matrix)
 */
-GM_LUA_PROXY_IMPL(GMGameObjectProxy, setScaling, L)
+GM_LUA_PROXY_IMPL(GMGameObjectProxy, setScaling)
 {
 	static const GMString s_invoker = NAME ".setScaling";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setScaling");
@@ -105,7 +97,7 @@ GM_LUA_PROXY_IMPL(GMGameObjectProxy, setScaling, L)
 namespace
 {
 	// {{BEGIN META FUNCTION}}
-	GM_LUA_FUNC(New, L)
+	GM_LUA_FUNC(New)
 	{
 		static const GMString s_invoker = NAME ".new";
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".new");

@@ -9,18 +9,13 @@ namespace luaapi
 {
 	GM_PRIVATE_OBJECT(GMShaderProxy)
 	{
-		GM_LUA_PROXY;
-		GMShader* shader = nullptr;
-		GMString __name = "GMShader";
+		GM_LUA_PROXY(GMShader);
 		GM_LUA_PROXY_FUNC(__index);
 	};
 
 	class GMShaderProxy : public GMObject
 	{
-		GM_LUA_PROXY_OBJECT(GMShaderProxy, GMShader, shader)
-
-	public:
-		GMShaderProxy(GMShader* shader = nullptr);
+		GM_LUA_PROXY_OBJECT(GMShaderProxy, GMShader)
 
 	protected:
 		virtual bool registerMeta() override;
@@ -29,19 +24,14 @@ namespace luaapi
 	// 以下是GMShader各种属性
 	GM_PRIVATE_OBJECT(GMMaterialProxy)
 	{
-		GM_LUA_PROXY;
-		GMMaterial* material = nullptr;
-		GMString __name = "GMMaterial";
+		GM_LUA_PROXY(GMMaterial);
 		GM_LUA_PROXY_FUNC(__index);
 		GM_LUA_PROXY_FUNC(__newindex);
 	};
 
 	class GMMaterialProxy : public GMObject
 	{
-		GM_LUA_PROXY_OBJECT(GMMaterialProxy, GMMaterial, material)
-
-	public:
-		GMMaterialProxy(GMMaterial* material = nullptr);
+		GM_LUA_PROXY_OBJECT(GMMaterialProxy, GMMaterial)
 
 	protected:
 		virtual bool registerMeta() override;

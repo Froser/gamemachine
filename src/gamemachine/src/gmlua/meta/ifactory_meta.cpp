@@ -12,7 +12,7 @@ using namespace gm::luaapi;
 namespace
 {
 	// {{BEGIN META FUNCTION}}
-	GM_LUA_FUNC(createWindow, L)
+	GM_LUA_FUNC(createWindow)
 	{
 		static const GMString s_invoker = NAME ".createWindow";
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".createWindow");
@@ -21,7 +21,7 @@ namespace
 		return GMReturnValues(L, IWindowProxy(window));
 	}
 
-	GM_LUA_FUNC(createLight, L)
+	GM_LUA_FUNC(createLight)
 	{
 		static const GMString s_invoker = NAME ".createLight";
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".createLight");

@@ -9,18 +9,14 @@ namespace luaapi
 {
 	GM_PRIVATE_OBJECT(IRenderContextProxy)
 	{
-		GM_LUA_PROXY;
-		const IRenderContext* context = nullptr;
+		GM_LUA_PROXY_WITH_TYPE(IRenderContext, const IRenderContext);
 		GM_LUA_PROXY_FUNC(getWindow);
 		GM_LUA_PROXY_FUNC(getEngine);
 	};
 
 	class IRenderContextProxy : public GMObject
 	{
-		GM_LUA_PROXY_OBJECT(IRenderContextProxy, const IRenderContext, context)
-
-	public:
-		IRenderContextProxy(const IRenderContext* context = nullptr);
+		GM_LUA_PROXY_OBJECT(IRenderContextProxy, const IRenderContext)
 
 	public:
 		virtual bool registerMeta() override;

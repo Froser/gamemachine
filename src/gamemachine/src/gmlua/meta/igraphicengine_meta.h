@@ -8,8 +8,7 @@ namespace luaapi
 {
 	GM_PRIVATE_OBJECT(IGraphicEngineProxy)
 	{
-		GM_LUA_PROXY;
-		IGraphicEngine* engine = nullptr;
+		GM_LUA_PROXY(IGraphicEngine);
 		GM_LUA_PROXY_FUNC(addLight);
 		GM_LUA_PROXY_FUNC(getCamera);
 		GM_LUA_PROXY_FUNC(getDefaultFramebuffers);
@@ -17,10 +16,7 @@ namespace luaapi
 
 	class IGraphicEngineProxy : public GMObject
 	{
-		GM_LUA_PROXY_OBJECT(IGraphicEngineProxy, IGraphicEngine, engine)
-
-	public:
-		IGraphicEngineProxy(IGraphicEngine* engine = nullptr);
+		GM_LUA_PROXY_OBJECT(IGraphicEngineProxy, IGraphicEngine)
 
 	protected:
 		virtual bool registerMeta() override;
@@ -47,8 +43,7 @@ namespace luaapi
 
 	GM_PRIVATE_OBJECT(GMCameraProxy)
 	{
-		GM_LUA_PROXY;
-		GMCamera* camera = nullptr;
+		GM_LUA_PROXY(GMCamera);
 		GM_LUA_PROXY_FUNC(lookAt);
 		GM_LUA_PROXY_FUNC(setPerspective);
 		GM_LUA_PROXY_FUNC(setOrtho);
@@ -56,10 +51,7 @@ namespace luaapi
 
 	class GMCameraProxy : public GMObject
 	{
-		GM_LUA_PROXY_OBJECT(GMCameraProxy, GMCamera, camera)
-
-	public:
-		GMCameraProxy(GMCamera* camera = nullptr);
+		GM_LUA_PROXY_OBJECT(GMCameraProxy, GMCamera)
 
 	protected:
 		virtual bool registerMeta() override;
@@ -68,17 +60,13 @@ namespace luaapi
 	//////////////////////////////////////////////////////////////////////////
 	GM_PRIVATE_OBJECT(IFramebuffersProxy)
 	{
-		GM_LUA_PROXY;
-		IFramebuffers* framebuffers = nullptr;
+		GM_LUA_PROXY(IFramebuffers);
 		GM_LUA_PROXY_FUNC(clear);
 	};
 
 	class IFramebuffersProxy : public GMObject
 	{
-		GM_LUA_PROXY_OBJECT(IFramebuffersProxy, IFramebuffers, framebuffers)
-
-	public:
-		IFramebuffersProxy(IFramebuffers* framebuffers = nullptr);
+		GM_LUA_PROXY_OBJECT(IFramebuffersProxy, IFramebuffers)
 
 	protected:
 		virtual bool registerMeta() override;

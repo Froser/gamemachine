@@ -11,7 +11,7 @@ using namespace gm::luaapi;
 /*
  * addLight([self], IGameHandler)
  */
-GM_LUA_PROXY_IMPL(IGraphicEngineProxy, addLight, L)
+GM_LUA_PROXY_IMPL(IGraphicEngineProxy, addLight)
 {
 	static const GMString s_invoker = NAME ".addLight";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".addLight");
@@ -29,7 +29,7 @@ GM_LUA_PROXY_IMPL(IGraphicEngineProxy, addLight, L)
 /*
  * getCamera([self])
  */
-GM_LUA_PROXY_IMPL(IGraphicEngineProxy, getCamera, L)
+GM_LUA_PROXY_IMPL(IGraphicEngineProxy, getCamera)
 {
 	static const GMString s_invoker = NAME ".getCamera";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getCamera");
@@ -46,7 +46,7 @@ GM_LUA_PROXY_IMPL(IGraphicEngineProxy, getCamera, L)
 /*
 * getCamera([self])
 */
-GM_LUA_PROXY_IMPL(IGraphicEngineProxy, getDefaultFramebuffers, L)
+GM_LUA_PROXY_IMPL(IGraphicEngineProxy, getDefaultFramebuffers)
 {
 	static const GMString s_invoker = NAME ".getDefaultFramebuffers";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getDefaultFramebuffers");
@@ -60,16 +60,9 @@ GM_LUA_PROXY_IMPL(IGraphicEngineProxy, getDefaultFramebuffers, L)
 	return GMReturnValues();
 }
 
-IGraphicEngineProxy::IGraphicEngineProxy(IGraphicEngine* engine /*= nullptr*/)
-{
-	D(d);
-	d->engine = engine;
-}
-
 bool IGraphicEngineProxy::registerMeta()
 {
 	GM_LUA_PROXY_META;
-	GM_META(engine);
 	GM_META_FUNCTION(addLight);
 	GM_META_FUNCTION(getCamera);
 	GM_META_FUNCTION(getDefaultFramebuffers);
@@ -98,7 +91,7 @@ GMCameraLookAt GMCameraLookAtProxy::toCameraLookAt()
 /*
  * lookAt([self], GMCameraLookAt)
  */
-GM_LUA_PROXY_IMPL(GMCameraProxy, lookAt, L)
+GM_LUA_PROXY_IMPL(GMCameraProxy, lookAt)
 {
 	static const GMString s_invoker = CAMERA_NAME ".lookAt";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, CAMERA_NAME ".lookAt");
@@ -114,7 +107,7 @@ GM_LUA_PROXY_IMPL(GMCameraProxy, lookAt, L)
 /*
  * setPerspective([self], fovy, aspect, near, far)
  */
-GM_LUA_PROXY_IMPL(GMCameraProxy, setPerspective, L)
+GM_LUA_PROXY_IMPL(GMCameraProxy, setPerspective)
 {
 	static const GMString s_invoker = CAMERA_NAME ".setPerspective";
 	GM_LUA_CHECK_ARG_COUNT(L, 5, CAMERA_NAME ".setPerspective");
@@ -132,7 +125,7 @@ GM_LUA_PROXY_IMPL(GMCameraProxy, setPerspective, L)
 /*
  * setOrtho([self], left, right, bottom, top, near, far)
  */
-GM_LUA_PROXY_IMPL(GMCameraProxy, setOrtho, L)
+GM_LUA_PROXY_IMPL(GMCameraProxy, setOrtho)
 {
 	static const GMString s_invoker = CAMERA_NAME ".setPerspective";
 	GM_LUA_CHECK_ARG_COUNT(L, 7, CAMERA_NAME ".setPerspective");
@@ -149,16 +142,9 @@ GM_LUA_PROXY_IMPL(GMCameraProxy, setOrtho, L)
 	return GMReturnValues();
 }
 
-GMCameraProxy::GMCameraProxy(GMCamera* camera /*= nullptr*/)
-{
-	D(d);
-	d->camera = camera;
-}
-
 bool GMCameraProxy::registerMeta()
 {
 	GM_LUA_PROXY_META;
-	GM_META(camera);
 	GM_META_FUNCTION(lookAt);
 	GM_META_FUNCTION(setPerspective);
 	GM_META_FUNCTION(setOrtho);
@@ -171,7 +157,7 @@ bool GMCameraProxy::registerMeta()
 /*
 * clear([self], clearType)
 */
-GM_LUA_PROXY_IMPL(IFramebuffersProxy, clear, L)
+GM_LUA_PROXY_IMPL(IFramebuffersProxy, clear)
 {
 	static const GMString s_invoker = IFRAMEBUFFERS_NAME ".clear";
 	GM_LUA_CHECK_ARG_COUNT_GT(L, 1, IFRAMEBUFFERS_NAME ".clear");
@@ -185,16 +171,9 @@ GM_LUA_PROXY_IMPL(IFramebuffersProxy, clear, L)
 	return GMReturnValues();
 }
 
-IFramebuffersProxy::IFramebuffersProxy(IFramebuffers* framebuffers /*= nullptr*/)
-{
-	D(d);
-	d->framebuffers = framebuffers;
-}
-
 bool IFramebuffersProxy::registerMeta()
 {
 	GM_LUA_PROXY_META;
-	GM_META(framebuffers);
 	GM_META_FUNCTION(clear);
 	return true;
 }

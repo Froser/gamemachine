@@ -228,17 +228,21 @@ private:
 #undef L
 #undef POP_GUARD
 
-#define GM_LUA_FUNC(FuncName, L) gm::luaapi::GMFunctionReturn FuncName(GMLuaCoreState* L)
-#define GM_LUA_PROXY_IMPL(Proxy, FuncName, L) gm::luaapi::GMFunctionReturn GM_PRIVATE_NAME(Proxy)::FuncName(GMLuaCoreState* L)
+#define GM_LUA_FUNC(FuncName) gm::luaapi::GMFunctionReturn FuncName(GMLuaCoreState* L)
+#define GM_LUA_PROXY_IMPL(Proxy, FuncName) gm::luaapi::GMFunctionReturn GM_PRIVATE_NAME(Proxy)::FuncName(GMLuaCoreState* L)
 #define GM_LUA_PROXY_FUNC(FuncName) GM_META_METHOD gm::luaapi::GMFunctionReturn FuncName(GMLuaCoreState*);
 
-// lua类成员函数，需要带以下宏
-#define GM_LUA_PROXY bool detached = false;
-#define GM_LUA_PROXY_META GM_META(detached)
+// lua类成员函数相关的宏
 #define GM_LUA_PROXY_METATABLE_NAME "__gm_metatable"
-#define GM_LUA_PROXY_METATABLE(clsName) clsName __gm_metatableinstance; gm::GMObject* __gm_metatable = nullptr; // 指定一个表为元表（继承）
-#define GM_LUA_PROXY_METATABLE_META { data()->__gm_metatableinstance.set(get()); data()->__gm_metatable = &(data()->__gm_metatableinstance); GM_META(__gm_metatable); } // registerMeta中加入此宏，像会应用元表
-#define GM_LUA_PROXY_OBJECT(className, type, handler) \
+
+#define GM_LUA_PROXY(className) bool detached = false; className* __handler = nullptr; GMString __name = #className;
+#define GM_LUA_PROXY_WITH_TYPE(className, type) bool detached = false; type* __handler = nullptr; GMString __name = #className;
+#define GM_LUA_PROXY_CONSTRUCTOR(proxyName, className) public: proxyName::proxyName(className* handler = nullptr) { D(d); d->__handler = handler; }
+
+#define GM_LUA_PROXY_META GM_META(detached); GM_META(__handler); GM_META(__name);
+#define GM_LUA_PROXY_EXTENDS(clsName) clsName __gm_metatableinstance; gm::GMObject* __gm_metatable = nullptr; // 指定一个表为元表（继承）
+#define GM_LUA_PROXY_EXTENDS_META { data()->__gm_metatableinstance.set(get()); data()->__gm_metatable = &(data()->__gm_metatableinstance); GM_META(__gm_metatable); } // registerMeta中加入此宏，像会应用元表
+#define GM_LUA_PROXY_OBJECT_NO_DEFAULT_CONSTRUCTOR(className, type)		\
 		GM_DECLARE_PRIVATE(className)				\
 		GM_ALLOW_COPY_MOVE(className)				\
 	public:											\
@@ -248,14 +252,14 @@ private:
 			const className& i =					\
 				dynamic_cast<const className&>(a);	\
 			D_OF(d_other, &i);						\
-			d->handler = d_other->handler;			\
+			d->__handler = d_other->__handler;		\
 		}											\
 													\
 		typedef type RealType;						\
 		RealType* get()								\
 		{											\
 			D(d);									\
-			return d->handler;						\
+			return d->__handler;					\
 		}											\
 													\
 		RealType* operator->()						\
@@ -266,7 +270,7 @@ private:
 		operator bool() const						\
 		{											\
 			D(d);									\
-			return !!d->handler;					\
+			return !!d->__handler;					\
 		}											\
 													\
 		void detach()								\
@@ -280,7 +284,7 @@ private:
 			D(d);									\
 			if (!d->detached)						\
 			{										\
-				GM_delete(d->handler);				\
+				GM_delete(d->__handler);			\
 				detach();							\
 			}										\
 		}											\
@@ -288,8 +292,12 @@ private:
 		void set(RealType* handler)					\
 		{											\
 			D(d);									\
-			d->handler = handler;					\
+			d->__handler = handler;					\
 		}
+
+#define GM_LUA_PROXY_OBJECT(className, type) \
+	GM_LUA_PROXY_CONSTRUCTOR(className, type) \
+	GM_LUA_PROXY_OBJECT_NO_DEFAULT_CONSTRUCTOR(className, type)
 
 // Lua indexer，用于模拟GMObject的属性
 #define GM_LUA_BEGIN_PROPERTY(proxyClass) \

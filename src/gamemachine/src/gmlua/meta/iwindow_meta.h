@@ -8,10 +8,7 @@ namespace luaapi
 {
 	GM_PRIVATE_OBJECT(IWindowProxy)
 	{
-		GM_LUA_PROXY;
-		IWindow* window = nullptr;
-
-		GMString __name = "IWindow";
+		GM_LUA_PROXY(IWindow);
 		GM_LUA_PROXY_FUNC(__gc);
 		GM_LUA_PROXY_FUNC(create);
 		GM_LUA_PROXY_FUNC(centerWindow);
@@ -21,10 +18,7 @@ namespace luaapi
 
 	class IWindowProxy : public GMObject
 	{
-		GM_LUA_PROXY_OBJECT(IWindowProxy, IWindow, window)
-
-	public:
-		IWindowProxy(IWindow* window = nullptr);
+		GM_LUA_PROXY_OBJECT(IWindowProxy, IWindow)
 
 	protected:
 		virtual bool registerMeta() override;

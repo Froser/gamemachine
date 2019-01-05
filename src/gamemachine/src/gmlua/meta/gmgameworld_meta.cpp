@@ -9,16 +9,9 @@ using namespace gm::luaapi;
 
 #define NAME "GMGameWorld"
 
-GMGameWorldProxy::GMGameWorldProxy(GMGameWorld* gameworld /*= nullptr*/)
-{
-	D(d);
-	d->gameworld = gameworld;
-}
-
 bool GMGameWorldProxy::registerMeta()
 {
 	GM_LUA_PROXY_META;
-	GM_META(gameworld);
 	GM_META_FUNCTION(renderScene);
 	GM_META_FUNCTION(addObjectAndInit);
 	GM_META_FUNCTION(addToRenderList);
@@ -28,7 +21,7 @@ bool GMGameWorldProxy::registerMeta()
 /*
  * __gc([self])
  */
-GM_LUA_PROXY_IMPL(GMGameWorldProxy, __gc, L)
+GM_LUA_PROXY_IMPL(GMGameWorldProxy, __gc)
 {
 	static const GMString s_invoker = NAME ".__gc";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
@@ -41,7 +34,7 @@ GM_LUA_PROXY_IMPL(GMGameWorldProxy, __gc, L)
 /*
  * renderScene([self])
  */
-GM_LUA_PROXY_IMPL(GMGameWorldProxy, renderScene, L)
+GM_LUA_PROXY_IMPL(GMGameWorldProxy, renderScene)
 {
 	static const GMString s_invoker = NAME ".renderScene";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".renderScene");
@@ -55,7 +48,7 @@ GM_LUA_PROXY_IMPL(GMGameWorldProxy, renderScene, L)
 /*
  * addObjectAndInit([self], GMObject)
  */
-GM_LUA_PROXY_IMPL(GMGameWorldProxy, addObjectAndInit, L)
+GM_LUA_PROXY_IMPL(GMGameWorldProxy, addObjectAndInit)
 {
 	static const GMString s_invoker = NAME ".addObjectAndInit";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".addObjectAndInit");
@@ -73,7 +66,7 @@ GM_LUA_PROXY_IMPL(GMGameWorldProxy, addObjectAndInit, L)
 /*
  * addToRenderList([self], GMObject)
  */
-GM_LUA_PROXY_IMPL(GMGameWorldProxy, addToRenderList, L)
+GM_LUA_PROXY_IMPL(GMGameWorldProxy, addToRenderList)
 {
 	static const GMString s_invoker = NAME ".addToRenderList";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".addToRenderList");
@@ -89,7 +82,7 @@ GM_LUA_PROXY_IMPL(GMGameWorldProxy, addToRenderList, L)
 namespace
 {
 	// {{BEGIN META FUNCTION}}
-	GM_LUA_FUNC(New, L)
+	GM_LUA_FUNC(New)
 	{
 		static const GMString s_invoker = NAME ".new";
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".new");

@@ -11,19 +11,14 @@ namespace luaapi
 {
 	GM_PRIVATE_OBJECT(GMSkeletalGameObjectProxy)
 	{
-		GM_LUA_PROXY;
-		GM_LUA_PROXY_METATABLE(GMGameObjectProxy);
-		GMSkeletalGameObject* gameObj = nullptr;
-		GMString __name = "GMSkeletalGameObject";
+		GM_LUA_PROXY(GMSkeletalGameObject);
+		GM_LUA_PROXY_EXTENDS(GMGameObjectProxy);
 		GM_LUA_PROXY_FUNC(update);
 	};
 
 	class GMSkeletalGameObjectProxy : public GMObject
 	{
-		GM_LUA_PROXY_OBJECT(GMSkeletalGameObjectProxy, GMSkeletalGameObject, gameObj)
-
-	public:
-		GMSkeletalGameObjectProxy(GMSkeletalGameObject* gameObj = nullptr);
+		GM_LUA_PROXY_OBJECT(GMSkeletalGameObjectProxy, GMSkeletalGameObject)
 
 	protected:
 		virtual bool registerMeta() override;

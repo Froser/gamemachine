@@ -8,18 +8,13 @@ namespace luaapi
 {
 	GM_PRIVATE_OBJECT(GMGamePackageProxy)
 	{
-		GM_LUA_PROXY;
-		GMGamePackage* package = nullptr;
-
+		GM_LUA_PROXY(GMGamePackage);
 		GM_LUA_PROXY_FUNC(loadPackage)
 	};
 
 	class GMGamePackageProxy : public GMObject
 	{
-		GM_LUA_PROXY_OBJECT(GMGamePackageProxy, GMGamePackage, package)
-
-	public:
-		GMGamePackageProxy(GMGamePackage* package = nullptr);
+		GM_LUA_PROXY_OBJECT(GMGamePackageProxy, GMGamePackage)
 
 	protected:
 		virtual bool registerMeta() override;

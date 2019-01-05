@@ -88,7 +88,7 @@ IGameHandlerProxy::IGameHandlerProxy(GMLuaCoreState* L)
 {
 	D(d);
 	GameHandlerImpl* impl = new GameHandlerImpl(L);
-	d->handler = impl;
+	d->__handler = impl;
 	d->shaderCallback = impl;
 }
 
@@ -96,8 +96,6 @@ bool IGameHandlerProxy::registerMeta()
 {
 	D(d);
 	GM_LUA_PROXY_META;
-	GM_META(handler);
-	GM_META(__name);
 	GM_META_FUNCTION(__gc);
 	GM_META(init);
 	GM_META(start);
@@ -109,9 +107,9 @@ bool IGameHandlerProxy::registerMeta()
 void IGameHandlerProxy::init()
 {
 	D(d);
-	if (d->handler)
+	if (d->__handler)
 	{
-		GameHandlerImpl* impl = static_cast<GameHandlerImpl*>(d->handler);
+		GameHandlerImpl* impl = static_cast<GameHandlerImpl*>(d->__handler);
 		impl->setInit(d->init);
 		impl->setEvent(d->event);
 		impl->setStart(d->start);
@@ -128,7 +126,7 @@ IShaderLoadCallback* IGameHandlerProxy::getShaderLoadCallback() GM_NOEXCEPT
 /*
  * __gc([self])
  */
-GM_LUA_PROXY_IMPL(IGameHandlerProxy, __gc, L)
+GM_LUA_PROXY_IMPL(IGameHandlerProxy, __gc)
 {
 	static const GMString s_invoker = NAME ".__gc";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");

@@ -8,10 +8,7 @@ namespace luaapi
 {
 	GM_PRIVATE_OBJECT(ILightProxy)
 	{
-		GM_LUA_PROXY;
-		ILight* light = nullptr;
-
-		GMString __name = "ILight";
+		GM_LUA_PROXY(ILight);
 		GM_LUA_PROXY_FUNC(__gc);
 		GM_LUA_PROXY_FUNC(setLightAttribute3);
 		GM_LUA_PROXY_FUNC(setLightAttribute);
@@ -19,10 +16,7 @@ namespace luaapi
 
 	class ILightProxy : public GMObject
 	{
-		GM_LUA_PROXY_OBJECT(ILightProxy, ILight, light)
-
-	public:
-		ILightProxy(ILight* light = nullptr);
+		GM_LUA_PROXY_OBJECT(ILightProxy, ILight)
 
 	protected:
 		virtual bool registerMeta() override;

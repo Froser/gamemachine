@@ -8,16 +8,9 @@ using namespace luaapi;
 
 #define NAME "IRenderContext"
 
-IRenderContextProxy::IRenderContextProxy(const IRenderContext* context)
-{
-	D(d);
-	d->context = context;
-}
-
 bool IRenderContextProxy::registerMeta()
 {
 	GM_LUA_PROXY_META;
-	GM_META(context);
 	GM_META_FUNCTION(getWindow);
 	GM_META_FUNCTION(getEngine);
 	return true;
@@ -26,7 +19,7 @@ bool IRenderContextProxy::registerMeta()
 /*
  * getWindow([self])
  */
-GM_LUA_PROXY_IMPL(IRenderContextProxy, getWindow, L)
+GM_LUA_PROXY_IMPL(IRenderContextProxy, getWindow)
 {
 	static const GMString s_invoker = NAME ".getWindow";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getWindow");
@@ -39,7 +32,7 @@ GM_LUA_PROXY_IMPL(IRenderContextProxy, getWindow, L)
 /*
  * getWindow([self])
  */
-GM_LUA_PROXY_IMPL(IRenderContextProxy, getEngine, L)
+GM_LUA_PROXY_IMPL(IRenderContextProxy, getEngine)
 {
 	static const GMString s_invoker = NAME ".getEngine";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getEngine");

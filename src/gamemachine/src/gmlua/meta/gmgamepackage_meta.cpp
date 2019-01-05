@@ -10,7 +10,7 @@ using namespace gm::luaapi;
 /*
 * loadPackage([self], path)
 */
-GM_LUA_PROXY_IMPL(GMGamePackageProxy, loadPackage, L)
+GM_LUA_PROXY_IMPL(GMGamePackageProxy, loadPackage)
 {
 	static const GMString s_invoker(L"loadPackage");
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".loadPackage");
@@ -22,16 +22,9 @@ GM_LUA_PROXY_IMPL(GMGamePackageProxy, loadPackage, L)
 	return 0;
 }
 
-GMGamePackageProxy::GMGamePackageProxy(GMGamePackage* package)
-{
-	D(d);
-	d->package = package;
-}
-
 bool GMGamePackageProxy::registerMeta()
 {
 	GM_LUA_PROXY_META;
-	GM_META(package)
 	GM_META_FUNCTION(loadPackage)
 	return true;
 }

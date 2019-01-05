@@ -8,18 +8,10 @@
 
 using namespace gm::luaapi;
 
-GMSkeletalGameObjectProxy::GMSkeletalGameObjectProxy(GMSkeletalGameObject* gameObj /*= nullptr*/)
-{
-	D(d);
-	d->gameObj = gameObj;
-}
-
 bool GMSkeletalGameObjectProxy::registerMeta()
 {
 	GM_LUA_PROXY_META;
-	GM_LUA_PROXY_METATABLE_META;
-	GM_META(__name);
-	GM_META(gameObj);
+	GM_LUA_PROXY_EXTENDS_META;
 	GM_META_FUNCTION(update);
 	return true;
 }
@@ -27,7 +19,7 @@ bool GMSkeletalGameObjectProxy::registerMeta()
 /*
  * update([self], dt)
  */
-GM_LUA_PROXY_IMPL(GMSkeletalGameObjectProxy, update, L)
+GM_LUA_PROXY_IMPL(GMSkeletalGameObjectProxy, update)
 {
 	static const GMString s_invoker = NAME ".update";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".update");
@@ -42,7 +34,7 @@ GM_LUA_PROXY_IMPL(GMSkeletalGameObjectProxy, update, L)
 namespace
 {
 	// {{BEGIN META FUNCTION}}
-	GM_LUA_FUNC(New, L)
+	GM_LUA_FUNC(New)
 	{
 		static const GMString s_invoker = NAME ".new";
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".new");

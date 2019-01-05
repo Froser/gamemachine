@@ -16,7 +16,7 @@ using namespace gm::luaapi;
 namespace
 {
 	// {{BEGIN META FUNCTION}}
-	GM_LUA_FUNC(loadShaderOpenGL, L)
+	GM_LUA_FUNC(loadShaderOpenGL)
 	{
 		static const GMString s_invoker = NAME ".loadShaderOpenGL";
 		GM_LUA_CHECK_ARG_COUNT(L, 9, NAME ".loadShaderOpenGL");
@@ -46,7 +46,7 @@ namespace
 		return GMReturnValues();
 	}
 
-	GM_LUA_FUNC(loadShaderDx11, L)
+	GM_LUA_FUNC(loadShaderDx11)
 	{
 #if GM_USE_DX11
 		static const GMString s_invoker = NAME ".loadShaderDx11";
