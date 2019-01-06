@@ -235,11 +235,11 @@ private:
 // lua类成员函数相关的宏
 #define GM_LUA_PROXY_METATABLE_NAME "__gm_metatable"
 
-#define GM_LUA_PROXY(className) bool detached = false; className* __handler = nullptr; GMString __name = #className;
-#define GM_LUA_PROXY_WITH_TYPE(className, type) bool detached = false; type* __handler = nullptr; GMString __name = #className;
+#define GM_LUA_PROXY(className) bool __detached = false; className* __handler = nullptr; GMString __name = #className;
+#define GM_LUA_PROXY_WITH_TYPE(className, type) bool __detached = false; type* __handler = nullptr; GMString __name = #className;
 #define GM_LUA_PROXY_CONSTRUCTOR(proxyName, className) public: proxyName::proxyName(className* handler = nullptr) { D(d); d->__handler = handler; }
 
-#define GM_LUA_PROXY_META GM_META(detached); GM_META(__handler); GM_META(__name);
+#define GM_LUA_PROXY_META GM_META(__detached); GM_META(__handler); GM_META(__name);
 #define GM_LUA_PROXY_EXTENDS(clsName) clsName __gm_metatableinstance; gm::GMObject* __gm_metatable = nullptr; // 指定一个表为元表（继承）
 #define GM_LUA_PROXY_EXTENDS_META { data()->__gm_metatableinstance.set(get()); data()->__gm_metatable = &(data()->__gm_metatableinstance); GM_META(__gm_metatable); } // registerMeta中加入此宏，像会应用元表
 #define GM_LUA_PROXY_OBJECT_NO_DEFAULT_CONSTRUCTOR(className, type)		\
@@ -276,13 +276,13 @@ private:
 		void detach()								\
 		{											\
 			D(d);									\
-			d->detached = true;						\
+			d->__detached = true;					\
 		}											\
 													\
 		void release()								\
 		{											\
 			D(d);									\
-			if (!d->detached)						\
+			if (!d->__detached)						\
 			{										\
 				GM_delete(d->__handler);			\
 				detach();							\

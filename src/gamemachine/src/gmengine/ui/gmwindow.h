@@ -49,7 +49,7 @@ public:
 	~GMWindow();
 
 public:
-	virtual IInput* getInputMananger() override;
+	virtual IInput* getInputManager() override;
 	virtual void msgProc(const GMMessage& message) override;
 	virtual GMRect getWindowRect() override;
 	virtual GMRect getRenderRect() override;

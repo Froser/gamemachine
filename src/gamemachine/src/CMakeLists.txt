@@ -210,6 +210,8 @@ set(SOURCES
 		gmlua/meta/gmshader_meta.cpp
 		gmlua/meta/gmmodel_meta.h
 		gmlua/meta/gmmodel_meta.cpp
+		gmlua/meta/iinput_meta.h
+		gmlua/meta/iinput_meta.cpp
 
 		extensions/bsp/bsp_factory.h
 		extensions/bsp/bsp_factory.cpp

@@ -20,6 +20,22 @@ function scale(x, y, z)
 	}
 end
 
+-- 内部函数
+function handleInput(dt)
+	local window = handler.context:getWindow()
+	local inputManager = window:getInputManager()
+	local keyboardState = inputManager:getKeyboardState()
+	local mouseState = inputManager:getMouseState()
+	local joystickState = inputManager:getJoystickState()
+	local ms = mouseState:mouseState()
+	if (ms.moving) then
+		print("Mouse moved. X: " .. ms.posX .. ", Y: " .. ms.posY)
+	end
+	if (ms.wheeled) then
+		print("Wheeled: " .. ms.wheeledDelta)
+	end
+end
+
 -- 准备窗口
 t = {}
 t.rc = { 0, 0, 1024, 768}
@@ -41,6 +57,8 @@ handler.event = function(evt)
 	if (evt == 2) then -- update
 		local dt = GM.getRunningStates().lastFrameElpased
 		handler.gameobject:update(dt)
+		local window = handler.context:getWindow()
+		handleInput(dt)
 	elseif (evt == 3) then -- render
 		handler.context:getEngine():getDefaultFramebuffers():clear()
 		handler.world:renderScene()

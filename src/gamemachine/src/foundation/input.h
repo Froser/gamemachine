@@ -25,7 +25,7 @@ struct GMJoystickState
 struct GMWheelState
 {
 	bool wheeled = false;
-	gm::GMshort delta = 0;
+	GMshort delta = 0;
 };
 
 struct GMMouseState
@@ -37,7 +37,8 @@ struct GMMouseState
 	GMMouseButton downButton;
 	GMMouseButton upButton;
 	GMMouseButton triggerButton;
-	GMWheelState wheel;
+	bool wheeled;
+	GMint32 wheeledDelta;
 	bool moving;
 };
 

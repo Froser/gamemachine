@@ -134,7 +134,7 @@ GMWindow::~GMWindow()
 	}
 }
 
-IInput* GMWindow::getInputMananger()
+IInput* GMWindow::getInputManager()
 {
 	D(d);
 	if (!d->input)

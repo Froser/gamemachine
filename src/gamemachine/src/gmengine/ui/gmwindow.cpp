@@ -31,7 +31,7 @@ bool GMWindow::handleSystemEvent(GMSystemEvent* event, REF GMLResult& result)
 	case GMSystemEventType::MouseMove:
 	case GMSystemEventType::MouseDown:
 	case GMSystemEventType::MouseUp:
-		getInputMananger()->handleSystemEvent(event);
+		getInputManager()->handleSystemEvent(event);
 		break;
 	case GMSystemEventType::SetCursor:
 		changeCursor();

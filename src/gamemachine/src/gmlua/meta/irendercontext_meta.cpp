@@ -25,8 +25,13 @@ GM_LUA_PROXY_IMPL(IRenderContextProxy, getWindow)
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getWindow");
 	IRenderContextProxy self;
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
-	IWindowProxy window(self->getWindow());
-	return GMReturnValues(L, window);
+	if (self)
+	{
+		IWindowProxy window(self->getWindow());
+		window.detach(); // lua不管理其生命周期
+		return GMReturnValues(L, window);
+	}
+	return GMReturnValues();
 }
 
 /*
@@ -38,6 +43,7 @@ GM_LUA_PROXY_IMPL(IRenderContextProxy, getEngine)
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getEngine");
 	IRenderContextProxy self;
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
-	IGraphicEngineProxy engine(self->getEngine());
-	return GMReturnValues(L, engine);
+	if (self)
+		return GMReturnValues(L, IGraphicEngineProxy(self->getEngine()));
+	return GMReturnValues();
 }

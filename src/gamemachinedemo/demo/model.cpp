@@ -141,11 +141,11 @@ void Demo_Model::init()
 void Demo_Model::handleMouseEvent()
 {
 	D(d);
-	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputMananger()->getMouseState();
+	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputManager()->getMouseState();
 	gm::GMMouseState state = ms.mouseState();
-	if (state.wheel.wheeled)
+	if (state.wheeled)
 	{
-		gm::GMfloat delta = .001f * state.wheel.delta / WHEEL_DELTA;
+		gm::GMfloat delta = .001f * state.wheeledDelta / WHEEL_DELTA;
 		GMFloat4 scaling;
 		{
 			GetScalingFromMatrix(d->gameObject->getScaling(), scaling);
@@ -250,7 +250,7 @@ gm::GMCubeMapGameObject* Demo_Model::createCubeMap()
 void Demo_Model::handleDragging()
 {
 	D(d);
-	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputMananger()->getMouseState();
+	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputManager()->getMouseState();
 	gm::GMMouseState state = ms.mouseState();
 	const gm::GMWindowStates& windowStates = getDemonstrationWorld()->getContext()->getWindow()->getWindowStates();
 

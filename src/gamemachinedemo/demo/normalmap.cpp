@@ -144,7 +144,7 @@ void Demo_NormalMap::event(gm::GameMachineHandlerEvent evt)
 	}
 	case gm::GameMachineHandlerEvent::Activate:
 	{
-		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
+		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputManager();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
 		if (kbState.keyTriggered(gm::GM_ASCIIToKey('0')))
 			db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, 0);

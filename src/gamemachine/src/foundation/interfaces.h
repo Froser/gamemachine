@@ -611,7 +611,7 @@ enum class GMCursorType
 typedef GMLResult (GM_SYSTEM_CALLBACK *GMWindowProcHandler)(GMWindowHandle hWnd, GMuint32 uMsg, GMWParam wParam, GMLParam lParam);
 GM_INTERFACE_FROM(IWindow, IQueriable)
 {
-	virtual IInput* getInputMananger() = 0;
+	virtual IInput* getInputManager() = 0;
 	virtual void msgProc(const GMMessage& message) = 0;
 	virtual GMWindowHandle create(const GMWindowDesc& desc) = 0;
 	virtual void centerWindow() = 0;

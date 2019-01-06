@@ -153,7 +153,7 @@ void Demo_ParticleBillboard::onActivate()
 {
 	D(d);
 	d->activated = true;
-	gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
+	gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputManager();
 	gm::IMouseState& mouseState = inputManager->getMouseState();
 	mouseState.setDetectingMode(true);
 	Base::onActivate();
@@ -163,7 +163,7 @@ void Demo_ParticleBillboard::onDeactivate()
 {
 	D(d);
 	d->activated = false;
-	gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
+	gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputManager();
 	gm::IMouseState& mouseState = inputManager->getMouseState();
 	mouseState.setDetectingMode(false);
 	Base::onDeactivate();
@@ -175,7 +175,7 @@ void Demo_ParticleBillboard::handleMouseEvent()
 	if (d->activated)
 	{
 		const static gm::GMfloat mouseSensitivity = 0.25f;
-		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
+		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputManager();
 		gm::IMouseState& mouseState = inputManager->getMouseState();
 		auto ms = mouseState.mouseState();
 		d->cameraUtility.update(Radian(-ms.deltaX * mouseSensitivity), Radian(-ms.deltaY * mouseSensitivity));

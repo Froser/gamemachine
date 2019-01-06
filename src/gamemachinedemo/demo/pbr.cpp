@@ -96,7 +96,7 @@ void Demo_PBR::init()
 void Demo_PBR::handleMouseEvent()
 {
 	D(d);
-	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputMananger()->getMouseState();
+	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputManager()->getMouseState();
 	gm::GMMouseState state = ms.mouseState();
 	if (state.downButton & gm::GMMouseButton_Left)
 	{
@@ -127,7 +127,7 @@ void Demo_PBR::handleMouseEvent()
 void Demo_PBR::handleDragging()
 {
 	D(d);
-	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputMananger()->getMouseState();
+	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputManager()->getMouseState();
 	gm::GMMouseState state = ms.mouseState();
 	const gm::GMWindowStates& windowStates = getDemonstrationWorld()->getContext()->getWindow()->getWindowStates();
 
@@ -211,7 +211,7 @@ void Demo_PBR::event(gm::GameMachineHandlerEvent evt)
 		handleMouseEvent();
 		handleDragging();
 
-		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
+		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputManager();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
 		break;
 	}

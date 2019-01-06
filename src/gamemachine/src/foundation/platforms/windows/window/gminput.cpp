@@ -220,6 +220,7 @@ void GMInput::update()
 	::GetKeyboardState(d->lastKeyState);
 	// restore
 	d->wheelState.wheeled = false;
+	d->wheelState.delta = 0;
 	d->mouseState.downButton = d->mouseState.upButton = GMMouseButton_None;
 	d->mouseState.moving = false;
 }
@@ -328,7 +329,8 @@ GMMouseState GMInput::mouseState()
 {
 	D(d);
 	GMMouseState& state = d->mouseState;
-	state.wheel = d->wheelState;
+	state.wheeled = d->wheelState.wheeled;
+	state.wheeledDelta = static_cast<GMint32>(d->wheelState.delta);
 
 	POINT pos;
 	::GetCursorPos(&pos);

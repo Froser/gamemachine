@@ -3,6 +3,7 @@
 #include <gamemachine.h>
 #include <gmlua.h>
 #include "igamehandler_meta.h"
+#include "iinput_meta.h"
 
 using namespace luaapi;
 
@@ -45,6 +46,7 @@ bool IWindowProxy::registerMeta()
 	GM_META_FUNCTION(centerWindow);
 	GM_META_FUNCTION(showWindow);
 	GM_META_FUNCTION(setHandler);
+	GM_META_FUNCTION(getInputManager);
 	return true;
 }
 
@@ -124,6 +126,20 @@ GM_LUA_PROXY_IMPL(IWindowProxy, setHandler)
 		self->setHandler(gameHandler.get());
 		self->getGraphicEngine()->setShaderLoadCallback(gameHandler.getShaderLoadCallback());
 	}
+	return GMReturnValues();
+}
+
+/*
+ * getInputManager([self])
+ */
+GM_LUA_PROXY_IMPL(IWindowProxy, getInputManager)
+{
+	static const GMString s_invoker = NAME ".getInputManager";
+	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getInputManager");
+	IWindowProxy self;
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+		return GMReturnValues(L, IInputProxy(self->getInputManager()));
 	return GMReturnValues();
 }
 //////////////////////////////////////////////////////////////////////////

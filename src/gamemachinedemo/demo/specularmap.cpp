@@ -87,11 +87,11 @@ void Demo_SpecularMap::init()
 void Demo_SpecularMap::handleMouseEvent()
 {
 	D(d);
-	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputMananger()->getMouseState();
+	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputManager()->getMouseState();
 	gm::GMMouseState state = ms.mouseState();
-	if (state.wheel.wheeled)
+	if (state.wheeled)
 	{
-		gm::GMfloat delta = .001f * state.wheel.delta / WHEEL_DELTA;
+		gm::GMfloat delta = .001f * state.wheeledDelta / WHEEL_DELTA;
 		GMFloat4 scaling;
 		{
 			GetScalingFromMatrix(d->gameObject->getScaling(), scaling);
@@ -136,7 +136,7 @@ void Demo_SpecularMap::handleDragging()
 {
 	D(d);
 	const gm::GMWindowStates& windowStates = getDemonstrationWorld()->getContext()->getWindow()->getWindowStates();
-	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputMananger()->getMouseState();
+	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputManager()->getMouseState();
 	gm::GMMouseState state = ms.mouseState();
 
 	if (d->draggingL)

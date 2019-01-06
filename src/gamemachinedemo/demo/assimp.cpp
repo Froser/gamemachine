@@ -71,11 +71,11 @@ void Demo_Assimp::init()
 void Demo_Assimp::handleMouseEvent()
 {
 	D(d);
-	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputMananger()->getMouseState();
+	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputManager()->getMouseState();
 	gm::GMMouseState state = ms.mouseState();
-	if (state.wheel.wheeled)
+	if (state.wheeled)
 	{
-		gm::GMfloat delta = .001f * state.wheel.delta / WHEEL_DELTA;
+		gm::GMfloat delta = .001f * state.wheeledDelta / WHEEL_DELTA;
 		GMFloat4 scaling;
 		{
 			GetScalingFromMatrix(d->gameObject->getScaling(), scaling);
@@ -116,7 +116,7 @@ void Demo_Assimp::handleMouseEvent()
 void Demo_Assimp::handleDragging()
 {
 	D(d);
-	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputMananger()->getMouseState();
+	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputManager()->getMouseState();
 	gm::GMMouseState state = ms.mouseState();
 	const gm::GMWindowStates& windowStates = getDemonstrationWorld()->getContext()->getWindow()->getWindowStates();
 

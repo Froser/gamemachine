@@ -198,7 +198,7 @@ void Demo_Collision::onDeactivate()
 void Demo_Collision::onWindowActivate()
 {
 	D(d);
-	gm::IInput* input = getDemonstrationWorld()->getMainWindow()->getInputMananger();
+	gm::IInput* input = getDemonstrationWorld()->getMainWindow()->getInputManager();
 	auto ms = input->getMouseState().mouseState();
 	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
 

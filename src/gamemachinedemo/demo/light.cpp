@@ -209,7 +209,7 @@ void Demo_Light_Directional_Normalmap::event(gm::GameMachineHandlerEvent evt)
 	{
 	case gm::GameMachineHandlerEvent::Update:
 	{
-		auto im = getDemonstrationWorld()->getContext()->getWindow()->getInputMananger();
+		auto im = getDemonstrationWorld()->getContext()->getWindow()->getInputManager();
 		gm::IWindow* window = getDemonstrationWorld()->getContext()->getWindow();
 		const auto& rc = window->getRenderRect();
 		auto hw = rc.width / 2, hh = rc.height / 2;

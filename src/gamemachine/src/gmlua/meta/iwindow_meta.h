@@ -14,6 +14,7 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(centerWindow);
 		GM_LUA_PROXY_FUNC(showWindow);
 		GM_LUA_PROXY_FUNC(setHandler);
+		GM_LUA_PROXY_FUNC(getInputManager);
 	};
 
 	class IWindowProxy : public GMObject

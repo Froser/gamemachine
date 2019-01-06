@@ -180,7 +180,7 @@ void DemoHandler::event(gm::GameMachineHandlerEvent evt)
 		break;
 	}
 	case gm::GameMachineHandlerEvent::Activate:
-		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
+		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputManager();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
 
 		if (kbState.keyTriggered(gm::GMKey_Escape))
@@ -710,7 +710,7 @@ void DemostrationEntrance::init(const gm::IRenderContext* context)
 void DemostrationEntrance::start()
 {
 	D(d);
-	gm::IInput* inputManager = d->mainWindow->getInputMananger();
+	gm::IInput* inputManager = d->mainWindow->getInputManager();
 	getWorld()->resetCameraAndLights();
 	loadDemostrations(d->world);
 }
