@@ -119,7 +119,7 @@ void Demo_Phong_PBR::handleMouseEvent()
 {
 	D(d);
 	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputManager()->getMouseState();
-	gm::GMMouseState state = ms.mouseState();
+	gm::GMMouseState state = ms.state();
 	if (state.downButton & gm::GMMouseButton_Left)
 	{
 		d->mouseDownX = state.posX;
@@ -150,7 +150,7 @@ void Demo_Phong_PBR::handleDragging()
 {
 	D(d);
 	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputManager()->getMouseState();
-	gm::GMMouseState state = ms.mouseState();
+	gm::GMMouseState state = ms.state();
 	const gm::GMWindowStates& windowStates = getDemonstrationWorld()->getContext()->getWindow()->getWindowStates();
 
 	if (d->draggingL)

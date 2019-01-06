@@ -26,6 +26,10 @@ private:
 	XInputSetState_Delegate m_xinputSetState;
 };
 
+class JoystickStateImpl;
+class MouseStateImpl;
+class KeyboardStateImpl;
+
 GM_PRIVATE_OBJECT(GMInput)
 {
 	enum { MAX_KEYS = 256 };
@@ -43,55 +47,30 @@ GM_PRIVATE_OBJECT(GMInput)
 	// mouse
 	GMMouseState mouseState;
 	GMWheelState wheelState;
+
+	// implements
+	JoystickStateImpl* joystickImpl = nullptr;
+	MouseStateImpl* mouseImpl = nullptr;
+	KeyboardStateImpl* keyboardImpl = nullptr;
 };
 
 class GMInput :
 	public GMObject,
-	public IInput,
-	public IKeyboardState,
-	public IJoystickState,
-	public IMouseState
+	public IInput
 {
 	GM_DECLARE_PRIVATE(GMInput)
 
 public:
 	GMInput(IWindow* window);
+	~GMInput();
 
-public:
-
-	// IInput
 public:
 	// 每一帧，应该调用一次update
 	virtual void update() override;
 	virtual IKeyboardState& getKeyboardState() override;
-	virtual IJoystickState& getJoystickState() override { return *this; }
-	virtual IMouseState& getMouseState() override { return *this; }
+	virtual IJoystickState& getJoystickState() override;
+	virtual IMouseState& getMouseState() override;
 	virtual void handleSystemEvent(GMSystemEvent* event) override;
-
-	// IKeyboardState
-public:
-	//! 返回某个键是否此时被按下。
-	/*!
-	  \param key 待测试的键。
-	  \return 返回是否此键被按下。
-	*/
-	virtual bool keydown(GMKey key) override;
-
-	//! 表示一个键是否按下一次，长按只算是一次
-	/*!
-	  \param key 按下的键。
-	  \return 返回是否此键被按下一次。
-	*/
-	virtual bool keyTriggered(GMKey key) override;
-
-	// IJoystickState
-public:
-	virtual void joystickVibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed) override;
-	virtual GMJoystickState joystickState() override;
-
-public:
-	virtual GMMouseState mouseState() override;
-	virtual void setDetectingMode(bool center) override;
 
 private:
 	void recordMouseDown(GMMouseButton button)

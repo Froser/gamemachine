@@ -41,7 +41,7 @@ protected:
 GM_PRIVATE_OBJECT(IMouseStateProxy)
 {
 	GM_LUA_PROXY(IMouseState);
-	GM_LUA_PROXY_FUNC(mouseState);
+	GM_LUA_PROXY_FUNC(state);
 	GM_LUA_PROXY_FUNC(setDetectingMode);
 };
 
@@ -57,8 +57,8 @@ protected:
 GM_PRIVATE_OBJECT(IJoystickStateProxy)
 {
 	GM_LUA_PROXY(IJoystickState);
-	GM_LUA_PROXY_FUNC(joystickVibrate);
-	GM_LUA_PROXY_FUNC(joystickState);
+	GM_LUA_PROXY_FUNC(vibrate);
+	GM_LUA_PROXY_FUNC(state);
 };
 
 class IJoystickStateProxy : public GMObject

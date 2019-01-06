@@ -33,6 +33,51 @@ protected:
 	}
 };
 
+struct GMJoystickState_
+{
+	bool valid;
+	GMint32 buttons;
+	GMint32 leftTrigger;
+	GMint32 rightTrigger;
+	GMint32 thumbLX;
+	GMint32 thumbLY;
+	GMint32 thumbRX;
+	GMint32 thumbRY;
+};
+
+class GMJoystickStateProxy : public GMObject
+{
+	GM_DECLARE_PRIVATE_FROM_STRUCT(GMJoystickStateProxy, GMJoystickState_)
+
+public:
+	GMJoystickStateProxy(const GMJoystickState& state)
+	{
+		D(d);
+		d->valid = state.valid;
+		d->buttons = state.buttons;
+		d->leftTrigger = static_cast<GMint32>(state.leftTrigger);
+		d->rightTrigger = static_cast<GMint32>(state.rightTrigger);
+		d->thumbLX = static_cast<GMint32>(state.thumbLX);
+		d->thumbLY = static_cast<GMint32>(state.thumbLY);
+		d->thumbRX = static_cast<GMint32>(state.thumbRX);
+		d->thumbRY = static_cast<GMint32>(state.thumbRY);
+	}
+
+protected:
+	virtual bool registerMeta() override
+	{
+		GM_META(valid);
+		GM_META(buttons);
+		GM_META(leftTrigger);
+		GM_META(rightTrigger);
+		GM_META(thumbLX);
+		GM_META(thumbLY);
+		GM_META(thumbRX);
+		GM_META(thumbRY);
+		return true;
+	}
+};
+
 //////////////////////////////////////////////////////////////////////////
 bool IInputProxy::registerMeta()
 {
@@ -46,15 +91,15 @@ bool IInputProxy::registerMeta()
 bool IKeyboardStateProxy::registerMeta()
 {
 	GM_LUA_PROXY_META;
-	// GM_META_FUNCTION(keydown);
-	// GM_META_FUNCTION(keyTriggered);
+	GM_META_FUNCTION(keydown);
+	GM_META_FUNCTION(keyTriggered);
 	return true;
 }
 
 bool IMouseStateProxy::registerMeta()
 {
 	GM_LUA_PROXY_META;
-	GM_META_FUNCTION(mouseState);
+	GM_META_FUNCTION(state);
 	GM_META_FUNCTION(setDetectingMode);
 	return true;
 }
@@ -62,8 +107,8 @@ bool IMouseStateProxy::registerMeta()
 bool IJoystickStateProxy::registerMeta()
 {
 	GM_LUA_PROXY_META;
-	// GM_META_FUNCTION(joystickVibrate);
-	// GM_META_FUNCTION(joystickState);
+	GM_META_FUNCTION(vibrate);
+	GM_META_FUNCTION(state);
 	return true;
 }
 
@@ -113,14 +158,14 @@ GM_LUA_PROXY_IMPL(IInputProxy, getMouseState)
 /*
  * mouseState([self])
  */
-GM_LUA_PROXY_IMPL(IMouseStateProxy, mouseState)
+GM_LUA_PROXY_IMPL(IMouseStateProxy, state)
 {
-	static const GMString s_invoker = "IMouseState.mouseState";
-	GM_LUA_CHECK_ARG_COUNT(L, 1, "IMouseState.mouseState");
+	static const GMString s_invoker = "IMouseState.state";
+	GM_LUA_CHECK_ARG_COUNT(L, 1, "IMouseState.state");
 	IMouseStateProxy self;
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
-		return GMReturnValues(L, GMMouseStateProxy(self->mouseState()));
+		return GMReturnValues(L, GMMouseStateProxy(self->state()));
 	return GMReturnValues();
 }
 
@@ -136,5 +181,65 @@ GM_LUA_PROXY_IMPL(IMouseStateProxy, setDetectingMode)
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
 		self->setDetectingMode(b);
+	return GMReturnValues();
+}
+
+/*
+ * keydown([self], key)
+ */
+GM_LUA_PROXY_IMPL(IKeyboardStateProxy, keydown)
+{
+	static const GMString s_invoker = "IKeyboardState.keydown";
+	GM_LUA_CHECK_ARG_COUNT(L, 2, "IKeyboardState.keydown");
+	IKeyboardStateProxy self;
+	GMKey key = static_cast<GMKey>(GMArgumentHelper::popArgument(L, s_invoker).toInt()); //key
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+		GMReturnValues(L, self->keydown(key));
+	return GMReturnValues();
+}
+
+/*
+ * keyTriggered([self], key)
+ */
+GM_LUA_PROXY_IMPL(IKeyboardStateProxy, keyTriggered)
+{
+	static const GMString s_invoker = "IKeyboardState.keydown";
+	GM_LUA_CHECK_ARG_COUNT(L, 2, "IKeyboardState.keydown");
+	IKeyboardStateProxy self;
+	GMKey key = static_cast<GMKey>(GMArgumentHelper::popArgument(L, s_invoker).toInt()); //key
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+		return GMReturnValues(L, self->keyTriggered(key));
+	return GMReturnValues();
+}
+
+/*
+ * joystickVibrate([self], leftMotorSpeed, rightMotorSpeed)
+ */
+GM_LUA_PROXY_IMPL(IJoystickStateProxy, vibrate)
+{
+	static const GMString s_invoker = "IJoystickState.vibrate";
+	GM_LUA_CHECK_ARG_COUNT(L, 3, "IJoystickState.vibrate");
+	IJoystickStateProxy self;
+	GMushort right = static_cast<GMushort>(GMArgumentHelper::popArgument(L, s_invoker).toInt()); //rightMotorSpeed
+	GMushort left = static_cast<GMushort>(GMArgumentHelper::popArgument(L, s_invoker).toInt()); //leftMotorSpeed
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+		self->vibrate(left, right);
+	return GMReturnValues();
+}
+
+/*
+ * state([self])
+ */
+GM_LUA_PROXY_IMPL(IJoystickStateProxy, state)
+{
+	static const GMString s_invoker = "IJoystickState.state";
+	GM_LUA_CHECK_ARG_COUNT(L, 1, "IJoystickState.state");
+	IJoystickStateProxy self;
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+		return GMReturnValues(L, GMJoystickStateProxy(self->state()));
 	return GMReturnValues();
 }

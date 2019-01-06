@@ -177,7 +177,7 @@ void Demo_ParticleBillboard::handleMouseEvent()
 		const static gm::GMfloat mouseSensitivity = 0.25f;
 		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputManager();
 		gm::IMouseState& mouseState = inputManager->getMouseState();
-		auto ms = mouseState.mouseState();
+		auto ms = mouseState.state();
 		d->cameraUtility.update(Radian(-ms.deltaX * mouseSensitivity), Radian(-ms.deltaY * mouseSensitivity));
 	}
 }

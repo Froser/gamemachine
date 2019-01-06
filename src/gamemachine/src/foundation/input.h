@@ -44,20 +44,31 @@ struct GMMouseState
 
 GM_INTERFACE(IJoystickState)
 {
-	virtual void joystickVibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed) = 0;
-	virtual GMJoystickState joystickState() = 0;
+	virtual void vibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed) = 0;
+	virtual GMJoystickState state() = 0;
 };
 
 GM_INTERFACE(IKeyboardState)
 {
+	//! 返回某个键是否此时被按下。
+	/*!
+	  \param key 待测试的键。
+	  \return 返回是否此键被按下。
+	*/
 	virtual bool keydown(GMKey key) = 0;
+
+	//! 表示一个键是否按下一次，长按只算是一次
+	/*!
+	  \param key 按下的键。
+	  \return 返回是否此键被按下一次。
+	*/
 	virtual bool keyTriggered(GMKey key) = 0;
 };
 
 GM_INTERFACE(IMouseState)
 {
-	virtual GMMouseState mouseState() = 0;
 	virtual void setDetectingMode(bool enable) = 0;
+	virtual GMMouseState state() = 0;
 };
 
 GM_INTERFACE(IInput)

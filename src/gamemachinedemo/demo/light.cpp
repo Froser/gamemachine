@@ -214,7 +214,7 @@ void Demo_Light_Directional_Normalmap::event(gm::GameMachineHandlerEvent evt)
 		const auto& rc = window->getRenderRect();
 		auto hw = rc.width / 2, hh = rc.height / 2;
 
-		auto ms = im->getMouseState().mouseState();
+		auto ms = im->getMouseState().state();
 		gm::GMfloat x = ((gm::GMfloat)ms.posX / rc.width) - .5f;
 		gm::GMfloat y = .5f - ((gm::GMfloat)ms.posY / rc.width);
 		GMVec3 lightDirection = Normalize(GMVec3(x, y, 1));

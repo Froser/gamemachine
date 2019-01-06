@@ -199,7 +199,7 @@ void Demo_Collision::onWindowActivate()
 {
 	D(d);
 	gm::IInput* input = getDemonstrationWorld()->getMainWindow()->getInputManager();
-	auto ms = input->getMouseState().mouseState();
+	auto ms = input->getMouseState().state();
 	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
 
 	if (ms.downButton & gm::GMMouseButton_Left)

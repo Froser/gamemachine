@@ -142,7 +142,7 @@ void Demo_Model::handleMouseEvent()
 {
 	D(d);
 	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputManager()->getMouseState();
-	gm::GMMouseState state = ms.mouseState();
+	gm::GMMouseState state = ms.state();
 	if (state.wheeled)
 	{
 		gm::GMfloat delta = .001f * state.wheeledDelta / WHEEL_DELTA;
@@ -251,7 +251,7 @@ void Demo_Model::handleDragging()
 {
 	D(d);
 	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputManager()->getMouseState();
-	gm::GMMouseState state = ms.mouseState();
+	gm::GMMouseState state = ms.state();
 	const gm::GMWindowStates& windowStates = getDemonstrationWorld()->getContext()->getWindow()->getWindowStates();
 
 	if (d->draggingL)

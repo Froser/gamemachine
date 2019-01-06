@@ -88,7 +88,7 @@ void Demo_SpecularMap::handleMouseEvent()
 {
 	D(d);
 	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputManager()->getMouseState();
-	gm::GMMouseState state = ms.mouseState();
+	gm::GMMouseState state = ms.state();
 	if (state.wheeled)
 	{
 		gm::GMfloat delta = .001f * state.wheeledDelta / WHEEL_DELTA;
@@ -137,7 +137,7 @@ void Demo_SpecularMap::handleDragging()
 	D(d);
 	const gm::GMWindowStates& windowStates = getDemonstrationWorld()->getContext()->getWindow()->getWindowStates();
 	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputManager()->getMouseState();
-	gm::GMMouseState state = ms.mouseState();
+	gm::GMMouseState state = ms.state();
 
 	if (d->draggingL)
 	{

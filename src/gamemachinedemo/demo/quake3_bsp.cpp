@@ -165,7 +165,7 @@ void Demo_Quake3_BSP::event(gm::GameMachineHandlerEvent evt)
 		gm::IJoystickState& joyState = inputManager->getJoystickState();
 		gm::IMouseState& mouseState = inputManager->getMouseState();
 
-		gm::GMJoystickState state = joyState.joystickState();
+		gm::GMJoystickState state = joyState.state();
 		GMVec3 direction(0);
 
 		if (kbState.keydown(gm::GM_ASCIIToKey('A')))
@@ -190,9 +190,9 @@ void Demo_Quake3_BSP::event(gm::GameMachineHandlerEvent evt)
 			d->sprite->action(gm::GMMovement::Jump);
 
 		if (kbState.keyTriggered(gm::GM_ASCIIToKey('V')))
-			joyState.joystickVibrate(30000, 30000);
+			joyState.vibrate(30000, 30000);
 		else if (kbState.keydown(gm::GM_ASCIIToKey('C')))
-			joyState.joystickVibrate(0, 0);
+			joyState.vibrate(0, 0);
 
 		if (kbState.keyTriggered(gm::GM_ASCIIToKey('I')))
 			db->debugConfig.set(gm::GMDebugConfigs::RunProfile_Bool, !db->debugConfig.get(gm::GMDebugConfigs::RunProfile_Bool).toBool());
@@ -218,7 +218,7 @@ void Demo_Quake3_BSP::event(gm::GameMachineHandlerEvent evt)
 		}
 		d->sprite->look(Radian(joystickPitch), Radian(joystickYaw));
 
-		gm::GMMouseState ms = mouseState.mouseState();
+		gm::GMMouseState ms = mouseState.state();
 		d->sprite->look(Radian(-ms.deltaY * mouseSensitivity), Radian(-ms.deltaX * mouseSensitivity));
 		
 		if (kbState.keyTriggered(gm::GM_ASCIIToKey('R')))

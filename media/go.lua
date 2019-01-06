@@ -27,13 +27,22 @@ function handleInput(dt)
 	local keyboardState = inputManager:getKeyboardState()
 	local mouseState = inputManager:getMouseState()
 	local joystickState = inputManager:getJoystickState()
-	local ms = mouseState:mouseState()
-	if (ms.moving) then
-		print("Mouse moved. X: " .. ms.posX .. ", Y: " .. ms.posY)
+	local ms = mouseState:state()
+	--if (ms.moving) then
+	--	GMDebugger.info("Mouse moved. X: " .. ms.posX .. ", Y: " .. ms.posY)
+	--end
+	--if (ms.wheeled) then
+	--	GMDebugger.info("Wheeled: " .. ms.wheeledDelta)
+	--end
+	if (keyboardState:keyTriggered(22)) then --22 == Escape
+		GMDebugger.info("ESC is pressed.")
+		GM.exit() -- 按下ESC退出程序
 	end
-	if (ms.wheeled) then
-		print("Wheeled: " .. ms.wheeledDelta)
+	if (keyboardState:keyTriggered(64)) then --64 == F2
+		GMDebugger.info("F2 is pressed. Vibrating joystick.")
+		joystickState:vibrate(30000, 30000)
 	end
+	joystickState:state()
 end
 
 -- 准备窗口

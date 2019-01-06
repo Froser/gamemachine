@@ -154,13 +154,47 @@ namespace
 		// 如果GMKey没有在其中，说明是个ASCII码
 		return static_cast<GMWParam>(GM_KeyToASCII(key));
 	}
+
+	GMString xinputDlls[] = {
+		"xinput9_1_0.dll",
+		"xinput1_4.dll",
+		"xinput1_3.dll",
+	};
+
 }
 
-static GMString xinputDlls[] = {
-	"xinput9_1_0.dll",
-	"xinput1_4.dll",
-	"xinput1_3.dll",
-};
+namespace gm
+{
+	class JoystickStateImpl : public IJoystickState
+	{
+	public:
+		JoystickStateImpl(GMInput* host) { m_host = host; }
+		virtual void vibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed) override;
+		virtual GMJoystickState state() override;
+	private:
+		GMInput* m_host = nullptr;
+	};
+
+	class MouseStateImpl : public IMouseState
+	{
+	public:
+		MouseStateImpl(GMInput* host) { m_host = host; }
+		virtual GMMouseState state() override;
+		virtual void setDetectingMode(bool center) override;
+	private:
+		GMInput* m_host = nullptr;
+	};
+
+	class KeyboardStateImpl : public IKeyboardState
+	{
+	public:
+		KeyboardStateImpl(GMInput* host) { m_host = host; }
+		virtual bool keydown(GMKey key) override;
+		virtual bool keyTriggered(GMKey key) override;
+	private:
+		GMInput* m_host = nullptr;
+	};
+}
 
 GMXInputWrapper::GMXInputWrapper()
 	: m_xinputGetState(nullptr)
@@ -212,6 +246,17 @@ GMInput::GMInput(IWindow* window)
 {
 	D(d);
 	d->window = window;
+	d->joystickImpl = new JoystickStateImpl(this);
+	d->mouseImpl = new MouseStateImpl(this);
+	d->keyboardImpl = new KeyboardStateImpl(this);
+}
+
+GMInput::~GMInput()
+{
+	D(d);
+	GM_delete(d->mouseImpl);
+	GM_delete(d->joystickImpl);
+	GM_delete(d->keyboardImpl);
 }
 
 void GMInput::update()
@@ -225,57 +270,26 @@ void GMInput::update()
 	d->mouseState.moving = false;
 }
 
-void GMInput::setDetectingMode(bool enable)
-{
-	D(d);
-	if (enable)
-	{
-		const GMRect& rect = d->window->getWindowStates().renderRect;
-		::SetCursorPos(rect.x + rect.width / 2, rect.y + rect.height / 2);
-		::ShowCursor(FALSE);
-	}
-	else
-	{
-		::ShowCursor(TRUE);
-	}
-
-	d->detectingMode = enable;
-}
-
-GMJoystickState GMInput::joystickState()
-{
-	D(d);
-	XINPUT_STATE state;
-	GMJoystickState result = { false };
-
-	if (d->xinput.XInputGetState(0, &state) == ERROR_SUCCESS)
-	{
-		result.valid = true;
-		result.leftTrigger = state.Gamepad.bLeftTrigger;
-		result.rightTrigger = state.Gamepad.bRightTrigger;
-		result.thumbLX = state.Gamepad.sThumbLX;
-		result.thumbLY = state.Gamepad.sThumbLY;
-		result.thumbRX = state.Gamepad.sThumbRX;
-		result.thumbRY = state.Gamepad.sThumbRY;
-		result.buttons = state.Gamepad.wButtons;
-	}
-
-	return std::move(result);
-}
-
-void GMInput::joystickVibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed)
-{
-	D(d);
-	XINPUT_VIBRATION v = { leftMotorSpeed, rightMotorSpeed };
-	d->xinput.XInputSetState(0, &v);
-}
-
 IKeyboardState& GMInput::getKeyboardState()
 {
-	GM_PROFILE("getKeyboardState");
 	D(d);
 	GetKeyboardState(d->keyState);
-	return *this;
+	GM_ASSERT(d->keyboardImpl);
+	return *d->keyboardImpl;
+}
+
+IJoystickState& GMInput::getJoystickState()
+{
+	D(d);
+	GM_ASSERT(d->joystickImpl);
+	return *d->joystickImpl;
+}
+
+IMouseState& GMInput::getMouseState()
+{
+	D(d);
+	GM_ASSERT(d->mouseImpl);
+	return *d->mouseImpl;
 }
 
 void GMInput::handleSystemEvent(GMSystemEvent* event)
@@ -312,22 +326,27 @@ void GMInput::handleSystemEvent(GMSystemEvent* event)
 	}
 }
 
-bool GMInput::keydown(GMKey key)
+//////////////////////////////////////////////////////////////////////////
+void MouseStateImpl::setDetectingMode(bool enable)
 {
-	D(d);
-	return !!(d->keyState[getWindowsKey(key)] & 0x80);
+	D_OF(d, m_host);
+	if (enable)
+	{
+		const GMRect& rect = d->window->getWindowStates().renderRect;
+		::SetCursorPos(rect.x + rect.width / 2, rect.y + rect.height / 2);
+		::ShowCursor(FALSE);
+	}
+	else
+	{
+		::ShowCursor(TRUE);
+	}
+
+	d->detectingMode = enable;
 }
 
-// 表示一个键是否按下一次，长按只算是一次
-bool GMInput::keyTriggered(GMKey key)
+GMMouseState MouseStateImpl::state()
 {
-	D(d);
-	return !(d->lastKeyState[getWindowsKey(key)] & 0x80) && (keydown(key));
-}
-
-GMMouseState GMInput::mouseState()
-{
-	D(d);
+	D_OF(d, m_host);
 	GMMouseState& state = d->mouseState;
 	state.wheeled = d->wheelState.wheeled;
 	state.wheeledDelta = static_cast<GMint32>(d->wheelState.delta);
@@ -341,7 +360,7 @@ GMMouseState GMInput::mouseState()
 		state.posX = p.x;
 		state.posY = p.y;
 
-		IKeyboardState& ks = getKeyboardState();
+		IKeyboardState& ks = m_host->getKeyboardState();
 		state.triggerButton = GMMouseButton_None;
 		if (ks.keyTriggered(GMKey_Lbutton))
 			state.triggerButton |= GMMouseButton_Left;
@@ -365,4 +384,45 @@ GMMouseState GMInput::mouseState()
 		state.deltaX = state.deltaY = 0;
 	}
 	return state;
+}
+
+GMJoystickState JoystickStateImpl::state()
+{
+	D_OF(d, m_host);
+	XINPUT_STATE state;
+	GMJoystickState result = { false };
+
+	if (d->xinput.XInputGetState(0, &state) == ERROR_SUCCESS)
+	{
+		result.valid = true;
+		result.leftTrigger = state.Gamepad.bLeftTrigger;
+		result.rightTrigger = state.Gamepad.bRightTrigger;
+		result.thumbLX = state.Gamepad.sThumbLX;
+		result.thumbLY = state.Gamepad.sThumbLY;
+		result.thumbRX = state.Gamepad.sThumbRX;
+		result.thumbRY = state.Gamepad.sThumbRY;
+		result.buttons = state.Gamepad.wButtons;
+	}
+
+	return std::move(result);
+}
+
+void JoystickStateImpl::vibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed)
+{
+	D_OF(d, m_host);
+	XINPUT_VIBRATION v = { leftMotorSpeed, rightMotorSpeed };
+	d->xinput.XInputSetState(0, &v);
+}
+
+bool KeyboardStateImpl::keydown(GMKey key)
+{
+	D_OF(d, m_host);
+	return !!(d->keyState[getWindowsKey(key)] & 0x80);
+}
+
+// 表示一个键是否按下一次，长按只算是一次
+bool KeyboardStateImpl::keyTriggered(GMKey key)
+{
+	D_OF(d, m_host);
+	return !(d->lastKeyState[getWindowsKey(key)] & 0x80) && (keydown(key));
 }
