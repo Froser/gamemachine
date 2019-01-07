@@ -47,7 +47,7 @@ GMWindowHandle GMWindow::create(const GMWindowDesc& desc)
 	return getWindowHandle();
 }
 
-IInput* GMWindow::getInputMananger()
+IInput* GMWindow::getInputManager()
 {
 	D(d);
 	if (!d->input)

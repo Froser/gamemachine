@@ -367,7 +367,7 @@ void GMLua::setMetatable(const GMObject& obj)
 			{
 				std::string name = member.first.toStdString();
 				lua_pushstring(L, name.c_str());
-				lua_pushcfunction(L, static_cast<GMLuaCFunction>(member.second.ptr));
+				lua_pushcfunction(L, (GMLuaCFunction)(member.second.ptr));
 				lua_rawset(L, -3);
 			}
 		}
@@ -661,7 +661,7 @@ void GMLua::setTable(const char* key, const GMObjectMember& value)
 		pushNewTable(**static_cast<GMObject**>(value.ptr));
 		break;
 	case GMMetaMemberType::Function:
-		lua_pushcfunction(L, static_cast<GMLuaCFunction>(value.ptr));
+		lua_pushcfunction(L, (GMLuaCFunction)(value.ptr));
 		break;
 	case GMMetaMemberType::Pointer:
 	{

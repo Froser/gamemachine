@@ -282,16 +282,6 @@ using GMSlots = HashMap<GMSignal, Vector<GMCallbackTarget>, GMStringHashFunctor>
 #define GM_SIGNAL(host, signal) host::sig_##signal()
 #define GM_DECLARE_SIGNAL(signal) public: inline static const gm::GMString& sig_##signal() { static gm::GMString s_sig(#signal); return s_sig; }
 
-#define GM_BEGIN_META_MAP \
-	protected: \
-	virtual bool registerMeta() override { D_BASE(db, GMObject); D(d); \
-	if (db->meta.size() > 0) return true;
-
-#define GM_BEGIN_META_MAP_FROM(base) \
-	virtual bool registerMeta() override { D_BASE(db, GMObject); D(d); \
-	if (db->meta.size() > 0) return true; \
-	base::registerMeta();
-
 #define GM_META(memberName) \
 { \
 	GM_STATIC_ASSERT(static_cast<gm::GMMetaMemberType>( gm::GMMetaMemberTypeGetter<decltype(data()-> memberName)>::Type ) != gm::GMMetaMemberType::Invalid, "Invalid Meta type"); \
@@ -302,7 +292,7 @@ using GMSlots = HashMap<GMSignal, Vector<GMCallbackTarget>, GMStringHashFunctor>
 	gm::GMObject::data()->meta[#memberName] = { type, sizeof(data()-> memberName), &data()->memberName };
 
 #define GM_META_FUNCTION(memberName) \
-	gm::GMObject::data()->meta[#memberName] = { GMMetaMemberType::Function, 0, &data()->memberName };
+	gm::GMObject::data()->meta[#memberName] = { gm::GMMetaMemberType::Function, 0, (void*)&data()->memberName };
 
 #define GM_END_META_MAP \
 	return true; }

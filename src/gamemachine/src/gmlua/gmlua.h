@@ -237,7 +237,7 @@ private:
 
 #define GM_LUA_PROXY(className) bool __detached = false; className* __handler = nullptr; GMString __name = #className;
 #define GM_LUA_PROXY_WITH_TYPE(className, type) bool __detached = false; type* __handler = nullptr; GMString __name = #className;
-#define GM_LUA_PROXY_CONSTRUCTOR(proxyName, className) public: proxyName::proxyName(className* handler = nullptr) { D(d); d->__handler = handler; }
+#define GM_LUA_PROXY_CONSTRUCTOR(proxyName, className) public: proxyName(className* handler = nullptr) { D(d); d->__handler = handler; }
 
 #define GM_LUA_PROXY_META GM_META(__detached); GM_META(__handler); GM_META(__name);
 #define GM_LUA_PROXY_EXTENDS(clsName) clsName __gm_metatableinstance; gm::GMObject* __gm_metatable = nullptr; // 指定一个表为元表（继承）
@@ -390,78 +390,6 @@ private:
 		}																						\
 	}																							\
 	return GMReturnValues();
-
-// Lua模板类，用于模拟一些容器
-#define __META(memberName) \
-{ \
-	GM_STATIC_ASSERT(static_cast<gm::GMMetaMemberType>( gm::GMMetaMemberTypeGetter<decltype(memberName)>::Type ) != gm::GMMetaMemberType::Invalid, "Invalid Meta type"); \
-	gm::GMObject::data()->meta[#memberName] = { static_cast<gm::GMMetaMemberType>( gm::GMMetaMemberTypeGetter<decltype(memberName)>::Type ), sizeof(memberName), &memberName }; \
-}
-
-#define __META_FUNCTION(memberName) \
-	gm::GMObject::data()->meta[#memberName] = { GMMetaMemberType::Function, 0, &memberName };
-
-template <typename T>
-class GMLuaVector : public GMObject
-{
-	typedef Vector<T> ContainerType;
-public:
-	GMLuaVector() = default;
-	GMLuaVector(ContainerType* container)
-		: value(container)
-	{
-	}
-
-	virtual bool registerMeta() override
-	{
-		__META(__name);
-		__META(value);
-		__META_FUNCTION(__index);
-		__META_FUNCTION(__gc);
-		__META_FUNCTION(size);
-		return true;
-	}
-
-	static gm::luaapi::GMFunctionReturn __gc(GMLuaCoreState* l)
-	{
-		static const GMString s_invoker = "GMLuaVector.__gc";
-		GMLuaVector self;
-		GMArgumentHelper::popArgumentAsObject(l, self, s_invoker); //self
-		self.release();
-		return GMReturnValues();
-	}
-
-	static gm::luaapi::GMFunctionReturn __index(GMLuaCoreState* l)
-	{
-		static const GMString s_invoker = "GMLuaVector.__index";
-		GMLuaVector self;
-		GMVariant i = GMArgumentHelper::popArgument(l, s_invoker); //i
-		GMArgumentHelper::popArgumentAsObject(l, self, s_invoker); //self
-		return GMReturnValues(l, (*(self.value))[i.toInt() - 1]);
-	}
-
-	static gm::luaapi::GMFunctionReturn size(GMLuaCoreState* l)
-	{
-		static const GMString s_invoker = "GMLuaVector.size";
-		GMLuaVector self;
-		GMArgumentHelper::popArgumentAsObject(l, self, s_invoker); //self
-		return GMReturnValues(l, self.value->size());
-	}
-
-private:
-	void release()
-	{
-		if (value)
-			GM_delete(value);
-	}
-
-private:
-	GMString __name = L"GMLuaVector";
-	ContainerType* value = nullptr;
-};
-
-#undef __META
-#undef __META_FUNCTION
 
 END_NS
 #endif
