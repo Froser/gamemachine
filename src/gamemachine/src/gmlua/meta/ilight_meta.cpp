@@ -8,18 +8,7 @@ using namespace luaapi;
 
 #define NAME "ILight"
 
-/*
- * __gc([self])
- */
-GM_LUA_PROXY_IMPL(ILightProxy, __gc)
-{
-	static const GMString s_invoker = NAME ".__gc";
-	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
-	ILightProxy self;
-	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
-	self.release();
-	return GMReturnValues();
-}
+GM_LUA_PROXY_GC_IMPL(ILightProxy, "ILight.__gc");
 
 /*
  * setLightAttribute3([self], type, float3)

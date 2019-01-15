@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
 	// 读取Lua
 	GMLua lua;
 	GMLuaResult result = lua.runFile(args[1].toStdString().c_str());
-	if (result.state == GMLuaStates::SyntaxError)
+	if (result.state != GMLuaStates::Ok)
 	{
 		gm_error("Syntax error: {0}", result.message);
 		getchar();

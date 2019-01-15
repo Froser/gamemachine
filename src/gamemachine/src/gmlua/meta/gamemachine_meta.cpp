@@ -104,15 +104,4 @@ namespace
 	};
 }
 
-const char* GameMachine_Meta::Name = NAME;
-
-void GameMachine_Meta::registerFunctions(GMLua* L)
-{
-	setRegisterFunction(L, Name, regCallback, true);
-}
-
-int GameMachine_Meta::regCallback(GMLuaCoreState *L)
-{
-	newLibrary(L, g_meta);
-	return 1;
-}
+GM_LUA_REGISTER_IMPL(GameMachine_Meta, NAME, g_meta);

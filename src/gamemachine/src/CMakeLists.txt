@@ -212,6 +212,8 @@ set(SOURCES
 		gmlua/meta/gmmodel_meta.cpp
 		gmlua/meta/iinput_meta.h
 		gmlua/meta/iinput_meta.cpp
+		gmlua/meta/gmwidget_meta.h
+		gmlua/meta/gmwidget_meta.cpp
 
 		extensions/bsp/bsp_factory.h
 		extensions/bsp/bsp_factory.cpp

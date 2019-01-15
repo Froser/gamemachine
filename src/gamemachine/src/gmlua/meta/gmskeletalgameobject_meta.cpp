@@ -51,15 +51,4 @@ namespace
 	};
 }
 
-const char* GMSkeletalGameObject_Meta::Name = NAME;
-
-void GMSkeletalGameObject_Meta::registerFunctions(GMLua* L)
-{
-	setRegisterFunction(L, Name, regCallback, true);
-}
-
-int GMSkeletalGameObject_Meta::regCallback(GMLuaCoreState *L)
-{
-	newLibrary(L, g_meta);
-	return 1;
-}
+GM_LUA_REGISTER_IMPL(GMSkeletalGameObject_Meta, NAME, g_meta);

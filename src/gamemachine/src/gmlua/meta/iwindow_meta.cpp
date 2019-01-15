@@ -50,18 +50,7 @@ bool IWindowProxy::registerMeta()
 	return true;
 }
 
-/*
- * __gc([self])
- */
-GM_LUA_PROXY_IMPL(IWindowProxy, __gc)
-{
-	static const GMString s_invoker = NAME ".__gc";
-	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
-	IWindowProxy self;
-	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
-	self.release();
-	return GMReturnValues();
-}
+GM_LUA_PROXY_GC_IMPL(IWindowProxy, "IWindow.__gc");
 
 /*
  * create([self], GMWindowDesc)

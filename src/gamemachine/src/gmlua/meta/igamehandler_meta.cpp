@@ -128,12 +128,11 @@ IShaderLoadCallback* IGameHandlerProxy::getShaderLoadCallback() GM_NOEXCEPT
  */
 GM_LUA_PROXY_IMPL(IGameHandlerProxy, __gc)
 {
-	static const GMString s_invoker = NAME ".__gc";
-	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
+	static const GMString s_invoker = "IGameHandler.__gc";
+	GM_LUA_CHECK_ARG_COUNT(L, 1, "IGameHandler.__gc");
 	IGameHandlerProxy self(L);
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	self.release();
 	return GMReturnValues();
 }
-
 //////////////////////////////////////////////////////////////////////////

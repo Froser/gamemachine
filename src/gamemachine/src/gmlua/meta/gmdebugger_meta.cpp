@@ -59,15 +59,4 @@ namespace
 	};
 }
 
-const char* GMDebugger_Meta::Name = NAME;
-
-void GMDebugger_Meta::registerFunctions(GMLua* L)
-{
-	setRegisterFunction(L, Name, regCallback, true);
-}
-
-int GMDebugger_Meta::regCallback(GMLuaCoreState *L)
-{
-	newLibrary(L, g_meta);
-	return 1;
-}
+GM_LUA_REGISTER_IMPL(GMDebugger_Meta, NAME, g_meta);

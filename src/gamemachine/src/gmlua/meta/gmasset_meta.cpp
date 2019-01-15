@@ -8,18 +8,7 @@
 
 using namespace gm::luaapi;
 
-/*
- * __gc([self])
- */
-GM_LUA_PROXY_IMPL(GMAssetProxy, __gc)
-{
-	static const GMString s_invoker = NAME ".__gc";
-	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
-	GMAssetProxy self;
-	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
-	self.release();
-	return GMReturnValues();
-}
+GM_LUA_PROXY_GC_IMPL(GMAssetProxy, "GMAsset.__gc");
 
 /*
  * getScene([self])

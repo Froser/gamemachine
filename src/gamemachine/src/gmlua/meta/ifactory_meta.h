@@ -6,15 +6,7 @@ BEGIN_NS
 
 namespace luaapi
 {
-	class IFactory_Meta : public GMLuaFunctionRegister
-	{
-	public:
-		virtual void registerFunctions(GMLua* L) override;
-
-	private:
-		static int regCallback(GMLuaCoreState *L);
-		static const char* Name;
-	};
+	GM_LUA_REGISTER(IFactory_Meta);
 }
 
 END_NS

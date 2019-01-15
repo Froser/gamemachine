@@ -18,18 +18,7 @@ bool GMGameWorldProxy::registerMeta()
 	return true;
 }
 
-/*
- * __gc([self])
- */
-GM_LUA_PROXY_IMPL(GMGameWorldProxy, __gc)
-{
-	static const GMString s_invoker = NAME ".__gc";
-	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
-	GMGameWorldProxy self;
-	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
-	self.release();
-	return GMReturnValues();
-}
+GM_LUA_PROXY_GC_IMPL(GMGameWorldProxy, "GMGameWorld.__gc");
 
 /*
  * renderScene([self])
@@ -101,15 +90,4 @@ namespace
 	};
 }
 
-const char* GMGameWorld_Meta::Name = NAME;
-
-void GMGameWorld_Meta::registerFunctions(GMLua* L)
-{
-	setRegisterFunction(L, Name, regCallback, true);
-}
-
-int GMGameWorld_Meta::regCallback(GMLuaCoreState *L)
-{
-	newLibrary(L, g_meta);
-	return 1;
-}
+GM_LUA_REGISTER_IMPL(GMGameWorld_Meta, NAME, g_meta);

@@ -71,15 +71,4 @@ namespace
 	};
 }
 
-const char* GMShaderHelper_Meta::Name = NAME;
-
-void GMShaderHelper_Meta::registerFunctions(GMLua* L)
-{
-	setRegisterFunction(L, Name, regCallback, true);
-}
-
-int GMShaderHelper_Meta::regCallback(GMLuaCoreState *L)
-{
-	newLibrary(L, g_meta);
-	return 1;
-}
+GM_LUA_REGISTER_IMPL(GMShaderHelper_Meta, NAME, g_meta);

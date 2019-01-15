@@ -25,15 +25,7 @@ namespace luaapi
 		virtual bool registerMeta() override;
 	};
 
-	class GMGameObject_Meta : public GMLuaFunctionRegister
-	{
-	public:
-		virtual void registerFunctions(GMLua* L) override;
-
-	private:
-		static int regCallback(GMLuaCoreState *L);
-		static const char* Name;
-	};
+	GM_LUA_REGISTER(GMGameObject_Meta);
 }
 
 END_NS

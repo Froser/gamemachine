@@ -7,15 +7,7 @@ BEGIN_NS
 
 namespace luaapi
 {
-	class GameMachine_Meta : public GMLuaFunctionRegister
-	{
-	public:
-		virtual void registerFunctions(GMLua* L) override;
-
-	private:
-		static int regCallback(GMLuaCoreState *L);
-		static const char* Name;
-	};
+	GM_LUA_REGISTER(GameMachine_Meta);
 }
 
 END_NS

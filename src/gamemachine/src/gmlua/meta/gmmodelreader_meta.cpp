@@ -79,15 +79,4 @@ namespace
 	};
 }
 
-const char* GMModelReader_Meta::Name = NAME;
-
-void GMModelReader_Meta::registerFunctions(GMLua* L)
-{
-	setRegisterFunction(L, Name, regCallback, true);
-}
-
-int GMModelReader_Meta::regCallback(GMLuaCoreState *L)
-{
-	newLibrary(L, g_meta);
-	return 1;
-}
+GM_LUA_REGISTER_IMPL(GMModelReader_Meta, NAME, g_meta);

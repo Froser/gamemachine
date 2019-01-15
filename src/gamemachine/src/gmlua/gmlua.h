@@ -228,9 +228,43 @@ private:
 #undef L
 #undef POP_GUARD
 
+#define GM_LUA_REGISTER(MetaName) \
+	class MetaName : public GMLuaFunctionRegister				\
+	{															\
+	public:														\
+		virtual void registerFunctions(GMLua* L) override;		\
+																\
+	private:													\
+		static int regCallback(GMLuaCoreState *L);				\
+		static const char* Name;								\
+	};
+
+#define GM_LUA_REGISTER_IMPL(MetaName, ObjectName, MetaFunctions) \
+	const char* MetaName::Name = ObjectName;					\
+	void MetaName::registerFunctions(GMLua* L)					\
+	{															\
+		setRegisterFunction(L, Name, regCallback, true);		\
+	}															\
+	int MetaName::regCallback(GMLuaCoreState *L)				\
+	{															\
+		newLibrary(L, MetaFunctions);							\
+		return 1;												\
+	}
+
 #define GM_LUA_FUNC(FuncName) gm::luaapi::GMFunctionReturn FuncName(GMLuaCoreState* L)
+
 #define GM_LUA_PROXY_IMPL(Proxy, FuncName) gm::luaapi::GMFunctionReturn GM_PRIVATE_NAME(Proxy)::FuncName(GMLuaCoreState* L)
 #define GM_LUA_PROXY_FUNC(FuncName) GM_META_METHOD gm::luaapi::GMFunctionReturn FuncName(GMLuaCoreState*);
+
+#define GM_LUA_PROXY_GC_IMPL(Proxy, Name) GM_LUA_PROXY_IMPL(Proxy, __gc)	\
+{																			\
+	static const GMString s_invoker = Name;									\
+	GM_LUA_CHECK_ARG_COUNT(L, 1, Name);										\
+	Proxy self;																\
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker);				\
+	self.release();															\
+	return GMReturnValues();												\
+}
 
 // lua类成员函数相关的宏
 #define GM_LUA_PROXY_METATABLE_NAME "__gm_metatable"
