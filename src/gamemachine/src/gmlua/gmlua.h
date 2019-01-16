@@ -278,12 +278,13 @@ private:
 	static const GMString s_invoker = Name;									\
 	GM_LUA_CHECK_ARG_COUNT(L, 1, Name);										\
 	Proxy self;																\
-	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker);				\
+	gm::luaapi::GMArgumentHelper::popArgumentAsObject(L, self, s_invoker);	\
 	self.release();															\
-	return GMReturnValues();												\
+	return gm::luaapi::GMReturnValues();									\
 }
 
 // lua类成员函数相关的宏
+// 以下宏需要手动引用gmlua_functions.h
 #define GM_LUA_PROXY_METATABLE_NAME "__gm_metatable"
 
 #define GM_LUA_PROXY(className) bool __detached = false; className* __handler = nullptr; GMString __name = #className;
@@ -352,25 +353,25 @@ private:
 
 // Lua indexer，用于模拟GMObject的属性
 #define GM_LUA_BEGIN_PROPERTY(proxyClass) \
-	{																							\
-		static const GMString s_invoker = #proxyClass ".__index";								\
-		proxyClass self;																		\
-		GMVariant key = GMArgumentHelper::peekArgument(L, 2, s_invoker); /*key*/				\
-		HashMap<GMString, std::function<GMReturnValues()>, GMStringHashFunctor> __s_indexMap;	\
-		if (__s_indexMap.empty())																\
+	{																										\
+		static const GMString s_invoker = #proxyClass ".__index";											\
+		proxyClass self;																					\
+		GMVariant key = gm::luaapi::GMArgumentHelper::peekArgument(L, 2, s_invoker); /*key*/				\
+		HashMap<GMString, std::function<gm::luaapi::GMReturnValues()>, GMStringHashFunctor> __s_indexMap;	\
+		if (__s_indexMap.empty())																			\
 		{
 
 #define GM_LUA_PROPERTY_PROXY_GETTER(targetProxy, name, memberName) \
 		{ __s_indexMap[#memberName] = [&]() {													\
-			GMArgumentHelper::popArgument(L, s_invoker); /*key*/								\
-			GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/					\
-			return GMReturnValues(L, targetProxy(&self->get##name())); }; }
+			gm::luaapi::GMArgumentHelper::popArgument(L, s_invoker); /*key*/					\
+			gm::luaapi::GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/		\
+			return gm::luaapi::GMReturnValues(L, targetProxy(&self->get##name())); }; }
 
 #define GM_LUA_PROPERTY_GETTER(name, memberName) \
 		{ __s_indexMap[#memberName] = [&]() {													\
 			GMArgumentHelper::popArgument(L, s_invoker); /*key*/								\
 			GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/					\
-			return GMReturnValues(L, (self->get##name())); }; }
+			return gm::luaapi::GMReturnValues(L, (self->get##name())); }; }
 
 #define GM_LUA_PROPERTY_TYPE_INT toInt
 #define GM_LUA_PROPERTY_TYPE_INT64 toInt64
@@ -390,44 +391,44 @@ private:
 				GMString::stringEquals(GM_LUA_PROPERTY_TYPE_NAME(propertyType), GM_LUA_PROPERTY_TYPE_NAME(GM_LUA_PROPERTY_TYPE_UINT)) ||		\
 				GMString::stringEquals(GM_LUA_PROPERTY_TYPE_NAME(propertyType), GM_LUA_PROPERTY_TYPE_NAME(GM_LUA_PROPERTY_TYPE_FLOAT)))			\
 			{																																	\
-				auto value = GMArgumentHelper::popArgument(L, s_invoker); /*value*/																\
-				GMArgumentHelper::popArgument(L, s_invoker); /*key*/																			\
-				GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/																\
+				auto value = gm::luaapi::GMArgumentHelper::popArgument(L, s_invoker); /*value*/													\
+				gm::luaapi::GMArgumentHelper::popArgument(L, s_invoker); /*key*/																\
+				gm::luaapi::GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/													\
 				if (self) self->set##name(value.propertyType());																				\
 			}																																	\
 			else if (GMString::stringEquals(GM_LUA_PROPERTY_TYPE_NAME(propertyType), GM_LUA_PROPERTY_TYPE_NAME(GM_LUA_PROPERTY_TYPE_VEC2)))		\
 			{																																	\
-				GMVariant value = GMArgumentHelper::popArgumentAsVec2(L, s_invoker); /*value*/													\
-				GMArgumentHelper::popArgument(L, s_invoker); /*key*/																			\
-				GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/																\
+				GMVariant value = gm::luaapi::GMArgumentHelper::popArgumentAsVec2(L, s_invoker); /*value*/										\
+				gm::luaapi::GMArgumentHelper::popArgument(L, s_invoker); /*key*/																\
+				gm::luaapi::GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/													\
 				if (self) self->set##name(value.propertyType());																				\
 			}																																	\
 			else if (GMString::stringEquals(GM_LUA_PROPERTY_TYPE_NAME(propertyType), GM_LUA_PROPERTY_TYPE_NAME(GM_LUA_PROPERTY_TYPE_VEC3)))		\
 			{																																	\
-				GMVariant value = GMArgumentHelper::popArgumentAsVec3(L, s_invoker); /*value*/													\
-				GMArgumentHelper::popArgument(L, s_invoker); /*key*/																			\
-				GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/																\
+				GMVariant value = gm::luaapi::GMArgumentHelper::popArgumentAsVec3(L, s_invoker); /*value*/										\
+				gm::luaapi::GMArgumentHelper::popArgument(L, s_invoker); /*key*/																\
+				gm::luaapi::GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/													\
 				if (self) self->set##name(value.propertyType());																				\
 			}																																	\
 			else if (GMString::stringEquals(GM_LUA_PROPERTY_TYPE_NAME(propertyType), GM_LUA_PROPERTY_TYPE_NAME(GM_LUA_PROPERTY_TYPE_VEC4)))		\
 			{																																	\
-				GMVariant value = GMArgumentHelper::popArgumentAsVec4(L, s_invoker); /*value*/													\
-				GMArgumentHelper::popArgument(L, s_invoker); /*key*/																			\
-				GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/																\
+				GMVariant value = gm::luaapi::GMArgumentHelper::popArgumentAsVec4(L, s_invoker); /*value*/										\
+				gm::luaapi::GMArgumentHelper::popArgument(L, s_invoker); /*key*/																\
+				gm::luaapi::GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/													\
 				if (self) self->set##name(value.propertyType());																				\
 			}																																	\
 			else if (GMString::stringEquals(GM_LUA_PROPERTY_TYPE_NAME(propertyType), GM_LUA_PROPERTY_TYPE_NAME(GM_LUA_PROPERTY_TYPE_MAT4)))		\
 			{																																	\
-				GMVariant value = GMArgumentHelper::popArgumentAsMat4(L, s_invoker); /*value*/													\
-				GMArgumentHelper::popArgument(L, s_invoker); /*key*/																			\
-				GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/																\
+				GMVariant value = gm::luaapi::GMArgumentHelper::popArgumentAsMat4(L, s_invoker); /*value*/										\
+				gm::luaapi::GMArgumentHelper::popArgument(L, s_invoker); /*key*/																\
+				gm::luaapi::GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/													\
 				if (self) self->set##name(value.propertyType());																				\
 			}																																	\
 			else																																\
 			{																																	\
 				gm_error(gm_dbg_wrap("wrong lua property type."));																				\
 			}																																	\
-			return GMReturnValues();																											\
+			return gm::luaapi::GMReturnValues();																								\
 		}; }
 
 #define GM_LUA_END_PROPERTY() \
@@ -440,7 +441,7 @@ private:
 					return itemIter->second();													\
 		}																						\
 	}																							\
-	return GMReturnValues();
+	return gm::luaapi::GMReturnValues();
 
 END_NS
 #endif
