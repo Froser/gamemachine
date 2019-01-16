@@ -23,6 +23,20 @@ namespace luaapi
 	public:
 		virtual bool registerMeta() override;
 	};
+
+	GM_PRIVATE_OBJECT(GMWidgetProxy)
+	{
+		GM_LUA_PROXY(GMWidget);
+		GM_LUA_PROXY_FUNC(__gc);
+	};
+
+	class GMWidgetProxy : public GMObject
+	{
+		GM_LUA_PROXY_OBJECT(GMWidgetProxy, GMWidget)
+
+	public:
+		virtual bool registerMeta() override;
+	};
 }
 
 END_NS

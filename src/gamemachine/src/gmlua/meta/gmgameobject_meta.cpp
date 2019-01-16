@@ -86,13 +86,7 @@ GM_LUA_PROXY_IMPL(GMGameObjectProxy, setScaling)
 namespace
 {
 	// {{BEGIN META FUNCTION}}
-	GM_LUA_FUNC(New)
-	{
-		static const GMString s_invoker = NAME ".new";
-		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".new");
-		GMGameObjectProxy proxy(new GMGameObject());
-		return GMReturnValues(L, GMVariant(proxy));
-	}
+	GM_LUA_DEFAULT_NEW_IMPL(New, NAME ".new", GMGameObjectProxy, GMGameObject);
 	// {{END META FUNCTION}}
 
 	GMLuaReg g_meta[] = {

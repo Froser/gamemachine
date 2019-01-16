@@ -71,15 +71,7 @@ GM_LUA_PROXY_IMPL(GMGameWorldProxy, addToRenderList)
 namespace
 {
 	// {{BEGIN META FUNCTION}}
-	GM_LUA_FUNC(New)
-	{
-		static const GMString s_invoker = NAME ".new";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".new");
-		IRenderContextProxy context;
-		GMArgumentHelper::popArgumentAsObject(L, context, s_invoker);
-		GMGameWorldProxy proxy(new GMGameWorld(context.get()));
-		return GMReturnValues(L, GMVariant(proxy));
-	}
+	GM_LUA_NEW_IMPL_ARG(New, NAME ".new", GMGameWorldProxy, GMGameWorld, IRenderContextProxy);
 	// {{END META FUNCTION}}
 
 	GMLuaReg g_meta[] = {

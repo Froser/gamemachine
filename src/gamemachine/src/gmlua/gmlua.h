@@ -252,6 +252,23 @@ private:
 	}
 
 #define GM_LUA_FUNC(FuncName) gm::luaapi::GMFunctionReturn FuncName(GMLuaCoreState* L)
+#define GM_LUA_DEFAULT_NEW_IMPL(New, FuncName, Proxy, Real) GM_LUA_FUNC(New)				\
+{																							\
+	static const GMString s_invoker = FuncName;												\
+	GM_LUA_CHECK_ARG_COUNT(L, 0,FuncName);													\
+	Proxy proxy(new Real());																\
+	return gm::luaapi::GMReturnValues(L, GMVariant(proxy));									\
+}
+
+#define GM_LUA_NEW_IMPL_ARG(New, FuncName, Proxy, Real, Arg0ProxyType) GM_LUA_FUNC(New)		\
+{																							\
+	static const GMString s_invoker = FuncName;												\
+	GM_LUA_CHECK_ARG_COUNT(L, 1, FuncName);													\
+	gm::luaapi::Arg0ProxyType arg0;															\
+	gm::luaapi::GMArgumentHelper::popArgumentAsObject(L, arg0, s_invoker);					\
+	Proxy proxy(new Real(arg0.get()));														\
+	return gm::luaapi::GMReturnValues(L, GMVariant(proxy));									\
+}
 
 #define GM_LUA_PROXY_IMPL(Proxy, FuncName) gm::luaapi::GMFunctionReturn GM_PRIVATE_NAME(Proxy)::FuncName(GMLuaCoreState* L)
 #define GM_LUA_PROXY_FUNC(FuncName) GM_META_METHOD gm::luaapi::GMFunctionReturn FuncName(GMLuaCoreState*);
