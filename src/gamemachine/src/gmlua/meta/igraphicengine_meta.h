@@ -12,6 +12,7 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(addLight);
 		GM_LUA_PROXY_FUNC(getCamera);
 		GM_LUA_PROXY_FUNC(getDefaultFramebuffers);
+		GM_LUA_PROXY_FUNC(getGlyphManager);
 	};
 
 	class IGraphicEngineProxy : public GMObject

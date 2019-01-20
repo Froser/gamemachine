@@ -246,6 +246,9 @@ public:
 	*/
 	bool renderFrame(IWindow* window = nullptr);
 
+	//! 马上处理一个GameMachine消息。
+	bool sendMessage(const GMMessage& msg);
+
 	//! 退出程序。
 	void exit();
 

@@ -61,6 +61,16 @@ handler.init = function(context)
 	handler.context = context;
 	handler.world = GMGameWorld.new(context)
 
+	-- 创建字体文件配置
+	local engine = handler.context:getEngine()
+	local glyphManager = engine:getGlyphManager()
+	local fontBufferCN = gamepackage:readFile(8, "simhei.ttf") --8: 字体资源
+	local fontBufferEN = gamepackage:readFile(8, "times.ttf")
+	local handleCN = glyphManager:addFontByMemory(fontBufferCN)
+	local handleEN = glyphManager:addFontByMemory(fontBufferEN)
+	glyphManager:setCN(handleCN)
+	glyphManager:setEN(handleEN)
+
 	uiconfiguration = GMUIConfiguration.new(context) -- 创建UI资源
 	local skinBuffer = gamepackage:readFile(3, "skin.gmskin") -- 3: 纹理资源。读取皮肤
 	uiconfiguration:import(skinBuffer)

@@ -216,6 +216,8 @@ set(SOURCES
 		gmlua/meta/gmwidget_meta.cpp
 		gmlua/meta/gmbuffer_meta.h
 		gmlua/meta/gmbuffer_meta.cpp
+		gmlua/meta/gmglyphmanager_meta.h
+		gmlua/meta/gmglyphmanager_meta.cpp
 
 		extensions/bsp/bsp_factory.h
 		extensions/bsp/bsp_factory.cpp

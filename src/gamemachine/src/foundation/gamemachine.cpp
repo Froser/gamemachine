@@ -109,14 +109,14 @@ void GameMachine::startGameMachine()
 void GameMachine::addWindow(AUTORELEASE IWindow* window)
 {
 	D(d);
+	d->windows.insert(window);
 	if (d->inited)
 	{
+		handleMessages();
 		auto handler = window->getHandler();
 		if (handler)
 			handler->init(window->getContext());
 	}
-
-	d->windows.insert(window);
 }
 
 void GameMachine::removeWindow(IWindow* window)
@@ -150,6 +150,11 @@ bool GameMachine::renderFrame(IWindow* window)
 
 	d->states.lastFrameElpased = frameCounter.elapsedFromStart();
 	return true;
+}
+
+bool GameMachine::sendMessage(const GMMessage& msg)
+{
+	return handleMessage(msg);
 }
 
 void GameMachine::exit()

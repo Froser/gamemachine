@@ -28,7 +28,7 @@ GM_LUA_PROXY_IMPL(GMGamePackageProxy, loadPackage)
  */
 GM_LUA_PROXY_IMPL(GMGamePackageProxy, readFile)
 {
-	static const GMString s_invoker(L"readFile");
+	static const GMString s_invoker(NAME ".readFile");
 	GM_LUA_CHECK_ARG_COUNT(L, 3, NAME ".readFile");
 	GMGamePackageProxy self;
 	GMString filename = GMArgumentHelper::popArgumentAsString(L, s_invoker); // filename

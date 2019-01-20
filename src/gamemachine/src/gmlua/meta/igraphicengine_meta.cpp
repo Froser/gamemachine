@@ -3,6 +3,7 @@
 #include <gamemachine.h>
 #include <gmlua.h>
 #include "ilight_meta.h"
+#include "gmglyphmanager_meta.h"
 
 #define NAME "IGraphicEngine"
 
@@ -44,8 +45,8 @@ GM_LUA_PROXY_IMPL(IGraphicEngineProxy, getCamera)
 }
 
 /*
-* getCamera([self])
-*/
+ * getCamera([self])
+ */
 GM_LUA_PROXY_IMPL(IGraphicEngineProxy, getDefaultFramebuffers)
 {
 	static const GMString s_invoker = NAME ".getDefaultFramebuffers";
@@ -60,12 +61,30 @@ GM_LUA_PROXY_IMPL(IGraphicEngineProxy, getDefaultFramebuffers)
 	return GMReturnValues();
 }
 
+/*
+ * getGlyphManager([self])
+ */
+GM_LUA_PROXY_IMPL(IGraphicEngineProxy, getGlyphManager)
+{
+	static const GMString s_invoker = NAME ".getGlyphManager";
+	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getGlyphManager");
+	IGraphicEngineProxy self;
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+	{
+		GMGlyphManager* glyphManager = self->getGlyphManager();
+		return GMReturnValues(L, GMGlyphManagerProxy(glyphManager));
+	}
+	return GMReturnValues();
+}
+
 bool IGraphicEngineProxy::registerMeta()
 {
 	GM_LUA_PROXY_META;
 	GM_META_FUNCTION(addLight);
 	GM_META_FUNCTION(getCamera);
 	GM_META_FUNCTION(getDefaultFramebuffers);
+	GM_META_FUNCTION(getGlyphManager);
 	return true;
 }
 
