@@ -140,6 +140,7 @@ void GMUIConfiguration::initResourceManager(GMWidgetResourceManager* manager)
 	{
 		d->textureMap[texture.id] = manager->addTexture(texture.asset, texture.width, texture.height);
 	}
+	manager->setUIConfiguration(*this);
 }
 
 void GMUIConfiguration::initWidget(GMWidget* widget)

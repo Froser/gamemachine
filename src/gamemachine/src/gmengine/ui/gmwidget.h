@@ -26,6 +26,7 @@ class GMControlTextEdit;
 class GMControlTextArea;
 class GMTypoTextBuffer;
 class GMControlScrollBar;
+class GMUIConfiguration;
 struct ITypoEngine;
 struct GMWidgetTextureArea;
 
@@ -119,6 +120,7 @@ GM_PRIVATE_OBJECT(GMWidgetResourceManager)
 	GMTextureAsset whiteTexture;
 	GMAtomic<GMlong> textureId;
 	GMlong whiteTextureId = 0;
+	GMUIConfiguration* configuration = nullptr;
 };
 
 class GM_EXPORT GMWidgetResourceManager : public GMObject
@@ -127,7 +129,10 @@ class GM_EXPORT GMWidgetResourceManager : public GMObject
 
 public:
 	GMWidgetResourceManager(const IRenderContext* context);
-	~GMWidgetResourceManager() = default;
+	~GMWidgetResourceManager();
+
+public:
+	GMWidget* createWidget();
 
 public:
 	ITypoEngine* getTypoEngine();
@@ -149,6 +154,8 @@ public:
 	void registerWidget(GMWidget* widget);
 
 	void onRenderRectResized();
+
+	void setUIConfiguration(const GMUIConfiguration& config);
 
 	inline const Vector<GMWidget*>& getCanvases()
 	{
@@ -367,6 +374,8 @@ GM_PRIVATE_OBJECT(GMWidget)
 
 class GM_EXPORT GMWidget : public GMObject
 {
+	friend class GMWidgetResourceManager;
+
 	GM_DECLARE_PRIVATE(GMWidget)
 	GM_DECLARE_PROPERTY(Minimum, minimized)
 	GM_DECLARE_PROPERTY(Visible, visible)
@@ -387,8 +396,10 @@ public:
 		CanScrollDown = 2,
 	};
 
-public:
+private:
 	GMWidget(GMWidgetResourceManager* manager);
+
+public:
 	~GMWidget();
 
 public:
@@ -408,12 +419,6 @@ public:
 	void setTitle(
 		const GMString& text,
 		const GMPoint& offset = { 10, 0 }
-	);
-
-	void addBorder(
-		const GMRect& corner,
-		const GMint32 marginLeft = 10,
-		const GMint32 marginTop = 30
 	);
 
 public:
@@ -488,6 +493,12 @@ public:
 	virtual void onUpdateSize();
 
 protected:
+	void addBorder(
+		const GMRect& corner,
+		const GMint32 marginLeft = 10,
+		const GMint32 marginTop = 30
+	);
+
 	void addBorder(
 		GMint32 x,
 		GMint32 y,

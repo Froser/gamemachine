@@ -60,6 +60,22 @@ handler.init = function(context)
 	gamepackage:loadPackage('D:\\gmpk')
 	handler.context = context;
 	handler.world = GMGameWorld.new(context)
+
+	uiconfiguration = GMUIConfiguration.new(context) -- 创建UI资源
+	local skinBuffer = gamepackage:readFile(3, "skin.gmskin") -- 3: 纹理资源。读取皮肤
+	uiconfiguration:import(skinBuffer)
+
+	widgetResourceManager = GMWidgetResourceManager.new(context) -- 必须为全局对象，不能为local
+	uiconfiguration:initResourceManager(widgetResourceManager)
+
+	mainWidget = widgetResourceManager:createWidget()
+	widgetResourceManager:registerWidget(mainWidget)
+	mainWidget:setPosition(10, 60)
+	mainWidget:setSize(250, 300)
+	mainWidget:setTitle("GameMachine Lua 菜单")
+
+	local window = handler.context:getWindow()
+	window:addWidget(mainWidget) -- 添加一个Widget
 end
 
 handler.event = function(evt)

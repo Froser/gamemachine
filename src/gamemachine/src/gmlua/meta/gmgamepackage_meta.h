@@ -10,6 +10,7 @@ namespace luaapi
 	{
 		GM_LUA_PROXY(GMGamePackage);
 		GM_LUA_PROXY_FUNC(loadPackage)
+		GM_LUA_PROXY_FUNC(readFile)
 	};
 
 	class GMGamePackageProxy : public GMObject

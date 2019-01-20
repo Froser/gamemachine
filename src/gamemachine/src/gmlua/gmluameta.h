@@ -28,7 +28,7 @@ namespace luaapi
 		GMGameObject_Meta().registerFunctions(L);
 		GMSkeletalGameObject_Meta().registerFunctions(L);
 		GMWidgetResourceManager_Meta().registerFunctions(L);
-		GMWidget_Meta().registerFunctions(L);
+		GMUIConfiguration_Meta().registerFunctions(L);
 		// {{END META REGISTER}}
 	}
 }

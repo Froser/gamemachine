@@ -4,6 +4,7 @@
 #include <gmlua.h>
 #include "igamehandler_meta.h"
 #include "iinput_meta.h"
+#include "gmwidget_meta.h"
 
 using namespace luaapi;
 
@@ -47,6 +48,7 @@ bool IWindowProxy::registerMeta()
 	GM_META_FUNCTION(showWindow);
 	GM_META_FUNCTION(setHandler);
 	GM_META_FUNCTION(getInputManager);
+	GM_META_FUNCTION(addWidget);
 	return true;
 }
 
@@ -129,6 +131,22 @@ GM_LUA_PROXY_IMPL(IWindowProxy, getInputManager)
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
 		return GMReturnValues(L, IInputProxy(self->getInputManager()));
+	return GMReturnValues();
+}
+
+/*
+ * addWidget([self], widget)
+ */
+GM_LUA_PROXY_IMPL(IWindowProxy, addWidget)
+{
+	static const GMString s_invoker = NAME ".addWidget";
+	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".addWidget");
+	IWindowProxy self;
+	GMWidgetProxy widget;
+	GMArgumentHelper::popArgumentAsObject(L, widget, s_invoker); //widget
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+		self->addWidget(widget.get());
 	return GMReturnValues();
 }
 //////////////////////////////////////////////////////////////////////////

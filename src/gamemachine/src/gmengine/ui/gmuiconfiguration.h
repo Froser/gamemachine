@@ -23,7 +23,7 @@ struct GMUIArea
 	GMRect cornerRc;
 };
 
-GM_PRIVATE_OBJECT(GMUIConfiguration)
+GM_PRIVATE_OBJECT_UNALIGNED(GMUIConfiguration)
 {
 	const IRenderContext* context;
 	Vector<GMUITexture> textures;
@@ -31,19 +31,23 @@ GM_PRIVATE_OBJECT(GMUIConfiguration)
 	Map<GMlong, GMlong> textureMap;
 };
 
-class GM_EXPORT GMUIConfiguration : public GMObject
+class GM_EXPORT GMUIConfiguration
 {
-	GM_DECLARE_PRIVATE(GMUIConfiguration)
+	friend class GMWidgetResourceManager;
+	GM_DECLARE_PRIVATE_NGO(GMUIConfiguration)
 
 public:
 	GMUIConfiguration(const IRenderContext* context);
+	GMUIConfiguration(const GMUIConfiguration&) = default;
 
 public:
 	void initResourceManager(GMWidgetResourceManager* manager);
-	void initWidget(GMWidget* widget);
 	bool import(const GMBuffer& buffer);
 	void addTexture(GMUITexture texture);
 	void addArea(GMUIArea area);
+
+private:
+	void initWidget(GMWidget* widget);
 
 public:
 	inline const IRenderContext* getContext() GM_NOEXCEPT

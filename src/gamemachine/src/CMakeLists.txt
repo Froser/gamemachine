@@ -214,6 +214,8 @@ set(SOURCES
 		gmlua/meta/iinput_meta.cpp
 		gmlua/meta/gmwidget_meta.h
 		gmlua/meta/gmwidget_meta.cpp
+		gmlua/meta/gmbuffer_meta.h
+		gmlua/meta/gmbuffer_meta.cpp
 
 		extensions/bsp/bsp_factory.h
 		extensions/bsp/bsp_factory.cpp

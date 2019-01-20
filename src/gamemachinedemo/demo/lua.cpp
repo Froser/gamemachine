@@ -87,9 +87,8 @@ gm::GMWidget* Demo_Lua::createDefaultWidget()
 {
 	D_BASE(d, Base);
 	gm::GMFontHandle stxingka = d->engine->getGlyphManager()->addFontByFileName("STXINGKA.TTF");
-	d->mainWidget = gm_makeOwnedPtr<gm::GMWidget>(getDemonstrationWorld()->getManager());
+	d->mainWidget = gm::GMOwnedPtr<gm::GMWidget>(getDemonstrationWorld()->getManager()->createWidget());
 	getDemonstrationWorld()->getManager()->registerWidget(d->mainWidget.get());
-	getDemonstrationWorld()->getUIConfiguration()->initWidget(d->mainWidget.get());
 
 	d->mainWidget->setTitle(L"选项菜单");
 	d->mainWidget->setTitleVisible(true);
@@ -104,8 +103,6 @@ gm::GMWidget* Demo_Lua::createDefaultWidget()
 	d->mainWidget->setKeyboardInput(true);
 	d->mainWidget->setVisible(false);
 
-	gm::GMRect corner = { 0,0,75,42 };
-	d->mainWidget->addBorder(corner);
 	d->mainWidget->setPosition(10, 60);
 	d->mainWidget->setSize(300, 500);
 	getDemoWorldReference()->getContext()->getWindow()->addWidget(d->mainWidget.get());

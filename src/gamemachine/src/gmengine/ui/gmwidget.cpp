@@ -9,6 +9,7 @@
 #include "gmdata/glyph/gmglyphmanager.h"
 #include "gmengine/gmmessage.h"
 #include "gmcontroltextedit.h"
+#include "gmuiconfiguration.h"
 
 namespace
 {
@@ -174,6 +175,7 @@ void GMStyle::refresh()
 GMWidgetResourceManager::GMWidgetResourceManager(const IRenderContext* context)
 {
 	D(d);
+	d->configuration = new GMUIConfiguration(context);
 	d->context = context;
 	d->textureId = 0;
 	d->textObject = gm_makeOwnedPtr<GMTextGameObject>(context->getWindow()->getRenderRect());
@@ -192,6 +194,12 @@ GMWidgetResourceManager::GMWidgetResourceManager(const IRenderContext* context)
 
 	GM.getFactory()->createWhiteTexture(context, d->whiteTexture);
 	d->whiteTextureId = addTexture(d->whiteTexture, 1, 1);
+}
+
+GMWidgetResourceManager::~GMWidgetResourceManager()
+{
+	D(d);
+	GM_delete(d->configuration);
 }
 
 GMlong GMWidgetResourceManager::addTexture(GMAsset texture, GMint32 width, GMint32 height)
@@ -223,6 +231,14 @@ void GMWidgetResourceManager::registerWidget(GMWidget* widget)
 	d->widgets[sz - 1]->setNextWidget(d->widgets[0]);
 }
 
+GMWidget* GMWidgetResourceManager::createWidget()
+{
+	D(d);
+	GMWidget* w = new GMWidget(this);
+	d->configuration->initWidget(w);
+	return w;
+}
+
 ITypoEngine* GMWidgetResourceManager::getTypoEngine()
 {
 	D(d);
@@ -241,6 +257,12 @@ void GMWidgetResourceManager::onRenderRectResized()
 	const GMWindowStates& windowStates = d->context->getWindow()->getWindowStates();
 	d->backBufferWidth = windowStates.renderRect.width;
 	d->backBufferHeight = windowStates.renderRect.height;
+}
+
+void GMWidgetResourceManager::setUIConfiguration(const GMUIConfiguration& config)
+{
+	D(d);
+	*(d->configuration) = config;
 }
 
 GMfloat GMWidget::s_timeRefresh = 0;
@@ -304,6 +326,8 @@ void GMWidget::setTitle(
 	D(d);
 	d->titleText = text;
 	d->titleOffset = offset;
+	if (!text.isEmpty())
+		setTitleVisible(true);
 }
 
 void GMWidget::addBorder(
@@ -985,6 +1009,9 @@ void GMWidget::updateScaling()
 void GMWidget::render(GMfloat elpasedTime)
 {
 	D(d);
+	if (!d->borderControl)
+		addBorder(d->areas[GMTextureArea::BorderArea].cornerRc);
+
 	if (d->timeLastRefresh < s_timeRefresh)
 	{
 		d->timeLastRefresh = GM.getRunningStates().elapsedTime;

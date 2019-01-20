@@ -262,9 +262,8 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 {
 	D(d);
 	gm::GMFontHandle stxingka = d->engine->getGlyphManager()->addFontByFileName("STXINGKA.TTF");
-	d->mainWidget = gm_makeOwnedPtr<gm::GMWidget>(getDemonstrationWorld()->getManager());
+	d->mainWidget = gm::GMOwnedPtr<gm::GMWidget>(getDemonstrationWorld()->getManager()->createWidget());
 	getDemonstrationWorld()->getManager()->registerWidget(d->mainWidget.get());
-	getDemonstrationWorld()->getUIConfiguration()->initWidget(d->mainWidget.get());
 
 	d->mainWidget->setTitle(L"选项菜单");
 	d->mainWidget->setTitleVisible(true);
@@ -280,8 +279,6 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 	d->mainWidget->setKeyboardInput(true);
 	d->mainWidget->setVisible(false);
 
-	gm::GMRect corner = { 0,0,75,42 };
-	d->mainWidget->addBorder(corner);
 	d->mainWidget->setPosition(10, 60);
 	d->mainWidget->setSize(300, 500);
 	getDemoWorldReference()->getContext()->getWindow()->addWidget(d->mainWidget.get());
@@ -494,11 +491,10 @@ void DemonstrationWorld::init()
 	d->configuration->import(ui);
 
 	d->manager = new gm::GMWidgetResourceManager(getContext());
-	d->mainWidget = new gm::GMWidget(d->manager);
 	d->configuration->initResourceManager(d->manager);
-	d->configuration->initWidget(d->mainWidget);
-
+	d->mainWidget = d->manager->createWidget();
 	d->manager->registerWidget(d->mainWidget);
+
 	d->mainWidget->setPosition(10, 60);
 	d->mainWidget->setSize(500, 650);
 	d->mainWidget->setTitle(L"GameMachine - 展示菜单");
@@ -544,12 +540,9 @@ void DemonstrationWorld::init()
 		GM.exit();
 	});
 
-	gm::GMRect corner = { 0,0,75,42 };
-	d->mainWidget->addBorder(corner);
 	d->mainWindow->addWidget(d->mainWidget);
 
-	gm::GMWidget* billboard = new gm::GMWidget(d->manager);
-	d->configuration->initWidget(billboard);
+	gm::GMWidget* billboard = d->manager->createWidget();
 	billboard->setSize(270, 90);
 	billboard->setPosition(600, 60);
 	gm::GMControlLabel* lb = gm::GMControlLabel::createControl(
@@ -564,7 +557,6 @@ void DemonstrationWorld::init()
 		false
 	);
 	billboard->addControl(lb);
-	billboard->addBorder(corner);
 	d->billboard = billboard;
 	d->mainWindow->addWidget(billboard);
 
