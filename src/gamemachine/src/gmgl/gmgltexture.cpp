@@ -262,3 +262,13 @@ void GMGLWhiteTexture::useTexture(GMint32 textureIndex)
 	glActiveTexture(GL_TEXTURE0 + textureIndex);
 	glBindTexture(GL_TEXTURE_2D, d->textureId);
 }
+
+void GMGLEmptyTexture::init()
+{
+	D(d);
+	static GMbyte texData[] = { 0 };
+	glGenTextures(1, &d->textureId);
+	glBindTexture(GL_TEXTURE_2D, d->textureId);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}

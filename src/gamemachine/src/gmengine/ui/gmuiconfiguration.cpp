@@ -150,6 +150,7 @@ void GMUIConfiguration::initWidget(GMWidget* widget)
 	{
 		widget->addArea(area.area, d->textureMap[area.textureId], area.rc, area.cornerRc);
 	}
+	widget->initStyles();
 }
 
 bool GMUIConfiguration::import(const GMBuffer& buffer)

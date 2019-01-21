@@ -55,5 +55,12 @@ public:
 	virtual void useTexture(GMint32 textureIndex) override;
 };
 
+class GMGLEmptyTexture : public GMGLWhiteTexture
+{
+public:
+	using GMGLWhiteTexture::GMGLWhiteTexture;
+	virtual void init() override;
+};
+
 END_NS
 #endif

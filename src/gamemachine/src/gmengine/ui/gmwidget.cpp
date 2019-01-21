@@ -190,7 +190,9 @@ GMWidgetResourceManager::GMWidgetResourceManager(const IRenderContext* context)
 	d->borderObject = gm_makeOwnedPtr<GMBorder2DGameObject>(context->getWindow()->getRenderRect());
 	d->borderObject->setContext(context);
 
-	addTexture(GMAsset(), 1, 1); //放入一个非法的Asset，占用textureId=0的情况
+	GMAsset emptyTexture;
+	GM.getFactory()->createEmptyTexture(context, emptyTexture);
+	addTexture(emptyTexture, 1, 1); //放入一个空texture，占用textureId=0的情况
 
 	GM.getFactory()->createWhiteTexture(context, d->whiteTexture);
 	d->whiteTextureId = addTexture(d->whiteTexture, 1, 1);

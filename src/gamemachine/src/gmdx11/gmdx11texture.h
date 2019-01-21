@@ -61,6 +61,12 @@ public:
 	virtual void bindSampler(GMTextureSampler*) override;
 };
 
+class GMDx11EmptyTexture : public GMDx11WhiteTexture
+{
+public:
+	using GMDx11WhiteTexture::GMDx11WhiteTexture;
+	virtual void init() override;
+};
 
 END_NS
 #endif

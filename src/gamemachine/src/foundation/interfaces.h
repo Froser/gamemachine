@@ -643,6 +643,7 @@ GM_INTERFACE(IFactory)
 	virtual void createGBuffer(const IRenderContext* context, OUT IGBuffer**) = 0;
 	virtual void createLight(GMLightType, OUT ILight**) = 0;
 	virtual void createWhiteTexture(const IRenderContext* context, REF GMTextureAsset&) = 0;
+	virtual void createEmptyTexture(const IRenderContext* context, REF GMTextureAsset&) = 0;
 	virtual void createShaderPrograms(const IRenderContext* context, const GMRenderTechniqueManager& manager, REF Vector<IShaderProgram*>* out) = 0;
 };
 

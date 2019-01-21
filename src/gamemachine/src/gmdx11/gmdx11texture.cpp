@@ -287,3 +287,40 @@ void GMDx11WhiteTexture::bindSampler(GMTextureSampler*)
 		GM_DX_HR(d->device->CreateSamplerState(&desc, &d->samplerState));
 	}
 }
+
+void GMDx11EmptyTexture::init()
+{
+	static GMbyte texData[] = { 0 };
+	D(d);
+	D3D11_TEXTURE2D_DESC texDesc = { 0 };
+	D3D11_SUBRESOURCE_DATA resourceData;
+	GMComPtr<ID3D11Texture2D> texture;
+
+	texDesc.Width = 1;
+	texDesc.Height = 1;
+	texDesc.MipLevels = 1;
+	texDesc.ArraySize = 1;
+	texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	texDesc.SampleDesc.Count = 1;
+	texDesc.SampleDesc.Quality = 0;
+	texDesc.Usage = D3D11_USAGE_DEFAULT;
+	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	texDesc.CPUAccessFlags = 0;
+	texDesc.MiscFlags = 0;
+
+	GMint32 index = 0;
+	GM_ASSERT(texDesc.ArraySize == 1);
+	GMuint32 pitch = 1;
+	resourceData.pSysMem = texData;
+	resourceData.SysMemPitch = pitch * 4;
+
+	GM_DX_HR(d->device->CreateTexture2D(&texDesc, &resourceData, &texture));
+	d->resource = texture;
+
+	GM_ASSERT(d->resource);
+	GM_DX_HR(d->device->CreateShaderResourceView(
+		d->resource,
+		NULL,
+		&d->shaderResourceView
+	));
+}

@@ -403,6 +403,7 @@ public:
 	~GMWidget();
 
 public:
+	void initStyles();
 	void addArea(GMTextureArea::Area area, GMlong textureId, const GMRect& rc, const GMRect& cornerRc);
 	void render(GMfloat elpasedTime);
 	void setNextWidget(GMWidget* nextWidget);
@@ -518,7 +519,6 @@ private:
 	bool onCycleFocus(bool goForward);
 	void onMouseMove(const GMPoint& pt);
 	void mapRect(GMControlPositionFlag positionFlag, GMRect& rc);
-	void initStyles();
 	GMRect getContentRect();
 	GMint32 getContentOverflowFlag();
 	void createVerticalScrollbar();

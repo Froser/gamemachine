@@ -72,6 +72,13 @@ void GMDx11Factory::createWhiteTexture(const IRenderContext* context, REF GMText
 	texture = GMAsset(GMAssetType::Texture, t);
 }
 
+void GMDx11Factory::createEmptyTexture(const IRenderContext* context, REF GMTextureAsset& texture)
+{
+	GMDx11EmptyTexture* t = new GMDx11EmptyTexture(context);
+	t->init();
+	texture = GMAsset(GMAssetType::Texture, t);
+}
+
 namespace
 {
 	const GMString s_technique11_template =

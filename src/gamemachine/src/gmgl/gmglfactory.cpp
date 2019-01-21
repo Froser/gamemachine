@@ -69,6 +69,13 @@ void GMGLFactory::createWhiteTexture(const IRenderContext* context, REF GMTextur
 	out = GMAsset(GMAssetType::Texture, t);
 }
 
+void GMGLFactory::createEmptyTexture(const IRenderContext* context, REF GMTextureAsset& out)
+{
+	GMGLEmptyTexture* t = new GMGLEmptyTexture(context);
+	t->init();
+	out = GMAsset(GMAssetType::Texture, t);
+}
+
 void GMGLFactory::createShaderPrograms(const IRenderContext* context, const GMRenderTechniqueManager& manager, REF Vector<IShaderProgram*>* out)
 {
 	for (auto& renderTechniques : manager.getRenderTechniques())

@@ -19,6 +19,7 @@ public:
 	virtual void createGBuffer(const IRenderContext* context, OUT IGBuffer**) override;
 	virtual void createLight(GMLightType, OUT ILight**) override;
 	virtual void createWhiteTexture(const IRenderContext* context, REF GMTextureAsset&) override;
+	virtual void createEmptyTexture(const IRenderContext* context, REF GMTextureAsset&) override;
 	virtual void createShaderPrograms(const IRenderContext* context, const GMRenderTechniqueManager& manager, REF Vector<IShaderProgram*>* out);
 };
 
