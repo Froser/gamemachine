@@ -321,12 +321,14 @@ void GMLua::setEachMetaMember(const GMObject& obj)
 	D(d);
 	GM_CHECK_LUA_STACK_BALANCE(0);
 	auto meta = obj.meta();
-	GM_ASSERT(meta);
-	for (const auto& member : *meta)
+	if (meta)
 	{
-		// 不将'__'开头的函数放入普通表
-		if (!member.first.startsWith(L"__") || member.second.type != GMMetaMemberType::Function)
-			setTable(member.first.toStdString().c_str(), member.second);
+		for (const auto& member : *meta)
+		{
+			// 不将'__'开头的函数放入普通表
+			if (!member.first.startsWith(L"__") || member.second.type != GMMetaMemberType::Function)
+				setTable(member.first.toStdString().c_str(), member.second);
+		}
 	}
 }
 
@@ -472,8 +474,8 @@ bool GMLua::popTable(GMObject& obj, GMint32 index)
 				}
 				case GMMetaMemberType::Object:
 				{
-					GMObject* obj = *static_cast<GMObject**>(member.second.ptr);
-					if (!popTable(*obj))
+					GMObject* o = *static_cast<GMObject**>(member.second.ptr);
+					if (o && !popTable(*o))
 						return false;
 					break;
 				}
@@ -606,6 +608,12 @@ void GMLua::push(const GMVariant& var)
 	}
 }
 
+void GMLua::pop(GMint32 num)
+{
+	D(d);
+	lua_pop(L, num);
+}
+
 void GMLua::setTable(const char* key, const GMObjectMember& value)
 {
 	D(d);
@@ -658,8 +666,20 @@ void GMLua::setTable(const char* key, const GMObjectMember& value)
 		break;
 	}
 	case GMMetaMemberType::Object:
-		pushNewTable(**static_cast<GMObject**>(value.ptr));
+	{
+		GMObject* obj = *static_cast<GMObject**>(value.ptr);
+		if (obj)
+		{
+			pushNewTable(*obj);
+		}
+		else
+		{
+			// 回滚操作，直接返回
+			lua_pop(L, 1);
+			return;
+		}
 		break;
+	}
 	case GMMetaMemberType::Function:
 		lua_pushcfunction(L, (GMLuaCFunction)(value.ptr));
 		break;
@@ -699,4 +719,23 @@ GMVariant GMLua::get(GMint32 index)
 		return lua_toboolean(L, index) ? true : false;
 	gm_error(gm_dbg_wrap("GMLua (pop): type not supported"));
 	return GMVariant();
+}
+
+GMLuaReference gm::GMLua::popFunction(bool* valid)
+{
+	D(d);
+	if (lua_isfunction(L, -1))
+	{
+		GM_CHECK_LUA_STACK_BALANCE(-1);
+		if (valid)
+			*valid = true;
+		return luaL_ref(L, LUA_REGISTRYINDEX);
+	}
+	else
+	{
+		GM_CHECK_LUA_STACK_BALANCE(0);
+		if (valid)
+			*valid = false;
+	}
+	return 0;
 }

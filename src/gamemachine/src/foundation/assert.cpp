@@ -20,7 +20,7 @@ void Assert::gm_assert(const char *assertion, const char *file, int line)
 	if (ret == 0 && reportMode & _CRTDBG_MODE_WNDW)
 		return;
 	else if (ret == 1)
-  		_CrtDbgBreak();
+		_CrtDbgBreak();
 #endif
 }
 

@@ -86,6 +86,8 @@ handler.init = function(context)
 
 	local window = handler.context:getWindow()
 	window:addWidget(mainWidget) -- 添加一个Widget
+
+	local exitButton = GMControlButton.createControl()
 end
 
 handler.event = function(evt)

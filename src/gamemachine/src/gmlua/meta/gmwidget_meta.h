@@ -50,6 +50,7 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(setPosition);
 		GM_LUA_PROXY_FUNC(setSize);
 		GM_LUA_PROXY_FUNC(setTitle);
+		GM_LUA_PROXY_FUNC(addControl);
 	};
 
 	class GMWidgetProxy : public GMObject

@@ -4,6 +4,7 @@
 #include <gmlua.h>
 #include "irendercontext_meta.h"
 #include "gmbuffer_meta.h"
+#include "gmcontrol_meta.h"
 
 using namespace luaapi;
 
@@ -110,8 +111,8 @@ GM_LUA_PROXY_IMPL(GMWidgetResourceManagerProxy, createWidget)
  */
 GM_LUA_PROXY_IMPL(GMWidgetProxy, setPosition)
 {
-	static const GMString s_invoker = "GMWidgetResourceManager.setPosition";
-	GM_LUA_CHECK_ARG_COUNT(L, 3, "GMWidgetResourceManager.setPosition");
+	static const GMString s_invoker = "GMWidget.setPosition";
+	GM_LUA_CHECK_ARG_COUNT(L, 3, "GMWidget.setPosition");
 	GMWidgetProxy self;
 	GMint32 y = GMArgumentHelper::popArgument(L, s_invoker).toInt(); //y
 	GMint32 x = GMArgumentHelper::popArgument(L, s_invoker).toInt(); //x
@@ -126,8 +127,8 @@ GM_LUA_PROXY_IMPL(GMWidgetProxy, setPosition)
  */
 GM_LUA_PROXY_IMPL(GMWidgetProxy, setSize)
 {
-	static const GMString s_invoker = "GMWidgetResourceManager.setSize";
-	GM_LUA_CHECK_ARG_COUNT(L, 3, "GMWidgetResourceManager.setSize");
+	static const GMString s_invoker = "GMWidget.setSize";
+	GM_LUA_CHECK_ARG_COUNT(L, 3, "GMWidget.setSize");
 	GMWidgetProxy self;
 	GMint32 height = GMArgumentHelper::popArgument(L, s_invoker).toInt(); //height
 	GMint32 width = GMArgumentHelper::popArgument(L, s_invoker).toInt(); //width
@@ -142,8 +143,8 @@ GM_LUA_PROXY_IMPL(GMWidgetProxy, setSize)
  */
 GM_LUA_PROXY_IMPL(GMWidgetProxy, setTitle)
 {
-	static const GMString s_invoker = "GMWidgetResourceManager.setTitle";
-	GM_LUA_CHECK_ARG_COUNT(L, 2, "GMWidgetResourceManager.setTitle");
+	static const GMString s_invoker = "GMWidget.setTitle";
+	GM_LUA_CHECK_ARG_COUNT(L, 2, "GMWidget.setTitle");
 	GMWidgetProxy self;
 	GMString title = GMArgumentHelper::popArgumentAsString(L, s_invoker); //title
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
@@ -151,6 +152,27 @@ GM_LUA_PROXY_IMPL(GMWidgetProxy, setTitle)
 		self->setTitle(title);
 	return GMReturnValues();
 }
+
+/*
+ * addControl([self], control)
+ */
+GM_LUA_PROXY_IMPL(GMWidgetProxy, addControl)
+{
+	static const GMString s_invoker = "GMWidget.addControl";
+	GM_LUA_CHECK_ARG_COUNT(L, 2, "GMWidget.addControl");
+	GMWidgetProxy self;
+	GMControlProxy control;
+	GMArgumentHelper::beginArgumentReference(L, control, s_invoker); //control
+	control.detach();
+	GMArgumentHelper::endArgumentReference(L, control);
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+		self->addControl(control.get());
+	else
+		control.attach();
+	return GMReturnValues();
+}
+
 //////////////////////////////////////////////////////////////////////////
 bool GMUIConfigurationProxy::registerMeta()
 {
@@ -180,5 +202,6 @@ bool GMWidgetProxy::registerMeta()
 	GM_META_FUNCTION(setPosition);
 	GM_META_FUNCTION(setSize);
 	GM_META_FUNCTION(setTitle);
+	GM_META_FUNCTION(addControl);
 	return true;
 }

@@ -176,6 +176,8 @@ set(SOURCES
 		gmlua/gmlua_functions.h
 		gmlua/gmlua_functions.cpp
 		gmlua/gmluameta.h
+		gmlua/meta/gmobject_meta.h
+		gmlua/meta/gmobject_meta.cpp
 		gmlua/meta/gamemachine_meta.h
 		gmlua/meta/gamemachine_meta.cpp
 		gmlua/meta/gmdebugger_meta.h
@@ -214,6 +216,8 @@ set(SOURCES
 		gmlua/meta/iinput_meta.cpp
 		gmlua/meta/gmwidget_meta.h
 		gmlua/meta/gmwidget_meta.cpp
+		gmlua/meta/gmcontrol_meta.h
+		gmlua/meta/gmcontrol_meta.cpp
 		gmlua/meta/gmbuffer_meta.h
 		gmlua/meta/gmbuffer_meta.cpp
 		gmlua/meta/gmglyphmanager_meta.h

@@ -39,8 +39,14 @@ GMVariant GMArgumentHelper::peekArgument(GMLuaCoreState* L, GMint32 index, const
 GMVariant GMArgumentHelper::popArgument(GMLuaCoreState* L, const GMString& invoker)
 {
 	GM_CHECK_LUA_STACK_BALANCE(-1);
+	GMLua lua(L);
+	bool isFunction = false;
+	GMLuaReference funcRef = lua.popFunction(&isFunction);
+	if (isFunction)
+		return funcRef; // 不需要pop，已经pop过了
+
 	POP_GUARD();
-	GMVariant v = GMLua(L).getTop();
+	GMVariant v = lua.getTop();
 	if (v.isInvalid())
 		gm_error(gm_dbg_wrap("GMArgumentHelper::popArgument: {0}: Cannot match the type of the argument. The type of the argument is {1}."), invoker, lua_typename(L, -1));
 	return v;

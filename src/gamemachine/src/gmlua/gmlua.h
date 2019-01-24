@@ -208,7 +208,9 @@ private:
 	*/
 	GMVariant getTop();
 	GMVariant get(GMint32 index);
+	GMLuaReference popFunction(bool* valid = nullptr);
 	void push(const GMVariant& var);
+	void pop(GMint32 num);
 
 public:
 	inline GMLuaCoreState* getLuaCoreState() GM_NOEXCEPT
@@ -329,6 +331,11 @@ private:
 		{											\
 			D(d);									\
 			d->__detached = true;					\
+		}											\
+		void attach()								\
+		{											\
+			D(d);									\
+			d->__detached = false;					\
 		}											\
 													\
 		void release()								\

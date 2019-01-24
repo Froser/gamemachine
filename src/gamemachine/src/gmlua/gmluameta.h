@@ -11,6 +11,7 @@
 #include "meta/gmgameobject_meta.h"
 #include "meta/gmskeletalgameobject_meta.h"
 #include "meta/gmwidget_meta.h"
+#include "meta/gmcontrol_meta.h"
 // {{END META INCLUDES}}
 
 BEGIN_NS
@@ -29,6 +30,7 @@ namespace luaapi
 		GMSkeletalGameObject_Meta().registerFunctions(L);
 		GMWidgetResourceManager_Meta().registerFunctions(L);
 		GMUIConfiguration_Meta().registerFunctions(L);
+		GMControlButton_Meta().registerFunctions(L);
 		// {{END META REGISTER}}
 	}
 }
