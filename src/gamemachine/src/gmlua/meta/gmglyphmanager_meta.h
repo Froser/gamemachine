@@ -3,21 +3,22 @@
 #include <gmcommon.h>
 #include <gmlua.h>
 #include <gmglyphmanager.h>
+#include "gmobject_meta.h"
 BEGIN_NS
 
 namespace luaapi
 {
 	GM_PRIVATE_OBJECT(GMGlyphManagerProxy)
 	{
-		GM_LUA_PROXY(GMGlyphManager);
 		GM_LUA_PROXY_FUNC(addFontByMemory);
 		GM_LUA_PROXY_FUNC(setEN);
 		GM_LUA_PROXY_FUNC(setCN);
 	};
 
-	class GMGlyphManagerProxy : public GMObject
+	class GMGlyphManagerProxy : public GMObjectProxy
 	{
-		GM_LUA_PROXY_OBJECT(GMGlyphManagerProxy, GMGlyphManager)
+		GM_LUA_PROXY_OBJ(GMGlyphManagerProxy, GMGlyphManager, GMObjectProxy)
+		GM_DECLARE_PRIVATE(GMGlyphManagerProxy)
 
 	protected:
 		virtual bool registerMeta() override;

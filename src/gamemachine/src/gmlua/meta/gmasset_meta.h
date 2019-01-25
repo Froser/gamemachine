@@ -3,21 +3,21 @@
 #include <gmcommon.h>
 #include <gmlua.h>
 #include <gmassets.h>
+#include "gmobject_meta.h"
 BEGIN_NS
 
 namespace luaapi
 {
 	GM_PRIVATE_OBJECT(GMAssetProxy)
 	{
-		GM_LUA_PROXY(GMAsset);
-		GM_LUA_PROXY_FUNC(__gc);
 		GM_LUA_PROXY_FUNC(getScene);
 		GM_LUA_PROXY_FUNC(getModel);
 	};
 
-	class GMAssetProxy : public GMObject
+	class GMAssetProxy : public GMObjectProxy
 	{
-		GM_LUA_PROXY_OBJECT_NO_DEFAULT_CONSTRUCTOR(GMAssetProxy, GMAsset)
+		GM_LUA_PROXY_OBJ(GMAssetProxy, GMAsset, GMObjectProxy)
+		GM_DECLARE_PRIVATE(GMAssetProxy)
 
 	public:
 		GMAssetProxy() = default;
@@ -34,9 +34,10 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(getModels);
 	};
 
-	class GMSceneProxy : public GMObject
+	class GMSceneProxy : public GMObjectProxy
 	{
-		GM_LUA_PROXY_OBJECT(GMSceneProxy, GMScene)
+		GM_LUA_PROXY_OBJ(GMSceneProxy, GMScene, GMObjectProxy)
+		GM_DECLARE_PRIVATE(GMSceneProxy)
 
 	protected:
 		virtual bool registerMeta() override;

@@ -3,23 +3,23 @@
 #include <gmcommon.h>
 #include <gmlua.h>
 #include <gmgameobject.h>
+#include "gmobject_meta.h"
 BEGIN_NS
 
 namespace luaapi
 {
 	GM_PRIVATE_OBJECT(GMGameObjectProxy)
 	{
-		GM_LUA_PROXY(GMGameObject);
-		GM_LUA_PROXY_FUNC(__gc);
 		GM_LUA_PROXY_FUNC(setAsset);
 		GM_LUA_PROXY_FUNC(setTranslation);
 		GM_LUA_PROXY_FUNC(setRotation);
 		GM_LUA_PROXY_FUNC(setScaling);
 	};
 
-	class GMGameObjectProxy : public GMObject
+	class GMGameObjectProxy : public GMObjectProxy
 	{
-		GM_LUA_PROXY_OBJECT(GMGameObjectProxy, GMGameObject)
+		GM_LUA_PROXY_OBJ(GMGameObjectProxy, GMGameObject, GMObjectProxy)
+		GM_DECLARE_PRIVATE(GMGameObjectProxy)
 
 	protected:
 		virtual bool registerMeta() override;

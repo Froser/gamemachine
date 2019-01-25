@@ -263,7 +263,7 @@ private:
 {																							\
 	static const GMString s_invoker = FuncName;												\
 	GM_LUA_CHECK_ARG_COUNT(L, 0,FuncName);													\
-	Proxy proxy(new Real());																\
+	Proxy proxy(L, new Real());																\
 	return gm::luaapi::GMReturnValues(L, GMVariant(proxy));									\
 }
 
@@ -273,22 +273,12 @@ private:
 	GM_LUA_CHECK_ARG_COUNT(L, 1, FuncName);													\
 	gm::luaapi::Arg0ProxyType arg0;															\
 	gm::luaapi::GMArgumentHelper::popArgumentAsObject(L, arg0, s_invoker);					\
-	Proxy proxy(new Real(arg0.get()));														\
+	Proxy proxy(L, new Real(arg0.get()));													\
 	return gm::luaapi::GMReturnValues(L, GMVariant(proxy));									\
 }
 
 #define GM_LUA_PROXY_IMPL(Proxy, FuncName) gm::luaapi::GMFunctionReturn GM_PRIVATE_NAME(Proxy)::FuncName(GMLuaCoreState* L)
 #define GM_LUA_PROXY_FUNC(FuncName) GM_META_METHOD gm::luaapi::GMFunctionReturn FuncName(GMLuaCoreState*);
-
-#define GM_LUA_PROXY_GC_IMPL(Proxy, Name) GM_LUA_PROXY_IMPL(Proxy, __gc)	\
-{																			\
-	static const GMString s_invoker = Name;									\
-	GM_LUA_CHECK_ARG_COUNT(L, 1, Name);										\
-	Proxy self;																\
-	gm::luaapi::GMArgumentHelper::popArgumentAsObject(L, self, s_invoker);	\
-	self.release();															\
-	return gm::luaapi::GMReturnValues();									\
-}
 
 // lua类成员函数相关的宏
 // 以下宏需要手动引用gmlua_functions.h
@@ -296,78 +286,11 @@ private:
 #define GM_LUA_PROXY_OBJ(className, realType, baseName) \
 	public:																			\
 		using baseName::baseName;													\
-		realType* get() { return gm_cast<realType*>(baseName::get()); }
+		realType* get() { return gm_cast<realType*>(baseName::get()); }				\
+		realType* operator->() { return get(); }
 
 #define GM_LUA_PROXY_METATABLE_NAME "__gm_metatable"
 
-#define GM_LUA_PROXY(className) bool __detached = false; className* __handler = nullptr; GMString __name = #className;
-#define GM_LUA_PROXY_WITH_TYPE(className, type) bool __detached = false; type* __handler = nullptr; GMString __name = #className;
-#define GM_LUA_PROXY_CONSTRUCTOR(proxyName, className) public: proxyName(className* handler = nullptr) { D(d); d->__handler = handler; }
-
-#define GM_LUA_PROXY_META GM_META(__detached); GM_META(__handler); GM_META(__name);
-#define GM_LUA_PROXY_EXTENDS(clsName) clsName __gm_metatableinstance; gm::GMObject* __gm_metatable = nullptr; // 指定一个表为元表（继承）
-#define GM_LUA_PROXY_EXTENDS_META { data()->__gm_metatableinstance.set(get()); data()->__gm_metatable = &(data()->__gm_metatableinstance); GM_META(__gm_metatable); } // registerMeta中加入此宏，像会应用元表
-#define GM_LUA_PROXY_OBJECT_NO_DEFAULT_CONSTRUCTOR(className, type)		\
-		GM_DECLARE_PRIVATE(className)				\
-		GM_ALLOW_COPY_MOVE(className)				\
-	public:											\
-		void copyData(const GMObject& a)			\
-		{											\
-			D(d);									\
-			const className& i =					\
-				dynamic_cast<const className&>(a);	\
-			D_OF(d_other, &i);						\
-			d->__handler = d_other->__handler;		\
-		}											\
-													\
-		typedef type RealType;						\
-		RealType* get()								\
-		{											\
-			D(d);									\
-			return d->__handler;					\
-		}											\
-													\
-		RealType* operator->()						\
-		{											\
-			return get();							\
-		}											\
-													\
-		operator bool() const						\
-		{											\
-			D(d);									\
-			return !!d->__handler;					\
-		}											\
-													\
-		void detach()								\
-		{											\
-			D(d);									\
-			d->__detached = true;					\
-		}											\
-		void attach()								\
-		{											\
-			D(d);									\
-			d->__detached = false;					\
-		}											\
-													\
-		void release()								\
-		{											\
-			D(d);									\
-			if (!d->__detached)						\
-			{										\
-				GM_delete(d->__handler);			\
-				detach();							\
-			}										\
-		}											\
-													\
-		void set(RealType* handler)					\
-		{											\
-			D(d);									\
-			d->__handler = handler;					\
-		}
-
-#define GM_LUA_PROXY_OBJECT(className, type) \
-	GM_LUA_PROXY_CONSTRUCTOR(className, type) \
-	GM_LUA_PROXY_OBJECT_NO_DEFAULT_CONSTRUCTOR(className, type)
 
 // Lua indexer，用于模拟GMObject的属性
 #define GM_LUA_BEGIN_PROPERTY(proxyClass) \

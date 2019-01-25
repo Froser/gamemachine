@@ -4,7 +4,7 @@
 #include <gmlua.h>
 BEGIN_NS
 
-#define LUA_PROXY(className) bool __detached = false; className* __handler = nullptr; GMString __name = #className;
+#define LUA_PROXY(className) className* __handler = nullptr; GMString __name = #className;
 
 namespace luaapi
 {
@@ -24,6 +24,12 @@ namespace luaapi
 
 	public: 
 		GMObjectProxy(GMLuaCoreState* l, GMObject* handler = nullptr);
+
+		void setObjectName(const GMString& name)
+		{
+			D(d);
+			d->__name = name;
+		}
 
 		void copyData(const GMObject& a)
 		{
@@ -58,6 +64,8 @@ namespace luaapi
 		virtual bool registerMeta() override;
 	};
 }
+
+#undef LUA_PROXY
 
 END_NS
 #endif

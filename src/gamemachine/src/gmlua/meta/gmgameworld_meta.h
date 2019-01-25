@@ -3,22 +3,22 @@
 #include <gmcommon.h>
 #include <gmlua.h>
 #include <gmgameworld.h>
+#include "gmobject_meta.h"
 BEGIN_NS
 
 namespace luaapi
 {
 	GM_PRIVATE_OBJECT(GMGameWorldProxy)
 	{
-		GM_LUA_PROXY(GMGameWorld);
-		GM_LUA_PROXY_FUNC(__gc);
 		GM_LUA_PROXY_FUNC(renderScene);
 		GM_LUA_PROXY_FUNC(addObjectAndInit);
 		GM_LUA_PROXY_FUNC(addToRenderList);
 	};
 
-	class GMGameWorldProxy : public GMObject
+	class GMGameWorldProxy : public GMObjectProxy
 	{
-		GM_LUA_PROXY_OBJECT(GMGameWorldProxy, GMGameWorld)
+		GM_LUA_PROXY_OBJ(GMGameWorldProxy, GMGameWorld, GMObjectProxy)
+		GM_DECLARE_PRIVATE(GMGameWorldProxy)
 
 	protected:
 		virtual bool registerMeta() override;

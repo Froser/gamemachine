@@ -15,7 +15,7 @@ GM_LUA_PROXY_IMPL(GMGamePackageProxy, loadPackage)
 {
 	static const GMString s_invoker(L"loadPackage");
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".loadPackage");
-	GMGamePackageProxy self;
+	GMGamePackageProxy self(L);
 	GMString path = GMArgumentHelper::popArgumentAsString(L, s_invoker); // path
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
@@ -30,7 +30,7 @@ GM_LUA_PROXY_IMPL(GMGamePackageProxy, readFile)
 {
 	static const GMString s_invoker(NAME ".readFile");
 	GM_LUA_CHECK_ARG_COUNT(L, 3, NAME ".readFile");
-	GMGamePackageProxy self;
+	GMGamePackageProxy self(L);
 	GMString filename = GMArgumentHelper::popArgumentAsString(L, s_invoker); // filename
 	GMPackageIndex type = static_cast<GMPackageIndex>(GMArgumentHelper::popArgument(L, s_invoker).toInt());
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
@@ -45,8 +45,7 @@ GM_LUA_PROXY_IMPL(GMGamePackageProxy, readFile)
 
 bool GMGamePackageProxy::registerMeta()
 {
-	GM_LUA_PROXY_META;
 	GM_META_FUNCTION(loadPackage)
 	GM_META_FUNCTION(readFile)
-	return true;
+	return Base::registerMeta();
 }

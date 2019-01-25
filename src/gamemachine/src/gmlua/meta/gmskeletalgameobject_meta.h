@@ -3,6 +3,7 @@
 #include <gmcommon.h>
 #include <gmlua.h>
 #include <gmskeletalgameobject.h>
+#include "gmobject_meta.h"
 #include "gmgameobject_meta.h"
 
 BEGIN_NS
@@ -11,14 +12,13 @@ namespace luaapi
 {
 	GM_PRIVATE_OBJECT(GMSkeletalGameObjectProxy)
 	{
-		GM_LUA_PROXY(GMSkeletalGameObject);
-		GM_LUA_PROXY_EXTENDS(GMGameObjectProxy);
 		GM_LUA_PROXY_FUNC(update);
 	};
 
-	class GMSkeletalGameObjectProxy : public GMObject
+	class GMSkeletalGameObjectProxy : public GMGameObjectProxy
 	{
-		GM_LUA_PROXY_OBJECT(GMSkeletalGameObjectProxy, GMSkeletalGameObject)
+		GM_LUA_PROXY_OBJ(GMSkeletalGameObjectProxy, GMSkeletalGameObject, GMGameObjectProxy)
+		GM_DECLARE_PRIVATE(GMSkeletalGameObjectProxy)
 
 	protected:
 		virtual bool registerMeta() override;

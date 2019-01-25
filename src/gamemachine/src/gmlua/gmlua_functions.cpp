@@ -116,25 +116,6 @@ bool GMArgumentHelper::popArgumentAsObject(GMLuaCoreState* L, REF GMObject& obj,
 	return true;
 }
 
-bool GMArgumentHelper::beginArgumentReference(GMLuaCoreState* L, REF GMObject& obj, const GMString& invoker)
-{
-	GM_CHECK_LUA_STACK_BALANCE(0);
-	if (!GMLua(L).popTable(obj))
-	{
-		gm_error(gm_dbg_wrap("GMLua::popArgumentAsObject: {0}: argument is not an object."), invoker);
-		return false;
-	}
-	return true;
-}
-
-void GMArgumentHelper::endArgumentReference(GMLuaCoreState* L, const GMObject& obj)
-{
-	GM_CHECK_LUA_STACK_BALANCE(-1);
-	POP_GUARD();
-	GMLua lua(L);
-	lua.setEachMetaMember(obj);
-}
-
 void GMReturnValues::pushArgument(const GMVariant& arg)
 {
 	if (arg.isObject())

@@ -11,14 +11,11 @@ using namespace gm::luaapi;
 
 bool GMGameWorldProxy::registerMeta()
 {
-	GM_LUA_PROXY_META;
 	GM_META_FUNCTION(renderScene);
 	GM_META_FUNCTION(addObjectAndInit);
 	GM_META_FUNCTION(addToRenderList);
 	return true;
 }
-
-GM_LUA_PROXY_GC_IMPL(GMGameWorldProxy, "GMGameWorld.__gc");
 
 /*
  * renderScene([self])
@@ -27,7 +24,7 @@ GM_LUA_PROXY_IMPL(GMGameWorldProxy, renderScene)
 {
 	static const GMString s_invoker = NAME ".renderScene";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".renderScene");
-	GMGameWorldProxy self;
+	GMGameWorldProxy self(L);
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
 		self->renderScene();
@@ -41,14 +38,15 @@ GM_LUA_PROXY_IMPL(GMGameWorldProxy, addObjectAndInit)
 {
 	static const GMString s_invoker = NAME ".addObjectAndInit";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".addObjectAndInit");
-	GMGameWorldProxy self;
+	GMGameWorldProxy self(L);
 	GMGameObjectProxy gameobject;
-	GMArgumentHelper::beginArgumentReference(L, gameobject, s_invoker); //GMObject
-	gameobject.detach();
-	GMArgumentHelper::endArgumentReference(L, gameobject);
+	GMArgumentHelper::popArgumentAsObject(L, gameobject, s_invoker); //GMObject
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
+	{
 		self->addObjectAndInit(gameobject.get());
+		gameobject.setAutoRelease(false);
+	}
 	return GMReturnValues();
 }
 

@@ -10,15 +10,12 @@ using namespace gm::luaapi;
 
 bool GMGameObjectProxy::registerMeta()
 {
-	GM_LUA_PROXY_META;
 	GM_META_FUNCTION(setAsset);
 	GM_META_FUNCTION(setTranslation);
 	GM_META_FUNCTION(setRotation);
 	GM_META_FUNCTION(setScaling);
-	return true;
+	return Base::registerMeta();
 }
-
-GM_LUA_PROXY_GC_IMPL(GMGameObjectProxy, "GMGameObject.__gc");
 
 /*
  * setAsset([self], GMAsset)
@@ -27,8 +24,8 @@ GM_LUA_PROXY_IMPL(GMGameObjectProxy, setAsset)
 {
 	static const GMString s_invoker = NAME ".setAsset";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setAsset");
-	GMGameObjectProxy self;
-	GMAssetProxy asset;
+	GMGameObjectProxy self(L);
+	GMAssetProxy asset(L);
 	GMArgumentHelper::popArgumentAsObject(L, asset, s_invoker); //asset
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
@@ -43,7 +40,7 @@ GM_LUA_PROXY_IMPL(GMGameObjectProxy, setTranslation)
 {
 	static const GMString s_invoker = NAME ".setTranslation";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setTranslation");
-	GMGameObjectProxy self;
+	GMGameObjectProxy self(L);
 	GMMat4 mat = GMArgumentHelper::popArgumentAsMat4(L, s_invoker).toMat4(); //matrix
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
@@ -58,7 +55,7 @@ GM_LUA_PROXY_IMPL(GMGameObjectProxy, setRotation)
 {
 	static const GMString s_invoker = NAME ".setRotation";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setRotation");
-	GMGameObjectProxy self;
+	GMGameObjectProxy self(L);
 	GMVec4 v = GMArgumentHelper::popArgumentAsVec4(L, s_invoker).toVec4(); //quat
 	GMQuat quat(v.getX(), v.getY(), v.getZ(), v.getW());
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
@@ -75,7 +72,7 @@ GM_LUA_PROXY_IMPL(GMGameObjectProxy, setScaling)
 {
 	static const GMString s_invoker = NAME ".setScaling";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setScaling");
-	GMGameObjectProxy self;
+	GMGameObjectProxy self(L);
 	GMMat4 mat = GMArgumentHelper::popArgumentAsMat4(L, s_invoker).toMat4(); //matrix
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)

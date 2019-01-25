@@ -2,7 +2,6 @@
 #include "gmskeletalgameobject_meta.h"
 #include <gamemachine.h>
 #include <gmlua.h>
-#include "gmasset_meta.h"
 
 #define NAME "GMSkeletalGameObject"
 
@@ -10,10 +9,8 @@ using namespace gm::luaapi;
 
 bool GMSkeletalGameObjectProxy::registerMeta()
 {
-	GM_LUA_PROXY_META;
-	GM_LUA_PROXY_EXTENDS_META;
 	GM_META_FUNCTION(update);
-	return true;
+	return Base::registerMeta();
 }
 
 /*
@@ -23,7 +20,7 @@ GM_LUA_PROXY_IMPL(GMSkeletalGameObjectProxy, update)
 {
 	static const GMString s_invoker = NAME ".update";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".update");
-	GMGameObjectProxy self;
+	GMGameObjectProxy self(L);
 	GMfloat dt = GMArgumentHelper::popArgument(L, s_invoker).toFloat(); //duration
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
