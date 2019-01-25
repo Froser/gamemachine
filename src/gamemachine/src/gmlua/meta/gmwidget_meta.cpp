@@ -168,8 +168,6 @@ GM_LUA_PROXY_IMPL(GMWidgetProxy, addControl)
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
 		self->addControl(control.get());
-	else
-		control.attach();
 	return GMReturnValues();
 }
 

@@ -45,16 +45,12 @@ GM_LUA_PROXY_GC_IMPL(GMControlProxy, "GMControl.__gc");
 bool GMControlProxy::registerMeta()
 {
 	D(d);
-	GM_LUA_PROXY_META;
-	GM_LUA_PROXY_EXTENDS_META;
 	GM_META_FUNCTION(__gc);
-	return true;
+	return GMObjectProxy::registerMeta();
 }
 
 bool GMControlButtonProxy::registerMeta()
 {
 	D(d);
-	GM_LUA_PROXY_META;
-	GM_LUA_PROXY_EXTENDS_META;
-	return true;
+	return GMControlProxy::registerMeta();
 }

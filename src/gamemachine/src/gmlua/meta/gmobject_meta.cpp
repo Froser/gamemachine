@@ -6,12 +6,13 @@
 using namespace luaapi;
 
 #define NAME "GMObject"
+#define GMOBJECT_PROXY_META GM_META(__detached); GM_META_WITH_TYPE(__handler, GMMetaMemberType::Pointer); GM_META(__name);
 
 //////////////////////////////////////////////////////////////////////////
 bool GMObjectProxy::registerMeta()
 {
 	D(d);
-	GM_LUA_PROXY_META;
+	GMOBJECT_PROXY_META;
 	GM_META_FUNCTION(connect);
 	return true;
 }

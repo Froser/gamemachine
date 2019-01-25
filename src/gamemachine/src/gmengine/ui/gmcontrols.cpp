@@ -9,6 +9,10 @@ GMControl::GMControl(GMWidget* widget)
 	d->widget = widget;
 }
 
+GMControl::~GMControl()
+{
+}
+
 bool GMControl::handleSystemEvent(GMSystemEvent* event)
 {
 	return false;

@@ -46,6 +46,7 @@ public:
 
 public:
 	GMControl(GMWidget* widget);
+	~GMControl();
 
 public:
 	inline void setEnabled(bool enabled)
