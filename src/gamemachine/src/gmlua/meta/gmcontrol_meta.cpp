@@ -21,7 +21,7 @@ namespace
 		if (widget)
 		{
 			GMControlButton* c = GMControlButton::createControl(widget.get(), text, x, y, width, height, false);
-			GMControlButtonProxy control(c);
+			GMControlButtonProxy control(L, c);
 			return GMReturnValues(L, control);
 		}
 		return GMReturnValues();
@@ -40,12 +40,10 @@ namespace
 GM_LUA_REGISTER_IMPL(GMControlButton_Meta, "GMControlButton", g_meta_gmcontrolbutton);
 
 //////////////////////////////////////////////////////////////////////////
-GM_LUA_PROXY_GC_IMPL(GMControlProxy, "GMControl.__gc");
 
 bool GMControlProxy::registerMeta()
 {
 	D(d);
-	GM_META_FUNCTION(__gc);
 	return GMObjectProxy::registerMeta();
 }
 

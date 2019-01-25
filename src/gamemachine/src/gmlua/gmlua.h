@@ -2,6 +2,7 @@
 #define __GMLUA_H__
 #include <gmcommon.h>
 #include <linearmath.h>
+#include "gmluaruntime.h"
 
 extern "C"
 {
@@ -99,6 +100,7 @@ struct GMLuaResult
 GM_PRIVATE_OBJECT(GMLua)
 {
 	GMLuaCoreState* luaState = nullptr;
+	GMLuaRuntime luaRuntime;
 	bool isWeakLuaStatePtr = false;
 	bool libraryLoaded = false;
 };
@@ -219,6 +221,9 @@ public:
 		return d->luaState;
 	}
 
+public:
+	static GMLuaRuntime* getRuntime(GMLuaCoreState*);
+
 private:
 	void loadLibrary();
 	GMLuaResult pcall(const char* functionName, const std::initializer_list<GMVariant>& args, GMint32 nRet);
@@ -287,6 +292,12 @@ private:
 
 // lua类成员函数相关的宏
 // 以下宏需要手动引用gmlua_functions.h
+
+#define GM_LUA_PROXY_OBJ(className, realType, baseName) \
+	public:																			\
+		using baseName::baseName;													\
+		realType* get() { return gm_cast<realType*>(baseName::get()); }
+
 #define GM_LUA_PROXY_METATABLE_NAME "__gm_metatable"
 
 #define GM_LUA_PROXY(className) bool __detached = false; className* __handler = nullptr; GMString __name = #className;

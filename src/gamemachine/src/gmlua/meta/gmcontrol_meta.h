@@ -11,23 +11,9 @@ namespace luaapi
 {
 	GM_LUA_REGISTER(GMControlButton_Meta);
 
-	GM_PRIVATE_OBJECT(GMControlProxy)
-	{
-		GM_LUA_PROXY_FUNC(__gc);
-	};
-
 	class GMControlProxy : public GMObjectProxy
 	{
-	public:
-		using GMObjectProxy::GMObjectProxy;
-
-		GM_DECLARE_PRIVATE(GMControlProxy)
-
-	public:
-		GMControl* get()
-		{
-			return gm_cast<GMControl*>(GMObjectProxy::get());
-		}
+		GM_LUA_PROXY_OBJ(GMControlProxy, GMControl, GMObjectProxy)
 
 	public:
 		virtual bool registerMeta() override;
@@ -36,8 +22,7 @@ namespace luaapi
 	//////////////////////////////////////////////////////////////////////////
 	class GMControlButtonProxy : public GMControlProxy
 	{
-	public:
-		using GMControlProxy::GMControlProxy;
+		GM_LUA_PROXY_OBJ(GMControlButtonProxy, GMControlButton, GMControlProxy)
 
 	public:
 		virtual bool registerMeta() override;

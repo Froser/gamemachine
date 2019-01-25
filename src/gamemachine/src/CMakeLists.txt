@@ -176,6 +176,8 @@ set(SOURCES
 		gmlua/gmlua_functions.h
 		gmlua/gmlua_functions.cpp
 		gmlua/gmluameta.h
+		gmlua/gmluaruntime.h
+		gmlua/gmluaruntime.cpp
 		gmlua/meta/gmobject_meta.h
 		gmlua/meta/gmobject_meta.cpp
 		gmlua/meta/gamemachine_meta.h

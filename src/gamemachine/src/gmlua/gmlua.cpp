@@ -30,6 +30,33 @@ struct __PopGuard							\
 
 namespace
 {
+	class Runtimes
+	{
+	public:
+		~Runtimes()
+		{
+			for (auto runtime : runtimes)
+			{
+				GM_delete(runtime.second);
+			}
+			GMClearSTLContainer(runtimes);
+		}
+
+		GMLuaRuntime* operator[](GMLuaCoreState* s)
+		{
+			GMLuaRuntime* runtime = runtimes[s];
+			if (!runtime)
+			{
+				runtime = new GMLuaRuntime();
+				runtimes[s] = runtime;
+			}
+			return runtime;
+		}
+
+	private:
+		Map<GMLuaCoreState*, GMLuaRuntime*> runtimes;
+	};
+
 	template <typename T>
 	void pushVector(const T& v, GMLuaCoreState* l)
 	{
@@ -282,6 +309,12 @@ GMLuaResult GMLua::protectedCall(const char* functionName, const std::initialize
 	}
 
 	return lr;
+}
+
+GMLuaRuntime* GMLua::getRuntime(GMLuaCoreState* s)
+{
+	static Runtimes runtimes;
+	return runtimes[s];
 }
 
 void GMLua::loadLibrary()

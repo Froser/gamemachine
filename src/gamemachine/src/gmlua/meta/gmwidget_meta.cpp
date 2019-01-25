@@ -161,13 +161,14 @@ GM_LUA_PROXY_IMPL(GMWidgetProxy, addControl)
 	static const GMString s_invoker = "GMWidget.addControl";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, "GMWidget.addControl");
 	GMWidgetProxy self;
-	GMControlProxy control;
-	GMArgumentHelper::beginArgumentReference(L, control, s_invoker); //control
-	control.detach();
-	GMArgumentHelper::endArgumentReference(L, control);
+	GMControlProxy control(L);
+	GMArgumentHelper::popArgumentAsObject(L, control, s_invoker); //control
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
+	{
 		self->addControl(control.get());
+		control.setAutoRelease(false); // 生命周期由GMWidget管理
+	}
 	return GMReturnValues();
 }
 
