@@ -29,13 +29,7 @@ bool GMObjectProxy::registerMeta()
 	return true;
 }
 
-void GMObjectProxy::set(GMObject* handler)
-{
-	D(d);
-	d->__handler = handler;
-}
-
-void gm::luaapi::GMObjectProxy::setAutoRelease(bool autorelease)
+void GMObjectProxy::setAutoRelease(bool autorelease)
 {
 	D(d);
 	if (autorelease)
@@ -53,7 +47,7 @@ void gm::luaapi::GMObjectProxy::setAutoRelease(bool autorelease)
 	}
 }
 
-GM_LUA_PROXY_IMPL(GMObjectProxy, __gc)
+GMFunctionReturn gmlua_gc(GMLuaCoreState* L)
 {
 	// 如果一个对象是自动释放的，当__gc被调用时，它将提前释放
 	static const GMString s_invoker = NAME ".__gc";
@@ -99,3 +93,26 @@ GM_LUA_PROXY_IMPL(GMObjectProxy, connect)
 	return GMReturnValues();
 }
 //////////////////////////////////////////////////////////////////////////
+
+bool GMAnyProxy::registerMeta()
+{
+	return true;
+}
+
+void GMAnyProxy::setAutoRelease(bool autorelease)
+{
+	D(d);
+	if (autorelease)
+	{
+		if (d->__handler)
+		{
+			// 这个对象放入runtime托管池
+			GMLua::getRuntime(d->l)->addObject(d->__handler);
+		}
+	}
+	else
+	{
+		// 从托管池移除，自己管理生命周期。
+		GMLua::getRuntime(d->l)->detachObject(d->__handler);
+	}
+}

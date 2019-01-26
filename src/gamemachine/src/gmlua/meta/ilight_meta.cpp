@@ -8,8 +8,6 @@ using namespace luaapi;
 
 #define NAME "ILight"
 
-GM_LUA_PROXY_GC_IMPL(ILightProxy, "ILight.__gc");
-
 /*
  * setLightAttribute3([self], type, float3)
  */
@@ -17,7 +15,7 @@ GM_LUA_PROXY_IMPL(ILightProxy, setLightAttribute3)
 {
 	static const GMString s_invoker = NAME ".setLightAttribute3";
 	GM_LUA_CHECK_ARG_COUNT(L, 3, NAME ".setLightAttribute3");
-	ILightProxy self;
+	ILightProxy self(L);
 	GMVariant v3 = GMArgumentHelper::popArgumentAsVec3(L, s_invoker); //float3
 	GMVariant type = GMArgumentHelper::popArgument(L, s_invoker); //type
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
@@ -33,7 +31,7 @@ GM_LUA_PROXY_IMPL(ILightProxy, setLightAttribute)
 {
 	static const GMString s_invoker = NAME ".setLightAttribute";
 	GM_LUA_CHECK_ARG_COUNT(L, 3, NAME ".setLightAttribute");
-	ILightProxy self;
+	ILightProxy self(L);
 	GMVariant f = GMArgumentHelper::popArgumentAsVec3(L, s_invoker); //float
 	GMVariant type = GMArgumentHelper::popArgument(L, s_invoker); //type
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
@@ -44,9 +42,7 @@ GM_LUA_PROXY_IMPL(ILightProxy, setLightAttribute)
 
 bool ILightProxy::registerMeta()
 {
-	GM_LUA_PROXY_META;
-	GM_META_FUNCTION(__gc);
 	GM_META_FUNCTION(setLightAttribute3);
 	GM_META_FUNCTION(setLightAttribute);
-	return true;
+	return Base::registerMeta();
 }

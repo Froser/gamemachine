@@ -81,13 +81,19 @@ handler.init = function(context)
 	mainWidget = widgetResourceManager:createWidget()
 	widgetResourceManager:registerWidget(mainWidget)
 	mainWidget:setPosition(10, 60)
-	mainWidget:setSize(250, 300)
+	mainWidget:setSize(250, 40)
 	mainWidget:setTitle("GameMachine Lua 菜单")
 
 	local window = handler.context:getWindow()
 	window:addWidget(mainWidget) -- 添加一个Widget
 
-	local exitButton = GMControlButton.createControl()
+	local exitButton = GMControlButton.createControl(mainWidget, "退出", 10, 10, 230, 30)
+	mainWidget:addControl(exitButton)
+
+	local exitCallback = function(sender, receiver)
+		GM.exit()
+	end
+	exitButton:connect(exitButton, "click", exitCallback)
 end
 
 handler.event = function(evt)

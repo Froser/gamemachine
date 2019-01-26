@@ -66,7 +66,7 @@ namespace
 		GMArgumentHelper::popArgumentAsObject(L, settings, s_invoker);
 		GMSceneAsset asset;
 		GMModelReader::load(settings.toModelLoadSettings(), GMModelReader::Assimp, asset);
-		GMAssetProxy proxy(asset);
+		GMAssetProxy proxy(L, asset);
 		return GMReturnValues(L, proxy);
 	}
 	// {{END META FUNCTION}}

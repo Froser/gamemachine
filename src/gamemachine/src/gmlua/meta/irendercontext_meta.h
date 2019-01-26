@@ -3,20 +3,21 @@
 #include <gmcommon.h>
 #include <gmlua.h>
 #include "iwindow_meta.h"
+#include "gmobject_meta.h"
 BEGIN_NS
 
 namespace luaapi
 {
 	GM_PRIVATE_OBJECT(IRenderContextProxy)
 	{
-		GM_LUA_PROXY_WITH_TYPE(IRenderContext, const IRenderContext);
 		GM_LUA_PROXY_FUNC(getWindow);
 		GM_LUA_PROXY_FUNC(getEngine);
 	};
 
-	class IRenderContextProxy : public GMObject
+	class IRenderContextProxy : public GMAnyProxy<const IRenderContext>
 	{
-		GM_LUA_PROXY_OBJECT(IRenderContextProxy, const IRenderContext)
+		GM_LUA_PROXY_OBJ(const IRenderContext, GMAnyProxy)
+		GM_DECLARE_PRIVATE_AND_BASE(IRenderContextProxy, GMAnyProxy)
 
 	public:
 		virtual bool registerMeta() override;

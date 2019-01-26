@@ -283,7 +283,7 @@ private:
 // lua类成员函数相关的宏
 // 以下宏需要手动引用gmlua_functions.h
 
-#define GM_LUA_PROXY_OBJ(className, realType, baseName) \
+#define GM_LUA_PROXY_OBJ(realType, baseName) \
 	public:																			\
 		using baseName::baseName;													\
 		realType* get() { return gm_cast<realType*>(baseName::get()); }				\
@@ -296,7 +296,7 @@ private:
 #define GM_LUA_BEGIN_PROPERTY(proxyClass) \
 	{																										\
 		static const GMString s_invoker = #proxyClass ".__index";											\
-		proxyClass self;																					\
+		proxyClass self(L);																					\
 		GMVariant key = gm::luaapi::GMArgumentHelper::peekArgument(L, 2, s_invoker); /*key*/				\
 		HashMap<GMString, std::function<gm::luaapi::GMReturnValues()>, GMStringHashFunctor> __s_indexMap;	\
 		if (__s_indexMap.empty())																			\

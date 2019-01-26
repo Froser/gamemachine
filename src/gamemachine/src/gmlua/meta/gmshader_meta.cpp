@@ -17,9 +17,8 @@ GM_LUA_PROXY_IMPL(GMShaderProxy, __index)
 
 bool GMShaderProxy::registerMeta()
 {
-	GM_LUA_PROXY_META;
 	GM_META_FUNCTION(__index);
-	return true;
+	return Base::registerMeta();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -55,8 +54,7 @@ GM_LUA_PROXY_IMPL(GMMaterialProxy, __newindex)
 
 bool GMMaterialProxy::registerMeta()
 {
-	GM_LUA_PROXY_META;
 	GM_META_FUNCTION(__index);
 	GM_META_FUNCTION(__newindex);
-	return true;
+	return Base::registerMeta();
 }

@@ -17,8 +17,8 @@ namespace luaapi
 
 	class GMGameWorldProxy : public GMObjectProxy
 	{
-		GM_LUA_PROXY_OBJ(GMGameWorldProxy, GMGameWorld, GMObjectProxy)
-		GM_DECLARE_PRIVATE(GMGameWorldProxy)
+		GM_LUA_PROXY_OBJ(GMGameWorld, GMObjectProxy)
+		GM_DECLARE_PRIVATE_AND_BASE(GMGameWorldProxy, GMObjectProxy)
 
 	protected:
 		virtual bool registerMeta() override;

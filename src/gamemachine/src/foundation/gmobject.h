@@ -18,9 +18,10 @@ BEGIN_NS
 /*!
   继承此接口，将自动获得一个虚析构函数。
 */
-struct GM_EXPORT IVirtualFunctionObject
+struct GM_EXPORT IDestroyObject
 {
-	virtual ~IVirtualFunctionObject() = default;
+	virtual ~IDestroyObject() = default;
+	virtual void destroy() { delete this; }
 };
 
 // 对象存储
@@ -317,9 +318,9 @@ GM_DECLARE_PRIVATE(子类名)来将子类的数据指针成员添加到子类中
 使用GM_ALLOW_COPY_MOVE宏来允许对象之间相互拷贝，它会生成一套左值和右值拷贝、赋值函数。<BR>
 另外，GMObject的数据将会在GMObject构造时被新建，在GMObject析构时被释放。
 */
-class GM_EXPORT GMObject : public IVirtualFunctionObject
+class GM_EXPORT GMObject : public IDestroyObject
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMObject, IVirtualFunctionObject)
+	GM_DECLARE_PRIVATE_AND_BASE(GMObject, IDestroyObject)
 	GM_DISABLE_COPY(GMObject)
 	GM_DISABLE_ASSIGN(GMObject)
 
@@ -414,8 +415,9 @@ inline TargetType gm_cast(SourceType obj)
 }
 
 // 接口统一定义
-#define GM_INTERFACE(name) struct GM_EXPORT name : public gm::IVirtualFunctionObject
-#define GM_INTERFACE_FROM(name, base) struct GM_EXPORT name : public base 
+#define GM_INTERFACE(name) struct GM_EXPORT name : public gm::IDestroyObject
+#define GM_INTERFACE_FROM(name, base) struct GM_EXPORT name : public base
+#define GM_DEFAULT_DESTORY_IMPL() public: virtual void destroy() override { delete this; }
 
 // 缓存类，用于存储缓存数据
 struct GM_EXPORT GMBuffer

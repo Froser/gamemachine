@@ -16,14 +16,15 @@ GM_LUA_PROXY_IMPL(IGraphicEngineProxy, addLight)
 {
 	static const GMString s_invoker = NAME ".addLight";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".addLight");
-	IGraphicEngineProxy self;
-	ILightProxy light;
-	GMArgumentHelper::beginArgumentReference(L, light, s_invoker); //IGameHandler
-	light.detach();
-	GMArgumentHelper::endArgumentReference(L, light);
+	IGraphicEngineProxy self(L);
+	ILightProxy light(L);
+	GMArgumentHelper::popArgumentAsObject(L, light, s_invoker); //IGameHandler
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
+	{
+		light.setAutoRelease(false);
 		self->addLight(light.get());
+	}
 	return GMReturnValues();
 }
 
@@ -34,12 +35,14 @@ GM_LUA_PROXY_IMPL(IGraphicEngineProxy, getCamera)
 {
 	static const GMString s_invoker = NAME ".getCamera";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getCamera");
-	IGraphicEngineProxy self;
+	IGraphicEngineProxy self(L);
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
 	{
 		GMCamera& camera = self->getCamera();
-		return GMReturnValues(L, GMCameraProxy(&camera));
+		GMCameraProxy proxy(L);
+		proxy.set(&camera);
+		return GMReturnValues(L, proxy);
 	}
 	return GMReturnValues();
 }
@@ -51,12 +54,14 @@ GM_LUA_PROXY_IMPL(IGraphicEngineProxy, getDefaultFramebuffers)
 {
 	static const GMString s_invoker = NAME ".getDefaultFramebuffers";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getDefaultFramebuffers");
-	IGraphicEngineProxy self;
+	IGraphicEngineProxy self(L);
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
 	{
 		IFramebuffers* defaultFramebuffers = self->getDefaultFramebuffers();
-		return GMReturnValues(L, IFramebuffersProxy(defaultFramebuffers));
+		IFramebuffersProxy proxy(L);
+		proxy.set(defaultFramebuffers);
+		return GMReturnValues(L, proxy);
 	}
 	return GMReturnValues();
 }
@@ -68,24 +73,25 @@ GM_LUA_PROXY_IMPL(IGraphicEngineProxy, getGlyphManager)
 {
 	static const GMString s_invoker = NAME ".getGlyphManager";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getGlyphManager");
-	IGraphicEngineProxy self;
+	IGraphicEngineProxy self(L);
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
 	{
 		GMGlyphManager* glyphManager = self->getGlyphManager();
-		return GMReturnValues(L, GMGlyphManagerProxy(glyphManager));
+		GMGlyphManagerProxy proxy(L);
+		proxy.set(glyphManager);
+		return GMReturnValues(L, proxy);
 	}
 	return GMReturnValues();
 }
 
 bool IGraphicEngineProxy::registerMeta()
 {
-	GM_LUA_PROXY_META;
 	GM_META_FUNCTION(addLight);
 	GM_META_FUNCTION(getCamera);
 	GM_META_FUNCTION(getDefaultFramebuffers);
 	GM_META_FUNCTION(getGlyphManager);
-	return true;
+	return Base::registerMeta();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -114,7 +120,7 @@ GM_LUA_PROXY_IMPL(GMCameraProxy, lookAt)
 {
 	static const GMString s_invoker = CAMERA_NAME ".lookAt";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, CAMERA_NAME ".lookAt");
-	GMCameraProxy self;
+	GMCameraProxy self(L);
 	GMCameraLookAtProxy lookAt;
 	GMArgumentHelper::popArgumentAsObject(L, lookAt, s_invoker); //IGameHandler
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
@@ -130,7 +136,7 @@ GM_LUA_PROXY_IMPL(GMCameraProxy, setPerspective)
 {
 	static const GMString s_invoker = CAMERA_NAME ".setPerspective";
 	GM_LUA_CHECK_ARG_COUNT(L, 5, CAMERA_NAME ".setPerspective");
-	GMCameraProxy self;
+	GMCameraProxy self(L);
 	GMfloat f = GMArgumentHelper::popArgument(L, s_invoker).toFloat(); //far
 	GMfloat n = GMArgumentHelper::popArgument(L, s_invoker).toFloat(); //near
 	GMfloat aspect = GMArgumentHelper::popArgument(L, s_invoker).toFloat(); //aspect
@@ -148,7 +154,7 @@ GM_LUA_PROXY_IMPL(GMCameraProxy, setOrtho)
 {
 	static const GMString s_invoker = CAMERA_NAME ".setPerspective";
 	GM_LUA_CHECK_ARG_COUNT(L, 7, CAMERA_NAME ".setPerspective");
-	GMCameraProxy self;
+	GMCameraProxy self(L);
 	GMfloat f = GMArgumentHelper::popArgument(L, s_invoker).toFloat(); //far
 	GMfloat n = GMArgumentHelper::popArgument(L, s_invoker).toFloat(); //near
 	GMfloat top = GMArgumentHelper::popArgument(L, s_invoker).toFloat(); //top
@@ -163,11 +169,10 @@ GM_LUA_PROXY_IMPL(GMCameraProxy, setOrtho)
 
 bool GMCameraProxy::registerMeta()
 {
-	GM_LUA_PROXY_META;
 	GM_META_FUNCTION(lookAt);
 	GM_META_FUNCTION(setPerspective);
 	GM_META_FUNCTION(setOrtho);
-	return true;
+	return Base::registerMeta();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -180,7 +185,7 @@ GM_LUA_PROXY_IMPL(IFramebuffersProxy, clear)
 {
 	static const GMString s_invoker = IFRAMEBUFFERS_NAME ".clear";
 	GM_LUA_CHECK_ARG_COUNT_GT(L, 1, IFRAMEBUFFERS_NAME ".clear");
-	IFramebuffersProxy self;
+	IFramebuffersProxy self(L);
 	GMFramebuffersClearType type = (GMArgumentHelper::getArgumentsCount(L) == 2) ? 
 		(static_cast<GMFramebuffersClearType>(GMArgumentHelper::popArgument(L, s_invoker).toInt())) : 
 		(GMFramebuffersClearType::All); // clearType
@@ -192,7 +197,6 @@ GM_LUA_PROXY_IMPL(IFramebuffersProxy, clear)
 
 bool IFramebuffersProxy::registerMeta()
 {
-	GM_LUA_PROXY_META;
 	GM_META_FUNCTION(clear);
-	return true;
+	return Base::registerMeta();
 }

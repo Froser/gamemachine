@@ -111,7 +111,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GameMachine)
 	GMConfigs* statesManager = nullptr;
 	GMMessage lastMessage;
 	Queue<GMMessage> messageQueue;
-	Vector<IVirtualFunctionObject*> managerQueue;
+	Vector<IDestroyObject*> managerQueue;
 	GMGameMachineRunningStates states;
 	GMGameMachineRunningMode runningMode;
 	GMConfigs configs;

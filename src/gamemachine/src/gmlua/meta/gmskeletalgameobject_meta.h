@@ -17,8 +17,8 @@ namespace luaapi
 
 	class GMSkeletalGameObjectProxy : public GMGameObjectProxy
 	{
-		GM_LUA_PROXY_OBJ(GMSkeletalGameObjectProxy, GMSkeletalGameObject, GMGameObjectProxy)
-		GM_DECLARE_PRIVATE(GMSkeletalGameObjectProxy)
+		GM_LUA_PROXY_OBJ(GMSkeletalGameObject, GMGameObjectProxy)
+		GM_DECLARE_PRIVATE_AND_BASE(GMSkeletalGameObjectProxy, GMGameObjectProxy)
 
 	protected:
 		virtual bool registerMeta() override;

@@ -4,6 +4,7 @@
 #include <gmlua.h>
 #include <gmwidget.h>
 #include <gmuiconfiguration.h>
+#include "gmobject_meta.h"
 BEGIN_NS
 
 namespace luaapi
@@ -17,10 +18,10 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(import);
 	};
 
-	class GMUIConfigurationProxy : public GMObjectProxy
+	class GMUIConfigurationProxy : public GMAnyProxy<GMUIConfiguration>
 	{
-		GM_LUA_PROXY_OBJ(GMUIConfigurationProxy, GMUIConfiguration, GMObjectProxy)
-		GM_DECLARE_PRIVATE(GMUIConfigurationProxy)
+		GM_LUA_PROXY_OBJ(GMUIConfiguration, GMAnyProxy)
+		GM_DECLARE_PRIVATE_AND_BASE(GMUIConfigurationProxy, GMAnyProxy)
 
 	public:
 		virtual bool registerMeta() override;
@@ -34,8 +35,8 @@ namespace luaapi
 
 	class GMWidgetResourceManagerProxy : public GMObjectProxy
 	{
-		GM_LUA_PROXY_OBJ(GMWidgetResourceManagerProxy, GMWidgetResourceManager, GMObjectProxy)
-		GM_DECLARE_PRIVATE(GMWidgetResourceManagerProxy)
+		GM_LUA_PROXY_OBJ(GMWidgetResourceManager, GMObjectProxy)
+		GM_DECLARE_PRIVATE_AND_BASE(GMWidgetResourceManagerProxy, GMObjectProxy)
 
 	public:
 		virtual bool registerMeta() override;
@@ -51,8 +52,8 @@ namespace luaapi
 
 	class GMWidgetProxy : public GMObjectProxy
 	{
-		GM_LUA_PROXY_OBJ(GMWidgetProxy, GMWidget, GMObjectProxy)
-		GM_DECLARE_PRIVATE(GMWidgetProxy)
+		GM_LUA_PROXY_OBJ(GMWidget, GMObjectProxy)
+		GM_DECLARE_PRIVATE_AND_BASE(GMWidgetProxy, GMObjectProxy)
 
 	public:
 		virtual bool registerMeta() override;

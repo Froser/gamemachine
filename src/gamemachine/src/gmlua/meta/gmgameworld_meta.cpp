@@ -14,7 +14,7 @@ bool GMGameWorldProxy::registerMeta()
 	GM_META_FUNCTION(renderScene);
 	GM_META_FUNCTION(addObjectAndInit);
 	GM_META_FUNCTION(addToRenderList);
-	return true;
+	return Base::registerMeta();
 }
 
 /*
@@ -39,7 +39,7 @@ GM_LUA_PROXY_IMPL(GMGameWorldProxy, addObjectAndInit)
 	static const GMString s_invoker = NAME ".addObjectAndInit";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".addObjectAndInit");
 	GMGameWorldProxy self(L);
-	GMGameObjectProxy gameobject;
+	GMGameObjectProxy gameobject(L);
 	GMArgumentHelper::popArgumentAsObject(L, gameobject, s_invoker); //GMObject
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
@@ -57,8 +57,8 @@ GM_LUA_PROXY_IMPL(GMGameWorldProxy, addToRenderList)
 {
 	static const GMString s_invoker = NAME ".addToRenderList";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".addToRenderList");
-	GMGameWorldProxy self;
-	GMGameObjectProxy gameobject;
+	GMGameWorldProxy self(L);
+	GMGameObjectProxy gameobject(L);
 	GMArgumentHelper::popArgumentAsObject(L, gameobject, s_invoker); //GMObject
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)

@@ -43,7 +43,7 @@ GM_LUA_PROXY_IMPL(GMUIConfigurationProxy, import)
 	static const GMString s_invoker = "GMUIConfiguration.import";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, "GMUIConfiguration.import");
 	GMUIConfigurationProxy self(L);
-	GMBufferProxy buffer;
+	GMBufferProxy buffer(L);
 	GMArgumentHelper::popArgumentAsObject(L, buffer, s_invoker); //buffer
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)

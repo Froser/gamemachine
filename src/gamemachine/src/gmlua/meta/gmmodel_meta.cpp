@@ -8,9 +8,8 @@ using namespace gm::luaapi;
 
 bool GMModelProxy::registerMeta()
 {
-	GM_LUA_PROXY_META;
 	GM_META_FUNCTION(__index)
-	return true;
+	return Base::registerMeta();
 }
 
 GM_LUA_PROXY_IMPL(GMModelProxy, __index)

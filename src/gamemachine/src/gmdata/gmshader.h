@@ -223,10 +223,11 @@ GM_PRIVATE_OBJECT(GMShader)
 	GMMaterial material;
 };
 
-GM_ALIGNED_16(class) GMShader
+GM_ALIGNED_16(class) GMShader : public IDestroyObject
 {
 	GM_DECLARE_PRIVATE_NGO(GMShader)
 	GM_DECLARE_ALIGNED_ALLOCATOR()
+	GM_DEFAULT_DESTORY_IMPL()
 
 public:
 	GMShader() = default;

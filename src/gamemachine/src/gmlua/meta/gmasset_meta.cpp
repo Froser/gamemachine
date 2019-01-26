@@ -19,7 +19,8 @@ GM_LUA_PROXY_IMPL(GMAssetProxy, getScene)
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
 	{
-		GMSceneProxy scene = self->getScene();
+		GMSceneProxy scene(L);
+		scene.set(self->getScene());
 		return GMReturnValues(L, scene);
 	}
 	return GMReturnValues();
@@ -50,7 +51,8 @@ bool GMAssetProxy::registerMeta()
 	return Base::registerMeta();
 }
 
-GMAssetProxy::GMAssetProxy(GMAsset asset)
+GMAssetProxy::GMAssetProxy(GMLuaCoreState* l, GMAsset asset)
+	: Base(l)
 {
 	D_BASE(d, Base);
 	d->__handler = new GMAsset();
@@ -71,7 +73,7 @@ GM_LUA_PROXY_IMPL(GMSceneProxy, getModels)
 {
 	static const GMString s_invoker = "GMScene.getModels";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, "GMScene.getModels");
-	GMSceneProxy self;
+	GMSceneProxy self(L);
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 
 	auto& ms = self->getModels();

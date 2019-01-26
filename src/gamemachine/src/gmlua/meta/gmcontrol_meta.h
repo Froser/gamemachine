@@ -13,7 +13,7 @@ namespace luaapi
 
 	class GMControlProxy : public GMObjectProxy
 	{
-		GM_LUA_PROXY_OBJ(GMControlProxy, GMControl, GMObjectProxy)
+		GM_LUA_PROXY_OBJ(GMControl, GMObjectProxy)
 
 	public:
 		virtual bool registerMeta() override;
@@ -22,7 +22,7 @@ namespace luaapi
 	//////////////////////////////////////////////////////////////////////////
 	class GMControlButtonProxy : public GMControlProxy
 	{
-		GM_LUA_PROXY_OBJ(GMControlButtonProxy, GMControlButton, GMControlProxy)
+		GM_LUA_PROXY_OBJ(GMControlButton, GMControlProxy)
 
 	public:
 		virtual bool registerMeta() override;

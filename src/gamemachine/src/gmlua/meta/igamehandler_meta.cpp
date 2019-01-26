@@ -76,7 +76,8 @@ namespace
 		virtual void onLoadShaders(const IRenderContext* context) override
 		{
 			D(d);
-			IRenderContextProxy proxy(context);
+			IRenderContextProxy proxy(d->L);
+			proxy.set(context);
 			lua_rawgeti(d->L, LUA_REGISTRYINDEX, d->onLoadShaders);
 			d->lua->protectedCall(nullptr, { proxy } );
 		}
@@ -87,29 +88,29 @@ namespace
 IGameHandlerProxy::IGameHandlerProxy(GMLuaCoreState* L)
 {
 	D(d);
+	D_BASE(db, Base);
 	GameHandlerImpl* impl = new GameHandlerImpl(L);
-	d->__handler = impl;
+	db->__handler = impl;
 	d->shaderCallback = impl;
 }
 
 bool IGameHandlerProxy::registerMeta()
 {
 	D(d);
-	GM_LUA_PROXY_META;
-	GM_META_FUNCTION(__gc);
 	GM_META(init);
 	GM_META(start);
 	GM_META(event);
 	GM_META(onLoadShaders);
-	return true;
+	return Base::registerMeta();
 }
 
 void IGameHandlerProxy::init()
 {
 	D(d);
-	if (d->__handler)
+	D_BASE(db, Base);
+	if (db->__handler)
 	{
-		GameHandlerImpl* impl = static_cast<GameHandlerImpl*>(d->__handler);
+		GameHandlerImpl* impl = static_cast<GameHandlerImpl*>(db->__handler);
 		impl->setInit(d->init);
 		impl->setEvent(d->event);
 		impl->setStart(d->start);
@@ -123,16 +124,4 @@ IShaderLoadCallback* IGameHandlerProxy::getShaderLoadCallback() GM_NOEXCEPT
 	return d->shaderCallback;
 }
 
-/*
- * __gc([self])
- */
-GM_LUA_PROXY_IMPL(IGameHandlerProxy, __gc)
-{
-	static const GMString s_invoker = "IGameHandler.__gc";
-	GM_LUA_CHECK_ARG_COUNT(L, 1, "IGameHandler.__gc");
-	IGameHandlerProxy self(L);
-	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
-	self.release();
-	return GMReturnValues();
-}
 //////////////////////////////////////////////////////////////////////////

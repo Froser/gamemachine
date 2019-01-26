@@ -10,10 +10,9 @@ using namespace luaapi;
 
 bool IRenderContextProxy::registerMeta()
 {
-	GM_LUA_PROXY_META;
 	GM_META_FUNCTION(getWindow);
 	GM_META_FUNCTION(getEngine);
-	return true;
+	return Base::registerMeta();
 }
 
 /*
@@ -23,12 +22,12 @@ GM_LUA_PROXY_IMPL(IRenderContextProxy, getWindow)
 {
 	static const GMString s_invoker = NAME ".getWindow";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getWindow");
-	IRenderContextProxy self;
+	IRenderContextProxy self(L);
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
 	{
-		IWindowProxy window(self->getWindow());
-		window.detach(); // lua不管理其生命周期
+		IWindowProxy window(L);
+		window.set(self->getWindow());
 		return GMReturnValues(L, window);
 	}
 	return GMReturnValues();
@@ -41,9 +40,13 @@ GM_LUA_PROXY_IMPL(IRenderContextProxy, getEngine)
 {
 	static const GMString s_invoker = NAME ".getEngine";
 	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getEngine");
-	IRenderContextProxy self;
+	IRenderContextProxy self(L);
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
-		return GMReturnValues(L, IGraphicEngineProxy(self->getEngine()));
+	{
+		IGraphicEngineProxy engine(L);
+		engine.set(self->getEngine());
+		return GMReturnValues(L, engine);
+	}
 	return GMReturnValues();
 }

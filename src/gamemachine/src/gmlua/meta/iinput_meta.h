@@ -3,71 +3,75 @@
 #include <gmcommon.h>
 #include <gmlua.h>
 #include <gminput.h>
+#include "gmobject_meta.h"
 BEGIN_NS
 
-GM_PRIVATE_OBJECT(IInputProxy)
+namespace luaapi
 {
-	GM_LUA_PROXY(IInput);
-	GM_LUA_PROXY_FUNC(getKeyboardState);
-	GM_LUA_PROXY_FUNC(getJoystickState);
-	GM_LUA_PROXY_FUNC(getMouseState);
-};
+	GM_PRIVATE_OBJECT(IInputProxy)
+	{
+		GM_LUA_PROXY_FUNC(getKeyboardState);
+		GM_LUA_PROXY_FUNC(getJoystickState);
+		GM_LUA_PROXY_FUNC(getMouseState);
+	};
 
-class IInputProxy : public GMObject
-{
-	GM_LUA_PROXY_OBJECT(IInputProxy, IInput)
+	class IInputProxy : public GMAnyProxy<IInput>
+	{
+		GM_LUA_PROXY_OBJ(IInput, GMAnyProxy)
+		GM_DECLARE_PRIVATE_AND_BASE(IInputProxy, GMAnyProxy)
 
-protected:
-	virtual bool registerMeta() override;
-};
+	protected:
+		virtual bool registerMeta() override;
+	};
 
-//////////////////////////////////////////////////////////////////////////
-GM_PRIVATE_OBJECT(IKeyboardStateProxy)
-{
-	GM_LUA_PROXY(IKeyboardState);
-	GM_LUA_PROXY_FUNC(keydown);
-	GM_LUA_PROXY_FUNC(keyTriggered);
-};
+	//////////////////////////////////////////////////////////////////////////
+	GM_PRIVATE_OBJECT(IKeyboardStateProxy)
+	{
+		GM_LUA_PROXY_FUNC(keydown);
+		GM_LUA_PROXY_FUNC(keyTriggered);
+	};
 
-class IKeyboardStateProxy : public GMObject
-{
-	GM_LUA_PROXY_OBJECT(IKeyboardStateProxy, IKeyboardState)
+	class IKeyboardStateProxy : public GMAnyProxy<IKeyboardState>
+	{
+		GM_LUA_PROXY_OBJ(IKeyboardState, GMAnyProxy)
+		GM_DECLARE_PRIVATE_AND_BASE(IKeyboardStateProxy, GMAnyProxy)
 
-protected:
-	virtual bool registerMeta() override;
-};
+	protected:
+		virtual bool registerMeta() override;
+	};
 
-//////////////////////////////////////////////////////////////////////////
-GM_PRIVATE_OBJECT(IMouseStateProxy)
-{
-	GM_LUA_PROXY(IMouseState);
-	GM_LUA_PROXY_FUNC(state);
-	GM_LUA_PROXY_FUNC(setDetectingMode);
-};
+	//////////////////////////////////////////////////////////////////////////
+	GM_PRIVATE_OBJECT(IMouseStateProxy)
+	{
+		GM_LUA_PROXY_FUNC(state);
+		GM_LUA_PROXY_FUNC(setDetectingMode);
+	};
 
-class IMouseStateProxy : public GMObject
-{
-	GM_LUA_PROXY_OBJECT(IMouseStateProxy, IMouseState)
+	class IMouseStateProxy : public GMAnyProxy<IMouseState>
+	{
+		GM_LUA_PROXY_OBJ(IMouseState, GMAnyProxy)
+		GM_DECLARE_PRIVATE_AND_BASE(IMouseStateProxy, GMAnyProxy)
 
-protected:
-	virtual bool registerMeta() override;
-};
+	protected:
+		virtual bool registerMeta() override;
+	};
 
-//////////////////////////////////////////////////////////////////////////
-GM_PRIVATE_OBJECT(IJoystickStateProxy)
-{
-	GM_LUA_PROXY(IJoystickState);
-	GM_LUA_PROXY_FUNC(vibrate);
-	GM_LUA_PROXY_FUNC(state);
-};
+	//////////////////////////////////////////////////////////////////////////
+	GM_PRIVATE_OBJECT(IJoystickStateProxy)
+	{
+		GM_LUA_PROXY_FUNC(vibrate);
+		GM_LUA_PROXY_FUNC(state);
+	};
 
-class IJoystickStateProxy : public GMObject
-{
-	GM_LUA_PROXY_OBJECT(IJoystickStateProxy, IJoystickState)
+	class IJoystickStateProxy : public GMAnyProxy<IJoystickState>
+	{
+		GM_LUA_PROXY_OBJ(IJoystickState, GMAnyProxy)
+		GM_DECLARE_PRIVATE_AND_BASE(IJoystickStateProxy, GMAnyProxy)
 
-protected:
-	virtual bool registerMeta() override;
-};
+	protected:
+		virtual bool registerMeta() override;
+	};
+}
 
 END_NS
 #endif

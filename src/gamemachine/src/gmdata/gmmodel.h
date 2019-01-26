@@ -225,10 +225,11 @@ enum class GMVertexDataType
 
 #define gmVertexIndex(i) ((GMuint32)i)
 
-GM_ALIGNED_16(class) GM_EXPORT GMModel
+GM_ALIGNED_16(class) GM_EXPORT GMModel : public IDestroyObject
 {
 	GM_DECLARE_PRIVATE_NGO(GMModel)
 	GM_DECLARE_ALIGNED_ALLOCATOR()
+	GM_DEFAULT_DESTORY_IMPL()
 
 public:
 	typedef GMfloat DataType;

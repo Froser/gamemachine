@@ -17,8 +17,8 @@ namespace luaapi
 
 	class GMGlyphManagerProxy : public GMObjectProxy
 	{
-		GM_LUA_PROXY_OBJ(GMGlyphManagerProxy, GMGlyphManager, GMObjectProxy)
-		GM_DECLARE_PRIVATE(GMGlyphManagerProxy)
+		GM_LUA_PROXY_OBJ(GMGlyphManager, GMObjectProxy)
+		GM_DECLARE_PRIVATE_AND_BASE(GMGlyphManagerProxy, GMObjectProxy)
 
 	protected:
 		virtual bool registerMeta() override;

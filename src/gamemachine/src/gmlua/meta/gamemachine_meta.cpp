@@ -65,20 +65,19 @@ namespace
 
 	GM_LUA_FUNC(getGamePackageManager)
 	{
-		GMGamePackageProxy proxy(GM.getGamePackageManager());
+		GMGamePackageProxy proxy(L);
+		proxy.set(GM.getGamePackageManager());
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".getGamePackageManager");
 		return GMReturnValues(L, GMVariant(proxy));
 	}
 
 	GM_LUA_FUNC(addWindow)
 	{
-		IWindowProxy window;
+		IWindowProxy window(L);
 		static const GMString s_invoker = NAME ".addWindow";
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".addWindow");
-		GMArgumentHelper::beginArgumentReference(L, window, s_invoker);
-		window.detach();
-		GMArgumentHelper::endArgumentReference(L, window);
-
+		GMArgumentHelper::popArgumentAsObject(L, window, s_invoker);
+		window.setAutoRelease(false);
 		GM.addWindow(window.get());
 		return GMReturnValues();
 	}

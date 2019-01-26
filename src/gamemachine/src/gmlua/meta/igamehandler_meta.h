@@ -2,26 +2,27 @@
 #define __GM_LUA_IGAMEHANDLERPROXY_META_H__
 #include <gmcommon.h>
 #include <gmlua.h>
+#include "gmobject_meta.h"
 BEGIN_NS
 
 namespace luaapi
 {
 	GM_PRIVATE_OBJECT(IGameHandlerProxy)
 	{
-		GM_LUA_PROXY(IGameHandler);
 		IShaderLoadCallback* shaderCallback = nullptr;
 		GMLuaReference init = 0;
 		GMLuaReference start = 0;
 		GMLuaReference event = 0;
 		GMLuaReference onLoadShaders = 0;
-		GM_LUA_PROXY_FUNC(__gc);
 	};
 
-	class IGameHandlerProxy : public GMObject
+	class IGameHandlerProxy : public GMAnyProxy<IGameHandler>
 	{
-		GM_LUA_PROXY_OBJECT_NO_DEFAULT_CONSTRUCTOR(IGameHandlerProxy, IGameHandler)
+		GM_LUA_PROXY_OBJ(IGameHandler, GMAnyProxy)
+		GM_DECLARE_PRIVATE_AND_BASE(IGameHandlerProxy, GMAnyProxy)
 
 	public:
+		IGameHandlerProxy() = delete;
 		IGameHandlerProxy(GMLuaCoreState* L);
 
 	public:
