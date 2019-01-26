@@ -15,7 +15,7 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(getMouseState);
 	};
 
-	class IInputProxy : public GMAnyProxy<IInput>
+	class IInputProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(IInput, GMAnyProxy)
 		GM_DECLARE_PRIVATE_AND_BASE(IInputProxy, GMAnyProxy)
@@ -31,7 +31,7 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(keyTriggered);
 	};
 
-	class IKeyboardStateProxy : public GMAnyProxy<IKeyboardState>
+	class IKeyboardStateProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(IKeyboardState, GMAnyProxy)
 		GM_DECLARE_PRIVATE_AND_BASE(IKeyboardStateProxy, GMAnyProxy)
@@ -47,7 +47,7 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(setDetectingMode);
 	};
 
-	class IMouseStateProxy : public GMAnyProxy<IMouseState>
+	class IMouseStateProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(IMouseState, GMAnyProxy)
 		GM_DECLARE_PRIVATE_AND_BASE(IMouseStateProxy, GMAnyProxy)
@@ -63,7 +63,7 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(state);
 	};
 
-	class IJoystickStateProxy : public GMAnyProxy<IJoystickState>
+	class IJoystickStateProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(IJoystickState, GMAnyProxy)
 		GM_DECLARE_PRIVATE_AND_BASE(IJoystickStateProxy, GMAnyProxy)

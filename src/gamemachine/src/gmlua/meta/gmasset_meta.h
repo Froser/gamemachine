@@ -14,7 +14,7 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(getModel);
 	};
 
-	class GMAssetProxy : public GMAnyProxy<GMAsset>
+	class GMAssetProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(GMAsset, GMAnyProxy)
 		GM_DECLARE_PRIVATE_AND_BASE(GMAssetProxy, GMAnyProxy)
@@ -32,7 +32,7 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(getModels);
 	};
 
-	class GMSceneProxy : public GMAnyProxy<GMScene>
+	class GMSceneProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(GMScene, GMAnyProxy)
 		GM_DECLARE_PRIVATE_AND_BASE(GMSceneProxy, GMAnyProxy)

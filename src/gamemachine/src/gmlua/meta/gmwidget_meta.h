@@ -18,7 +18,7 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(import);
 	};
 
-	class GMUIConfigurationProxy : public GMAnyProxy<GMUIConfiguration>
+	class GMUIConfigurationProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(GMUIConfiguration, GMAnyProxy)
 		GM_DECLARE_PRIVATE_AND_BASE(GMUIConfigurationProxy, GMAnyProxy)

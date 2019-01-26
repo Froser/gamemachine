@@ -11,7 +11,7 @@ namespace
 	{
 		static const GMString s_invoker = L"GMControlButton.createControl";
 		GM_LUA_CHECK_ARG_COUNT(L, 6, "GMControlButton.createControl");
-		GMWidgetProxy widget;
+		GMWidgetProxy widget(L);
 		GMint32 height = GMArgumentHelper::popArgument(L, s_invoker).toInt(); // height
 		GMint32 width = GMArgumentHelper::popArgument(L, s_invoker).toInt(); // width
 		GMint32 y = GMArgumentHelper::popArgument(L, s_invoker).toInt(); // y

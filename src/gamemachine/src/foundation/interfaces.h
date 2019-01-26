@@ -323,7 +323,7 @@ GM_INTERFACE(IGBuffer)
 	virtual GMGeometryPassingState getGeometryPassingState() = 0;
 };
 
-GM_INTERFACE(IShaderLoadCallback)
+struct IShaderLoadCallback
 {
 	virtual void onLoadShaders(const IRenderContext* context) = 0;
 };
@@ -585,7 +585,7 @@ struct GMWindowStates
 	GMRect framebufferRect; //!< 帧缓存矩形区域。它不随窗口大小而改变。它表示默认帧缓存的区域。
 };
 
-struct IRenderContext
+GM_INTERFACE(IRenderContext)
 {
 	virtual IWindow* getWindow() const = 0;
 	virtual IGraphicEngine* getEngine() const = 0;

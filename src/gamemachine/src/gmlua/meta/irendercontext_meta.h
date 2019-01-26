@@ -14,12 +14,16 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(getEngine);
 	};
 
-	class IRenderContextProxy : public GMAnyProxy<const IRenderContext>
+	class IRenderContextProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(const IRenderContext, GMAnyProxy)
 		GM_DECLARE_PRIVATE_AND_BASE(IRenderContextProxy, GMAnyProxy)
 
 	public:
+		void set(const IRenderContext* o);
+		void setLuaCoreState(GMLuaCoreState* l);
+
+	protected:
 		virtual bool registerMeta() override;
 	};
 }

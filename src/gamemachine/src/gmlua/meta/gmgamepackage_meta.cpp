@@ -36,7 +36,7 @@ GM_LUA_PROXY_IMPL(GMGamePackageProxy, readFile)
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
 	{
-		GMBufferProxy buffer(new GMBuffer());
+		GMBufferProxy buffer(L, new GMBuffer());
 		self->readFile(type, filename, buffer.get());
 		return GMReturnValues(L, buffer);
 	}

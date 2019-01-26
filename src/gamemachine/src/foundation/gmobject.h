@@ -417,10 +417,9 @@ inline TargetType gm_cast(SourceType obj)
 // 接口统一定义
 #define GM_INTERFACE(name) struct GM_EXPORT name : public gm::IDestroyObject
 #define GM_INTERFACE_FROM(name, base) struct GM_EXPORT name : public base
-#define GM_DEFAULT_DESTORY_IMPL() public: virtual void destroy() override { delete this; }
 
 // 缓存类，用于存储缓存数据
-struct GM_EXPORT GMBuffer
+struct GM_EXPORT GMBuffer : public IDestroyObject
 {
 	GMBuffer() = default;
 	~GMBuffer();

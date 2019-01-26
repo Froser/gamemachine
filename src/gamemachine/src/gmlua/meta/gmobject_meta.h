@@ -87,7 +87,7 @@ namespace luaapi
 		GM_ALLOW_COPY(GMAnyProxy)
 
 	public:
-		GMAnyProxy(GMLuaCoreState* l, GMObject* handler = nullptr);
+		GMAnyProxy(GMLuaCoreState* l, IDestroyObject* handler = nullptr);
 
 		void setObjectName(const GMString& name)
 		{
@@ -120,7 +120,7 @@ namespace luaapi
 			return !!d->__handler;
 		}
 
-		void set(GMObject* handler)
+		void set(IDestroyObject* handler)
 		{
 			D(d);
 			d->__handler = handler;

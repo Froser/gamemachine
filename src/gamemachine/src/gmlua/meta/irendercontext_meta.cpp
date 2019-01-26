@@ -15,6 +15,17 @@ bool IRenderContextProxy::registerMeta()
 	return Base::registerMeta();
 }
 
+void IRenderContextProxy::set(const IRenderContext* o)
+{
+	Base::set(const_cast<IRenderContext*>(o));
+}
+
+void IRenderContextProxy::setLuaCoreState(GMLuaCoreState* l)
+{
+	D_BASE(d, Base);
+	d->l = l;
+}
+
 /*
  * getWindow([self])
  */

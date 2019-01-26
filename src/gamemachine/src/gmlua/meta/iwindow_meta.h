@@ -17,7 +17,7 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(addWidget);
 	};
 
-	class IWindowProxy : public GMAnyProxy<IWindow>
+	class IWindowProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(IWindow, GMAnyProxy)
 		GM_DECLARE_PRIVATE_AND_BASE(IWindowProxy, GMAnyProxy)

@@ -56,7 +56,9 @@ GMAssetProxy::GMAssetProxy(GMLuaCoreState* l, GMAsset asset)
 {
 	D_BASE(d, Base);
 	d->__handler = new GMAsset();
-	*(d->__handler) = asset;
+	// __handler不是GMAsset类型，因此会调用基类(IDestroyObject)拷贝构造函数
+	// 因此需要强行转换，否则会造成拷贝切割
+	*static_cast<GMAsset*>(d->__handler) = asset;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -80,7 +82,7 @@ GM_LUA_PROXY_IMPL(GMSceneProxy, getModels)
 	Vector<GMAssetProxy>* assets = new Vector<GMAssetProxy>();
 	for (auto model : ms)
 	{
-		assets->emplace_back(model);
+		assets->emplace_back(L, model);
 	}
 
 	GMLuaVector<GMAssetProxy> models(assets);

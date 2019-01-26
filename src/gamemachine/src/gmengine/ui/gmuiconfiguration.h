@@ -31,7 +31,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMUIConfiguration)
 	Map<GMlong, GMlong> textureMap;
 };
 
-class GM_EXPORT GMUIConfiguration
+class GM_EXPORT GMUIConfiguration : public IDestroyObject
 {
 	friend class GMWidgetResourceManager;
 	GM_DECLARE_PRIVATE_NGO(GMUIConfiguration)

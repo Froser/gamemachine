@@ -48,7 +48,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMAsset)
 	void* asset = nullptr;
 };
 
-class GM_EXPORT GMAsset
+class GM_EXPORT GMAsset : public IDestroyObject
 {
 	GM_DECLARE_PRIVATE_NGO(GMAsset)
 

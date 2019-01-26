@@ -3,11 +3,37 @@
 #include <gmlua.h>
 #include <gmobject.h>
 
+#define NAME "GMObject"
+
+namespace gm
+{
+	namespace luaapi
+	{
+		GMFunctionReturn gmlua_gc(GMLuaCoreState* L)
+		{
+			// 如果一个对象是自动释放的，当__gc被调用时，它将提前释放
+			static const GMString s_invoker = NAME ".__gc";
+			GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
+			GMObjectProxy self(L);
+			GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+			if (self)
+			{
+				GMLuaRuntime* rt = GMLua::getRuntime(L);
+				if (rt->containsObject(self.get()))
+				{
+					bool b = rt->detachObject(self.get());
+					GM_ASSERT(b);
+					GM_delete(self.get());
+				}
+			}
+			return GMReturnValues();
+		}
+	}
+}
+
 using namespace luaapi;
 
 #define GM_LUA_PROXY_META GM_META_WITH_TYPE(__handler, GMMetaMemberType::Pointer); GM_META(__name);
-
-#define NAME "GMObject"
 
 GMObjectProxy::GMObjectProxy(GMLuaCoreState* l, GMObject* handler /*= nullptr*/)
 {
@@ -47,26 +73,6 @@ void GMObjectProxy::setAutoRelease(bool autorelease)
 	}
 }
 
-GMFunctionReturn gmlua_gc(GMLuaCoreState* L)
-{
-	// 如果一个对象是自动释放的，当__gc被调用时，它将提前释放
-	static const GMString s_invoker = NAME ".__gc";
-	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
-	GMObjectProxy self(L);
-	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
-	if (self)
-	{
-		GMLuaRuntime* rt = GMLua::getRuntime(L);
-		if (rt->containsObject(self.get()))
-		{
-			bool b = rt->detachObject(self.get());
-			GM_ASSERT(b);
-			GM_delete(self.get());
-		}
-	}
-	return GMReturnValues();
-}
-
 /*
  * connect([self], sender, signal, callback)
  */
@@ -93,9 +99,21 @@ GM_LUA_PROXY_IMPL(GMObjectProxy, connect)
 	return GMReturnValues();
 }
 //////////////////////////////////////////////////////////////////////////
+GMAnyProxy::GMAnyProxy(GMLuaCoreState* l, IDestroyObject* handler /*= nullptr*/)
+{
+	D(d);
+	d->l = l;
+	set(handler);
+
+	// 通过构造传入的对象，默认管理其生命周期。
+	if (handler)
+		setAutoRelease(true);
+}
 
 bool GMAnyProxy::registerMeta()
 {
+	D(d);
+	GM_LUA_PROXY_META;
 	return true;
 }
 

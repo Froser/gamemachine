@@ -7,7 +7,7 @@ BEGIN_NS
 
 namespace luaapi
 {
-	class GMBufferProxy : public GMAnyProxy<GMBuffer>
+	class GMBufferProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(GMBuffer, GMAnyProxy)
 	};

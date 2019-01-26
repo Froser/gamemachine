@@ -16,7 +16,7 @@ namespace luaapi
 		GMLuaReference onLoadShaders = 0;
 	};
 
-	class IGameHandlerProxy : public GMAnyProxy<IGameHandler>
+	class IGameHandlerProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(IGameHandler, GMAnyProxy)
 		GM_DECLARE_PRIVATE_AND_BASE(IGameHandlerProxy, GMAnyProxy)

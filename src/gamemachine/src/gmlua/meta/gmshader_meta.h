@@ -13,7 +13,7 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(__index);
 	};
 
-	class GMShaderProxy : public GMAnyProxy<GMShader>
+	class GMShaderProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(GMShader, GMAnyProxy)
 		GM_DECLARE_PRIVATE_AND_BASE(GMShaderProxy, GMAnyProxy)
@@ -29,7 +29,7 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(__newindex);
 	};
 
-	class GMMaterialProxy : public GMAnyProxy<GMMaterial>
+	class GMMaterialProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(GMMaterial, GMAnyProxy)
 		GM_DECLARE_PRIVATE_AND_BASE(GMMaterialProxy, GMAnyProxy)

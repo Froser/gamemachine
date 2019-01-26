@@ -20,7 +20,7 @@ namespace
 	{
 		static const GMString s_invoker = NAME ".loadShaderOpenGL";
 		GM_LUA_CHECK_ARG_COUNT(L, 9, NAME ".loadShaderOpenGL");
-		IRenderContextProxy context;
+		IRenderContextProxy context(L);
 		GMString filtersPixelFilePath = GMArgumentHelper::popArgumentAsString(L, s_invoker);
 		GMString filtersVertexFilePath = GMArgumentHelper::popArgumentAsString(L, s_invoker);
 		GMString deferredLightPixelFilePath = GMArgumentHelper::popArgumentAsString(L, s_invoker);
@@ -51,7 +51,7 @@ namespace
 #if GM_USE_DX11
 		static const GMString s_invoker = NAME ".loadShaderDx11";
 		GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".loadShaderDx11");
-		IRenderContextProxy context;
+		IRenderContextProxy context(L);
 		GMString path = GMArgumentHelper::popArgumentAsString(L, s_invoker);
 		GMArgumentHelper::popArgumentAsObject(L, context, s_invoker);
 		GMDx11Helper::loadShader(context.get(), path);

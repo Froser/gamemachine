@@ -54,7 +54,8 @@ namespace
 		virtual void init(const IRenderContext* context) override
 		{
 			D(d);
-			IRenderContextProxy renderContext(context);
+			IRenderContextProxy renderContext(d->L);
+			renderContext.set(context);
 			lua_rawgeti(d->L, LUA_REGISTRYINDEX, d->init);
 			d->lua->protectedCall(nullptr, { &renderContext });
 		}
@@ -86,6 +87,7 @@ namespace
 
 //////////////////////////////////////////////////////////////////////////
 IGameHandlerProxy::IGameHandlerProxy(GMLuaCoreState* L)
+	: GMAnyProxy(L)
 {
 	D(d);
 	D_BASE(db, Base);

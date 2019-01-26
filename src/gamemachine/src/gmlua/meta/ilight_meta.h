@@ -13,7 +13,7 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(setLightAttribute);
 	};
 
-	class ILightProxy : public GMAnyProxy<ILight>
+	class ILightProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(ILight, GMAnyProxy)
 		GM_DECLARE_PRIVATE_AND_BASE(ILightProxy, GMAnyProxy)

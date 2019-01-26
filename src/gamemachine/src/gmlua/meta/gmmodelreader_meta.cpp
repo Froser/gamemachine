@@ -15,7 +15,7 @@ GM_PRIVATE_OBJECT(GMModelLoadSettingsProxy)
 	GMString filename;
 	GMString directory;
 	GMObject* context = nullptr;
-	IRenderContextProxy ref;
+	IRenderContextProxy ref = IRenderContextProxy(nullptr);
 	GMModelPathType type;
 };
 
@@ -30,6 +30,7 @@ public:
 	virtual bool registerMeta() override;
 
 public:
+	void setLuaCoreState(GMLuaCoreState* l);
 	GMModelLoadSettings toModelLoadSettings();
 };
 
@@ -48,6 +49,11 @@ bool GMModelLoadSettingsProxy::registerMeta()
 	return true;
 }
 
+void GMModelLoadSettingsProxy::setLuaCoreState(GMLuaCoreState* l)
+{
+	D(d);
+	d->ref.setLuaCoreState(l);
+}
 
 GMModelLoadSettings GMModelLoadSettingsProxy::toModelLoadSettings()
 {
@@ -63,6 +69,7 @@ namespace
 		static const GMString s_invoker = NAME ".load";
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".load");
 		GMModelLoadSettingsProxy settings;
+		settings.setLuaCoreState(L);
 		GMArgumentHelper::popArgumentAsObject(L, settings, s_invoker);
 		GMSceneAsset asset;
 		GMModelReader::load(settings.toModelLoadSettings(), GMModelReader::Assimp, asset);

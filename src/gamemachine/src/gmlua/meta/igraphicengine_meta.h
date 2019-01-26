@@ -15,7 +15,7 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(getGlyphManager);
 	};
 
-	class IGraphicEngineProxy : public GMAnyProxy<IGraphicEngine>
+	class IGraphicEngineProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(IGraphicEngine, GMAnyProxy)
 		GM_DECLARE_PRIVATE_AND_BASE(IGraphicEngineProxy, GMAnyProxy)
@@ -50,7 +50,7 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(setOrtho);
 	};
 
-	class GMCameraProxy : public GMAnyProxy<GMCamera>
+	class GMCameraProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(GMCamera, GMAnyProxy)
 		GM_DECLARE_PRIVATE_AND_BASE(GMCameraProxy, GMAnyProxy)
@@ -65,7 +65,7 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(clear);
 	};
 
-	class IFramebuffersProxy : public GMAnyProxy<IFramebuffers>
+	class IFramebuffersProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(IFramebuffers, GMAnyProxy)
 		GM_DECLARE_PRIVATE_AND_BASE(IFramebuffersProxy, GMAnyProxy)

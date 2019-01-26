@@ -12,7 +12,7 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(__index);
 	};
 
-	class GMModelProxy : public GMAnyProxy<GMModel>
+	class GMModelProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(GMModel, GMAnyProxy)
 		GM_DECLARE_PRIVATE_AND_BASE(GMModelProxy, GMAnyProxy)

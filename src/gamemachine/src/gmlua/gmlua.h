@@ -271,7 +271,7 @@ private:
 {																							\
 	static const GMString s_invoker = FuncName;												\
 	GM_LUA_CHECK_ARG_COUNT(L, 1, FuncName);													\
-	gm::luaapi::Arg0ProxyType arg0;															\
+	gm::luaapi::Arg0ProxyType arg0(L);														\
 	gm::luaapi::GMArgumentHelper::popArgumentAsObject(L, arg0, s_invoker);					\
 	Proxy proxy(L, new Real(arg0.get()));													\
 	return gm::luaapi::GMReturnValues(L, GMVariant(proxy));									\
@@ -306,7 +306,9 @@ private:
 		{ __s_indexMap[#memberName] = [&]() {													\
 			gm::luaapi::GMArgumentHelper::popArgument(L, s_invoker); /*key*/					\
 			gm::luaapi::GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/		\
-			return gm::luaapi::GMReturnValues(L, targetProxy(&self->get##name())); }; }
+			targetProxy proxy(L);																\
+			proxy.set(&self->get##name());														\
+			return gm::luaapi::GMReturnValues(L, proxy); }; }
 
 #define GM_LUA_PROPERTY_GETTER(name, memberName) \
 		{ __s_indexMap[#memberName] = [&]() {													\

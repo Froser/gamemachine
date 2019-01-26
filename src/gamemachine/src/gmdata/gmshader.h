@@ -185,7 +185,7 @@ GM_PRIVATE_OBJECT(GMMaterial)
 	HashMap<GMString, GMVariant, GMStringHashFunctor> customMaterials;
 };
 
-GM_ALIGNED_16(class) GMMaterial
+GM_ALIGNED_16(class) GMMaterial : public IDestroyObject
 {
 	GM_DECLARE_PRIVATE_NGO(GMMaterial)
 	GM_DECLARE_ALIGNED_ALLOCATOR()
@@ -227,7 +227,6 @@ GM_ALIGNED_16(class) GMShader : public IDestroyObject
 {
 	GM_DECLARE_PRIVATE_NGO(GMShader)
 	GM_DECLARE_ALIGNED_ALLOCATOR()
-	GM_DEFAULT_DESTORY_IMPL()
 
 public:
 	GMShader() = default;
