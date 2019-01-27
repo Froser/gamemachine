@@ -38,7 +38,8 @@ GM_LUA_PROXY_IMPL(GMAssetProxy, getModel)
 	if (self)
 	{
 		auto m = self->getModel();
-		GMModelProxy model(L, m);
+		GMModelProxy model(L);
+		model.set(m);
 		return GMReturnValues(L, model);
 	}
 	return GMReturnValues();

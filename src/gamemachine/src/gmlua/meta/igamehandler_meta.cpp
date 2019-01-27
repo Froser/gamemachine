@@ -41,13 +41,13 @@ namespace
 		{
 			D(d);
 			if (d->init)
-				luaL_unref(d->L, LUA_REGISTRYINDEX, d->init);
+				d->lua->freeReference(d->init);
 			if (d->start)
-				luaL_unref(d->L, LUA_REGISTRYINDEX, d->start);
+				d->lua->freeReference(d->start);
 			if (d->event)
-				luaL_unref(d->L, LUA_REGISTRYINDEX, d->event);
+				d->lua->freeReference(d->event);
 			if (d->onLoadShaders)
-				luaL_unref(d->L, LUA_REGISTRYINDEX, d->onLoadShaders);
+				d->lua->freeReference(d->onLoadShaders);
 		}
 
 	public:
@@ -56,22 +56,19 @@ namespace
 			D(d);
 			IRenderContextProxy renderContext(d->L);
 			renderContext.set(context);
-			lua_rawgeti(d->L, LUA_REGISTRYINDEX, d->init);
-			d->lua->protectedCall(nullptr, { &renderContext });
+			d->lua->protectedCall(d->init, { &renderContext });
 		}
 
 		virtual void start() override
 		{
 			D(d);
-			lua_rawgeti(d->L, LUA_REGISTRYINDEX, d->start);
-			d->lua->protectedCall(nullptr);
+			d->lua->protectedCall(d->start);
 		}
 
 		virtual void event(GameMachineHandlerEvent evt) override
 		{
 			D(d);
-			lua_rawgeti(d->L, LUA_REGISTRYINDEX, d->event);
-			d->lua->protectedCall(nullptr, { static_cast<GMint32>(evt) });
+			d->lua->protectedCall(d->event, { static_cast<GMint32>(evt) });
 		}
 
 		virtual void onLoadShaders(const IRenderContext* context) override
@@ -79,8 +76,7 @@ namespace
 			D(d);
 			IRenderContextProxy proxy(d->L);
 			proxy.set(context);
-			lua_rawgeti(d->L, LUA_REGISTRYINDEX, d->onLoadShaders);
-			d->lua->protectedCall(nullptr, { proxy } );
+			d->lua->protectedCall(d->onLoadShaders, { proxy } );
 		}
 	};
 }

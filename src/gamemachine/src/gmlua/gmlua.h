@@ -160,7 +160,31 @@ public:
 	*/
 	bool getFromGlobal(const char* name, GMObject& obj);
 
+	//! 通过函数名，在受保护模式下调用一个Lua函数。
+	/*!
+	  \param functionName 函数名。函数必须在全局范围内能找到。
+	  \param args 调用参数。
+	  \param returns 函数返回值。
+	  \param nRet 函数返回个数。
+	  \return 函数调用结果。
+	*/
 	GMLuaResult protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args = {}, GMVariant* returns = nullptr, GMint32 nRet = 0);
+	
+	//! 通过一个引用，在受保护模式下调用一个Lua函数。
+	/*!
+	  \param functionName 函数名。函数必须在全局范围内能找到。
+	  \param args 调用参数。
+	  \param returns 函数返回值。
+	  \param nRet 函数返回个数。
+	  \return 函数调用结果。
+	*/
+	GMLuaResult protectedCall(GMLuaReference funcRef, const std::initializer_list<GMVariant>& args = {}, GMVariant* returns = nullptr, GMint32 nRet = 0);
+
+	//! 释放一个引用。
+	/*!
+	  \param ref Lua引用。
+	*/
+	void freeReference(GMLuaReference ref);
 
 // 针对堆栈的操作，提供给友元
 private:

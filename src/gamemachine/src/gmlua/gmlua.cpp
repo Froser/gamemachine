@@ -318,6 +318,19 @@ GMLuaResult GMLua::protectedCall(const char* functionName, const std::initialize
 	return lr;
 }
 
+GMLuaResult GMLua::protectedCall(GMLuaReference funcRef, const std::initializer_list<GMVariant>& args, GMVariant* returns, GMint32 nRet)
+{
+	D(d);
+	lua_rawgeti(L, LUA_REGISTRYINDEX, funcRef);
+	return protectedCall(nullptr, args, returns, nRet);
+}
+
+void GMLua::freeReference(GMLuaReference ref)
+{
+	D(d);
+	luaL_unref(L, LUA_REGISTRYINDEX, ref);
+}
+
 GMLuaRuntime* GMLua::getRuntime(GMLuaCoreState* s)
 {
 	static Runtimes runtimes;
@@ -389,6 +402,7 @@ void GMLua::setMetatable(const GMObject& obj)
 	{
 		L"__index",
 		L"__newindex",
+		L"__gc",
 	};
 
 	GM_CHECK_LUA_STACK_BALANCE(0);

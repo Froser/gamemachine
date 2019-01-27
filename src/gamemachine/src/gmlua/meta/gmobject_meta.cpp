@@ -52,6 +52,7 @@ bool GMObjectProxy::registerMeta()
 	GM_LUA_PROXY_META;
 	GM_META_FUNCTION(__gc);
 	GM_META_FUNCTION(connect);
+	GM_META_FUNCTION(emit);
 	return true;
 }
 
@@ -74,6 +75,16 @@ void GMObjectProxy::setAutoRelease(bool autorelease)
 }
 
 /*
+ * __gc([self])
+ */
+GM_LUA_PROXY_IMPL(GMObjectProxy, __gc)
+{
+	static const GMString s_invoker = NAME ".__gc";
+	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
+	return gmlua_gc(L);
+}
+
+/*
  * connect([self], sender, signal, callback)
  */
 GM_LUA_PROXY_IMPL(GMObjectProxy, connect)
@@ -92,10 +103,24 @@ GM_LUA_PROXY_IMPL(GMObjectProxy, connect)
 			sender.set(s);
 			receiver.set(r);
 			GMLua l(L);
-			lua_rawgeti(L, LUA_REGISTRYINDEX, callback);
-			l.protectedCall(nullptr, { sender, receiver } );
+			l.protectedCall(callback, { sender, receiver });
 		});
 	}
+	return GMReturnValues();
+}
+
+/*
+ * emit([self], signal)
+ */
+GM_LUA_PROXY_IMPL(GMObjectProxy, emit)
+{
+	static const GMString s_invoker = NAME ".emit";
+	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".emit");
+	GMObjectProxy self(L), sender(L);
+	GMString signal = GMArgumentHelper::popArgumentAsString(L, s_invoker); //signal
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+		self->emit(signal);
 	return GMReturnValues();
 }
 //////////////////////////////////////////////////////////////////////////
@@ -114,6 +139,7 @@ bool GMAnyProxy::registerMeta()
 {
 	D(d);
 	GM_LUA_PROXY_META;
+	GM_META_FUNCTION(__gc);
 	return true;
 }
 
@@ -133,4 +159,14 @@ void GMAnyProxy::setAutoRelease(bool autorelease)
 		// 从托管池移除，自己管理生命周期。
 		GMLua::getRuntime(d->l)->detachObject(d->__handler);
 	}
+}
+
+/*
+ * __gc([self])
+ */
+GM_LUA_PROXY_IMPL(GMAnyProxy, __gc)
+{
+	static const GMString s_invoker = NAME ".__gc";
+	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
+	return gmlua_gc(L);
 }

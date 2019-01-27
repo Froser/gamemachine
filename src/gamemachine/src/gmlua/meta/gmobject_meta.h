@@ -8,15 +8,14 @@ BEGIN_NS
 
 namespace luaapi
 {
-	GMFunctionReturn gmlua_gc(GMLuaCoreState*);
-
 	GM_PRIVATE_OBJECT(GMObjectProxy)
 	{
 		LUA_PROXY(GMObject);
 
-		GMFunctionReturn (*__gc)(GMLuaCoreState*) = gmlua_gc;
-		GM_LUA_PROXY_FUNC(connect);
 		GMLuaCoreState* l = nullptr;
+		GM_LUA_PROXY_FUNC(__gc);
+		GM_LUA_PROXY_FUNC(connect);
+		GM_LUA_PROXY_FUNC(emit);
 	};
 
 	class GMObjectProxy : public GMObject
@@ -73,8 +72,7 @@ namespace luaapi
 	{
 		LUA_PROXY(IDestroyObject);
 
-		GMFunctionReturn(*__gc)(GMLuaCoreState*) = gmlua_gc;
-		GM_LUA_PROXY_FUNC(connect);
+		GM_LUA_PROXY_FUNC(__gc);
 		GMLuaCoreState* l = nullptr;
 	};
 
