@@ -26,6 +26,11 @@ void IRenderContextProxy::setLuaCoreState(GMLuaCoreState* l)
 	d->l = l;
 }
 
+IRenderContextProxy::IRenderContextProxy(const IRenderContextProxy& rhs)
+	: GMAnyProxy(rhs.getLuaCoreState(), const_cast<IRenderContext*>(static_cast<const IRenderContext*>(rhs.get())))
+{
+}
+
 /*
  * getWindow([self])
  */

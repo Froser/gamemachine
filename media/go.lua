@@ -109,6 +109,7 @@ handler.event = function(evt)
 end
 
 handler.start = function()
+	GMDebugger.info('Starting GameMachine Lua Demo...')
 	local settings = {
 		directory = '',
 		filename = 'boblampclean/boblampclean.md5mesh',

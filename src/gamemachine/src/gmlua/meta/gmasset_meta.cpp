@@ -61,6 +61,15 @@ GMAssetProxy::GMAssetProxy(GMLuaCoreState* l, GMAsset asset)
 	*static_cast<GMAsset*>(d->__handler) = asset;
 }
 
+GMAssetProxy::GMAssetProxy(const GMAssetProxy& rhs)
+	: GMAnyProxy(rhs.getLuaCoreState(), rhs.get())
+{
+}
+
+GMAssetProxy::~GMAssetProxy()
+{
+}
+
 //////////////////////////////////////////////////////////////////////////
 bool GMSceneProxy::registerMeta()
 {

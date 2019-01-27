@@ -22,10 +22,15 @@ namespace luaapi
 	class GMObjectProxy : public GMObject
 	{
 		GM_DECLARE_PRIVATE(GMObjectProxy)
-		GM_ALLOW_COPY(GMObjectProxy)
 
 	public: 
 		GMObjectProxy(GMLuaCoreState* l, GMObject* handler = nullptr);
+
+		GMLuaCoreState* getLuaCoreState() const
+		{
+			D(d);
+			return d->l;
+		}
 
 		void setObjectName(const GMString& name)
 		{
@@ -33,21 +38,13 @@ namespace luaapi
 			d->__name = name;
 		}
 
-		void copyData(const GMObject& a)
-		{
-			D(d);
-			const GMObjectProxy& i = static_cast<const GMObjectProxy&>(a);
-			D_OF(d_other, &i);
-			d->__handler = d_other->__handler;
-		}
-
-		GMObject* get()
+		GMObject* get() const
 		{
 			D(d);
 			return d->__handler;
 		}
 
-		GMObject* operator->()
+		GMObject* operator->() const
 		{
 			return get();
 		}
@@ -84,7 +81,6 @@ namespace luaapi
 	class GMAnyProxy : public GMObject
 	{
 		GM_DECLARE_PRIVATE(GMAnyProxy)
-		GM_ALLOW_COPY(GMAnyProxy)
 
 	public:
 		GMAnyProxy(GMLuaCoreState* l, IDestroyObject* handler = nullptr);
@@ -95,21 +91,19 @@ namespace luaapi
 			d->__name = name;
 		}
 
-		void copyData(const GMObject& a)
+		GMLuaCoreState* getLuaCoreState() const
 		{
 			D(d);
-			const GMAnyProxy& i = static_cast<const GMAnyProxy&>(a);
-			D_OF(d_other, &i);
-			d->__handler = d_other->__handler;
+			return d->l;
 		}
 
-		IDestroyObject* get()
+		IDestroyObject* get() const
 		{
 			D(d);
 			return d->__handler;
 		}
 
-		IDestroyObject* operator->()
+		IDestroyObject* operator->() const
 		{
 			return get();
 		}

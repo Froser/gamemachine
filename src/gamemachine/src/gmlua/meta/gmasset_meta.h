@@ -21,6 +21,8 @@ namespace luaapi
 
 	public:
 		GMAssetProxy(GMLuaCoreState* l, GMAsset asset);
+		GMAssetProxy(const GMAssetProxy& rhs);
+		~GMAssetProxy();
 
 	protected:
 		virtual bool registerMeta() override;

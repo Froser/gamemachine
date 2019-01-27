@@ -150,19 +150,26 @@ namespace
 	{
 		// 看看成员是否有GM_LUA_PROXY_METATABLE_NAME，如果有，设置它为元表，否则，设置自己为元表
 		static const GMString s_metatableNameKw = L"__name";
-		static const GMString s_metatableTag = GM_LUA_PROXY_METATABLE_NAME;
 
 		auto meta = obj.meta();
 		for (const auto& member : *meta)
 		{
 			if (member.first == s_metatableNameKw)
 				metatableName = *static_cast<GMString*>(member.second.ptr);
-			if (member.first == s_metatableTag)
-				if (member.second.type == GMMetaMemberType::Object)
-					return getMetaTableAndName(**static_cast<GMObject**>(member.second.ptr), metatableName, metatable);
 		}
 		if (metatable)
 			*metatable = &obj;
+	}
+
+	template <typename T, GMsize_t sz>
+	bool contains(const T (&arr)[sz], const T& t)
+	{
+		for (GMsize_t i = 0; i < sz; ++i)
+		{
+			if (arr[i] == t)
+				return true;
+		}
+		return false;
 	}
 }
 
@@ -378,7 +385,11 @@ void GMLua::pushNewTable(const GMObject& obj, bool setmt)
 void GMLua::setMetatable(const GMObject& obj)
 {
 	D(d);
-	static const GMString s_index = L"__index";
+	static const GMString s_overrideList[] =
+	{
+		L"__index",
+		L"__newindex",
+	};
 
 	GM_CHECK_LUA_STACK_BALANCE(0);
 	auto tableIdx = lua_gettop(L);
@@ -395,10 +406,9 @@ void GMLua::setMetatable(const GMObject& obj)
 		// 存在meta数据
 		for (const auto& member : *metaTable->meta())
 		{
-			if (member.first == s_index)
-				hasIndex = true;
-
-			if (member.second.type == GMMetaMemberType::Function)
+			// 只为几个默认的meta写方法
+			if (contains(s_overrideList, member.first) &&
+				member.second.type == GMMetaMemberType::Function)
 			{
 				std::string name = member.first.toStdString();
 				lua_pushstring(L, name.c_str());
@@ -407,15 +417,6 @@ void GMLua::setMetatable(const GMObject& obj)
 			}
 		}
 
-	}
-
-	if (!hasIndex)
-	{
-		lua_pushstring(L, "__index");
-		// 当元表不为本身，说明obj这个表拥有一个基类（元表）。
-		// 此时应该为其基类递归设置元表。
-		pushNewTable(*metaTable, metaTable != &obj);
-		lua_rawset(L, -3);
 	}
 
 	lua_setmetatable(L, tableIdx);

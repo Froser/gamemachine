@@ -286,11 +286,8 @@ private:
 #define GM_LUA_PROXY_OBJ(realType, baseName) \
 	public:																			\
 		using baseName::baseName;													\
-		realType* get() { return gm_cast<realType*>(baseName::get()); }				\
-		realType* operator->() { return get(); }
-
-#define GM_LUA_PROXY_METATABLE_NAME "__gm_metatable"
-
+		realType* get() const { return gm_cast<realType*>(baseName::get()); }		\
+		realType* operator->() const { return get(); }
 
 // Lua indexer，用于模拟GMObject的属性
 #define GM_LUA_BEGIN_PROPERTY(proxyClass) \

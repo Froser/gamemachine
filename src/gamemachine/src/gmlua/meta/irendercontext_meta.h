@@ -20,6 +20,9 @@ namespace luaapi
 		GM_DECLARE_PRIVATE_AND_BASE(IRenderContextProxy, GMAnyProxy)
 
 	public:
+		IRenderContextProxy(const IRenderContextProxy& rhs);
+
+	public:
 		void set(const IRenderContext* o);
 		void setLuaCoreState(GMLuaCoreState* l);
 
