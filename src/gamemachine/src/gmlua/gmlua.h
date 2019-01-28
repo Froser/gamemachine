@@ -35,7 +35,7 @@ namespace luaapi
 	struct GMReturnValues;
 }
 
-struct GMLuaFunctionRegister
+struct GM_EXPORT GMLuaFunctionRegister
 {
 	virtual void registerFunctions(GMLua*) = 0;
 

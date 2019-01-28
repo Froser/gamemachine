@@ -14,7 +14,7 @@ BEGIN_NS
 
 namespace luaapi
 {
-	struct GMArgumentHelper
+	struct GM_EXPORT GMArgumentHelper
 	{
 		//! 获取函数当前未被获取的参数数量。
 		/*!
@@ -34,7 +34,7 @@ namespace luaapi
 		static bool popArgumentAsObject(GMLuaCoreState* L, REF GMObject& obj, const GMString& invoker);
 	};
 
-	struct GMReturnValues
+	struct GM_EXPORT GMReturnValues
 	{
 	public:
 		template <typename... VariantType>
