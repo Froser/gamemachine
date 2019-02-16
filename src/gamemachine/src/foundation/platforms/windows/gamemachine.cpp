@@ -220,7 +220,6 @@ void GameMachine::runEventLoop()
 	while (WM_QUIT != msg.message)
 	{
 		bGotMessage = PeekMessage(&msg, NULL, 0, 0, PM_REMOVE);
-
 		if (bGotMessage)
 		{
 			::TranslateMessage(&msg);
@@ -230,20 +229,14 @@ void GameMachine::runEventLoop()
 		{
 			if (d->runningMode == GMGameMachineRunningMode::GameMode)
 			{
-				// 处理GameMachine消息
-				if (!handleMessages())
-					break;
-
 				if (!renderFrame())
 					break;
 			}
-			else
-			{
-				// Application模式下，虽然不进行渲染，但是还是有消息处理
-				if (!handleMessages())
-					break;
-			}
 		}
+
+		// Application模式下，虽然不进行渲染，但是还是有消息处理
+		if (!handleMessages())
+			break;
 	}
 	terminate();
 }

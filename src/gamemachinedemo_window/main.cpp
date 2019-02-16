@@ -354,8 +354,10 @@ namespace
 		{
 		case WM_QUIT:
 		case WM_CLOSE:
+		{
 			GM.exit();
-			break;
+			return TRUE;
+		}
 		case WM_HSCROLL:
 		{
 			if (GetDlgItem(g_hDlg, IDC_SLIDER1) == (HWND)lParam)
@@ -365,17 +367,17 @@ namespace
 				HWND hContainer = GetDlgItem(g_hDlg, ID_CONTAINER);
 				GM.renderFrame(s_flow->getContext()->getWindow());
 			}
-			break;
+			return TRUE;
 		}
 		case WM_PAINT:
 		{
 			if (s_flow)
 				GM.renderFrame(s_flow->getContext()->getWindow());
-			break;
+			return TRUE;
 		}
 		}
 
-		return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
+		return FALSE;
 	}
 }
 
