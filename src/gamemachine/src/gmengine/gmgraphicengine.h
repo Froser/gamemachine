@@ -78,6 +78,7 @@ struct GMShaderVariableShadowInfoDesc
 	T ShadowMapHeight;
 	T BiasMin;
 	T BiasMax;
+	T CascadedShadowLevel;
 };
 
 template <typename T>
@@ -171,6 +172,7 @@ struct GMShadowSourceDesc
 	{
 		NoShadow,
 		DirectShadow,
+		CascadedShadow,
 	};
 
 	Type type;
@@ -180,7 +182,7 @@ struct GMShadowSourceDesc
 	float biasMax = 0.005f;
 	GMint32 width;
 	GMint32 height;
-
+	GMint32 cascadedShadowLevel = 1; //!< GameMachine将构造出一副(width*cascadedLevel, height)的纹理来记录shadow map。如果cascadedLevel为1，那么就是普通的阴影贴图。否则，它就是CSM方式的阴影贴图。
 	static GMint64 version;
 };
 

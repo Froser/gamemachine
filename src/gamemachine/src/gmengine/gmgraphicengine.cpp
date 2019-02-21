@@ -72,6 +72,7 @@ static GMShaderVariablesDesc s_defaultShaderVariablesDesc =
 		"ShadowMapHeight",
 		"BiasMin",
 		"BiasMax",
+		"CascadedShadowLevel",
 	},
 
 	{

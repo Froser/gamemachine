@@ -367,6 +367,8 @@ struct GMShadowInfo
     int ShadowMapHeight;
     float BiasMin;
     float BiasMax;
+
+    int CascadedShadowLevel;
 };
 Texture2D GM_ShadowMap;
 Texture2DMS<float4> GM_ShadowMapMSAA;

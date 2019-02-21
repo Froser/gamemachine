@@ -301,6 +301,7 @@ public:
 	EFFECT_MEMBER_AS_SCALAR(ShadowMapHeight, ShadowInfo(), GM_VariablesDesc.ShadowInfo.ShadowMapHeight)
 	EFFECT_MEMBER_AS_SCALAR(ShadowBiasMin, ShadowInfo(), GM_VariablesDesc.ShadowInfo.BiasMin)
 	EFFECT_MEMBER_AS_SCALAR(ShadowBiasMax, ShadowInfo(), GM_VariablesDesc.ShadowInfo.BiasMax)
+	EFFECT_MEMBER_AS_SCALAR(CascadedShadowLevel, ShadowInfo(), GM_VariablesDesc.ShadowInfo.CascadedShadowLevel)
 	EFFECT_VARIABLE_AS_SHADER_RESOURCE(ShadowMap, GM_VariablesDesc.ShadowInfo.ShadowMap)
 	EFFECT_VARIABLE_AS_SHADER_RESOURCE(ShadowMapMSAA, GM_VariablesDesc.ShadowInfo.ShadowMapMSAA)
 
@@ -627,6 +628,12 @@ void GMDx11Technique::beginModel(GMModel* model, const GMGameObject* parent)
 		else
 		{
 			GM_DX_HR(hasShadow->SetBool(false));
+
+			ID3DX11EffectScalarVariable* cascadedShadowLevel = bank.CascadedShadowLevel();
+			if (cascadedShadowLevel->IsValid())
+			{
+				GM_DX_HR(cascadedShadowLevel->SetInt(shadowSourceDesc.cascadedShadowLevel));
+			}
 		}
 	}
 
