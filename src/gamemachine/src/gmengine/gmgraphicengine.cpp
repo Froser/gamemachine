@@ -348,8 +348,12 @@ void GMGraphicEngine::generateShadowBuffer(const List<GMGameObject*>& forwardRen
 	d->shadowDepthFramebuffers->clear(GMFramebuffersClearType::Depth);
 	d->shadowDepthFramebuffers->bind();
 	d->isDrawingShadow = true;
+
+
 	draw(forwardRenderingObjects);
 	draw(deferredRenderingObjects);
+
+
 	d->shadowDepthFramebuffers->unbind();
 	d->isDrawingShadow = false;
 }

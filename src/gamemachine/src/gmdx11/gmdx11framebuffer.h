@@ -92,6 +92,7 @@ GM_PRIVATE_OBJECT(GMDx11ShadowFramebuffers)
 	GMint32 width = 0;
 	GMint32 height = 0;
 	GMShadowSourceDesc shadowSource;
+	D3D11_VIEWPORT viewports[GMGraphicEngine::getMaxCascadedShadowLevels()];
 };
 
 class GMDx11ShadowFramebuffers : public GMDx11Framebuffers

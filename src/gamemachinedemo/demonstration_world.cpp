@@ -18,6 +18,7 @@
 #include "demo/sound.h"
 #include "demo/literature.h"
 #include "demo/model.h"
+#include "demo/csm.h"
 #include "demo/assimp.h"
 #include "demo/collision.h"
 #include "demo/specularmap.h"
@@ -55,6 +56,7 @@ namespace
 		world->addDemo(L"声音: 演示播放音乐。", new Demo_Sound(world));
 		world->addDemo(L"文字: 使用排版引擎实现排版。", new Demo_Literature(world));
 		world->addDemo(L"模型: 读取模型文件。", new Demo_Model(world));
+		world->addDemo(L"阴影: 使用CSM渲染场景。", new Demo_CSM(world));
 		// world->addDemo(L"模型: 使用ASSIMP读取各种模型文件。", new Demo_Assimp(world));
 		world->addDemo(L"物理: 演示相互碰撞的物体(Box)。", new Demo_Collision(world));
 		world->addDemo(L"物理: 演示相互碰撞的物体(Cone)。", new Demo_Collision_Cone(world));

@@ -407,6 +407,19 @@ bool GMDx11ShadowFramebuffers::init(const GMFramebuffersDesc& desc)
 	GM_DX_HR_RET(device->CreateShaderResourceView(db->depthStencilTexture, &dsrvd, &d->depthShaderResourceView));
 	GM_DX11_SET_OBJECT_NAME_A(db->depthStencilTexture, "GM_ShadowMap");
 	GM_DX11_SET_OBJECT_NAME_A(d->depthShaderResourceView, "GM_ShadowMap_SRV");
+
+	// 创建每一个cascade的viewport
+
+	for (GMint32 i = 0; i < d->shadowSource.cascadedShadowLevel; ++i)
+	{
+		d->viewports[i].Height = d->shadowSource.height;
+		d->viewports[i].Width = d->shadowSource.width;
+		d->viewports[i].MaxDepth = windowStates.maxDepth;
+		d->viewports[i].MinDepth = windowStates.minDepth;
+		d->viewports[i].TopLeftX = d->shadowSource.width * i;
+		d->viewports[i].TopLeftY = 0;
+	}
+
 	return true;
 }
 

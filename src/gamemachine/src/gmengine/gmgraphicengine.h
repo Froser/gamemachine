@@ -333,6 +333,11 @@ public:
 	}
 	static const GMShaderVariablesDesc& getDefaultShaderVariablesDesc();
 
+	static constexpr const GMsize_t getMaxCascadedShadowLevels()
+	{
+		return 5;
+	}
+
 	inline const GMShadowSourceDesc& getShadowSourceDesc()
 	{
 		D(d);

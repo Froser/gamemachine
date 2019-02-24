@@ -41,6 +41,8 @@ set(SOURCES
 		demo/literature.cpp
 		demo/model.h
 		demo/model.cpp
+		demo/csm.h
+		demo/csm.cpp
 		demo/collision.h
 		demo/collision.cpp
 		demo/specularmap.h
