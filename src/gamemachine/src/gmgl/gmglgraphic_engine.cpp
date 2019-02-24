@@ -109,7 +109,6 @@ bool GMGLGraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
 
 void GMGLGraphicEngine::createShadowFramebuffers(OUT IFramebuffers** framebuffers)
 {
-
 	D_BASE(d, Base);
 	GMGLShadowFramebuffers* sdframebuffers = new GMGLShadowFramebuffers(d->context);
 	(*framebuffers) = sdframebuffers;
@@ -121,6 +120,12 @@ void GMGLGraphicEngine::createShadowFramebuffers(OUT IFramebuffers** framebuffer
 	desc.rect = rect;
 	bool succeed = sdframebuffers->init(desc);
 	GM_ASSERT(succeed);
+}
+
+ICSMFramebuffers* GMGLGraphicEngine::getCSMFramebuffers()
+{
+	GM_ASSERT(false);
+	return nullptr;
 }
 
 void GMGLGraphicEngine::activateLights(ITechnique* technique)

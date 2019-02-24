@@ -69,6 +69,7 @@ public:
 	virtual bool setInterface(GameMachineInterfaceID, void*);
 	virtual bool getInterface(GameMachineInterfaceID, void**);
 	virtual void createShadowFramebuffers(OUT IFramebuffers** framebuffers) override;
+	virtual ICSMFramebuffers* getCSMFramebuffers() override;
 
 public:
 	virtual void activateLights(ITechnique* technique);

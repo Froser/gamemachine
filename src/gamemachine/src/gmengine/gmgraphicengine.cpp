@@ -345,14 +345,20 @@ void GMGraphicEngine::generateShadowBuffer(const List<GMGameObject*>& forwardRen
 	}
 
 	GM_ASSERT(d->shadowDepthFramebuffers);
+	ICSMFramebuffers* csm = getCSMFramebuffers(); // csm和d->shadowDepthFramebuffers其实是同一个对象
+	csm->applyCascadedLevel(0);
+
 	d->shadowDepthFramebuffers->clear(GMFramebuffersClearType::Depth);
 	d->shadowDepthFramebuffers->bind();
 	d->isDrawingShadow = true;
 
-
-	draw(forwardRenderingObjects);
-	draw(deferredRenderingObjects);
-
+	// 遍历每个cascaded level
+	for (auto i = csm->cascadedBegin(); i != csm->cascadedEnd(); ++i)
+	{
+		csm->applyCascadedLevel(i);
+		draw(forwardRenderingObjects);
+		draw(deferredRenderingObjects);
+	}
 
 	d->shadowDepthFramebuffers->unbind();
 	d->isDrawingShadow = false;

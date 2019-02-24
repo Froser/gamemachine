@@ -173,6 +173,7 @@ void Demo_CSM::setDefaultLights()
 			desc.biasMax = desc.biasMin = 0.0005f;
 			desc.width = windowStates.renderRect.width * 2;
 			desc.height = windowStates.renderRect.height * 2;
+			desc.cascadedShadowLevel = 3;
 
 			gm::GMCameraLookAt lookAt;
 			desc.camera.lookAt(gm::GMCameraLookAt::makeLookAt(desc.position, GMVec3(0, 0, 0)));

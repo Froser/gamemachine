@@ -153,10 +153,18 @@ void GMDx11GraphicEngine::createShadowFramebuffers(OUT IFramebuffers** framebuff
 	rect.width = d->shadow.width * d->shadow.cascadedShadowLevel;
 	rect.height = d->shadow.height;
 	desc.rect = rect;
-	sdframebuffers->setShadowSource(d->shadow);
+
+	getCSMFramebuffers()->setShadowSource(d->shadow);
 
 	bool succeed = sdframebuffers->init(desc);
 	GM_ASSERT(succeed);
+}
+
+ICSMFramebuffers* GMDx11GraphicEngine::getCSMFramebuffers()
+{
+	D_BASE(d, Base);
+	GMDx11ShadowFramebuffers* sdframebuffers = gm_cast<GMDx11ShadowFramebuffers*>(d->shadowDepthFramebuffers);
+	return gm_cast<ICSMFramebuffers*>(sdframebuffers);
 }
 
 bool GMDx11GraphicEngine::msgProc(const GMMessage& e)

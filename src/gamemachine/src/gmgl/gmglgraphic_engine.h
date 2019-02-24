@@ -97,6 +97,7 @@ public:
 	virtual bool getInterface(GameMachineInterfaceID, void**) { return false; }
 	virtual bool setInterface(GameMachineInterfaceID, void*);
 	virtual void createShadowFramebuffers(OUT IFramebuffers** framebuffers) override;
+	virtual ICSMFramebuffers* getCSMFramebuffers() override;
 
 public:
 	inline void setCubeMap(GMTextureAsset tex)
