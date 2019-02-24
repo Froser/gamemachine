@@ -109,6 +109,7 @@ bool GMGLGraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
 
 void GMGLGraphicEngine::createShadowFramebuffers(OUT IFramebuffers** framebuffers)
 {
+
 	D_BASE(d, Base);
 	GMGLShadowFramebuffers* sdframebuffers = new GMGLShadowFramebuffers(d->context);
 	(*framebuffers) = sdframebuffers;

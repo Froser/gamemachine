@@ -411,6 +411,12 @@ void GMGLShadowFramebuffers::use()
 	setViewport();
 }
 
+
+void gm::GMGLShadowFramebuffers::use(GMsize_t index)
+{
+	//TODO
+}
+
 void GMGLShadowFramebuffers::bind()
 {
 	D_BASE(d, Base);

@@ -172,7 +172,10 @@ void GMGraphicEngine::draw(const List<GMGameObject*>& forwardRenderingObjects, c
 	D(d);
 	// 如果绘制阴影，先生成阴影缓存
 	if (d->shadow.type != GMShadowSourceDesc::NoShadow)
+	{
 		generateShadowBuffer(forwardRenderingObjects, deferredRenderingObjects);
+		d->lastShadow = d->shadow;
+	}
 
 	// 是否使用滤镜
 	bool useFilterFramebuffer = needUseFilterFramebuffer();
@@ -327,7 +330,20 @@ void GMGraphicEngine::generateShadowBuffer(const List<GMGameObject*>& forwardRen
 {
 	D(d);
 	if (!d->shadowDepthFramebuffers)
+	{
 		createShadowFramebuffers(&d->shadowDepthFramebuffers);
+	}
+	else
+	{
+		if (d->shadow.cascadedShadowLevel != d->lastShadow.cascadedShadowLevel ||
+			d->shadow.width != d->lastShadow.width ||
+			d->shadow.height != d->lastShadow.height)
+		{
+			GM_delete(d->shadowDepthFramebuffers);
+			createShadowFramebuffers(&d->shadowDepthFramebuffers);
+		}
+	}
+
 	GM_ASSERT(d->shadowDepthFramebuffers);
 	d->shadowDepthFramebuffers->clear(GMFramebuffersClearType::Depth);
 	d->shadowDepthFramebuffers->bind();

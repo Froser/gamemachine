@@ -6,6 +6,8 @@
 #include "gmdx11texture.h"
 #include <gmtools.h>
 #include <gmassets.h>
+#include <gmgraphicengine.h>
+
 BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMDx11Framebuffer)
@@ -89,17 +91,20 @@ GM_PRIVATE_OBJECT(GMDx11ShadowFramebuffers)
 	GMComPtr<ID3D11ShaderResourceView> depthShaderResourceView;
 	GMint32 width = 0;
 	GMint32 height = 0;
+	GMShadowSourceDesc shadowSource;
 };
 
 class GMDx11ShadowFramebuffers : public GMDx11Framebuffers
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMDx11ShadowFramebuffers, GMDx11Framebuffers)
+	GM_DECLARE_PROPERTY(ShadowSource, shadowSource)
 
 public:
 	using GMDx11Framebuffers::GMDx11Framebuffers;
 
 public:
 	virtual bool init(const GMFramebuffersDesc& desc) override;
+	virtual void use(GMsize_t index);
 
 public:
 	ID3D11ShaderResourceView* getShadowMapShaderResourceView();

@@ -2,9 +2,9 @@
 #define __GMGLFRAMEBUFFER_H__
 #include <gmcommon.h>
 #include <gmassets.h>
+#include <gmgraphicengine.h>
 BEGIN_NS
 
-class GMGraphicEngine;
 GM_PRIVATE_OBJECT(GMGLFramebuffer)
 {
 	const IRenderContext* context = nullptr;
@@ -106,6 +106,7 @@ GM_PRIVATE_OBJECT(GMGLShadowFramebuffers)
 	GMint32 width = 0;
 	GMint32 height = 0;
 	GMTextureAsset shadowMapTexture;
+	GMShadowSourceDesc shadowSource;
 };
 
 class GMGLShadowFramebuffers : public GMGLFramebuffers
@@ -119,6 +120,8 @@ public:
 	virtual bool init(const GMFramebuffersDesc& desc) override;
 	virtual void use() override;
 	virtual void bind() override;
+
+	virtual void use(GMsize_t index);
 
 public:
 	inline GMint32 getShadowMapWidth()
@@ -141,6 +144,7 @@ public:
 
 private:
 	virtual void createDepthStencilBuffer(const GMFramebufferDesc& desc);
+
 };
 
 END_NS

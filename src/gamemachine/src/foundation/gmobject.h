@@ -14,16 +14,6 @@
 
 BEGIN_NS
 
-//! IVirtualFunctionObject接口无其它含义，表示此类有一个虚析构函数
-/*!
-  继承此接口，将自动获得一个虚析构函数。
-*/
-struct GM_EXPORT IDestroyObject
-{
-	virtual ~IDestroyObject() = default;
-	virtual void destroy() { delete this; }
-};
-
 // 对象存储
 template <typename T>
 GM_ALIGNED_STRUCT(GMObjectPrivateBase)

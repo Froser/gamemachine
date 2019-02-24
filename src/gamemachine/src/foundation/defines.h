@@ -375,6 +375,27 @@ inline bool operator!=(const GMRect& lhs, const GMRect& rhs)
 	return !(lhs == rhs);
 }
 
+//! IDestroyObject接口无其它含义，表示此类有一个虚析构函数
+/*!
+继承此接口，将自动获得一个虚析构函数。
+*/
+struct GM_EXPORT IDestroyObject
+{
+	virtual ~IDestroyObject() = default;
+	virtual void destroy() { delete this; }
+};
+
+inline void GM_delete(IDestroyObject*& o)
+{
+	if (o)
+	{
+		o->destroy();
+#if GM_DEBUG
+		o = nullptr;
+#endif
+	}
+}
+
 template <typename T>
 inline void GM_delete(T*& o)
 {

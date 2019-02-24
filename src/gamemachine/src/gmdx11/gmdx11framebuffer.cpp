@@ -410,6 +410,11 @@ bool GMDx11ShadowFramebuffers::init(const GMFramebuffersDesc& desc)
 	return true;
 }
 
+void GMDx11ShadowFramebuffers::use(GMsize_t index)
+{
+	//TODO
+}
+
 ID3D11ShaderResourceView* GMDx11ShadowFramebuffers::getShadowMapShaderResourceView()
 {
 	D(d);
