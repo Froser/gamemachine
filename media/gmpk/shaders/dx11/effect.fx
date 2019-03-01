@@ -551,11 +551,25 @@ float CalculateShadow(matrix shadowMatrix, float4 worldPos, float3 normal_N)
             return 1.f;
         }
 
-        closestDepth = GM_ShadowMapMSAA.Load(int3(x, y, 0), 0);
+        if (GM_ShadowInfo.CascadedShadowLevel == 1)
+        {
+            closestDepth = GM_ShadowMapMSAA.Load(int3(x, y, 0), 0);
+        }
+        else
+        {
+
+        }
     }
     else
     {
-        closestDepth = GM_ShadowMap.Sample(ShadowMapSampler, projCoords.xy).r;
+        if (GM_ShadowInfo.CascadedShadowLevel == 1)
+        {
+            closestDepth = GM_ShadowMap.Sample(ShadowMapSampler, projCoords.xy).r;
+        }
+        else
+        {
+            
+        }
     }
 
     return projCoords.z - bias > closestDepth ? 0.f : 1.f;

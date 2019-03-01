@@ -335,7 +335,7 @@ void GMGraphicEngine::generateShadowBuffer(const List<GMGameObject*>& forwardRen
 	}
 	else
 	{
-		if (d->shadow.cascadedShadowLevel != d->lastShadow.cascadedShadowLevel ||
+		if (d->shadow.cascades != d->lastShadow.cascades ||
 			d->shadow.width != d->lastShadow.width ||
 			d->shadow.height != d->lastShadow.height)
 		{

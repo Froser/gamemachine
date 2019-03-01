@@ -8,6 +8,7 @@
 #include "gmdx11graphic_engine.h"
 #include "gmdx11gbuffer.h"
 #include "gmdx11framebuffer.h"
+#include "gmengine/gmcsmhelper.h"
 
 #define GMSHADER_SEMANTIC_NAME_POSITION "POSITION"
 #define GMSHADER_SEMANTIC_NAME_NORMAL "NORMAL"
@@ -632,7 +633,7 @@ void GMDx11Technique::beginModel(GMModel* model, const GMGameObject* parent)
 			ID3DX11EffectScalarVariable* cascadedShadowLevel = bank.CascadedShadowLevel();
 			if (cascadedShadowLevel->IsValid())
 			{
-				GM_DX_HR(cascadedShadowLevel->SetInt(shadowSourceDesc.cascadedShadowLevel));
+				GM_DX_HR(cascadedShadowLevel->SetInt(shadowSourceDesc.cascades));
 			}
 		}
 	}
@@ -1298,10 +1299,19 @@ void GMDx11Technique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* p
 	}
 
 	const GMShadowSourceDesc& shadowSourceDesc = getEngine()->getShadowSourceDesc();
-	const GMCamera& camera = shadowSourceDesc.camera;
+	GMCamera shadowCamera = shadowSourceDesc.camera;
 	GMFloat4 viewPosition;
 	shadowSourceDesc.position.loadFloat4(viewPosition);
 
+	// 只有层数>1时，我们采用CSM
+	if (shadowSourceDesc.cascades > 1)
+	{
+		// 我们需要计算出此层的投影和frustum
+		ICSMFramebuffers* csm = getEngine()->getCSMFramebuffers();
+		GMCSMHelper::setOrthoCamera(csm, getEngine()->getCamera(), shadowSourceDesc, shadowCamera);
+	}
+
+	// 设置变量
 	GMDx11EffectVariableBank& bank = getVarBank();
 	ID3DX11EffectVariable* shadowInfo = bank.ShadowInfo();
 	ID3DX11EffectVectorVariable* position = bank.ShadowPosition();
@@ -1311,7 +1321,7 @@ void GMDx11Technique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* p
 	ID3DX11EffectScalarVariable* biasMin = bank.ShadowBiasMin();
 	ID3DX11EffectScalarVariable* biasMax = bank.ShadowBiasMax();
 	GM_DX_HR(position->SetFloatVector(ValuePointer(viewPosition)));
-	GM_DX_HR(shadowMatrix->SetMatrix(ValuePointer(camera.getViewMatrix() * camera.getProjectionMatrix())));
+	GM_DX_HR(shadowMatrix->SetMatrix(ValuePointer(shadowCamera.getViewMatrix() * shadowCamera.getProjectionMatrix())));
 	GM_DX_HR(biasMin->SetFloat(shadowSourceDesc.biasMin));
 	GM_DX_HR(biasMax->SetFloat(shadowSourceDesc.biasMax));
 

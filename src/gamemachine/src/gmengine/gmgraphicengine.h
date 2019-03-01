@@ -166,6 +166,7 @@ struct GMShaderVariablesDesc_t
 using GMShaderVariablesDesc = GMShaderVariablesDesc_t<const GMString>;
 using GMShaderVariablesIndices = GMShaderVariablesDesc_t<GMint32>;
 
+constexpr GMsize_t GMMaxCascades = 5;
 struct GMShadowSourceDesc
 {
 	enum Type
@@ -182,7 +183,8 @@ struct GMShadowSourceDesc
 	float biasMax = 0.005f;
 	GMint32 width = 0;
 	GMint32 height = 0;
-	GMint32 cascadedShadowLevel = 1; //!< GameMachine将构造出一副(width*cascadedLevel, height)的纹理来记录shadow map。如果cascadedLevel为1，那么就是普通的阴影贴图。否则，它就是CSM方式的阴影贴图。
+	GMint32 cascades = 1; //!< GameMachine将构造出一副(width*cascadedLevel, height)的纹理来记录shadow map。如果cascadedLevel为1，那么就是普通的阴影贴图。否则，它就是CSM方式的阴影贴图。
+	Array<GMfloat, GMMaxCascades> cascadePartitions = { 1 }; //!< 层级的分区，范围为(0, 1]。如果某个层级为0，则按照所在的索引来等分。
 	static GMint64 version;
 };
 
@@ -334,9 +336,9 @@ public:
 	}
 	static const GMShaderVariablesDesc& getDefaultShaderVariablesDesc();
 
-	static constexpr const GMsize_t getMaxCascadedShadowLevels()
+	static constexpr const GMsize_t getMaxCascades()
 	{
-		return 5;
+		return GMMaxCascades;
 	}
 
 	inline const GMShadowSourceDesc& getShadowSourceDesc()

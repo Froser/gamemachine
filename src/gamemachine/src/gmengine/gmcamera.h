@@ -28,7 +28,7 @@ GM_ALIGNED_STRUCT(GMCameraLookAt)
 	GMVec3 position = Zero<GMVec3>(); //!< 摄像机位置
 	GMVec3 up = GMVec3(0, 1, 0);
 
-	static GMCameraLookAt makeLookAt(const GMVec3& _position, const GMVec3& _focusAt, const GMVec3& _up = GMVec3(1, 1, 1))
+	static GMCameraLookAt makeLookAt(const GMVec3& _position, const GMVec3& _focusAt, const GMVec3& _up = GMVec3(0, 1, 0))
 	{
 		return GMCameraLookAt(_focusAt - _position, _position, _up);
 	}
@@ -65,7 +65,7 @@ GM_PRIVATE_OBJECT(GMFrustum)
 			GMfloat bottom;
 			GMfloat top;
 		};
-	};
+	} parameters;
 	GMfloat n;
 	GMfloat f;
 
@@ -82,6 +82,9 @@ class GMFrustum
 {
 	GM_DECLARE_PRIVATE_NGO(GMFrustum)
 	GM_DECLARE_ALIGNED_ALLOCATOR()
+	GM_DECLARE_GETTER(Near, n)
+	GM_DECLARE_GETTER(Far, f)
+	GM_DECLARE_GETTER(Parameters, parameters)
 
 	friend class GMCamera;
 
@@ -96,7 +99,7 @@ class GMFrustum
 	  获取平截头体的6个平面方程，法线方向朝外。
 	  \param planes 得到的平面方程。
 	*/
-	void getPlanes(GMFrustumPlanes& planes);
+	void getPlanes(GMFrustumPlanes& planes) const;
 
 	const GMMat4& getProjectionMatrix() const;
 	const GMMat4& getViewMatrix() const;
@@ -120,6 +123,7 @@ class GM_EXPORT GMCamera : public GMObject
 	GM_DECLARE_PRIVATE(GMCamera)
 	GM_ALLOW_COPY_MOVE(GMCamera)
 	GM_DECLARE_PROPERTY(LookAt, lookAt)
+	GM_DECLARE_GETTER(Frustum, frustum)
 
 public:
 	GMCamera();

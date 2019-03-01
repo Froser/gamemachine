@@ -8,14 +8,14 @@ void GMFrustum::setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat to
 {
 	D(d);
 	d->type = GMFrustumType::Orthographic;
-	d->left = left;
-	d->right = right;
-	d->bottom = bottom;
-	d->top = top;
+	d->parameters.left = left;
+	d->parameters.right = right;
+	d->parameters.bottom = bottom;
+	d->parameters.top = top;
 	d->n = n;
 	d->f = f;
 
-	d->projectionMatrix = Ortho(d->left, d->right, d->bottom, d->top, d->n, d->f);
+	d->projectionMatrix = Ortho(d->parameters.left, d->parameters.right, d->parameters.bottom, d->parameters.top, d->n, d->f);
 	d->dirty = true;
 }
 
@@ -23,16 +23,16 @@ void GMFrustum::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat 
 {
 	D(d);
 	d->type = GMFrustumType::Perspective;
-	d->fovy = fovy;
-	d->aspect = aspect;
+	d->parameters.fovy = fovy;
+	d->parameters.aspect = aspect;
 	d->n = n;
 	d->f = f;
 
-	d->projectionMatrix = Perspective(d->fovy, d->aspect, d->n, d->f);
+	d->projectionMatrix = Perspective(d->parameters.fovy, d->parameters.aspect, d->n, d->f);
 	d->dirty = true;
 }
 
-void GMFrustum::getPlanes(GMFrustumPlanes& planes)
+void GMFrustum::getPlanes(GMFrustumPlanes& planes) const
 {
 	D(d);
 	const GMMat4& projection = getProjectionMatrix();

@@ -1,4 +1,9 @@
 ﻿#if !GM_USE_DX11
+
+#ifndef XMISNAN
+#define XMISNAN(x)  ((*(UINT*)&(x) & 0x7F800000) == 0x7F800000 && (*(UINT*)&(x) & 0x7FFFFF) != 0)
+#endif
+
 namespace glm
 {
 	inline vec4 combine_vec4(const vec3& v3, const vec4& v4)
@@ -100,6 +105,49 @@ namespace glm
 		obj /= obj.w;
 
 		return vec<3, T, Q>(obj);
+	}
+
+	inline vec4 reciprocal(const vec4& V)
+	{
+		vec4 result;
+		result[0] = 0.0f;
+
+		for (auto i = 0; i < 4; i++)
+		{
+			if (XMISNAN(V[i]))
+			{
+				reinterpret_cast<gm::GMuint32&>(result[i]) = 0x7FC00000;
+			}
+			else if (V[i] == 0.0f || V[i] == -0.0f)
+			{
+				reinterpret_cast<gm::GMuint32&>(result[i]) = 0x7F800000 | (reinterpret_cast<const gm::GMuint32&>(V[i]) & 0x80000000);
+			}
+			else
+			{
+				result[i] = 1.f / V[i];
+			}
+		}
+		return result;
+	}
+
+	inline vec4 minComponent(const vec4& V1, const vec4& V2)
+	{
+		vec4 result;
+		result[0] = (V1[0] < V2[0]) ? V1[0] : V2[0];
+		result[1] = (V1[1] < V2[1]) ? V1[1] : V2[1];
+		result[2] = (V1[2] < V2[2]) ? V1[2] : V2[2];
+		result[3] = (V1[3] < V2[3]) ? V1[3] : V2[3];
+		return result;
+	}
+
+	inline vec4 maxComponent(const vec4& V1, const vec4& V2)
+	{
+		vec4 result;
+		result[0] = (V1[0] > V2[0]) ? V1[0] : V2[0];
+		result[1] = (V1[1] > V2[1]) ? V1[1] : V2[1];
+		result[2] = (V1[2] > V2[2]) ? V1[2] : V2[2];
+		result[3] = (V1[3] > V2[3]) ? V1[3] : V2[3];
+		return result;
 	}
 }
 #endif
@@ -1107,4 +1155,85 @@ template <>
 inline gm::GMfloat* ValuePointer(const GMFloat4& data)
 {
 	return (gm::GMfloat*)(&(data[0]));
+}
+
+inline GMVec4 SplatX(const GMVec4& V)
+{
+	GMVec4 R;
+#if GM_USE_DX11
+	R.v_ = DirectX::XMVectorSplatX(V.v_);
+#else
+	auto v = V.getX();
+	R.v_ = glm::vec4(v, v, v, v);
+#endif
+	return R;
+}
+
+inline GMVec4 SplatY(const GMVec4& V)
+{
+	GMVec4 R;
+#if GM_USE_DX11
+	R.v_ = DirectX::XMVectorSplatY(V.v_);
+#else
+	auto v = V.getY();
+	R.v_ = glm::vec4(v, v, v, v);
+#endif
+	return R;
+}
+
+inline GMVec4 SplatZ(const GMVec4& V)
+{
+	GMVec4 R;
+#if GM_USE_DX11
+	R.v_ = DirectX::XMVectorSplatZ(V.v_);
+#else
+	auto v = V.getZ();
+	R.v_ = glm::vec4(v, v, v, v);
+#endif
+	return R;
+}
+
+inline GMVec4 SplatW(const GMVec4& V)
+{
+	GMVec4 R;
+#if GM_USE_DX11
+	R.v_ = DirectX::XMVectorSplatW(V.v_);
+#else
+	auto v = V.getW();
+	R.v_ = glm::vec4(v, v, v, v);
+#endif
+	return R;
+}
+
+inline GMVec4 Reciprocal(const GMVec4& V)
+{
+	GMVec4 R;
+#if GM_USE_DX11
+	R.v_ = DirectX::XMVectorReciprocal(V.v_);
+#else
+	R.v_ = glm::reciprocal(V.v_);
+#endif
+	return R;
+}
+
+inline GMVec4 MinComponent(const GMVec4& V1, const GMVec4& V2)
+{
+	GMVec4 R;
+#if GM_USE_DX11
+	R.v_ = DirectX::XMVectorMin(V1.v_, V2.v_);
+#else
+	R.v_ = glm::minComponent(V1.v_, V2.v_);
+#endif
+	return R;
+}
+
+inline GMVec4 MaxComponent(const GMVec4& V1, const GMVec4& V2)
+{
+	GMVec4 R;
+#if GM_USE_DX11
+	R.v_ = DirectX::XMVectorMax(V1.v_, V2.v_);
+#else
+	R.v_ = glm::maxComponent(V1.v_, V2.v_);
+#endif
+	return R;
 }

@@ -28,6 +28,10 @@ constexpr gm::GMfloat PI = 3.141592653f;
 #	define FLT_EPSILON 1.192092896e-07F
 #endif
 
+#ifndef FLT_MAX
+#	define FLT_MAX 3.402823466e+38F
+#endif
+
 #define GM_SIMD_EPSILON FLT_EPSILON
 
 // 数学函数
@@ -642,6 +646,15 @@ inline GMVec4 Clamp(const GMVec4& v, gm::GMfloat minv, gm::GMfloat maxv)
 	r.setW(Clamp(v.getW(), minv, maxv));
 	return r;
 }
+
+inline GMVec4 SplatX(const GMVec4& V);
+inline GMVec4 SplatY(const GMVec4& V);
+inline GMVec4 SplatZ(const GMVec4& V);
+inline GMVec4 SplatW(const GMVec4& V);
+inline GMVec4 Reciprocal(const GMVec4& V);
+
+inline GMVec4 MinComponent(const GMVec4& V1, const GMVec4& V2);
+inline GMVec4 MaxComponent(const GMVec4& V1, const GMVec4& V2);
 
 #include "linearmath.inl"
 

@@ -379,14 +379,6 @@ IFramebuffers* GMDx11Framebuffers::createDefaultFramebuffers(const IRenderContex
 	return new GMDx11DefaultFramebuffers(context);
 }
 
-void GMDx11ShadowFramebuffers::clear(GMFramebuffersClearType clearType)
-{
-	D(d);
-	// 我们只清理currentViewport == 0的情况，它表示CSM渲染刚刚开始。
-	if (d->currentViewport == 0)
-		Base::clear(clearType);
-}
-
 bool GMDx11ShadowFramebuffers::init(const GMFramebuffersDesc& desc)
 {
 	bool b = Base::init(desc);
@@ -417,7 +409,7 @@ bool GMDx11ShadowFramebuffers::init(const GMFramebuffersDesc& desc)
 	GM_DX11_SET_OBJECT_NAME_A(d->depthShaderResourceView, "GM_ShadowMap_SRV");
 
 	// 创建每一个cascade的viewport
-	for (GMint32 i = 0; i < d->shadowSource.cascadedShadowLevel; ++i)
+	for (GMint32 i = 0; i < d->shadowSource.cascades; ++i)
 	{
 		d->viewports[i].Height = d->shadowSource.height;
 		d->viewports[i].Width = d->shadowSource.width;
@@ -445,23 +437,29 @@ void GMDx11ShadowFramebuffers::setShadowSource(const GMShadowSourceDesc& shadowS
 	d->shadowSource = shadowSource;
 }
 
-CSMViewport GMDx11ShadowFramebuffers::cascadedBegin()
+GMCascadeLevel GMDx11ShadowFramebuffers::cascadedBegin()
 {
 	D(d);
 	return 0;
 }
 
-CSMViewport GMDx11ShadowFramebuffers::cascadedEnd()
+GMCascadeLevel GMDx11ShadowFramebuffers::cascadedEnd()
 {
 	D(d);
-	return d->shadowSource.cascadedShadowLevel;
+	return d->shadowSource.cascades;
 }
 
-void GMDx11ShadowFramebuffers::applyCascadedLevel(CSMViewport vp)
+void GMDx11ShadowFramebuffers::applyCascadedLevel(GMCascadeLevel vp)
 {
 	D(d);
 	d->currentViewport = vp;
 	use();
+}
+
+GMCascadeLevel GMDx11ShadowFramebuffers::currentLevel()
+{
+	D(d);
+	return d->currentViewport;
 }
 
 ID3D11ShaderResourceView* GMDx11ShadowFramebuffers::getShadowMapShaderResourceView()

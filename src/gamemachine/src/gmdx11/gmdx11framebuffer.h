@@ -92,8 +92,8 @@ GM_PRIVATE_OBJECT(GMDx11ShadowFramebuffers)
 	GMint32 width = 0;
 	GMint32 height = 0;
 	GMShadowSourceDesc shadowSource;
-	D3D11_VIEWPORT viewports[GMGraphicEngine::getMaxCascadedShadowLevels()];
-	CSMViewport currentViewport;
+	D3D11_VIEWPORT viewports[GMGraphicEngine::getMaxCascades()];
+	GMCascadeLevel currentViewport;
 };
 
 class GMDx11ShadowFramebuffers : public GMDx11Framebuffers, public ICSMFramebuffers
@@ -104,15 +104,15 @@ public:
 	using GMDx11Framebuffers::GMDx11Framebuffers;
 
 public:
-	virtual void clear(GMFramebuffersClearType) override;
 	virtual bool init(const GMFramebuffersDesc& desc) override;
 	virtual void use() override;
 
 public:
 	virtual void setShadowSource(const GMShadowSourceDesc& shadowSource);
-	virtual CSMViewport cascadedBegin() override;
-	virtual CSMViewport cascadedEnd() override;
-	virtual void applyCascadedLevel(CSMViewport) override;
+	virtual GMCascadeLevel cascadedBegin() override;
+	virtual GMCascadeLevel cascadedEnd() override;
+	virtual void applyCascadedLevel(GMCascadeLevel) override;
+	virtual GMCascadeLevel currentLevel() override;
 
 public:
 	ID3D11ShaderResourceView* getShadowMapShaderResourceView();

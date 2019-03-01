@@ -5,6 +5,12 @@
 #include <gmdemogameworld.h>
 #include "demonstration_world.h"
 
+enum View
+{
+	CameraView,
+	ShadowCameraView,
+};
+
 GM_PRIVATE_OBJECT(Demo_CSM)
 {
 	gm::GMGameObject* gameObject = nullptr;
@@ -12,6 +18,9 @@ GM_PRIVATE_OBJECT(Demo_CSM)
 	gm::GMint32 mouseDownY;
 	bool dragging = false;
 	GMQuat lookAtRotation;
+	View view = CameraView;
+	gm::GMCamera viewerCamera;
+	gm::GMCamera shadowCamera;
 };
 
 class Demo_CSM : public DemoHandler
@@ -29,6 +38,7 @@ public:
 private:
 	void handleMouseEvent();
 	void handleDragging();
+	void updateCamera();
 
 protected:
 	virtual void setLookAt() override;

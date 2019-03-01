@@ -307,13 +307,14 @@ GM_INTERFACE(IFramebuffers)
 	virtual void setClearColor(const GMfloat rgba[4]) = 0;
 };
 
-typedef GMint32 CSMViewport;
+typedef GMint32 GMCascadeLevel;
 GM_INTERFACE(ICSMFramebuffers)
 {
 	virtual void setShadowSource(const GMShadowSourceDesc&) = 0;
-	virtual CSMViewport cascadedBegin() = 0;
-	virtual CSMViewport cascadedEnd() = 0;
-	virtual void applyCascadedLevel(CSMViewport) = 0;
+	virtual GMCascadeLevel cascadedBegin() = 0;
+	virtual GMCascadeLevel cascadedEnd() = 0;
+	virtual void applyCascadedLevel(GMCascadeLevel) = 0;
+	virtual GMCascadeLevel currentLevel() = 0;
 };
 
 enum class GMGeometryPassingState

@@ -150,7 +150,7 @@ void GMDx11GraphicEngine::createShadowFramebuffers(OUT IFramebuffers** framebuff
 	GMFramebuffersDesc desc;
 	GMRect rect;
 	// 构造一个 (width * cascadedShadowLevel, height) 的shadow map
-	rect.width = d->shadow.width * d->shadow.cascadedShadowLevel;
+	rect.width = d->shadow.width * d->shadow.cascades;
 	rect.height = d->shadow.height;
 	desc.rect = rect;
 

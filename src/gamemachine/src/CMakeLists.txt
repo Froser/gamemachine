@@ -78,6 +78,8 @@ set(SOURCES
 		gmengine/gmrendertechnique.cpp
 		gmengine/gmprimitivemanager.h
 		gmengine/gmprimitivemanager.cpp
+		gmengine/gmcsmhelper.h
+		gmengine/gmcsmhelper.cpp
 		gmengine/gameobjects/gmgameobject.h
 		gmengine/gameobjects/gmgameobject.cpp
 		gmengine/gameobjects/gmspritegameobject.h
