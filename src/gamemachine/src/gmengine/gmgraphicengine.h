@@ -71,6 +71,7 @@ struct GMShaderVariableShadowInfoDesc
 	T ShadowInfo;
 	T HasShadow;
 	T ShadowMatrix;
+	T CurrentCascadeLevel;
 	T Position;
 	T ShadowMap;
 	T ShadowMapMSAA;
@@ -79,6 +80,7 @@ struct GMShaderVariableShadowInfoDesc
 	T BiasMin;
 	T BiasMax;
 	T CascadedShadowLevel;
+	T ViewCascade;
 };
 
 template <typename T>

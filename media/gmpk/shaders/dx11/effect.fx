@@ -358,17 +358,19 @@ float4 CalculateWithToneMapping(float4 c)
 //--------------------------------------------------------------------------------------
 // Shadow
 //--------------------------------------------------------------------------------------
+static const int GM_MaxCascadeLevel = 5;
 struct GMShadowInfo
 {
     bool HasShadow;
-    matrix ShadowMatrix;
+    matrix ShadowMatrix[GM_MaxCascadeLevel];
+    int CurrentCascadeLevel;
     float4 Position;
     int ShadowMapWidth;
     int ShadowMapHeight;
     float BiasMin;
     float BiasMax;
-
     int CascadedShadowLevel;
+    bool ViewCascade;
 };
 Texture2D GM_ShadowMap;
 Texture2DMS<float4> GM_ShadowMapMSAA;
@@ -526,12 +528,12 @@ interface IIlluminationModel
 };
 int GM_IlluminationModel = 0;
 
-float CalculateShadow(matrix shadowMatrix, float4 worldPos, float3 normal_N)
+float CalculateShadow(matrix shadowMatrix[GM_MaxCascadeLevel], float4 worldPos, float3 normal_N)
 {
     if (!GM_ShadowInfo.HasShadow)
         return 1.0f;
 
-    float4 fragPos = mul(worldPos, shadowMatrix);
+    float4 fragPos = mul(worldPos, shadowMatrix[GM_ShadowInfo.CurrentCascadeLevel]);
     float3 projCoords = fragPos.xyz / fragPos.w;
     if (projCoords.z > 1.0f)
         return 1.0f;
@@ -1187,7 +1189,7 @@ VS_OUTPUT VS_Shadow( VS_INPUT input )
     output.Position = mul(output.Position, GM_WorldMatrix);
     output.WorldPos = output.Position;
     
-    output.Position = mul(output.Position, GM_ShadowInfo.ShadowMatrix);
+    output.Position = mul(output.Position, GM_ShadowInfo.ShadowMatrix[GM_ShadowInfo.CurrentCascadeLevel]);
 
     output.Normal = input.Normal;
     output.Texcoord = input.Texcoord;

@@ -65,6 +65,7 @@ static GMShaderVariablesDesc s_defaultShaderVariablesDesc =
 		"GM_ShadowInfo",
 		"HasShadow",
 		"ShadowMatrix",
+		"CurrentCascadeLevel",
 		"Position",
 		"GM_ShadowMap",
 		"GM_ShadowMapMSAA",
@@ -73,6 +74,7 @@ static GMShaderVariablesDesc s_defaultShaderVariablesDesc =
 		"BiasMin",
 		"BiasMax",
 		"CascadedShadowLevel",
+		"ViewCascade",
 	},
 
 	{

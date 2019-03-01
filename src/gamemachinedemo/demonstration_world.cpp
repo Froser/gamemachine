@@ -135,6 +135,7 @@ void DemoHandler::onDeactivate()
 
 	gm::GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
 	config.set(gm::GMRenderConfigs::HDR_Bool, false);
+	config.set(gm::GMRenderConfigs::ViewCascade_Bool, false);
 
 	d->parentDemonstrationWorld->getMainWidget()->setVisible(true);
 	d->parentDemonstrationWorld->getBillboardWidget()->setVisible(true);

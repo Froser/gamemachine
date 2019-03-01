@@ -67,6 +67,7 @@ enum class GMRenderConfigs
 	Gamma_Float,
 	HDR_Bool,
 	ToneMapping,
+	ViewCascade_Bool,
 	Max,
 };
 

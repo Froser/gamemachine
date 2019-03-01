@@ -78,7 +78,7 @@ void Demo_CSM::init()
 	gm::GMControlButton* button = nullptr;
 	widget->addControl(button = gm::GMControlButton::createControl(
 		widget,
-		L"可视化CSM范围",
+		L"切换可视化CSM范围",
 		10,
 		top,
 		250,
@@ -88,6 +88,8 @@ void Demo_CSM::init()
 
 	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		// Visualize CSM
+		gm::GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+		config.set(gm::GMRenderConfigs::ViewCascade_Bool, !config.get(gm::GMRenderConfigs::ViewCascade_Bool).toBool());
 	});
 
 	widget->addControl(button = gm::GMControlButton::createControl(
