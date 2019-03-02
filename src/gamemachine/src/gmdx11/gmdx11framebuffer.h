@@ -93,6 +93,7 @@ GM_PRIVATE_OBJECT(GMDx11ShadowFramebuffers)
 	GMint32 height = 0;
 	GMShadowSourceDesc shadowSource;
 	D3D11_VIEWPORT viewports[GMGraphicEngine::getMaxCascades()];
+	GMfloat cascadeEndClip[GMGraphicEngine::getMaxCascades()] = { 0 };
 	GMCascadeLevel currentViewport;
 };
 
@@ -113,6 +114,7 @@ public:
 	virtual GMCascadeLevel cascadedEnd() override;
 	virtual void applyCascadedLevel(GMCascadeLevel) override;
 	virtual GMCascadeLevel currentLevel() override;
+	virtual GMfloat getEndClip(GMCascadeLevel) override;
 
 public:
 	ID3D11ShaderResourceView* getShadowMapShaderResourceView();

@@ -7,6 +7,7 @@
 #include "gmengine/gameobjects/gmgameobject.h"
 #include "gmdx11gbuffer.h"
 #include "gmdx11glyphmanager.h"
+#include "gmengine/gmcsmhelper.h"
 
 GMDx11GraphicEngine::GMDx11GraphicEngine(const IRenderContext* context)
 	: GMGraphicEngine(context)
@@ -103,6 +104,7 @@ bool GMDx11GraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
 bool GMDx11GraphicEngine::getInterface(GameMachineInterfaceID id, void** out)
 {
 	D(d);
+	D_BASE(db, Base);
 	switch (id)
 	{
 	case GameMachineInterfaceID::D3D11Device:
@@ -135,6 +137,13 @@ bool GMDx11GraphicEngine::getInterface(GameMachineInterfaceID id, void** out)
 		d->depthStencilTexture->AddRef();
 		(*out) = d->depthStencilTexture.get();
 		break;
+	case GameMachineInterfaceID::CSMFramebuffer:
+	{
+		GMDx11ShadowFramebuffers* sdframebuffers = gm_cast<GMDx11ShadowFramebuffers*>(db->shadowDepthFramebuffers);
+		GM_ASSERT(sdframebuffers);
+		(*out) = gm_cast<ICSMFramebuffers*>(sdframebuffers);
+		break;
+	}
 	default:
 		return false;
 	}
@@ -160,11 +169,31 @@ void GMDx11GraphicEngine::createShadowFramebuffers(OUT IFramebuffers** framebuff
 	GM_ASSERT(succeed);
 }
 
-ICSMFramebuffers* GMDx11GraphicEngine::getCSMFramebuffers()
+void GMDx11GraphicEngine::resetCSM()
 {
-	D_BASE(d, Base);
-	GMDx11ShadowFramebuffers* sdframebuffers = gm_cast<GMDx11ShadowFramebuffers*>(d->shadowDepthFramebuffers);
-	return gm_cast<ICSMFramebuffers*>(sdframebuffers);
+	ICSMFramebuffers* csm = getCSMFramebuffers();
+	GMDx11Technique_3D_Shadow* shadowTech = gm_cast<GMDx11Technique_3D_Shadow*>(getTechnique(GMModelType::Model3D));
+	const GMShadowSourceDesc& shadowSourceDesc = getShadowSourceDesc();
+	if (shadowSourceDesc.cascades > 1)
+	{
+		for (GMCascadeLevel i = 0; i < shadowSourceDesc.cascades; ++i)
+		{
+			csm->applyCascadedLevel(i);
+
+			// 我们需要计算出此层的投影和frustum
+			GMCamera shadowCamera = shadowSourceDesc.camera;
+			GMCSMHelper::setOrthoCamera(csm, getCamera(), shadowSourceDesc, shadowCamera);
+			shadowTech->setCascadeCamera(i, shadowCamera);
+
+			// 设置End clip
+			shadowTech->setCascadeEndClip(i, csm->getEndClip(i));
+		}
+	}
+	else
+	{
+		// 如果只有一层，则不使用CSM
+		shadowTech->setCascadeCamera(0, shadowSourceDesc.camera);
+	}
 }
 
 bool GMDx11GraphicEngine::msgProc(const GMMessage& e)

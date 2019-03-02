@@ -128,6 +128,11 @@ ICSMFramebuffers* GMGLGraphicEngine::getCSMFramebuffers()
 	return nullptr;
 }
 
+void GMGLGraphicEngine::resetCSM()
+{
+	GM_ASSERT(false);
+}
+
 void GMGLGraphicEngine::activateLights(ITechnique* technique)
 {
 	D(d);

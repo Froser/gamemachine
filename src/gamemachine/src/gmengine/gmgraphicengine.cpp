@@ -65,6 +65,7 @@ static GMShaderVariablesDesc s_defaultShaderVariablesDesc =
 		"GM_ShadowInfo",
 		"HasShadow",
 		"ShadowMatrix",
+		"EndClip",
 		"CurrentCascadeLevel",
 		"Position",
 		"GM_ShadowMap",
@@ -289,6 +290,13 @@ bool GMGraphicEngine::isNeedDiscardTexture(GMModel* model, GMTextureType type)
 		model->getType() != GMModelType::Text;
 }
 
+ICSMFramebuffers* GMGraphicEngine::getCSMFramebuffers()
+{
+	ICSMFramebuffers* csm = nullptr;
+	getInterface(GameMachineInterfaceID::CSMFramebuffer, (void**)&csm);
+	return csm;
+}
+
 void GMGraphicEngine::createFilterFramebuffer()
 {
 	D(d);
@@ -331,28 +339,29 @@ void GMGraphicEngine::createFilterFramebuffer()
 void GMGraphicEngine::generateShadowBuffer(const List<GMGameObject*>& forwardRenderingObjects, const List<GMGameObject*>& deferredRenderingObjects)
 {
 	D(d);
+	d->isDrawingShadow = true;
+
 	if (!d->shadowDepthFramebuffers)
 	{
 		createShadowFramebuffers(&d->shadowDepthFramebuffers);
+		resetCSM();
 	}
 	else
 	{
 		if (d->shadow.cascades != d->lastShadow.cascades ||
 			d->shadow.width != d->lastShadow.width ||
-			d->shadow.height != d->lastShadow.height)
+			d->shadow.height != d->lastShadow.height) //TODO or cameraChanged
 		{
 			GM_delete(d->shadowDepthFramebuffers);
 			createShadowFramebuffers(&d->shadowDepthFramebuffers);
+			resetCSM();
 		}
 	}
 
 	GM_ASSERT(d->shadowDepthFramebuffers);
 	ICSMFramebuffers* csm = getCSMFramebuffers(); // csm和d->shadowDepthFramebuffers其实是同一个对象
-	csm->applyCascadedLevel(0);
-
 	d->shadowDepthFramebuffers->clear(GMFramebuffersClearType::Depth);
 	d->shadowDepthFramebuffers->bind();
-	d->isDrawingShadow = true;
 
 	// 遍历每个cascaded level
 	for (auto i = csm->cascadedBegin(); i != csm->cascadedEnd(); ++i)

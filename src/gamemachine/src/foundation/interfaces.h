@@ -99,6 +99,8 @@ enum class GameMachineInterfaceID
 	D3D11ShaderProgram,
 	D3D11Effect,
 
+	CSMFramebuffer,
+
 	CustomInterfaceBegin,
 	//用户自定义接口须在此之后
 };
@@ -315,6 +317,7 @@ GM_INTERFACE(ICSMFramebuffers)
 	virtual GMCascadeLevel cascadedEnd() = 0;
 	virtual void applyCascadedLevel(GMCascadeLevel) = 0;
 	virtual GMCascadeLevel currentLevel() = 0;
+	virtual GMfloat getEndClip(GMCascadeLevel) = 0;
 };
 
 enum class GMGeometryPassingState

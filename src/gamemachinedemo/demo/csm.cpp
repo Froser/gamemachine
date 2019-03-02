@@ -25,7 +25,7 @@ void Demo_CSM::setLookAt()
 {
 	D(d);
 	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
-	camera.setPerspective(PI / 4, 1.33333f, .05f, 933.849548f);
+	camera.setPerspective(PI / 4, 1.33333f, .05f, 500.849548f);
 	camera.lookAt(s_lookAt);
 	d->viewerCamera = camera;
 	d->lookAtRotation = Identity<GMQuat>();
@@ -53,7 +53,8 @@ void Demo_CSM::init()
 
 	gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(models);
 	d->gameObject = new gm::GMGameObject(asset);
-	d->gameObject->setTranslation(Translate(GMVec3(50.f, 10.f, 0)));
+	d->gameObject->setTranslation(Translate(GMVec3(50.f, 5.f, 0)));
+	d->gameObject->setScaling(Scale(GMVec3(.5f, .5f, .5f)));
 	d->gameObject->setRotation(Rotate(PI, GMVec3(0, 1, 0)));
 
 	asDemoGameWorld(getDemoWorldReference())->addObject("cat", d->gameObject);
@@ -224,7 +225,7 @@ void Demo_CSM::setDefaultLights()
 			desc.width = windowStates.renderRect.width;
 			desc.height = windowStates.renderRect.height;
 			desc.cascades = 2;
-			desc.cascadePartitions = { .5f, 1 };
+			desc.cascadePartitions = { .2f, 1 };
 
 			gm::GMCameraLookAt lookAt = gm::GMCameraLookAt::makeLookAt(
 				GMVec3(-160.0f, 150.0f, -110.3f),

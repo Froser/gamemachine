@@ -71,6 +71,7 @@ struct GMShaderVariableShadowInfoDesc
 	T ShadowInfo;
 	T HasShadow;
 	T ShadowMatrix;
+	T EndClip;
 	T CurrentCascadeLevel;
 	T Position;
 	T ShadowMap;
@@ -277,10 +278,11 @@ public:
 	virtual GMRenderTechniqueManager* getRenderTechniqueManager() override;
 	virtual GMPrimitiveManager* getPrimitiveManager() override;
 	virtual void createModelDataProxy(const IRenderContext* context, GMModel* model, bool transfer = true) override;
+	virtual ICSMFramebuffers* getCSMFramebuffers();
 
 protected:
 	virtual void createShadowFramebuffers(OUT IFramebuffers** framebuffers) = 0;
-	virtual ICSMFramebuffers* getCSMFramebuffers() = 0;
+	virtual void resetCSM() = 0;
 	virtual void createFilterFramebuffer();
 	virtual void generateShadowBuffer(const List<GMGameObject*>& forwardRenderingObjects, const List<GMGameObject*>& deferredRenderingObjects);
 	virtual bool needUseFilterFramebuffer();

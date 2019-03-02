@@ -233,8 +233,15 @@ private:
 	void passAllAndDraw(GMModel* model);
 };
 
+GM_PRIVATE_OBJECT(GMDx11Technique_3D_Shadow)
+{
+	GMCamera shadowCameras[GMGraphicEngine::getMaxCascades()];
+};
+
 class GMDx11Technique_3D_Shadow : public GMDx11Technique_3D
 {
+	GM_DECLARE_PRIVATE_AND_BASE(GMDx11Technique_3D_Shadow, GMDx11Technique_3D)
+
 public:
 	using GMDx11Technique_3D::GMDx11Technique_3D;
 
@@ -245,6 +252,10 @@ protected:
 	}
 
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
+
+public:
+	virtual void setCascadeCamera(GMCascadeLevel level, const GMCamera& camera);
+	virtual void setCascadeEndClip(GMCascadeLevel level, GMfloat endClip);
 };
 
 class GMDx11Technique_Particle : public GMDx11Technique

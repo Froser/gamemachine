@@ -119,21 +119,21 @@ namespace
 		outPoints[6] = GMVec4(xf,  -yf,intervalEnd, 1.0);
 		outPoints[7] = GMVec4(-xf, -yf,intervalEnd, 1.0);
 	}
+}
 
-	void getFrustumIntervals(const GMCamera& camera, const GMShadowSourceDesc& shadowSource, GMCascadeLevel level, GMfloat& frustumIntervalBegin, GMfloat& frustumIntervalEnd)
-	{
-		const auto& frustum = camera.getFrustum();
-		GMfloat cameraNearFarRange = frustum.getFar() - frustum.getNear();
-		if (level == 0)
-			frustumIntervalBegin = 0;
-		else
-			frustumIntervalBegin = shadowSource.cascadePartitions[level - 1];
+void GMCSMHelper::getFrustumIntervals(const GMCamera& camera, const GMShadowSourceDesc& shadowSource, GMCascadeLevel level, GMfloat& frustumIntervalBegin, GMfloat& frustumIntervalEnd)
+{
+	const auto& frustum = camera.getFrustum();
+	GMfloat cameraNearFarRange = frustum.getFar() - frustum.getNear();
+	if (level == 0)
+		frustumIntervalBegin = 0;
+	else
+		frustumIntervalBegin = shadowSource.cascadePartitions[level - 1];
 
-		frustumIntervalEnd = shadowSource.cascadePartitions[level];
+	frustumIntervalEnd = shadowSource.cascadePartitions[level];
 
-		frustumIntervalBegin *= cameraNearFarRange;
-		frustumIntervalEnd *= cameraNearFarRange;
-	}
+	frustumIntervalBegin *= cameraNearFarRange;
+	frustumIntervalEnd *= cameraNearFarRange;
 }
 
 void GMCSMHelper::setOrthoCamera(ICSMFramebuffers* csm, const GMCamera& viewerCamera, const GMShadowSourceDesc& shadowSourceDesc, GMCamera& shadowCamera)
