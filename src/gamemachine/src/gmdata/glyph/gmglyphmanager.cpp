@@ -87,7 +87,7 @@ GMFontHandle GMGlyphManager::addFontByFullName(const GMString& fontFullName)
 		font.fontPath = fontFullName;
 		font.face = face;
 		d->fonts.push_back(font);
-		return d->fonts.size() - 1;
+		return gm_sizet_to_uint(d->fonts.size() - 1);
 	}
 	gm_error(gm_dbg_wrap("load font failed."));
 	return GMInvalidFontHandle;
@@ -106,7 +106,7 @@ GMFontHandle GMGlyphManager::addFontByMemory(GMBuffer&& buffer)
 		font.buffer = std::move(buffer);
 		font.face = face;
 		d->fonts.push_back(std::move(font));
-		return d->fonts.size() - 1;
+		return gm_sizet_to_uint(d->fonts.size() - 1);
 	}
 	gm_error(gm_dbg_wrap("load font failed."));
 	return GMInvalidFontHandle;

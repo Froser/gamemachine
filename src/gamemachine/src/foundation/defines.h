@@ -284,8 +284,8 @@ using GMSharedPtr = std::shared_ptr<T>;
 #define gm_makeOwnedPtr std::make_unique
 #define gm_makeSharedPtr std::make_shared
 
-typedef GMsize_t GMFontHandle;
-constexpr GMsize_t GMInvalidFontHandle = -1;
+typedef GMuint32 GMFontHandle;
+constexpr GMuint32 GMInvalidFontHandle = -1;
 
 struct GMRect
 {

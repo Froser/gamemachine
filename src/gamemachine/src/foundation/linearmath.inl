@@ -1,7 +1,8 @@
 ﻿#if !GM_USE_DX11
 
 #ifndef XMISNAN
-#define XMISNAN(x)  ((*(UINT*)&(x) & 0x7F800000) == 0x7F800000 && (*(UINT*)&(x) & 0x7FFFFF) != 0)
+static_assert(sizeof(unsigned int) == 4, "Wrong unsigned int size.");
+#define XMISNAN(x)  ((*(unsigned int*)&(x) & 0x7F800000) == 0x7F800000 && (*(unsigned int*)&(x) & 0x7FFFFF) != 0)
 #endif
 
 namespace glm
