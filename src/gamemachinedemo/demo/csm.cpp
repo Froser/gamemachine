@@ -96,8 +96,11 @@ void Demo_CSM::init()
 
 	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		// Visualize CSM
-		gm::GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
-		config.set(gm::GMRenderConfigs::ViewCascade_Bool, d->viewCSM = !config.get(gm::GMRenderConfigs::ViewCascade_Bool).toBool());
+		if (d->view == CameraView)
+		{
+			gm::GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+			config.set(gm::GMRenderConfigs::ViewCascade_Bool, d->viewCSM = !config.get(gm::GMRenderConfigs::ViewCascade_Bool).toBool());
+		}
 	});
 
 	widget->addControl(button = gm::GMControlButton::createControl(
@@ -234,7 +237,7 @@ void Demo_CSM::setDefaultLights()
 			shadowCamera.setPerspective(PI / 4, 1.f, 1, 1000);
 
 			desc.camera = shadowCamera;
-			desc.biasMax = desc.biasMin = 0.0005f;
+			desc.biasMax = desc.biasMin = 0.005f;
 			desc.width = windowStates.renderRect.width;
 			desc.height = windowStates.renderRect.height;
 			desc.cascades = 2;
