@@ -169,7 +169,7 @@ struct GMShaderVariablesDesc_t
 using GMShaderVariablesDesc = GMShaderVariablesDesc_t<const GMString>;
 using GMShaderVariablesIndices = GMShaderVariablesDesc_t<GMint32>;
 
-constexpr GMsize_t GMMaxCascades = 5;
+constexpr GMsize_t GMMaxCascades = 8;
 struct GMShadowSourceDesc
 {
 	enum Type

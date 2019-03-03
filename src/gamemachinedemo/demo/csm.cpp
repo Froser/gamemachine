@@ -8,7 +8,7 @@
 namespace
 {
 	const gm::GMCameraLookAt s_lookAt = gm::GMCameraLookAt::makeLookAt(
-		GMVec3(100.0f, 5.0f, 5.0f),
+		GMVec3(100.0f, 15.0f, 5.0f),
 		GMVec3(0, 0, 0)
 	);
 }
@@ -25,7 +25,7 @@ void Demo_CSM::setLookAt()
 {
 	D(d);
 	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
-	camera.setPerspective(PI / 4, 1.33333f, .05f, 500.849548f);
+	camera.setPerspective(PI / 4, 1.33333f, .05f, 300);
 	camera.lookAt(s_lookAt);
 	d->viewerCamera = camera;
 	d->lookAtRotation = Identity<GMQuat>();
@@ -59,12 +59,19 @@ void Demo_CSM::init()
 
 	asDemoGameWorld(getDemoWorldReference())->addObject("cat", d->gameObject);
 
+	d->gameObject2 = new gm::GMGameObject(asset);
+	d->gameObject2->setTranslation(Translate(GMVec3(25.f, 5.f, 0.f)));
+	d->gameObject2->setScaling(Scale(GMVec3(.5f, .5f, .5f)));
+	d->gameObject2->setRotation(Rotate(PI, GMVec3(0, 1, 0)));
+
+	asDemoGameWorld(getDemoWorldReference())->addObject("cat2", d->gameObject2);
+
 	// 创建地板
 	gm::GMGameObject* ground = new gm::GMGameObject();
 	ground->setTranslation(Translate(GMVec3(0, -50, 0)));
 
 	gm::GMSceneAsset groundShapeAsset;
-	gm::GMPrimitiveCreator::createCube(GMVec3(5000, 50, 5000), groundShapeAsset);
+	gm::GMPrimitiveCreator::createCube(GMVec3(500, 50, 500), groundShapeAsset);
 	groundShapeAsset.getScene()->getModels()[0].getModel()->getShader().getMaterial().setAmbient(GMVec3(.8125f / .7f, .644f / .7f, .043f / .7f));
 	groundShapeAsset.getScene()->getModels()[0].getModel()->getShader().getMaterial().setDiffuse(GMVec3(.1f));
 	groundShapeAsset.getScene()->getModels()[0].getModel()->getShader().getMaterial().setSpecular(GMVec3(.4f));
@@ -90,7 +97,7 @@ void Demo_CSM::init()
 	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		// Visualize CSM
 		gm::GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
-		config.set(gm::GMRenderConfigs::ViewCascade_Bool, !config.get(gm::GMRenderConfigs::ViewCascade_Bool).toBool());
+		config.set(gm::GMRenderConfigs::ViewCascade_Bool, d->viewCSM = !config.get(gm::GMRenderConfigs::ViewCascade_Bool).toBool());
 	});
 
 	widget->addControl(button = gm::GMControlButton::createControl(
@@ -105,6 +112,9 @@ void Demo_CSM::init()
 
 	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->view = CameraView;
+
+		gm::GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+		config.set(gm::GMRenderConfigs::ViewCascade_Bool, d->viewCSM);
 	});
 
 	widget->addControl(button = gm::GMControlButton::createControl(
@@ -119,6 +129,9 @@ void Demo_CSM::init()
 
 	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->view = ShadowCameraView;
+
+		gm::GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+		config.set(gm::GMRenderConfigs::ViewCascade_Bool, false);
 	});
 
 	widget->setSize(widget->getSize().width, top + 40);

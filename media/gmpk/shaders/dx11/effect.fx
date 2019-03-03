@@ -358,11 +358,12 @@ float4 CalculateWithToneMapping(float4 c)
 //--------------------------------------------------------------------------------------
 // Shadow
 //--------------------------------------------------------------------------------------
-static const int GM_MaxCascadeLevel = 5;
+static const int GM_MaxCascadeLevel = 8;
 struct GMShadowInfo
 {
     bool HasShadow;
     matrix ShadowMatrix[GM_MaxCascadeLevel];
+    float EndClip[GM_MaxCascadeLevel];
     int CurrentCascadeLevel;
     float4 Position;
     int ShadowMapWidth;
@@ -376,6 +377,19 @@ Texture2D GM_ShadowMap;
 Texture2DMS<float4> GM_ShadowMapMSAA;
 
 GMShadowInfo GM_ShadowInfo;
+
+// Cascade Color
+static const float4 GM_CascadeColors[GM_MaxCascadeLevel] = {
+    float4 ( 1.1f, 0.0f, 0.0f, 1.0f ),
+    float4 ( 0.0f, 1.1f, 0.0f, 1.0f ),
+    float4 ( 0.0f, 0.0f, 1.5f, 1.0f ),
+    float4 ( 1.1f, 0.0f, 1.5f, 1.0f ),
+    float4 ( 1.1f, 1.1f, 0.0f, 1.0f ),
+    float4 ( 1.0f, 1.0f, 1.0f, 1.0f ),
+    float4 ( 0.0f, 1.0f, 1.5f, 1.0f ),
+    float4 ( 0.5f, 3.5f, 0.75f, 1.0f )
+};
+
 //--------------------------------------------------------------------------------------
 // States
 //--------------------------------------------------------------------------------------
@@ -407,6 +421,7 @@ struct VS_OUTPUT
     float4 Color       : COLOR;
     float4 WorldPos    : POSITION;
     float4 Position    : SV_POSITION;
+    float4 Z           : Z;
 };
 
 typedef VS_OUTPUT PS_INPUT;
@@ -506,6 +521,7 @@ float4 IlluminateRefraction(
 
 struct PS_3D_INPUT
 {
+    float Z;                   // 投影到世界后的Z坐标（未除以w）
     float3 WorldPos;            // 世界坐标
     float3 Normal_World_N;      // 世界法线
     float3 Normal_Eye_N;        // 眼睛空间法向量
@@ -528,12 +544,27 @@ interface IIlluminationModel
 };
 int GM_IlluminationModel = 0;
 
-float CalculateShadow(matrix shadowMatrix[GM_MaxCascadeLevel], float4 worldPos, float3 normal_N)
+float CalculateShadow(PS_3D_INPUT input, matrix shadowMatrix[GM_MaxCascadeLevel])
 {
     if (!GM_ShadowInfo.HasShadow)
         return 1.0f;
 
-    float4 fragPos = mul(worldPos, shadowMatrix[GM_ShadowInfo.CurrentCascadeLevel]);
+    int cascade = 0;
+    if (GM_ShadowInfo.CascadedShadowLevel > 1)
+    {
+        for (int i = 0; i < GM_ShadowInfo.CascadedShadowLevel; ++i)
+        {
+            if (input.Z <= GM_ShadowInfo.EndClip[i])
+            {
+                cascade = i;
+                break;
+            }
+        }
+    }
+
+    float4 worldPos = ToFloat4(input.WorldPos);
+    float3 normal_N = input.Normal_World_N;
+    float4 fragPos = mul(worldPos, shadowMatrix[cascade]);
     float3 projCoords = fragPos.xyz / fragPos.w;
     if (projCoords.z > 1.0f)
         return 1.0f;
@@ -545,7 +576,10 @@ float CalculateShadow(matrix shadowMatrix[GM_MaxCascadeLevel], float4 worldPos, 
     float closestDepth = 0;
     if (GM_ScreenInfo.Multisampling)
     {
-        int x = GM_ShadowInfo.ShadowMapWidth * projCoords.x;
+        // 每一份Shadow Map的宽度
+        int pieceWidth = GM_ShadowInfo.ShadowMapWidth / GM_ShadowInfo.CascadedShadowLevel;
+
+        int x = pieceWidth * (projCoords.x + cascade);
         int y = GM_ShadowInfo.ShadowMapHeight * projCoords.y;
         if (projCoords.x > 1 || projCoords.x < 0 ||
             projCoords.y > 1 || projCoords.y < 0 )
@@ -553,14 +587,7 @@ float CalculateShadow(matrix shadowMatrix[GM_MaxCascadeLevel], float4 worldPos, 
             return 1.f;
         }
 
-        if (GM_ShadowInfo.CascadedShadowLevel == 1)
-        {
-            closestDepth = GM_ShadowMapMSAA.Load(int3(x, y, 0), 0);
-        }
-        else
-        {
-
-        }
+        closestDepth = GM_ShadowMapMSAA.Load(int3(x, y, 0), 0);
     }
     else
     {
@@ -570,11 +597,32 @@ float CalculateShadow(matrix shadowMatrix[GM_MaxCascadeLevel], float4 worldPos, 
         }
         else
         {
-            
+            // 每一份Shadow Map的缩放。例如，假设Cascade Level = 3，那么第一幅Shadow Map采样范围就是0~0.333。
+            float projRatio = 1.f / GM_ShadowInfo.CascadedShadowLevel;
+
+            float2 projCoordsInCSM = float2(projRatio * (projCoords.x + cascade), projCoords.y);
+            closestDepth = GM_ShadowMap.Sample(ShadowMapSampler, projCoordsInCSM.xy).r;
         }
     }
 
     return projCoords.z - bias > closestDepth ? 0.f : 1.f;
+}
+
+float4 ViewCascade(PS_3D_INPUT input)
+{
+    float4 cascadeIndicator = float4(1, 1, 1, 1);
+    if (GM_ShadowInfo.HasShadow && GM_ShadowInfo.ViewCascade)
+    {
+        for (int i = 0; i < GM_ShadowInfo.CascadedShadowLevel; ++i)
+        {
+            if (input.Z <= GM_ShadowInfo.EndClip[i])
+            {
+                cascadeIndicator = GM_CascadeColors[i];
+                break;
+            }
+        }
+    }
+    return cascadeIndicator;
 }
 
 class GMPhong : IIlluminationModel
@@ -743,16 +791,17 @@ static const int GM_IlluminationModel_CookTorranceBRDF = 2;
 
 float4 PS_3D_CalculateColor(PS_3D_INPUT input)
 {
-    float factor_Shadow = CalculateShadow(GM_ShadowInfo.ShadowMatrix, ToFloat4(input.WorldPos), input.Normal_World_N);
+    float factor_Shadow = CalculateShadow(input, GM_ShadowInfo.ShadowMatrix);
+    float4 csmIndicator = ViewCascade(input);
     switch (input.IlluminationModel)
     {
         case GM_IlluminationModel_None:
             discard;
             break;
         case GM_IlluminationModel_Phong:
-            return GM_Phong.Calculate(input, factor_Shadow);
+            return csmIndicator * GM_Phong.Calculate(input, factor_Shadow);
         case GM_IlluminationModel_CookTorranceBRDF:
-            return GM_CookTorranceBRDF.Calculate(input, factor_Shadow);
+            return csmIndicator * GM_CookTorranceBRDF.Calculate(input, factor_Shadow);
     }
     return float4(0, 0, 0, 0);
 }
@@ -783,6 +832,7 @@ VS_OUTPUT VS_3D( VS_INPUT input )
     output.Bitangent = input.Bitangent;
     output.Lightmap = input.Lightmap;
     output.Color = input.Color;
+    output.Z = output.Position.z;
     return output;
 }
 
@@ -822,6 +872,7 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
     float3 normal_Eye_N = normalize(mul(input.Normal, transform_Normal_Eye));
 
     PS_3D_INPUT commonInput;
+    commonInput.Z = input.Z;
     commonInput.Normal_World_N = normalize(mul(input.Normal, inverseTransposeModelMatrix));
     GMTangentSpace tangentSpace;
     if (PS_3D_HasNormalMap())
@@ -898,6 +949,7 @@ VS_OUTPUT VS_2D(VS_INPUT input)
     output.Bitangent = input.Bitangent;
     output.Lightmap = input.Lightmap;
     output.Color = input.Color;
+    output.Z = output.Position.z;
     return output;
 }
 
@@ -934,6 +986,7 @@ VS_OUTPUT VS_Text(VS_INPUT input)
     output.Bitangent = input.Bitangent;
     output.Lightmap = input.Lightmap;
     output.Color = input.Color;
+    output.Z = output.Position.z;
     return output;
 }
 
@@ -954,6 +1007,7 @@ VS_OUTPUT VS_CubeMap(VS_INPUT input)
     output.Position = mul(output.Position, GM_WorldMatrix);
     output.Position = mul(output.Position, GM_ViewMatrix);
     output.Position = mul(output.Position, GM_ProjectionMatrix);
+    output.Z = output.Position.z;
     return output;
 }
 
@@ -1071,12 +1125,15 @@ VS_OUTPUT VS_3D_LightPass(VS_INPUT input)
     VS_OUTPUT output;
     output.Position = ToFloat4(input.Position);
     output.Texcoord = input.Texcoord;
+    output.Z = output.Position.z;
     return output;
 }
 
 float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
 {
     PS_3D_INPUT commonInput;
+    commonInput.Z = input.Z;
+
     int3 coord = int3(input.Texcoord * float2(GM_ScreenInfo.ScreenWidth, GM_ScreenInfo.ScreenHeight), 0);
     GMTangentSpace tangentSpace;
     float3 tangent_Eye_N;
@@ -1197,6 +1254,7 @@ VS_OUTPUT VS_Shadow( VS_INPUT input )
     output.Bitangent = input.Bitangent;
     output.Lightmap = input.Lightmap;
     output.Color = input.Color;
+    output.Z = output.Position.z;
     return output;
 }
 
@@ -1389,6 +1447,7 @@ VS_OUTPUT VS_Filter(VS_INPUT input)
     VS_OUTPUT output;
     output.Position = float4(input.Position.x, input.Position.y, input.Position.z, 1);
     output.Texcoord = input.Texcoord;
+    output.Z = output.Position.z;
     return output;
 }
 

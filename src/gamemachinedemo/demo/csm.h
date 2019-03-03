@@ -14,6 +14,7 @@ enum View
 GM_PRIVATE_OBJECT(Demo_CSM)
 {
 	gm::GMGameObject* gameObject = nullptr;
+	gm::GMGameObject* gameObject2 = nullptr;
 	gm::GMint32 mouseDownX;
 	gm::GMint32 mouseDownY;
 	bool dragging = false;
@@ -21,6 +22,7 @@ GM_PRIVATE_OBJECT(Demo_CSM)
 	View view = CameraView;
 	gm::GMCamera viewerCamera;
 	gm::GMCamera shadowCamera;
+	bool viewCSM = false;
 };
 
 class Demo_CSM : public DemoHandler

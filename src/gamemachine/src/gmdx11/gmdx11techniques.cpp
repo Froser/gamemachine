@@ -627,13 +627,13 @@ void GMDx11Technique::beginModel(GMModel* model, const GMGameObject* parent)
 		if (shadowSourceDesc.type != GMShadowSourceDesc::NoShadow)
 		{
 			GM_DX_HR(hasShadow->SetBool(true));
+
+			ID3DX11EffectScalarVariable* cascadedShadowLevel = bank.CascadedShadowLevel();
+			GM_DX_HR(cascadedShadowLevel->SetInt(shadowSourceDesc.cascades));
 		}
 		else
 		{
 			GM_DX_HR(hasShadow->SetBool(false));
-
-			ID3DX11EffectScalarVariable* cascadedShadowLevel = bank.CascadedShadowLevel();
-			GM_DX_HR(cascadedShadowLevel->SetInt(shadowSourceDesc.cascades));
 		}
 	}
 
