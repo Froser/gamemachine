@@ -169,7 +169,7 @@ struct GMShaderVariablesDesc_t
 using GMShaderVariablesDesc = GMShaderVariablesDesc_t<const GMString>;
 using GMShaderVariablesIndices = GMShaderVariablesDesc_t<GMint32>;
 
-constexpr GMsize_t GMMaxCascades = 8;
+constexpr GMCascadeLevel GMMaxCascades = 8;
 struct GMShadowSourceDesc
 {
 	enum Type
@@ -344,7 +344,7 @@ public:
 	}
 	static const GMShaderVariablesDesc& getDefaultShaderVariablesDesc();
 
-	static constexpr const GMsize_t getMaxCascades()
+	static constexpr const GMCascadeLevel getMaxCascades()
 	{
 		return GMMaxCascades;
 	}

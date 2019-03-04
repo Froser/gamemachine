@@ -15,6 +15,7 @@ GM_PRIVATE_OBJECT(Demo_CSM)
 {
 	gm::GMGameObject* gameObject = nullptr;
 	gm::GMGameObject* gameObject2 = nullptr;
+	gm::GMGameObject* gameObject3 = nullptr;
 	gm::GMint32 mouseDownX;
 	gm::GMint32 mouseDownY;
 	bool dragging = false;

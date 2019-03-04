@@ -380,14 +380,14 @@ GMShadowInfo GM_ShadowInfo;
 
 // Cascade Color
 static const float4 GM_CascadeColors[GM_MaxCascadeLevel] = {
-    float4 ( 1.1f, 0.0f, 0.0f, 1.0f ),
-    float4 ( 0.0f, 1.1f, 0.0f, 1.0f ),
-    float4 ( 0.0f, 0.0f, 1.5f, 1.0f ),
-    float4 ( 1.1f, 0.0f, 1.5f, 1.0f ),
-    float4 ( 1.1f, 1.1f, 0.0f, 1.0f ),
-    float4 ( 1.0f, 1.0f, 1.0f, 1.0f ),
-    float4 ( 0.0f, 1.0f, 1.5f, 1.0f ),
-    float4 ( 0.5f, 3.5f, 0.75f, 1.0f )
+    float4 ( 0.5f, 0.0f, 0.0f, 0.0f ),
+    float4 ( 0.0f, 0.5f, 0.0f, 0.0f ),
+    float4 ( 0.0f, 0.0f, 0.5f, 0.0f ),
+    float4 ( 0.5f, 0.0f, 0.5f, 0.0f ),
+    float4 ( 0.5f, 0.5f, 0.0f, 0.0f ),
+    float4 ( 0.0f, 0.5f, 0.5f, 0.0f ),
+    float4 ( 0.5f, 0.5f, 0.5f, 0.0f ),
+    float4 ( 0.5f, 0.5f, 0.75f, 0.0f )
 };
 
 //--------------------------------------------------------------------------------------
@@ -610,7 +610,7 @@ float CalculateShadow(PS_3D_INPUT input, matrix shadowMatrix[GM_MaxCascadeLevel]
 
 float4 ViewCascade(PS_3D_INPUT input)
 {
-    float4 cascadeIndicator = float4(1, 1, 1, 1);
+    float4 cascadeIndicator = float4(0, 0, 0, 0);
     if (GM_ShadowInfo.HasShadow && GM_ShadowInfo.ViewCascade)
     {
         for (int i = 0; i < GM_ShadowInfo.CascadedShadowLevel; ++i)
@@ -799,9 +799,9 @@ float4 PS_3D_CalculateColor(PS_3D_INPUT input)
             discard;
             break;
         case GM_IlluminationModel_Phong:
-            return csmIndicator * GM_Phong.Calculate(input, factor_Shadow);
+            return csmIndicator + GM_Phong.Calculate(input, factor_Shadow);
         case GM_IlluminationModel_CookTorranceBRDF:
-            return csmIndicator * GM_CookTorranceBRDF.Calculate(input, factor_Shadow);
+            return csmIndicator + GM_CookTorranceBRDF.Calculate(input, factor_Shadow);
     }
     return float4(0, 0, 0, 0);
 }

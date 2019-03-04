@@ -255,9 +255,21 @@ float calculateShadow(PS_3D_INPUT vertex, mat4 shadowMatrix[GM_MaxCascadeLevel])
     return projCoords.z - bias > closestDepth ? 0.f : 1.f;
 }
 
+
 vec4 viewCascade()
 {
-    vec4 cascadeIndicator = vec4(1, 1, 1, 1);
+    // Cascade Colors
+    vec4 GM_CascadeColors[GM_MaxCascadeLevel];
+    GM_CascadeColors[0] = vec4 ( 0.5f, 0.0f, 0.0f, 0.0f );
+    GM_CascadeColors[1] = vec4 ( 0.0f, 0.5f, 0.0f, 0.0f );
+    GM_CascadeColors[2] = vec4 ( 0.0f, 0.0f, 0.5f, 0.0f );
+    GM_CascadeColors[3] = vec4 ( 0.5f, 0.0f, 0.5f, 0.0f );
+    GM_CascadeColors[4] = vec4 ( 0.5f, 0.5f, 0.0f, 0.0f );
+    GM_CascadeColors[5] = vec4 ( 0.0f, 0.5f, 0.5f, 0.0f );
+    GM_CascadeColors[6] = vec4 ( 0.5f, 0.5f, 0.5f, 0.0f );
+    GM_CascadeColors[7] = vec4 ( 0.5f, 0.5f, 0.75f, 0.0f );
+
+    vec4 cascadeIndicator = vec4(0, 0, 0, 0);
     if (GM_ShadowInfo.HasShadow == 1 && GM_ShadowInfo.ViewCascade == 1)
     {
         for (int i = 0; i < GM_ShadowInfo.CascadedShadowLevel; ++i)
@@ -430,16 +442,16 @@ vec4 GM_CookTorranceBRDF_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
 
 vec4 PS_3D_CalculateColor(PS_3D_INPUT vertex)
 {
-    float factor_Shadow = 0;//calculateShadow(vertex, GM_ShadowInfo.ShadowMatrix);
+    float factor_Shadow = calculateShadow(vertex, GM_ShadowInfo.ShadowMatrix);
     vec4 csmIndicator = viewCascade();
     switch (vertex.IlluminationModel)
     {
         case GM_IlluminationModel_None:
             discard;
         case GM_IlluminationModel_Phong:
-            return csmIndicator * GM_Phong_CalculateColor(vertex, factor_Shadow);
+            return csmIndicator + GM_Phong_CalculateColor(vertex, factor_Shadow);
         case GM_IlluminationModel_CookTorranceBRDF:
-            return csmIndicator * GM_CookTorranceBRDF_CalculateColor(vertex, factor_Shadow);
+            return csmIndicator + GM_CookTorranceBRDF_CalculateColor(vertex, factor_Shadow);
     }
     return vec4(0, 0, 0, 0);
 }

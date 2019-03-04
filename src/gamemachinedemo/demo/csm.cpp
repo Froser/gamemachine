@@ -52,6 +52,7 @@ void Demo_CSM::init()
 	gm::GMModelReader::load(loadSettings, models);
 
 	gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(models);
+
 	d->gameObject = new gm::GMGameObject(asset);
 	d->gameObject->setTranslation(Translate(GMVec3(50.f, 5.f, 0)));
 	d->gameObject->setScaling(Scale(GMVec3(.5f, .5f, .5f)));
@@ -65,6 +66,13 @@ void Demo_CSM::init()
 	d->gameObject2->setRotation(Rotate(PI, GMVec3(0, 1, 0)));
 
 	asDemoGameWorld(getDemoWorldReference())->addObject("cat2", d->gameObject2);
+
+	d->gameObject3 = new gm::GMGameObject(asset);
+	d->gameObject3->setTranslation(Translate(GMVec3(0.f, 5.f, 0.f)));
+	d->gameObject3->setScaling(Scale(GMVec3(.5f, .5f, .5f)));
+	d->gameObject3->setRotation(Rotate(PI, GMVec3(0, 1, 0)));
+
+	asDemoGameWorld(getDemoWorldReference())->addObject("cat3", d->gameObject3);
 
 	// 创建地板
 	gm::GMGameObject* ground = new gm::GMGameObject();
@@ -240,8 +248,8 @@ void Demo_CSM::setDefaultLights()
 			desc.biasMax = desc.biasMin = 0.005f;
 			desc.width = windowStates.renderRect.width;
 			desc.height = windowStates.renderRect.height;
-			desc.cascades = 2;
-			desc.cascadePartitions = { .2f, 1 };
+			desc.cascades = 3;
+			desc.cascadePartitions = { .2f, .3f, 1 };
 
 			gm::GMCameraLookAt lookAt = gm::GMCameraLookAt::makeLookAt(
 				GMVec3(-160.0f, 150.0f, -110.3f),

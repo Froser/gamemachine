@@ -145,7 +145,7 @@ namespace
 		{
 			static const GMString s_shadowInfo = GMString(GM_VariablesDesc.ShadowInfo.ShadowInfo) + L"." + GM_VariablesDesc.ShadowInfo.EndClip;
 			s_shadowMapNames.resize(GMGraphicEngine::getMaxCascades());
-			for (GMint32 i = 0; i < GMGraphicEngine::getMaxCascades(); ++i)
+			for (GMCascadeLevel i = 0; i < GMGraphicEngine::getMaxCascades(); ++i)
 			{
 				s_shadowMapNames[i] = s_shadowInfo + L"[" + GMString(i) + L"]";
 			}
@@ -160,7 +160,7 @@ namespace
 		{
 			static const GMString s_shadowInfo = GMString(GM_VariablesDesc.ShadowInfo.ShadowInfo) + L"." + GM_VariablesDesc.ShadowInfo.ShadowMatrix;
 			s_shadowMapNames.resize(GMGraphicEngine::getMaxCascades());
-			for (GMint32 i = 0; i < GMGraphicEngine::getMaxCascades(); ++i)
+			for (GMCascadeLevel i = 0; i < GMGraphicEngine::getMaxCascades(); ++i)
 			{
 				s_shadowMapNames[i] = s_shadowInfo + L"[" + GMString(i) + L"]";
 			}
@@ -204,13 +204,13 @@ namespace
 				shaderProgram->setInt(VI_N(ShadowInfo.ShadowMapHeight, s_height), shadowFramebuffers->getShadowMapHeight());
 				shaderProgram->setInt(VI_N(ShadowInfo.ShadowMap, s_shadowMap), GMTextureRegisterQuery<GMTextureType::ShadowMap>::Value);
 
-				// 是否显示CSM范围
-				GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
-				bool vc = config.get(GMRenderConfigs::ViewCascade_Bool).toBool();
-				shaderProgram->setInt(VI_N(ShadowInfo.ViewCascade, s_viewCascade), vc ? 1 : 0);
-
 				g_shadowDirty = false;
 			}
+
+			// 是否显示CSM范围
+			GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+			bool vc = config.get(GMRenderConfigs::ViewCascade_Bool).toBool();
+			shaderProgram->setInt(VI_N(ShadowInfo.ViewCascade, s_viewCascade), vc ? 1 : 0);
 
 			// 设置当前的Cascade层级和Shadow Map矩阵
 			shaderProgram->setInt(VI_N(ShadowInfo.CascadedShadowLevel, s_cascadedShadowLevel), shadowSourceDesc->cascades);
@@ -500,10 +500,8 @@ void GMGLTechnique::setCascadeEndClip(GMCascadeLevel level, GMfloat endClip)
 {
 	D_BASE(d, GMGLTechnique);
 	IShaderProgram* shaderProgram = getShaderProgram();
-	for (GMsize_t i = 0; i < GMGraphicEngine::getMaxCascades(); ++i)
-	{
-		shaderProgram->setFloat(getVariableIndex(shaderProgram, d->cascadeEndClipVariableIndices[i], getShadowMapEndClipNames(i)), endClip);
-	}
+	shaderProgram->useProgram();
+	shaderProgram->setFloat(getVariableIndex(shaderProgram, d->cascadeEndClipVariableIndices[level], getShadowMapEndClipNames(level)), endClip);
 }
 
 void GMGLTechnique::prepareScreenInfo(IShaderProgram* shaderProgram)

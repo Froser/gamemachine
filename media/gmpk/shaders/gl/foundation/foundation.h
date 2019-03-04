@@ -31,15 +31,3 @@ struct GMShadowInfo
 };
 
 uniform GMShadowInfo GM_ShadowInfo;
-
-// Cascade Color
-const vec4 GM_CascadeColors[GM_MaxCascadeLevel] = {
-    vec4 ( 1.1f, 0.0f, 0.0f, 1.0f ),
-    vec4 ( 0.0f, 1.1f, 0.0f, 1.0f ),
-    vec4 ( 0.0f, 0.0f, 1.5f, 1.0f ),
-    vec4 ( 1.1f, 0.0f, 1.5f, 1.0f ),
-    vec4 ( 1.1f, 1.1f, 0.0f, 1.0f ),
-    vec4 ( 1.0f, 1.0f, 1.0f, 1.0f ),
-    vec4 ( 0.0f, 1.0f, 1.5f, 1.0f ),
-    vec4 ( 0.5f, 3.5f, 0.75f, 1.0f )
-};
