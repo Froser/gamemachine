@@ -168,67 +168,6 @@ namespace
 		return s_shadowMapNames[level];
 	}
 
-	void applyShadow(GMGLTechnique* tech, const GMShadowSourceDesc* shadowSourceDesc, IShaderProgram* shaderProgram, GMGLShadowFramebuffers* shadowFramebuffers, bool hasShadow)
-	{
-		D_OF(d, tech);
-		static IShaderProgram* lastProgram = nullptr;
-		static GMint64 lastShadowVersion = 0;
-		static const GMString s_shadowInfo = GMString(GM_VariablesDesc.ShadowInfo.ShadowInfo) + L".";
-		static const GMString s_position = s_shadowInfo + GM_VariablesDesc.ShadowInfo.Position;
-		static const GMString s_width = s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMapWidth;
-		static const GMString s_height = s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMapHeight;
-		static const GMString s_biasMin = s_shadowInfo + GM_VariablesDesc.ShadowInfo.BiasMin;
-		static const GMString s_biasMax = s_shadowInfo + GM_VariablesDesc.ShadowInfo.BiasMax;
-		static const GMString s_hasShadow = s_shadowInfo + GM_VariablesDesc.ShadowInfo.HasShadow;
-		static const GMString s_shadowMap = s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMap;
-		static const GMString s_cascadedShadowLevel = s_shadowInfo + GM_VariablesDesc.ShadowInfo.CascadedShadowLevel;
-		static const GMString s_viewCascade = s_shadowInfo + GM_VariablesDesc.ShadowInfo.ViewCascade;
-		static const GMString s_currentCascadeLevel = s_shadowInfo + GM_VariablesDesc.ShadowInfo.CurrentCascadeLevel;
-
-		if (hasShadow)
-		{
-			if (g_shadowDirty || lastShadowVersion != shadowSourceDesc->version)
-			{
-				lastProgram = shaderProgram;
-				lastShadowVersion = shadowSourceDesc->version;
-
-				shaderProgram->setBool(VI_N(ShadowInfo.HasShadow, s_hasShadow), 1);
-				const GMCamera& camera = shadowSourceDesc->camera;
-				GMFloat4 viewPosition;
-				shadowSourceDesc->position.loadFloat4(viewPosition);
-				shaderProgram->setVec4(VI_N(ShadowInfo.Position, s_position), viewPosition);
-				shaderProgram->setFloat(VI_N(ShadowInfo.BiasMin, s_biasMin), shadowSourceDesc->biasMin);
-				shaderProgram->setFloat(VI_N(ShadowInfo.BiasMax, s_biasMax), shadowSourceDesc->biasMax);
-
-				shaderProgram->setInt(VI_N(ShadowInfo.ShadowMapWidth, s_width), shadowFramebuffers->getShadowMapWidth());
-				shaderProgram->setInt(VI_N(ShadowInfo.ShadowMapHeight, s_height), shadowFramebuffers->getShadowMapHeight());
-				shaderProgram->setInt(VI_N(ShadowInfo.ShadowMap, s_shadowMap), GMTextureRegisterQuery<GMTextureType::ShadowMap>::Value);
-
-				g_shadowDirty = false;
-			}
-
-			// 是否显示CSM范围
-			GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
-			bool vc = config.get(GMRenderConfigs::ViewCascade_Bool).toBool();
-			shaderProgram->setInt(VI_N(ShadowInfo.ViewCascade, s_viewCascade), vc ? 1 : 0);
-
-			// 设置当前的Cascade层级和Shadow Map矩阵
-			shaderProgram->setInt(VI_N(ShadowInfo.CascadedShadowLevel, s_cascadedShadowLevel), shadowSourceDesc->cascades);
-
-			ICSMFramebuffers* csm = d->engine->getCSMFramebuffers();
-			GMCascadeLevel currentLevel = csm->currentLevel();
-			shaderProgram->setInt(VI_N(ShadowInfo.CurrentCascadeLevel, s_currentCascadeLevel), currentLevel);
-			shaderProgram->setMatrix4(getVariableIndex(shaderProgram, d->cascadeShadowMatrixVariableIndices[currentLevel], getShadowMapShadowMatrixNames(currentLevel)),
-				d->engine->getCascadeCameraVPMatrix(currentLevel)
-			);
-
-		}
-		else
-		{
-			shaderProgram->setBool(VI_N(ShadowInfo.HasShadow, s_hasShadow), 0);
-		}
-	}
-
 	GMTextureAsset createWhiteTexture(const IRenderContext* context)
 	{
 		GMTextureAsset texture;
@@ -624,6 +563,65 @@ void GMGLTechnique::prepareLights()
 	d->engine->activateLights(this);
 }
 
+void GMGLTechnique::prepareShadow(const GMShadowSourceDesc* shadowSourceDesc, GMGLShadowFramebuffers* shadowFramebuffers, bool hasShadow)
+{
+	D(d);
+	static const GMString s_shadowInfo = GMString(GM_VariablesDesc.ShadowInfo.ShadowInfo) + L".";
+	static const GMString s_position = s_shadowInfo + GM_VariablesDesc.ShadowInfo.Position;
+	static const GMString s_width = s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMapWidth;
+	static const GMString s_height = s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMapHeight;
+	static const GMString s_biasMin = s_shadowInfo + GM_VariablesDesc.ShadowInfo.BiasMin;
+	static const GMString s_biasMax = s_shadowInfo + GM_VariablesDesc.ShadowInfo.BiasMax;
+	static const GMString s_hasShadow = s_shadowInfo + GM_VariablesDesc.ShadowInfo.HasShadow;
+	static const GMString s_shadowMap = s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMap;
+	static const GMString s_cascadedShadowLevel = s_shadowInfo + GM_VariablesDesc.ShadowInfo.CascadedShadowLevel;
+	static const GMString s_viewCascade = s_shadowInfo + GM_VariablesDesc.ShadowInfo.ViewCascade;
+	static const GMString s_currentCascadeLevel = s_shadowInfo + GM_VariablesDesc.ShadowInfo.CurrentCascadeLevel;
+
+	IShaderProgram* shaderProgram = getShaderProgram();
+	if (hasShadow)
+	{
+		if (g_shadowDirty || d->shadowContext.lastShadowVersion != shadowSourceDesc->version)
+		{
+			d->shadowContext.lastShadowVersion = shadowSourceDesc->version;
+
+			shaderProgram->setBool(VI_N(ShadowInfo.HasShadow, s_hasShadow), 1);
+			const GMCamera& camera = shadowSourceDesc->camera;
+			GMFloat4 viewPosition;
+			shadowSourceDesc->position.loadFloat4(viewPosition);
+			shaderProgram->setVec4(VI_N(ShadowInfo.Position, s_position), viewPosition);
+			shaderProgram->setFloat(VI_N(ShadowInfo.BiasMin, s_biasMin), shadowSourceDesc->biasMin);
+			shaderProgram->setFloat(VI_N(ShadowInfo.BiasMax, s_biasMax), shadowSourceDesc->biasMax);
+
+			shaderProgram->setInt(VI_N(ShadowInfo.ShadowMapWidth, s_width), shadowFramebuffers->getShadowMapWidth());
+			shaderProgram->setInt(VI_N(ShadowInfo.ShadowMapHeight, s_height), shadowFramebuffers->getShadowMapHeight());
+			shaderProgram->setInt(VI_N(ShadowInfo.ShadowMap, s_shadowMap), GMTextureRegisterQuery<GMTextureType::ShadowMap>::Value);
+
+			g_shadowDirty = false;
+		}
+
+		// 是否显示CSM范围
+		GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+		bool vc = config.get(GMRenderConfigs::ViewCascade_Bool).toBool();
+		shaderProgram->setInt(VI_N(ShadowInfo.ViewCascade, s_viewCascade), vc ? 1 : 0);
+
+		// 设置当前的Cascade层级和Shadow Map矩阵
+		shaderProgram->setInt(VI_N(ShadowInfo.CascadedShadowLevel, s_cascadedShadowLevel), shadowSourceDesc->cascades);
+
+		ICSMFramebuffers* csm = d->engine->getCSMFramebuffers();
+		GMCascadeLevel currentLevel = csm->currentLevel();
+		shaderProgram->setInt(VI_N(ShadowInfo.CurrentCascadeLevel, s_currentCascadeLevel), currentLevel);
+		shaderProgram->setMatrix4(getVariableIndex(shaderProgram, d->cascadeShadowMatrixVariableIndices[currentLevel], getShadowMapShadowMatrixNames(currentLevel)),
+			d->engine->getCascadeCameraVPMatrix(currentLevel)
+		);
+
+	}
+	else
+	{
+		shaderProgram->setBool(VI_N(ShadowInfo.HasShadow, s_hasShadow), 0);
+	}
+}
+
 GMIlluminationModel GMGLTechnique::prepareIlluminationModel(GMModel* model)
 {
 	D(d);
@@ -705,11 +703,11 @@ void GMGLTechnique_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	{
 		GMGLShadowFramebuffers* shadowFramebuffers = gm_cast<GMGLShadowFramebuffers*>(db->engine->getShadowMapFramebuffers());
 		shadowFramebuffers->getShadowMapTexture().getTexture()->useTexture(0);
-		applyShadow(this, &shadowSourceDesc, shaderProgram, shadowFramebuffers, true);
+		prepareShadow(&shadowSourceDesc, shadowFramebuffers, true);
 	}
 	else
 	{
-		applyShadow(this, nullptr, shaderProgram, nullptr, false);
+		prepareShadow(nullptr, nullptr, false);
 	}
 
 	db->gammaHelper.setGamma(this, db->engine, shaderProgram);
@@ -973,11 +971,11 @@ void GMGLTechnique_LightPass::beginModel(GMModel* model, const GMGameObject* par
 	{
 		GMGLShadowFramebuffers* shadowFramebuffers = gm_cast<GMGLShadowFramebuffers*>(d->engine->getShadowMapFramebuffers());
 		shadowFramebuffers->getShadowMapTexture().getTexture()->useTexture(0);
-		applyShadow(this, &shadowSourceDesc, shaderProgram, shadowFramebuffers, true);
+		prepareShadow(&shadowSourceDesc, shadowFramebuffers, true);
 	}
 	else
 	{
-		applyShadow(this, nullptr, shaderProgram, nullptr, false);
+		prepareShadow(nullptr, nullptr, false);
 	}
 
 	d->gammaHelper.setGamma(this, d->engine, shaderProgram);

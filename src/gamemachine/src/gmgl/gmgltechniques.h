@@ -7,6 +7,7 @@
 BEGIN_NS
 
 class GMGLTechnique;
+class GMGLShadowFramebuffers;
 class GMGammaHelper
 {
 public:
@@ -24,12 +25,18 @@ GM_PRIVATE_OBJECT(GMGLTechnique)
 		GMScene* currentScene = nullptr;
 	};
 
+	struct ShadowContext
+	{
+		GMint64 lastShadowVersion = 0;
+	};
+
 	const IRenderContext* context = nullptr;
 	GMGLGraphicEngine* engine = nullptr;
 	const GMShaderVariablesDesc* variablesDesc = nullptr;
 	GMDebugConfig debugConfig;
 	GMGammaHelper gammaHelper;
 	TechniqueContext techContext;
+	ShadowContext shadowContext;
 
 	Vector<GMShaderVariablesIndices> indexBank;
 
@@ -98,6 +105,7 @@ protected:
 	void prepareDepth(GMModel* model);
 	void prepareDebug(GMModel* model);
 	void prepareLights();
+	void prepareShadow(const GMShadowSourceDesc* shadowSourceDesc, GMGLShadowFramebuffers* shadowFramebuffers, bool hasShadow);
 	GMIlluminationModel prepareIlluminationModel(GMModel* model);
 
 private:
