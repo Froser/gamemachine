@@ -115,6 +115,7 @@ public:
 	virtual void applyCascadedLevel(GMCascadeLevel) override;
 	virtual GMCascadeLevel currentLevel() override;
 	virtual GMfloat getEndClip(GMCascadeLevel) override;
+	virtual void setEachCascadeEndClip(GMCascadeLevel) override;
 
 public:
 	ID3D11ShaderResourceView* getShadowMapShaderResourceView();

@@ -409,7 +409,6 @@ bool GMDx11ShadowFramebuffers::init(const GMFramebuffersDesc& desc)
 	GM_DX11_SET_OBJECT_NAME_A(db->depthStencilTexture, "GM_ShadowMap");
 	GM_DX11_SET_OBJECT_NAME_A(d->depthShaderResourceView, "GM_ShadowMap_SRV");
 
-	const GMCamera& camera = d->shadowSource.camera;
 	for (GMCascadeLevel i = 0; i < d->shadowSource.cascades; ++i)
 	{
 		// 创建每一个cascade的viewport
@@ -420,12 +419,7 @@ bool GMDx11ShadowFramebuffers::init(const GMFramebuffersDesc& desc)
 		d->viewports[i].TopLeftX = d->shadowSource.width * i;
 		d->viewports[i].TopLeftY = 0;
 
-		// 根据相机透视矩阵，来算出每个裁剪范围
-		GMfloat intervalBegin = 0, intervalEnd = 0;
-		GMCSMHelper::getFrustumIntervals(db->context->getEngine()->getCamera(), d->shadowSource, i, intervalBegin, intervalEnd);
-		GMVec4 view = { 0, 0, intervalEnd, 1.f };
-		GMVec4 clip = view * camera.getProjectionMatrix();
-		d->cascadeEndClip[i] = clip.getZ();
+		setEachCascadeEndClip(i);
 	}
 
 	return true;
@@ -475,6 +469,19 @@ GMfloat GMDx11ShadowFramebuffers::getEndClip(GMCascadeLevel level)
 {
 	D(d);
 	return d->cascadeEndClip[level];
+}
+
+void GMDx11ShadowFramebuffers::setEachCascadeEndClip(GMCascadeLevel level)
+{
+	D(d);
+	D_BASE(db, Base);
+	// 根据相机透视矩阵，来算出每个裁剪范围
+	const GMCamera& camera = d->shadowSource.camera;
+	GMfloat intervalBegin = 0, intervalEnd = 0;
+	GMCSMHelper::getFrustumIntervals(db->context->getEngine()->getCamera(), d->shadowSource, level, intervalBegin, intervalEnd);
+	GMVec4 view = { 0, 0, intervalEnd, 1.f };
+	GMVec4 clip = view * camera.getProjectionMatrix();
+	d->cascadeEndClip[level] = clip.getZ();
 }
 
 ID3D11ShaderResourceView* GMDx11ShadowFramebuffers::getShadowMapShaderResourceView()

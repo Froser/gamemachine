@@ -318,6 +318,7 @@ GM_INTERFACE(ICSMFramebuffers)
 	virtual void applyCascadedLevel(GMCascadeLevel) = 0;
 	virtual GMCascadeLevel currentLevel() = 0;
 	virtual GMfloat getEndClip(GMCascadeLevel) = 0;
+	virtual void setEachCascadeEndClip(GMCascadeLevel) = 0;
 };
 
 enum class GMGeometryPassingState

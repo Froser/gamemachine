@@ -350,20 +350,34 @@ void GMGraphicEngine::generateShadowBuffer(const List<GMGameObject*>& forwardRen
 	{
 		if (d->shadow.cascades != d->lastShadow.cascades ||
 			d->shadow.width != d->lastShadow.width ||
-			d->shadow.height != d->lastShadow.height) //TODO or cameraChanged
+			d->shadow.height != d->lastShadow.height)
 		{
 			GM_delete(d->shadowDepthFramebuffers);
 			createShadowFramebuffers(&d->shadowDepthFramebuffers);
 			resetCSM();
 		}
+		else if (d->shadow.camera.getFrustum().getParameters() != d->lastShadow.camera.getFrustum().getParameters() ||
+			d->shadow.camera.getFrustum().getNear() != d->lastShadow.camera.getFrustum().getNear() ||
+			d->shadow.camera.getFrustum().getFar() != d->lastShadow.camera.getFrustum().getFar()
+			)
+		{
+			ICSMFramebuffers* csm = getCSMFramebuffers(); // csm和d->shadowDepthFramebuffers其实是同一个对象
+			for (GMCascadeLevel i = 0; i < d->shadow.cascades; ++i)
+			{
+				// 创建每一个cascade的viewport
+				csm->setEachCascadeEndClip(i);
+				resetCSM();
+			}
+		}
 	}
 
+
 	GM_ASSERT(d->shadowDepthFramebuffers);
-	ICSMFramebuffers* csm = getCSMFramebuffers(); // csm和d->shadowDepthFramebuffers其实是同一个对象
 	d->shadowDepthFramebuffers->clear(GMFramebuffersClearType::Depth);
 	d->shadowDepthFramebuffers->bind();
 
 	// 遍历每个cascaded level
+	ICSMFramebuffers* csm = getCSMFramebuffers(); // csm和d->shadowDepthFramebuffers其实是同一个对象
 	for (auto i = csm->cascadedBegin(); i != csm->cascadedEnd(); ++i)
 	{
 		csm->applyCascadedLevel(i);

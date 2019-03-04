@@ -76,7 +76,7 @@ GMFontHandle GMGlyphManager::addFontByFullName(const GMString& fontFullName)
 	for (GMsize_t i = 0; i < d->fonts.size(); ++i)
 	{
 		if (d->fonts[i].fontPath == fontFullName)
-			return i;
+			return gm_sizet_to_uint(i);
 	}
 
 	GMFont font;

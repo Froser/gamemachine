@@ -50,7 +50,7 @@ GM_PRIVATE_OBJECT(GMFrustum)
 {
 	GMFrustumType type = GMFrustumType::Perspective;
 
-	union
+	union Parameters
 	{
 		struct
 		{
@@ -111,6 +111,21 @@ class GMFrustum
 private:
 	static bool isBoundingBoxInside(const GMFrustumPlanes& planes, const GMVec3 (&vertices)[8]);
 };
+
+inline bool operator ==(const GM_PRIVATE_NAME(GMFrustum)::Parameters& lhs, const GM_PRIVATE_NAME(GMFrustum)::Parameters& rhs)
+{
+	return lhs.fovy == rhs.fovy &&
+		lhs.aspect == rhs.aspect &&
+		lhs.left == rhs.left &&
+		lhs.right == rhs.right &&
+		lhs.bottom == rhs.bottom &&
+		lhs.top == rhs.top;
+}
+
+inline bool operator !=(const GM_PRIVATE_NAME(GMFrustum)::Parameters& lhs, const GM_PRIVATE_NAME(GMFrustum)::Parameters& rhs)
+{
+	return !(lhs == rhs);
+}
 
 GM_PRIVATE_OBJECT(GMCamera)
 {
