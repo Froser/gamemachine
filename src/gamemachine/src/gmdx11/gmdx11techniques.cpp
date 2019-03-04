@@ -648,6 +648,7 @@ void GMDx11Technique::beginModel(GMModel* model, const GMGameObject* parent)
 
 			ID3DX11EffectScalarVariable* cascadedShadowLevel = bank.CascadedShadowLevel();
 			GM_DX_HR(cascadedShadowLevel->SetInt(shadowSourceDesc.cascades));
+			prepareShadow(false);
 		}
 		else
 		{
@@ -839,6 +840,60 @@ void GMDx11Technique::applyTextureAttribute(GMModel* model, GMTextureAsset textu
 		// 将这个Texture的Enabled设置为false
 		GM_DX_TRY(bank->enabled, bank->enabled->SetBool(FALSE));
 	}
+}
+
+void GMDx11Technique::prepareShadow(bool isDrawingShadow)
+{
+	D(d);
+	const GMShadowSourceDesc& shadowSourceDesc = getEngine()->getShadowSourceDesc();
+	GMFloat4 viewPosition;
+	shadowSourceDesc.position.loadFloat4(viewPosition);
+
+	// 设置变量
+	GMDx11EffectVariableBank& bank = getVarBank();
+	ID3DX11EffectVariable* shadowInfo = bank.ShadowInfo();
+	ID3DX11EffectVectorVariable* position = bank.ShadowPosition();
+	ID3DX11EffectScalarVariable* shadowMapWidth = bank.ShadowMapWidth();
+	ID3DX11EffectScalarVariable* shadowMapHeight = bank.ShadowMapHeight();
+	ID3DX11EffectScalarVariable* biasMin = bank.ShadowBiasMin();
+	ID3DX11EffectScalarVariable* biasMax = bank.ShadowBiasMax();
+
+	if (!isDrawingShadow) // 只有非绘制阴影时，才需要阴影贴图相关信息
+	{
+		if (d->lastShadowVersion != shadowSourceDesc.version)
+		{
+			const GMWindowStates& windowStates = d->context->getWindow()->getWindowStates();
+
+			GM_DX_HR(position->SetFloatVector(ValuePointer(viewPosition)));
+
+			GM_DX_HR(biasMin->SetFloat(shadowSourceDesc.biasMin));
+			GM_DX_HR(biasMax->SetFloat(shadowSourceDesc.biasMax));
+
+			GMDx11ShadowFramebuffers* shadowFramebuffers = gm_cast<GMDx11ShadowFramebuffers*>(getEngine()->getShadowMapFramebuffers());
+			GM_DX_HR(shadowMapWidth->SetInt(shadowFramebuffers->getShadowMapWidth()));
+			GM_DX_HR(shadowMapHeight->SetInt(shadowFramebuffers->getShadowMapHeight()));
+
+			ID3DX11EffectShaderResourceVariable* shadowMap = windowStates.sampleCount > 1 ? bank.ShadowMapMSAA() : bank.ShadowMap();
+			GM_DX_HR(shadowMap->SetResource(shadowFramebuffers->getShadowMapShaderResourceView()));
+
+			d->lastShadowVersion = shadowSourceDesc.version;
+		}
+	}
+
+	ID3DX11EffectScalarVariable* currentCascadeLevel = bank.CurrentCascadeLevel();
+	ID3DX11EffectScalarVariable* viewCascade = bank.ViewCascade();
+	ID3DX11EffectVariable* shadowMatrix = bank.ShadowMatrix();
+
+	// 是否显示CSM范围
+	GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+	bool vc = config.get(GMRenderConfigs::ViewCascade_Bool).toBool();
+	GM_DX_HR(viewCascade->SetBool(vc ? TRUE : FALSE));
+
+	// 设置当前的Cascade层级和Shadow Map矩阵
+	ICSMFramebuffers* csm = getEngine()->getCSMFramebuffers();
+	GMCascadeLevel currentLevel = csm->currentLevel();
+	GM_DX_HR(currentCascadeLevel->SetInt(currentLevel));
+	GM_DX_HR(shadowMatrix->GetElement(currentLevel)->AsMatrix()->SetMatrix(ValuePointer(getEngine()->getCascadeCameraVPMatrix(currentLevel))));
 }
 
 void GMDx11Technique::prepareBuffer(GMModel* model)
@@ -1284,7 +1339,6 @@ void GMDx11Technique_Deferred_3D_LightPass::prepareTextures(GMModel* model)
 void GMDx11Technique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D_BASE(d, GMDx11Technique);
-	const GMWindowStates& windowStates = d->context->getWindow()->getWindowStates();
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
 	shaderProgram->useProgram();
 	if (!d->inputLayout)
@@ -1315,43 +1369,7 @@ void GMDx11Technique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* p
 		shaderProgram->setMatrix4(VI(InverseTransposeModelMatrix), Identity<GMMat4>());
 	}
 
-	const GMShadowSourceDesc& shadowSourceDesc = getEngine()->getShadowSourceDesc();
-	GMFloat4 viewPosition;
-	shadowSourceDesc.position.loadFloat4(viewPosition);
-
-	// 设置变量
-	GMDx11EffectVariableBank& bank = getVarBank();
-	ID3DX11EffectVariable* shadowInfo = bank.ShadowInfo();
-	ID3DX11EffectVectorVariable* position = bank.ShadowPosition();
-	ID3DX11EffectVariable* shadowMatrix = bank.ShadowMatrix();
-	ID3DX11EffectScalarVariable* shadowMapWidth = bank.ShadowMapWidth();
-	ID3DX11EffectScalarVariable* shadowMapHeight = bank.ShadowMapHeight();
-	ID3DX11EffectScalarVariable* biasMin = bank.ShadowBiasMin();
-	ID3DX11EffectScalarVariable* biasMax = bank.ShadowBiasMax();
-	ID3DX11EffectScalarVariable* currentCascadeLevel = bank.CurrentCascadeLevel();
-	ID3DX11EffectScalarVariable* viewCascade = bank.ViewCascade();
-
-	// 是否显示CSM范围
-	GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
-	bool vc = config.get(GMRenderConfigs::ViewCascade_Bool).toBool();
-	GM_DX_HR(viewCascade->SetBool(vc ? TRUE : FALSE));
-
-	GM_DX_HR(position->SetFloatVector(ValuePointer(viewPosition)));
-
-	ICSMFramebuffers* csm = getEngine()->getCSMFramebuffers();
-	GMCascadeLevel currentLevel = csm->currentLevel();
-	GM_DX_HR(currentCascadeLevel->SetInt(currentLevel)); //TODO
-	GM_DX_HR(shadowMatrix->GetElement(currentLevel)->AsMatrix()->SetMatrix(ValuePointer(getEngine()->getCascadeCameraVPMatrix(currentLevel))));
-
-	GM_DX_HR(biasMin->SetFloat(shadowSourceDesc.biasMin));
-	GM_DX_HR(biasMax->SetFloat(shadowSourceDesc.biasMax));
-
-	GMDx11ShadowFramebuffers* shadowFramebuffers = gm_cast<GMDx11ShadowFramebuffers*>(getEngine()->getShadowMapFramebuffers());
-	GM_DX_HR(shadowMapWidth->SetInt(shadowFramebuffers->getShadowMapWidth()));
-	GM_DX_HR(shadowMapHeight->SetInt(shadowFramebuffers->getShadowMapHeight()));
-
-	ID3DX11EffectShaderResourceVariable* shadowMap = windowStates.sampleCount > 1 ? bank.ShadowMapMSAA() : bank.ShadowMap();
-	GM_DX_HR(shadowMap->SetResource(shadowFramebuffers->getShadowMapShaderResourceView()));
+	prepareShadow(true);
 }
 
 ID3DX11EffectTechnique* GMDx11Technique_Custom::getTechnique()

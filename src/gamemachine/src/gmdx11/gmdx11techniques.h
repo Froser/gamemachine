@@ -52,6 +52,7 @@ GM_PRIVATE_OBJECT(GMDx11Technique)
 	GMfloat gamma = 0;
 	Map<ID3DX11EffectVariable*, GMTextureAttributeBank> textureVariables;
 	GMShaderVariablesIndices indexBank = { 0 };
+	GMint64 lastShadowVersion = { 0 };
 };
 
 class GMDx11Technique : public GMObject, public ITechnique
@@ -105,6 +106,7 @@ protected:
 	virtual void prepareDepthStencil(GMModel* model);
 	virtual void prepareDebug(GMModel* model);
 	virtual void applyTextureAttribute(GMModel* model, GMTextureAsset texture, GMTextureType type);
+	virtual void prepareShadow(bool isDrawingShadow);
 	virtual ID3DX11EffectTechnique* getTechnique();
 	GMTextureAsset getTexture(GMTextureSampler& sampler);
 	void setGamma(IShaderProgram* shaderProgram);
