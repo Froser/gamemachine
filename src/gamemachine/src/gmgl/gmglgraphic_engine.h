@@ -94,11 +94,8 @@ public:
 	virtual GMGlyphManager* getGlyphManager() override;
 
 public:
-	virtual bool getInterface(GameMachineInterfaceID, void**) { return false; }
+	virtual bool getInterface(GameMachineInterfaceID, void**);
 	virtual bool setInterface(GameMachineInterfaceID, void*);
-	virtual void createShadowFramebuffers(OUT IFramebuffers** framebuffers) override;
-	virtual ICSMFramebuffers* getCSMFramebuffers() override;
-	virtual void resetCSM() override;
 
 public:
 	inline void setCubeMap(GMTextureAsset tex)

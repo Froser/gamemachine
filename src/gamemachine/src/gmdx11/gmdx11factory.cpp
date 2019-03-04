@@ -39,12 +39,20 @@ void GMDx11Factory::createGlyphManager(const IRenderContext* context, OUT GMGlyp
 
 void GMDx11Factory::createFramebuffer(const IRenderContext* context, OUT IFramebuffer** fb)
 {
-	*fb = new GMDx11Framebuffer(context);
+	if (fb)
+		*fb = new GMDx11Framebuffer(context);
 }
 
 void GMDx11Factory::createFramebuffers(const IRenderContext* context, OUT IFramebuffers** fbs)
 {
-	*fbs = new GMDx11Framebuffers(context);
+	if (fbs)
+		*fbs = new GMDx11Framebuffers(context);
+}
+
+void GMDx11Factory::createShadowFramebuffers(const IRenderContext* context, OUT IFramebuffers** fbs)
+{
+	if (fbs)
+		*fbs = new GMDx11ShadowFramebuffers(context);
 }
 
 void GMDx11Factory::createGBuffer(const IRenderContext* context, OUT IGBuffer** g)

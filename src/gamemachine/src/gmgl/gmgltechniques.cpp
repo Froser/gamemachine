@@ -967,7 +967,7 @@ void GMGLTechnique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* par
 {
 	GMGLTechnique_3D::beginModel(model, parent);
 
-	D_BASE(d, Base);
+	D_BASE(d, GMGLTechnique);
 	IShaderProgram* shaderProgram = getShaderProgram();
 
 	if (parent)
@@ -989,6 +989,21 @@ void GMGLTechnique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* par
 		s_shadow,
 		GMShaderType::Pixel);
 	GM_ASSERT(b);
+}
+
+void GMGLTechnique_3D_Shadow::setCascadeCamera(GMCascadeLevel level, const GMCamera& camera)
+{
+	D(d);
+	d->shadowCameras[level] = camera;
+}
+
+void GMGLTechnique_3D_Shadow::setCascadeEndClip(GMCascadeLevel level, GMfloat endClip)
+{
+	D(d);
+	//TODO
+	GM_ASSERT(false);
+	//GMDx11EffectVariableBank& bank = getVarBank();
+	//GM_DX_HR(bank.EndClip()->GetElement(level)->AsScalar()->SetFloat(endClip));
 }
 
 IShaderProgram* GMGLTechnique_Custom::getShaderProgram()

@@ -7,6 +7,7 @@
 #include "foundation/gmprofile.h"
 #include "foundation/gmconfigs.h"
 #include "gmprimitivemanager.h"
+#include "gmcsmhelper.h"
 
 static GMShaderVariablesDesc s_defaultShaderVariablesDesc =
 {
@@ -295,6 +296,60 @@ ICSMFramebuffers* GMGraphicEngine::getCSMFramebuffers()
 	ICSMFramebuffers* csm = nullptr;
 	getInterface(GameMachineInterfaceID::CSMFramebuffer, (void**)&csm);
 	return csm;
+}
+
+void GMGraphicEngine::createShadowFramebuffers(OUT IFramebuffers** framebuffers)
+{
+	D(d);
+	GM_ASSERT(framebuffers);
+
+	IFramebuffers* sdframebuffers = nullptr;
+	GM.getFactory()->createShadowFramebuffers(d->context, &sdframebuffers);
+	GM_ASSERT(sdframebuffers);
+
+	(*framebuffers) = sdframebuffers;
+
+	GMFramebuffersDesc desc;
+	GMRect rect;
+	// 构造一个 (width * cascadedShadowLevel, height) 的shadow map
+	rect.width = d->shadow.width * d->shadow.cascades;
+	rect.height = d->shadow.height;
+	desc.rect = rect;
+
+	getCSMFramebuffers()->setShadowSource(d->shadow);
+
+	bool succeed = sdframebuffers->init(desc);
+	GM_ASSERT(succeed);
+}
+
+void GMGraphicEngine::resetCSM()
+{
+	ICSMFramebuffers* csm = getCSMFramebuffers();
+	ICSMTechnique* shadowTech = nullptr;
+	bool gotInterface = getInterface(GameMachineInterfaceID::CSMTechnique, (void**)&shadowTech);
+	GM_ASSERT(gotInterface);
+
+	const GMShadowSourceDesc& shadowSourceDesc = getShadowSourceDesc();
+	if (shadowSourceDesc.cascades > 1)
+	{
+		for (GMCascadeLevel i = 0; i < shadowSourceDesc.cascades; ++i)
+		{
+			csm->applyCascadedLevel(i);
+
+			// 我们需要计算出此层的投影和frustum
+			GMCamera shadowCamera = shadowSourceDesc.camera;
+			GMCSMHelper::setOrthoCamera(csm, getCamera(), shadowSourceDesc, shadowCamera);
+			shadowTech->setCascadeCamera(i, shadowCamera);
+
+			// 设置End clip
+			shadowTech->setCascadeEndClip(i, csm->getEndClip(i));
+		}
+	}
+	else
+	{
+		// 如果只有一层，则不使用CSM
+		shadowTech->setCascadeCamera(0, shadowSourceDesc.camera);
+	}
 }
 
 void GMGraphicEngine::createFilterFramebuffer()

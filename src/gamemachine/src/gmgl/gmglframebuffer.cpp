@@ -4,6 +4,7 @@
 #include "gmgltexture.h"
 #include "gmengine/gmgraphicengine.h"
 #include "foundation/gamemachine.h"
+#include "gmengine/gmcsmhelper.h"
 
 GM_PRIVATE_OBJECT_UNALIGNED(GMGLFramebufferTexture)
 {
@@ -401,20 +402,30 @@ bool GMGLShadowFramebuffers::init(const GMFramebuffersDesc& desc)
 	D_BASE(db, Base);
 	d->width = desc.rect.width;
 	d->height = desc.rect.height;
+
+	for (GMCascadeLevel i = 0; i < d->shadowSource.cascades; ++i)
+	{
+		// 创建每一个cascade的viewport
+		d->viewports[i].height = d->shadowSource.height;
+		d->viewports[i].width = d->shadowSource.width;
+		d->viewports[i].topLeftX = d->shadowSource.width * i;
+		d->viewports[i].topLeftY = 0;
+
+		setEachCascadeEndClip(i);
+	}
+
 	return true;
 }
 
 void GMGLShadowFramebuffers::use()
 {
-	D_BASE(d, Base);
-	glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
-	setViewport();
-}
+	D(d);
+	D_BASE(db, Base);
+	glBindFramebuffer(GL_FRAMEBUFFER, db->fbo);
 
-
-void gm::GMGLShadowFramebuffers::use(GMsize_t index)
-{
-	//TODO
+	// 选择当前的viewport
+	const auto& viewport = d->viewports[d->currentViewport];
+	glViewport(viewport.topLeftX, viewport.topLeftY, viewport.width, viewport.height);
 }
 
 void GMGLShadowFramebuffers::bind()
@@ -450,4 +461,54 @@ void GMGLShadowFramebuffers::createDepthStencilBuffer(const GMFramebufferDesc& d
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	GM_ASSERT(status == GL_FRAMEBUFFER_COMPLETE);
+}
+
+void GMGLShadowFramebuffers::setShadowSource(const GMShadowSourceDesc& shadowSource)
+{
+	D(d);
+	d->shadowSource = shadowSource;
+}
+
+GMCascadeLevel GMGLShadowFramebuffers::cascadedBegin()
+{
+	D(d);
+	return 0;
+}
+
+GMCascadeLevel GMGLShadowFramebuffers::cascadedEnd()
+{
+	D(d);
+	return d->shadowSource.cascades;
+}
+
+void GMGLShadowFramebuffers::applyCascadedLevel(GMCascadeLevel vp)
+{
+	D(d);
+	d->currentViewport = vp;
+	use();
+}
+
+GMCascadeLevel GMGLShadowFramebuffers::currentLevel()
+{
+	D(d);
+	return d->currentViewport;
+}
+
+GMfloat GMGLShadowFramebuffers::getEndClip(GMCascadeLevel level)
+{
+	D(d);
+	return d->cascadeEndClip[level];
+}
+
+void GMGLShadowFramebuffers::setEachCascadeEndClip(GMCascadeLevel level)
+{
+	D(d);
+	D_BASE(db, Base);
+	// 根据相机透视矩阵，来算出每个裁剪范围
+	const GMCamera& camera = d->shadowSource.camera;
+	GMfloat intervalBegin = 0, intervalEnd = 0;
+	GMCSMHelper::getFrustumIntervals(db->context->getEngine()->getCamera(), d->shadowSource, level, intervalBegin, intervalEnd);
+	GMVec4 view = { 0, 0, intervalEnd, 1.f };
+	GMVec4 clip = view * camera.getProjectionMatrix();
+	d->cascadeEndClip[level] = clip.getZ();
 }

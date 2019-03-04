@@ -105,6 +105,9 @@ bool GMDx11GraphicEngine::getInterface(GameMachineInterfaceID id, void** out)
 {
 	D(d);
 	D_BASE(db, Base);
+	if (!out)
+		return false;
+
 	switch (id)
 	{
 	case GameMachineInterfaceID::D3D11Device:
@@ -144,56 +147,27 @@ bool GMDx11GraphicEngine::getInterface(GameMachineInterfaceID id, void** out)
 		(*out) = gm_cast<ICSMFramebuffers*>(sdframebuffers);
 		break;
 	}
+	case GameMachineInterfaceID::CSMTechnique:
+	{
+		bool drawingShadowCache = db->isDrawingShadow;
+		if (!db->isDrawingShadow)
+		{
+			db->isDrawingShadow = true;
+			GMDx11Technique_3D_Shadow* shadowTech = gm_cast<GMDx11Technique_3D_Shadow*>(getTechnique(GMModelType::Model3D));
+			db->isDrawingShadow = drawingShadowCache;
+			(*out) = static_cast<ICSMTechnique*>(shadowTech);
+		}
+		else
+		{
+			GMDx11Technique_3D_Shadow* shadowTech = gm_cast<GMDx11Technique_3D_Shadow*>(getTechnique(GMModelType::Model3D));
+			(*out) = static_cast<ICSMTechnique*>(shadowTech);
+		}
+		break;
+	}
 	default:
 		return false;
 	}
 	return true;
-}
-
-void GMDx11GraphicEngine::createShadowFramebuffers(OUT IFramebuffers** framebuffers)
-{
-	D_BASE(d, Base);
-	GMDx11ShadowFramebuffers* sdframebuffers = new GMDx11ShadowFramebuffers(d->context);
-	(*framebuffers) = sdframebuffers;
-
-	GMFramebuffersDesc desc;
-	GMRect rect;
-	// 构造一个 (width * cascadedShadowLevel, height) 的shadow map
-	rect.width = d->shadow.width * d->shadow.cascades;
-	rect.height = d->shadow.height;
-	desc.rect = rect;
-
-	getCSMFramebuffers()->setShadowSource(d->shadow);
-
-	bool succeed = sdframebuffers->init(desc);
-	GM_ASSERT(succeed);
-}
-
-void GMDx11GraphicEngine::resetCSM()
-{
-	ICSMFramebuffers* csm = getCSMFramebuffers();
-	GMDx11Technique_3D_Shadow* shadowTech = gm_cast<GMDx11Technique_3D_Shadow*>(getTechnique(GMModelType::Model3D));
-	const GMShadowSourceDesc& shadowSourceDesc = getShadowSourceDesc();
-	if (shadowSourceDesc.cascades > 1)
-	{
-		for (GMCascadeLevel i = 0; i < shadowSourceDesc.cascades; ++i)
-		{
-			csm->applyCascadedLevel(i);
-
-			// 我们需要计算出此层的投影和frustum
-			GMCamera shadowCamera = shadowSourceDesc.camera;
-			GMCSMHelper::setOrthoCamera(csm, getCamera(), shadowSourceDesc, shadowCamera);
-			shadowTech->setCascadeCamera(i, shadowCamera);
-
-			// 设置End clip
-			shadowTech->setCascadeEndClip(i, csm->getEndClip(i));
-		}
-	}
-	else
-	{
-		// 如果只有一层，则不使用CSM
-		shadowTech->setCascadeCamera(0, shadowSourceDesc.camera);
-	}
 }
 
 bool GMDx11GraphicEngine::msgProc(const GMMessage& e)

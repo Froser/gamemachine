@@ -281,8 +281,8 @@ public:
 	virtual ICSMFramebuffers* getCSMFramebuffers();
 
 protected:
-	virtual void createShadowFramebuffers(OUT IFramebuffers** framebuffers) = 0;
-	virtual void resetCSM() = 0;
+	virtual void createShadowFramebuffers(OUT IFramebuffers** framebuffers);
+	virtual void resetCSM();
 	virtual void createFilterFramebuffer();
 	virtual void generateShadowBuffer(const List<GMGameObject*>& forwardRenderingObjects, const List<GMGameObject*>& deferredRenderingObjects);
 	virtual bool needUseFilterFramebuffer();

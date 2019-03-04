@@ -107,9 +107,19 @@ GM_PRIVATE_OBJECT(GMGLShadowFramebuffers)
 	GMint32 height = 0;
 	GMTextureAsset shadowMapTexture;
 	GMShadowSourceDesc shadowSource;
+	GMfloat cascadeEndClip[GMGraphicEngine::getMaxCascades()] = { 0 };
+	GMCascadeLevel currentViewport;
+
+	struct
+	{
+		GMfloat topLeftX;
+		GMfloat topLeftY;
+		GMfloat width;
+		GMfloat height;
+	} viewports[GMGraphicEngine::getMaxCascades()] = { 0 };
 };
 
-class GMGLShadowFramebuffers : public GMGLFramebuffers
+class GMGLShadowFramebuffers : public GMGLFramebuffers, public ICSMFramebuffers
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMGLShadowFramebuffers, GMGLFramebuffers)
 
@@ -121,7 +131,14 @@ public:
 	virtual void use() override;
 	virtual void bind() override;
 
-	virtual void use(GMsize_t index);
+public:
+	virtual void setShadowSource(const GMShadowSourceDesc& shadowSource);
+	virtual GMCascadeLevel cascadedBegin() override;
+	virtual GMCascadeLevel cascadedEnd() override;
+	virtual void applyCascadedLevel(GMCascadeLevel) override;
+	virtual GMCascadeLevel currentLevel() override;
+	virtual GMfloat getEndClip(GMCascadeLevel) override;
+	virtual void setEachCascadeEndClip(GMCascadeLevel) override;
 
 public:
 	inline GMint32 getShadowMapWidth()

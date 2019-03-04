@@ -100,6 +100,7 @@ enum class GameMachineInterfaceID
 	D3D11Effect,
 
 	CSMFramebuffer,
+	CSMTechnique,
 
 	CustomInterfaceBegin,
 	//用户自定义接口须在此之后
@@ -319,6 +320,12 @@ GM_INTERFACE(ICSMFramebuffers)
 	virtual GMCascadeLevel currentLevel() = 0;
 	virtual GMfloat getEndClip(GMCascadeLevel) = 0;
 	virtual void setEachCascadeEndClip(GMCascadeLevel) = 0;
+};
+
+GM_INTERFACE(ICSMTechnique)
+{
+	virtual void setCascadeCamera(GMCascadeLevel level, const GMCamera& camera) = 0;
+	virtual void setCascadeEndClip(GMCascadeLevel level, GMfloat endClip) = 0;
 };
 
 enum class GMGeometryPassingState
@@ -654,6 +661,7 @@ GM_INTERFACE(IFactory)
 	virtual void createGlyphManager(const IRenderContext* context, OUT GMGlyphManager**) = 0;
 	virtual void createFramebuffer(const IRenderContext* context, OUT IFramebuffer**) = 0;
 	virtual void createFramebuffers(const IRenderContext* context, OUT IFramebuffers**) = 0;
+	virtual void createShadowFramebuffers(const IRenderContext* context, OUT IFramebuffers**) = 0;
 	virtual void createGBuffer(const IRenderContext* context, OUT IGBuffer**) = 0;
 	virtual void createLight(GMLightType, OUT ILight**) = 0;
 	virtual void createWhiteTexture(const IRenderContext* context, REF GMTextureAsset&) = 0;

@@ -36,12 +36,20 @@ void GMGLFactory::createGlyphManager(const IRenderContext* context, OUT GMGlyphM
 
 void GMGLFactory::createFramebuffer(const IRenderContext* context, OUT IFramebuffer** fb)
 {
-	*fb = new GMGLFramebuffer(context);
+	if (fb)
+		*fb = new GMGLFramebuffer(context);
 }
 
 void GMGLFactory::createFramebuffers(const IRenderContext* context, OUT IFramebuffers** fbs)
 {
-	*fbs = new GMGLFramebuffers(context);
+	if (fbs)
+		*fbs = new GMGLFramebuffers(context);
+}
+
+void GMGLFactory::createShadowFramebuffers(const IRenderContext* context, OUT IFramebuffers** fbs)
+{
+	if (fbs)
+		*fbs = new GMGLShadowFramebuffers(context);
 }
 
 void GMGLFactory::createGBuffer(const IRenderContext* context, OUT IGBuffer** g)

@@ -12,6 +12,7 @@
 #include "foundation/gmprofile.h"
 #include "gmglframebuffer.h"
 #include "gmglglyphmanager.h"
+#include "gmengine/gmcsmhelper.h"
 
 extern "C"
 {
@@ -84,6 +85,42 @@ void GMGLGraphicEngine::installShaders()
 	d->renderTechniqueManager->init();
 }
 
+bool GMGLGraphicEngine::getInterface(GameMachineInterfaceID id, void** out)
+{
+	D_BASE(db, Base);
+	if (!out)
+		return false;
+
+	switch (id)
+	{
+	case GameMachineInterfaceID::CSMFramebuffer:
+	{
+		GMGLShadowFramebuffers* sdframebuffers = gm_cast<GMGLShadowFramebuffers*>(db->shadowDepthFramebuffers);
+		GM_ASSERT(sdframebuffers);
+		(*out) = gm_cast<ICSMFramebuffers*>(sdframebuffers);
+		break;
+	}
+	case GameMachineInterfaceID::CSMTechnique:
+	{
+		bool drawingShadowCache = db->isDrawingShadow;
+		if (!db->isDrawingShadow)
+		{
+			db->isDrawingShadow = true;
+			GMGLTechnique_3D_Shadow* shadowTech = gm_cast<GMGLTechnique_3D_Shadow*>(getTechnique(GMModelType::Model3D));
+			db->isDrawingShadow = drawingShadowCache;
+			(*out) = static_cast<ICSMTechnique*>(shadowTech);
+		}
+		else
+		{
+			GMGLTechnique_3D_Shadow* shadowTech = gm_cast<GMGLTechnique_3D_Shadow*>(getTechnique(GMModelType::Model3D));
+			(*out) = static_cast<ICSMTechnique*>(shadowTech);
+		}
+		break;
+	}
+	}
+	return false;
+}
+
 bool GMGLGraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
 {
 	D(d);
@@ -105,32 +142,6 @@ bool GMGLGraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
 		return false;
 	}
 	return true;
-}
-
-void GMGLGraphicEngine::createShadowFramebuffers(OUT IFramebuffers** framebuffers)
-{
-	D_BASE(d, Base);
-	GMGLShadowFramebuffers* sdframebuffers = new GMGLShadowFramebuffers(d->context);
-	(*framebuffers) = sdframebuffers;
-
-	GMFramebuffersDesc desc;
-	GMRect rect;
-	rect.width = d->shadow.width;
-	rect.height = d->shadow.height;
-	desc.rect = rect;
-	bool succeed = sdframebuffers->init(desc);
-	GM_ASSERT(succeed);
-}
-
-ICSMFramebuffers* GMGLGraphicEngine::getCSMFramebuffers()
-{
-	GM_ASSERT(false);
-	return nullptr;
-}
-
-void GMGLGraphicEngine::resetCSM()
-{
-	GM_ASSERT(false);
 }
 
 void GMGLGraphicEngine::activateLights(ITechnique* technique)

@@ -16,6 +16,7 @@ public:
 	virtual void createGlyphManager(const IRenderContext* context, OUT GMGlyphManager**) override;
 	virtual void createFramebuffer(const IRenderContext* context, OUT IFramebuffer**) override;
 	virtual void createFramebuffers(const IRenderContext* context, OUT IFramebuffers**) override;
+	virtual void createShadowFramebuffers(const IRenderContext* context, OUT IFramebuffers**) override;
 	virtual void createGBuffer(const IRenderContext* context, OUT IGBuffer**) override;
 	virtual void createLight(GMLightType, OUT ILight**) override;
 	virtual void createWhiteTexture(const IRenderContext* context, REF GMTextureAsset&) override;

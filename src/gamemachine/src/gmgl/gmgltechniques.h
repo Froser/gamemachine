@@ -218,13 +218,24 @@ protected:
 	void prepareTextures(GMModel* model);
 };
 
-class GMGLTechnique_3D_Shadow : public GMGLTechnique_3D
+GM_PRIVATE_OBJECT(GMGLTechnique_3D_Shadow)
 {
+	GMCamera shadowCameras[GMGraphicEngine::getMaxCascades()];
+};
+
+class GMGLTechnique_3D_Shadow : public GMGLTechnique_3D, public ICSMTechnique
+{
+	GM_DECLARE_PRIVATE_AND_BASE(GMGLTechnique_3D_Shadow, GMGLTechnique_3D)
+
 public:
 	using GMGLTechnique_3D::GMGLTechnique_3D;
 
 protected:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
+
+public:
+	virtual void setCascadeCamera(GMCascadeLevel level, const GMCamera& camera) override;
+	virtual void setCascadeEndClip(GMCascadeLevel level, GMfloat endClip) override;
 };
 
 class GMGLTechnique_Particle : public GMGLTechnique_2D
