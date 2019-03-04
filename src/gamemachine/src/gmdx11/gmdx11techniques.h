@@ -114,6 +114,9 @@ private:
 	GMTextureAsset getWhiteTexture();
 	void updateBoneTransforms(IShaderProgram* shaderProgram, GMModel* model);
 
+protected:
+	virtual void setCascadeEndClip(GMCascadeLevel level, GMfloat endClip);
+
 public:
 	static const std::string& getTechniqueNameByTechniqueId(GMRenderTechinqueID id);
 };
@@ -233,15 +236,8 @@ private:
 	void passAllAndDraw(GMModel* model);
 };
 
-GM_PRIVATE_OBJECT(GMDx11Technique_3D_Shadow)
+class GMDx11Technique_3D_Shadow : public GMDx11Technique_3D
 {
-	GMCamera shadowCameras[GMGraphicEngine::getMaxCascades()];
-};
-
-class GMDx11Technique_3D_Shadow : public GMDx11Technique_3D, public ICSMTechnique
-{
-	GM_DECLARE_PRIVATE_AND_BASE(GMDx11Technique_3D_Shadow, GMDx11Technique_3D)
-
 public:
 	using GMDx11Technique_3D::GMDx11Technique_3D;
 
@@ -252,10 +248,6 @@ protected:
 	}
 
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
-
-public:
-	virtual void setCascadeCamera(GMCascadeLevel level, const GMCamera& camera) override;
-	virtual void setCascadeEndClip(GMCascadeLevel level, GMfloat endClip) override;
 };
 
 class GMDx11Technique_Particle : public GMDx11Technique

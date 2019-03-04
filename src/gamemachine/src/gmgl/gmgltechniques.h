@@ -56,7 +56,9 @@ GM_PRIVATE_OBJECT(GMGLTechnique)
 		GMint32 ScreenHeight;
 	};
 	Vector<ScreenInfoIndices> screenInfoIndices;
-	Array<GMint32, GMScene::MaxBoneCount> boneVariableIndices;
+	Array<GMint32, GMScene::MaxBoneCount> boneVariableIndices = { 0 };
+	Array<GMint32, GMGraphicEngine::getMaxCascades()> cascadeEndClipVariableIndices = { 0 };
+	Array<GMint32, GMGraphicEngine::getMaxCascades()> cascadeShadowMatrixVariableIndices = { 0 };
 };
 
 class GMGLTechnique : public GMObject, public ITechnique
@@ -85,6 +87,7 @@ protected:
 	virtual bool drawTexture(GMModel* model, GMTextureType type);
 	virtual GMTextureAsset getTexture(GMTextureSampler& frames);
 	virtual void updateCameraMatrices(IShaderProgram* shaderProgram);
+	virtual void setCascadeEndClip(GMCascadeLevel level, GMfloat endClip);
 
 protected:
 	void prepareScreenInfo(IShaderProgram* shaderProgram);
@@ -93,7 +96,6 @@ protected:
 	void prepareFrontFace(GMModel* model);
 	void prepareCull(GMModel* model);
 	void prepareDepth(GMModel* model);
-	void prepareLine(GMModel* model);
 	void prepareDebug(GMModel* model);
 	void prepareLights();
 	GMIlluminationModel prepareIlluminationModel(GMModel* model);
@@ -218,24 +220,15 @@ protected:
 	void prepareTextures(GMModel* model);
 };
 
-GM_PRIVATE_OBJECT(GMGLTechnique_3D_Shadow)
+class GMGLTechnique_3D_Shadow : public GMGLTechnique_3D
 {
-	GMCamera shadowCameras[GMGraphicEngine::getMaxCascades()];
-};
-
-class GMGLTechnique_3D_Shadow : public GMGLTechnique_3D, public ICSMTechnique
-{
-	GM_DECLARE_PRIVATE_AND_BASE(GMGLTechnique_3D_Shadow, GMGLTechnique_3D)
+	typedef GMGLTechnique_3D Base;
 
 public:
 	using GMGLTechnique_3D::GMGLTechnique_3D;
 
 protected:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
-
-public:
-	virtual void setCascadeCamera(GMCascadeLevel level, const GMCamera& camera) override;
-	virtual void setCascadeEndClip(GMCascadeLevel level, GMfloat endClip) override;
 };
 
 class GMGLTechnique_Particle : public GMGLTechnique_2D

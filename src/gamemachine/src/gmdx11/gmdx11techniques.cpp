@@ -371,6 +371,13 @@ void GMDx11Technique::updateBoneTransforms(IShaderProgram* shaderProgram, GMMode
 	}
 }
 
+void GMDx11Technique::setCascadeEndClip(GMCascadeLevel level, GMfloat endClip)
+{
+	D(d);
+	GMDx11EffectVariableBank& bank = getVarBank();
+	GM_DX_HR(bank.EndClip()->GetElement(level)->AsScalar()->SetFloat(endClip));
+}
+
 const std::string& GMDx11Technique::getTechniqueNameByTechniqueId(GMRenderTechinqueID id)
 {
 	static Vector<std::string> s_names;
@@ -565,6 +572,17 @@ void GMDx11Technique::beginScene(GMScene* scene)
 {
 	D(d);
 	d->techContext.currentScene = scene;
+
+	// 如果有阴影，设置好阴影所有参数
+	const GMShadowSourceDesc& shadowSourceDesc = getEngine()->getShadowSourceDesc();
+	if (shadowSourceDesc.type != GMShadowSourceDesc::NoShadow)
+	{
+		ICSMFramebuffers* csm = getEngine()->getCSMFramebuffers();
+		for (GMCascadeLevel i = 0; i < shadowSourceDesc.cascades; ++i)
+		{
+			setCascadeEndClip(i, csm->getEndClip(i));
+		}
+	}
 }
 
 void GMDx11Technique::endScene()
@@ -1265,8 +1283,7 @@ void GMDx11Technique_Deferred_3D_LightPass::prepareTextures(GMModel* model)
 
 void GMDx11Technique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* parent)
 {
-	D(_d);
-	D_BASE(d, Base);
+	D_BASE(d, GMDx11Technique);
 	const GMWindowStates& windowStates = d->context->getWindow()->getWindowStates();
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
 	shaderProgram->useProgram();
@@ -1323,10 +1340,8 @@ void GMDx11Technique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* p
 
 	ICSMFramebuffers* csm = getEngine()->getCSMFramebuffers();
 	GMCascadeLevel currentLevel = csm->currentLevel();
-	GM_DX_HR(currentCascadeLevel->SetInt(currentLevel));
-	GM_DX_HR(shadowMatrix->GetElement(currentLevel)->AsMatrix()->SetMatrix(
-		ValuePointer(_d->shadowCameras[currentLevel].getViewMatrix() * _d->shadowCameras[currentLevel].getProjectionMatrix()))
-	);
+	GM_DX_HR(currentCascadeLevel->SetInt(currentLevel)); //TODO
+	GM_DX_HR(shadowMatrix->GetElement(currentLevel)->AsMatrix()->SetMatrix(ValuePointer(getEngine()->getCascadeCameraVPMatrix(currentLevel))));
 
 	GM_DX_HR(biasMin->SetFloat(shadowSourceDesc.biasMin));
 	GM_DX_HR(biasMax->SetFloat(shadowSourceDesc.biasMax));
@@ -1337,19 +1352,6 @@ void GMDx11Technique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* p
 
 	ID3DX11EffectShaderResourceVariable* shadowMap = windowStates.sampleCount > 1 ? bank.ShadowMapMSAA() : bank.ShadowMap();
 	GM_DX_HR(shadowMap->SetResource(shadowFramebuffers->getShadowMapShaderResourceView()));
-}
-
-void GMDx11Technique_3D_Shadow::setCascadeCamera(GMCascadeLevel level, const GMCamera& camera)
-{
-	D(d);
-	d->shadowCameras[level] = camera;
-}
-
-void GMDx11Technique_3D_Shadow::setCascadeEndClip(GMCascadeLevel level, GMfloat endClip)
-{
-	D(d);
-	GMDx11EffectVariableBank& bank = getVarBank();
-	GM_DX_HR(bank.EndClip()->GetElement(level)->AsScalar()->SetFloat(endClip));
 }
 
 ID3DX11EffectTechnique* GMDx11Technique_Custom::getTechnique()

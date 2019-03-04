@@ -1,3 +1,6 @@
+// 顶点屏幕坐标z值，未除以w，用于CSM相关计算
+in float _z;
+
 // 光照相关
 #define MAX_LIGHT_COUNT 50
 struct GM_Attenuation_t
@@ -208,20 +211,65 @@ vec3 calculateRefractionByNormalTangent(vec3 worldPos, GMTangentSpace tangentSpa
     return calculateRefractionByNormalWorld(worldPos, normal_world_N, Refractivity);
 }
 
-float calculateShadow(mat4 shadowMatrix, vec4 worldPos, vec3 normal_N)
+float calculateShadow(PS_3D_INPUT vertex, mat4 shadowMatrix[GM_MaxCascadeLevel])
 {
     if (GM_ShadowInfo.HasShadow == 0)
         return 1.0f;
 
-    vec4 fragPos = shadowMatrix * worldPos;
+    int cascade = 0;
+    if (GM_ShadowInfo.CascadedShadowLevel > 1)
+    {
+        for (int i = 0; i < GM_ShadowInfo.CascadedShadowLevel; ++i)
+        {
+            if (_z <= GM_ShadowInfo.EndClip[i])
+            {
+                cascade = i;
+                break;
+            }
+        }
+    }
+
+    vec4 worldPos = vec4(vertex.WorldPos, 1);
+    vec3 normal_N = vertex.Normal_World_N;
+    vec4 fragPos = shadowMatrix[cascade] * worldPos;
     vec3 projCoords = fragPos.xyz / fragPos.w;
     if (projCoords.z > 1.0f)
         return 1.0f;
     projCoords = projCoords * 0.5f + 0.5f;
 
     float bias = (GM_ShadowInfo.BiasMin == GM_ShadowInfo.BiasMax) ? GM_ShadowInfo.BiasMin : max(GM_ShadowInfo.BiasMax * (1.0 - dot(normal_N, normalize(worldPos.xyz - GM_ShadowInfo.Position.xyz))), GM_ShadowInfo.BiasMin);
-    float closestDepth = texture(GM_ShadowInfo.GM_ShadowMap, projCoords.xy).r;
+
+    float closestDepth = 0.f;
+    if (GM_ShadowInfo.CascadedShadowLevel == 1)
+    {
+        closestDepth = texture(GM_ShadowInfo.GM_ShadowMap, projCoords.xy).r;
+    }
+    else
+    {
+        // 每一份Shadow Map的缩放。例如，假设Cascade Level = 3，那么第一幅Shadow Map采样范围就是0~0.333。
+        float projRatio = 1.f / GM_ShadowInfo.CascadedShadowLevel;
+
+        vec2 projCoordsInCSM = vec2(projRatio * (projCoords.x + cascade), projCoords.y);
+        closestDepth = texture(GM_ShadowInfo.GM_ShadowMap, projCoordsInCSM.xy).r;
+    }
     return projCoords.z - bias > closestDepth ? 0.f : 1.f;
+}
+
+vec4 viewCascade()
+{
+    vec4 cascadeIndicator = vec4(1, 1, 1, 1);
+    if (GM_ShadowInfo.HasShadow == 1 && GM_ShadowInfo.ViewCascade == 1)
+    {
+        for (int i = 0; i < GM_ShadowInfo.CascadedShadowLevel; ++i)
+        {
+            if (_z <= GM_ShadowInfo.EndClip[i])
+            {
+                cascadeIndicator = GM_CascadeColors[i];
+                break;
+            }
+        }
+    }
+    return cascadeIndicator;
 }
 
 vec4 GM_Phong_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
@@ -382,15 +430,16 @@ vec4 GM_CookTorranceBRDF_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
 
 vec4 PS_3D_CalculateColor(PS_3D_INPUT vertex)
 {
-    float factor_Shadow = calculateShadow(GM_ShadowInfo.ShadowMatrix, vec4(vertex.WorldPos, 1), vertex.Normal_World_N);
+    float factor_Shadow = 0;//calculateShadow(vertex, GM_ShadowInfo.ShadowMatrix);
+    vec4 csmIndicator = viewCascade();
     switch (vertex.IlluminationModel)
     {
         case GM_IlluminationModel_None:
             discard;
         case GM_IlluminationModel_Phong:
-            return GM_Phong_CalculateColor(vertex, factor_Shadow);
+            return csmIndicator * GM_Phong_CalculateColor(vertex, factor_Shadow);
         case GM_IlluminationModel_CookTorranceBRDF:
-            return GM_CookTorranceBRDF_CalculateColor(vertex, factor_Shadow);
+            return csmIndicator * GM_CookTorranceBRDF_CalculateColor(vertex, factor_Shadow);
     }
     return vec4(0, 0, 0, 0);
 }

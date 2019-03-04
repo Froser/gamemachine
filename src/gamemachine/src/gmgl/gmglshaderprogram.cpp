@@ -136,9 +136,6 @@ void GMGLShaderProgram::useProgram()
 	
 	glUseProgram(d->shaderProgram);
 	d->lastUsedProgram = d->shaderProgram;
-	
-	GMGLGraphicEngine* engine = gm_cast<GMGLGraphicEngine*>(d->context->getEngine());
-	engine->shaderProgramChanged(this);
 }
 
 void GMGLShaderProgram::attachShader(const GMGLShaderInfo& shaderCfgs)

@@ -241,6 +241,7 @@ GM_PRIVATE_OBJECT(GMGraphicEngine)
 	GMShadowSourceDesc shadow;
 	GMShadowSourceDesc lastShadow;
 	IFramebuffers* shadowDepthFramebuffers = nullptr;
+	GMMat4 shadowCameraVPmatrices[GMMaxCascades];
 	bool isDrawingShadow = false;
 };
 
@@ -304,6 +305,8 @@ public:
 	bool isWireFrameMode(GMModel* model);
 	bool isNeedDiscardTexture(GMModel* model, GMTextureType type);
 
+	const GMMat4& getCascadeCameraVPMatrix(GMCascadeLevel level);
+
 public:
 	inline GMFramebuffersStack& getFramebuffersStack()
 	{
@@ -332,6 +335,7 @@ protected:
 
 private:
 	IGBuffer* createGBuffer();
+	void setCascadeCamera(GMCascadeLevel level, const GMCamera& camera);
 
 public:
 	static constexpr const GMsize_t getMaxLightCount()

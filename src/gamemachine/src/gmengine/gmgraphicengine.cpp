@@ -325,10 +325,6 @@ void GMGraphicEngine::createShadowFramebuffers(OUT IFramebuffers** framebuffers)
 void GMGraphicEngine::resetCSM()
 {
 	ICSMFramebuffers* csm = getCSMFramebuffers();
-	ICSMTechnique* shadowTech = nullptr;
-	bool gotInterface = getInterface(GameMachineInterfaceID::CSMTechnique, (void**)&shadowTech);
-	GM_ASSERT(gotInterface);
-
 	const GMShadowSourceDesc& shadowSourceDesc = getShadowSourceDesc();
 	if (shadowSourceDesc.cascades > 1)
 	{
@@ -339,16 +335,13 @@ void GMGraphicEngine::resetCSM()
 			// 我们需要计算出此层的投影和frustum
 			GMCamera shadowCamera = shadowSourceDesc.camera;
 			GMCSMHelper::setOrthoCamera(csm, getCamera(), shadowSourceDesc, shadowCamera);
-			shadowTech->setCascadeCamera(i, shadowCamera);
-
-			// 设置End clip
-			shadowTech->setCascadeEndClip(i, csm->getEndClip(i));
+			setCascadeCamera(i, shadowCamera);
 		}
 	}
 	else
 	{
 		// 如果只有一层，则不使用CSM
-		shadowTech->setCascadeCamera(0, shadowSourceDesc.camera);
+		setCascadeCamera(0, shadowSourceDesc.camera);
 	}
 }
 
@@ -464,6 +457,18 @@ void GMGraphicEngine::unbindFilterFramebufferAndDraw()
 	GM_ASSERT(filterFramebuffers);
 	filterFramebuffers->unbind();
 	getFilterQuad()->draw();
+}
+
+void GMGraphicEngine::setCascadeCamera(GMCascadeLevel level, const GMCamera& camera)
+{
+	D(d);
+	d->shadowCameraVPmatrices[level] = camera.getViewMatrix() * camera.getProjectionMatrix();
+}
+
+const GMMat4& GMGraphicEngine::getCascadeCameraVPMatrix(GMCascadeLevel level)
+{
+	D(d);
+	return d->shadowCameraVPmatrices[level];
 }
 
 IGBuffer* GMGraphicEngine::createGBuffer()

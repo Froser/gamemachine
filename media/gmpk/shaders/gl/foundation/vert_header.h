@@ -16,6 +16,7 @@ out vec4 _tangent;
 out vec4 _bitangent;
 out vec2 _lightmapuv;
 out vec4 _color;
+out float _z;
 
 vec4 position;
 vec4 normal;

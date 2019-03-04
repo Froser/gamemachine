@@ -20,6 +20,7 @@ void model3d_calcCoords()
     _uv = uv;
     _lightmapuv = lightmapuv;
     _color = color;
+    _z = gl_Position.z;
 }
 
 void GM_Model3D()

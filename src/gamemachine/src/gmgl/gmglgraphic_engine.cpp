@@ -100,25 +100,10 @@ bool GMGLGraphicEngine::getInterface(GameMachineInterfaceID id, void** out)
 		(*out) = gm_cast<ICSMFramebuffers*>(sdframebuffers);
 		break;
 	}
-	case GameMachineInterfaceID::CSMTechnique:
-	{
-		bool drawingShadowCache = db->isDrawingShadow;
-		if (!db->isDrawingShadow)
-		{
-			db->isDrawingShadow = true;
-			GMGLTechnique_3D_Shadow* shadowTech = gm_cast<GMGLTechnique_3D_Shadow*>(getTechnique(GMModelType::Model3D));
-			db->isDrawingShadow = drawingShadowCache;
-			(*out) = static_cast<ICSMTechnique*>(shadowTech);
-		}
-		else
-		{
-			GMGLTechnique_3D_Shadow* shadowTech = gm_cast<GMGLTechnique_3D_Shadow*>(getTechnique(GMModelType::Model3D));
-			(*out) = static_cast<ICSMTechnique*>(shadowTech);
-		}
-		break;
+	default:
+		return false;
 	}
-	}
-	return false;
+	return true;
 }
 
 bool GMGLGraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
