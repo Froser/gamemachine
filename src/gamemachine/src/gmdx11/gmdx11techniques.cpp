@@ -585,11 +585,14 @@ void GMDx11Technique::beginScene(GMScene* scene)
 	const GMShadowSourceDesc& shadowSourceDesc = getEngine()->getShadowSourceDesc();
 	if (shadowSourceDesc.type != GMShadowSourceDesc::NoShadow)
 	{
-		ICSMFramebuffers* csm = getEngine()->getCSMFramebuffers();
-		for (GMCascadeLevel i = 0; i < shadowSourceDesc.cascades; ++i)
+		if (d->engine->getGBuffer()->getGeometryPassingState() != GMGeometryPassingState::PassingGeometry)
 		{
-			setCascadeEndClip(i, csm->getEndClip(i));
-			setCascadeCameraVPMatrices(i);
+			ICSMFramebuffers* csm = getEngine()->getCSMFramebuffers();
+			for (GMCascadeLevel i = 0; i < shadowSourceDesc.cascades; ++i)
+			{
+				setCascadeEndClip(i, csm->getEndClip(i));
+				setCascadeCameraVPMatrices(i);
+			}
 		}
 	}
 }

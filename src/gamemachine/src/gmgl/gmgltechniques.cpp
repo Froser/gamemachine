@@ -225,11 +225,15 @@ void GMGLTechnique::beginScene(GMScene* scene)
 	const GMShadowSourceDesc& shadowSourceDesc = d->engine->getShadowSourceDesc();
 	if (shadowSourceDesc.type != GMShadowSourceDesc::NoShadow)
 	{
-		ICSMFramebuffers* csm = d->engine->getCSMFramebuffers();
-		for (GMCascadeLevel i = 0; i < shadowSourceDesc.cascades; ++i)
+		// 在Geometry Pass阶段，我们不需要设置阴影信息。
+		if (d->engine->getGBuffer()->getGeometryPassingState() != GMGeometryPassingState::PassingGeometry)
 		{
-			setCascadeEndClip(i, csm->getEndClip(i));
-			setCascadeCameraVPMatrices(i);
+			ICSMFramebuffers* csm = d->engine->getCSMFramebuffers();
+			for (GMCascadeLevel i = 0; i < shadowSourceDesc.cascades; ++i)
+			{
+				setCascadeEndClip(i, csm->getEndClip(i));
+				setCascadeCameraVPMatrices(i);
+			}
 		}
 	}
 }
