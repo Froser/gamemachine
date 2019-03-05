@@ -378,6 +378,14 @@ void GMDx11Technique::setCascadeEndClip(GMCascadeLevel level, GMfloat endClip)
 	GM_DX_HR(bank.EndClip()->GetElement(level)->AsScalar()->SetFloat(endClip));
 }
 
+void GMDx11Technique::setCascadeCameraVPMatrices(GMCascadeLevel level)
+{
+	D(d);
+	GMDx11EffectVariableBank& bank = getVarBank();
+	ID3DX11EffectVariable* shadowMatrix = bank.ShadowMatrix();
+	GM_DX_HR(shadowMatrix->GetElement(level)->AsMatrix()->SetMatrix(ValuePointer(getEngine()->getCascadeCameraVPMatrix(level))));
+}
+
 const std::string& GMDx11Technique::getTechniqueNameByTechniqueId(GMRenderTechinqueID id)
 {
 	static Vector<std::string> s_names;
@@ -581,6 +589,7 @@ void GMDx11Technique::beginScene(GMScene* scene)
 		for (GMCascadeLevel i = 0; i < shadowSourceDesc.cascades; ++i)
 		{
 			setCascadeEndClip(i, csm->getEndClip(i));
+			setCascadeCameraVPMatrices(i);
 		}
 	}
 }
@@ -882,7 +891,6 @@ void GMDx11Technique::prepareShadow(bool isDrawingShadow)
 
 	ID3DX11EffectScalarVariable* currentCascadeLevel = bank.CurrentCascadeLevel();
 	ID3DX11EffectScalarVariable* viewCascade = bank.ViewCascade();
-	ID3DX11EffectVariable* shadowMatrix = bank.ShadowMatrix();
 
 	// 是否显示CSM范围
 	GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
@@ -893,7 +901,6 @@ void GMDx11Technique::prepareShadow(bool isDrawingShadow)
 	ICSMFramebuffers* csm = getEngine()->getCSMFramebuffers();
 	GMCascadeLevel currentLevel = csm->currentLevel();
 	GM_DX_HR(currentCascadeLevel->SetInt(currentLevel));
-	GM_DX_HR(shadowMatrix->GetElement(currentLevel)->AsMatrix()->SetMatrix(ValuePointer(getEngine()->getCascadeCameraVPMatrix(currentLevel))));
 }
 
 void GMDx11Technique::prepareBuffer(GMModel* model)

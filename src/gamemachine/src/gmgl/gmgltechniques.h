@@ -96,6 +96,7 @@ protected:
 	virtual GMTextureAsset getTexture(GMTextureSampler& frames);
 	virtual void updateCameraMatrices(IShaderProgram* shaderProgram);
 	virtual void setCascadeEndClip(GMCascadeLevel level, GMfloat endClip);
+	virtual void setCascadeCameraVPMatrices(GMCascadeLevel level);
 
 protected:
 	void prepareScreenInfo(IShaderProgram* shaderProgram);

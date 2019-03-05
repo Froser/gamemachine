@@ -229,6 +229,7 @@ void GMGLTechnique::beginScene(GMScene* scene)
 		for (GMCascadeLevel i = 0; i < shadowSourceDesc.cascades; ++i)
 		{
 			setCascadeEndClip(i, csm->getEndClip(i));
+			setCascadeCameraVPMatrices(i);
 		}
 	}
 }
@@ -440,10 +441,20 @@ void GMGLTechnique::updateCameraMatrices(IShaderProgram* shaderProgram)
 
 void GMGLTechnique::setCascadeEndClip(GMCascadeLevel level, GMfloat endClip)
 {
-	D_BASE(d, GMGLTechnique);
+	D(d);
 	IShaderProgram* shaderProgram = getShaderProgram();
 	shaderProgram->useProgram();
 	shaderProgram->setFloat(getVariableIndex(shaderProgram, d->cascadeEndClipVariableIndices[level], getShadowMapEndClipNames(level)), endClip);
+}
+
+void GMGLTechnique::setCascadeCameraVPMatrices(GMCascadeLevel level)
+{
+	D(d);
+	IShaderProgram* shaderProgram = getShaderProgram();
+	shaderProgram->useProgram();
+	shaderProgram->setMatrix4(getVariableIndex(shaderProgram, d->cascadeShadowMatrixVariableIndices[level], getShadowMapShadowMatrixNames(level)),
+		d->engine->getCascadeCameraVPMatrix(level)
+	);
 }
 
 void GMGLTechnique::prepareScreenInfo(IShaderProgram* shaderProgram)
@@ -609,10 +620,6 @@ void GMGLTechnique::prepareShadow(const GMShadowSourceDesc* shadowSourceDesc, GM
 		ICSMFramebuffers* csm = d->engine->getCSMFramebuffers();
 		GMCascadeLevel currentLevel = csm->currentLevel();
 		shaderProgram->setInt(VI_N(ShadowInfo.CurrentCascadeLevel, s_currentCascadeLevel), currentLevel);
-		shaderProgram->setMatrix4(getVariableIndex(shaderProgram, d->cascadeShadowMatrixVariableIndices[currentLevel], getShadowMapShadowMatrixNames(currentLevel)),
-			d->engine->getCascadeCameraVPMatrix(currentLevel)
-		);
-
 	}
 	else
 	{

@@ -118,6 +118,7 @@ private:
 
 protected:
 	virtual void setCascadeEndClip(GMCascadeLevel level, GMfloat endClip);
+	virtual void setCascadeCameraVPMatrices(GMCascadeLevel level);
 
 public:
 	static const std::string& getTechniqueNameByTechniqueId(GMRenderTechinqueID id);
