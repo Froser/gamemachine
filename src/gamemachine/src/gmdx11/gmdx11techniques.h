@@ -251,6 +251,7 @@ protected:
 	}
 
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
+	virtual void draw(GMModel* model) override;
 };
 
 class GMDx11Technique_Particle : public GMDx11Technique

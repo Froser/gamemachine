@@ -720,8 +720,6 @@ void GMGLTechnique_3D::beginModel(GMModel* model, const GMGameObject* parent)
 
 void GMGLTechnique_3D::beforeDraw(GMModel* model)
 {
-	D(d);
-	D_BASE(db, GMGLTechnique);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	// 材质
@@ -1055,6 +1053,17 @@ void GMGLTechnique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* par
 		s_shadow,
 		GMShaderType::Pixel);
 	GM_ASSERT(b);
+}
+
+void GMGLTechnique_3D_Shadow::beforeDraw(GMModel* model)
+{
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	prepareShaderAttributes(model);
+}
+
+void GMGLTechnique_3D_Shadow::afterDraw(GMModel* model)
+{
+	// do nothing
 }
 
 IShaderProgram* GMGLTechnique_Custom::getShaderProgram()

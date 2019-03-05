@@ -236,6 +236,8 @@ public:
 
 protected:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
+	virtual void beforeDraw(GMModel* model) override;
+	virtual void afterDraw(GMModel* model) override;
 };
 
 class GMGLTechnique_Particle : public GMGLTechnique_2D

@@ -1107,7 +1107,6 @@ void GMDx11Technique::setGamma(IShaderProgram* shaderProgram)
 
 void GMDx11Technique::draw(GMModel* model)
 {
-	D(d);
 	prepareScreenInfo();
 	prepareBuffer(model);
 	prepareLights();
@@ -1377,6 +1376,15 @@ void GMDx11Technique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* p
 	}
 
 	prepareShadow(true);
+}
+
+void GMDx11Technique_3D_Shadow::draw(GMModel* model)
+{
+	prepareBuffer(model);
+	prepareRasterizer(model);
+	prepareBlend(model);
+	prepareDepthStencil(model);
+	passAllAndDraw(model);
 }
 
 ID3DX11EffectTechnique* GMDx11Technique_Custom::getTechnique()
