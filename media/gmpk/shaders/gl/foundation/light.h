@@ -211,7 +211,7 @@ vec3 calculateRefractionByNormalTangent(vec3 worldPos, GMTangentSpace tangentSpa
     return calculateRefractionByNormalWorld(worldPos, normal_world_N, Refractivity);
 }
 
-float calculateShadow(PS_3D_INPUT vertex, mat4 shadowMatrix[GM_MaxCascadeLevel])
+float calculateShadow(PS_3D_INPUT vertex)
 {
     if (GM_ShadowInfo.HasShadow == 0)
         return 1.0f;
@@ -231,10 +231,11 @@ float calculateShadow(PS_3D_INPUT vertex, mat4 shadowMatrix[GM_MaxCascadeLevel])
 
     vec4 worldPos = vec4(vertex.WorldPos, 1);
     vec3 normal_N = vertex.Normal_World_N;
-    vec4 fragPos = shadowMatrix[cascade] * worldPos;
+    vec4 fragPos = GM_ShadowInfo.ShadowMatrix[cascade] * worldPos;
     vec3 projCoords = fragPos.xyz / fragPos.w;
     if (projCoords.z > 1.0f)
         return 1.0f;
+
     projCoords = projCoords * 0.5f + 0.5f;
 
     float bias = (GM_ShadowInfo.BiasMin == GM_ShadowInfo.BiasMax) ? GM_ShadowInfo.BiasMin : max(GM_ShadowInfo.BiasMax * (1.0 - dot(normal_N, normalize(worldPos.xyz - GM_ShadowInfo.Position.xyz))), GM_ShadowInfo.BiasMin);
@@ -248,10 +249,10 @@ float calculateShadow(PS_3D_INPUT vertex, mat4 shadowMatrix[GM_MaxCascadeLevel])
     {
         // 每一份Shadow Map的缩放。例如，假设Cascade Level = 3，那么第一幅Shadow Map采样范围就是0~0.333。
         float projRatio = 1.f / GM_ShadowInfo.CascadedShadowLevel;
-
         vec2 projCoordsInCSM = vec2(projRatio * (projCoords.x + cascade), projCoords.y);
         closestDepth = texture(GM_ShadowInfo.GM_ShadowMap, projCoordsInCSM.xy).r;
     }
+
     return projCoords.z - bias > closestDepth ? 0.f : 1.f;
 }
 
@@ -442,7 +443,7 @@ vec4 GM_CookTorranceBRDF_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
 
 vec4 PS_3D_CalculateColor(PS_3D_INPUT vertex)
 {
-    float factor_Shadow = calculateShadow(vertex, GM_ShadowInfo.ShadowMatrix);
+    float factor_Shadow = calculateShadow(vertex);
     vec4 csmIndicator = viewCascade();
     switch (vertex.IlluminationModel)
     {

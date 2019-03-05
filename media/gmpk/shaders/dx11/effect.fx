@@ -544,7 +544,7 @@ interface IIlluminationModel
 };
 int GM_IlluminationModel = 0;
 
-float CalculateShadow(PS_3D_INPUT input, matrix shadowMatrix[GM_MaxCascadeLevel])
+float CalculateShadow(PS_3D_INPUT input)
 {
     if (!GM_ShadowInfo.HasShadow)
         return 1.0f;
@@ -564,7 +564,7 @@ float CalculateShadow(PS_3D_INPUT input, matrix shadowMatrix[GM_MaxCascadeLevel]
 
     float4 worldPos = ToFloat4(input.WorldPos);
     float3 normal_N = input.Normal_World_N;
-    float4 fragPos = mul(worldPos, shadowMatrix[cascade]);
+    float4 fragPos = mul(worldPos, GM_ShadowInfo.ShadowMatrix[cascade]);
     float3 projCoords = fragPos.xyz / fragPos.w;
     if (projCoords.z > 1.0f)
         return 1.0f;
@@ -791,7 +791,7 @@ static const int GM_IlluminationModel_CookTorranceBRDF = 2;
 
 float4 PS_3D_CalculateColor(PS_3D_INPUT input)
 {
-    float factor_Shadow = CalculateShadow(input, GM_ShadowInfo.ShadowMatrix);
+    float factor_Shadow = CalculateShadow(input);
     float4 csmIndicator = ViewCascade(input);
     switch (input.IlluminationModel)
     {
