@@ -66,6 +66,7 @@ GM_PRIVATE_OBJECT(GMGLTechnique)
 	Array<GMint32, GMScene::MaxBoneCount> boneVariableIndices = { 0 };
 	Array<GMint32, GMGraphicEngine::getMaxCascades()> cascadeEndClipVariableIndices = { 0 };
 	Array<GMint32, GMGraphicEngine::getMaxCascades()> cascadeShadowMatrixVariableIndices = { 0 };
+	bool isShadowDirty = true;
 };
 
 class GMGLTechnique : public GMObject, public ITechnique
@@ -111,9 +112,6 @@ protected:
 private:
 	void updateBoneTransforms(IShaderProgram* shaderProgram, GMModel* model);
 	void startDraw(GMModel* model);
-
-public:
-	static void dirtyShadowMapAttributes();
 };
 
 GM_PRIVATE_OBJECT(GMGLTechnique_3D)

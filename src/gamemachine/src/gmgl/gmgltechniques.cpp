@@ -13,8 +13,6 @@
 
 namespace
 {
-	bool g_shadowDirty = true;
-
 	// variable index getter (with shaderProgram)
 #define VI_SP(d, name, shaderProgram, indexBank) \
 	getVariableIndex(shaderProgram, d->indexBank[verifyIndicesContainer(d->indexBank, shaderProgram)].name, GM_VariablesDesc.name)
@@ -195,6 +193,11 @@ GMGLTechnique::GMGLTechnique(const IRenderContext* context)
 	d->context = context;
 	d->engine = gm_cast<GMGLGraphicEngine*>(d->context->getEngine());
 	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
+
+	// 绑定着色器变化状态。着色器变化后，将isShadowDirty标记为true，准备为着色器更新阴影参数。
+	connect(*d->engine, GM_SIGNAL(GMGLGraphicEngine, shaderProgramChanged), [d](GMObject*, GMObject*) {
+		d->isShadowDirty = true;
+	});
 }
 
 void GMGLTechnique::draw(GMModel* model)
@@ -459,11 +462,6 @@ void GMGLTechnique::prepareScreenInfo(IShaderProgram* shaderProgram)
 	}
 }
 
-void GMGLTechnique::dirtyShadowMapAttributes()
-{
-	g_shadowDirty = true;
-}
-
 void GMGLTechnique::prepareShaderAttributes(GMModel* model)
 {
 	prepareBlend(model);
@@ -581,7 +579,7 @@ void GMGLTechnique::prepareShadow(const GMShadowSourceDesc* shadowSourceDesc, GM
 	IShaderProgram* shaderProgram = getShaderProgram();
 	if (hasShadow)
 	{
-		if (g_shadowDirty || d->shadowContext.lastShadowVersion != shadowSourceDesc->version)
+		if (d->isShadowDirty || d->shadowContext.lastShadowVersion != shadowSourceDesc->version)
 		{
 			d->shadowContext.lastShadowVersion = shadowSourceDesc->version;
 
@@ -597,7 +595,7 @@ void GMGLTechnique::prepareShadow(const GMShadowSourceDesc* shadowSourceDesc, GM
 			shaderProgram->setInt(VI_N(ShadowInfo.ShadowMapHeight, s_height), shadowFramebuffers->getShadowMapHeight());
 			shaderProgram->setInt(VI_N(ShadowInfo.ShadowMap, s_shadowMap), GMTextureRegisterQuery<GMTextureType::ShadowMap>::Value);
 
-			g_shadowDirty = false;
+			d->isShadowDirty = false;
 		}
 
 		// 是否显示CSM范围

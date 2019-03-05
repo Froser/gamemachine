@@ -156,7 +156,7 @@ void GMGLGraphicEngine::activateLights(ITechnique* technique)
 
 void GMGLGraphicEngine::shaderProgramChanged(IShaderProgram* program)
 {
-	GMGLTechnique::dirtyShadowMapAttributes();
+	emit(GM_SIGNAL(GMGLGraphicEngine, shaderProgramChanged));
 }
 
 void GMGLGraphicEngine::update(GMUpdateDataType type)
