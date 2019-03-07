@@ -97,6 +97,7 @@ protected:
 	virtual void updateCameraMatrices(IShaderProgram* shaderProgram);
 	virtual void setCascadeEndClip(GMCascadeLevel level, GMfloat endClip);
 	virtual void setCascadeCameraVPMatrices(GMCascadeLevel level);
+	virtual void initShadow();
 
 protected:
 	void prepareScreenInfo(IShaderProgram* shaderProgram);
@@ -151,6 +152,7 @@ public:
 
 public:
 	virtual void beforeDraw(GMModel* model) override;
+	virtual void initShadow() {}
 
 protected:
 	void prepareTextures(GMModel* model);
@@ -165,6 +167,7 @@ public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void beforeDraw(GMModel* model) override;
 	virtual void afterDraw(GMModel* model) override;
+	virtual void initShadow() {}
 
 protected:
 	void prepareTextures(GMModel* model);
@@ -193,6 +196,7 @@ private:
 	virtual void afterDraw(GMModel* model) override;
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual IShaderProgram* getShaderProgram() override;
+	virtual void initShadow() {}
 
 protected:
 	virtual GMint32 activateTexture(GMModel* model, GMTextureType type);
@@ -238,6 +242,7 @@ protected:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void beforeDraw(GMModel* model) override;
 	virtual void afterDraw(GMModel* model) override;
+	virtual void initShadow() {}
 };
 
 class GMGLTechnique_Particle : public GMGLTechnique_2D

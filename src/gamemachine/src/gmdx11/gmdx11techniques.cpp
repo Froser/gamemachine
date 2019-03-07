@@ -580,21 +580,7 @@ void GMDx11Technique::beginScene(GMScene* scene)
 {
 	D(d);
 	d->techContext.currentScene = scene;
-
-	// 如果有阴影，设置好阴影所有参数
-	const GMShadowSourceDesc& shadowSourceDesc = getEngine()->getShadowSourceDesc();
-	if (shadowSourceDesc.type != GMShadowSourceDesc::NoShadow)
-	{
-		if (d->engine->getGBuffer()->getGeometryPassingState() != GMGeometryPassingState::PassingGeometry)
-		{
-			ICSMFramebuffers* csm = getEngine()->getCSMFramebuffers();
-			for (GMCascadeLevel i = 0; i < shadowSourceDesc.cascades; ++i)
-			{
-				setCascadeEndClip(i, csm->getEndClip(i));
-				setCascadeCameraVPMatrices(i);
-			}
-		}
-	}
+	initShadow();
 }
 
 void GMDx11Technique::endScene()
@@ -696,6 +682,25 @@ const IRenderContext* GMDx11Technique::getContext()
 {
 	D(d);
 	return d->context;
+}
+
+void GMDx11Technique::initShadow()
+{
+	D(d);
+	// 如果有阴影，设置好阴影所有参数
+	const GMShadowSourceDesc& shadowSourceDesc = getEngine()->getShadowSourceDesc();
+	if (shadowSourceDesc.type != GMShadowSourceDesc::NoShadow)
+	{
+		if (d->engine->getGBuffer()->getGeometryPassingState() != GMGeometryPassingState::PassingGeometry)
+		{
+			ICSMFramebuffers* csm = getEngine()->getCSMFramebuffers();
+			for (GMCascadeLevel i = 0; i < shadowSourceDesc.cascades; ++i)
+			{
+				setCascadeEndClip(i, csm->getEndClip(i));
+				setCascadeCameraVPMatrices(i);
+			}
+		}
+	}
 }
 
 void GMDx11Technique::prepareScreenInfo()

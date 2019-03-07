@@ -106,6 +106,7 @@ protected:
 	virtual void prepareDepthStencil(GMModel* model);
 	virtual void prepareDebug(GMModel* model);
 	virtual void applyTextureAttribute(GMModel* model, GMTextureAsset texture, GMTextureType type);
+	virtual void initShadow();
 	virtual void prepareShadow(bool isDrawingShadow);
 	virtual ID3DX11EffectTechnique* getTechnique();
 	GMTextureAsset getTexture(GMTextureSampler& sampler);
@@ -148,6 +149,7 @@ protected:
 	}
 
 	virtual void prepareTextures(GMModel* model);
+	virtual void initShadow() {}
 };
 
 class GMDx11Technique_Text : public GMDx11Technique
@@ -160,6 +162,8 @@ protected:
 	{
 		return "GMTech_Text";
 	}
+
+	virtual void initShadow() {}
 };
 
 class GMDx11Technique_CubeMap : public GMDx11Technique
@@ -175,6 +179,7 @@ protected:
 
 public:
 	virtual void prepareTextures(GMModel* model);
+	virtual void initShadow() {}
 };
 
 GM_PRIVATE_OBJECT(GMDx11Technique_Filter)
@@ -203,6 +208,7 @@ private:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void draw(GMModel* model) override;
 	virtual void passAllAndDraw(GMModel* model) override;
+	virtual void initShadow() {}
 
 	void setHDR(IShaderProgram* shaderProgram);
 };
@@ -219,6 +225,7 @@ protected:
 	}
 
 	virtual void passAllAndDraw(GMModel* model);
+	virtual void initShadow() {}
 };
 
 class GMDx11Technique_Deferred_3D_LightPass : public GMDx11Technique
@@ -252,6 +259,7 @@ protected:
 
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void draw(GMModel* model) override;
+	virtual void initShadow() {}
 };
 
 class GMDx11Technique_Particle : public GMDx11Technique

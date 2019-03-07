@@ -220,22 +220,7 @@ void GMGLTechnique::beginScene(GMScene* scene)
 {
 	D(d);
 	d->techContext.currentScene = scene;
-
-	// 如果有阴影，设置好阴影所有参数
-	const GMShadowSourceDesc& shadowSourceDesc = d->engine->getShadowSourceDesc();
-	if (shadowSourceDesc.type != GMShadowSourceDesc::NoShadow)
-	{
-		// 在Geometry Pass阶段，我们不需要设置阴影信息。
-		if (d->engine->getGBuffer()->getGeometryPassingState() != GMGeometryPassingState::PassingGeometry)
-		{
-			ICSMFramebuffers* csm = d->engine->getCSMFramebuffers();
-			for (GMCascadeLevel i = 0; i < shadowSourceDesc.cascades; ++i)
-			{
-				setCascadeEndClip(i, csm->getEndClip(i));
-				setCascadeCameraVPMatrices(i);
-			}
-		}
-	}
+	initShadow();
 }
 
 void GMGLTechnique::endScene()
@@ -574,6 +559,26 @@ void GMGLTechnique::prepareLights()
 {
 	D(d);
 	d->engine->activateLights(this);
+}
+
+void GMGLTechnique::initShadow()
+{
+	D(d);
+	// 如果有阴影，设置好阴影所有参数
+	const GMShadowSourceDesc& shadowSourceDesc = d->engine->getShadowSourceDesc();
+	if (shadowSourceDesc.type != GMShadowSourceDesc::NoShadow)
+	{
+		// 在Geometry Pass阶段，我们不需要设置阴影信息。
+		if (d->engine->getGBuffer()->getGeometryPassingState() != GMGeometryPassingState::PassingGeometry)
+		{
+			ICSMFramebuffers* csm = d->engine->getCSMFramebuffers();
+			for (GMCascadeLevel i = 0; i < shadowSourceDesc.cascades; ++i)
+			{
+				setCascadeEndClip(i, csm->getEndClip(i));
+				setCascadeCameraVPMatrices(i);
+			}
+		}
+	}
 }
 
 void GMGLTechnique::prepareShadow(const GMShadowSourceDesc* shadowSourceDesc, GMGLShadowFramebuffers* shadowFramebuffers, bool hasShadow)
