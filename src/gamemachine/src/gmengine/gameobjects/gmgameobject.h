@@ -47,7 +47,7 @@ public:
 	void setWorld(GMGameWorld* world);
 	GMGameWorld* getWorld();
 	void setPhysicsObject(AUTORELEASE GMPhysicsObject* phyObj);
-	void foreach(std::function<void(GMModel*)>);
+	void foreachModel(std::function<void(GMModel*)>);
 
 public:
 	virtual void onAppendingObjectToWorld() {}

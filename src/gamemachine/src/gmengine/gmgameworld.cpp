@@ -37,7 +37,7 @@ void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
 	obj->onAppendingObjectToWorld();
 	d->gameObjects.insert(GMOwnedPtr<GMGameObject>(obj));
 
-	obj->foreach([d, this](GMModel* m) {
+	obj->foreachModel([d, this](GMModel* m) {
 		getContext()->getEngine()->createModelDataProxy(d->context, m);
 	});
 }

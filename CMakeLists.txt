@@ -174,8 +174,11 @@ macro(gm_begin_project)
 				dxguid.lib
 			)
 	endif(GM_USE_DX11)
-endmacro(gm_begin_project)
+	
+	# Include QT
+	include_directories(${Qt5Core_INCLUDE_DIRS})
 
+endmacro(gm_begin_project)
 
 macro(gm_link_gamemachine_libraries libraryName ACCESS)
 	gm_link_bullet3(${libraryName} ${ACCESS})
@@ -214,6 +217,13 @@ if(WIN32)
 	endif()
 	option(GM_USE_DX11 "Use DirectX11 (SDK required)" ${DirectX_FOUND})
 endif(WIN32)
+
+
+#About QT
+find_package(Qt5Core)
+if (${Qt5Core_FOUND})
+	message("Qt5 Core detected.")
+endif(${Qt5Core_FOUND})
 
 # Environments:
 if(GM_BUILD_DOCS)

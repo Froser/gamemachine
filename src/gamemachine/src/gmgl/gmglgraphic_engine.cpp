@@ -156,7 +156,7 @@ void GMGLGraphicEngine::activateLights(ITechnique* technique)
 
 void GMGLGraphicEngine::shaderProgramChanged(IShaderProgram* program)
 {
-	emit(GM_SIGNAL(GMGLGraphicEngine, shaderProgramChanged));
+	emitSignal(GM_SIGNAL(GMGLGraphicEngine, shaderProgramChanged));
 }
 
 void GMGLGraphicEngine::update(GMUpdateDataType type)

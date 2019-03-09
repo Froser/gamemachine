@@ -52,7 +52,7 @@ bool GMObjectProxy::registerMeta()
 	GM_LUA_PROXY_META;
 	GM_META_FUNCTION(__gc);
 	GM_META_FUNCTION(connect);
-	GM_META_FUNCTION(emit);
+	GM_META_FUNCTION(emitSignal);
 	return true;
 }
 
@@ -112,7 +112,7 @@ GM_LUA_PROXY_IMPL(GMObjectProxy, connect)
 /*
  * emit([self], signal)
  */
-GM_LUA_PROXY_IMPL(GMObjectProxy, emit)
+GM_LUA_PROXY_IMPL(GMObjectProxy, emitSignal)
 {
 	static const GMString s_invoker = NAME ".emit";
 	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".emit");
@@ -120,7 +120,7 @@ GM_LUA_PROXY_IMPL(GMObjectProxy, emit)
 	GMString signal = GMArgumentHelper::popArgumentAsString(L, s_invoker); //signal
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
-		self->emit(signal);
+		self->emitSignal(signal);
 	return GMReturnValues();
 }
 //////////////////////////////////////////////////////////////////////////

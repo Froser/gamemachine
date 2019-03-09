@@ -613,7 +613,7 @@ bool GMControlTextEdit::onChar(GMSystemCharEvent* event)
 		if (event->getCharacter() == GMFunctionCharacter_Ctrl_X)
 		{
 			deleteSelectionText();
-			emit(GM_SIGNAL(GMControlTextEdit, textChanged));
+			emitSignal(GM_SIGNAL(GMControlTextEdit, textChanged));
 		}
 		return true;
 	}
@@ -679,7 +679,7 @@ bool GMControlTextEdit::onChar(GMSystemCharEvent* event)
 	}
 
 	resetCaretBlink();
-	emit(GM_SIGNAL(GMControlTextEdit, textChanged));
+	emitSignal(GM_SIGNAL(GMControlTextEdit, textChanged));
 
 	return true;
 }
@@ -775,7 +775,7 @@ bool GMControlTextEdit::onKey_Delete(GMSystemKeyEvent* event)
 		// 删除一个选区
 		if (deleteSelectionText())
 		{
-			emit(GM_SIGNAL(GMControlTextEdit, textChanged));
+			emitSignal(GM_SIGNAL(GMControlTextEdit, textChanged));
 		}
 		else
 		{
@@ -788,7 +788,7 @@ bool GMControlTextEdit::onKey_Delete(GMSystemKeyEvent* event)
 		if (d->buffer->removeChar(d->cp))
 		{
 			d->buffer->analyze(d->cp);
-			emit(GM_SIGNAL(GMControlTextEdit, textChanged));
+			emitSignal(GM_SIGNAL(GMControlTextEdit, textChanged));
 		}
 		else
 		{
@@ -805,7 +805,7 @@ bool GMControlTextEdit::onKey_Back(GMSystemKeyEvent* event)
 	if (d->selectionStartCP != d->cp)
 	{
 		deleteSelectionText();
-		emit(GM_SIGNAL(GMControlTextEdit, textChanged));
+		emitSignal(GM_SIGNAL(GMControlTextEdit, textChanged));
 	}
 	else if (d->cp > 0)
 	{
@@ -815,7 +815,7 @@ bool GMControlTextEdit::onKey_Back(GMSystemKeyEvent* event)
 		if (d->buffer->removeChar(d->cp))
 		{
 			d->buffer->analyze(d->cp);
-			emit(GM_SIGNAL(GMControlTextEdit, textChanged));
+			emitSignal(GM_SIGNAL(GMControlTextEdit, textChanged));
 		}
 
 		resetCaretBlink();
@@ -1800,7 +1800,7 @@ bool GMControlTextArea::onKey_Back(GMSystemKeyEvent* event)
 	if (d->selectionStartCP != d->cp)
 	{
 		deleteSelectionText();
-		emit(GM_SIGNAL(GMControlTextArea, textChanged));
+		emitSignal(GM_SIGNAL(GMControlTextArea, textChanged));
 	}
 	else if (d->cp > 0)
 	{
@@ -1809,7 +1809,7 @@ bool GMControlTextArea::onKey_Back(GMSystemKeyEvent* event)
 		if (d->buffer->removeChar(d->cp))
 		{
 			d->buffer->analyze(d->cp);
-			emit(GM_SIGNAL(GMControlTextArea, textChanged));
+			emitSignal(GM_SIGNAL(GMControlTextArea, textChanged));
 		}
 
 		resetCaretBlink();

@@ -1,6 +1,7 @@
 ﻿#ifndef __GMOBJECT_H__
 #define __GMOBJECT_H__
 #include "defines.h"
+#include <QObject>
 #include "memory.h"
 #include <functional>
 #include <gmstring.h>
@@ -270,8 +271,8 @@ using GMConnectionTargets = Vector<GMConnectionTarget>;
 
 using GMSlots = HashMap<GMSignal, Vector<GMCallbackTarget>, GMStringHashFunctor>;
 
-#define GM_SIGNAL(host, signal) host::sig_##signal()
-#define GM_DECLARE_SIGNAL(signal) public: inline static const gm::GMString& sig_##signal() { static gm::GMString s_sig(#signal); return s_sig; }
+#define GM_SIGNAL(host, sig) host::sig_##sig()
+#define GM_DECLARE_SIGNAL(sig) public: inline static const gm::GMString& sig_##sig() { static gm::GMString s_sig(#sig); return s_sig; }
 
 #define GM_META(memberName) \
 { \
@@ -293,7 +294,7 @@ GM_PRIVATE_OBJECT(GMObject)
 {
 	bool metaRegistered = false;
 	GMMeta meta;
-	GMSlots slots;
+	GMSlots objSlots;
 	GMConnectionTargets connectionTargets;
 };
 
@@ -340,26 +341,26 @@ public:
 	/*!
 	  为此对象绑定另外一个对象的信号，当被绑定对象的信号被触发时，执行回调函数。
 	  \param sender 信号源。也就是信号的产生方。当信号源的对象的信号被触发时，执行回调函数。
-	  \param signal 绑定的信号。
+	  \param sig 绑定的信号。
 	  \param callback 信号被触发时执行的回调函数。
 	  \sa detachEvent()
 	*/
-	void connect(GMObject& sender, GMSignal signal, const GMEventCallback& callback);
+	void connect(GMObject& sender, GMSignal sig, const GMEventCallback& callback);
 
 	//! 从某对象源中解绑一个信号。
 	/*!
 	  当从某对象解除绑定信号后，对象源的信号被触发后将不会通知此对象。
 	  \param sender 对象源。也就是信号的产生方。
-	  \param signal 需要解除的信号名。
+	  \param sig 需要解除的信号名。
 	*/
-	void disconnect(GMObject& sender, GMSignal signal);
+	void disconnect(GMObject& sender, GMSignal sig);
 
 	//! 触发一个信号。
 	/*!
 	  当一个信号被触发后，将会通知所有绑定了此对象此信号的所有对象，调用它们绑定的回调函数。
-	  \param signal 需要触发的信号名。
+	  \param sig 需要触发的信号名。
 	*/
-	void emit(GMSignal signal);
+	void emitSignal(GMSignal sig);
 
 	//! 拷贝GMObject私有数据
 	/*!
@@ -380,12 +381,12 @@ public:
 	}
 
 private:
-	void addConnection(GMSignal signal, GMObject& receiver, GMEventCallback callback);
-	void removeSignalAndConnection(GMSignal signal, GMObject& receiver);
-	void removeSignal(GMSignal signal, GMObject& receiver);
+	void addConnection(GMSignal sig, GMObject& receiver, GMEventCallback callback);
+	void removeSignalAndConnection(GMSignal sig, GMObject& receiver);
+	void removeSignal(GMSignal sig, GMObject& receiver);
 	void releaseConnections();
-	void addConnection(GMObject* host, GMSignal signal);
-	void removeConnection(GMObject* host, GMSignal signal);
+	void addConnection(GMObject* host, GMSignal sig);
+	void removeConnection(GMObject* host, GMSignal sig);
 
 protected:
 	virtual bool registerMeta() { return false; }

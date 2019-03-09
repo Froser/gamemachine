@@ -15,7 +15,7 @@ namespace luaapi
 		GMLuaCoreState* l = nullptr;
 		GM_LUA_PROXY_FUNC(__gc);
 		GM_LUA_PROXY_FUNC(connect);
-		GM_LUA_PROXY_FUNC(emit);
+		GM_LUA_PROXY_FUNC(emitSignal);
 	};
 
 	class GMObjectProxy : public GMObject

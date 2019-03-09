@@ -272,7 +272,7 @@ bool GMControlButton::onKeyUp(GMSystemKeyEvent* event)
 		if (d->pressed)
 		{
 			d->pressed = false;
-			emit(GM_SIGNAL(GMControlButton, click));
+			emitSignal(GM_SIGNAL(GMControlButton, click));
 			return true;
 		}
 	}
@@ -380,7 +380,7 @@ bool GMControlButton::handleMouseRelease(const GMPoint& pt)
 
 		if (containsPoint(pt))
 		{
-			emit(GM_SIGNAL(GMControlButton, click));
+			emitSignal(GM_SIGNAL(GMControlButton, click));
 		}
 
 		return true;
@@ -800,7 +800,7 @@ bool GMControlScrollBar::onMouseUp(GMSystemMouseEvent* event)
 	d->draggingThumb = false;
 	d->arrowState = GMControlScrollBarArrowState::Clear;
 	updateThumbRect();
-	emit(GM_SIGNAL(GMControlScrollBar, endDragThumb));
+	emitSignal(GM_SIGNAL(GMControlScrollBar, endDragThumb));
 	return false;
 }
 
@@ -823,7 +823,7 @@ bool GMControlScrollBar::onMouseMove(GMSystemMouseEvent* event)
 		if (value > getMaximum())
 			value = getMaximum();
 		setValue(value);
-		emit(GM_SIGNAL(GMControlScrollBar, valueChanged));
+		emitSignal(GM_SIGNAL(GMControlScrollBar, valueChanged));
 
 		return true;
 	}
@@ -836,7 +836,7 @@ bool GMControlScrollBar::onCaptureChanged(GMSystemCaptureChangedEvent* event)
 	if (getParent()->getParentWindow()->getWindowHandle() != event->getCapturedWindow())
 	{
 		d->draggingThumb = false;
-		emit(GM_SIGNAL(GMControlScrollBar, endDragThumb));
+		emitSignal(GM_SIGNAL(GMControlScrollBar, endDragThumb));
 	}
 	return false;
 }
@@ -881,7 +881,7 @@ bool GMControlScrollBar::handleMouseClick(GMSystemMouseEvent* event)
 		if (d->value < d->minimum)
 			d->value = d->minimum;
 		updateThumbRect();
-		emit(GM_SIGNAL(GMControlScrollBar, valueChanged));
+		emitSignal(GM_SIGNAL(GMControlScrollBar, valueChanged));
 		d->arrowState = GMControlScrollBarArrowState::ClickedUp;
 		d->arrowTime = nowElapsed;
 		return true;
@@ -896,7 +896,7 @@ bool GMControlScrollBar::handleMouseClick(GMSystemMouseEvent* event)
 		if (d->value > d->maximum)
 			d->value = d->maximum;
 		updateThumbRect();
-		emit(GM_SIGNAL(GMControlScrollBar, valueChanged));
+		emitSignal(GM_SIGNAL(GMControlScrollBar, valueChanged));
 		d->arrowState = GMControlScrollBarArrowState::ClickedDown;
 		d->arrowTime = nowElapsed;
 		return true;
@@ -909,7 +909,7 @@ bool GMControlScrollBar::handleMouseClick(GMSystemMouseEvent* event)
 
 		d->thumbOffset = d->mousePt.y - d->rcThumb.y;
 		d->draggingThumb = true;
-		emit(GM_SIGNAL(GMControlScrollBar, startDragThumb));
+		emitSignal(GM_SIGNAL(GMControlScrollBar, startDragThumb));
 		return true;
 	}
 
@@ -954,5 +954,5 @@ void GMControlScrollBar::scroll(GMint32 value)
 	d->value += value;
 	clampValue();
 	updateThumbRect();
-	emit(GM_SIGNAL(GMControlScrollBar, valueChanged));
+	emitSignal(GM_SIGNAL(GMControlScrollBar, valueChanged));
 }

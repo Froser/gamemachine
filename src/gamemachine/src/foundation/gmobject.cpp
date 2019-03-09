@@ -38,51 +38,51 @@ const GMMeta* GMObject::meta() const
 	return &d->meta;
 }
 
-void GMObject::connect(GMObject& sender, GMSignal signal, const GMEventCallback& callback)
+void GMObject::connect(GMObject& sender, GMSignal sig, const GMEventCallback& callback)
 {
-	sender.addConnection(std::move(signal), *this, callback);
+	sender.addConnection(std::move(sig), *this, callback);
 }
 
-void GMObject::disconnect(GMObject& sender, GMSignal signal)
+void GMObject::disconnect(GMObject& sender, GMSignal sig)
 {
-	sender.removeSignalAndConnection(std::move(signal), *this);
+	sender.removeSignalAndConnection(std::move(sig), *this);
 }
 
-void GMObject::addConnection(GMSignal signal, GMObject& receiver, GMEventCallback callback)
+void GMObject::addConnection(GMSignal sig, GMObject& receiver, GMEventCallback callback)
 {
 	D(d);
 	GMCallbackTarget target = { &receiver, callback };
-	d->slots[signal].push_back(target);
-	receiver.addConnection(this, std::move(signal));
+	d->objSlots[sig].push_back(target);
+	receiver.addConnection(this, std::move(sig));
 }
 
-void GMObject::removeSignalAndConnection(GMSignal signal, GMObject& receiver)
+void GMObject::removeSignalAndConnection(GMSignal sig, GMObject& receiver)
 {
 	D(d);
 	// 移除自己的接收者
-	removeSignal(signal, receiver);
+	removeSignal(sig, receiver);
 
 	// 移除自己连接到的信号
-	receiver.removeConnection(this, std::move(signal));
+	receiver.removeConnection(this, std::move(sig));
 }
 
-void GMObject::emit(GMSignal signal)
+void GMObject::emitSignal(GMSignal sig)
 {
 	D(d);
-	if (d->slots.empty())
+	if (d->objSlots.empty())
 		return;
 
-	auto& targets = d->slots[std::move(signal)];
+	auto& targets = d->objSlots[std::move(sig)];
 	for (auto& target : targets)
 	{
 		target.callback(this, target.receiver);
 	}
 }
 
-void GMObject::removeSignal(GMSignal signal, GMObject& receiver)
+void GMObject::removeSignal(GMSignal sig, GMObject& receiver)
 {
 	D(d);
-	auto& targets = d->slots[std::move(signal)];
+	auto& targets = d->objSlots[std::move(sig)];
 	removeIf(targets, [&](auto iter) {
 		return iter->receiver == &receiver;
 	});
@@ -92,9 +92,9 @@ void GMObject::releaseConnections()
 {
 	D(d);
 	// 释放连接到此对象的信号
-	if (!d->slots.empty())
+	if (!d->objSlots.empty())
 	{
-		for (auto& event : d->slots)
+		for (auto& event : d->objSlots)
 		{
 			GMSignal name = event.first;
 			for (auto& target : event.second)
@@ -102,7 +102,7 @@ void GMObject::releaseConnections()
 				target.receiver->removeConnection(this, name);
 			}
 		}
-		GMClearSTLContainer(d->slots);
+		GMClearSTLContainer(d->objSlots);
 	}
 
 	// 释放此对象连接的所有信号
@@ -115,20 +115,20 @@ void GMObject::releaseConnections()
 	}
 }
 
-void GMObject::addConnection(GMObject* host, GMSignal signal)
+void GMObject::addConnection(GMObject* host, GMSignal sig)
 {
 	D(d);
 	GMConnectionTarget c;
 	c.host = host;
-	c.name = std::move(signal);
+	c.name = std::move(sig);
 	d->connectionTargets.push_back(std::move(c));
 }
 
-void GMObject::removeConnection(GMObject* host, GMSignal signal)
+void GMObject::removeConnection(GMObject* host, GMSignal sig)
 {
 	D(d);
 	removeIf(d->connectionTargets, [&](auto iter) {
-		return iter->name == signal && iter->host == host;
+		return iter->name == sig && iter->host == host;
 	});
 }
 

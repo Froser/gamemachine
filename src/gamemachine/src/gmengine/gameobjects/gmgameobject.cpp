@@ -72,7 +72,7 @@ void GMGameObject::setPhysicsObject(AUTORELEASE GMPhysicsObject* phyObj)
 	d->physics->setGameObject(this);
 }
 
-void GMGameObject::foreach(std::function<void(GMModel*)> cb)
+void GMGameObject::foreachModel(std::function<void(GMModel*)> cb)
 {
 	GMScene* scene = getScene();
 	if (scene)
@@ -86,7 +86,7 @@ void GMGameObject::foreach(std::function<void(GMModel*)> cb)
 
 void GMGameObject::draw()
 {
-	foreach([this](GMModel* m) {
+	foreachModel([this](GMModel* m) {
 		drawModel(getContext(), m);
 	});
 	endDraw();
