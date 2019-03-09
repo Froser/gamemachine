@@ -1,7 +1,6 @@
 ﻿#ifndef __GMOBJECT_H__
 #define __GMOBJECT_H__
 #include "defines.h"
-#include <QObject>
 #include "memory.h"
 #include <functional>
 #include <gmstring.h>
