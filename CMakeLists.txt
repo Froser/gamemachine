@@ -175,9 +175,6 @@ macro(gm_begin_project)
 			)
 	endif(GM_USE_DX11)
 	
-	# Include QT
-	include_directories(${Qt5Core_INCLUDE_DIRS})
-
 endmacro(gm_begin_project)
 
 macro(gm_link_gamemachine_libraries libraryName ACCESS)
@@ -224,6 +221,11 @@ find_package(Qt5Core)
 if (${Qt5Core_FOUND})
 	message("Qt5 Core detected.")
 endif(${Qt5Core_FOUND})
+
+find_package(Qt5Widgets)
+if (${Qt5Widgets_FOUND})
+	message("Qt5 Widgets detected.")
+endif(${Qt5Widgets_FOUND})
 
 # Environments:
 if(GM_BUILD_DOCS)

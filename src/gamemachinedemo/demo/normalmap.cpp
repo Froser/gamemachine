@@ -93,7 +93,7 @@ void Demo_NormalMap::init()
 			d->animation.pause();
 		else
 			d->animation.play();
-		emit(GM_SIGNAL(Demo_NormalMap, rotateStateChanged));
+		emitSignal(GM_SIGNAL(Demo_NormalMap, rotateStateChanged));
 	});
 
 	connect(*this, GM_SIGNAL(Demo_NormalMap, rotateStateChanged), [=](auto, auto) {
