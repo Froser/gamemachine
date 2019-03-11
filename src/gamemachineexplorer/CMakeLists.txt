@@ -39,6 +39,11 @@ set(SOURCES
 		src/shell/application.cpp
 		src/shell/mainwindow.h
 		src/shell/mainwindow.cpp
+		src/shell/gamemachinewidget.h
+		src/shell/gamemachinewidget.cpp
+
+		src/core/handler.h
+		src/core/handler.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)

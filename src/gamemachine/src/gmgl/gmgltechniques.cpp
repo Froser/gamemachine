@@ -243,8 +243,7 @@ void GMGLTechnique::beginModel(GMModel* model, const GMGameObject* parent)
 	shaderProgram->setInt(VI(ColorVertexOp), static_cast<GMint32>(model->getShader().getVertexColorOp()));
 
 	// 骨骼动画
-	GM_ASSERT(d->techContext.currentScene);
-	if (d->techContext.currentScene->hasAnimation())
+	if (d->techContext.currentScene && d->techContext.currentScene->hasAnimation())
 	{
 		shaderProgram->setInt(VI(UseBoneAnimation), 1);
 		updateBoneTransforms(shaderProgram, model);

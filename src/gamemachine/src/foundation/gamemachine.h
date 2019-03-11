@@ -200,9 +200,26 @@ public:
 	  在游戏循环之前，它首先会新建主窗口和调试窗口，创建内部各种管理器并初始化它们。接下来，触发游戏时钟，程序运行时
 	间从此刻开始计算。在此之后，程序的消息循环正式开始。循环会先处理来自系统的消息，如窗口、鼠标、键盘消息，接下来处
 	理GameMachine消息，然后调用游戏流程管理器管理游戏流程，最后再更新此帧的状态。
-	  \sa init()
+	  \sa init(), startGameMachineWithoutMessageLoop()
 	*/
 	void startGameMachine();
+
+	//! 开始运行GameMachine，但是不进行消息循环。
+	/*!
+	  如果GameMachine程序嵌入在了其它框架，那么它很有可能不需要自己调用消息循环。比如Qt的QApplication::exec()会调用
+	  自己的循环。<BR>
+	  这种情况下，当程序结束时，需要手动调用finalize方法来释放资源。<BR>
+	  \sa startGameMachine(), finalize()
+	*/
+	void startGameMachineWithoutMessageLoop();
+
+	//! 手动触发一次GameMachine消息处理。
+	/*!
+	  当GameMachine没有通过startGameMachine()来进行消息循环时，应该手动调用此方法来处理当前堆积的消息。<BR>
+	  \return 如果是一个退出GameMachine的消息，返回false，否则返回true。
+	  \sa startGameMachineWithoutMessageLoop(), renderFrame()
+	*/
+	bool handleMessages();
 
 	//! 设置当前的运行状态。
 	/*!
@@ -252,12 +269,18 @@ public:
 	//! 退出程序。
 	void exit();
 
+	//! 释放GameMachine资源。
+	/*!
+	  如果通过startGameMachine自己启动了一个消息循环，则不需要在程序结束时调用finalize()。<BR>
+	  如果通过startGameMachineWithoutMessageLoop运行GameMachine，在程序结束时需要调用它来释放资源。
+	  \sa startGameMachine(), startGameMachineWithoutMessageLoop()
+	*/
+	void finalize();
+
 private:
 	void initSystemInfo();
 	void runEventLoop();
 	template <typename T, typename U> void registerManager(T* newObject, OUT U** manager);
-	void terminate();
-	bool handleMessages();
 	bool handleMessage(const GMMessage& msg);
 	void updateGameMachineRunningStates();
 	void setRenderEnvironment(GMRenderEnvironment renv);
@@ -265,6 +288,7 @@ private:
 	void beginHandlerEvents(IWindow* window);
 	void endHandlerEvents(IWindow* window);
 	void eachHandler(std::function<void(IWindow*, IGameHandler*)> action);
+	void beforeStartGameMachine();
 };
 
 END_NS

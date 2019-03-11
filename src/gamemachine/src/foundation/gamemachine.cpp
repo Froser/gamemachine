@@ -80,30 +80,20 @@ GMMessage GameMachine::peekMessage()
 
 void GameMachine::startGameMachine()
 {
-	D(d);
-	updateGameMachineRunningStates();
-	handleMessages();
-	eachHandler([](auto window, auto)
-	{
-		window->getContext()->getEngine()->init();
-	});
-
-	// 初始化gameHandler
-	if (!d->states.crashDown)
-	{
-		eachHandler([](auto window, auto handler)
-		{
-			if (handler)
-				handler->start();
-		});
-	}
-	else
-	{
-		terminate();
-	}
+	// 做一些开始之前的工作
+	beforeStartGameMachine();
 
 	// 消息循环
 	runEventLoop();
+}
+
+void GameMachine::startGameMachineWithoutMessageLoop()
+{
+	// 做一些开始之前的工作
+	beforeStartGameMachine();
+
+	// 不进行消息循环
+	return;
 }
 
 void GameMachine::addWindow(AUTORELEASE IWindow* window)
@@ -134,7 +124,7 @@ bool GameMachine::renderFrame(IWindow* window)
 
 	// 检查是否崩溃
 	if (checkCrashDown())
-		return true;
+		return false;
 
 	// 调用Handler
 	beginHandlerEvents(window);
@@ -307,7 +297,7 @@ void GameMachine::registerManager(T* newObject, OUT U** manager)
 	d->managerQueue.push_back(*manager);
 }
 
-void GameMachine::terminate()
+void GameMachine::finalize()
 {
 	D(d);
 	eachHandler([](auto, auto handler) {
@@ -338,5 +328,30 @@ void GameMachine::eachHandler(std::function<void(IWindow*, IGameHandler*)> actio
 	for (decltype(auto) window : d->windows)
 	{
 		action(window, window->getHandler());
+	}
+}
+
+void GameMachine::beforeStartGameMachine()
+{
+	D(d);
+	updateGameMachineRunningStates();
+	handleMessages();
+	eachHandler([](auto window, auto)
+	{
+		window->getContext()->getEngine()->init();
+	});
+
+	// 初始化gameHandler
+	if (!d->states.crashDown)
+	{
+		eachHandler([](auto window, auto handler)
+		{
+			if (handler)
+				handler->start();
+		});
+	}
+	else
+	{
+		finalize();
 	}
 }

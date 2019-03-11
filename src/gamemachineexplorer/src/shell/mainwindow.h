@@ -2,6 +2,9 @@
 #define __MAINWINDOW_H__
 #include <gmecommon.h>
 #include <QMainWindow>
+#include <QtWidgets>
+#include <gamemachine.h>
+#include "gamemachinewidget.h"
 
 namespace shell
 {
@@ -10,7 +13,17 @@ namespace shell
 		Q_OBJECT
 
 	public:
-		using QMainWindow::QMainWindow;
+		MainWindow(QWidget* parent = nullptr);
+
+	public:
+		void initGameMachine(const GMGameMachineDesc&);
+
+	private:
+		void setupUi();
+
+	private:
+		QWidget* m_centralwidget = nullptr;
+		GameMachineWidget* m_gmwidget = nullptr;
 	};
 }
 
