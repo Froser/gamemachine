@@ -13,9 +13,7 @@ set(CMAKE_AUTOUIC ON)
 include_directories(
 	${Qt5Core_INCLUDE_DIRS}
 	${Qt5Widgets_INCLUDE_DIRS}
-)
-
-target_link_libraries(${Qt5Widgets_LIBRARIES})
+	)
 
 include_directories(
 		../3rdparty/glm-0.9.9-a2
@@ -39,6 +37,8 @@ set(SOURCES
 
 		src/shell/application.h
 		src/shell/application.cpp
+		src/shell/mainwindow.h
+		src/shell/mainwindow.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)
@@ -59,5 +59,26 @@ if(MSVC)
 	set_target_properties(${gamemachineexplorer_dll} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
 	gm_gamemachine_project(${gamemachineexplorer_dll} FALSE)
 endif(MSVC)
+
+target_link_libraries(gamemachineexplorer 
+	PUBLIC
+	Qt5::Core
+	Qt5::Gui 
+	Qt5::Widgets
+	)
+target_link_libraries(gamemachineexplorer_dll 
+	PUBLIC
+	Qt5::Core
+	Qt5::Gui 
+	Qt5::Widgets
+	)
+
+# Copy Dlls (On windows)
+if(WIN32)
+	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Core> $<TARGET_FILE_DIR:${PROJECT_NAME}>
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Gui> $<TARGET_FILE_DIR:${PROJECT_NAME}>
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::Widgets> $<TARGET_FILE_DIR:${PROJECT_NAME}> )
+endif(WIN32)
 
 gm_end_project(${PROJECT_NAME})
