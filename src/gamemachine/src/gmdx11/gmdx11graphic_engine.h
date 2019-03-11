@@ -31,6 +31,7 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMScopedPtr<IShaderProgram> shaderProgram;
 	GMDx11CubeMapState cubemapState;
 
+	bool inited = false;
 	bool ready = false;
 	bool lightDirty = true;
 

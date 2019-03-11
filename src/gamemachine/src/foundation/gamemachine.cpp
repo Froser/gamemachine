@@ -106,6 +106,14 @@ void GameMachine::addWindow(AUTORELEASE IWindow* window)
 		auto handler = window->getHandler();
 		if (handler)
 			handler->init(window->getContext());
+
+		if (d->gamemachinestarted)
+		{
+			// 如果gamemachine已经开始，则表示错过了window初始化
+			auto engine = window->getContext()->getEngine();
+			engine->init();
+			handler->start();
+		}
 	}
 }
 
@@ -149,7 +157,7 @@ bool GameMachine::sendMessage(const GMMessage& msg)
 
 void GameMachine::exit()
 {
-	postMessage({ gm::GameMachineMessageType::QuitGameMachine });
+	postMessage({ GameMachineMessageType::QuitGameMachine });
 }
 
 void GameMachine::setRenderEnvironment(GMRenderEnvironment renv)
@@ -336,6 +344,13 @@ void GameMachine::beforeStartGameMachine()
 	D(d);
 	updateGameMachineRunningStates();
 	handleMessages();
+	initHandlers();
+	d->gamemachinestarted = true;
+}
+
+void GameMachine::initHandlers()
+{
+	D(d);
 	eachHandler([](auto window, auto)
 	{
 		window->getContext()->getEngine()->init();
@@ -352,6 +367,7 @@ void GameMachine::beforeStartGameMachine()
 	}
 	else
 	{
-		finalize();
+		if (!d->gamemachinestarted)
+			finalize();
 	}
 }

@@ -51,24 +51,29 @@ GMGLGraphicEngine::GMGLGraphicEngine(const IRenderContext* context)
 
 void GMGLGraphicEngine::init()
 {
-	Base::init();
-	installShaders();
-	glEnable(GL_MULTISAMPLE);
+	D(d);
+	if (!d->inited)
+	{
+		Base::init();
+		installShaders();
+		glEnable(GL_MULTISAMPLE);
 
-	auto& runningState = GM.getRunningStates();
-	glClearDepth(runningState.farZ);
-	glDepthFunc(GL_LEQUAL);
+		auto& runningState = GM.getRunningStates();
+		glClearDepth(runningState.farZ);
+		glDepthFunc(GL_LEQUAL);
 
-	glEnable(GL_STENCIL_TEST);
-	glClearStencil(0);
-	GMStencilOptions options(GMStencilOptions::Ox00, GMStencilOptions::Always);
-	setStencilOptions(options);
-	getDefaultFramebuffers()->clear();
+		glEnable(GL_STENCIL_TEST);
+		glClearStencil(0);
+		GMStencilOptions options(GMStencilOptions::Ox00, GMStencilOptions::Always);
+		setStencilOptions(options);
+		getDefaultFramebuffers()->clear();
 
 #if GM_DEBUG
-	glEnable(GL_DEBUG_OUTPUT);
-	glDebugMessageCallback((GLDEBUGPROC)GL_MessageCallback, 0);
+		glEnable(GL_DEBUG_OUTPUT);
+		glDebugMessageCallback((GLDEBUGPROC)GL_MessageCallback, 0);
 #endif
+		d->inited = true;
+	}
 }
 
 void GMGLGraphicEngine::installShaders()

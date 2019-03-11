@@ -13,10 +13,8 @@ namespace shell
 
 	void MainWindow::initGameMachine(const GMGameMachineDesc& desc)
 	{
-		m_gmwidget = GameMachineWidget::createGameMachineWidget(desc, new core::Handler(), this);
-
-		//mainLayout->addWidget(m_gmwidget);
-		m_gmwidget->setGeometry(0, 0, 800, 600);
+		Q_ASSERT(m_gmwidget);
+		m_gmwidget->setGameMachine(desc, new core::Handler());
 	}
 
 	void MainWindow::setupUi()
@@ -29,6 +27,10 @@ namespace shell
 
 		QVBoxLayout* mainLayout = new QVBoxLayout(m_centralwidget);
 		mainLayout->setContentsMargins(0, 0, 0, 0);
+
+		//mainLayout->addWidget(m_gmwidget);
+		m_gmwidget = new GameMachineWidget(m_centralwidget);
+		m_gmwidget->setGeometry(0, 0, 800, 600);
 	}
 
 }

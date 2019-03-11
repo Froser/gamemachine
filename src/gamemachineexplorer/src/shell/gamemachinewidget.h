@@ -9,11 +9,10 @@ namespace shell
 	{
 		Q_OBJECT
 
-	private:
-		explicit GameMachineWidget(QWidget* parent = nullptr);
+		using QWidget::QWidget;
 
 	public:
-		static GameMachineWidget* createGameMachineWidget(const GMGameMachineDesc& desc, IGameHandler* handler, QWidget* parent = nullptr);
+		void setGameMachine(const GMGameMachineDesc& desc, IGameHandler* handler);
 
 	protected:
 		void setRenderContext(const IRenderContext* context);

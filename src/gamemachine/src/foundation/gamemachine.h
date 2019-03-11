@@ -105,6 +105,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GameMachine)
 {
 	GMClock clock;
 	bool inited = false;
+	bool gamemachinestarted = false;
 	Set<IWindow*> windows;
 	IFactory* factory = nullptr;
 	GMGamePackage* gamePackageManager = nullptr;
@@ -289,6 +290,7 @@ private:
 	void endHandlerEvents(IWindow* window);
 	void eachHandler(std::function<void(IWindow*, IGameHandler*)> action);
 	void beforeStartGameMachine();
+	void initHandlers();
 };
 
 END_NS

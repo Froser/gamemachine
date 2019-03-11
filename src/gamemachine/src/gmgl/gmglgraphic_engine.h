@@ -53,6 +53,7 @@ struct GMGLLightContext
 
 GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 {
+	bool inited = false;
 	bool engineReady = false;
 
 	// 著色器程序

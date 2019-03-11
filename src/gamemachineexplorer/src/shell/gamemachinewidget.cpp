@@ -25,13 +25,7 @@ namespace
 
 namespace shell
 {
-	GameMachineWidget::GameMachineWidget(QWidget* parent /*= nullptr*/)
-		: QWidget(parent)
-	{
-
-	}
-
-	GameMachineWidget* GameMachineWidget::createGameMachineWidget(const GMGameMachineDesc& desc, IGameHandler* handler, QWidget* parent/* = nullptr*/)
+	void GameMachineWidget::setGameMachine(const GMGameMachineDesc& desc, IGameHandler* handler)
 	{
 		if (!g_isGameMachineInited)
 		{
@@ -42,13 +36,12 @@ namespace shell
 			g_isGameMachineInited = true;
 		}
 
-		GameMachineWidget* gmwidget = new GameMachineWidget(parent);
-		IWindow* gamemachineWindow = createGameMachineChildWindow(handler, (HWND)gmwidget->winId(), desc.factory);
+		IWindow* gamemachineWindow = createGameMachineChildWindow(handler, (HWND)winId(), desc.factory);
 		GM.addWindow(gamemachineWindow);
-		gmwidget->setRenderContext(gamemachineWindow->getContext());
-		gmwidget->setAttribute(Qt::WA_PaintOnScreen, true);
-		gmwidget->setAttribute(Qt::WA_NativeWindow, true);
-		return gmwidget;
+		setRenderContext(gamemachineWindow->getContext());
+		setAttribute(Qt::WA_PaintOnScreen, true);
+		setAttribute(Qt::WA_NativeWindow, true);
+		GM.handleMessages();
 	}
 
 	void GameMachineWidget::setRenderContext(const IRenderContext* context)
