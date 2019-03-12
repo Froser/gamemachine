@@ -4,6 +4,8 @@
 
 namespace
 {
+	using namespace gm;
+
 	bool g_isGameMachineInited = false;
 
 	IWindow* createGameMachineChildWindow(IGameHandler* handler, HWND hContainer, IFactory* factory)
@@ -19,11 +21,25 @@ namespace
 		window->create(wndAttrs);
 		return window;
 	}
+
+	GMAtomic<GMsize_t>& getGameMachineRefCount()
+	{
+		static GMAtomic<GMsize_t> s_gmrefcnt;
+		return s_gmrefcnt;
+	}
 }
 
-
-namespace shell
+namespace gm
 {
+	GameMachineWidget::~GameMachineWidget()
+	{
+		if (m_gamemachineSet)
+		{
+			if (!--getGameMachineRefCount())
+				GM.finalize();
+		}
+	}
+
 	void GameMachineWidget::setGameMachine(const GMGameMachineDesc& desc, IGameHandler* handler)
 	{
 		if (!g_isGameMachineInited)
@@ -41,6 +57,9 @@ namespace shell
 		setAttribute(Qt::WA_PaintOnScreen, true);
 		setAttribute(Qt::WA_NativeWindow, true);
 		GM.handleMessages();
+
+		m_gamemachineSet = true;
+		++getGameMachineRefCount();
 	}
 
 	void GameMachineWidget::setRenderContext(const IRenderContext* context)
@@ -50,6 +69,7 @@ namespace shell
 
 	bool GameMachineWidget::event(QEvent* e)
 	{
+		// 是否需要在所有Event时都来handle messages?
 		if (g_isGameMachineInited)
 			GM.handleMessages();
 

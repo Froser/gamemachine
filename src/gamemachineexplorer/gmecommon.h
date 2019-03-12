@@ -4,6 +4,7 @@
 // Fwds
 namespace gm
 {
+	class GameMachineWidget;
 	class GMGameWorld;
 	class GMGameObject;
 	struct IGameHandler;

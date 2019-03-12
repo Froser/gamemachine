@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "mainwindow.h"
-#include <QVBoxLayout>
+#include <gamemachinewidget.h>
 #include "src/core/handler.h"
 #include "src/core/handler_control.h"
 

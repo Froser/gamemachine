@@ -20,6 +20,7 @@ include_directories(
 		../gamemachine/include
 		../gamemachineui/include
 		../gamemachinemedia/include
+		../gamemachineqt/include
 		./
 	)
 
@@ -39,8 +40,6 @@ set(SOURCES
 		src/shell/application.cpp
 		src/shell/mainwindow.h
 		src/shell/mainwindow.cpp
-		src/shell/gamemachinewidget.h
-		src/shell/gamemachinewidget.cpp
 
 		src/core/handler.h
 		src/core/handler.cpp
@@ -72,12 +71,14 @@ target_link_libraries(gamemachineexplorer
 	Qt5::Core
 	Qt5::Gui 
 	Qt5::Widgets
+	gamemachineqt
 	)
 target_link_libraries(gamemachineexplorer_dll 
 	PUBLIC
 	Qt5::Core
 	Qt5::Gui 
 	Qt5::Widgets
+	gamemachineqt
 	)
 
 # Copy Dlls (On windows)

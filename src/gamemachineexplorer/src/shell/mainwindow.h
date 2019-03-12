@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <QtWidgets>
 #include <gamemachine.h>
-#include "gamemachinewidget.h"
 
 namespace shell
 {

@@ -1,15 +1,18 @@
 ﻿#ifndef __GAMEMACHINEWIDGET_H__
 #define __GAMEMACHINEWIDGET_H__
-#include <gmecommon.h>
 #include <QWidget>
+#include "forwards.h"
 
-namespace shell
+namespace gm
 {
 	class GameMachineWidget : public QWidget
 	{
 		Q_OBJECT
 
 		using QWidget::QWidget;
+
+	public:
+		~GameMachineWidget();
 
 	public:
 		void setGameMachine(const GMGameMachineDesc& desc, IGameHandler* handler);
@@ -24,6 +27,7 @@ namespace shell
 
 	private:
 		const IRenderContext* m_context = nullptr;
+		bool m_gamemachineSet = false;
 	};
 }
 
