@@ -1,5 +1,5 @@
-﻿#ifndef __HANDLER_CONTROL_H__
-#define __HANDLER_CONTROL_H__
+﻿#ifndef __CORE_HANDLER_CONTROL_H__
+#define __CORE_HANDLER_CONTROL_H__
 #include <gmecommon.h>
 #include <QtCore>
 #include <gmassets.h>

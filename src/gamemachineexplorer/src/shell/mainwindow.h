@@ -1,5 +1,5 @@
-﻿#ifndef __MAINWINDOW_H__
-#define __MAINWINDOW_H__
+﻿#ifndef __SHELL_MAINWINDOW_H__
+#define __SHELL_MAINWINDOW_H__
 #include <gmecommon.h>
 #include <QMainWindow>
 #include <QtWidgets>
@@ -19,11 +19,22 @@ namespace shell
 
 	private:
 		void setupUi();
+		void createActions();
+		void createMenus();
+		void createToolbar();
+		void createToolbox();
 
 	private:
 		QWidget* m_centralwidget = nullptr;
-		GameMachineWidget* m_gmwidget = nullptr;
-		core::HandlerControl* m_gmcontrol = nullptr;
+		core::Scene* m_scene = nullptr;
+
+	// Actions
+	private:
+		QAction* m_newFileAct = nullptr;
+		QAction* m_openFileAct = nullptr;
+
+		QAction* m_addModelAct = nullptr;
+		QAction* m_addLightAct = nullptr;
 	};
 }
 

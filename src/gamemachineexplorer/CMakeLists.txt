@@ -22,6 +22,7 @@ include_directories(
 		../gamemachinemedia/include
 		../gamemachineqt/include
 		./
+		./src
 	)
 
 IF(WIN32)
@@ -45,6 +46,10 @@ set(SOURCES
 		src/core/handler.cpp
 		src/core/handler_control.h
 		src/core/handler_control.cpp
+		src/core/scene.h
+		src/core/scene.cpp
+		src/core/scene_model.h
+		src/core/scene_model.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)

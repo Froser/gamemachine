@@ -16,6 +16,8 @@ namespace core
 {
 	class Handler;
 	class HandlerControl;
+	class Scene;
+	class SceneModel;
 }
 
 using namespace gm;

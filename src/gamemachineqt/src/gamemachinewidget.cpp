@@ -8,7 +8,7 @@ namespace
 
 	bool g_isGameMachineInited = false;
 
-	IWindow* createGameMachineChildWindow(IGameHandler* handler, HWND hContainer, IFactory* factory)
+	IWindow* createGameMachineChildWindow(IGameHandler* handler, float renderWidth, float renderHeight, HWND hContainer, IFactory* factory)
 	{
 		IWindow* window = NULL;
 		factory->createWindow(NULL, 0, &window);
@@ -18,6 +18,7 @@ namespace
 		GMWindowDesc wndAttrs;
 		wndAttrs.createNewWindow = false;
 		wndAttrs.existWindowHandle = hContainer;
+		wndAttrs.rc = { 0, 0, renderWidth, renderHeight };
 		window->create(wndAttrs);
 		return window;
 	}
@@ -40,7 +41,7 @@ namespace gm
 		}
 	}
 
-	void GameMachineWidget::setGameMachine(const GMGameMachineDesc& desc, IGameHandler* handler)
+	void GameMachineWidget::setGameMachine(const GMGameMachineDesc& desc, float renderWidth, float renderHeight, IGameHandler* handler)
 	{
 		if (!g_isGameMachineInited)
 		{
@@ -51,7 +52,7 @@ namespace gm
 			g_isGameMachineInited = true;
 		}
 
-		IWindow* gamemachineWindow = createGameMachineChildWindow(handler, (HWND)winId(), desc.factory);
+		IWindow* gamemachineWindow = createGameMachineChildWindow(handler, renderWidth, renderHeight, (HWND)winId(), desc.factory);
 		GM.addWindow(gamemachineWindow);
 		setRenderContext(gamemachineWindow->getContext());
 		setAttribute(Qt::WA_PaintOnScreen, true);

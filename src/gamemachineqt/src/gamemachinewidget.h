@@ -15,7 +15,7 @@ namespace gm
 		~GameMachineWidget();
 
 	public:
-		void setGameMachine(const GMGameMachineDesc& desc, IGameHandler* handler);
+		void setGameMachine(const GMGameMachineDesc& desc, float renderWidth, float renderHeight, IGameHandler* handler);
 
 	protected:
 		void setRenderContext(const IRenderContext* context);

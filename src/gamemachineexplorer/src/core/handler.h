@@ -1,5 +1,5 @@
-﻿#ifndef __HANDLER_H__
-#define __HANDLER_H__
+﻿#ifndef __CORE_HANDLER_H__
+#define __CORE_HANDLER_H__
 #include <gmecommon.h>
 #include <gamemachine.h>
 

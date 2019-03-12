@@ -1,5 +1,5 @@
-﻿#ifndef __GMEAPPLICATION_H__
-#define __GMEAPPLICATION_H__
+﻿#ifndef __SHELL_GMEAPPLICATION_H__
+#define __SHELL_GMEAPPLICATION_H__
 #include <gmecommon.h>
 #include <QApplication>
 
