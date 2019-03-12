@@ -8,10 +8,13 @@
 #include <gmdx11helper.h>
 #endif
 
-#include <gmprimitivemanager.h>
-
 namespace core
 {
+	Handler::~Handler()
+	{
+		GM_delete(m_world);
+	}
+
 	void Handler::init(const IRenderContext* context)
 	{
 		m_context = context;
@@ -49,6 +52,7 @@ namespace core
 		}
 
 		context->getEngine()->setShaderLoadCallback(this);
+		m_world = new GMGameWorld(context);
 	}
 
 	void Handler::start()
@@ -90,6 +94,7 @@ namespace core
 		case GameMachineHandlerEvent::Render:
 		{
 			m_context->getEngine()->getDefaultFramebuffers()->clear();
+			m_world->renderScene();
 			break;
 		}
 		}

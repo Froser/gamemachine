@@ -44,6 +44,8 @@ set(SOURCES
 
 		src/core/handler.h
 		src/core/handler.cpp
+		src/core/handler_control.h
+		src/core/handler_control.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)

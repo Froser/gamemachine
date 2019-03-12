@@ -8,6 +8,9 @@ namespace core
 	class Handler : public IGameHandler, public IShaderLoadCallback
 	{
 	public:
+		~Handler();
+
+	public:
 		virtual void init(const IRenderContext* context);
 		virtual void start();
 		virtual void event(GameMachineHandlerEvent evt);
@@ -19,8 +22,14 @@ namespace core
 			return m_context;
 		}
 
+		GMGameWorld* getWorld()
+		{
+			return m_world;
+		}
+
 	private:
 		const IRenderContext* m_context = nullptr;
+		GMGameWorld* m_world = nullptr;
 	};
 
 }

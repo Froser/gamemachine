@@ -24,10 +24,9 @@ int main(int argc, char* argv[])
 #endif
 	shell::MainWindow mainWindow;
 
-	const QStringList& args = app.arguments();
 	GMRenderEnvironment re = GMRenderEnvironment::DirectX11;
 	IFactory* factory = nullptr;
-	if (args.contains("-opengl"))
+	if (wcscmp(lpCmdLine, L"-opengl") == 0)
 	{
 		factory = new GMGLFactory();
 		re = GMRenderEnvironment::OpenGL;

@@ -4,9 +4,17 @@
 // Fwds
 namespace gm
 {
+	class GMGameWorld;
+	class GMGameObject;
 	struct IGameHandler;
 	struct IRenderContext;
 	struct GMGameMachineDesc;
+}
+
+namespace core
+{
+	class Handler;
+	class HandlerControl;
 }
 
 using namespace gm;

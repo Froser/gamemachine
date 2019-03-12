@@ -2,6 +2,7 @@
 #include "mainwindow.h"
 #include <QVBoxLayout>
 #include "src/core/handler.h"
+#include "src/core/handler_control.h"
 
 namespace shell
 {
@@ -14,7 +15,13 @@ namespace shell
 	void MainWindow::initGameMachine(const GMGameMachineDesc& desc)
 	{
 		Q_ASSERT(m_gmwidget);
-		m_gmwidget->setGameMachine(desc, new core::Handler());
+		core::Handler* handler = new core::Handler();
+		m_gmwidget->setGameMachine(desc, handler);
+		
+		m_gmcontrol = new core::HandlerControl(handler, this);
+		m_gmcontrol->clearRenderList();
+		m_gmcontrol->renderLogo();
+		m_gmcontrol->setDefaultColor(GMVec4(.117f, .117f, .117f, 1));
 	}
 
 	void MainWindow::setupUi()
@@ -28,7 +35,6 @@ namespace shell
 		QVBoxLayout* mainLayout = new QVBoxLayout(m_centralwidget);
 		mainLayout->setContentsMargins(0, 0, 0, 0);
 
-		//mainLayout->addWidget(m_gmwidget);
 		m_gmwidget = new GameMachineWidget(m_centralwidget);
 		m_gmwidget->setGeometry(0, 0, 800, 600);
 	}

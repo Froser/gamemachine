@@ -18,6 +18,7 @@ namespace shell
 		void setRenderContext(const IRenderContext* context);
 
 	protected:
+		virtual bool event(QEvent* e) override;
 		virtual QPaintEngine* paintEngine() const override;
 		virtual void paintEvent(QPaintEvent *event) override;
 

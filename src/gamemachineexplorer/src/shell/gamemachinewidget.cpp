@@ -11,7 +11,6 @@ namespace
 		IWindow* window = NULL;
 		factory->createWindow(NULL, 0, &window);
 		GM_ASSERT(window);
-
 		window->setHandler(handler);
 
 		GMWindowDesc wndAttrs;
@@ -47,6 +46,14 @@ namespace shell
 	void GameMachineWidget::setRenderContext(const IRenderContext* context)
 	{
 		m_context = context;
+	}
+
+	bool GameMachineWidget::event(QEvent* e)
+	{
+		if (g_isGameMachineInited)
+			GM.handleMessages();
+
+		return QWidget::event(e);
 	}
 
 	QPaintEngine* GameMachineWidget::paintEngine() const

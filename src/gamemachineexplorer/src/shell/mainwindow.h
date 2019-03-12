@@ -24,6 +24,7 @@ namespace shell
 	private:
 		QWidget* m_centralwidget = nullptr;
 		GameMachineWidget* m_gmwidget = nullptr;
+		core::HandlerControl* m_gmcontrol = nullptr;
 	};
 }
 
