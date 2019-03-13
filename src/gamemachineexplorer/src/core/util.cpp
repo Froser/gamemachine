@@ -37,14 +37,18 @@ namespace core
 			x += dx;
 		}
 
-		/*
 		for (GMsize_t j = 0; j < sliceM + 1; ++j)
 		{
+			GMVertex vert1 = { { x_start, y, z } };
+			vert1.color = { desc.lineColor[0], desc.lineColor[1], desc.lineColor[2], 1 };
+			vertices.push_back(std::move(vert1));
+
+			GMVertex vert2 = { { x_end, y, z } };
+			vert1.color = { desc.lineColor[0], desc.lineColor[1], desc.lineColor[2], 1 };
+			vertices.push_back(std::move(vert2));
 
 			z += dz;
-			x = x_start;
 		}
-		*/
 
 		GMModel* m = new GMModel();
 		m->setUsageHint(GMUsageHint::DynamicDraw);

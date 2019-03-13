@@ -21,7 +21,7 @@ namespace
 		static GMCamera s_camera;
 		std::call_once(s_flag, [](GMCamera&){
 			s_camera.setOrtho(-1, 1, -1, 1, .1f, 3200.f);
-			gm::GMCameraLookAt lookAt;
+			GMCameraLookAt lookAt;
 			lookAt.lookAt = { 0, 0, 1 };
 			lookAt.position = { 0, 0, -1 };
 			s_camera.lookAt(lookAt);
@@ -83,6 +83,7 @@ namespace core
 
 	void SceneControl::renderLogo()
 	{
+		setDefaultCamera(defaultCamera());
 		if (m_assets.logo.asset.isEmpty())
 		{
 			m_assets.logo.asset = createLogo();
@@ -95,15 +96,22 @@ namespace core
 
 	void SceneControl::renderPlain()
 	{
+		//TODO 先写死一个Camera
+		GMCamera camera;
+		camera.setPerspective(Radian(75.f), .75f, .1f, 1000);
+		GMCameraLookAt lookAt = GMCameraLookAt::makeLookAt(GMVec3(40, 40, 40), GMVec3(0, 0, 0));
+		camera.lookAt(lookAt);
+		setDefaultCamera(camera);
+
 		if (m_assets.plain.asset.isEmpty())
 		{
 			// 创建一个平面
 			GMPlainDescription desc = {
-				-256.f,
-				-256.f,
+				-128.f,
 				0,
-				512.f,
-				512.f,
+				-128.f,
+				256.f,
+				256,
 				50,
 				50,
 				{ 1, 1, 1 }
