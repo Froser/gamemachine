@@ -46,7 +46,6 @@ gm_add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
 add_library(${PROJECT_NAME}
 		${SOURCES}
 	)
-gm_gamemachine_project(${PROJECT_NAME} TRUE)
 
 target_link_libraries(gamemachineqt
 	PUBLIC

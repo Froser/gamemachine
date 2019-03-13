@@ -334,7 +334,7 @@ GM_PRIVATE_OBJECT(GMScene)
 	GMOwnedPtr<GMSkeletalNode> skeletalRoot;
 };
 
-class GMScene : public GMObject
+class GM_EXPORT GMScene : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMScene)
 	GM_DECLARE_PROPERTY(Models, models)
