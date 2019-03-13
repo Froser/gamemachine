@@ -41,15 +41,19 @@ set(SOURCES
 		src/shell/application.cpp
 		src/shell/mainwindow.h
 		src/shell/mainwindow.cpp
+		src/shell/mainwindow_actions.h
+		src/shell/mainwindow_actions.cpp
 
 		src/core/handler.h
 		src/core/handler.cpp
-		src/core/handler_control.h
-		src/core/handler_control.cpp
+		src/core/scene_control.h
+		src/core/scene_control.cpp
 		src/core/scene.h
 		src/core/scene.cpp
 		src/core/scene_model.h
 		src/core/scene_model.cpp
+		src/core/util.h
+		src/core/util.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)

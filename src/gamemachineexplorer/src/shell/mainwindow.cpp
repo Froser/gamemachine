@@ -3,7 +3,7 @@
 #include <gamemachinewidget.h>
 #include <core/scene.h>
 #include <core/handler.h>
-#include <core/handler_control.h>
+#include <core/scene_control.h>
 #include <core/scene_model.h>
 
 namespace shell
@@ -22,12 +22,11 @@ namespace shell
 			core::Handler* handler = new core::Handler();
 			gmwidget->setGameMachine(desc, size().width(), size().height(), handler);
 
-			core::HandlerControl* control = new core::HandlerControl(handler, m_scene);
+			core::SceneControl* control = new core::SceneControl(handler, m_scene);
 			control->clearRenderList();
 			control->renderLogo();
 			control->setDefaultColor(GMVec4(.117f, .117f, .117f, 1));
 			m_scene->setControl(control);
-			m_scene->setModel(new core::SceneModel(m_scene));
 		}
 	}
 
@@ -47,6 +46,7 @@ namespace shell
 		m_scene = new core::Scene(this);
 		m_scene->setWidget(gmwidget);
 		mainLayout->addWidget(gmwidget);
+		m_actions.setScene(m_scene);
 
 		// Create menus and toolbar
 		createActions();
@@ -59,6 +59,7 @@ namespace shell
 		if (!m_newFileAct)
 		{
 			m_newFileAct = new QAction(tr("New"), this);
+			connect(m_newFileAct, &QAction::triggered, &m_actions, &MainWindowActions::onNewFile);
 		}
 
 		if (!m_openFileAct)

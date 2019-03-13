@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QtWidgets>
 #include <gamemachine.h>
+#include "mainwindow_actions.h"
 
 namespace shell
 {
@@ -22,10 +23,10 @@ namespace shell
 		void createActions();
 		void createMenus();
 		void createToolbar();
-		void createToolbox();
 
 	private:
 		QWidget* m_centralwidget = nullptr;
+		MainWindowActions m_actions;
 		core::Scene* m_scene = nullptr;
 
 	// Actions

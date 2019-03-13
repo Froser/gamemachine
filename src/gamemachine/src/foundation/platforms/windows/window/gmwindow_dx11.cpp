@@ -127,7 +127,12 @@ void GMWindow_Dx11::onWindowCreated(const GMWindowDesc& wndAttrs)
 	GMComPtr<ID3D11DepthStencilState> depthStencilState;
 	GMComPtr<ID3D11RasterizerState> rasterizerState;
 
-	const GMRect& renderRc = getRenderRect();
+	GMRect renderRc = {
+		static_cast<GMint32>(wndAttrs.rc.x),
+		static_cast<GMint32>(wndAttrs.rc.y),
+		static_cast<GMint32>(wndAttrs.rc.width),
+		static_cast<GMint32>(wndAttrs.rc.height)
+	};
 	UINT renderWidth = renderRc.width;
 	UINT renderHeight = renderRc.height;
 	GMuint32 numerator = 0, denominator = 0;

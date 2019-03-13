@@ -7,6 +7,8 @@ namespace gm
 	class GameMachineWidget;
 	class GMGameWorld;
 	class GMGameObject;
+	class GMModel;
+	class GMShader;
 	struct IGameHandler;
 	struct IRenderContext;
 	struct GMGameMachineDesc;
@@ -15,7 +17,7 @@ namespace gm
 namespace core
 {
 	class Handler;
-	class HandlerControl;
+	class SceneControl;
 	class Scene;
 	class SceneModel;
 }

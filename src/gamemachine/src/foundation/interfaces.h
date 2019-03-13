@@ -196,7 +196,7 @@ struct GMWindowDesc
 	GMString windowName = L"Default GameMachine Main Window";
 	GMDWord dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME;
 	GMDWord dwExStyle = NULL;
-	GMRectF rc = { 0, 0, 1024, 768 };
+	GMRectF rc = { 0, 0, 0, 0 }; //!< 渲染窗口大小。如果需要创建新窗口，且宽度或高度小于或等于0，则分别拿到一个默认值。如果不需要创建窗口，且宽度或高度小于或等于0，则拿hwndParent窗口大小。
 	GMint32 samples = 8;
 	GMInstance instance;
 };

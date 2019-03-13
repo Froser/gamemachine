@@ -12,6 +12,9 @@
 #	define GetWindowStyle(hwnd) ((DWORD)GetWindowLong(hwnd, GWL_STYLE))
 #endif
 
+#define DefaultWindowWidth 1024
+#define DefaultWindowHeight 768
+
 namespace
 {
 	Map<HWND, GMWindow*> s_hwndMap;
@@ -218,6 +221,11 @@ GMWindowHandle GMWindow::create(const GMWindowDesc& desc)
 	GMWindowDesc attrs = desc;
 	if (desc.createNewWindow)
 	{
+		if (attrs.rc.width <= 0)
+			attrs.rc.width = DefaultWindowWidth;
+		if (attrs.rc.height <= 0)
+			attrs.rc.height = DefaultWindowHeight;
+
 		// 在非全屏的时候才有效，计算出客户窗口（渲染窗口）大小
 		RECT rc = { (LONG) attrs.rc.x, (LONG) attrs.rc.y, (LONG) (attrs.rc.x + attrs.rc.width), (LONG) (attrs.rc.y + attrs.rc.height) };
 		::AdjustWindowRectEx(&rc, attrs.dwStyle, FALSE, attrs.dwExStyle);
@@ -242,12 +250,22 @@ GMWindowHandle GMWindow::create(const GMWindowDesc& desc)
 	{
 		hwnd = attrs.existWindowHandle;
 		setWindowHandle(attrs.existWindowHandle, false);
-		const GMRect& rc = getRenderRect();
-		attrs.rc = { (GMfloat) rc.x, (GMfloat) rc.y, (GMfloat) rc.width, (GMfloat) rc.height };
+
+		// 如果没有指定大小，则拿窗口本身大小
+		if (attrs.rc.width <= 0 || attrs.rc.height <= 0)
+		{
+			const GMRect& rc = getRenderRect();
+			attrs.rc = { (GMfloat)rc.x, (GMfloat)rc.y, (GMfloat)rc.width, (GMfloat)rc.height };
+		}
 	}
 
 	onWindowCreated(attrs);
-	d->windowStates.renderRect = getRenderRect();
+	d->windowStates.renderRect = {
+		static_cast<GMint32>(attrs.rc.x),
+		static_cast<GMint32>(attrs.rc.y),
+		static_cast<GMint32>(attrs.rc.width),
+		static_cast<GMint32>(attrs.rc.height)
+	};
 	d->windowStates.framebufferRect = d->windowStates.renderRect;
 	return hwnd;
 }

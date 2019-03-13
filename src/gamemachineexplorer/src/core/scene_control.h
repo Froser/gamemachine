@@ -7,15 +7,21 @@
 
 namespace core
 {
+	struct Asset
+	{
+		GMSceneAsset asset;
+		GMGameObject* object = nullptr;
+	};
+
 	class Handler;
-	class HandlerControl : public QObject
+	class SceneControl : public QObject
 	{
 		Q_OBJECT
 
 		struct Assets
 		{
-			GMSceneAsset logo;
-			GMGameObject* logoObj = nullptr;
+			Asset logo;
+			Asset plain;
 		};
 
 		struct Light
@@ -24,14 +30,22 @@ namespace core
 		};
 
 	public:
-		HandlerControl(Handler* handler, QObject* parent = nullptr);
+		SceneControl(Handler* handler, QObject* parent = nullptr);
 
+	public slots:
+		void onSceneModelCreated();
+
+	// 对场景的操作
 	public:
 		void setDefaultCamera(const GMCamera& camera);
 		void setDefaultColor(const GMVec4& color);
 		void setDefaultLight(const GMVec3& position, const GMVec3& diffuseIntensity, const GMVec3& ambientIntensity);
 		void clearRenderList();
 		void renderLogo();
+		void renderPlain();
+
+	signals:
+		void renderUpdate();
 
 	protected:
 		virtual GMAsset createLogo();

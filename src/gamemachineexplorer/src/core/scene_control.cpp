@@ -1,8 +1,9 @@
 ﻿#include "stdafx.h"
-#include "handler_control.h"
+#include "scene_control.h"
 #include <gmutilities.h>
 #include "handler.h"
 #include <gmlight.h>
+#include "util.h"
 
 namespace
 {
@@ -31,7 +32,7 @@ namespace
 
 namespace core
 {
-	HandlerControl::HandlerControl(Handler* handler, QObject* parent /*= nullptr*/)
+	SceneControl::SceneControl(Handler* handler, QObject* parent /*= nullptr*/)
 		: QObject(parent)
 		, m_handler(handler)
 	{
@@ -39,19 +40,25 @@ namespace core
 		setDefaultCamera(defaultCamera());
 	}
 
-	void HandlerControl::setDefaultCamera(const GMCamera& camera)
+	void SceneControl::onSceneModelCreated()
+	{
+		clearRenderList();
+		renderPlain();
+	}
+
+	void SceneControl::setDefaultCamera(const GMCamera& camera)
 	{
 		auto engine = m_handler->getContext()->getEngine();
 		engine->setCamera(camera);
 	}
 
-	void HandlerControl::setDefaultColor(const GMVec4& color)
+	void SceneControl::setDefaultColor(const GMVec4& color)
 	{
 		auto engine = m_handler->getContext()->getEngine();
 		engine->getDefaultFramebuffers()->setClearColor(ValuePointer(color));
 	}
 
-	void HandlerControl::setDefaultLight(const GMVec3& position, const GMVec3& diffuseIntensity, const GMVec3& ambientIntensity)
+	void SceneControl::setDefaultLight(const GMVec3& position, const GMVec3& diffuseIntensity, const GMVec3& ambientIntensity)
 	{
 		auto engine = m_handler->getContext()->getEngine();
 		if (m_lights.defaultLightIndex == -1)
@@ -69,23 +76,48 @@ namespace core
 		}
 	}
 
-	void HandlerControl::clearRenderList()
+	void SceneControl::clearRenderList()
 	{
 		m_handler->getWorld()->clearRenderList();
 	}
 
-	void HandlerControl::renderLogo()
+	void SceneControl::renderLogo()
 	{
-		if (m_assets.logo.isEmpty())
+		if (m_assets.logo.asset.isEmpty())
 		{
-			m_assets.logo = createLogo();
-			m_assets.logoObj = new GMGameObject(m_assets.logo);
-			m_handler->getWorld()->addObjectAndInit(m_assets.logoObj);
+			m_assets.logo.asset = createLogo();
+			m_assets.logo.object = new GMGameObject(m_assets.logo.asset);
+			m_handler->getWorld()->addObjectAndInit(m_assets.logo.object);
 		}
-		m_handler->getWorld()->addToRenderList(m_assets.logoObj);
+		m_handler->getWorld()->addToRenderList(m_assets.logo.object);
+		emit renderUpdate();
 	}
 
-	GMSceneAsset HandlerControl::createLogo()
+	void SceneControl::renderPlain()
+	{
+		if (m_assets.plain.asset.isEmpty())
+		{
+			// 创建一个平面
+			GMPlainDescription desc = {
+				-256.f,
+				-256.f,
+				0,
+				512.f,
+				512.f,
+				50,
+				50,
+				{ 1, 1, 1 }
+			};
+
+			utCreatePlain(desc, m_assets.plain.asset);
+			m_assets.plain.object = new GMGameObject(m_assets.plain.asset);
+			m_handler->getWorld()->addObjectAndInit(m_assets.plain.object);
+		}
+		m_handler->getWorld()->addToRenderList(m_assets.plain.object);
+		emit renderUpdate();
+	}
+
+	GMSceneAsset SceneControl::createLogo()
 	{
 		// 创建一个带纹理的对象
 		GMVec2 extents = GMVec2(1.f, .5f);

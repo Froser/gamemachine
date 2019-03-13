@@ -12,17 +12,26 @@ namespace core
 		using QObject::QObject;
 
 	public:
-		void setControl(HandlerControl* control);
-		void setWidget(GameMachineWidget* widget);
-		void setModel(SceneModel* model);
+		void newFile();
 
 	public:
-		HandlerControl* control();
+		void setControl(SceneControl* control);
+		SceneControl* control();
+
+		void setWidget(GameMachineWidget* widget);
 		GameMachineWidget* widget();
+
+		void setModel(SceneModel* model);
 		SceneModel* model();
 
+	private slots:
+		void onRenderUpdate();
+
+	signals:
+		void fileCreated();
+
 	private:
-		HandlerControl* m_control = nullptr;
+		SceneControl* m_control = nullptr;
 		SceneModel* m_model = nullptr;
 		GameMachineWidget* m_widget = nullptr;
 	};
