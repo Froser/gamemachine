@@ -4,6 +4,7 @@
 #include "handler.h"
 #include <gmlight.h>
 #include "util.h"
+#include "scene_model.h"
 
 namespace
 {
@@ -37,16 +38,17 @@ namespace core
 		, m_handler(handler)
 	{
 		setDefaultLight(GMVec3(0, 0, -.2f), GMVec3(.7f, .7f, .7f), GMVec3(0, 0, 0));
-		setDefaultCamera(defaultCamera());
+		setViewCamera(defaultCamera());
 	}
 
-	void SceneControl::onSceneModelCreated()
+	void SceneControl::onSceneModelCreated(SceneModel* model)
 	{
+		resetModel(model);
 		clearRenderList();
 		renderPlain();
 	}
 
-	void SceneControl::setDefaultCamera(const GMCamera& camera)
+	void SceneControl::setViewCamera(const GMCamera& camera)
 	{
 		auto engine = m_handler->getContext()->getEngine();
 		engine->setCamera(camera);
@@ -83,7 +85,7 @@ namespace core
 
 	void SceneControl::renderLogo()
 	{
-		setDefaultCamera(defaultCamera());
+		setViewCamera(defaultCamera());
 		if (m_assets.logo.asset.isEmpty())
 		{
 			m_assets.logo.asset = createLogo();
@@ -96,13 +98,6 @@ namespace core
 
 	void SceneControl::renderPlain()
 	{
-		//TODO 先写死一个Camera
-		GMCamera camera;
-		camera.setPerspective(Radian(75.f), .75f, .1f, 1000);
-		GMCameraLookAt lookAt = GMCameraLookAt::makeLookAt(GMVec3(40, 40, 40), GMVec3(0, 0, 0));
-		camera.lookAt(lookAt);
-		setDefaultCamera(camera);
-
 		if (m_assets.plain.asset.isEmpty())
 		{
 			// 创建一个平面
@@ -123,6 +118,22 @@ namespace core
 		}
 		m_handler->getWorld()->addToRenderList(m_assets.plain.object);
 		emit renderUpdate();
+	}
+
+	void SceneControl::resetModel(SceneModel* model)
+	{
+		// 负责重置Model，更新渲染，更新资源
+		m_model = model;
+		
+		// 重新生成场景相关的资源:
+		// 重置摄像机
+		m_sceneViewCamera.setPerspective(Radian(75.f), .75f, .1f, 1000); //TODO aspect需要计算，near和far需要从全局拿
+		GlobalProperties& props = model->getProperties();
+		GMCameraLookAt lookAt = GMCameraLookAt::makeLookAt(
+			GMVec3(props.viewCamera.posX, props.viewCamera.posY, props.viewCamera.posZ),
+			GMVec3(props.viewCamera.lookAtX, props.viewCamera.lookAtY, props.viewCamera.lookAtZ));
+		m_sceneViewCamera.lookAt(lookAt);
+		setViewCamera(m_sceneViewCamera);
 	}
 
 	GMSceneAsset SceneControl::createLogo()

@@ -18,6 +18,7 @@ namespace core
 	{
 		Q_OBJECT
 
+		// 公共资源
 		struct Assets
 		{
 			Asset logo;
@@ -33,11 +34,11 @@ namespace core
 		SceneControl(Handler* handler, QObject* parent = nullptr);
 
 	public slots:
-		void onSceneModelCreated();
+		void onSceneModelCreated(SceneModel* model);
 
 	// 对场景的操作
 	public:
-		void setDefaultCamera(const GMCamera& camera);
+		void setViewCamera(const GMCamera& camera);
 		void setDefaultColor(const GMVec4& color);
 		void setDefaultLight(const GMVec3& position, const GMVec3& diffuseIntensity, const GMVec3& ambientIntensity);
 		void clearRenderList();
@@ -48,12 +49,17 @@ namespace core
 		void renderUpdate();
 
 	protected:
+		virtual void resetModel(SceneModel*);
 		virtual GMAsset createLogo();
 
 	private:
 		Handler* m_handler = nullptr;
+		SceneModel* m_model = nullptr;
 		Assets m_assets;
 		Light m_lights;
+
+		// 场景相关组件
+		GMCamera m_sceneViewCamera;
 	};
 }
 

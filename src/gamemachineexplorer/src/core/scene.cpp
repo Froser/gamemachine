@@ -12,8 +12,8 @@ namespace core
 			m_model->deleteLater();
 
 		m_model = new SceneModel(this);
-		connect(this, &Scene::fileCreated, m_control, &SceneControl::onSceneModelCreated);
-		emit fileCreated();
+		connect(this, &Scene::fileCreated, m_control, &SceneControl::onSceneModelCreated, Qt::UniqueConnection);
+		emit fileCreated(m_model);
 	}
 
 	SceneControl* Scene::control()

@@ -28,7 +28,7 @@ namespace core
 		void onRenderUpdate();
 
 	signals:
-		void fileCreated();
+		void fileCreated(SceneModel*);
 
 	private:
 		SceneControl* m_control = nullptr;

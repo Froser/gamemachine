@@ -67,6 +67,11 @@ namespace shell
 			m_openFileAct = new QAction(tr("Open"), this);
 		}
 
+		if (!m_closeFileAct)
+		{
+			m_closeFileAct = new QAction(tr("Close"), this);
+		}
+
 		if (!m_addModelAct)
 		{
 			m_addModelAct = new QAction(tr("Add Model"), this);
@@ -83,6 +88,7 @@ namespace shell
 		auto fileMenu = menuBar()->addMenu(tr("&File"));
 		fileMenu->addAction(m_newFileAct);
 		fileMenu->addAction(m_openFileAct);
+		fileMenu->addAction(m_closeFileAct);
 	}
 
 	void MainWindow::createToolbar()
