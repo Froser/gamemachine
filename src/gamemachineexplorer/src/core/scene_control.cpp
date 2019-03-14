@@ -1,8 +1,10 @@
 ﻿#include "stdafx.h"
 #include "scene_control.h"
 #include <gmutilities.h>
-#include "handler.h"
+#include <gmdiscretedynamicsworld.h>
+#include <gmphysicsshape.h>
 #include <gmlight.h>
+#include "handler.h"
 #include "util.h"
 #include "scene_model.h"
 
@@ -23,7 +25,7 @@ namespace
 		std::call_once(s_flag, [](GMCamera&){
 			s_camera.setOrtho(-1, 1, -1, 1, .1f, 3200.f);
 			GMCameraLookAt lookAt;
-			lookAt.lookAt = { 0, 0, 1 };
+			lookAt.lookDirection = { 0, 0, 1 };
 			lookAt.position = { 0, 0, -1 };
 			s_camera.lookAt(lookAt);
 		}, s_camera);
@@ -48,6 +50,58 @@ namespace core
 		renderPlain();
 	}
 
+	void SceneControl::onWidgetMousePress(shell::View* v, QMouseEvent* e)
+	{
+		m_mouseDownPos = e->pos();
+		Asset selected = hitTest(m_mouseDownPos.x(), m_mouseDownPos.y());
+		
+		if (selected == m_assets[AT_Plane])
+		{
+			// 地板不能和其它元素同时选中
+			m_selectedAssets.clear();
+			if (!m_selectedAssets.contains(selected))
+				m_selectedAssets.append(selected);
+		}
+		else
+		{
+			// 如果用户按住Ctrl，则添加到选择列表
+			if (!(e->modifiers() & Qt::ControlModifier))
+				m_selectedAssets.clear();
+			if (!m_selectedAssets.contains(selected))
+				m_selectedAssets.append(selected);
+		}
+
+		m_mouseDown = true;
+	}
+
+	void SceneControl::onWidgetMouseRelease(shell::View* v, QMouseEvent* e)
+	{
+		m_mouseDown = false;
+	}
+
+	void SceneControl::onWidgetMouseMove(shell::View*, QMouseEvent* e)
+	{
+		if (m_mouseDown)
+		{
+			// 先获取偏移
+			float dx = e->pos().x() - m_mouseDownPos.x();
+			float dy = e->pos().y() - m_mouseDownPos.y();
+			
+			// 如果选中了地板，移动镜头
+			if (m_selectedAssets.contains(m_assets[AT_Plane]))
+			{
+				// 镜头位置移动
+				GMCameraLookAt lookAt = m_sceneViewCamera.getLookAt();
+				lookAt.position.setX(lookAt.position.getX() + dx);
+				lookAt.position.setZ(lookAt.position.getZ() + dy);
+				m_sceneViewCamera.setLookAt(lookAt);
+				setViewCamera(m_sceneViewCamera);
+				m_mouseDownPos = e->pos();
+				emit renderUpdate();
+			}
+		}
+	}
+
 	void SceneControl::setViewCamera(const GMCamera& camera)
 	{
 		auto engine = m_handler->getContext()->getEngine();
@@ -63,19 +117,25 @@ namespace core
 	void SceneControl::setDefaultLight(const GMVec3& position, const GMVec3& diffuseIntensity, const GMVec3& ambientIntensity)
 	{
 		auto engine = m_handler->getContext()->getEngine();
-		if (m_lights.defaultLightIndex == -1)
+		if (m_defaultLight.defaultLightIndex == -1)
 		{
 			ILight* light = nullptr;
 			GM.getFactory()->createLight(GMLightType::PointLight, &light);
 			setLightAttributes(light, position, diffuseIntensity, ambientIntensity);
-			m_lights.defaultLightIndex = engine->addLight(light);
+			m_defaultLight.defaultLightIndex = engine->addLight(light);
 		}
 		else
 		{
-			ILight* light = engine->getLight(m_lights.defaultLightIndex);
+			ILight* light = engine->getLight(m_defaultLight.defaultLightIndex);
 			setLightAttributes(light, position, diffuseIntensity, ambientIntensity);
 			engine->update(GMUpdateDataType::LightChanged);
 		}
+	}
+
+	const GMCamera& SceneControl::currentCamera()
+	{
+		auto engine = m_handler->getContext()->getEngine();
+		return engine->getCamera();
 	}
 
 	void SceneControl::clearRenderList()
@@ -86,37 +146,52 @@ namespace core
 	void SceneControl::renderLogo()
 	{
 		setViewCamera(defaultCamera());
-		if (m_assets.logo.asset.isEmpty())
+		if (m_assets[AT_Logo].asset.isEmpty())
 		{
-			m_assets.logo.asset = createLogo();
-			m_assets.logo.object = new GMGameObject(m_assets.logo.asset);
-			m_handler->getWorld()->addObjectAndInit(m_assets.logo.object);
+			m_assets[AT_Logo].asset = createLogo();
+			m_assets[AT_Logo].object = new GMGameObject(m_assets[AT_Logo].asset);
+			m_handler->getWorld()->addObjectAndInit(m_assets[AT_Logo].object);
 		}
-		m_handler->getWorld()->addToRenderList(m_assets.logo.object);
+		m_handler->getWorld()->addToRenderList(m_assets[AT_Logo].object);
 		emit renderUpdate();
 	}
 
 	void SceneControl::renderPlain()
 	{
-		if (m_assets.plain.asset.isEmpty())
+		constexpr float PLANE_LENGTH = 256.f;
+		constexpr float PLANE_WIDTH = 256.f;
+		constexpr float HALF_PLANE_LENGTH = PLANE_LENGTH / 2.f;
+		constexpr float HALF_PLANE_WIDTH = PLANE_WIDTH / 2.f;
+		constexpr float PLANE_HEIGHT = 2.f;
+		if (m_assets[AT_Plane].asset.isEmpty())
 		{
 			// 创建一个平面
 			GMPlainDescription desc = {
-				-128.f,
+				-HALF_PLANE_LENGTH,
 				0,
-				-128.f,
-				256.f,
-				256,
+				-HALF_PLANE_WIDTH,
+				PLANE_LENGTH,
+				PLANE_WIDTH,
 				50,
 				50,
 				{ 1, 1, 1 }
 			};
 
-			utCreatePlain(desc, m_assets.plain.asset);
-			m_assets.plain.object = new GMGameObject(m_assets.plain.asset);
-			m_handler->getWorld()->addObjectAndInit(m_assets.plain.object);
+			utCreatePlain(desc, m_assets[AT_Plane].asset);
+			m_assets[AT_Plane].object = new GMGameObject(m_assets[AT_Plane].asset);
+			m_handler->getWorld()->addObjectAndInit(m_assets[AT_Plane].object);
+
+			// 设置一个物理形状
+			GMRigidPhysicsObject* rigidPlain = new gm::GMRigidPhysicsObject();
+			rigidPlain->setMass(.0f);
+			m_assets[AT_Plane].object->setPhysicsObject(rigidPlain);
+			GMPhysicsShapeHelper::createCubeShape(GMVec3(HALF_PLANE_LENGTH, PLANE_HEIGHT, HALF_PLANE_WIDTH), m_assets[AT_Plane].shape);
+			rigidPlain->setShape(m_assets[AT_Plane].shape);
+
+			// 添加到世界
+			m_handler->getPhysicsWorld()->addRigidObject(rigidPlain);
 		}
-		m_handler->getWorld()->addToRenderList(m_assets.plain.object);
+		m_handler->getWorld()->addToRenderList(m_assets[AT_Plane].object);
 		emit renderUpdate();
 	}
 
@@ -127,7 +202,7 @@ namespace core
 		
 		// 重新生成场景相关的资源:
 		// 重置摄像机
-		m_sceneViewCamera.setPerspective(Radian(75.f), .75f, .1f, 1000); //TODO aspect需要计算，near和far需要从全局拿
+		m_sceneViewCamera.setPerspective(Radian(75.f), .75f, .1f, 2000); //TODO aspect需要计算，near和far需要从全局拿
 		GlobalProperties& props = model->getProperties();
 		GMCameraLookAt lookAt = GMCameraLookAt::makeLookAt(
 			GMVec3(props.viewCamera.posX, props.viewCamera.posY, props.viewCamera.posZ),
@@ -151,4 +226,27 @@ namespace core
 		GMToolUtil::addTextureToShader(model->getShader(), tex, GMTextureType::Diffuse);
 		return asset;
 	}
+
+	Asset SceneControl::hitTest(int x, int y)
+	{
+		const GMCamera& camera = currentCamera();
+		GMVec3 rayFrom = camera.getLookAt().position;
+		GMVec3 rayTo = camera.getRayToWorld(m_handler->getContext()->getWindow()->getRenderRect(), x, y);
+		GMPhysicsRayTestResult rayTestResult = m_handler->getPhysicsWorld()->rayTest(rayFrom, rayTo);
+		return findAsset(rayTestResult.hitObject);
+	}
+
+	Asset SceneControl::findAsset(GMPhysicsObject* phyObj)
+	{
+		if (phyObj)
+		{
+			for (int i = AT_Begin; i < AT_End; ++i)
+			{
+				if (m_assets[i].object && m_assets[i].object->getPhysicsObject() == phyObj)
+					return m_assets[i];
+			}
+		}
+		return Asset();
+	}
+
 }

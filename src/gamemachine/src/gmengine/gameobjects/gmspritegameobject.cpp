@@ -65,17 +65,17 @@ void GMSpriteGameObject::update(GMDuration dt)
 	}
 	direction = FastNormalize(direction);
 
-	const GMVec3& lookAt = d->camera.getLookAt().lookAt;
+	const GMVec3& lookDirection = d->camera.getLookAt().lookDirection;
 	if (moved)
 	{
-		GMPhysicsMoveArgs args(lookAt, direction, moveSpeed, rate);
+		GMPhysicsMoveArgs args(lookDirection, direction, moveSpeed, rate);
 		GMPhysicsWorld* world = getWorld()->getPhysicsWorld();
 		world->applyMove(getPhysicsObject(), args);
 	}
 
 	if (jumped)
 	{
-		GMPhysicsMoveArgs args(lookAt, direction, jumpSpeed, rate);
+		GMPhysicsMoveArgs args(lookDirection, direction, jumpSpeed, rate);
 		GMPhysicsWorld* world = getWorld()->getPhysicsWorld();
 		world->applyJump(getPhysicsObject(), args);
 	}

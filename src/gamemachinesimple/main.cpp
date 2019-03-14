@@ -51,7 +51,7 @@ public:
 		camera.setPerspective(Radian(75.f), 1.333f, .1f, 3200);				// 设置一个透视视图
 
 		GMCameraLookAt lookAt;
-		lookAt.lookAt = Normalize(GMVec3(.5f, -.3f, 1));						// 摄像机朝向
+		lookAt.lookDirection = Normalize(GMVec3(.5f, -.3f, 1));					// 摄像机朝向
 		lookAt.position = GMVec3(-1, 2, -3);									// 摄像机位置
 		camera.lookAt(lookAt);
 

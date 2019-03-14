@@ -143,7 +143,7 @@ void Demo_Collision::setLookAt()
 	camera.setPerspective(Radian(75.f), 1.333f, .1f, 3200);
 
 	gm::GMCameraLookAt lookAt;
-	lookAt.lookAt = Normalize(GMVec3(.5f, -.3f, 1));
+	lookAt.lookDirection = Normalize(GMVec3(.5f, -.3f, 1));
 	lookAt.position = GMVec3(-1, 2, -3);
 	camera.lookAt(lookAt);
 }

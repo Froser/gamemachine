@@ -272,8 +272,7 @@ void Demo_Model::handleDragging()
 	{
 		gm::GMfloat rotateX = d->mouseDownX - state.posX;
 		gm::GMfloat rotateY = d->mouseDownY - state.posY;
-		GMVec3 lookAt3 = Normalize(s_lookAt.lookAt);
-		GMVec4 lookAt = GMVec4(lookAt3, 1.f);
+		GMVec3 lookDir3 = Normalize(s_lookAt.lookDirection);
 		GMQuat q = Rotate(d->lookAtRotation,
 			PI * rotateX / windowStates.renderRect.width,
 			GMVec3(0, 1, 0));
@@ -283,7 +282,7 @@ void Demo_Model::handleDragging()
 			GMVec3(1, 0, 0));
 		d->lookAtRotation = q;
 		gm::GMCameraLookAt cameraLookAt = {
-			GMVec4(s_lookAt.lookAt, 1.f) * QuatToMatrix(q),
+			GMVec4(s_lookAt.lookDirection, 1.f) * QuatToMatrix(q),
 			s_lookAt.position
 		};
 		getDemonstrationWorld()->getContext()->getEngine()->getCamera().lookAt(cameraLookAt);

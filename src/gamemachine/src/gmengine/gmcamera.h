@@ -12,19 +12,19 @@ GM_ALIGNED_STRUCT(GMCameraLookAt)
 {
 	GMCameraLookAt() = default;
 	GMCameraLookAt(const GMVec3& _lookAt, const GMVec3& _position, const GMVec3& _up)
-		: lookAt(_lookAt)
+		: lookDirection(_lookAt)
 		, position(_position)
 		, up(_up)
 	{
 	}
 
 	GMCameraLookAt(const GMVec3& _lookAt, const GMVec3& _position)
-		: lookAt(_lookAt)
+		: lookDirection(_lookAt)
 		, position(_position)
 	{
 	}
 
-	GMVec3 lookAt = Zero<GMVec3>(); //!< 摄像机朝向，单位向量指示其方向
+	GMVec3 lookDirection = Zero<GMVec3>(); //!< 摄像机朝向，单位向量指示其方向
 	GMVec3 position = Zero<GMVec3>(); //!< 摄像机位置
 	GMVec3 up = GMVec3(0, 1, 0);
 
@@ -36,7 +36,7 @@ GM_ALIGNED_STRUCT(GMCameraLookAt)
 
 inline GMMat4 getViewMatrix(const GMCameraLookAt& lookAt)
 {
-	return LookAt(lookAt.position, lookAt.lookAt + lookAt.position, lookAt.up);
+	return LookAt(lookAt.position, lookAt.lookDirection + lookAt.position, lookAt.up);
 }
 
 //Frustum
@@ -183,7 +183,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMCameraUtility)
 	GMCamera* camera;
 	GMfloat limitPitch = Radian(85.f);
 	GMVec3 position;
-	GMVec3 lookAt;
+	GMVec3 lookDirection;
 };
 
 //! 用于响应鼠标移动时调整摄像机的一个便捷类

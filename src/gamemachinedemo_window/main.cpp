@@ -133,7 +133,7 @@ namespace
 		camera.setPerspective(Radian(75.f), 1.333f, .1f, 3200);
 
 		gm::GMCameraLookAt lookAt;
-		lookAt.lookAt = { 0, -.5f, 1 };
+		lookAt.lookDirection = { 0, -.5f, 1 };
 		lookAt.position = { 0, .5f, -1 };
 		camera.lookAt(lookAt);
 

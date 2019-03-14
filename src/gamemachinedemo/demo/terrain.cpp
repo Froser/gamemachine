@@ -82,7 +82,7 @@ void Demo_Terrain::setLookAt()
 	camera.setPerspective(Radian(75.f), 1.333f, .1f, 3200);
 
 	gm::GMCameraLookAt lookAt;
-	lookAt.lookAt = Normalize(GMVec3(0, -.5f, 1));
+	lookAt.lookDirection = Normalize(GMVec3(0, -.5f, 1));
 	lookAt.position = GMVec3(0, 100, 0);
 	camera.lookAt(lookAt);
 }

@@ -218,7 +218,7 @@ void GMParticleModel_2D::updateData(const IRenderContext* context, void* dataPtr
 {
 	D(d);
 	auto& particles = d->system->getEmitter()->getParticles();
-	const auto& lookAt = context->getEngine()->getCamera().getLookAt().lookAt;
+	const auto& lookDirection = context->getEngine()->getCamera().getLookAt().lookDirection;
 
 	// 一个粒子有6个顶点，2个三角形，放入并行计算
 	enum { VerticesPerParticle = 6 };
@@ -227,7 +227,7 @@ void GMParticleModel_2D::updateData(const IRenderContext* context, void* dataPtr
 		GM.getRunningStates().systemInfo.numberOfProcessors,
 		particles.begin(),
 		particles.end(),
-		[&particles, dataPtr, this, &lookAt](auto begin, auto end) {
+		[&particles, dataPtr, this, &lookDirection](auto begin, auto end) {
 		// 计算一下数据偏移
 		GMVertex* dataOffset = reinterpret_cast<GMVertex*>(dataPtr) + (begin - particles.begin()) * VerticesPerParticle;
 		for (auto iter = begin; iter != end; ++iter)
@@ -240,7 +240,7 @@ void GMParticleModel_2D::updateData(const IRenderContext* context, void* dataPtr
 				he,
 				particle->getColor(),
 				Rotate(particle->getRotation(), GMVec3(0, 0, 1)),
-				lookAt
+				lookDirection
 			);
 			dataOffset += VerticesPerParticle;
 		}
@@ -252,7 +252,7 @@ void GMParticleModel_3D::updateData(const IRenderContext* context, void* dataPtr
 {
 	D(d);
 	auto& particles = d->system->getEmitter()->getParticles();
-	const auto& lookAt = context->getEngine()->getCamera().getLookAt().lookAt;
+	const auto& lookDirection = context->getEngine()->getCamera().getLookAt().lookDirection;
 
 	// 粒子本身若带有旋转，则会在正对用户视觉后再来应用此旋转
 	// 一个粒子有6个顶点，2个三角形，放入并行计算
@@ -262,7 +262,7 @@ void GMParticleModel_3D::updateData(const IRenderContext* context, void* dataPtr
 		GM.getRunningStates().systemInfo.numberOfProcessors,
 		particles.begin(),
 		particles.end(),
-		[&particles, dataPtr, this, &lookAt](auto begin, auto end) {
+		[&particles, dataPtr, this, &lookDirection](auto begin, auto end) {
 			// 计算一下数据偏移
 			GMVertex* dataOffset = reinterpret_cast<GMVertex*>(dataPtr) + (begin - particles.begin()) * VerticesPerParticle;
 			for (auto iter = begin; iter != end; ++iter)
@@ -276,7 +276,7 @@ void GMParticleModel_3D::updateData(const IRenderContext* context, void* dataPtr
 					he,
 					particle->getColor(),
 					Rotate(particle->getRotation(), GMVec3(0, 0, 1)),
-					lookAt,
+					lookDirection,
 					particle->getPosition().getZ()
 				);
 				dataOffset += VerticesPerParticle;

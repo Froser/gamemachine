@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "mainwindow.h"
+#include "view.h"
 #include <gamemachinewidget.h>
 #include <core/scene.h>
 #include <core/handler.h>
@@ -42,7 +43,7 @@ namespace shell
 		QVBoxLayout* mainLayout = new QVBoxLayout(m_centralwidget);
 		mainLayout->setContentsMargins(0, 0, 0, 0);
 
-		GameMachineWidget* gmwidget = new GameMachineWidget(m_centralwidget);
+		View* gmwidget = new View(m_centralwidget);
 		m_scene = new core::Scene(this);
 		m_scene->setWidget(gmwidget);
 		mainLayout->addWidget(gmwidget);

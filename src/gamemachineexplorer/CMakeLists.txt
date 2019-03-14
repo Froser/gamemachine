@@ -43,6 +43,8 @@ set(SOURCES
 		src/shell/mainwindow.cpp
 		src/shell/mainwindow_actions.h
 		src/shell/mainwindow_actions.cpp
+		src/shell/view.h
+		src/shell/view.cpp
 
 		src/core/handler.h
 		src/core/handler.cpp

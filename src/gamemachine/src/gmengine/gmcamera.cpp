@@ -145,7 +145,7 @@ GMCamera::GMCamera()
 	D(d);
 	d->frustum.setPerspective(Radian(75.f), 1.333f, .1f, 3200);
 	d->lookAt.position = GMVec3(0);
-	d->lookAt.lookAt = GMVec3(0, 0, 1);
+	d->lookAt.lookDirection = GMVec3(0, 0, 1);
 }
 
 void GMCamera::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f)
@@ -212,11 +212,11 @@ void GMCameraUtility::update(GMfloat yaw, GMfloat pitch)
 	D(d);
 	if (d->camera)
 	{
-		GMVec3 lookAt = d->lookAt;
+		GMVec3 lookDirection = d->lookDirection;
 		GMFloat4 f4_lookAt;
-		lookAt.loadFloat4(f4_lookAt);
+		lookDirection.loadFloat4(f4_lookAt);
 
-		// 不考虑roll，把lookAt投影到世界坐标系平面
+		// 不考虑roll，把lookDirection投影到世界坐标系平面
 		GMVec3 lookAt_z = GMVec3(f4_lookAt[0], 0, f4_lookAt[2]);
 		// 计算pitch是否超出范围，不考虑roll
 		GMfloat calculatedPitch = Asin(f4_lookAt[1]) + pitch;
@@ -225,12 +225,12 @@ void GMCameraUtility::update(GMfloat yaw, GMfloat pitch)
 			// 找到lookAt_z垂直的一个向量，使用与世界坐标相同的坐标系
 			GMVec3 lookAt_x = GMVec3(1, 0, 0) * GMQuat(GMVec3(0, 0, 1), lookAt_z);
 			GMQuat qPitch = Rotate(-pitch, FastNormalize(lookAt_x));
-			lookAt = lookAt * qPitch;
+			lookDirection = lookDirection * qPitch;
 		}
 
 		GMQuat qYaw = Rotate(-yaw, GMVec3(0, 1, 0));
-		d->lookAt = FastNormalize(lookAt * qYaw);
-		d->camera->lookAt(GMCameraLookAt(d->lookAt, d->position));
+		d->lookDirection = FastNormalize(lookDirection * qYaw);
+		d->camera->lookAt(GMCameraLookAt(d->lookDirection, d->position));
 	}
 	else
 	{
@@ -245,6 +245,6 @@ void GMCameraUtility::setCamera(GMCamera* camera)
 	if (camera)
 	{
 		d->position = camera->getLookAt().position;
-		d->lookAt = camera->getLookAt().lookAt;
+		d->lookDirection = camera->getLookAt().lookDirection;
 	}
 }

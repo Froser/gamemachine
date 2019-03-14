@@ -7,6 +7,7 @@
 #include <gmdx11.h>
 #include <gmdx11helper.h>
 #endif
+#include "..\src\gmphysics\gmdiscretedynamicsworld.h"
 
 namespace core
 {
@@ -53,6 +54,7 @@ namespace core
 
 		context->getEngine()->setShaderLoadCallback(this);
 		m_world = new GMGameWorld(context);
+		m_physicsWorld = new GMDiscreteDynamicsWorld(m_world);
 	}
 
 	void Handler::start()

@@ -18,8 +18,8 @@ namespace core
 		void setControl(SceneControl* control);
 		SceneControl* control();
 
-		void setWidget(GameMachineWidget* widget);
-		GameMachineWidget* widget();
+		void setWidget(shell::View* widget);
+		shell::View* widget();
 
 		void setModel(SceneModel* model);
 		SceneModel* model();
@@ -31,9 +31,12 @@ namespace core
 		void fileCreated(SceneModel*);
 
 	private:
+		void connectWidgetAndControl();
+
+	private:
 		SceneControl* m_control = nullptr;
 		SceneModel* m_model = nullptr;
-		GameMachineWidget* m_widget = nullptr;
+		shell::View* m_widget = nullptr;
 	};
 }
 

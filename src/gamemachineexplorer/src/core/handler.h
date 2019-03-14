@@ -27,9 +27,15 @@ namespace core
 			return m_world;
 		}
 
+		GMDiscreteDynamicsWorld* getPhysicsWorld()
+		{
+			return m_physicsWorld;
+		}
+
 	private:
 		const IRenderContext* m_context = nullptr;
 		GMGameWorld* m_world = nullptr;
+		GMDiscreteDynamicsWorld* m_physicsWorld = nullptr;
 	};
 
 }
