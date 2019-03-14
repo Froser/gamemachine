@@ -11,20 +11,20 @@ BEGIN_NS
 GM_ALIGNED_STRUCT(GMCameraLookAt)
 {
 	GMCameraLookAt() = default;
-	GMCameraLookAt(const GMVec3& _lookAt, const GMVec3& _position, const GMVec3& _up)
-		: lookDirection(_lookAt)
+	GMCameraLookAt(const GMVec3& _lookDirection, const GMVec3& _position, const GMVec3& _up)
+		: lookDirection(_lookDirection)
 		, position(_position)
 		, up(_up)
 	{
 	}
 
-	GMCameraLookAt(const GMVec3& _lookAt, const GMVec3& _position)
-		: lookDirection(_lookAt)
+	GMCameraLookAt(const GMVec3& _lookDirection, const GMVec3& _position)
+		: lookDirection(_lookDirection)
 		, position(_position)
 	{
 	}
 
-	GMVec3 lookDirection = Zero<GMVec3>(); //!< 摄像机朝向，单位向量指示其方向
+	GMVec3 lookDirection = Zero<GMVec3>(); //!< 摄像机朝向，单位向量指示其方向。它不一定是单位向量。用于指示方向时需要单位化。
 	GMVec3 position = Zero<GMVec3>(); //!< 摄像机位置
 	GMVec3 up = GMVec3(0, 1, 0);
 
@@ -137,7 +137,7 @@ class GM_EXPORT GMCamera : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMCamera)
 	GM_ALLOW_COPY_MOVE(GMCamera)
-	GM_DECLARE_PROPERTY(LookAt, lookAt)
+	GM_DECLARE_GETTER(LookAt, lookAt)
 	GM_DECLARE_GETTER(Frustum, frustum)
 
 public:

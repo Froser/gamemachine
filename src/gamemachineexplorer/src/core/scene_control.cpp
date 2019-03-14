@@ -10,6 +10,10 @@
 
 namespace
 {
+	const GMVec3 s_x(1, 0, 0);
+	const GMVec3 s_up(0, 1, 0);
+	const GMVec3 s_z(0, 0, 1);
+
 	void setLightAttributes(ILight* light, const GMVec3& position, const GMVec3& diffuseIntensity, const GMVec3& ambientIntensity)
 	{
 		GM_ASSERT(light);
@@ -85,16 +89,28 @@ namespace core
 		{
 			// 先获取偏移
 			float dx = e->pos().x() - m_mouseDownPos.x();
-			float dy = e->pos().y() - m_mouseDownPos.y();
+			float dz = e->pos().y() - m_mouseDownPos.y();
 			
-			// 如果选中了地板，移动镜头
+			// 如果选中了地面，移动镜头
 			if (m_selectedAssets.contains(m_assets[AT_Plane]))
 			{
 				// 镜头位置移动
 				GMCameraLookAt lookAt = m_sceneViewCamera.getLookAt();
-				lookAt.position.setX(lookAt.position.getX() + dx);
-				lookAt.position.setZ(lookAt.position.getZ() + dy);
-				m_sceneViewCamera.setLookAt(lookAt);
+				
+				// 镜头位置在相机空间的坐标
+				GMVec4 position_Camera = GMVec4(dx, 0, dz, 1);
+
+				// 创建相机坐标系
+				GMVec3 cameraZ_World = Normalize(GMVec3(lookAt.lookDirection.getX(), 0, lookAt.lookDirection.getZ()));
+
+				// 求出相机x坐标与世界坐标余弦
+				GMVec3 cameraX_World = Normalize(Cross(s_up, cameraZ_World));
+				float cos_X = Dot(cameraX_World, s_x);
+				float sin_X = Sqrt(1 - cos_X * cos_X);
+				GMVec3 posDelta = GMVec3(dx * cos_X + dz * sin_X, 0, dx * sin_X + dz * cos_X);
+				lookAt.position = lookAt.position + posDelta;
+
+				m_sceneViewCamera.lookAt(lookAt);
 				setViewCamera(m_sceneViewCamera);
 				m_mouseDownPos = e->pos();
 				emit renderUpdate();

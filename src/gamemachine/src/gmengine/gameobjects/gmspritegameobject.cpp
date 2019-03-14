@@ -7,7 +7,7 @@ GMSpriteGameObject::GMSpriteGameObject(GMfloat radius, const GMVec3& position)
 {
 	D(d);
 	d->radius = radius;
-	d->camera.setLookAt(GMCameraLookAt(GMVec3(0, 0, -1), position));
+	d->camera.lookAt(GMCameraLookAt(GMVec3(0, 0, -1), position));
 	d->limitPitch = Radian(85.f);
 	d->cameraUtility.setCamera(&d->camera);
 }
