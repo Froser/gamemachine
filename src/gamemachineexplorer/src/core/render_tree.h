@@ -2,10 +2,25 @@
 #define __CORE_RENDER_TREE_H__
 #include <gmecommon.h>
 #include <QtCore>
-#include "scene_control.h"
+#include <gamemachine.h>
 
 namespace core
 {
+	struct Asset
+	{
+		GMSceneAsset asset;
+		GMPhysicsShapeAsset shape;
+		GMGameObject* object = nullptr;
+	};
+
+	typedef QList<RenderTree*> RenderTrees;
+	typedef QList<RenderNode*> SelectedNodes;
+
+	inline bool operator ==(const Asset& lhs, const Asset& rhs)
+	{
+		return (lhs.asset == rhs.asset) && (lhs.shape == rhs.shape) && (lhs.object == rhs.object);
+	}
+
 	struct RenderMouseDetails
 	{
 		bool mouseDown;
@@ -13,10 +28,16 @@ namespace core
 		int lastPosition[2];
 	};
 
+	struct IContextCallback
+	{
+		virtual SelectedNodes selectedNotes() = 0;
+	};
+
 	struct RenderContext
 	{
 		Handler* handler;
 		SceneControl* control;
+		IContextCallback* callback;
 	};
 
 	enum EventResult
@@ -37,7 +58,9 @@ namespace core
 	public:
 		virtual void render(const RenderContext&);
 		virtual RenderNode* hitTest(const RenderContext&, int x, int y);
-		virtual EventResult onMouseMove(SelectedAssets& selectedAssets, const RenderMouseDetails& details);
+		virtual EventResult onMousePress(const RenderContext& ctx, const RenderMouseDetails& details);
+		virtual EventResult onMouseRelease(const RenderContext& ctx, const RenderMouseDetails& details);
+		virtual EventResult onMouseMove(const RenderContext& ctx, const RenderMouseDetails& details);
 
 	protected:
 		virtual bool isAssetReady() const;
@@ -51,7 +74,7 @@ namespace core
 		QList<RenderNode*> m_nodes;
 	};
 
-	class RenderTree : public QObject
+	class RenderTree : public QObject, public IContextCallback
 	{
 		Q_OBJECT
 
@@ -60,9 +83,18 @@ namespace core
 		~RenderTree();
 
 	public:
+		void setRoot(RenderNode* root);
+
+	public:
 		virtual void render(bool cleanBuffer);
 		virtual RenderNode* hitTest(int x, int y);
-		virtual void onMouseMove(SelectedAssets& selectedAssets, const RenderMouseDetails& details);
+		virtual void onMousePress(const RenderMouseDetails& details);
+		virtual void onMouseRelease(const RenderMouseDetails& details);
+		virtual void onMouseMove(const RenderMouseDetails& details);
+
+		// IContextCallback
+	public:
+		virtual SelectedNodes selectedNotes() override;
 
 	private:
 		RenderNode* m_root = nullptr;

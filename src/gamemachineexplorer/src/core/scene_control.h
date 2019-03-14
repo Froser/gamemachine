@@ -5,24 +5,10 @@
 #include <QtWidgets>
 #include <gmassets.h>
 #include <gamemachine.h>
+#include "render_tree.h"
 
 namespace core
 {
-	struct Asset
-	{
-		GMSceneAsset asset;
-		GMPhysicsShapeAsset shape;
-		GMGameObject* object = nullptr;
-	};
-
-	typedef QList<Asset> SelectedAssets;
-	typedef QList<RenderTree*> RenderTrees;
-
-	inline bool operator ==(const Asset& lhs, const Asset& rhs)
-	{
-		return (lhs.asset == rhs.asset) && (lhs.shape == rhs.shape) && (lhs.object == rhs.object);
-	}
-
 	class Handler;
 	class SceneControl : public QObject
 	{
@@ -42,6 +28,9 @@ namespace core
 		void onWidgetMouseRelease(shell::View*, QMouseEvent*);
 		void onWidgetMouseMove(shell::View*, QMouseEvent*);
 
+	public:
+		virtual void init();
+
 	// 对场景的操作
 	public:
 		Handler* getHandler();
@@ -49,26 +38,37 @@ namespace core
 		void setDefaultColor(const GMVec4& color);
 		void setDefaultLight(const GMVec3& position, const GMVec3& diffuseIntensity, const GMVec3& ambientIntensity);
 		const GMCamera& currentCamera();
-
 		void clearRenderList();
+		void render();
+		void select(RenderNode*);
+		void clearSelect();
+		SelectedNodes selectedNodes();
 
 	signals:
 		void renderUpdate();
 
 	protected:
 		virtual void resetModel(SceneModel*);
-		virtual GMAsset createLogo();
 		virtual RenderNode* hitTest(int x, int y);
+
+	protected:
+		void setCurrentRenderTree(RenderTree*);
+
+	private:
+		RenderMouseDetails mouseDetails(const QMouseEvent* e);
+		RenderTree* createRenderTree_Splash();
+		RenderTree* createRenderTree_Scene();
 
 	private:
 		// 基本元素
 		Handler* m_handler = nullptr;
 		SceneModel* m_model = nullptr;
-		RenderTrees m_renderTrees;
 		Light m_defaultLight;
+		RenderTree* m_splashTree = nullptr;
+		RenderTree* m_sceneTree = nullptr;
+		SelectedNodes m_selectedNodes;
 
 		// UIL
-		SelectedAssets m_selectedAssets;
 		bool m_mouseDown = false;
 		QPoint m_mouseDownPos;
 

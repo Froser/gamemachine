@@ -5,10 +5,10 @@
 
 namespace core
 {
-	class LogoNode : public RenderNode
+	class SplashNode : public RenderNode
 	{
 	public:
-		virtual EventResult onMouseMove(SelectedAssets& selectedAssets, const RenderMouseDetails& details) override;
+		virtual EventResult onMouseMove(const RenderContext& ctx, const RenderMouseDetails& details) override;
 
 	protected:
 		virtual void initAsset(const RenderContext& ctx) override;
@@ -21,7 +21,7 @@ namespace core
 	class PlaneNode : public RenderNode
 	{
 	public:
-		virtual EventResult onMouseMove(SelectedAssets& selectedAssets, const RenderMouseDetails& details) override;
+		virtual EventResult onMouseMove(const RenderContext& ctx, const RenderMouseDetails& details) override;
 
 	protected:
 		virtual void initAsset(const RenderContext& ctx) override;

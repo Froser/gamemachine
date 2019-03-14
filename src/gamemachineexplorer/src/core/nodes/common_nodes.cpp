@@ -8,19 +8,19 @@
 
 namespace core
 {
-	EventResult LogoNode::onMouseMove(SelectedAssets& selectedAssets, const RenderMouseDetails& details)
+	EventResult SplashNode::onMouseMove(const RenderContext& ctx, const RenderMouseDetails& details)
 	{
 		return ER_Continue;
 	}
 
-	void LogoNode::initAsset(const RenderContext& ctx)
+	void SplashNode::initAsset(const RenderContext& ctx)
 	{
 		m_asset.asset = createLogo(ctx);
 		m_asset.object = new GMGameObject(m_asset.asset);
 		ctx.handler->getWorld()->addObjectAndInit(m_asset.object);
 	}
 
-	GMSceneAsset LogoNode::createLogo(const RenderContext& ctx)
+	GMSceneAsset SplashNode::createLogo(const RenderContext& ctx)
 	{
 		// 创建一个带纹理的对象
 		GMVec2 extents = GMVec2(1.f, .5f);
@@ -34,6 +34,37 @@ namespace core
 		GMTextureAsset tex = GMToolUtil::createTexture(ctx.handler->getContext(), "gamemachine.png"); //TODO 考虑从qrc拿
 		GMToolUtil::addTextureToShader(model->getShader(), tex, GMTextureType::Diffuse);
 		return asset;
+	}
+
+	EventResult PlaneNode::onMouseMove(const RenderContext& ctx, const RenderMouseDetails& details)
+	{
+		// 先获取偏移
+		float dx = details.position[0] - details.lastPosition[0];
+		float dz = details.position[1] - details.lastPosition[1];
+
+		// 如果选中了地面，移动镜头
+		/*
+		// 镜头位置移动
+		GMCameraLookAt lookAt = m_sceneViewCamera.getLookAt();
+
+		// 镜头位置在相机空间的坐标
+		GMVec4 position_Camera = GMVec4(dx, 0, dz, 1);
+
+		// 创建相机坐标系
+		GMVec3 cameraZ_World = Normalize(GMVec3(lookAt.lookDirection.getX(), 0, lookAt.lookDirection.getZ()));
+
+		// 求出相机x坐标与世界坐标余弦
+		GMVec3 cameraX_World = Normalize(Cross(s_up, cameraZ_World));
+		float cos_X = Dot(cameraX_World, s_x);
+		float sin_X = Sqrt(1 - cos_X * cos_X);
+		GMVec3 posDelta = GMVec3(dx * cos_X + dz * sin_X, 0, dx * sin_X + dz * cos_X);
+		lookAt.position = lookAt.position + posDelta;
+
+		m_sceneViewCamera.lookAt(lookAt);
+		setViewCamera(m_sceneViewCamera);
+		m_mouseDownPos = e->pos();
+		*/
+		return ER_OK;
 	}
 
 	void PlaneNode::initAsset(const RenderContext& ctx)

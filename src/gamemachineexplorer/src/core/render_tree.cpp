@@ -2,6 +2,7 @@
 #include "render_tree.h"
 #include "handler.h"
 #include <gmdiscretedynamicsworld.h>
+#include "scene_control.h"
 
 #define SAFE_DELETE(p) { delete (p); p = nullptr;  }
 
@@ -64,11 +65,31 @@ namespace core
 		return nullptr;
 	}
 
-	EventResult RenderNode::onMouseMove(SelectedAssets& selectedAssets, const RenderMouseDetails& details)
+	EventResult RenderNode::onMousePress(const RenderContext& ctx, const RenderMouseDetails& details)
 	{
 		foreach(auto node, m_nodes)
 		{
-			if (node && node->onMouseMove(selectedAssets, details) == ER_OK)
+			if (node && node->onMousePress(ctx, details) == ER_OK)
+				return ER_OK;
+		}
+		return ER_Continue;
+	}
+
+	EventResult RenderNode::onMouseRelease(const RenderContext& ctx, const RenderMouseDetails& details)
+	{
+		foreach(auto node, m_nodes)
+		{
+			if (node && node->onMouseRelease(ctx, details) == ER_OK)
+				return ER_OK;
+		}
+		return ER_Continue;
+	}
+
+	EventResult RenderNode::onMouseMove(const RenderContext& ctx, const RenderMouseDetails& details)
+	{
+		foreach(auto node, m_nodes)
+		{
+			if (node && node->onMouseMove(ctx, details) == ER_OK)
 				return ER_OK;
 		}
 		return ER_Continue;
@@ -76,7 +97,7 @@ namespace core
 
 	bool RenderNode::isAssetReady() const
 	{
-		return m_asset.asset.isEmpty();
+		return !m_asset.asset.isEmpty();
 	}
 
 	void RenderNode::renderAsset(const RenderContext& ctx)
@@ -95,13 +116,22 @@ namespace core
 	{
 		m_ctx = {
 			m_control->getHandler(),
-			m_control
+			m_control,
+			this
 		};
 	}
 
 	RenderTree::~RenderTree()
 	{
 		SAFE_DELETE(m_root);
+	}
+
+	void RenderTree::setRoot(RenderNode* root)
+	{
+		if (m_root && m_root != root)
+			delete m_root;
+
+		m_root = root;
 	}
 
 	void RenderTree::render(bool cleanBuffer)
@@ -119,6 +149,8 @@ namespace core
 
 	RenderNode* RenderTree::hitTest(int x, int y)
 	{
+		m_control->clearSelect();
+
 		if (m_root)
 		{
 			return m_root->hitTest(m_ctx, x, y);
@@ -126,11 +158,35 @@ namespace core
 		return nullptr;
 	}
 
-	void RenderTree::onMouseMove(SelectedAssets& selectedAssets, const RenderMouseDetails& details)
+	void RenderTree::onMousePress(const RenderMouseDetails& details)
+	{
+		m_control->clearSelect();
+
+		if (m_root)
+		{
+			m_root->onMousePress(m_ctx, details);
+		}
+	}
+
+	void RenderTree::onMouseRelease(const RenderMouseDetails& details)
 	{
 		if (m_root)
 		{
-			m_root->onMouseMove(selectedAssets, details);
+			m_root->onMouseRelease(m_ctx, details);
 		}
 	}
+
+	void RenderTree::onMouseMove(const RenderMouseDetails& details)
+	{
+		if (m_root)
+		{
+			m_root->onMouseMove(m_ctx, details);
+		}
+	}
+
+	SelectedNodes RenderTree::selectedNotes()
+	{
+		return m_control->selectedNodes();
+	}
+
 }

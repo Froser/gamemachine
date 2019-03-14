@@ -24,9 +24,7 @@ namespace shell
 			gmwidget->setGameMachine(desc, size().width(), size().height(), handler);
 
 			core::SceneControl* control = new core::SceneControl(handler, m_scene);
-			control->clearRenderList();
-			control->renderLogo();
-			control->setDefaultColor(GMVec4(.117f, .117f, .117f, 1));
+			control->init();
 			m_scene->setControl(control);
 		}
 	}

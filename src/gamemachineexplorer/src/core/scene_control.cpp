@@ -4,6 +4,7 @@
 #include "handler.h"
 #include "scene_model.h"
 #include "render_tree.h"
+#include "nodes/common_nodes.h"
 
 namespace
 {
@@ -48,71 +49,33 @@ namespace core
 	{
 		resetModel(model);
 		clearRenderList();
+		setCurrentRenderTree(createRenderTree_Scene());
 	}
 
 	void SceneControl::onWidgetMousePress(shell::View* v, QMouseEvent* e)
 	{
 		if (m_currentRenderTree)
 		{
-			m_mouseDownPos = e->pos();
-			Asset selected = hitTest(m_mouseDownPos.x(), m_mouseDownPos.y());
-			if (selected == m_assets[AT_Plane])
-			{
-				// 地板不能和其它元素同时选中
-				m_selectedAssets.clear();
-				if (!m_selectedAssets.contains(selected))
-					m_selectedAssets.append(selected);
-			}
-			else
-			{
-				// 如果用户按住Ctrl，则添加到选择列表
-				if (!(e->modifiers() & Qt::ControlModifier))
-					m_selectedAssets.clear();
-				if (!m_selectedAssets.contains(selected))
-					m_selectedAssets.append(selected);
-			}
+			RenderNode* hitTestResult = m_currentRenderTree->hitTest(e->pos().x(), e->pos().y());
+			if (hitTestResult)
+				select(hitTestResult);
+			m_currentRenderTree->onMousePress(mouseDetails(e));
 		}
 		m_mouseDown = true;
 	}
 
 	void SceneControl::onWidgetMouseRelease(shell::View* v, QMouseEvent* e)
 	{
+		if (m_currentRenderTree)
+			m_currentRenderTree->onMouseRelease(mouseDetails(e));
 		m_mouseDown = false;
 	}
 
 	void SceneControl::onWidgetMouseMove(shell::View*, QMouseEvent* e)
 	{
-		if (m_mouseDown)
-		{
-			// 先获取偏移
-			float dx = e->pos().x() - m_mouseDownPos.x();
-			float dz = e->pos().y() - m_mouseDownPos.y();
-			
-			// 如果选中了地面，移动镜头
-			if (m_selectedAssets.contains(m_assets[AT_Plane]))
-			{
-				// 镜头位置移动
-				GMCameraLookAt lookAt = m_sceneViewCamera.getLookAt();
-				
-				// 镜头位置在相机空间的坐标
-				GMVec4 position_Camera = GMVec4(dx, 0, dz, 1);
-
-				// 创建相机坐标系
-				GMVec3 cameraZ_World = Normalize(GMVec3(lookAt.lookDirection.getX(), 0, lookAt.lookDirection.getZ()));
-
-				// 求出相机x坐标与世界坐标余弦
-				GMVec3 cameraX_World = Normalize(Cross(s_up, cameraZ_World));
-				float cos_X = Dot(cameraX_World, s_x);
-				float sin_X = Sqrt(1 - cos_X * cos_X);
-				GMVec3 posDelta = GMVec3(dx * cos_X + dz * sin_X, 0, dx * sin_X + dz * cos_X);
-				lookAt.position = lookAt.position + posDelta;
-
-				m_sceneViewCamera.lookAt(lookAt);
-				setViewCamera(m_sceneViewCamera);
-				m_mouseDownPos = e->pos();
-				emit renderUpdate();
-			}
-		}
+		if (m_currentRenderTree)
+			m_currentRenderTree->onMouseMove(mouseDetails(e));
+		m_mouseDownPos = e->pos();
 	}
 
 	Handler* SceneControl::getHandler()
@@ -161,6 +124,35 @@ namespace core
 		m_handler->getWorld()->clearRenderList();
 	}
 
+	void SceneControl::render()
+	{
+		if (m_currentRenderTree)
+			m_currentRenderTree->render(true);
+		emit renderUpdate();
+	}
+
+	void SceneControl::select(RenderNode* node)
+	{
+		m_selectedNodes << node;
+	}
+
+	void SceneControl::clearSelect()
+	{
+		m_selectedNodes.clear();
+	}
+
+	SelectedNodes SceneControl::selectedNodes()
+	{
+		return m_selectedNodes;
+	}
+
+	void SceneControl::init()
+	{
+		clearRenderList();
+		setDefaultColor(GMVec4(.117f, .117f, .117f, 1));
+		setCurrentRenderTree(createRenderTree_Splash());
+	}
+
 	void SceneControl::resetModel(SceneModel* model)
 	{
 		// 负责重置Model，更新渲染，更新资源
@@ -183,5 +175,45 @@ namespace core
 		{
 			return m_currentRenderTree->hitTest(x, y);
 		}
+
+		return nullptr;
 	}
+
+	void SceneControl::setCurrentRenderTree(RenderTree* tree)
+	{
+		m_currentRenderTree = tree;
+		render();
+	}
+
+	RenderMouseDetails SceneControl::mouseDetails(const QMouseEvent* e)
+	{
+		RenderMouseDetails details;
+		details.position[0] = e->pos().x();
+		details.position[1] = e->pos().y();
+		details.lastPosition[0] = m_mouseDownPos.x();
+		details.lastPosition[1] = m_mouseDownPos.y();
+		details.mouseDown = m_mouseDown;
+		return details;
+	}
+
+	RenderTree* SceneControl::createRenderTree_Splash()
+	{
+		if (m_splashTree)
+			m_splashTree->deleteLater();
+
+		m_splashTree = new RenderTree(this);
+		m_splashTree->setRoot(new SplashNode());
+		return m_splashTree;
+	}
+
+	RenderTree* SceneControl::createRenderTree_Scene()
+	{
+		if (m_sceneTree)
+			m_sceneTree->deleteLater();
+
+		m_sceneTree = new RenderTree(this);
+		m_sceneTree->setRoot(new PlaneNode());
+		return m_sceneTree;
+	}
+
 }
