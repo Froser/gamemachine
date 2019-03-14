@@ -73,6 +73,7 @@ namespace core
 
 	public:
 		void appendNode(RenderNode* node);
+		void reset();
 
 	public:
 		virtual void render(bool cleanBuffer);

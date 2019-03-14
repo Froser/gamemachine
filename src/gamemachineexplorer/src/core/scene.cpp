@@ -8,12 +8,19 @@ namespace core
 {
 	void Scene::newFile()
 	{
-		if (m_model)
-			m_model->deleteLater();
-
+		closeFile();
 		m_model = new SceneModel(this);
-		connect(this, &Scene::fileCreated, m_control, &SceneControl::onSceneModelCreated, Qt::UniqueConnection);
 		emit fileCreated(m_model);
+	}
+
+	void Scene::closeFile()
+	{
+		if (m_model)
+		{
+			emit fileClosed(m_model);
+			m_model->deleteLater();
+			m_model = nullptr;
+		}
 	}
 
 	SceneControl* Scene::control()
@@ -36,6 +43,8 @@ namespace core
 		Q_ASSERT(!m_control);
 		m_control = control;
 		connect(m_control, &SceneControl::renderUpdate, this, &Scene::onRenderUpdate);
+		connect(this, &Scene::fileCreated, m_control, &SceneControl::onSceneModelCreated, Qt::UniqueConnection);
+		connect(this, &Scene::fileClosed, m_control, &SceneControl::onSceneModelDestroyed, Qt::UniqueConnection);
 		connectWidgetAndControl();
 	}
 
@@ -66,5 +75,4 @@ namespace core
 			connect(m_widget, &shell::View::mouseMove, m_control, &SceneControl::onWidgetMouseMove, Qt::UniqueConnection);
 		}
 	}
-
 }

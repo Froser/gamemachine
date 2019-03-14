@@ -106,6 +106,11 @@ namespace core
 		m_nodes << node;
 	}
 
+	void RenderTree::reset()
+	{
+		clearSelect();
+	}
+
 	void RenderTree::render(bool cleanBuffer)
 	{
 		if (cleanBuffer)

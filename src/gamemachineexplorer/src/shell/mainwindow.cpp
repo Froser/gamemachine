@@ -69,6 +69,13 @@ namespace shell
 		if (!m_closeFileAct)
 		{
 			m_closeFileAct = new QAction(tr("Close"), this);
+			connect(m_closeFileAct, &QAction::triggered, &m_actions, &MainWindowActions::onCloseFile);
+		}
+
+		if (!m_quitAct)
+		{
+			m_quitAct = new QAction(tr("Quit"), this);
+			connect(m_quitAct, &QAction::triggered, &m_actions, &MainWindowActions::onQuit);
 		}
 
 		if (!m_addModelAct)
@@ -88,6 +95,8 @@ namespace shell
 		fileMenu->addAction(m_newFileAct);
 		fileMenu->addAction(m_openFileAct);
 		fileMenu->addAction(m_closeFileAct);
+		fileMenu->addSeparator();
+		fileMenu->addAction(m_quitAct);
 	}
 
 	void MainWindow::createToolbar()

@@ -45,7 +45,20 @@ namespace core
 	{
 		resetModel(model);
 		clearRenderList();
-		setCurrentRenderTree(createRenderTree_Scene());
+		setCurrentRenderTree(getRenderTree_Scene());
+		render();
+	}
+
+	void SceneControl::onSceneModelDestroyed(SceneModel* model)
+	{
+		m_model = nullptr;
+		if (m_sceneTree)
+			m_sceneTree->reset();
+		if (m_splashTree)
+		{
+			m_splashTree->reset();
+			renderSplash();
+		}
 	}
 
 	void SceneControl::onWidgetMousePress(shell::View* v, QMouseEvent* e)
@@ -146,7 +159,7 @@ namespace core
 	{
 		clearRenderList();
 		setDefaultColor(GMVec4(.117f, .117f, .117f, 1));
-		setCurrentRenderTree(createRenderTree_Splash());
+		renderSplash();
 	}
 
 	void SceneControl::resetModel(SceneModel* model)
@@ -181,7 +194,6 @@ namespace core
 	void SceneControl::setCurrentRenderTree(RenderTree* tree)
 	{
 		m_currentRenderTree = tree;
-		render();
 	}
 
 	RenderMouseDetails SceneControl::mouseDetails(const QMouseEvent* e)
@@ -195,24 +207,31 @@ namespace core
 		return details;
 	}
 
-	RenderTree* SceneControl::createRenderTree_Splash()
+	RenderTree* SceneControl::getRenderTree_Splash()
 	{
-		if (m_splashTree)
-			m_splashTree->deleteLater();
-
-		m_splashTree = new RenderTree(this);
-		m_splashTree->appendNode(new SplashNode());
+		if (!m_splashTree)
+		{
+			m_splashTree = new RenderTree(this);
+			m_splashTree->appendNode(new SplashNode());
+		}
 		return m_splashTree;
 	}
 
-	RenderTree* SceneControl::createRenderTree_Scene()
+	RenderTree* SceneControl::getRenderTree_Scene()
 	{
-		if (m_sceneTree)
-			m_sceneTree->deleteLater();
-
-		m_sceneTree = new RenderTree(this);
-		m_sceneTree->appendNode(new PlaneNode());
+		if (!m_sceneTree)
+		{
+			m_sceneTree = new RenderTree(this);
+			m_sceneTree->appendNode(new PlaneNode());
+		}
 		return m_sceneTree;
+	}
+
+	void SceneControl::renderSplash()
+	{
+		setCamera(defaultCamera());
+		setCurrentRenderTree(getRenderTree_Splash());
+		render();
 	}
 
 }

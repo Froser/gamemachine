@@ -24,6 +24,7 @@ namespace core
 
 	public slots:
 		void onSceneModelCreated(SceneModel* model);
+		void onSceneModelDestroyed(SceneModel* model);
 		void onWidgetMousePress(shell::View*, QMouseEvent*);
 		void onWidgetMouseRelease(shell::View*, QMouseEvent*);
 		void onWidgetMouseMove(shell::View*, QMouseEvent*);
@@ -56,8 +57,9 @@ namespace core
 
 	private:
 		RenderMouseDetails mouseDetails(const QMouseEvent* e);
-		RenderTree* createRenderTree_Splash();
-		RenderTree* createRenderTree_Scene();
+		RenderTree* getRenderTree_Splash();
+		RenderTree* getRenderTree_Scene();
+		void renderSplash();
 
 	private:
 		// 基本元素

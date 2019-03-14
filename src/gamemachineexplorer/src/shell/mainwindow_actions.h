@@ -15,6 +15,8 @@ namespace shell
 
 	public slots:
 		void onNewFile();
+		void onCloseFile();
+		void onQuit();
 
 	private:
 		core::Scene* m_scene = nullptr;

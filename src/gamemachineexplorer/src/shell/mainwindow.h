@@ -34,7 +34,7 @@ namespace shell
 		QAction* m_newFileAct = nullptr;
 		QAction* m_openFileAct = nullptr;
 		QAction* m_closeFileAct = nullptr;
-
+		QAction* m_quitAct = nullptr;
 		QAction* m_addModelAct = nullptr;
 		QAction* m_addLightAct = nullptr;
 	};

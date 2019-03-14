@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "mainwindow_actions.h"
 #include <core/scene.h>
+#include <QApplication>
 
 namespace shell
 {
@@ -16,4 +17,18 @@ namespace shell
 			m_scene->newFile();
 		}
 	}
+
+	void MainWindowActions::onCloseFile()
+	{
+		if (m_scene)
+		{
+			m_scene->closeFile();
+		}
+	}
+
+	void MainWindowActions::onQuit()
+	{
+		QApplication::instance()->quit();
+	}
+
 }

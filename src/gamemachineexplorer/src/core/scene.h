@@ -13,6 +13,7 @@ namespace core
 
 	public:
 		void newFile();
+		void closeFile();
 
 	public:
 		void setControl(SceneControl* control);
@@ -29,6 +30,7 @@ namespace core
 
 	signals:
 		void fileCreated(SceneModel*);
+		void fileClosed(SceneModel*);
 
 	private:
 		void connectWidgetAndControl();
