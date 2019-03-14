@@ -12,9 +12,10 @@ namespace core
 
 	protected:
 		virtual void initAsset(const RenderContext& ctx) override;
+		virtual bool hitTest(const RenderContext& ctx) override;
 
 	private:
-		GMSceneAsset createLogo(const RenderContext& ctx);
+		GMSceneAsset createSplash(const RenderContext& ctx);
 	};
 
 	//! 表示一个平面的绘制

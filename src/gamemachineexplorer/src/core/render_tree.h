@@ -28,16 +28,11 @@ namespace core
 		int lastPosition[2];
 	};
 
-	struct IContextCallback
-	{
-		virtual SelectedNodes selectedNotes() = 0;
-	};
-
 	struct RenderContext
 	{
 		Handler* handler;
 		SceneControl* control;
-		IContextCallback* callback;
+		RenderTree* tree;
 	};
 
 	enum EventResult
@@ -49,15 +44,12 @@ namespace core
 	class RenderNode
 	{
 	public:
-		~RenderNode();
-
-	public:
 		Asset asset();
 		void setAsset(const Asset& asset);
 
 	public:
 		virtual void render(const RenderContext&);
-		virtual RenderNode* hitTest(const RenderContext&, int x, int y);
+		virtual bool hitTest(const RenderContext&);
 		virtual EventResult onMousePress(const RenderContext& ctx, const RenderMouseDetails& details);
 		virtual EventResult onMouseRelease(const RenderContext& ctx, const RenderMouseDetails& details);
 		virtual EventResult onMouseMove(const RenderContext& ctx, const RenderMouseDetails& details);
@@ -69,12 +61,9 @@ namespace core
 
 	protected:
 		Asset m_asset;
-
-	private:
-		QList<RenderNode*> m_nodes;
 	};
 
-	class RenderTree : public QObject, public IContextCallback
+	class RenderTree : public QObject
 	{
 		Q_OBJECT
 
@@ -83,21 +72,23 @@ namespace core
 		~RenderTree();
 
 	public:
-		void setRoot(RenderNode* root);
+		void appendNode(RenderNode* node);
 
 	public:
 		virtual void render(bool cleanBuffer);
 		virtual RenderNode* hitTest(int x, int y);
-		virtual void onMousePress(const RenderMouseDetails& details);
+		virtual void onMousePress(const RenderMouseDetails& details, RenderNode* hitTestResult);
 		virtual void onMouseRelease(const RenderMouseDetails& details);
 		virtual void onMouseMove(const RenderMouseDetails& details);
 
-		// IContextCallback
 	public:
-		virtual SelectedNodes selectedNotes() override;
+		virtual void clearSelect();
+		virtual void select(RenderNode*);
+		virtual SelectedNodes selectedNotes();
 
 	private:
-		RenderNode* m_root = nullptr;
+		QList<RenderNode*> m_nodes;
+		SelectedNodes m_selection;
 		SceneControl* m_control = nullptr;
 		RenderContext m_ctx;
 	};

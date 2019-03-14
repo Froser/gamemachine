@@ -5,6 +5,14 @@
 #include <gmutilities.h>
 #include <gmdiscretedynamicsworld.h>
 #include <gmphysicsshape.h>
+#include <core/scene_control.h>
+
+namespace
+{
+	const GMVec3 s_x(1, 0, 0);
+	const GMVec3 s_up(0, 1, 0);
+	const GMVec3 s_z(0, 0, 1);
+}
 
 namespace core
 {
@@ -15,12 +23,17 @@ namespace core
 
 	void SplashNode::initAsset(const RenderContext& ctx)
 	{
-		m_asset.asset = createLogo(ctx);
+		m_asset.asset = createSplash(ctx);
 		m_asset.object = new GMGameObject(m_asset.asset);
 		ctx.handler->getWorld()->addObjectAndInit(m_asset.object);
 	}
 
-	GMSceneAsset SplashNode::createLogo(const RenderContext& ctx)
+	bool SplashNode::hitTest(const RenderContext& ctx)
+	{
+		return false;
+	}
+
+	GMSceneAsset SplashNode::createSplash(const RenderContext& ctx)
 	{
 		// 创建一个带纹理的对象
 		GMVec2 extents = GMVec2(1.f, .5f);
@@ -43,9 +56,9 @@ namespace core
 		float dz = details.position[1] - details.lastPosition[1];
 
 		// 如果选中了地面，移动镜头
-		/*
 		// 镜头位置移动
-		GMCameraLookAt lookAt = m_sceneViewCamera.getLookAt();
+		GMCamera camera = ctx.control->viewCamera();
+		GMCameraLookAt lookAt = camera.getLookAt();
 
 		// 镜头位置在相机空间的坐标
 		GMVec4 position_Camera = GMVec4(dx, 0, dz, 1);
@@ -60,10 +73,10 @@ namespace core
 		GMVec3 posDelta = GMVec3(dx * cos_X + dz * sin_X, 0, dx * sin_X + dz * cos_X);
 		lookAt.position = lookAt.position + posDelta;
 
-		m_sceneViewCamera.lookAt(lookAt);
-		setViewCamera(m_sceneViewCamera);
-		m_mouseDownPos = e->pos();
-		*/
+		camera.lookAt(lookAt);
+		ctx.control->setViewCamera(camera);
+		ctx.control->setCamera(camera);
+		ctx.control->update();
 		return ER_OK;
 	}
 

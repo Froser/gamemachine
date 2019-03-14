@@ -6,16 +6,21 @@
 
 #define SAFE_DELETE(p) { delete (p); p = nullptr;  }
 
+namespace
+{
+	core::RenderNode* find(const QList<core::RenderNode*>& container, GMGameObject* obj)
+	{
+		foreach(auto node, container)
+		{
+			if (node->asset().object == obj)
+				return node;
+		}
+		return nullptr;
+	}
+}
+
 namespace core
 {
-	RenderNode::~RenderNode()
-	{
-		foreach(auto node, m_nodes)
-		{
-			SAFE_DELETE(node);
-		}
-	}
-
 	Asset RenderNode::asset()
 	{
 		return m_asset;
@@ -38,60 +43,27 @@ namespace core
 			if (isAssetReady())
 				renderAsset(ctx);
 		}
-
-		foreach(auto node, m_nodes)
-		{
-			if (node)
-				node->render(ctx);
-		}
 	}
 
-	RenderNode* RenderNode::hitTest(const RenderContext& ctx, int x, int y)
+	bool RenderNode::hitTest(const RenderContext& ctx)
 	{
-		const GMCamera& camera = ctx.control->currentCamera();
-		GMVec3 rayFrom = camera.getLookAt().position;
-		GMVec3 rayTo = camera.getRayToWorld(ctx.handler->getContext()->getWindow()->getRenderRect(), x, y);
-		GMPhysicsRayTestResult rayTestResult = ctx.handler->getPhysicsWorld()->rayTest(rayFrom, rayTo);
-
-		foreach(auto node, m_nodes)
-		{
-			if (node)
-			{
-				RenderNode* hitTestNode = node->hitTest(ctx, x, y);
-				if (hitTestNode)
-					return hitTestNode;
-			}
-		}
-		return nullptr;
+		return true;
 	}
 
 	EventResult RenderNode::onMousePress(const RenderContext& ctx, const RenderMouseDetails& details)
 	{
-		foreach(auto node, m_nodes)
-		{
-			if (node && node->onMousePress(ctx, details) == ER_OK)
-				return ER_OK;
-		}
+		ctx.tree->clearSelect();
+		ctx.tree->select(this);
 		return ER_Continue;
 	}
 
 	EventResult RenderNode::onMouseRelease(const RenderContext& ctx, const RenderMouseDetails& details)
 	{
-		foreach(auto node, m_nodes)
-		{
-			if (node && node->onMouseRelease(ctx, details) == ER_OK)
-				return ER_OK;
-		}
 		return ER_Continue;
 	}
 
 	EventResult RenderNode::onMouseMove(const RenderContext& ctx, const RenderMouseDetails& details)
 	{
-		foreach(auto node, m_nodes)
-		{
-			if (node && node->onMouseMove(ctx, details) == ER_OK)
-				return ER_OK;
-		}
 		return ER_Continue;
 	}
 
@@ -123,70 +95,90 @@ namespace core
 
 	RenderTree::~RenderTree()
 	{
-		SAFE_DELETE(m_root);
+		foreach(auto node, m_nodes)
+		{
+			SAFE_DELETE(node);
+		}
 	}
 
-	void RenderTree::setRoot(RenderNode* root)
+	void RenderTree::appendNode(RenderNode* node)
 	{
-		if (m_root && m_root != root)
-			delete m_root;
-
-		m_root = root;
+		m_nodes << node;
 	}
 
 	void RenderTree::render(bool cleanBuffer)
 	{
 		if (cleanBuffer)
-		{
-			m_ctx.handler->getWorld()->clearRenderList();
-		}
+			m_control->clearRenderList();
 
-		if (m_root)
+		foreach(auto node, m_nodes)
 		{
-			m_root->render(m_ctx);
+			node->render(m_ctx);
 		}
 	}
 
 	RenderNode* RenderTree::hitTest(int x, int y)
 	{
-		m_control->clearSelect();
-
-		if (m_root)
+		const GMCamera& camera = m_control->currentCamera();
+		GMVec3 rayFrom = camera.getLookAt().position;
+		GMVec3 rayTo = camera.getRayToWorld(m_ctx.handler->getContext()->getWindow()->getRenderRect(), x, y);
+		GMPhysicsRayTestResult rayTestResult = m_ctx.handler->getPhysicsWorld()->rayTest(rayFrom, rayTo);
+		if (rayTestResult.hit)
 		{
-			return m_root->hitTest(m_ctx, x, y);
+			RenderNode* candidate = find(m_nodes, rayTestResult.hitObject->getGameObject());
+			if (candidate && candidate->hitTest(m_ctx))
+				return candidate;
 		}
 		return nullptr;
 	}
 
-	void RenderTree::onMousePress(const RenderMouseDetails& details)
+	void RenderTree::onMousePress(const RenderMouseDetails& details, RenderNode* hitTestResult)
 	{
-		m_control->clearSelect();
-
-		if (m_root)
+		foreach (auto node, m_nodes)
 		{
-			m_root->onMousePress(m_ctx, details);
+			if (hitTestResult == node && node->onMousePress(m_ctx, details) == ER_OK)
+				break;
 		}
 	}
 
 	void RenderTree::onMouseRelease(const RenderMouseDetails& details)
 	{
-		if (m_root)
+		foreach(auto node, m_nodes)
 		{
-			m_root->onMouseRelease(m_ctx, details);
+			if (!m_selection.contains(node))
+				continue;
+
+			if (node->onMouseRelease(m_ctx, details) == ER_OK)
+				break;
 		}
 	}
 
 	void RenderTree::onMouseMove(const RenderMouseDetails& details)
 	{
-		if (m_root)
+		foreach(auto node, m_nodes)
 		{
-			m_root->onMouseMove(m_ctx, details);
+			if (!m_selection.contains(node))
+				continue;
+
+			if (node->onMouseMove(m_ctx, details) == ER_OK)
+				break;
 		}
+	}
+
+	void RenderTree::clearSelect()
+	{
+		m_selection.clear();
+	}
+
+	void RenderTree::select(RenderNode* node)
+	{
+		if (!m_selection.contains(node))
+			m_selection << node;
 	}
 
 	SelectedNodes RenderTree::selectedNotes()
 	{
-		return m_control->selectedNodes();
+		return m_selection;
 	}
 
 }

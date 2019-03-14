@@ -8,10 +8,6 @@
 
 namespace
 {
-	const GMVec3 s_x(1, 0, 0);
-	const GMVec3 s_up(0, 1, 0);
-	const GMVec3 s_z(0, 0, 1);
-
 	void setLightAttributes(ILight* light, const GMVec3& position, const GMVec3& diffuseIntensity, const GMVec3& ambientIntensity)
 	{
 		GM_ASSERT(light);
@@ -42,7 +38,7 @@ namespace core
 		, m_handler(handler)
 	{
 		setDefaultLight(GMVec3(0, 0, -.2f), GMVec3(.7f, .7f, .7f), GMVec3(0, 0, 0));
-		setViewCamera(defaultCamera());
+		setCamera(defaultCamera());
 	}
 
 	void SceneControl::onSceneModelCreated(SceneModel* model)
@@ -57,10 +53,9 @@ namespace core
 		if (m_currentRenderTree)
 		{
 			RenderNode* hitTestResult = m_currentRenderTree->hitTest(e->pos().x(), e->pos().y());
-			if (hitTestResult)
-				select(hitTestResult);
-			m_currentRenderTree->onMousePress(mouseDetails(e));
+			m_currentRenderTree->onMousePress(mouseDetails(e), hitTestResult);
 		}
+		m_mouseDownPos = e->pos();
 		m_mouseDown = true;
 	}
 
@@ -68,6 +63,7 @@ namespace core
 	{
 		if (m_currentRenderTree)
 			m_currentRenderTree->onMouseRelease(mouseDetails(e));
+		m_mouseDownPos = e->pos();
 		m_mouseDown = false;
 	}
 
@@ -83,7 +79,17 @@ namespace core
 		return m_handler;
 	}
 
+	const GMCamera& SceneControl::viewCamera()
+	{
+		return m_sceneViewCamera;
+	}
+
 	void SceneControl::setViewCamera(const GMCamera& camera)
+	{
+		m_sceneViewCamera = camera;
+	}
+
+	void SceneControl::setCamera(const GMCamera& camera)
 	{
 		auto engine = m_handler->getContext()->getEngine();
 		engine->setCamera(camera);
@@ -124,26 +130,16 @@ namespace core
 		m_handler->getWorld()->clearRenderList();
 	}
 
+	void SceneControl::update()
+	{
+		emit renderUpdate();
+	}
+
 	void SceneControl::render()
 	{
 		if (m_currentRenderTree)
 			m_currentRenderTree->render(true);
 		emit renderUpdate();
-	}
-
-	void SceneControl::select(RenderNode* node)
-	{
-		m_selectedNodes << node;
-	}
-
-	void SceneControl::clearSelect()
-	{
-		m_selectedNodes.clear();
-	}
-
-	SelectedNodes SceneControl::selectedNodes()
-	{
-		return m_selectedNodes;
 	}
 
 	void SceneControl::init()
@@ -160,13 +156,16 @@ namespace core
 		
 		// 重新生成场景相关的资源:
 		// 重置摄像机
-		m_sceneViewCamera.setPerspective(Radian(75.f), .75f, .1f, 2000); //TODO aspect需要计算，near和far需要从全局拿
+		IWindow* window = m_handler->getContext()->getWindow();
+		GMRect rc = window->getRenderRect();
+		float aspect = rc.width / rc.height;
+		m_sceneViewCamera.setPerspective(Radian(75.f), aspect, .1f, 2000); //TODO ，near和far需要从全局拿
 		GlobalProperties& props = model->getProperties();
 		GMCameraLookAt lookAt = GMCameraLookAt::makeLookAt(
 			GMVec3(props.viewCamera.posX, props.viewCamera.posY, props.viewCamera.posZ),
 			GMVec3(props.viewCamera.lookAtX, props.viewCamera.lookAtY, props.viewCamera.lookAtZ));
 		m_sceneViewCamera.lookAt(lookAt);
-		setViewCamera(m_sceneViewCamera);
+		setCamera(m_sceneViewCamera);
 	}
 
 	RenderNode* SceneControl::hitTest(int x, int y)
@@ -202,7 +201,7 @@ namespace core
 			m_splashTree->deleteLater();
 
 		m_splashTree = new RenderTree(this);
-		m_splashTree->setRoot(new SplashNode());
+		m_splashTree->appendNode(new SplashNode());
 		return m_splashTree;
 	}
 
@@ -212,7 +211,7 @@ namespace core
 			m_sceneTree->deleteLater();
 
 		m_sceneTree = new RenderTree(this);
-		m_sceneTree->setRoot(new PlaneNode());
+		m_sceneTree->appendNode(new PlaneNode());
 		return m_sceneTree;
 	}
 

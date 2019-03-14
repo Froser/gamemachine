@@ -34,15 +34,14 @@ namespace core
 	// 对场景的操作
 	public:
 		Handler* getHandler();
+		const GMCamera& viewCamera();
 		void setViewCamera(const GMCamera& camera);
+		void setCamera(const GMCamera& camera);
 		void setDefaultColor(const GMVec4& color);
 		void setDefaultLight(const GMVec3& position, const GMVec3& diffuseIntensity, const GMVec3& ambientIntensity);
 		const GMCamera& currentCamera();
 		void clearRenderList();
-		void render();
-		void select(RenderNode*);
-		void clearSelect();
-		SelectedNodes selectedNodes();
+		void update();
 
 	signals:
 		void renderUpdate();
@@ -52,6 +51,7 @@ namespace core
 		virtual RenderNode* hitTest(int x, int y);
 
 	protected:
+		void render();
 		void setCurrentRenderTree(RenderTree*);
 
 	private:
@@ -66,7 +66,6 @@ namespace core
 		Light m_defaultLight;
 		RenderTree* m_splashTree = nullptr;
 		RenderTree* m_sceneTree = nullptr;
-		SelectedNodes m_selectedNodes;
 
 		// UIL
 		bool m_mouseDown = false;
