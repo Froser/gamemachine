@@ -20,6 +20,8 @@ namespace core
 	class SceneControl;
 	class Scene;
 	class SceneModel;
+	class RenderTree;
+	class RenderNode;
 }
 
 namespace shell

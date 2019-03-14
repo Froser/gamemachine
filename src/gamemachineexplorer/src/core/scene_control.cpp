@@ -1,12 +1,9 @@
 ﻿#include "stdafx.h"
 #include "scene_control.h"
-#include <gmutilities.h>
-#include <gmdiscretedynamicsworld.h>
-#include <gmphysicsshape.h>
 #include <gmlight.h>
 #include "handler.h"
-#include "util.h"
 #include "scene_model.h"
+#include "render_tree.h"
 
 namespace
 {
@@ -51,30 +48,30 @@ namespace core
 	{
 		resetModel(model);
 		clearRenderList();
-		renderPlain();
 	}
 
 	void SceneControl::onWidgetMousePress(shell::View* v, QMouseEvent* e)
 	{
-		m_mouseDownPos = e->pos();
-		Asset selected = hitTest(m_mouseDownPos.x(), m_mouseDownPos.y());
-		
-		if (selected == m_assets[AT_Plane])
+		if (m_currentRenderTree)
 		{
-			// 地板不能和其它元素同时选中
-			m_selectedAssets.clear();
-			if (!m_selectedAssets.contains(selected))
-				m_selectedAssets.append(selected);
-		}
-		else
-		{
-			// 如果用户按住Ctrl，则添加到选择列表
-			if (!(e->modifiers() & Qt::ControlModifier))
+			m_mouseDownPos = e->pos();
+			Asset selected = hitTest(m_mouseDownPos.x(), m_mouseDownPos.y());
+			if (selected == m_assets[AT_Plane])
+			{
+				// 地板不能和其它元素同时选中
 				m_selectedAssets.clear();
-			if (!m_selectedAssets.contains(selected))
-				m_selectedAssets.append(selected);
+				if (!m_selectedAssets.contains(selected))
+					m_selectedAssets.append(selected);
+			}
+			else
+			{
+				// 如果用户按住Ctrl，则添加到选择列表
+				if (!(e->modifiers() & Qt::ControlModifier))
+					m_selectedAssets.clear();
+				if (!m_selectedAssets.contains(selected))
+					m_selectedAssets.append(selected);
+			}
 		}
-
 		m_mouseDown = true;
 	}
 
@@ -118,6 +115,11 @@ namespace core
 		}
 	}
 
+	Handler* SceneControl::getHandler()
+	{
+		return m_handler;
+	}
+
 	void SceneControl::setViewCamera(const GMCamera& camera)
 	{
 		auto engine = m_handler->getContext()->getEngine();
@@ -159,58 +161,6 @@ namespace core
 		m_handler->getWorld()->clearRenderList();
 	}
 
-	void SceneControl::renderLogo()
-	{
-		setViewCamera(defaultCamera());
-		if (m_assets[AT_Logo].asset.isEmpty())
-		{
-			m_assets[AT_Logo].asset = createLogo();
-			m_assets[AT_Logo].object = new GMGameObject(m_assets[AT_Logo].asset);
-			m_handler->getWorld()->addObjectAndInit(m_assets[AT_Logo].object);
-		}
-		m_handler->getWorld()->addToRenderList(m_assets[AT_Logo].object);
-		emit renderUpdate();
-	}
-
-	void SceneControl::renderPlain()
-	{
-		constexpr float PLANE_LENGTH = 256.f;
-		constexpr float PLANE_WIDTH = 256.f;
-		constexpr float HALF_PLANE_LENGTH = PLANE_LENGTH / 2.f;
-		constexpr float HALF_PLANE_WIDTH = PLANE_WIDTH / 2.f;
-		constexpr float PLANE_HEIGHT = 2.f;
-		if (m_assets[AT_Plane].asset.isEmpty())
-		{
-			// 创建一个平面
-			GMPlainDescription desc = {
-				-HALF_PLANE_LENGTH,
-				0,
-				-HALF_PLANE_WIDTH,
-				PLANE_LENGTH,
-				PLANE_WIDTH,
-				50,
-				50,
-				{ 1, 1, 1 }
-			};
-
-			utCreatePlain(desc, m_assets[AT_Plane].asset);
-			m_assets[AT_Plane].object = new GMGameObject(m_assets[AT_Plane].asset);
-			m_handler->getWorld()->addObjectAndInit(m_assets[AT_Plane].object);
-
-			// 设置一个物理形状
-			GMRigidPhysicsObject* rigidPlain = new gm::GMRigidPhysicsObject();
-			rigidPlain->setMass(.0f);
-			m_assets[AT_Plane].object->setPhysicsObject(rigidPlain);
-			GMPhysicsShapeHelper::createCubeShape(GMVec3(HALF_PLANE_LENGTH, PLANE_HEIGHT, HALF_PLANE_WIDTH), m_assets[AT_Plane].shape);
-			rigidPlain->setShape(m_assets[AT_Plane].shape);
-
-			// 添加到世界
-			m_handler->getPhysicsWorld()->addRigidObject(rigidPlain);
-		}
-		m_handler->getWorld()->addToRenderList(m_assets[AT_Plane].object);
-		emit renderUpdate();
-	}
-
 	void SceneControl::resetModel(SceneModel* model)
 	{
 		// 负责重置Model，更新渲染，更新资源
@@ -227,42 +177,11 @@ namespace core
 		setViewCamera(m_sceneViewCamera);
 	}
 
-	GMSceneAsset SceneControl::createLogo()
+	RenderNode* SceneControl::hitTest(int x, int y)
 	{
-		// 创建一个带纹理的对象
-		GMVec2 extents = GMVec2(1.f, .5f);
-		GMSceneAsset asset;
-		GMPrimitiveCreator::createQuadrangle(extents, 0, asset);
-
-		GMModel* model = asset.getScene()->getModels()[0].getModel();
-		model->getShader().getMaterial().setDiffuse(GMVec3(1, 1, 1));
-		model->getShader().getMaterial().setSpecular(GMVec3(0));
-
-		GMTextureAsset tex = GMToolUtil::createTexture(m_handler->getContext(), "gamemachine.png"); //TODO 考虑从qrc拿
-		GMToolUtil::addTextureToShader(model->getShader(), tex, GMTextureType::Diffuse);
-		return asset;
-	}
-
-	Asset SceneControl::hitTest(int x, int y)
-	{
-		const GMCamera& camera = currentCamera();
-		GMVec3 rayFrom = camera.getLookAt().position;
-		GMVec3 rayTo = camera.getRayToWorld(m_handler->getContext()->getWindow()->getRenderRect(), x, y);
-		GMPhysicsRayTestResult rayTestResult = m_handler->getPhysicsWorld()->rayTest(rayFrom, rayTo);
-		return findAsset(rayTestResult.hitObject);
-	}
-
-	Asset SceneControl::findAsset(GMPhysicsObject* phyObj)
-	{
-		if (phyObj)
+		if (m_currentRenderTree)
 		{
-			for (int i = AT_Begin; i < AT_End; ++i)
-			{
-				if (m_assets[i].object && m_assets[i].object->getPhysicsObject() == phyObj)
-					return m_assets[i];
-			}
+			return m_currentRenderTree->hitTest(x, y);
 		}
-		return Asset();
 	}
-
 }

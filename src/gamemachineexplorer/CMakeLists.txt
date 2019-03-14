@@ -56,6 +56,10 @@ set(SOURCES
 		src/core/scene_model.cpp
 		src/core/util.h
 		src/core/util.cpp
+		src/core/render_tree.h
+		src/core/render_tree.cpp
+		src/core/nodes/common_nodes.h
+		src/core/nodes/common_nodes.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)
