@@ -6,16 +6,36 @@
 #include <gmdiscretedynamicsworld.h>
 #include <gmphysicsshape.h>
 #include <core/scene_control.h>
+#include <core/scene_model.h>
 
 namespace
 {
 	const GMVec3 s_x(1, 0, 0);
 	const GMVec3 s_up(0, 1, 0);
 	const GMVec3 s_z(0, 0, 1);
+
+	GMCamera defaultCamera()
+	{
+		static std::once_flag s_flag;
+		static GMCamera s_camera;
+		std::call_once(s_flag, [](GMCamera&) {
+			s_camera.setOrtho(-1, 1, -1, 1, .1f, 3200.f);
+			GMCameraLookAt lookAt;
+			lookAt.lookDirection = { 0, 0, 1 };
+			lookAt.position = { 0, 0, -1 };
+			s_camera.lookAt(lookAt);
+		}, s_camera);
+		return s_camera;
+	}
 }
 
 namespace core
 {
+	void SplashRenderTree::onRenderTreeSet()
+	{
+		control()->setCamera(defaultCamera());
+	}
+
 	EventResult SplashNode::onMouseMove(const RenderContext& ctx, const RenderMouseDetails& details)
 	{
 		return ER_Continue;
@@ -113,6 +133,25 @@ namespace core
 
 		// 添加到世界
 		ctx.handler->getPhysicsWorld()->addRigidObject(rigidPlain);
+	}
+
+	void SceneRenderTree::onRenderTreeSet()
+	{
+		SceneControl* ctrl = control();
+		// 重新生成场景相关的资源:
+		// 重置摄像机
+		IWindow* window = ctrl->handler()->getContext()->getWindow();
+		GMRect rc = window->getRenderRect();
+		float aspect = rc.width / rc.height;
+		GMCamera camera = ctrl->viewCamera();
+		camera.setPerspective(Radian(75.f), aspect, .1f, 2000); //TODO ，near和far需要从全局拿
+		GlobalProperties& props = ctrl->model()->getProperties();
+		GMCameraLookAt lookAt = GMCameraLookAt::makeLookAt(
+			GMVec3(props.viewCamera.posX, props.viewCamera.posY, props.viewCamera.posZ),
+			GMVec3(props.viewCamera.lookAtX, props.viewCamera.lookAtY, props.viewCamera.lookAtZ));
+		camera.lookAt(lookAt);
+		ctrl->setViewCamera(camera);
+		ctrl->setCamera(camera);
 	}
 
 }

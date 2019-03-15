@@ -87,7 +87,7 @@ namespace core
 		, m_control(control)
 	{
 		m_ctx = {
-			m_control->getHandler(),
+			m_control->handler(),
 			m_control,
 			this
 		};
@@ -137,6 +137,10 @@ namespace core
 		return nullptr;
 	}
 
+	void RenderTree::onRenderTreeSet()
+	{
+	}
+
 	void RenderTree::onMousePress(const RenderMouseDetails& details, RenderNode* hitTestResult)
 	{
 		foreach (auto node, m_nodes)
@@ -184,6 +188,11 @@ namespace core
 	SelectedNodes RenderTree::selectedNotes()
 	{
 		return m_selection;
+	}
+
+	SceneControl* RenderTree::control()
+	{
+		return m_control;
 	}
 
 }

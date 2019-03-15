@@ -5,6 +5,14 @@
 
 namespace core
 {
+	class SplashRenderTree : public RenderTree
+	{
+		using RenderTree::RenderTree;
+
+	public:
+		virtual void onRenderTreeSet() override;
+	};
+
 	class SplashNode : public RenderNode
 	{
 	public:
@@ -19,6 +27,14 @@ namespace core
 	};
 
 	//! 表示一个平面的绘制
+	class SceneRenderTree : public RenderTree
+	{
+		using RenderTree::RenderTree;
+
+	public:
+		virtual void onRenderTreeSet() override;
+	};
+
 	class PlaneNode : public RenderNode
 	{
 	public:

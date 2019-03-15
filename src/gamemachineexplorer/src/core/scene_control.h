@@ -34,7 +34,8 @@ namespace core
 
 	// 对场景的操作
 	public:
-		Handler* getHandler();
+		Handler* handler();
+		SceneModel* model();
 		const GMCamera& viewCamera();
 		void setViewCamera(const GMCamera& camera);
 		void setCamera(const GMCamera& camera);

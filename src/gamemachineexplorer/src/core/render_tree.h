@@ -78,6 +78,7 @@ namespace core
 	public:
 		virtual void render(bool cleanBuffer);
 		virtual RenderNode* hitTest(int x, int y);
+		virtual void onRenderTreeSet();
 		virtual void onMousePress(const RenderMouseDetails& details, RenderNode* hitTestResult);
 		virtual void onMouseRelease(const RenderMouseDetails& details);
 		virtual void onMouseMove(const RenderMouseDetails& details);
@@ -86,6 +87,9 @@ namespace core
 		virtual void clearSelect();
 		virtual void select(RenderNode*);
 		virtual SelectedNodes selectedNotes();
+
+	protected:
+		SceneControl* control();
 
 	private:
 		QList<RenderNode*> m_nodes;
