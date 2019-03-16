@@ -66,11 +66,11 @@ else(CMAKE_SIZEOF_VOID_P EQUAL 8)
 endif(CMAKE_SIZEOF_VOID_P EQUAL 8)
 
 macro(gm_use_gamemachine_dll libraryName)
-	target_compile_definitions(${libraryName} PRIVATE COMPILE_DEFINITIONS GM_USE_DLL GM_USE_MEDIA_DLL)
+	target_compile_definitions(${libraryName} PRIVATE GM_USE_DLL GM_USE_MEDIA_DLL)
 endmacro(gm_use_gamemachine_dll libraryName)
 
 macro(gm_use_gamemachine_qt_dll libraryName)
-	target_compile_definitions(${libraryName} PRIVATE COMPILE_DEFINITIONS GM_USE_QT_DLL)
+	target_compile_definitions(${libraryName} PRIVATE GM_USE_QT_DLL)
 endmacro(gm_use_gamemachine_qt_dll)
 
 macro(gm_link_bullet3 libraryName ACCESS)
