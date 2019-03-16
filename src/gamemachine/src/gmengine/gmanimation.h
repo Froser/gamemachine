@@ -71,7 +71,7 @@ public:
 
 #if GM_MSVC
 	template <>
-	GMAnimation(void) = default;
+	GMAnimation(void) {};
 #elif GM_GCC
 	GMAnimation() = default;
 #endif

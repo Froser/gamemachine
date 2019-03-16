@@ -43,15 +43,29 @@ gm_source_group_by_dir(SOURCES)
 
 gm_add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
 
-add_library(${PROJECT_NAME}
+add_library(${PROJECT_NAME}_static
 		${SOURCES}
 	)
+	
+if(MSVC)
+	add_library(${PROJECT_NAME} SHARED
+		${SOURCES}
+	)
+	gm_gamemachine_project(${PROJECT_NAME} FALSE)
+	set_target_properties(${PROJECT_NAME} PROPERTIES DEFINE_SYMBOL GM_QT_DLL)
+endif(MSVC)
 
-target_link_libraries(gamemachineqt
+target_link_libraries(${PROJECT_NAME}_static
 	PUBLIC
 	Qt5::Core
 	Qt5::Gui 
 	Qt5::Widgets
 	)
 
+target_link_libraries(${PROJECT_NAME}
+	PUBLIC
+	Qt5::Core
+	Qt5::Gui 
+	Qt5::Widgets
+	)
 gm_end_project(${PROJECT_NAME})

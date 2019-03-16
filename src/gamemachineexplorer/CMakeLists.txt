@@ -79,6 +79,7 @@ if(MSVC)
 	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
 	set_target_properties(${gamemachineexplorer_dll} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
 	gm_gamemachine_project(${gamemachineexplorer_dll} FALSE)
+	gm_use_gamemachine_qt_dll(${gamemachineexplorer_dll})
 endif(MSVC)
 
 target_link_libraries(gamemachineexplorer 
@@ -86,8 +87,9 @@ target_link_libraries(gamemachineexplorer
 	Qt5::Core
 	Qt5::Gui 
 	Qt5::Widgets
-	gamemachineqt
+	gamemachineqt_static
 	)
+
 target_link_libraries(gamemachineexplorer_dll 
 	PUBLIC
 	Qt5::Core

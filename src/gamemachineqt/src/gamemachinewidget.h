@@ -1,11 +1,12 @@
 ﻿#ifndef __GAMEMACHINEWIDGET_H__
 #define __GAMEMACHINEWIDGET_H__
 #include <QWidget>
+#include <gamemachine.h>
 #include "forwards.h"
 
 namespace gm
 {
-	class GameMachineWidget : public QWidget
+	class GM_QT_EXPORT GameMachineWidget : public QWidget
 	{
 		Q_OBJECT
 

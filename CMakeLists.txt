@@ -66,9 +66,12 @@ else(CMAKE_SIZEOF_VOID_P EQUAL 8)
 endif(CMAKE_SIZEOF_VOID_P EQUAL 8)
 
 macro(gm_use_gamemachine_dll libraryName)
-	set_target_properties(${libraryName} PROPERTIES DEFINE_SYMBOL GM_USE_DLL)
-	set_target_properties(${libraryName} PROPERTIES DEFINE_SYMBOL GM_USE_MEDIA_DLL)
+	target_compile_definitions(${libraryName} PRIVATE COMPILE_DEFINITIONS GM_USE_DLL GM_USE_MEDIA_DLL)
 endmacro(gm_use_gamemachine_dll libraryName)
+
+macro(gm_use_gamemachine_qt_dll libraryName)
+	target_compile_definitions(${libraryName} PRIVATE COMPILE_DEFINITIONS GM_USE_QT_DLL)
+endmacro(gm_use_gamemachine_qt_dll)
 
 macro(gm_link_bullet3 libraryName ACCESS)
 	target_link_libraries(${libraryName} ${ACCESS} Bullet3Collision)
@@ -198,6 +201,7 @@ macro(gm_gamemachine_project libraryName is_static)
 		message("GameMachine: ${libraryName} is a dynamic gamemachine program.")
 		target_link_libraries(${libraryName} PUBLIC gamemachine)
 		target_link_libraries(${libraryName} PUBLIC gamemachinemedia)
+		gm_use_gamemachine_dll(${libraryName})
 	endif(${is_static})
 endmacro(gm_gamemachine_project)
 

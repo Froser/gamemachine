@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "gamemachinewidget.h"
-#include <gamemachine.h>
 
 namespace
 {
