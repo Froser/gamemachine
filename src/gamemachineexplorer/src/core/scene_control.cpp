@@ -6,24 +6,12 @@
 #include "render_tree.h"
 #include "nodes/common_nodes.h"
 
-namespace
-{
-	void setLightAttributes(ILight* light, const GMVec3& position, const GMVec3& diffuseIntensity, const GMVec3& ambientIntensity)
-	{
-		GM_ASSERT(light);
-		light->setLightAttribute3(GMLight::Position, ValuePointer(position));
-		light->setLightAttribute3(GMLight::DiffuseIntensity, ValuePointer(diffuseIntensity));
-		light->setLightAttribute3(GMLight::AmbientIntensity, ValuePointer(ambientIntensity));
-	}
-}
-
 namespace core
 {
 	SceneControl::SceneControl(Handler* handler, QObject* parent /*= nullptr*/)
 		: QObject(parent)
 		, m_handler(handler)
 	{
-		setDefaultLight(GMVec3(0, 0, -.2f), GMVec3(.7f, .7f, .7f), GMVec3(0, 0, 0));
 	}
 
 	void SceneControl::onSceneModelCreated(SceneModel* model)
@@ -98,28 +86,32 @@ namespace core
 		engine->setCamera(camera);
 	}
 
-	void SceneControl::setDefaultColor(const GMVec4& color)
+	void SceneControl::setClearColor(const GMVec4& color)
 	{
 		auto engine = m_handler->getContext()->getEngine();
 		engine->getDefaultFramebuffers()->setClearColor(ValuePointer(color));
 	}
 
-	void SceneControl::setDefaultLight(const GMVec3& position, const GMVec3& diffuseIntensity, const GMVec3& ambientIntensity)
+	ILight* SceneControl::defaultLight()
 	{
 		auto engine = m_handler->getContext()->getEngine();
+		ILight* light = nullptr;
 		if (m_defaultLight.defaultLightIndex == -1)
 		{
-			ILight* light = nullptr;
 			GM.getFactory()->createLight(GMLightType::PointLight, &light);
-			setLightAttributes(light, position, diffuseIntensity, ambientIntensity);
 			m_defaultLight.defaultLightIndex = engine->addLight(light);
 		}
 		else
 		{
-			ILight* light = engine->getLight(m_defaultLight.defaultLightIndex);
-			setLightAttributes(light, position, diffuseIntensity, ambientIntensity);
-			engine->update(GMUpdateDataType::LightChanged);
+			light = engine->getLight(m_defaultLight.defaultLightIndex);
 		}
+		return light;
+	}
+
+	void SceneControl::updateLight()
+	{
+		auto engine = m_handler->getContext()->getEngine();
+		engine->update(GMUpdateDataType::LightChanged);
 	}
 
 	const GMCamera& SceneControl::currentCamera()
@@ -148,7 +140,7 @@ namespace core
 	void SceneControl::init()
 	{
 		clearRenderList();
-		setDefaultColor(GMVec4(.117f, .117f, .117f, 1));
+		setClearColor(GMVec4(.117f, .117f, .117f, 1));
 		renderSplash();
 	}
 
@@ -214,5 +206,4 @@ namespace core
 		setCurrentRenderTree(getRenderTree_Splash());
 		render();
 	}
-
 }

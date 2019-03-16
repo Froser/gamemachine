@@ -39,8 +39,8 @@ namespace core
 		const GMCamera& viewCamera();
 		void setViewCamera(const GMCamera& camera);
 		void setCamera(const GMCamera& camera);
-		void setDefaultColor(const GMVec4& color);
-		void setDefaultLight(const GMVec3& position, const GMVec3& diffuseIntensity, const GMVec3& ambientIntensity);
+		ILight* defaultLight();
+		void updateLight();
 		const GMCamera& currentCamera();
 		void clearRenderList();
 		void update();
@@ -49,6 +49,7 @@ namespace core
 		void renderUpdate();
 
 	protected:
+		virtual void setClearColor(const GMVec4& color);
 		virtual void resetModel(SceneModel*);
 		virtual RenderNode* hitTest(int x, int y);
 

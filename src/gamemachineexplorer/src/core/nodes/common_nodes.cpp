@@ -7,12 +7,22 @@
 #include <gmphysicsshape.h>
 #include <core/scene_control.h>
 #include <core/scene_model.h>
+#include <gmlight.h>
 
 namespace
 {
 	const GMVec3 s_x(1, 0, 0);
 	const GMVec3 s_up(0, 1, 0);
 	const GMVec3 s_z(0, 0, 1);
+
+	void setLightAttributes(core::SceneControl* ctrl, ILight* light, const GMVec3& position, const GMVec3& diffuseIntensity, const GMVec3& ambientIntensity)
+	{
+		GM_ASSERT(light);
+		light->setLightAttribute3(GMLight::Position, ValuePointer(position));
+		light->setLightAttribute3(GMLight::DiffuseIntensity, ValuePointer(diffuseIntensity));
+		light->setLightAttribute3(GMLight::AmbientIntensity, ValuePointer(ambientIntensity));
+		ctrl->updateLight();
+	}
 
 	GMCamera defaultCamera()
 	{
@@ -33,7 +43,10 @@ namespace core
 {
 	void SplashRenderTree::onRenderTreeSet()
 	{
-		control()->setCamera(defaultCamera());
+		SceneControl* ctrl = control();
+		ctrl->setCamera(defaultCamera());
+
+		setLightAttributes(ctrl, ctrl->defaultLight(), GMVec3(0, 0, -.2f), GMVec3(.7f, .7f, .7f), GMVec3(0, 0, 0));
 	}
 
 	EventResult SplashNode::onMouseMove(const RenderContext& ctx, const RenderMouseDetails& details)
@@ -138,7 +151,7 @@ namespace core
 	void SceneRenderTree::onRenderTreeSet()
 	{
 		SceneControl* ctrl = control();
-		// 重新生成场景相关的资源:
+		
 		// 重置摄像机
 		IWindow* window = ctrl->handler()->getContext()->getWindow();
 		GMRect rc = window->getRenderRect();
@@ -152,6 +165,9 @@ namespace core
 		camera.lookAt(lookAt);
 		ctrl->setViewCamera(camera);
 		ctrl->setCamera(camera);
+
+		// 设置光照
+		setLightAttributes(ctrl, ctrl->defaultLight(), GMVec3(0, 0, 0), GMVec3(1, 1, 1), GMVec3(1, 1, 1));
 	}
 
 }
