@@ -6,7 +6,7 @@ add_subdirectory(./3rdparty/libmad libmad)
 add_subdirectory(./3rdparty/jpeg-6b libjpeg)
 add_subdirectory(./3rdparty/lua lua)
 add_subdirectory(./3rdparty/glm-0.9.9-a2 glm)
-add_subdirectory(./3rdparty/openal-soft-1.18.2 openal)
+add_subdirectory(./3rdparty/openal-soft-1.19.1 openal)
 add_subdirectory(./3rdparty/bullet3-2.87 bullet3)
 add_subdirectory(./3rdparty/assimp-3.3.1 assimp-3.3.1)
 
