@@ -59,6 +59,7 @@ public:
 	my_type & operator=(const AlignedAllocator< O, Alignment > &) { return *this; }
 
 	friend bool operator==(const my_type &, const my_type &) { return true; }
+	friend bool operator!=(const my_type &, const my_type &) { return false; }
 };
 
 // override new, delete，对齐分配内存
