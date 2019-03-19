@@ -29,7 +29,8 @@ namespace core
 	//! 表示一个平面的绘制
 	class SceneRenderTree : public RenderTree
 	{
-		using RenderTree::RenderTree;
+	public:
+		SceneRenderTree(SceneControl*);
 
 	public:
 		virtual void onRenderTreeSet() override;

@@ -30,5 +30,4 @@ namespace core
 		m_propertyTree.viewCamera.lookAtX = m_propertyTree.viewCamera.lookAtY = m_propertyTree.viewCamera.lookAtZ = 0;
 		notifyPropertyChanged(Property_ViewCamera);
 	}
-
 }

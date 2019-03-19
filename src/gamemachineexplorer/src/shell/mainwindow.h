@@ -37,6 +37,8 @@ namespace shell
 		QAction* m_quitAct = nullptr;
 		QAction* m_addModelAct = nullptr;
 		QAction* m_addLightAct = nullptr;
+		QAction* m_orthoAct = nullptr;
+		QAction* m_perspectiveAct = nullptr;
 	};
 }
 

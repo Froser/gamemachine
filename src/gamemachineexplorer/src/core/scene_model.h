@@ -15,6 +15,7 @@ namespace core
 	{
 		struct ViewCameraProperties
 		{
+			int ortho : 1;
 			float posX;
 			float posY;
 			float posZ;
@@ -45,7 +46,7 @@ namespace core
 		void propertyChanged(ChangedProperty);
 
 	private:
-		GlobalProperties m_propertyTree;
+		GlobalProperties m_propertyTree = { 0 };
 	};
 }
 

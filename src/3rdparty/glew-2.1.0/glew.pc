@@ -1,6 +1,6 @@
-prefix=C:/Program Files (x86)/Project
+prefix=C:/Program Files/Project
 exec_prefix=${prefix}
-libdir=C:/Program Files (x86)/Project/lib
+libdir=C:/Program Files/Project/lib
 includedir=${prefix}/include
 
 Name: glew

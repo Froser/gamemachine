@@ -6,6 +6,7 @@
 #include <gmassets.h>
 #include <gamemachine.h>
 #include "render_tree.h"
+#include "scene_model.h"
 
 namespace core
 {
@@ -62,6 +63,9 @@ namespace core
 		RenderTree* getRenderTree_Splash();
 		RenderTree* getRenderTree_Scene();
 		void renderSplash();
+
+	private slots:
+		void onPropertyChanged(ChangedProperty);
 
 	private:
 		// 基本元素

@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "mainwindow_actions.h"
 #include <core/scene.h>
+#include <core/scene_model.h>
 #include <QApplication>
 
 namespace shell
@@ -29,6 +30,32 @@ namespace shell
 	void MainWindowActions::onQuit()
 	{
 		QApplication::instance()->quit();
+	}
+
+	void MainWindowActions::onOrtho()
+	{
+		if (m_scene)
+		{
+			core::SceneModel* model = m_scene->model();
+			if (model)
+			{
+				model->getProperties().viewCamera.ortho = 1;
+				model->notifyPropertyChanged(core::Property_ViewCamera);
+			}
+		}
+	}
+
+	void MainWindowActions::onPerspective()
+	{
+		if (m_scene)
+		{
+			core::SceneModel* model = m_scene->model();
+			if (model)
+			{
+				model->getProperties().viewCamera.ortho = 0;
+				model->notifyPropertyChanged(core::Property_ViewCamera);
+			}
+		}
 	}
 
 }

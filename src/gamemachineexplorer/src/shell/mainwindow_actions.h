@@ -17,6 +17,8 @@ namespace shell
 		void onNewFile();
 		void onCloseFile();
 		void onQuit();
+		void onOrtho();
+		void onPerspective();
 
 	private:
 		core::Scene* m_scene = nullptr;

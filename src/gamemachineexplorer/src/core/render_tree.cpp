@@ -3,21 +3,9 @@
 #include "handler.h"
 #include <gmdiscretedynamicsworld.h>
 #include "scene_control.h"
+#include "scene_model.h"
 
 #define SAFE_DELETE(p) { delete (p); p = nullptr;  }
-
-namespace
-{
-	core::RenderNode* find(const QList<core::RenderNode*>& container, GMGameObject* obj)
-	{
-		foreach(auto node, container)
-		{
-			if (node->asset().object == obj)
-				return node;
-		}
-		return nullptr;
-	}
-}
 
 namespace core
 {
@@ -130,7 +118,7 @@ namespace core
 		GMPhysicsRayTestResult rayTestResult = m_ctx.handler->getPhysicsWorld()->rayTest(rayFrom, rayTo);
 		if (rayTestResult.hit)
 		{
-			RenderNode* candidate = find(m_nodes, rayTestResult.hitObject->getGameObject());
+			RenderNode* candidate = find(rayTestResult.hitObject->getGameObject());
 			if (candidate && candidate->hitTest(m_ctx))
 				return candidate;
 		}
@@ -174,6 +162,12 @@ namespace core
 		}
 	}
 
+	bool RenderTree::onPropertyChanged(ChangedProperty property)
+	{
+		onRenderTreeSet();
+		return true;
+	}
+
 	void RenderTree::clearSelect()
 	{
 		m_selection.clear();
@@ -190,9 +184,29 @@ namespace core
 		return m_selection;
 	}
 
+	RenderNode* RenderTree::find(GMGameObject* obj)
+	{
+		foreach(auto node, m_nodes)
+		{
+			if (node->asset().object == obj)
+				return node;
+		}
+		return nullptr;
+	}
+
 	SceneControl* RenderTree::control()
 	{
 		return m_control;
+	}
+
+	RenderContext& RenderTree::context()
+	{
+		return m_ctx;
+	}
+
+	QList<RenderNode*>& RenderTree::nodes()
+	{
+		return m_nodes;
 	}
 
 }

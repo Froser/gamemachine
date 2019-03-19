@@ -3,6 +3,7 @@
 #include <gmecommon.h>
 #include <QtCore>
 #include <gamemachine.h>
+#include "scene_model.h"
 
 namespace core
 {
@@ -82,6 +83,7 @@ namespace core
 		virtual void onMousePress(const RenderMouseDetails& details, RenderNode* hitTestResult);
 		virtual void onMouseRelease(const RenderMouseDetails& details);
 		virtual void onMouseMove(const RenderMouseDetails& details);
+		virtual bool onPropertyChanged(ChangedProperty);
 
 	public:
 		virtual void clearSelect();
@@ -89,11 +91,17 @@ namespace core
 		virtual SelectedNodes selectedNotes();
 
 	protected:
+		virtual RenderNode* find(GMGameObject*);
+
+	protected:
 		SceneControl* control();
+		RenderContext& context();
+		QList<RenderNode*>& nodes();
 
 	private:
 		QList<RenderNode*> m_nodes;
 		SelectedNodes m_selection;
+		RenderTree* m_childTree = nullptr;
 		SceneControl* m_control = nullptr;
 		RenderContext m_ctx;
 	};

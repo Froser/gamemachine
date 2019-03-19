@@ -85,24 +85,22 @@ namespace core
 	EventResult PlaneNode::onMouseMove(const RenderContext& ctx, const RenderMouseDetails& details)
 	{
 		// 先获取偏移
-		float dx = details.position[0] - details.lastPosition[0];
-		float dz = details.position[1] - details.lastPosition[1];
+		int dx = details.position[0] - details.lastPosition[0];
+		int dz = details.position[1] - details.lastPosition[1];
 
 		// 如果选中了地面，移动镜头
 		// 镜头位置移动
 		GMCamera camera = ctx.control->viewCamera();
 		GMCameraLookAt lookAt = camera.getLookAt();
 
-		// 镜头位置在相机空间的坐标
-		GMVec4 position_Camera = GMVec4(dx, 0, dz, 1);
-
 		// 创建相机坐标系
 		GMVec3 cameraZ_World = Normalize(GMVec3(lookAt.lookDirection.getX(), 0, lookAt.lookDirection.getZ()));
 
 		// 求出相机x坐标与世界坐标余弦
 		GMVec3 cameraX_World = Normalize(Cross(s_up, cameraZ_World));
-		float cos_X = Dot(cameraX_World, s_x);
-		float sin_X = Sqrt(1 - cos_X * cos_X);
+		float cos_X = cameraX_World.getX();
+		float sin_X = cameraX_World.getZ();
+
 		GMVec3 posDelta = GMVec3(dx * cos_X + dz * sin_X, 0, dx * sin_X + dz * cos_X);
 		lookAt.position = lookAt.position + posDelta;
 
@@ -148,6 +146,12 @@ namespace core
 		ctx.handler->getPhysicsWorld()->addRigidObject(rigidPlain);
 	}
 
+	SceneRenderTree::SceneRenderTree(SceneControl* ctrl)
+		: RenderTree(ctrl)
+	{
+		nodes().append(new PlaneNode());
+	}
+
 	void SceneRenderTree::onRenderTreeSet()
 	{
 		SceneControl* ctrl = control();
@@ -157,8 +161,13 @@ namespace core
 		GMRect rc = window->getRenderRect();
 		float aspect = rc.width / rc.height;
 		GMCamera camera = ctrl->viewCamera();
-		camera.setPerspective(Radian(75.f), aspect, .1f, 2000); //TODO ，near和far需要从全局拿
+
 		GlobalProperties& props = ctrl->model()->getProperties();
+		if (props.viewCamera.ortho)
+			camera.setOrtho(-1, 1, -1, 1, .1f, 2000); //TODO ，near和far需要从全局拿
+		else
+			camera.setPerspective(Radian(75.f), aspect, .1f, 2000);
+
 		GMCameraLookAt lookAt = GMCameraLookAt::makeLookAt(
 			GMVec3(props.viewCamera.posX, props.viewCamera.posY, props.viewCamera.posZ),
 			GMVec3(props.viewCamera.lookAtX, props.viewCamera.lookAtY, props.viewCamera.lookAtZ));
@@ -169,5 +178,4 @@ namespace core
 		// 设置光照
 		setLightAttributes(ctrl, ctrl->defaultLight(), GMVec3(0, 0, 0), GMVec3(1, 1, 1), GMVec3(1, 1, 1));
 	}
-
 }

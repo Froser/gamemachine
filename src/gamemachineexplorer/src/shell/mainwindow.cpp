@@ -87,6 +87,18 @@ namespace shell
 		{
 			m_addLightAct = new QAction(tr("Add Light"), this);
 		}
+
+		if (!m_orthoAct)
+		{
+			m_orthoAct = new QAction(tr("Ortho View"), this);
+			connect(m_orthoAct, &QAction::triggered, &m_actions, &MainWindowActions::onOrtho);
+		}
+
+		if (!m_perspectiveAct)
+		{
+			m_perspectiveAct = new QAction(tr("Perspective View"), this);
+			connect(m_perspectiveAct, &QAction::triggered, &m_actions, &MainWindowActions::onPerspective);
+		}
 	}
 
 	void MainWindow::createMenus()
@@ -108,6 +120,8 @@ namespace shell
 		auto itemTb = addToolBar(tr("Items"));
 		itemTb->addAction(m_addModelAct);
 		itemTb->addAction(m_addLightAct);
+		itemTb->addAction(m_orthoAct);
+		itemTb->addAction(m_perspectiveAct);
 	}
 
 }

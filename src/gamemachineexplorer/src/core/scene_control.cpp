@@ -148,6 +148,7 @@ namespace core
 	{
 		// 负责重置Model
 		m_model = model;
+		connect(m_model, &SceneModel::propertyChanged, this, &SceneControl::onPropertyChanged);
 	}
 
 	RenderNode* SceneControl::hitTest(int x, int y)
@@ -196,7 +197,6 @@ namespace core
 		if (!m_sceneTree)
 		{
 			m_sceneTree = new SceneRenderTree(this);
-			m_sceneTree->appendNode(new PlaneNode());
 		}
 		return m_sceneTree;
 	}
@@ -206,4 +206,14 @@ namespace core
 		setCurrentRenderTree(getRenderTree_Splash());
 		render();
 	}
+
+	void SceneControl::onPropertyChanged(ChangedProperty property)
+	{
+		if (m_currentRenderTree)
+		{
+			if (m_currentRenderTree->onPropertyChanged(property))
+				render();
+		}
+	}
+
 }
