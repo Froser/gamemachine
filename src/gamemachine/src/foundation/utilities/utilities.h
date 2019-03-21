@@ -33,6 +33,7 @@ struct GMTerrainDescription
 	GMsize_t sliceN; //!< 地形在z轴的分块数。
 	GMfloat textureLength; //!< 一块地形纹理在x轴的长度。
 	GMfloat textureHeight; //!< 一块地形纹理在z轴的长度。
+	bool dynamic;
 };
 
 struct GM_EXPORT GMPrimitiveCreator

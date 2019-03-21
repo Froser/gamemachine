@@ -249,6 +249,9 @@ set(SOURCES
 		extensions/bsp/render/gmbspgameworldprivate.cpp
 		extensions/bsp/render/gmbspgameworld.h
 		extensions/bsp/render/gmbspgameworld.cpp
+
+		extensions/objects/gmwavegameobject.h
+		extensions/objects/gmwavegameobject.cpp
 	)
 
 set(WIN32_SOURCES

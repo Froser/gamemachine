@@ -2,7 +2,7 @@
 #define __BSPPHYSICSWORLD_H__
 #include <gmcommon.h>
 #include <gmphysicsworld.h>
-#include <gmbspphysicsworld.h>
+#include <extensions/bsp/gmbspphysicsworld.h>
 #include "gmbsptrace.h"
 #include "gmbsppatch.h"
 BEGIN_NS

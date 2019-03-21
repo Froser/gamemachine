@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmbspmove.h"
 #include "extensions/bsp/render/gmbspgameworld.h"
-#include <gmbspphysicsworld.h>
+#include <extensions/bsp/gmbspphysicsworld.h>
 #include "gmphysics/gmphysicsobject.h"
 #include "foundation/gamemachine.h"
 #include "foundation/gmprofile.h"

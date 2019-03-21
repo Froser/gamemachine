@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
 #include "quake3_bsp.h"
 #include <linearmath.h>
-#include <gmbspgameworld.h>
-#include <gmbspfactory.h>
+#include <extensions/bsp/gmbspgameworld.h>
+#include <extensions/bsp/gmbspfactory.h>
 #include <gmwidget.h>
 #include <gmcontrols.h>
 

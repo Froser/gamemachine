@@ -1,11 +1,11 @@
 ﻿#include "stdafx.h"
-#include "terrain.h"
-
+#include "wave.h"
+#include <extensions/objects/gmwavegameobject.h>
 #ifndef WHEEL_DELTA
 #define WHEEL_DELTA 120
 #endif
 
-void Demo_Terrain::init()
+void Demo_Wave::init()
 {
 	D(d);
 	D_BASE(db, DemoHandler);
@@ -17,39 +17,31 @@ void Demo_Terrain::init()
 	gm::GMBuffer map;
 	GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Textures, "map.png", &map);
 
-	gm::GMImage* imgMap = nullptr;
-	gm::GMImageReader::load(map.buffer, map.size, &imgMap);
-
-	gm::GMTerrainDescription desc = {
-		imgMap->getData().mip[0].data,
-		imgMap->getData().channels,
-		imgMap->getWidth(),
-		imgMap->getHeight(),
+	gm::GMWaveGameObjectDescription desc = {
 		-256.f,
 		-256.f,
 		512.f,
 		512.f,
 		80.f,
+		10,
+		10,
 		100,
-		100,
-		100,
-		100,
-		false
+		100
 	};
 
-	gm::GMPrimitiveCreator::createTerrain(desc, d->terrainScene);
-	gm::GMModel* terrainModel = d->terrainScene.getScene()->getModels()[0].getModel();
+	gm::GMWaveGameObject* wave = gm::GMWaveGameObject::create(desc);
+	d->wave = wave;
+	gm::GMModel* waveModel = d->wave->getModel();
 	gm::GMTextureAsset texture = gm::GMToolUtil::createTexture(db->parentDemonstrationWorld->getContext(), L"grass.jpg");
-	gm::GMToolUtil::addTextureToShader(terrainModel->getShader(), texture, gm::GMTextureType::Ambient);
-	terrainModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setWrapS(gm::GMS_Wrap::Repeat);
-	terrainModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setWrapT(gm::GMS_Wrap::Repeat);
-	terrainModel->getShader().getMaterial().setAmbient(GMVec3(.7f, .7f, .7f));
-	d->terrain = new gm::GMGameObject(d->terrainScene);
+	gm::GMToolUtil::addTextureToShader(waveModel->getShader(), texture, gm::GMTextureType::Ambient);
+	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setWrapS(gm::GMS_Wrap::Repeat);
+	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setWrapT(gm::GMS_Wrap::Repeat);
+	waveModel->getShader().getMaterial().setAmbient(GMVec3(.7f, .7f, .7f));
 
-	asDemoGameWorld(getDemoWorldReference())->addObject(L"terrain", d->terrain);
+	asDemoGameWorld(getDemoWorldReference())->addObject(L"wave", d->wave);
 }
 
-void Demo_Terrain::event(gm::GameMachineHandlerEvent evt)
+void Demo_Wave::event(gm::GameMachineHandlerEvent evt)
 {
 	D(d);
 	Base::event(evt);
@@ -77,7 +69,7 @@ void Demo_Terrain::event(gm::GameMachineHandlerEvent evt)
 	}
 }
 
-void Demo_Terrain::setLookAt()
+void Demo_Wave::setLookAt()
 {
 	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
 	camera.setPerspective(Radian(75.f), 1.333f, .1f, 3200);
@@ -88,7 +80,7 @@ void Demo_Terrain::setLookAt()
 	camera.lookAt(lookAt);
 }
 
-void Demo_Terrain::setDefaultLights()
+void Demo_Wave::setDefaultLights()
 {
 	// 所有Demo的默认灯光属性
 	D(d);
@@ -113,7 +105,7 @@ void Demo_Terrain::setDefaultLights()
 	}
 }
 
-void Demo_Terrain::handleMouseEvent()
+void Demo_Wave::handleMouseEvent()
 {
 	D(d);
 	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputManager()->getMouseState();
@@ -124,28 +116,28 @@ void Demo_Terrain::handleMouseEvent()
 		gm::GMfloat delta = .05f * state.wheeledDelta / WHEEL_DELTA;
 		GMFloat4 scaling;
 		{
-			GetScalingFromMatrix(d->terrain->getScaling(), scaling);
+			GetScalingFromMatrix(d->wave->getScaling(), scaling);
 			scaling[0] += delta;
 			scaling[1] += delta;
 			scaling[2] += delta;
 			if (scaling[0] > 0 && scaling[1] > 0 && scaling[2] > 0)
-				d->terrain->setScaling(Scale(GMVec3(scaling[0], scaling[1], scaling[2])));
+				d->wave->setScaling(Scale(GMVec3(scaling[0], scaling[1], scaling[2])));
 		}
 	}
 
 	if (d->draggingL)
 	{
 		gm::GMfloat rotateX = state.posX - d->mouseDownX;
-		GMQuat q = Rotate(d->terrain->getRotation(),
+		GMQuat q = Rotate(d->wave->getRotation(),
 			PI * rotateX / windowStates.renderRect.width,
 			GMVec3(0, 1, 0));
-		d->terrain->setRotation(q);
+		d->wave->setRotation(q);
 		d->mouseDownX = state.posX;
 		d->mouseDownY = state.posY;
 	}
 }
 
-void Demo_Terrain::handleDragging()
+void Demo_Wave::handleDragging()
 {
 	D(d);
 	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputManager()->getMouseState();

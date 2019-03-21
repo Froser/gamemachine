@@ -61,6 +61,8 @@ set(SOURCES
 		demo/md5mesh.cpp
 		demo/terrain.h
 		demo/terrain.cpp
+		demo/wave.h
+		demo/wave.cpp
 		demo/customshader.h
 		demo/customshader.cpp
 		demo/assimp.h

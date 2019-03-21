@@ -2,7 +2,7 @@
 #define __BSPPHYSICSSTRUCTS_H__
 #include <gmcommon.h>
 #include <linearmath.h>
-#include <gmbsp.h>
+#include <extensions/bsp/gmbsp.h>
 #include <gmphysicsworld.h>
 BEGIN_NS
 

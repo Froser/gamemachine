@@ -518,6 +518,8 @@ void GMPrimitiveCreator::createTerrain(
 
 	// 顶点数据创建完毕
 	// 接下来创建indices
+	if (desc.dynamic)
+		m->setUsageHint(GMUsageHint::DynamicDraw);
 	m->setDrawMode(GMModelDrawMode::Index);
 	m->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
 	for (GMsize_t i = 0; i < sliceN; ++i)

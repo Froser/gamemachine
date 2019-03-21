@@ -31,6 +31,7 @@
 #include "demo/terrain.h"
 #include "demo/customshader.h"
 #include "demo/customlight.h"
+#include "demo/wave.h"
 
 #if GM_USE_DX11
 #include <gmdx11helper.h>
@@ -72,6 +73,7 @@ namespace
 		world->addDemo(L"粒子系统: 渲染一个Billboard 3D粒子系统。", new Demo_ParticleBillboard(world));
 		world->addDemo(L"MD5: 渲染MD5骨骼动画。", new Demo_MD5Mesh(world));
 		world->addDemo(L"地形: 渲染一个地形。", new Demo_Terrain(world));
+		world->addDemo(L"地形: 渲染一个水面。", new Demo_Wave(world));
 		world->addDemo(L"自定义着色器: 使用自定义着色器进行渲染。", new Demo_CustomShader(world));
 		world->addDemo(L"自定义着色器: 实现聚光灯效果。", new Demo_CustomLight(world));
 		world->addDemo(L"LUA: 执行Lua脚本。", new Demo_Lua(world));
