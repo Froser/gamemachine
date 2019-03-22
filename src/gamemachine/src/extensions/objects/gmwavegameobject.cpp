@@ -189,6 +189,16 @@ namespace
 
 		scene = GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, m));
 	}
+
+	GMfloat gerstner_x(const GMWaveDescription& desc, GMfloat t, GMfloat x0)
+	{
+		return desc.Q * desc.A * desc.D * Sin(desc.D * x0 - desc.omega * t);
+	}
+
+	GMfloat gerstner_y(const GMWaveDescription& desc, GMfloat t, GMfloat x0)
+	{
+		return desc.A * Cos(desc.D * x0 - desc.omega * t);
+	}
 }
 
 GMWaveGameObject* GMWaveGameObject::create(const GMWaveGameObjectDescription& desc)
@@ -197,6 +207,10 @@ GMWaveGameObject* GMWaveGameObject::create(const GMWaveGameObjectDescription& de
 	GMSceneAsset waveScene;
 	createTerrain(desc, waveScene);
 	ret->setAsset(waveScene);
+	ret->setObjectDescription(desc);
+
+	GMModel* waveModel = waveScene.getScene()->getModels()[0].getModel();
+	ret->setVertices(waveModel->getParts()[0]->vertices());
 	return ret;
 }
 
@@ -219,11 +233,36 @@ void GMWaveGameObject::update(GMDuration dt)
 {
 	D(d);
 	d->duration += dt;
+	updateEachVertex();
 }
 
-void GMWaveGameObject::updateEachVertex(GMDuration dt)
+void GMWaveGameObject::updateEachVertex()
 {
 	D(d);
 	D_BASE(db, Base);
-	GMVertices vertices = getModel()->getParts()[0]->vertices();
+	if (d->isPlaying)
+	{
+		GMVertices vertices = d->vertices;
+		for (GMVertex& vertex : vertices)
+		{
+			vertex.positions = {
+				vertex.positions[0] - gerstner_x(d->waveDescriptions[0], d->duration, vertex.positions[0]),
+				gerstner_y(d->waveDescriptions[0], d->duration, vertex.positions[0]),
+				vertex.positions[2]
+			};
+		}
+		calculateNormals(vertices, getObjectDescription().sliceM, getObjectDescription().sliceN);
+		GMModelDataProxy* proxy = getModel()->getModelDataProxy();
+		proxy->beginUpdateBuffer(GMModelBufferType::VertexBuffer);
+		void* ptr = proxy->getBuffer();
+		GMsize_t sz = sizeof(GMVertex) * vertices.size();
+		memcpy_s(ptr, sz, vertices.data(), sz);
+		proxy->endUpdateBuffer();
+	}
+}
+
+void GMWaveGameObject::setVertices(const GMVertices& vertices)
+{
+	D(d);
+	d->vertices = vertices;
 }

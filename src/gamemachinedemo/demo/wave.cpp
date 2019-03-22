@@ -30,6 +30,11 @@ void Demo_Wave::init()
 	};
 
 	gm::GMWaveGameObject* wave = gm::GMWaveGameObject::create(desc);
+	Vector<gm::GMWaveDescription> wd = {
+		{ .2f, 5.f, 10.f, 0, 5.f }
+	};
+	wave->setWaveDescriptions(wd);
+	wave->play();
 	d->wave = wave;
 	gm::GMModel* waveModel = d->wave->getModel();
 	gm::GMTextureAsset texture = gm::GMToolUtil::createTexture(db->parentDemonstrationWorld->getContext(), L"grass.jpg");
@@ -52,6 +57,8 @@ void Demo_Wave::event(gm::GameMachineHandlerEvent evt)
 	case gm::GameMachineHandlerEvent::FrameEnd:
 		break;
 	case gm::GameMachineHandlerEvent::Update:
+		if (d->wave)
+			d->wave->update(GM.getRunningStates().lastFrameElpased);
 		break;
 	case gm::GameMachineHandlerEvent::Render:
 		getDemoWorldReference()->renderScene();

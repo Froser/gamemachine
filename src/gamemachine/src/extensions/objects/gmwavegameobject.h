@@ -11,8 +11,8 @@ struct GMWaveGameObjectDescription
 	GMfloat terrainLength; //!< 地形在x轴的长度。
 	GMfloat terrainWidth; //!< 地形在y轴的长度。
 	GMfloat heightScaling; //!< 地形高度的缩放比例。
-	GMsize_t sliceM; //!< 地形在x轴的分块数。
-	GMsize_t sliceN; //!< 地形在z轴的分块数。
+	GMint32 sliceM; //!< 地形在x轴的分块数。
+	GMint32 sliceN; //!< 地形在z轴的分块数。
 	GMfloat textureLength; //!< 一块地形纹理在x轴的长度。
 	GMfloat textureHeight; //!< 一块地形纹理在z轴的长度。
 };
@@ -23,11 +23,14 @@ struct GMWaveDescription
 	GMfloat A; // amplitude
 	GMfloat D; // wavelength
 	GMfloat theta; // direction
+	GMfloat omega;
 };
 
 GM_PRIVATE_OBJECT(GMWaveGameObject)
 {
+	GMWaveGameObjectDescription objectDescription;
 	Vector<GMWaveDescription> waveDescriptions;
+	GMVertices vertices;
 	bool isPlaying = false;
 	GMDuration duration = 0;
 };
@@ -35,6 +38,7 @@ GM_PRIVATE_OBJECT(GMWaveGameObject)
 class GMWaveGameObject : public GMGameObject
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMWaveGameObject, GMGameObject)
+	GM_DECLARE_PROPERTY(ObjectDescription, objectDescription)
 
 private:
 	GMWaveGameObject() = default;
@@ -48,7 +52,10 @@ public:
 	void update(GMDuration dt);
 
 private:
-	void updateEachVertex(GMDuration dt);
+	void updateEachVertex();
+
+private:
+	void setVertices(const GMVertices& vertices);
 };
 
 END_NS
