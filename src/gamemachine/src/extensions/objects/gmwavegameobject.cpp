@@ -190,14 +190,25 @@ namespace
 		scene = GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, m));
 	}
 
-	GMfloat gerstner_x(const GMWaveDescription& desc, GMfloat t, GMfloat x0)
+	GMfloat gerstner_x(const GMWaveDescription& desc, GMfloat fi, GMVec3 pos, GMfloat t)
 	{
-		return desc.Q * desc.A * desc.D * Sin(desc.D * x0 - desc.omega * t);
+		if (FuzzyCompare(desc.steepness, 0))
+			return 0;
+
+		return desc.steepness * desc.amplitude * Dot(desc.direction, GMVec3(pos.getX(), 0, 0)) * Cos(desc.waveLength * Dot(desc.direction, pos) + fi * t);
 	}
 
-	GMfloat gerstner_y(const GMWaveDescription& desc, GMfloat t, GMfloat x0)
+	GMfloat gerstner_y(const GMWaveDescription& desc, GMfloat fi, GMVec3 pos, GMfloat t)
 	{
-		return desc.A * Cos(desc.D * x0 - desc.omega * t);
+		return desc.amplitude * Sin(desc.waveLength * Dot(desc.direction, pos) + fi * t);
+	}
+
+	GMfloat gerstner_z(const GMWaveDescription& desc, GMfloat fi, GMVec3 pos, GMfloat t)
+	{
+		if (FuzzyCompare(desc.steepness, 0))
+			return 0;
+
+		return desc.steepness * desc.amplitude * Dot(desc.direction, GMVec3(0, 0, pos.getZ())) * Cos(desc.waveLength * Dot(desc.direction, pos) + fi * t);
 	}
 }
 
@@ -245,10 +256,22 @@ void GMWaveGameObject::updateEachVertex()
 		GMVertices vertices = d->vertices;
 		for (GMVertex& vertex : vertices)
 		{
+			GMfloat gerstner_x_sum = 0;
+			GMfloat gerstner_y_sum = 0;
+			GMfloat gerstner_z_sum = 0;
+			GMVec3 pos = { vertex.positions[0], vertex.positions[1], vertex.positions[2] };
+			for (GMsize_t i = 0; i < d->waveDescriptions.size(); ++i)
+			{
+				GMfloat fi = 2 * d->waveDescriptions[i].speed / d->waveDescriptions[i].waveLength;
+				gerstner_x_sum += gerstner_x(d->waveDescriptions[i], fi, pos, d->duration);
+				gerstner_y_sum += gerstner_y(d->waveDescriptions[i], fi, pos, d->duration);
+				gerstner_z_sum += gerstner_z(d->waveDescriptions[i], fi, pos, d->duration);
+			}
+
 			vertex.positions = {
-				vertex.positions[0] - gerstner_x(d->waveDescriptions[0], d->duration, vertex.positions[0]),
-				gerstner_y(d->waveDescriptions[0], d->duration, vertex.positions[0]),
-				vertex.positions[2]
+				vertex.positions[0] + gerstner_x_sum,
+				gerstner_y_sum,
+				vertex.positions[2] + gerstner_z_sum
 			};
 		}
 		calculateNormals(vertices, getObjectDescription().sliceM, getObjectDescription().sliceN);

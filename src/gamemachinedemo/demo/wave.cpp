@@ -14,34 +14,36 @@ void Demo_Wave::init()
 	getDemoWorldReference().reset(new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext()));
 	createDefaultWidget();
 
-	gm::GMBuffer map;
-	GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Textures, "map.png", &map);
-
 	gm::GMWaveGameObjectDescription desc = {
 		-256.f,
 		-256.f,
 		512.f,
 		512.f,
 		80.f,
-		10,
-		10,
+		25,
+		25,
 		100,
 		100
 	};
 
 	gm::GMWaveGameObject* wave = gm::GMWaveGameObject::create(desc);
+	GMVec3 direction1 = Normalize(GMVec3(1, 0, 1));
+	GMVec3 direction2 = Normalize(GMVec3(-1, 0, -1));
+	GMVec3 direction3 = Normalize(GMVec3(-1, 0, 0));
 	Vector<gm::GMWaveDescription> wd = {
-		{ .2f, 5.f, 10.f, 0, 5.f }
+		{ 0.f, 5.f, direction1, 5.f, 7.f },
+		{ 0.01f, 2.f, direction2, 5.f, 5.f },
+		//{ 0.01f, 3.f, direction3, 7.f, 3.f },
 	};
 	wave->setWaveDescriptions(wd);
 	wave->play();
 	d->wave = wave;
 	gm::GMModel* waveModel = d->wave->getModel();
-	gm::GMTextureAsset texture = gm::GMToolUtil::createTexture(db->parentDemonstrationWorld->getContext(), L"grass.jpg");
+	gm::GMTextureAsset texture = gm::GMToolUtil::createTexture(db->parentDemonstrationWorld->getContext(), L"water.tga");
 	gm::GMToolUtil::addTextureToShader(waveModel->getShader(), texture, gm::GMTextureType::Ambient);
 	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setWrapS(gm::GMS_Wrap::Repeat);
 	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setWrapT(gm::GMS_Wrap::Repeat);
-	waveModel->getShader().getMaterial().setAmbient(GMVec3(.7f, .7f, .7f));
+	waveModel->getShader().getMaterial().setAmbient(GMVec3(.3f, .3f, .3f));
 
 	asDemoGameWorld(getDemoWorldReference())->addObject(L"wave", d->wave);
 }

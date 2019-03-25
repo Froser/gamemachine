@@ -19,11 +19,11 @@ struct GMWaveGameObjectDescription
 
 struct GMWaveDescription
 {
-	GMfloat Q; // steepness
-	GMfloat A; // amplitude
-	GMfloat D; // wavelength
-	GMfloat theta; // direction
-	GMfloat omega;
+	GMfloat steepness; // between 0 and 1
+	GMfloat amplitude;
+	GMVec3 direction;
+	GMfloat speed;
+	GMfloat waveLength;
 };
 
 GM_PRIVATE_OBJECT(GMWaveGameObject)
