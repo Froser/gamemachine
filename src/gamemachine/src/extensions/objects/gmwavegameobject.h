@@ -49,6 +49,7 @@ public:
 public:
 	void setWaveDescriptions(Vector<GMWaveDescription> desc);
 	void play();
+	void stop();
 	void update(GMDuration dt);
 
 private:

@@ -6,6 +6,9 @@
 #define getIndex(x, y) ((x) + (y) * (sliceM + 1))
 #define getAdjVert(x, y, pos) getAdjacentVertex(vertices, x, y, sliceM, pos)
 
+#define TO_VEC3(i) GMVec3((i)[0], (i)[1], (i)[2])
+#define TO_VEC2(i) GMVec2((i)[0], (i)[1])
+
 namespace
 {
 	// 按照以下顺序求法线:
@@ -19,6 +22,60 @@ namespace
 		GMVec3 v1 = GMVec3(p1.positions[0], p1.positions[1], p1.positions[2]) - v0;
 		GMVec3 v2 = GMVec3(p2.positions[0], p2.positions[1], p2.positions[2]) - v0;
 		return Normalize(Cross(v1, v2));
+	}
+
+	void calculateTangent(GMVertex& p0, const GMVertex& p1, const GMVertex& p2)
+	{
+		GMVertex& currentVertex = p0;
+		GMVec3 e0, e1, e2;
+		GMVec2 uv0, uv1, uv2;
+
+		e0 = TO_VEC3(p0.positions);
+		e1 = TO_VEC3(p1.positions);
+		e2 = TO_VEC3(p2.positions);
+		uv0 = TO_VEC2(p0.texcoords);
+		uv1 = TO_VEC2(p1.texcoords);
+		uv2 = TO_VEC2(p2.texcoords);
+
+		GMVec3 E1 = e1 - e0;
+		GMVec3 E2 = e2 - e0;
+		GMVec2 deltaUV1 = uv1 - uv0;
+		GMVec2 deltaUV2 = uv2 - uv0;
+		const GMfloat& t1 = deltaUV1.getX();
+		const GMfloat& b1 = deltaUV1.getY();
+		const GMfloat& t2 = deltaUV2.getX();
+		const GMfloat& b2 = deltaUV2.getY();
+
+		GMFloat4 f4_E1, f4_E2;
+		E1.loadFloat4(f4_E1);
+		E2.loadFloat4(f4_E2);
+
+		GMfloat s = 1.0f / (t1*b2 - b1*t2);
+
+		GMfloat tangents[3] = {
+			s * (b2 * f4_E1[0] - b1 * f4_E2[0]),
+			s * (b2 * f4_E1[1] - b1 * f4_E2[1]),
+			s * (b2 * f4_E1[2] - b1 * f4_E2[2])
+		};
+		GMfloat bitangents[3] = {
+			s * (-t2 * f4_E1[0] + t1 * f4_E2[0]),
+			s * (-t2 * f4_E1[1] + t1 * f4_E2[1]),
+			s * (-t2 * f4_E1[2] + t1 * f4_E2[2])
+		};
+
+		GMVec3 tangentVector = FastNormalize(GMVec3(tangents[0], tangents[1], tangents[2]));
+		GMVec3 bitangentVector = FastNormalize(GMVec3(bitangents[0], bitangents[1], bitangents[2]));
+		GMFloat4 f4_tangentVector, f4_bitangentVector;
+		tangentVector.loadFloat4(f4_tangentVector);
+		bitangentVector.loadFloat4(f4_bitangentVector);
+
+		currentVertex.tangents[0] = f4_tangentVector[0];
+		currentVertex.tangents[1] = f4_tangentVector[1];
+		currentVertex.tangents[2] = f4_tangentVector[2];
+
+		currentVertex.bitangents[0] = f4_bitangentVector[0];
+		currentVertex.bitangents[1] = f4_bitangentVector[1];
+		currentVertex.bitangents[2] = f4_bitangentVector[2];
 	}
 
 	enum VertexPosition
@@ -120,6 +177,54 @@ namespace
 		}
 	}
 
+	void calculateTangentSpace(GMVertices& vertices, GMint32 sliceM, GMint32 sliceN)
+	{
+		for (GMsize_t i = 0; i < sliceN + 1; ++i)
+		{
+			for (GMsize_t j = 0; j < sliceM + 1; ++j)
+			{
+				if (i == 0 && j == 0) //左下角
+				{
+					calculateTangent(getVertex(j, i), getAdjVert(j, i, Up), getAdjVert(j, i, Right));
+				}
+				else if (i == 0 && j == sliceM) //右下角
+				{
+					calculateTangent(getVertex(j, i), getAdjVert(j, i, Left), getAdjVert(j, i, Up));
+				}
+				else if (i == sliceN && j == 0)
+				{
+					calculateTangent(getVertex(j, i), getAdjVert(j, i, Right), getAdjVert(j, i, Down));
+				}
+				else if (i == sliceN && j == sliceM)
+				{
+					calculateTangent(getVertex(j, i), getAdjVert(j, i, Down), getAdjVert(j, i, Left));
+				}
+				// 四条边的情况
+				else if (i == 0)
+				{
+					calculateTangent(getVertex(j, i), getAdjVert(j, i, Left), getAdjVert(j, i, Up));
+				}
+				else if (j == 0)
+				{
+					calculateTangent(getVertex(j, i), getAdjVert(j, i, Up), getAdjVert(j, i, Right));
+				}
+				else if (j == sliceM)
+				{
+					calculateTangent(getVertex(j, i), getAdjVert(j, i, Left), getAdjVert(j, i, Up));
+				}
+				else if (i == sliceN)
+				{
+					calculateTangent(getVertex(j, i), getAdjVert(j, i, Right), getAdjVert(j, i, Down));
+				}
+				// 中央
+				else
+				{
+					calculateTangent(getVertex(j, i), getAdjVert(j, i, Left), getAdjVert(j, i, Up));
+				}
+			}
+		}
+	}
+
 	void createTerrain(
 		const GMWaveGameObjectDescription& desc,
 		REF GMSceneAsset& scene
@@ -160,9 +265,6 @@ namespace
 			z += dz;
 			x = x_start;
 		}
-
-		// 再计算法线，一个顶点的法线等于相邻三角形平均值
-		calculateNormals(vertices, sliceM, sliceN);
 
 		// 顶点数据创建完毕
 		GMModel* m = new GMModel();
@@ -240,6 +342,15 @@ void GMWaveGameObject::play()
 	}
 }
 
+void GMWaveGameObject::stop()
+{
+	D(d);
+	if (d->isPlaying)
+	{
+		d->isPlaying = false;
+	}
+}
+
 void GMWaveGameObject::update(GMDuration dt)
 {
 	D(d);
@@ -260,12 +371,16 @@ void GMWaveGameObject::updateEachVertex()
 			GMfloat gerstner_y_sum = 0;
 			GMfloat gerstner_z_sum = 0;
 			GMVec3 pos = { vertex.positions[0], vertex.positions[1], vertex.positions[2] };
+
 			for (GMsize_t i = 0; i < d->waveDescriptions.size(); ++i)
 			{
 				GMfloat fi = 2 * d->waveDescriptions[i].speed / d->waveDescriptions[i].waveLength;
 				gerstner_x_sum += gerstner_x(d->waveDescriptions[i], fi, pos, d->duration);
 				gerstner_y_sum += gerstner_y(d->waveDescriptions[i], fi, pos, d->duration);
 				gerstner_z_sum += gerstner_z(d->waveDescriptions[i], fi, pos, d->duration);
+
+				GMfloat wa = d->waveDescriptions[i].amplitude * d->waveDescriptions[i].waveLength;
+				GMfloat c = Cos(d->waveDescriptions[i].waveLength * Dot(d->waveDescriptions[i].direction, pos) + fi * d->duration);
 			}
 
 			vertex.positions = {
@@ -274,7 +389,10 @@ void GMWaveGameObject::updateEachVertex()
 				vertex.positions[2] + gerstner_z_sum
 			};
 		}
+
 		calculateNormals(vertices, getObjectDescription().sliceM, getObjectDescription().sliceN);
+		//calculateTangentSpace(vertices, getObjectDescription().sliceM, getObjectDescription().sliceN);
+
 		GMModelDataProxy* proxy = getModel()->getModelDataProxy();
 		proxy->beginUpdateBuffer(GMModelBufferType::VertexBuffer);
 		void* ptr = proxy->getBuffer();

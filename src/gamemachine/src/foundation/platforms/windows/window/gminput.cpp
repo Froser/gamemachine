@@ -332,7 +332,7 @@ void MouseStateImpl::setDetectingMode(bool enable)
 	D_OF(d, m_host);
 	if (enable)
 	{
-		const GMRect& rect = d->window->getWindowStates().renderRect;
+		const GMRect& rect = d->window->getWindowRect();
 		::SetCursorPos(rect.x + rect.width / 2, rect.y + rect.height / 2);
 		::ShowCursor(FALSE);
 	}

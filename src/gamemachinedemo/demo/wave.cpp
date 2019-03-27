@@ -1,9 +1,68 @@
 ﻿#include "stdafx.h"
 #include "wave.h"
-#include <extensions/objects/gmwavegameobject.h>
+#include <gmgameobject.h>
+#include <gmimagebuffer.h>
+#include <gmcontrols.h>
 #ifndef WHEEL_DELTA
 #define WHEEL_DELTA 120
 #endif
+
+namespace
+{
+	gm::GMCubeMapGameObject* createCubeMap(const gm::IRenderContext* context)
+	{
+		gm::GMGamePackage* pk = GM.getGamePackageManager();
+		gm::GMImage* slices[6] = { nullptr };
+		{
+			gm::GMBuffer buf;
+			pk->readFile(gm::GMPackageIndex::Textures, "cubemap/cubemap_posx.jpg", &buf);
+			gm::GMImageReader::load(buf.buffer, buf.size, &slices[0]);
+			GM_ASSERT(slices[0]);
+		}
+		{
+			gm::GMBuffer buf;
+			pk->readFile(gm::GMPackageIndex::Textures, "cubemap/cubemap_negx.jpg", &buf);
+			gm::GMImageReader::load(buf.buffer, buf.size, &slices[1]);
+			GM_ASSERT(slices[1]);
+		}
+		{
+			gm::GMBuffer buf;
+			pk->readFile(gm::GMPackageIndex::Textures, "cubemap/cubemap_posy.jpg", &buf);
+			gm::GMImageReader::load(buf.buffer, buf.size, &slices[2]);
+			GM_ASSERT(slices[2]);
+		}
+		{
+			gm::GMBuffer buf;
+			pk->readFile(gm::GMPackageIndex::Textures, "cubemap/cubemap_negy.jpg", &buf);
+			gm::GMImageReader::load(buf.buffer, buf.size, &slices[3]);
+			GM_ASSERT(slices[3]);
+		}
+		{
+			gm::GMBuffer buf;
+			pk->readFile(gm::GMPackageIndex::Textures, "cubemap/cubemap_posz.jpg", &buf);
+			gm::GMImageReader::load(buf.buffer, buf.size, &slices[4]);
+			GM_ASSERT(slices[4]);
+		}
+		{
+			gm::GMBuffer buf;
+			pk->readFile(gm::GMPackageIndex::Textures, "cubemap/cubemap_negz.jpg", &buf);
+			gm::GMImageReader::load(buf.buffer, buf.size, &slices[5]);
+			GM_ASSERT(slices[5]);
+		}
+
+		gm::GMCubeMapBuffer cubeMap(*slices[0], *slices[1], *slices[2], *slices[3], *slices[4], *slices[5]);
+		gm::GMTextureAsset cubeMapTex;
+		GM.getFactory()->createTexture(context, &cubeMap, cubeMapTex);
+
+		for (auto slice : slices)
+		{
+			gm::GM_delete(slice);
+		}
+
+		return new gm::GMCubeMapGameObject(cubeMapTex);
+	}
+
+}
 
 void Demo_Wave::init()
 {
@@ -12,7 +71,70 @@ void Demo_Wave::init()
 	Base::init();
 
 	getDemoWorldReference().reset(new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext()));
-	createDefaultWidget();
+	gm::GMWidget* widget = createDefaultWidget();
+	auto top = getClientAreaTop();
+
+	gm::GMControlButton* button = nullptr;
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
+		L"停止水波",
+		10,
+		top,
+		250,
+		30,
+		false
+	));
+
+	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		if (d->wave)
+			d->wave->stop();
+	});
+
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
+		L"继续水波",
+		10,
+		top += 40,
+		250,
+		30,
+		false
+	));
+
+	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		if (d->wave)
+			d->wave->play();
+	});
+
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
+		L"停止水流",
+		10,
+		top += 40,
+		250,
+		30,
+		false
+	));
+
+	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		setWaterFlow(false);
+	});
+
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
+		L"开始水流",
+		10,
+		top += 40,
+		250,
+		30,
+		false
+	));
+
+	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		setWaterFlow(true);
+	});
+
+	widget->setSize(widget->getSize().width, top + 40);
+
 
 	gm::GMWaveGameObjectDescription desc = {
 		-256.f,
@@ -28,12 +150,12 @@ void Demo_Wave::init()
 
 	gm::GMWaveGameObject* wave = gm::GMWaveGameObject::create(desc);
 	GMVec3 direction1 = Normalize(GMVec3(1, 0, 1));
-	GMVec3 direction2 = Normalize(GMVec3(-1, 0, -1));
+	GMVec3 direction2 = Normalize(GMVec3(-1, 0, 1));
 	GMVec3 direction3 = Normalize(GMVec3(-1, 0, 0));
 	Vector<gm::GMWaveDescription> wd = {
-		{ 0.f, 5.f, direction1, 5.f, 7.f },
-		{ 0.01f, 2.f, direction2, 5.f, 5.f },
-		//{ 0.01f, 3.f, direction3, 7.f, 3.f },
+		{ 0.f, 2.5f, direction1, 2.f, 7.f },
+		{ 0.01f, 1.f, direction2, 3.f, 5.f },
+		{ 0.03f, 1.5f, direction3, 5.f, 3.f },
 	};
 	wave->setWaveDescriptions(wd);
 	wave->play();
@@ -41,11 +163,33 @@ void Demo_Wave::init()
 	gm::GMModel* waveModel = d->wave->getModel();
 	gm::GMTextureAsset texture = gm::GMToolUtil::createTexture(db->parentDemonstrationWorld->getContext(), L"water.tga");
 	gm::GMToolUtil::addTextureToShader(waveModel->getShader(), texture, gm::GMTextureType::Ambient);
+	gm::GMToolUtil::addTextureToShader(waveModel->getShader(), texture, gm::GMTextureType::Diffuse);
+	gm::GMToolUtil::addTextureToShader(waveModel->getShader(), texture, gm::GMTextureType::Specular);
+
+	//texture = gm::GMToolUtil::createTexture(db->parentDemonstrationWorld->getContext(), L"water-normal.tga");
+	//gm::GMToolUtil::addTextureToShader(waveModel->getShader(), texture, gm::GMTextureType::NormalMap);
+
 	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setWrapS(gm::GMS_Wrap::Repeat);
 	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setWrapT(gm::GMS_Wrap::Repeat);
-	waveModel->getShader().getMaterial().setAmbient(GMVec3(.3f, .3f, .3f));
+	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Diffuse).setWrapS(gm::GMS_Wrap::Repeat);
+	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Diffuse).setWrapT(gm::GMS_Wrap::Repeat);
+	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Specular).setWrapS(gm::GMS_Wrap::Repeat);
+	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Specular).setWrapT(gm::GMS_Wrap::Repeat);
+	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::NormalMap).setWrapS(gm::GMS_Wrap::Repeat);
+	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::NormalMap).setWrapT(gm::GMS_Wrap::Repeat);
+
+	setWaterFlow(true);
+	waveModel->getShader().getMaterial().setAmbient(GMVec3(.4f, .4f, .4f));
+	waveModel->getShader().getMaterial().setDiffuse(GMVec3(.6f, .6f, .6f));
+	waveModel->getShader().getMaterial().setSpecular(GMVec3(.6f, .6f, .6f));
+	waveModel->getShader().getMaterial().setShininess(50);
 
 	asDemoGameWorld(getDemoWorldReference())->addObject(L"wave", d->wave);
+
+	d->skyObject = createCubeMap(getDemoWorldReference()->getContext());
+	d->skyObject->setScaling(Scale(GMVec3(1000, 1000, 1000)));
+	d->skyObject->setTranslation(Translate(GMVec3(0, 20, 0)));
+	asDemoGameWorld(getDemoWorldReference())->addObject(L"sky", d->skyObject);
 }
 
 void Demo_Wave::event(gm::GameMachineHandlerEvent evt)
@@ -58,16 +202,28 @@ void Demo_Wave::event(gm::GameMachineHandlerEvent evt)
 		break;
 	case gm::GameMachineHandlerEvent::FrameEnd:
 		break;
+	case gm::GameMachineHandlerEvent::Activate:
+	{
+		if (d->activate)
+		{
+			const static gm::GMfloat mouseSensitivity = 0.25f;
+			gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputManager();
+			gm::IMouseState& mouseState = inputManager->getMouseState();
+			auto ms = mouseState.state();
+			d->cameraUtility.update(Radian(-ms.deltaX * mouseSensitivity), Radian(-ms.deltaY * mouseSensitivity));
+
+			gm::IKeyboardState& kbState = inputManager->getKeyboardState();
+			if (kbState.keyTriggered(gm::GM_ASCIIToKey('R')))
+				setMouseTrace(!d->mouseTrace);
+		}
+		break;
+	}
 	case gm::GameMachineHandlerEvent::Update:
 		if (d->wave)
 			d->wave->update(GM.getRunningStates().lastFrameElpased);
 		break;
 	case gm::GameMachineHandlerEvent::Render:
 		getDemoWorldReference()->renderScene();
-		break;
-	case gm::GameMachineHandlerEvent::Activate:
-		handleMouseEvent();
-		handleDragging();
 		break;
 	case gm::GameMachineHandlerEvent::Deactivate:
 		break;
@@ -85,8 +241,11 @@ void Demo_Wave::setLookAt()
 
 	gm::GMCameraLookAt lookAt;
 	lookAt.lookDirection = Normalize(GMVec3(0, -.5f, 1));
-	lookAt.position = GMVec3(0, 100, 0);
+	lookAt.position = GMVec3(0, 10, 0);
 	camera.lookAt(lookAt);
+
+	D(d);
+	d->cameraUtility.setCamera(&camera);
 }
 
 void Demo_Wave::setDefaultLights()
@@ -101,11 +260,11 @@ void Demo_Wave::setDefaultLights()
 			gm::ILight* light = nullptr;
 			GM.getFactory()->createLight(gm::GMLightType::PointLight, &light);
 			GM_ASSERT(light);
-			gm::GMfloat ambientIntensity[] = { .5f, .5f, .5f };
-			gm::GMfloat diffuseIntensity[] = { .3f, .3f, .3f };
+			gm::GMfloat ambientIntensity[] = { .8f, .8f, .8f };
+			gm::GMfloat diffuseIntensity[] = { 1.2f, 1.2f, 1.2f };
 			light->setLightAttribute3(gm::GMLight::AmbientIntensity, ambientIntensity);
 			light->setLightAttribute3(gm::GMLight::DiffuseIntensity, diffuseIntensity);
-			light->setLightAttribute(gm::GMLight::SpecularIntensity, .3f);
+			light->setLightAttribute(gm::GMLight::SpecularIntensity, 1.f);
 
 			gm::GMfloat lightPos[] = { 100.f, 100.f, 100.f };
 			light->setLightAttribute3(gm::GMLight::Position, lightPos);
@@ -114,53 +273,57 @@ void Demo_Wave::setDefaultLights()
 	}
 }
 
-void Demo_Wave::handleMouseEvent()
+void Demo_Wave::onActivate()
 {
 	D(d);
-	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputManager()->getMouseState();
-	gm::GMMouseState state = ms.state();
-	const gm::GMWindowStates& windowStates = getDemonstrationWorld()->getContext()->getWindow()->getWindowStates();
-	if (state.wheeled)
-	{
-		gm::GMfloat delta = .05f * state.wheeledDelta / WHEEL_DELTA;
-		GMFloat4 scaling;
-		{
-			GetScalingFromMatrix(d->wave->getScaling(), scaling);
-			scaling[0] += delta;
-			scaling[1] += delta;
-			scaling[2] += delta;
-			if (scaling[0] > 0 && scaling[1] > 0 && scaling[2] > 0)
-				d->wave->setScaling(Scale(GMVec3(scaling[0], scaling[1], scaling[2])));
-		}
-	}
-
-	if (d->draggingL)
-	{
-		gm::GMfloat rotateX = state.posX - d->mouseDownX;
-		GMQuat q = Rotate(d->wave->getRotation(),
-			PI * rotateX / windowStates.renderRect.width,
-			GMVec3(0, 1, 0));
-		d->wave->setRotation(q);
-		d->mouseDownX = state.posX;
-		d->mouseDownY = state.posY;
-	}
+	d->activate = true;
+	setMouseTrace(true);
+	Base::onActivate();
 }
 
-void Demo_Wave::handleDragging()
+void Demo_Wave::onDeactivate()
 {
 	D(d);
-	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputManager()->getMouseState();
-	gm::GMMouseState state = ms.state();
-	if (state.downButton & gm::GMMouseButton_Left)
+	d->activate = false;
+	setMouseTrace(false);
+	Base::onDeactivate();
+}
+
+void Demo_Wave::setMouseTrace(bool enabled)
+{
+	D(d);
+	gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputManager();
+	gm::IMouseState& mouseState = inputManager->getMouseState();
+	d->mouseTrace = enabled;
+
+	// 鼠标跟踪开启时，detecting mode也开启，每一帧将返回窗口中心，以获取鼠标移动偏量
+	mouseState.setDetectingMode(d->mouseTrace);
+}
+
+void Demo_Wave::setWaterFlow(bool flow)
+{
+	D(d);
+	if (d->wave)
 	{
-		d->mouseDownX = state.posX;
-		d->mouseDownY = state.posY;
-		d->draggingL = true;
-		getDemonstrationWorld()->getMainWindow()->setWindowCapture(true);
-	}
-	else if (state.upButton & gm::GMMouseButton_Left)
-	{
-		d->draggingL = false;
-		getDemonstrationWorld()->getMainWindow()->setWindowCapture(false);
+		gm::GMModel* waveModel = d->wave->getModel();
+		if (flow)
+		{
+			gm::GMS_TextureTransform tt;
+			tt.type = gm::GMS_TextureTransformType::Scroll;
+			tt.p1 = .025f;
+			tt.p2 = .05f;
+			waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setTextureTransform(0, tt);
+			waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Diffuse).setTextureTransform(0, tt);
+			waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Specular).setTextureTransform(0, tt);
+		}
+		else
+		{
+
+			gm::GMS_TextureTransform tt;
+			tt.type = gm::GMS_TextureTransformType::NoTextureTransform;
+			waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setTextureTransform(0, tt);
+			waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Diffuse).setTextureTransform(0, tt);
+			waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Specular).setTextureTransform(0, tt);
+		}
 	}
 }
