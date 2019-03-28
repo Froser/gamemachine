@@ -29,4 +29,12 @@ void init_layouts()
     normal = vec4(gm_normal.xyz, 1);
     tangent = vec4(gm_tangent.xyz, 1);
     bitangent = vec4(gm_bitangent.xyz, 1);
+
+    _normal = normal;
+    _tangent = tangent;
+    _bitangent = bitangent;
+    _uv = uv;
+    _lightmapuv = lightmapuv;
+    _color = color;
+    _z = gl_Position.z;
 }

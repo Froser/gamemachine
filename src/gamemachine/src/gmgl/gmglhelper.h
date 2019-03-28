@@ -3,6 +3,7 @@
 #include <gmcommon.h>
 BEGIN_NS
 
+struct GMGLShaderInfo;
 struct GM_EXPORT GMGLHelper
 {
 	struct GMGLShaderContent
@@ -34,6 +35,8 @@ struct GM_EXPORT GMGLHelper
 		const GMString& filtersVertexFilePath,
 		const GMString& filtersPixelFilePath
 	);
+
+	static const GMGLShaderInfo& getDefaultShaderCode(GMShaderType);
 };
 
 END_NS

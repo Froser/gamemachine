@@ -3,9 +3,9 @@
 #include <linearmath.h>
 #include <gmwidget.h>
 
-static gm::GMRenderTechinqueID s_techid;
+static gm::GMRenderTechinqueID s_techid, s_techid2;
 
-void Demo_CustomShader::init()
+void Demo_CustomGeometryShader::init()
 {
 	D(d);
 	Base::init();
@@ -51,7 +51,7 @@ void Demo_CustomShader::init()
 	gm::GMToolUtil::addTextureToShader(quad->getShader(), tex, gm::GMTextureType::Diffuse);
 	getDemoWorldReference()->getAssets().addAsset(tex);
 
-	quad->setTechniqueId(s_techid);
+	quad->setTechniqueId(techId());
 	quad->setType(gm::GMModelType::Custom);
 
 	getDemoWorldReference()->getAssets().addAsset(asset);
@@ -62,7 +62,12 @@ void Demo_CustomShader::init()
 	widget->setSize(widget->getSize().width, getClientAreaTop() + 40);
 }
 
-void Demo_CustomShader::event(gm::GameMachineHandlerEvent evt)
+gm::GMRenderTechinqueID Demo_CustomGeometryShader::techId()
+{
+	return s_techid;
+}
+
+void Demo_CustomGeometryShader::event(gm::GameMachineHandlerEvent evt)
 {
 	D_BASE(db, Base);
 	D(d);
@@ -90,7 +95,7 @@ void Demo_CustomShader::event(gm::GameMachineHandlerEvent evt)
 	}
 }
 
-void Demo_CustomShader::initCustomShader(const gm::IRenderContext* context)
+void Demo_CustomGeometryShader::initCustomShader(const gm::IRenderContext* context)
 {
 	gm::IGraphicEngine* engine = context->getEngine();
 	gm::GMRenderTechniques techs;
@@ -186,7 +191,7 @@ void Demo_CustomShader::initCustomShader(const gm::IRenderContext* context)
 	);
 	pixelTech.setCode(
 		gm::GMRenderEnvironment::DirectX11,
-		L"float4 PS_Custom(PS_INPUT input) : SV_TARGET\n"
+		L"float4 PS_Demo_CustomGeometryShader(PS_INPUT input) : SV_TARGET\n"
 		L"{\n"
 		L"	float4 color = float4(0.0f, 0.0f, 0.0f, 0.0f);\n"
 		L"	color += GM_DiffuseTextureAttribute.Sample(GM_DiffuseTexture, GM_DiffuseSampler, input.Texcoord);\n"
@@ -196,4 +201,43 @@ void Demo_CustomShader::initCustomShader(const gm::IRenderContext* context)
 	techs.addRenderTechnique(pixelTech);
 
 	s_techid = engine->getRenderTechniqueManager()->addRenderTechniques(techs);
+}
+
+gm::GMRenderTechinqueID Demo_CustomAndDefaultShader::techId()
+{
+	return s_techid2;
+}
+
+void Demo_CustomAndDefaultShader::initCustomShader(const gm::IRenderContext* context)
+{
+	gm::IGraphicEngine* engine = context->getEngine();
+	gm::GMRenderTechniques techs;
+	gm::GMRenderTechnique vertexTech(gm::GMShaderType::Vertex);
+	vertexTech.setCode(
+		gm::GMRenderEnvironment::OpenGL,
+		L"#version 330\n"
+		L"#include \"foundation/foundation.h\"\n"
+		L"#include \"foundation/vert_header.h\"\n"
+		L"out vec4 _model3d_position_world;"
+		L"out vec3 _cubemap_uv;"
+		L""
+		L"void main()"
+		L"{"
+		L"    init_layouts();"
+		L"    _model3d_position_world = GM_WorldMatrix * position;"
+		L"    gl_Position = (GM_ProjectionMatrix * GM_ViewMatrix * _model3d_position_world) + vec4(.1, .1, 0, 0);"
+		L"}"
+	);
+	vertexTech.setCode(
+		gm::GMRenderEnvironment::DirectX11,
+		L"VS_OUTPUT VS_Demo_CustomShader(VS_INPUT input)"
+		L"{"
+		L"    VS_OUTPUT r = VS_3D(input);"
+		L"    r.Position += float4(.1, .1, 0, 0);"
+		L"    return r;"
+		L"}"
+	);
+	techs.addRenderTechnique(vertexTech);
+
+	s_techid2 = engine->getRenderTechniqueManager()->addRenderTechniques(techs);
 }

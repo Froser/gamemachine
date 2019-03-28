@@ -5,6 +5,7 @@ const int GM_ModelType_Model3D = 1;
 const int GM_ModelType_Text = 2;
 const int GM_ModelType_CubeMap = 3;
 const int GM_ModelType_Particle = 6;
+const int GM_ModelType_Custom = 7;
 const int GM_ModelType_Shadow = 8;
 
 void GM_InvokeTechniqueEntrance()
@@ -16,6 +17,7 @@ void GM_InvokeTechniqueEntrance()
 			GM_Model2D();
 			break;
 		case GM_ModelType_Model3D:
+		case GM_ModelType_Custom:
 			GM_Model3D();
 			break;
 		case GM_ModelType_Text:

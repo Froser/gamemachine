@@ -563,17 +563,20 @@ END_NS
 GMDx11Technique::GMDx11Technique(const IRenderContext* context)
 {
 	D(d);
-	d->context = context;
+	if (context)
+	{
+		d->context = context;
 
-	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
-	shaderProgram->useProgram();
-	GM_ASSERT(!d->effect);
-	shaderProgram->getInterface(GameMachineInterfaceID::D3D11Effect, (void**)&d->effect);
-	GM_ASSERT(d->effect);
+		IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
+		shaderProgram->useProgram();
+		GM_ASSERT(!d->effect);
+		shaderProgram->getInterface(GameMachineInterfaceID::D3D11Effect, (void**)&d->effect);
+		GM_ASSERT(d->effect);
 
-	d->deviceContext = getEngine()->getDeviceContext();
-	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
-	getVarBank().init(d->effect);
+		d->deviceContext = getEngine()->getDeviceContext();
+		d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
+		getVarBank().init(d->effect);
+	}
 }
 
 void GMDx11Technique::beginScene(GMScene* scene)

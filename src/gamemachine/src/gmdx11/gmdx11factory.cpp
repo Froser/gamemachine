@@ -105,7 +105,7 @@ namespace
 
 	GMString getVS(const GMString& code)
 	{
-		GMString expr = L"VS_OUTPUT (.+)(.*)\\(VS_INPUT (.+)\\)(.*)";
+		static const GMString expr = L"VS_OUTPUT (.+)(.*)\\(VS_INPUT (.+)\\)(.*)";
 		std::string value;
 		std::regex regPair(expr.toStdString());
 		std::smatch match;
@@ -120,9 +120,9 @@ namespace
 
 	GMString getPS(const GMString& code)
 	{
-		GMString expr = L"float4 (.+)(.*)\\(PS_INPUT (.+)\\)(.*)SV_TARGET(.*)";
+		static const std::string expr = "float4 (.+)(.*)\\(PS_INPUT (.+)\\)(.*)SV_TARGET(.*)";
 		std::string value;
-		std::regex regPair(expr.toStdString());
+		std::regex regPair(expr);
 		std::smatch match;
 		std::string c = code.toStdString();
 		if (std::regex_search(c, match, regPair))
@@ -135,9 +135,9 @@ namespace
 
 	GMString getGS(const GMString& code)
 	{
-		GMString expr = L"void (.+)(.*)\\((.*)(point|line|triangle|lineadj|triangleadj) (.+)\\)(.*)";
+		static const std::string expr = "void (.+)(.*)\\((.*)(point|line|triangle|lineadj|triangleadj) (.+)\\)(.*)";
 		std::string value;
-		std::regex regPair(expr.toStdString());
+		std::regex regPair(expr);
 		std::smatch match;
 		std::string c = code.toStdString();
 		if (std::regex_search(c, match, regPair))
@@ -146,6 +146,28 @@ namespace
 			value = match[1].str();
 		}
 		return value;
+	}
+
+	GMString getDefaultVS(const GMString& fxCode)
+	{
+		//TODO
+		static GMString s;
+		static std::once_flag s_flag;
+		std::call_once(s_flag, [&fxCode](GMString& vs) {
+			vs = L"VS_3D";
+		}, s);
+		return s;
+	}
+
+	GMString getDefaultPS(const GMString& fxCode)
+	{
+		//TODO
+		static GMString s;
+		static std::once_flag s_flag;
+		std::call_once(s_flag, [&fxCode](GMString& ps) {
+			ps = L"PS_3D";
+		}, s);
+		return s;
 	}
 }
 
@@ -214,6 +236,17 @@ void GMDx11Factory::createShaderPrograms(const IRenderContext* context, const GM
 				else if (technique.getShaderType() == GMShaderType::Geometry)
 					gs = getGS(code);
 
+				// 如果没有指定VS和PS着色器，则补充默认的着色器程序
+				if (vs.isEmpty())
+				{
+					vs = getDefaultVS(fxCode);
+				}
+
+				if (ps.isEmpty())
+				{
+					ps = getDefaultPS(fxCode);
+				}
+
 				fxCode += code;
 				fxCode += L"\n";
 			}
@@ -224,8 +257,8 @@ void GMDx11Factory::createShaderPrograms(const IRenderContext* context, const GM
 
 			// 拿到PS, VS后，通过s_technique11_template插入fx底部
 			fxCode += s_technique11_template
-				.replace(L"{vs}", vs.isEmpty() ? L"NULL" : L"CompileShader(vs_5_0," + vs + L"())")
-				.replace(L"{ps}", vs.isEmpty() ? L"NULL" : L"CompileShader(ps_5_0," + ps + L"())")
+				.replace(L"{vs}", L"CompileShader(vs_5_0," + vs + L"())")
+				.replace(L"{ps}", L"CompileShader(ps_5_0," + ps + L"())")
 				.replace(L"{gs}", gs.isEmpty() ? L"NULL" : L"CompileShader(gs_5_0," + gs + L"())")
 				.replace(L"{id}", GMDx11Technique::getTechniqueNameByTechniqueId(renderTechniques.getId()) );
 			fxCode += L"\n";

@@ -2,6 +2,12 @@
 #include "gmglhelper.h"
 #include "gmglshaderprogram.h"
 
+namespace
+{
+	GMGLShaderInfo s_defaultVS;
+	GMGLShaderInfo s_defaultPS;
+}
+
 bool GMGLHelper::loadShader(
 	const IRenderContext* context,
 	const GMGLShaderContent& forwardVertex,
@@ -26,6 +32,9 @@ bool GMGLHelper::loadShader(
 		};
 		forward->attachShader(shadersInfo[0]);
 		forward->attachShader(shadersInfo[1]);
+
+		s_defaultVS = shadersInfo[0];
+		s_defaultPS = shadersInfo[1];
 	}
 
 	{
@@ -160,4 +169,24 @@ bool GMGLHelper::loadShader(
 		filtersVertex,
 		filtersPixel
 	);
+}
+
+const GMGLShaderInfo& GMGLHelper::getDefaultShaderCode(GMShaderType type)
+{
+	const GMGLShaderInfo* result = nullptr;
+	switch (type)
+	{
+	case GMShaderType::Vertex:
+		result = &s_defaultVS;
+		break;
+	case GMShaderType::Pixel:
+	default:
+		result = &s_defaultPS;
+		break;
+	}
+
+	if (result->source.isEmpty())
+		gm_warning(gm_dbg_wrap("Code is empty. Please call loadShader first."));
+
+	return *result;
 }

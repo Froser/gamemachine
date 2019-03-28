@@ -9,6 +9,7 @@
 #include "gmglgbuffer.h"
 #include "gmgllight.h"
 #include "gmengine/ui/gmwindow.h"
+#include "gmglhelper.h"
 
 void GMGLFactory::createWindow(GMInstance instance, IWindow* parent, OUT IWindow** window)
 {
@@ -86,15 +87,32 @@ void GMGLFactory::createEmptyTexture(const IRenderContext* context, REF GMTextur
 
 void GMGLFactory::createShaderPrograms(const IRenderContext* context, const GMRenderTechniqueManager& manager, REF Vector<IShaderProgram*>* out)
 {
+	GMGLShaderInfo s_vs, s_ps;
+	s_vs = GMGLHelper::getDefaultShaderCode(GMShaderType::Vertex);
+	s_ps = GMGLHelper::getDefaultShaderCode(GMShaderType::Pixel);
 	for (auto& renderTechniques : manager.getRenderTechniques())
 	{
 		const auto& techniques = renderTechniques.getTechniques();
 		GMGLShaderProgram* shaderProgram = new GMGLShaderProgram(context);
+		bool hasVS = false, hasPS = false;
 		for (auto& technique : techniques)
 		{
-			GMGLShaderInfo shaderInfo = { GMGLShaderInfo::toGLShaderType(technique.getShaderType()), technique.getCode(GMRenderEnvironment::OpenGL) };
+			GMShaderType t = technique.getShaderType();
+			if (t == GMShaderType::Vertex)
+				hasVS = true;
+			else if (t == GMShaderType::Pixel)
+				hasPS = true;
+
+			GMGLShaderInfo shaderInfo = { GMGLShaderInfo::toGLShaderType(t), technique.getCode(GMRenderEnvironment::OpenGL), t == GMShaderType::Vertex ? s_vs.filename : s_ps.filename };
 			shaderProgram->attachShader(shaderInfo);
 		}
+
+		// 如果着色器程序没有VS或PS(FS)，则使用默认的
+		if (!hasVS)
+			shaderProgram->attachShader(s_vs);
+
+		if (!hasPS)
+			shaderProgram->attachShader(s_ps);
 
 		shaderProgram->load();
 		if (out)

@@ -74,7 +74,8 @@ namespace
 		world->addDemo(L"MD5: 渲染MD5骨骼动画。", new Demo_MD5Mesh(world));
 		world->addDemo(L"地形: 渲染一个地形。", new Demo_Terrain(world));
 		world->addDemo(L"地形: 渲染一个水面。", new Demo_Wave(world));
-		world->addDemo(L"自定义着色器: 使用自定义着色器进行渲染。", new Demo_CustomShader(world));
+		world->addDemo(L"自定义着色器: 使用自定义顶点着色器进行渲染。", new Demo_CustomAndDefaultShader(world));
+		world->addDemo(L"自定义着色器: 使用自定义几何着色器进行渲染。", new Demo_CustomGeometryShader(world));
 		world->addDemo(L"自定义着色器: 实现聚光灯效果。", new Demo_CustomLight(world));
 		world->addDemo(L"LUA: 执行Lua脚本。", new Demo_Lua(world));
 		world->init();
@@ -769,7 +770,8 @@ DemostrationEntrance::~DemostrationEntrance()
 void DemostrationEntrance::onLoadShaders(const gm::IRenderContext* context)
 {
 	D(d);
-	Demo_CustomShader::initCustomShader(context);
+	Demo_CustomGeometryShader::initCustomShader(context);
+	Demo_CustomAndDefaultShader::initCustomShader(context);
 	Demo_CustomLight::initCustomShader(context);
 	auto& env = GM.getRunningStates().renderEnvironment;
 	if (env == gm::GMRenderEnvironment::OpenGL)
