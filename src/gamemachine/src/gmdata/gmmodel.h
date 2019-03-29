@@ -200,7 +200,7 @@ GM_PRIVATE_OBJECT(GMModel)
 	GMTopologyMode mode = GMTopologyMode::Triangles;
 	GMsize_t verticesCount = 0;
 	bool needTransfer = true;
-	GMRenderTechinqueID techniqueId = 0;
+	GMRenderTechniqueID techniqueId = 0;
 	GMModelAsset parentAsset;
 	GMOwnedPtr<GMSkeleton> skeleton;
 	AlignedVector<GMMat4> boneTransformations;

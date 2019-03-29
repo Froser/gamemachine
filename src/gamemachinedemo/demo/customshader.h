@@ -17,7 +17,7 @@ public:
 	virtual void event(gm::GameMachineHandlerEvent evt) override;
 
 protected:
-	virtual gm::GMRenderTechinqueID techId();
+	virtual gm::GMRenderTechniqueID techId();
 	const gm::GMString& getDescription() const
 	{
 		static gm::GMString desc = L"使用自定义几何着色器。";
@@ -36,7 +36,7 @@ public:
 	using Base::Base;
 
 protected:
-	virtual gm::GMRenderTechinqueID techId();
+	virtual gm::GMRenderTechniqueID techId();
 	const gm::GMString& getDescription() const
 	{
 		static gm::GMString desc = L"使用自定义着色器。只改顶点阶段。";

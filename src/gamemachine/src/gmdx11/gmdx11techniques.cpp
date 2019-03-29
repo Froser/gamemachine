@@ -386,7 +386,7 @@ void GMDx11Technique::setCascadeCameraVPMatrices(GMCascadeLevel level)
 	GM_DX_HR(shadowMatrix->GetElement(level)->AsMatrix()->SetMatrix(ValuePointer(getEngine()->getCascadeCameraVPMatrix(level))));
 }
 
-const std::string& GMDx11Technique::getTechniqueNameByTechniqueId(GMRenderTechinqueID id)
+const std::string& GMDx11Technique::getTechniqueNameByTechniqueId(GMRenderTechniqueID id)
 {
 	static Vector<std::string> s_names;
 
@@ -664,7 +664,7 @@ void GMDx11Technique::beginModel(GMModel* model, const GMGameObject* parent)
 
 	// 骨骼动画
 	GM_ASSERT(d->techContext.currentScene);
-	if (d->techContext.currentScene->hasAnimation() && parent->isAnimationObject())
+	if (d->techContext.currentScene->hasAnimation() && parent && parent->isSkeletalObject())
 	{
 		shaderProgram->setInt(VI(UseBoneAnimation), 1);
 		updateBoneTransforms(shaderProgram, model);
@@ -673,6 +673,9 @@ void GMDx11Technique::beginModel(GMModel* model, const GMGameObject* parent)
 	{
 		shaderProgram->setInt(VI(UseBoneAnimation), 0);
 	}
+
+	if (parent)
+		parent->onRenderShader(model, shaderProgram);
 }
 
 void GMDx11Technique::endModel()

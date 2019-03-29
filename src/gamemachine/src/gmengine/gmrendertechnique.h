@@ -3,16 +3,16 @@
 #include <gmcommon.h>
 BEGIN_NS
 
-typedef GMlong GMRenderTechinqueID;
+typedef GMlong GMRenderTechniqueID;
 class GMRenderTechnique;
 class GMRenderTechniques;
 
 GM_PRIVATE_OBJECT(GMRenderTechniqueManager)
 {
 	const IRenderContext* context = nullptr;
-	GMAtomic<GMRenderTechinqueID> id;
+	GMAtomic<GMRenderTechniqueID> id;
 	Set<GMRenderTechniques> renderTechniques;
-	Map<GMRenderTechinqueID, GMOwnedPtr<IShaderProgram>> shaderPrograms;
+	Map<GMRenderTechniqueID, GMOwnedPtr<IShaderProgram>> shaderPrograms;
 	bool inited = false;
 };
 
@@ -30,8 +30,8 @@ public:
 	GMRenderTechniqueManager(const IRenderContext* context);
 
 public:
-	GMRenderTechinqueID addRenderTechniques(GMRenderTechniques renderTechniques);
-	IShaderProgram* getShaderProgram(GMRenderTechinqueID id);
+	GMRenderTechniqueID addRenderTechniques(GMRenderTechniques renderTechniques);
+	IShaderProgram* getShaderProgram(GMRenderTechniqueID id);
 	void init();
 	bool isEmpty();
 
@@ -82,7 +82,7 @@ public:
 	void setPath(GMRenderEnvironment type, GMString path);
 
 friend_methods(GMRenderTechniqueManager):
-	void setId(GMRenderTechinqueID id);
+	void setId(GMRenderTechniqueID id);
 
 friend_methods(GMRenderTechniques):
 	inline void setParent(GMRenderTechniques* parent) GM_NOEXCEPT
@@ -94,7 +94,7 @@ friend_methods(GMRenderTechniques):
 
 GM_PRIVATE_OBJECT(GMRenderTechniques)
 {
-	GMRenderTechinqueID id;
+	GMRenderTechniqueID id;
 	Vector<GMRenderTechnique> techniques;
 };
 

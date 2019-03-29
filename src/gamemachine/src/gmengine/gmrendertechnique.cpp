@@ -3,7 +3,7 @@
 #include "foundation/utilities/tools.h"
 #include "foundation/gamemachine.h"
 
-GMRenderTechinqueID GMRenderTechniqueManager::addRenderTechniques(GMRenderTechniques renderTechniques)
+GMRenderTechniqueID GMRenderTechniqueManager::addRenderTechniques(GMRenderTechniques renderTechniques)
 {
 	D(d);
 	GM_ASSERT(!d->inited);
@@ -32,7 +32,7 @@ GMRenderTechniqueManager::GMRenderTechniqueManager(const IRenderContext* context
 	d->context = context;
 }
 
-IShaderProgram* GMRenderTechniqueManager::getShaderProgram(GMRenderTechinqueID id)
+IShaderProgram* GMRenderTechniqueManager::getShaderProgram(GMRenderTechniqueID id)
 {
 	D(d);
 	IShaderProgram* shaderProgram = d->shaderPrograms[id].get();

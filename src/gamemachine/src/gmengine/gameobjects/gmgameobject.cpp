@@ -120,7 +120,7 @@ const IRenderContext* GMGameObject::getContext()
 }
 
 
-bool GMGameObject::isAnimationObject() const
+bool GMGameObject::isSkeletalObject() const
 {
 	return false;
 }

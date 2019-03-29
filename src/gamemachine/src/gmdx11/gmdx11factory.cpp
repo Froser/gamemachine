@@ -150,7 +150,6 @@ namespace
 
 	GMString getDefaultVS(const GMString& fxCode)
 	{
-		//TODO
 		static GMString s;
 		static std::once_flag s_flag;
 		std::call_once(s_flag, [&fxCode](GMString& vs) {
@@ -161,7 +160,6 @@ namespace
 
 	GMString getDefaultPS(const GMString& fxCode)
 	{
-		//TODO
 		static GMString s;
 		static std::once_flag s_flag;
 		std::call_once(s_flag, [&fxCode](GMString& ps) {
@@ -236,17 +234,6 @@ void GMDx11Factory::createShaderPrograms(const IRenderContext* context, const GM
 				else if (technique.getShaderType() == GMShaderType::Geometry)
 					gs = getGS(code);
 
-				// 如果没有指定VS和PS着色器，则补充默认的着色器程序
-				if (vs.isEmpty())
-				{
-					vs = getDefaultVS(fxCode);
-				}
-
-				if (ps.isEmpty())
-				{
-					ps = getDefaultPS(fxCode);
-				}
-
 				fxCode += code;
 				fxCode += L"\n";
 			}
@@ -257,8 +244,8 @@ void GMDx11Factory::createShaderPrograms(const IRenderContext* context, const GM
 
 			// 拿到PS, VS后，通过s_technique11_template插入fx底部
 			fxCode += s_technique11_template
-				.replace(L"{vs}", L"CompileShader(vs_5_0," + vs + L"())")
-				.replace(L"{ps}", L"CompileShader(ps_5_0," + ps + L"())")
+				.replace(L"{vs}", L"CompileShader(vs_5_0," + (!vs.isEmpty() ? vs : getDefaultVS(fxCode)) + L"())")
+				.replace(L"{ps}", L"CompileShader(ps_5_0," + (!ps.isEmpty() ? ps : getDefaultPS(fxCode)) + L"())")
 				.replace(L"{gs}", gs.isEmpty() ? L"NULL" : L"CompileShader(gs_5_0," + gs + L"())")
 				.replace(L"{id}", GMDx11Technique::getTechniqueNameByTechniqueId(renderTechniques.getId()) );
 			fxCode += L"\n";

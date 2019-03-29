@@ -1,16 +1,28 @@
 ﻿#include "stdafx.h"
 #include "gmwavegameobject.h"
 #include <gmutilities.h>
+#include <gmgl/shader_constants.h>
 
 #define getVertex(x, y) (vertices[(x) + (y) * (sliceM + 1)])
-#define getIndex(x, y) ((x) + (y) * (sliceM + 1))
+#define getVertexIndex(x, y) ((x) + (y) * (sliceM + 1))
 #define getAdjVert(x, y, pos) getAdjacentVertex(vertices, x, y, sliceM, pos)
 
 #define TO_VEC3(i) GMVec3((i)[0], (i)[1], (i)[2])
 #define TO_VEC2(i) GMVec2((i)[0], (i)[1])
 
+struct GMWaveDescriptionStrings
+{
+	GMString steepness;
+	GMString amplitude;
+	GMString direction;
+	GMString speed;
+	GMString waveLength;
+};
+
 namespace
 {
+	GMRenderTechniqueID s_techId;
+
 	// 按照以下顺序求法线:
 	// p0   p1 | p2   p0 |      p2 | p1
 	//         |         |         |
@@ -279,13 +291,13 @@ namespace
 		{
 			for (GMsize_t j = 0; j < sliceM; ++j)
 			{
-				part->index(getIndex(j, i));
-				part->index(getIndex(j, i + 1));
-				part->index(getIndex(j + 1, i + 1));
+				part->index(getVertexIndex(j, i));
+				part->index(getVertexIndex(j, i + 1));
+				part->index(getVertexIndex(j + 1, i + 1));
 
-				part->index(getIndex(j, i));
-				part->index(getIndex(j + 1, i + 1));
-				part->index(getIndex(j + 1, i));
+				part->index(getVertexIndex(j, i));
+				part->index(getVertexIndex(j + 1, i + 1));
+				part->index(getVertexIndex(j + 1, i));
 			}
 		}
 
@@ -314,6 +326,77 @@ namespace
 	}
 }
 
+void GMWaveGameObject::initShader(const IRenderContext* context)
+{
+	IGraphicEngine* engine = context->getEngine();
+	GMRenderTechniques techs;
+	GMRenderTechnique vertexTech(GMShaderType::Vertex);
+	vertexTech.setCode(
+		GMRenderEnvironment::OpenGL,
+		L"#version 330\n"
+		L"#include \"foundation/foundation.h\"\n"
+		L"#include \"foundation/vert_header.h\"\n"
+		L"out vec4 _model3d_position_world;"
+		L"out vec3 _cubemap_uv;"
+		L""
+		L"struct GMExt_Wave_WaveDescription"
+		L"{"
+		L"    float Steepness;"
+		L"    float Amplitude;"
+		L"    vec3 Direction;"
+		L"    float Speed;"
+		L"    float WaveLength;"
+		L"};"
+		L""
+		L"const int GM_MaxWaves = 10;"
+		L"uniform GMExt_Wave_WaveDescription GM_Ext_Wave_WaveDescriptions[GM_MaxWaves];"
+		L"uniform int GM_Ext_Wave_IsWavePlaying = 0;"
+		L"uniform int GM_Ext_Wave_WaveCount = 1;"
+		L"uniform float GM_Ext_Wave_Duration = 0;"
+		L"\n"
+		L"float GM_Ext_Wave_gerstner_x(GMExt_Wave_WaveDescription desc, float fi, vec3 pos, float t)\n"
+		L"{"
+		L"    return desc.Steepness * desc.Amplitude * dot(desc.Direction, vec3(pos.x, 0, 0)) * cos(desc.WaveLength * dot(desc.Direction, pos) + fi * t);"
+		L"}"
+		L"\n"
+		L"float GM_Ext_Wave_gerstner_y(GMExt_Wave_WaveDescription desc, float fi, vec3 pos, float t)\n"
+		L"{"
+		L"    return desc.Amplitude * sin(desc.WaveLength * dot(desc.Direction, pos) + fi * t);"
+		L"}"
+		L"\n"
+		L"float GM_Ext_Wave_gerstner_z(GMExt_Wave_WaveDescription desc, float fi, vec3 pos, float t)\n"
+		L"{"
+		L"    return desc.Steepness * desc.Amplitude * dot(desc.Direction, vec3(0, 0, pos.z)) * cos(desc.WaveLength * dot(desc.Direction, pos) + fi * t);"
+		L"}"
+		L"\n"
+		L"void main()"
+		L"{"
+		L"    init_layouts();"
+		L"    vec4 p = position;"
+		L"    if (GM_Ext_Wave_IsWavePlaying != 0)"
+		L"    {"
+		L"        float gerstner_x_sum = 0;"
+		L"        float gerstner_y_sum = 0;"
+		L"        float gerstner_z_sum = 0;"
+		L"        for (int i = 0; i < GM_Ext_Wave_WaveCount; ++i)"
+		L"        {"
+		L"            float fi = 2 * GM_Ext_Wave_WaveDescriptions[i].Speed / GM_Ext_Wave_WaveDescriptions[i].WaveLength;"
+		L"            gerstner_x_sum += GM_Ext_Wave_gerstner_x(GM_Ext_Wave_WaveDescriptions[i], fi, p.xyz, GM_Ext_Wave_Duration);"
+		L"            gerstner_y_sum += GM_Ext_Wave_gerstner_y(GM_Ext_Wave_WaveDescriptions[i], fi, p.xyz, GM_Ext_Wave_Duration);"
+		L"            gerstner_z_sum += GM_Ext_Wave_gerstner_z(GM_Ext_Wave_WaveDescriptions[i], fi, p.xyz, GM_Ext_Wave_Duration);"
+		L"        }"
+		L""
+		L"        p = vec4(p.x + gerstner_x_sum, gerstner_y_sum, p.z + gerstner_z_sum, 1);"
+		L"    }"
+		L""
+		L"    _model3d_position_world = GM_WorldMatrix * p;"
+		L"    gl_Position = (GM_ProjectionMatrix * GM_ViewMatrix * _model3d_position_world);"
+		L"}"
+	);
+	techs.addRenderTechnique(vertexTech);
+	s_techId = engine->getRenderTechniqueManager()->addRenderTechniques(techs);
+}
+
 GMWaveGameObject* GMWaveGameObject::create(const GMWaveGameObjectDescription& desc)
 {
 	GMWaveGameObject* ret = new GMWaveGameObject();
@@ -324,6 +407,8 @@ GMWaveGameObject* GMWaveGameObject::create(const GMWaveGameObjectDescription& de
 
 	GMModel* waveModel = waveScene.getScene()->getModels()[0].getModel();
 	ret->setVertices(waveModel->getParts()[0]->vertices());
+	waveModel->setTechniqueId(s_techId);
+	waveModel->setType(GMModelType::Custom);
 	return ret;
 }
 
@@ -355,7 +440,64 @@ void GMWaveGameObject::update(GMDuration dt)
 {
 	D(d);
 	d->duration += dt;
-	updateEachVertex();
+	// updateEachVertex();
+}
+
+void GMWaveGameObject::onRenderShader(GMModel* model, IShaderProgram* shaderProgram) const
+{
+	D(d);
+	static Vector<GMWaveDescriptionStrings> s_waveDescriptionStrings;
+	static const GMString s_isPlaying = L"GM_Ext_Wave_IsWavePlaying";
+	static const GMString s_waveCount = L"GM_Ext_Wave_WaveCount";
+	static const GMString s_duration = L"GM_Ext_Wave_Duration";
+	static std::once_flag s_flag;
+	constexpr GMint32 MAX_WAVES = 10;
+
+	std::call_once(s_flag, [MAX_WAVES](Vector<GMWaveDescriptionStrings>& strings) {
+		strings.resize(MAX_WAVES);
+		for (GMint32 i = 0; i < MAX_WAVES; ++i)
+		{
+			GMString strIdx = GMString(i);
+			strings[i].steepness = L"GM_Ext_Wave_WaveDescriptions[" + strIdx + L"].Steepness";
+			strings[i].amplitude = L"GM_Ext_Wave_WaveDescriptions[" + strIdx + L"].Amplitude";
+			strings[i].direction = L"GM_Ext_Wave_WaveDescriptions[" + strIdx + L"].Direction";
+			strings[i].speed = L"GM_Ext_Wave_WaveDescriptions[" + strIdx + L"].Speed";
+			strings[i].waveLength = L"GM_Ext_Wave_WaveDescriptions[" + strIdx + L"].WaveLength";
+		}
+	}, s_waveDescriptionStrings);
+
+	// 传递参数
+	GMsize_t prog = verifyIndicesContainer(d->globalIndices, shaderProgram);
+	verifyIndicesContainer(d->waveIndices, shaderProgram);
+	GMint32 waveCount = gm_sizet_to_int(d->waveDescriptions.size());
+	if (d->waveIndices[prog].size() <= waveCount)
+		d->waveIndices[prog].resize(waveCount + 1);
+
+	shaderProgram->setInt(getVariableIndex(shaderProgram, d->globalIndices[prog].isPlaying, s_isPlaying), d->isPlaying ? 1 : 0);
+	shaderProgram->setInt(getVariableIndex(shaderProgram, d->globalIndices[prog].waveCount, s_waveCount), waveCount);
+	shaderProgram->setFloat(getVariableIndex(shaderProgram, d->globalIndices[prog].duration, s_duration), d->duration);
+	for (GMint32 i = 0; i < waveCount; ++i)
+	{
+		shaderProgram->setFloat(
+			getVariableIndex(shaderProgram, d->waveIndices[prog][i].steepness, s_waveDescriptionStrings[i].steepness),
+			d->waveDescriptions[i].steepness);
+
+		shaderProgram->setFloat(
+			getVariableIndex(shaderProgram, d->waveIndices[prog][i].amplitude, s_waveDescriptionStrings[i].amplitude),
+			d->waveDescriptions[i].amplitude);
+
+		shaderProgram->setVec3(
+			getVariableIndex(shaderProgram, d->waveIndices[prog][i].direction, s_waveDescriptionStrings[i].direction),
+			ValuePointer(d->waveDescriptions[i].direction));
+
+		shaderProgram->setFloat(
+			getVariableIndex(shaderProgram, d->waveIndices[prog][i].speed, s_waveDescriptionStrings[i].speed),
+			d->waveDescriptions[i].speed);
+
+		shaderProgram->setFloat(
+			getVariableIndex(shaderProgram, d->waveIndices[prog][i].waveLength, s_waveDescriptionStrings[i].waveLength),
+			d->waveDescriptions[i].waveLength);
+	}
 }
 
 void GMWaveGameObject::updateEachVertex()
@@ -378,9 +520,6 @@ void GMWaveGameObject::updateEachVertex()
 				gerstner_x_sum += gerstner_x(d->waveDescriptions[i], fi, pos, d->duration);
 				gerstner_y_sum += gerstner_y(d->waveDescriptions[i], fi, pos, d->duration);
 				gerstner_z_sum += gerstner_z(d->waveDescriptions[i], fi, pos, d->duration);
-
-				GMfloat wa = d->waveDescriptions[i].amplitude * d->waveDescriptions[i].waveLength;
-				GMfloat c = Cos(d->waveDescriptions[i].waveLength * Dot(d->waveDescriptions[i].direction, pos) + fi * d->duration);
 			}
 
 			vertex.positions = {

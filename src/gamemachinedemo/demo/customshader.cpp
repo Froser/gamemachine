@@ -3,7 +3,7 @@
 #include <linearmath.h>
 #include <gmwidget.h>
 
-static gm::GMRenderTechinqueID s_techid, s_techid2;
+static gm::GMRenderTechniqueID s_techid, s_techid2;
 
 void Demo_CustomGeometryShader::init()
 {
@@ -62,7 +62,7 @@ void Demo_CustomGeometryShader::init()
 	widget->setSize(widget->getSize().width, getClientAreaTop() + 40);
 }
 
-gm::GMRenderTechinqueID Demo_CustomGeometryShader::techId()
+gm::GMRenderTechniqueID Demo_CustomGeometryShader::techId()
 {
 	return s_techid;
 }
@@ -203,7 +203,7 @@ void Demo_CustomGeometryShader::initCustomShader(const gm::IRenderContext* conte
 	s_techid = engine->getRenderTechniqueManager()->addRenderTechniques(techs);
 }
 
-gm::GMRenderTechinqueID Demo_CustomAndDefaultShader::techId()
+gm::GMRenderTechniqueID Demo_CustomAndDefaultShader::techId()
 {
 	return s_techid2;
 }

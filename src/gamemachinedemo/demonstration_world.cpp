@@ -773,6 +773,7 @@ void DemostrationEntrance::onLoadShaders(const gm::IRenderContext* context)
 	Demo_CustomGeometryShader::initCustomShader(context);
 	Demo_CustomAndDefaultShader::initCustomShader(context);
 	Demo_CustomLight::initCustomShader(context);
+	gm::GMWaveGameObject::initShader(context);
 	auto& env = GM.getRunningStates().renderEnvironment;
 	if (env == gm::GMRenderEnvironment::OpenGL)
 	{

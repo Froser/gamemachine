@@ -56,7 +56,8 @@ public:
 	virtual void update(GMDuration dt) {}
 	virtual bool canDeferredRendering();
 	virtual const IRenderContext* getContext();
-	virtual bool isAnimationObject() const;
+	virtual bool isSkeletalObject() const;
+	virtual void onRenderShader(GMModel*, IShaderProgram* shaderProgram) const {}
 
 protected:
 	virtual void drawModel(const IRenderContext* context, GMModel* model);

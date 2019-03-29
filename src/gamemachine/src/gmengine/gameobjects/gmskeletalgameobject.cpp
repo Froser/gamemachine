@@ -201,7 +201,7 @@ void GMSkeletalGameObject::update(GMDuration dt)
 	}
 }
 
-bool GMSkeletalGameObject::isAnimationObject() const
+bool GMSkeletalGameObject::isSkeletalObject() const
 {
 	return true;
 }

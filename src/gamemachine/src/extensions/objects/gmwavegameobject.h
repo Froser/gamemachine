@@ -26,6 +26,22 @@ struct GMWaveDescription
 	GMfloat waveLength;
 };
 
+struct GMWaveDescriptionIndices
+{
+	GMint32 steepness;
+	GMint32 amplitude;
+	GMint32 direction;
+	GMint32 speed;
+	GMint32 waveLength;
+};
+
+struct GMWaveIndices
+{
+	GMint32 isPlaying;
+	GMint32 waveCount;
+	GMint32 duration;
+};
+
 GM_PRIVATE_OBJECT(GMWaveGameObject)
 {
 	GMWaveGameObjectDescription objectDescription;
@@ -33,6 +49,8 @@ GM_PRIVATE_OBJECT(GMWaveGameObject)
 	GMVertices vertices;
 	bool isPlaying = false;
 	GMDuration duration = 0;
+	Vector<Vector<GMWaveDescriptionIndices>> waveIndices;
+	Vector<GMWaveIndices> globalIndices;
 };
 
 class GMWaveGameObject : public GMGameObject
@@ -44,6 +62,7 @@ private:
 	GMWaveGameObject() = default;
 
 public:
+	static void initShader(const IRenderContext* context);
 	static GMWaveGameObject* create(const GMWaveGameObjectDescription& desc);
 
 public:
@@ -51,6 +70,9 @@ public:
 	void play();
 	void stop();
 	void update(GMDuration dt);
+
+public:
+	virtual void onRenderShader(GMModel* model, IShaderProgram* shaderProgram) const;
 
 private:
 	void updateEachVertex();

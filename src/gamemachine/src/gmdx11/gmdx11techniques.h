@@ -122,7 +122,7 @@ protected:
 	virtual void setCascadeCameraVPMatrices(GMCascadeLevel level);
 
 public:
-	static const std::string& getTechniqueNameByTechniqueId(GMRenderTechinqueID id);
+	static const std::string& getTechniqueNameByTechniqueId(GMRenderTechniqueID id);
 };
 
 class GMDx11Technique_3D : public GMDx11Technique
