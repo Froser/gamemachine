@@ -12,6 +12,7 @@ GM_PRIVATE_OBJECT(Demo_Wave)
 	gm::GMCameraUtility cameraUtility;
 	bool activate = false;
 	bool mouseTrace = false;
+	gm::GMControlLabel* handwareAccelerationLabel = nullptr;
 };
 
 class Demo_Wave : public DemoHandler

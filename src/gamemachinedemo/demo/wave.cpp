@@ -133,8 +133,33 @@ void Demo_Wave::init()
 		setWaterFlow(true);
 	});
 
-	widget->setSize(widget->getSize().width, top + 40);
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
+		L"使用CPU/GPU渲染",
+		10,
+		top += 40,
+		250,
+		30,
+		false
+	));
 
+	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		auto acc = d->wave->getHandwareAcceleration();
+		d->wave->setHandwareAcceleration(acc == gm::GMWaveGameObjectHardwareAcceleration::GPU ? gm::GMWaveGameObjectHardwareAcceleration::CPU : gm::GMWaveGameObjectHardwareAcceleration::GPU);
+	});
+
+	widget->addControl(d->handwareAccelerationLabel = gm::GMControlLabel::createControl(
+		widget,
+		gm::GMString(),
+		GMVec4(1, 1, 1, 1),
+		10,
+		top += 40,
+		250,
+		30,
+		false
+	));
+
+	widget->setSize(widget->getSize().width, top + 40);
 
 	gm::GMWaveGameObjectDescription desc = {
 		-256.f,
@@ -221,6 +246,8 @@ void Demo_Wave::event(gm::GameMachineHandlerEvent evt)
 	case gm::GameMachineHandlerEvent::Update:
 		if (d->wave)
 			d->wave->update(GM.getRunningStates().lastFrameElpased);
+		if (d->handwareAccelerationLabel)
+			d->handwareAccelerationLabel->setText(d->wave->getHandwareAcceleration() == gm::GMWaveGameObjectHardwareAcceleration::CPU ? L"渲染方式：CPU" : L"渲染方式：GPU");
 		break;
 	case gm::GameMachineHandlerEvent::Render:
 		getDemoWorldReference()->renderScene();

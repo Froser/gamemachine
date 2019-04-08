@@ -42,6 +42,12 @@ struct GMWaveIndices
 	GMint32 duration;
 };
 
+enum class GMWaveGameObjectHardwareAcceleration
+{
+	GPU,
+	CPU,
+};
+
 GM_PRIVATE_OBJECT(GMWaveGameObject)
 {
 	GMWaveGameObjectDescription objectDescription;
@@ -49,14 +55,20 @@ GM_PRIVATE_OBJECT(GMWaveGameObject)
 	GMVertices vertices;
 	bool isPlaying = false;
 	GMDuration duration = 0;
+	GMModel* waveModel = nullptr;
+
+	// GPU 相关变量
 	Vector<Vector<GMWaveDescriptionIndices>> waveIndices;
 	Vector<GMWaveIndices> globalIndices;
+
+	GMWaveGameObjectHardwareAcceleration acceleration = GMWaveGameObjectHardwareAcceleration::GPU;
 };
 
 class GMWaveGameObject : public GMGameObject
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMWaveGameObject, GMGameObject)
 	GM_DECLARE_PROPERTY(ObjectDescription, objectDescription)
+	GM_DECLARE_PROPERTY(HandwareAcceleration, acceleration)
 
 private:
 	GMWaveGameObject() = default;
