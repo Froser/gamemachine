@@ -311,50 +311,53 @@ void GMWaveGameObject::onRenderShader(GMModel* model, IShaderProgram* shaderProg
 		static std::once_flag s_flag;
 		constexpr GMint32 MAX_WAVES = 10;
 
-		std::call_once(s_flag, [MAX_WAVES](Vector<GMWaveDescriptionStrings>& strings) {
-			strings.resize(MAX_WAVES);
-			for (GMint32 i = 0; i < MAX_WAVES; ++i)
-			{
-				GMString strIdx = GMString(i);
-				strings[i].steepness = L"GM_Ext_Wave_WaveDescriptions[" + strIdx + L"].Steepness";
-				strings[i].amplitude = L"GM_Ext_Wave_WaveDescriptions[" + strIdx + L"].Amplitude";
-				strings[i].direction = L"GM_Ext_Wave_WaveDescriptions[" + strIdx + L"].Direction";
-				strings[i].speed = L"GM_Ext_Wave_WaveDescriptions[" + strIdx + L"].Speed";
-				strings[i].waveLength = L"GM_Ext_Wave_WaveDescriptions[" + strIdx + L"].WaveLength";
-			}
-		}, s_waveDescriptionStrings);
-
-		// 传递参数
-		GMsize_t prog = verifyIndicesContainer(d->globalIndices, shaderProgram);
-		verifyIndicesContainer(d->waveIndices, shaderProgram);
-		GMint32 waveCount = gm_sizet_to_int(d->waveDescriptions.size());
-		if (d->waveIndices[prog].size() <= waveCount)
-			d->waveIndices[prog].resize(waveCount + 1);
-
-		shaderProgram->setInt(getVariableIndex(shaderProgram, d->globalIndices[prog].isPlaying, s_isPlaying), d->isPlaying ? 1 : 0);
-		shaderProgram->setInt(getVariableIndex(shaderProgram, d->globalIndices[prog].waveCount, s_waveCount), waveCount);
-		shaderProgram->setFloat(getVariableIndex(shaderProgram, d->globalIndices[prog].duration, s_duration), d->duration);
-		for (GMint32 i = 0; i < waveCount; ++i)
+		if (GM.getRunningStates().renderEnvironment == GMRenderEnvironment::OpenGL)
 		{
-			shaderProgram->setFloat(
-				getVariableIndex(shaderProgram, d->waveIndices[prog][i].steepness, s_waveDescriptionStrings[i].steepness),
-				d->waveDescriptions[i].steepness);
+			std::call_once(s_flag, [MAX_WAVES](Vector<GMWaveDescriptionStrings>& strings) {
+				strings.resize(MAX_WAVES);
+				for (GMint32 i = 0; i < MAX_WAVES; ++i)
+				{
+					GMString strIdx = GMString(i);
+					strings[i].steepness = L"GM_Ext_Wave_WaveDescriptions[" + strIdx + L"].Steepness";
+					strings[i].amplitude = L"GM_Ext_Wave_WaveDescriptions[" + strIdx + L"].Amplitude";
+					strings[i].direction = L"GM_Ext_Wave_WaveDescriptions[" + strIdx + L"].Direction";
+					strings[i].speed = L"GM_Ext_Wave_WaveDescriptions[" + strIdx + L"].Speed";
+					strings[i].waveLength = L"GM_Ext_Wave_WaveDescriptions[" + strIdx + L"].WaveLength";
+				}
+			}, s_waveDescriptionStrings);
 
-			shaderProgram->setFloat(
-				getVariableIndex(shaderProgram, d->waveIndices[prog][i].amplitude, s_waveDescriptionStrings[i].amplitude),
-				d->waveDescriptions[i].amplitude);
+			// 传递参数
+			GMsize_t prog = verifyIndicesContainer(d->globalIndices, shaderProgram);
+			verifyIndicesContainer(d->waveIndices, shaderProgram);
+			GMint32 waveCount = gm_sizet_to_int(d->waveDescriptions.size());
+			if (d->waveIndices[prog].size() <= waveCount)
+				d->waveIndices[prog].resize(waveCount + 1);
 
-			shaderProgram->setVec3(
-				getVariableIndex(shaderProgram, d->waveIndices[prog][i].direction, s_waveDescriptionStrings[i].direction),
-				ValuePointer(d->waveDescriptions[i].direction));
+			shaderProgram->setInt(getVariableIndex(shaderProgram, d->globalIndices[prog].isPlaying, s_isPlaying), d->isPlaying ? 1 : 0);
+			shaderProgram->setInt(getVariableIndex(shaderProgram, d->globalIndices[prog].waveCount, s_waveCount), waveCount);
+			shaderProgram->setFloat(getVariableIndex(shaderProgram, d->globalIndices[prog].duration, s_duration), d->duration);
+			for (GMint32 i = 0; i < waveCount; ++i)
+			{
+				shaderProgram->setFloat(
+					getVariableIndex(shaderProgram, d->waveIndices[prog][i].steepness, s_waveDescriptionStrings[i].steepness),
+					d->waveDescriptions[i].steepness);
 
-			shaderProgram->setFloat(
-				getVariableIndex(shaderProgram, d->waveIndices[prog][i].speed, s_waveDescriptionStrings[i].speed),
-				d->waveDescriptions[i].speed);
+				shaderProgram->setFloat(
+					getVariableIndex(shaderProgram, d->waveIndices[prog][i].amplitude, s_waveDescriptionStrings[i].amplitude),
+					d->waveDescriptions[i].amplitude);
 
-			shaderProgram->setFloat(
-				getVariableIndex(shaderProgram, d->waveIndices[prog][i].waveLength, s_waveDescriptionStrings[i].waveLength),
-				d->waveDescriptions[i].waveLength);
+				shaderProgram->setVec3(
+					getVariableIndex(shaderProgram, d->waveIndices[prog][i].direction, s_waveDescriptionStrings[i].direction),
+					ValuePointer(d->waveDescriptions[i].direction));
+
+				shaderProgram->setFloat(
+					getVariableIndex(shaderProgram, d->waveIndices[prog][i].speed, s_waveDescriptionStrings[i].speed),
+					d->waveDescriptions[i].speed);
+
+				shaderProgram->setFloat(
+					getVariableIndex(shaderProgram, d->waveIndices[prog][i].waveLength, s_waveDescriptionStrings[i].waveLength),
+					d->waveDescriptions[i].waveLength);
+			}
 		}
 	}
 }

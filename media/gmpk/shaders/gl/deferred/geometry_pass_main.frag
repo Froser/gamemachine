@@ -40,14 +40,14 @@ void GM_GeometryPass()
     }
     else if (GM_IlluminationModel == GM_IlluminationModel_Phong)
     {
-        ${deferred_geometry_pass_gTexAmbientAlbedo} = vec4(GM_Material.Ka, 1) * sampleTextures(GM_AmbientTextureAttribute, _uv) * sampleTextures(GM_LightmapTextureAttribute, _lightmapuv);
-        ${deferred_geometry_pass_gTexDiffuseMetallicRoughnessAO} = vec4(GM_Material.Kd, 1) * sampleTextures(GM_DiffuseTextureAttribute, _uv);
-        ${deferred_geometry_pass_gKs_Shininess_F0} = vec4(GM_Material.Ks * sampleTextures(GM_SpecularTextureAttribute, _uv).r, GM_Material.Shininess);
+        ${deferred_geometry_pass_gTexAmbientAlbedo} = vec4(GM_Material.Ka, 1) * GM_SampleTextures(GM_AmbientTextureAttribute, _uv) * GM_SampleTextures(GM_LightmapTextureAttribute, _lightmapuv);
+        ${deferred_geometry_pass_gTexDiffuseMetallicRoughnessAO} = vec4(GM_Material.Kd, 1) * GM_SampleTextures(GM_DiffuseTextureAttribute, _uv);
+        ${deferred_geometry_pass_gKs_Shininess_F0} = vec4(GM_Material.Ks * GM_SampleTextures(GM_SpecularTextureAttribute, _uv).r, GM_Material.Shininess);
     }
     else if (GM_IlluminationModel == GM_IlluminationModel_CookTorranceBRDF)
     {
-        ${deferred_geometry_pass_gTexAmbientAlbedo} = sampleTextures(GM_AlbedoTextureAttribute, _uv);
-        ${deferred_geometry_pass_gTexDiffuseMetallicRoughnessAO} = sampleTextures(GM_MetallicRoughnessAOTextureAttribute, _uv);
+        ${deferred_geometry_pass_gTexAmbientAlbedo} = GM_SampleTextures(GM_AlbedoTextureAttribute, _uv);
+        ${deferred_geometry_pass_gTexDiffuseMetallicRoughnessAO} = GM_SampleTextures(GM_MetallicRoughnessAOTextureAttribute, _uv);
         ${deferred_geometry_pass_gKs_Shininess_F0} = vec4(GM_Material.F0, 1);
     }
 
@@ -59,7 +59,7 @@ void GM_GeometryPass()
 
     if (GM_NormalMapTextureAttribute.Enabled == 1)
     {
-        ${deferred_geometry_pass_gNormalMap_bNormalMap} = texture(GM_NormalMapTextureAttribute.Texture, _uv);
+        ${deferred_geometry_pass_gNormalMap_bNormalMap} = GM_SampleTextures(GM_NormalMapTextureAttribute, _uv);
         ${deferred_geometry_pass_gNormalMap_bNormalMap}.a = 1;
         if (GM_IsTangentSpaceInvalid(_tangent.xyz, _bitangent.xyz))
         {
@@ -67,7 +67,7 @@ void GM_GeometryPass()
                 _deferred_geometry_pass_position_world.xyz,
                 _uv,
                 normal_World_N,
-                GM_NormalMapTextureAttribute.Texture
+                GM_NormalMapTextureAttribute
             );
             mat3 TBN = transpose(tangentSpace.TBN);
             ${deferred_geometry_pass_gTangent_eye} = normalToTexture(normalize(TBN[0]));

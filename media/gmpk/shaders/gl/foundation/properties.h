@@ -23,7 +23,7 @@ uniform GMTexture GM_AlbedoTextureAttribute;
 uniform GMTexture GM_MetallicRoughnessAOTextureAttribute;
 uniform samplerCube GM_CubeMapTextureAttribute; //CubeMap作为单独一个纹理
 
-vec4 sampleTextures(GMTexture tex, vec2 uv)
+vec4 GM_SampleTextures(GMTexture tex, vec2 uv)
 {
     return tex.Enabled == 1
             ? vec4(texture(tex.Texture, uv * vec2(tex.ScaleX, tex.ScaleY) + vec2(tex.OffsetX, tex.OffsetY)))

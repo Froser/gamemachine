@@ -3,17 +3,17 @@
 //--------------------------------------------------------------------------------------
 static const float PI = 3.1415927f;
 
-float4 ToFloat4(float3 v, float w)
+float4 GM_ToFloat4(float3 v, float w)
 {
     return float4(v.x, v.y, v.z, w);
 }
 
-float4 ToFloat4(float3 v)
+float4 GM_ToFloat4(float3 v)
 {
-    return ToFloat4(v, 1);
+    return GM_ToFloat4(v, 1);
 }
 
-float3x3 ToFloat3x3(float4x4 m)
+float3x3 GM_ToFloat3x3(float4x4 m)
 {
     return float3x3(
         m[0].xyz,
@@ -137,7 +137,8 @@ class GMTexture
 
     float3 RGBToNormal(Texture2D tex, SamplerState ss, float2 texcoord)
     {
-        return TextureRGBToNormal(tex, ss, texcoord);
+        float2 transformedTexcoord = texcoord * float2(ScaleX, ScaleY) + float2(OffsetX, OffsetY);
+        return TextureRGBToNormal(tex, ss, transformedTexcoord);
     }
 };
 
@@ -281,7 +282,7 @@ class GMPhongLightProxy
         }
         else if (light.Type == GM_DirectionalLight)
         {
-            return mul(-light.Direction, ToFloat3x3(GM_ViewMatrix));
+            return mul(-light.Direction, GM_ToFloat3x3(GM_ViewMatrix));
         }
         return float3(0,0,0);
     }
@@ -316,7 +317,7 @@ float GM_GammaInv;
 
 float4 CalculateGammaCorrection(float4 factor)
 {
-    return ToFloat4(pow(factor.rgb, float3(GM_GammaInv, GM_GammaInv, GM_GammaInv)));
+    return GM_ToFloat4(pow(factor.rgb, float3(GM_GammaInv, GM_GammaInv, GM_GammaInv)));
 }
 
 float4 CalculateGammaCorrectionIfNecessary(float4 factor)
@@ -351,7 +352,7 @@ GMReinhardToneMapping ReinhardToneMapping;
 float4 CalculateWithToneMapping(float4 c)
 {
     if (GM_HDR)
-        return ToFloat4(GM_ToneMapping.ToneMapping(c.rgb));
+        return GM_ToFloat4(GM_ToneMapping.ToneMapping(c.rgb));
     return c;
 }
 
@@ -476,7 +477,7 @@ class GMTangentSpace
     }
 };
 
-float4 IlluminateRefractionByNormalWorldN(
+float4 GM_IlluminateRefractionByNormalWorldN(
     GMCubeMapTexture cubeMap,
     TextureCube tex,
     float3 normal_World_N,
@@ -490,7 +491,7 @@ float4 IlluminateRefractionByNormalWorldN(
     return cubeMap.Sample(tex, GM_CubeMapSampler, refraction.xyz);
 }
 
-float4 IlluminateRefraction(
+float4 GM_IlluminateRefraction(
     GMCubeMapTexture cubeMap,
     TextureCube tex,
     float3 normal_World_N,
@@ -508,11 +509,11 @@ float4 IlluminateRefraction(
     {
         // 如果是切线空间，计算会复杂点，要将切线空间的法线换算回世界空间
         float3 normal_Eye_N = normalize(mul(tangentSpace.Normal_Tangent_N, transpose(tangentSpace.TBN)));
-        float3 normalFromTangent_World_N = mul(normal_Eye_N, ToFloat3x3(GM_InverseViewMatrix));
-        return IlluminateRefractionByNormalWorldN(cubeMap, tex, normalFromTangent_World_N, position_World, viewPosition_World, refractivity);
+        float3 normalFromTangent_World_N = mul(normal_Eye_N, GM_ToFloat3x3(GM_InverseViewMatrix));
+        return GM_IlluminateRefractionByNormalWorldN(cubeMap, tex, normalFromTangent_World_N, position_World, viewPosition_World, refractivity);
     }
 
-    return IlluminateRefractionByNormalWorldN(cubeMap, tex, normal_World_N, position_World, viewPosition_World, refractivity);
+    return GM_IlluminateRefractionByNormalWorldN(cubeMap, tex, normal_World_N, position_World, viewPosition_World, refractivity);
 }
 
 //--------------------------------------------------------------------------------------
@@ -544,7 +545,7 @@ interface IIlluminationModel
 };
 int GM_IlluminationModel = 0;
 
-float CalculateShadow(PS_3D_INPUT input)
+float GM_CalculateShadow(PS_3D_INPUT input)
 {
     if (!GM_ShadowInfo.HasShadow)
         return 1.0f;
@@ -562,7 +563,7 @@ float CalculateShadow(PS_3D_INPUT input)
         }
     }
 
-    float4 worldPos = ToFloat4(input.WorldPos);
+    float4 worldPos = GM_ToFloat4(input.WorldPos);
     float3 normal_N = input.Normal_World_N;
     float4 fragPos = mul(worldPos, GM_ShadowInfo.ShadowMatrix[cascade]);
     float3 projCoords = fragPos.xyz / fragPos.w;
@@ -608,7 +609,7 @@ float CalculateShadow(PS_3D_INPUT input)
     return projCoords.z - bias > closestDepth ? 0.f : 1.f;
 }
 
-float4 ViewCascade(PS_3D_INPUT input)
+float4 GM_ViewCascade(PS_3D_INPUT input)
 {
     float4 cascadeIndicator = float4(0, 0, 0, 0);
     if (GM_ShadowInfo.HasShadow && GM_ShadowInfo.ViewCascade)
@@ -637,7 +638,7 @@ class GMPhong : IIlluminationModel
         input.SpecularTexture = max(input.SpecularTexture, float3(0, 0, 0));
 
         // 将法线换算到眼睛坐标系
-        float3 position_Eye = (mul(ToFloat4(input.WorldPos), GM_ViewMatrix)).xyz;
+        float3 position_Eye = (mul(GM_ToFloat4(input.WorldPos), GM_ViewMatrix)).xyz;
         float3 position_Eye_N = normalize(position_Eye);
 
         for (int i = 0; i < GM_LightCount; ++i)
@@ -666,18 +667,18 @@ class GMPhong : IIlluminationModel
                 factor_Specular += spotFactor * PhoneLightProxy.IlluminateSpecular(GM_LightAttributes[i], lightDirection_Tangent_N, eyeDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N, input.Shininess) * GM_LightAttributes[i].Color * GM_LightAttributes[i].SpecularIntensity / attenuation; 
             }
         }
-        float4 color_Ambient = CalculateGammaCorrectionIfNecessary(factor_Ambient) * ToFloat4(input.AmbientLightmapTexture);
-        float4 color_Diffuse = shadowFactor * CalculateGammaCorrectionIfNecessary(factor_Diffuse) * ToFloat4(input.DiffuseTexture);
+        float4 color_Ambient = CalculateGammaCorrectionIfNecessary(factor_Ambient) * GM_ToFloat4(input.AmbientLightmapTexture);
+        float4 color_Diffuse = shadowFactor * CalculateGammaCorrectionIfNecessary(factor_Diffuse) * GM_ToFloat4(input.DiffuseTexture);
 
         // 计算Specular
-        float4 color_Specular = shadowFactor * CalculateGammaCorrectionIfNecessary(factor_Specular) * ToFloat4(input.SpecularTexture);
+        float4 color_Specular = shadowFactor * CalculateGammaCorrectionIfNecessary(factor_Specular) * GM_ToFloat4(input.SpecularTexture);
         
         // 计算折射
-        float4 color_Refractivity = IlluminateRefraction(
+        float4 color_Refractivity = GM_IlluminateRefraction(
             GM_CubeMapTextureAttribute,
             GM_CubeMapTexture,
             input.Normal_World_N,
-            ToFloat4(input.WorldPos),
+            GM_ToFloat4(input.WorldPos),
             GM_ViewPosition,
             input.HasNormalMap,
             input.TangentSpace,
@@ -777,7 +778,7 @@ class GMCookTorranceBRDF : IIlluminationModel
             Lo += (kd * input.AlbedoTexture / PI + specular) * radiance * cosTheta;
         }
 
-        float4 color = ToFloat4(ambient + Lo) * shadowFactor;
+        float4 color = GM_ToFloat4(ambient + Lo) * shadowFactor;
         color.rgb = ReinhardToneMapping.ToneMapping(color.rgb);
         color = CalculateGammaCorrection(color);
         return color;
@@ -791,8 +792,8 @@ static const int GM_IlluminationModel_CookTorranceBRDF = 2;
 
 float4 PS_3D_CalculateColor(PS_3D_INPUT input)
 {
-    float factor_Shadow = CalculateShadow(input);
-    float4 csmIndicator = ViewCascade(input);
+    float factor_Shadow = GM_CalculateShadow(input);
+    float4 csmIndicator = GM_ViewCascade(input);
     switch (input.IlluminationModel)
     {
         case GM_IlluminationModel_None:
@@ -809,7 +810,7 @@ float4 PS_3D_CalculateColor(PS_3D_INPUT input)
 VS_OUTPUT VS_3D( VS_INPUT input )
 {
     VS_OUTPUT output;
-    output.Position = ToFloat4(input.Position);
+    output.Position = GM_ToFloat4(input.Position);
 
     if (GM_UseBoneAnimation != 0)
     {
@@ -867,8 +868,8 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
     }
 
     // 将法线换算到眼睛坐标系
-    float3x3 inverseTransposeModelMatrix = ToFloat3x3(GM_InverseTransposeModelMatrix);
-    float3x3 transform_Normal_Eye = mul(inverseTransposeModelMatrix, ToFloat3x3(GM_ViewMatrix));
+    float3x3 inverseTransposeModelMatrix = GM_ToFloat3x3(GM_InverseTransposeModelMatrix);
+    float3x3 transform_Normal_Eye = mul(inverseTransposeModelMatrix, GM_ToFloat3x3(GM_ViewMatrix));
     float3 normal_Eye_N = normalize(mul(input.Normal, transform_Normal_Eye));
 
     PS_3D_INPUT commonInput;
@@ -1041,7 +1042,7 @@ Texture2DMS<float4> GM_DeferredSpecular_Shininess_F0_MSAA;
 // [-1, 1] -> [0, 1]
 float4 Float3ToTexture(float3 normal)
 {
-    return ToFloat4((normal + 1) * .5f, 1);
+    return GM_ToFloat4((normal + 1) * .5f, 1);
 }
 
 struct VS_GEOMETRY_OUTPUT
@@ -1070,8 +1071,8 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
     output.Position_Refractivity.rgb = input.WorldPos;
     output.Position_Refractivity.a = GM_Material.Refractivity;
 
-    float3x3 inverseTransposeModelMatrix = ToFloat3x3(GM_InverseTransposeModelMatrix);
-    float3x3 normalEyeTransform = mul(inverseTransposeModelMatrix, ToFloat3x3(GM_ViewMatrix));
+    float3x3 inverseTransposeModelMatrix = GM_ToFloat3x3(GM_InverseTransposeModelMatrix);
+    float3x3 normalEyeTransform = mul(inverseTransposeModelMatrix, GM_ToFloat3x3(GM_ViewMatrix));
     float3 normal_World = normalize(mul(input.Normal.xyz, inverseTransposeModelMatrix));
     output.Normal_World_IlluminationModel = Float3ToTexture(normal_World);
     output.Normal_World_IlluminationModel.a = GM_IlluminationModel;
@@ -1084,13 +1085,13 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
         output.TextureAmbientAlbedo = texAmbient * GM_Material.Ka;
         output.TextureDiffuseMetallicRoughnessAO = texDiffuse * GM_Material.Kd;
         float texSpecular = GM_SpecularTextureAttribute.Sample(GM_SpecularTexture, GM_SpecularSampler, input.Texcoord).r;
-        output.Specular_Shininess_F0 = ToFloat4(GM_Material.Ks * texSpecular, GM_Material.Shininess);
+        output.Specular_Shininess_F0 = GM_ToFloat4(GM_Material.Ks * texSpecular, GM_Material.Shininess);
     }
     else if (GM_IlluminationModel == GM_IlluminationModel_CookTorranceBRDF)
     {
         output.TextureAmbientAlbedo = GM_AlbedoTextureAttribute.Sample(GM_AlbedoTexture, GM_AlbedoSampler, input.Texcoord);
         output.TextureDiffuseMetallicRoughnessAO = GM_MetallicRoughnessAOTextureAttribute.Sample(GM_MetallicRoughnessAOTexture, GM_MetallicRoughnessAOSampler, input.Texcoord);
-        output.Specular_Shininess_F0 = ToFloat4(GM_Material.F0);
+        output.Specular_Shininess_F0 = GM_ToFloat4(GM_Material.F0);
     }
 
     if (PS_3D_HasNormalMap())
@@ -1108,7 +1109,7 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
             output.Tangent_Eye = Float3ToTexture(normalize(mul(input.Tangent, normalEyeTransform)));
             output.Bitangent_Eye = Float3ToTexture(normalize(mul(input.Bitangent, normalEyeTransform)));
         }
-        output.NormalMap_HasNormalMap = ToFloat4(PS_3D_NormalMap().Sample(GM_NormalMapTexture, GM_NormalMapSampler, input.Texcoord), 1);
+        output.NormalMap_HasNormalMap = GM_ToFloat4(PS_3D_NormalMap().Sample(GM_NormalMapTexture, GM_NormalMapSampler, input.Texcoord), 1);
     }
     else
     {
@@ -1123,7 +1124,7 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
 VS_OUTPUT VS_3D_LightPass(VS_INPUT input)
 {
     VS_OUTPUT output;
-    output.Position = ToFloat4(input.Position);
+    output.Position = GM_ToFloat4(input.Position);
     output.Texcoord = input.Texcoord;
     output.Z = output.Position.z;
     return output;
@@ -1208,7 +1209,7 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
     }
     commonInput.WorldPos = PosRef.rgb;
     commonInput.HasNormalMap = (normalMapFlag.a != 0);
-    commonInput.Normal_Eye_N = mul(commonInput.Normal_World_N, ToFloat3x3(GM_ViewMatrix));
+    commonInput.Normal_Eye_N = mul(commonInput.Normal_World_N, GM_ToFloat3x3(GM_ViewMatrix));
 
     tangentSpace.Normal_Tangent_N = RGBToNormal(normalMapFlag.rgb);
     tangentSpace.TBN = transpose(float3x3(
@@ -1242,7 +1243,7 @@ float4 PS_Particle(PS_INPUT input) : SV_TARGET
 VS_OUTPUT VS_Shadow( VS_INPUT input )
 {
     VS_OUTPUT output;
-    output.Position = ToFloat4(input.Position);
+    output.Position = GM_ToFloat4(input.Position);
     output.Position = mul(output.Position, GM_WorldMatrix);
     output.WorldPos = output.Position;
     
@@ -1336,12 +1337,12 @@ class GMInversionFilter : IFilter
 {
     float4 Sample(Texture2D tex, int3 coord)
     {
-        return ToFloat4((float3(1.f, 1.f, 1.f) - tex.Load(coord)).rgb, 1);
+        return GM_ToFloat4((float3(1.f, 1.f, 1.f) - tex.Load(coord)).rgb, 1);
     }
 
     float4 SampleMSAA(Texture2DMS<float4> tex, int3 coord, int samplerId)
     {
-        return ToFloat4((float3(1.f, 1.f, 1.f) - tex.Load(coord, samplerId)).rgb, 1);
+        return GM_ToFloat4((float3(1.f, 1.f, 1.f) - tex.Load(coord, samplerId)).rgb, 1);
     }
 };
 

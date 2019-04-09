@@ -155,11 +155,11 @@ GMTangentSpace GM_CalculateTangentSpaceRuntime(
         vec3 worldPos,
         vec2 texcoord,
         vec3 normal_World_N,
-        sampler2D normalMap
+        GMTexture normalMap
     )
 {
     GMTangentSpace tangentSpace;
-    tangentSpace.Normal_Tangent_N = texture(normalMap, texcoord).xyz * 2.0 - 1.0;
+    tangentSpace.Normal_Tangent_N = GM_SampleTextures(normalMap, texcoord).xyz * 2.0 - 1.0;
 
     vec3 Q1  = dFdx(worldPos);
     vec3 Q2  = dFdy(worldPos);
@@ -191,7 +191,7 @@ struct PS_3D_INPUT
     int IlluminationModel;
 };
 
-vec3 calculateRefractionByNormalWorld(vec3 worldPos, vec3 normal_world_N, float Refractivity)
+vec3 GM_CalculateRefractionByNormalWorld(vec3 worldPos, vec3 normal_world_N, float Refractivity)
 {
     if (Refractivity == 0.f)
         return vec3(0, 0, 0);
@@ -201,17 +201,17 @@ vec3 calculateRefractionByNormalWorld(vec3 worldPos, vec3 normal_world_N, float 
     return texture(GM_CubeMapTextureAttribute, vec3(R.x, R.y, R.z)).rgb;
 }
 
-vec3 calculateRefractionByNormalTangent(vec3 worldPos, GMTangentSpace tangentSpace, float Refractivity)
+vec3 GM_CalculateRefractionByNormalTangent(vec3 worldPos, GMTangentSpace tangentSpace, float Refractivity)
 {
     if (Refractivity == 0.f)
         return vec3(0, 0, 0);
     
     // 如果是切线空间，计算会复杂点，要将切线空间的法线换算回世界空间
     vec3 normal_world_N = normalize(mat3(GM_InverseViewMatrix) * transpose(tangentSpace.TBN) * tangentSpace.Normal_Tangent_N);
-    return calculateRefractionByNormalWorld(worldPos, normal_world_N, Refractivity);
+    return GM_CalculateRefractionByNormalWorld(worldPos, normal_world_N, Refractivity);
 }
 
-float calculateShadow(PS_3D_INPUT vertex)
+float GM_CalculateShadow(PS_3D_INPUT vertex)
 {
     if (GM_ShadowInfo.HasShadow == 0)
         return 1.0f;
@@ -257,7 +257,7 @@ float calculateShadow(PS_3D_INPUT vertex)
 }
 
 
-vec4 viewCascade()
+vec4 GM_ViewCascade()
 {
     // Cascade Colors
     vec4 GM_CascadeColors[GM_MaxCascadeLevel];
@@ -315,7 +315,7 @@ vec4 GM_Phong_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
             ambientLight += spotFactor * GMLight_Ambient(GM_lights[i]) / attenuation;
             diffuseLight += spotFactor * GMLight_Diffuse(GM_lights[i], lightDirection_eye_N, vertex.Normal_Eye_N) / attenuation;
             specularLight += spotFactor * GMLight_Specular(GM_lights[i], lightDirection_eye_N, eyeDirection_eye_N, vertex.Normal_Eye_N, vertex.Shininess) / attenuation;
-            refractionLight += spotFactor * calculateRefractionByNormalWorld(vertex.WorldPos, vertex.Normal_World_N, vertex.Refractivity);
+            refractionLight += spotFactor * GM_CalculateRefractionByNormalWorld(vertex.WorldPos, vertex.Normal_World_N, vertex.Refractivity);
         }
     }
     else
@@ -338,7 +338,7 @@ vec4 GM_Phong_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
             ambientLight += spotFactor * GMLight_Ambient(GM_lights[i]) / attenuation;
             diffuseLight += spotFactor * GMLight_Diffuse(GM_lights[i], lightDirection_tangent_N, vertex.TangentSpace.Normal_Tangent_N) / attenuation;
             specularLight += spotFactor * GMLight_Specular(GM_lights[i], lightDirection_tangent_N, eyeDirection_tangent_N, vertex.TangentSpace.Normal_Tangent_N, vertex.Shininess) / attenuation;
-            refractionLight += spotFactor * calculateRefractionByNormalTangent(vertex.WorldPos, vertex.TangentSpace, vertex.Refractivity);
+            refractionLight += spotFactor * GM_CalculateRefractionByNormalTangent(vertex.WorldPos, vertex.TangentSpace, vertex.Refractivity);
         }
     }
     vec3 finalColor =   vertex.AmbientLightmapTexture * GM_CalculateGammaCorrectionIfNecessary(ambientLight) +
@@ -443,8 +443,8 @@ vec4 GM_CookTorranceBRDF_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
 
 vec4 PS_3D_CalculateColor(PS_3D_INPUT vertex)
 {
-    float factor_Shadow = calculateShadow(vertex);
-    vec4 csmIndicator = viewCascade();
+    float factor_Shadow = GM_CalculateShadow(vertex);
+    vec4 csmIndicator = GM_ViewCascade();
     switch (vertex.IlluminationModel)
     {
         case GM_IlluminationModel_None:

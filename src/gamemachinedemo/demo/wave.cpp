@@ -342,6 +342,7 @@ void Demo_Wave::setWaterFlow(bool flow)
 			waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setTextureTransform(0, tt);
 			waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Diffuse).setTextureTransform(0, tt);
 			waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Specular).setTextureTransform(0, tt);
+			waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::NormalMap).setTextureTransform(0, tt);
 		}
 		else
 		{
@@ -351,6 +352,7 @@ void Demo_Wave::setWaterFlow(bool flow)
 			waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setTextureTransform(0, tt);
 			waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Diffuse).setTextureTransform(0, tt);
 			waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Specular).setTextureTransform(0, tt);
+			waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::NormalMap).setTextureTransform(0, tt);
 		}
 	}
 }
