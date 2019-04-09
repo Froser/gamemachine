@@ -180,7 +180,7 @@ void Demo_Wave::init()
 	Vector<gm::GMWaveDescription> wd = {
 		{ 0.f, 2.5f, direction1, 2.f, 7.f },
 		{ 0.01f, 1.f, direction2, 3.f, 5.f },
-		{ 0.03f, 1.5f, direction3, 5.f, 3.f },
+		//{ 0.03f, 1.5f, direction3, 5.f, 3.f },
 	};
 	wave->setWaveDescriptions(wd);
 	wave->play();

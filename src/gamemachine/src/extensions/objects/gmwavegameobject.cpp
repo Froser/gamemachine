@@ -3,12 +3,7 @@
 #include <gmutilities.h>
 #include <gmgl/shader_constants.h>
 
-#define getVertex(x, y) (vertices[(x) + (y) * (sliceM + 1)])
 #define getVertexIndex(x, y) ((x) + (y) * (sliceM + 1))
-#define getAdjVert(x, y, pos) getAdjacentVertex(vertices, x, y, sliceM, pos)
-
-#define TO_VEC3(i) GMVec3((i)[0], (i)[1], (i)[2])
-#define TO_VEC2(i) GMVec2((i)[0], (i)[1])
 
 struct GMWaveDescriptionStrings
 {
@@ -23,239 +18,27 @@ namespace
 {
 	GMRenderTechniqueID s_techId;
 
-	// 按照以下顺序求法线:
-	// p0   p1 | p2   p0 |      p2 | p1
-	//         |         |         |
-	// p2      |      p1 | p1   p0 | p0   p2
-	// 法线 = (p1 - p0) * (p2 - p0)
-	GMVec3 calculateNormal(const GMVertex& p0, const GMVertex& p1, const GMVertex& p2)
-	{
-		GMVec3 v0 = GMVec3(p0.positions[0], p0.positions[1], p0.positions[2]);
-		GMVec3 v1 = GMVec3(p1.positions[0], p1.positions[1], p1.positions[2]) - v0;
-		GMVec3 v2 = GMVec3(p2.positions[0], p2.positions[1], p2.positions[2]) - v0;
-		return Normalize(Cross(v1, v2));
-	}
-
-	void calculateTangent(GMVertex& p0, const GMVertex& p1, const GMVertex& p2)
-	{
-		GMVertex& currentVertex = p0;
-		GMVec3 e0, e1, e2;
-		GMVec2 uv0, uv1, uv2;
-
-		e0 = TO_VEC3(p0.positions);
-		e1 = TO_VEC3(p1.positions);
-		e2 = TO_VEC3(p2.positions);
-		uv0 = TO_VEC2(p0.texcoords);
-		uv1 = TO_VEC2(p1.texcoords);
-		uv2 = TO_VEC2(p2.texcoords);
-
-		GMVec3 E1 = e1 - e0;
-		GMVec3 E2 = e2 - e0;
-		GMVec2 deltaUV1 = uv1 - uv0;
-		GMVec2 deltaUV2 = uv2 - uv0;
-		const GMfloat& t1 = deltaUV1.getX();
-		const GMfloat& b1 = deltaUV1.getY();
-		const GMfloat& t2 = deltaUV2.getX();
-		const GMfloat& b2 = deltaUV2.getY();
-
-		GMFloat4 f4_E1, f4_E2;
-		E1.loadFloat4(f4_E1);
-		E2.loadFloat4(f4_E2);
-
-		GMfloat s = 1.0f / (t1*b2 - b1*t2);
-
-		GMfloat tangents[3] = {
-			s * (b2 * f4_E1[0] - b1 * f4_E2[0]),
-			s * (b2 * f4_E1[1] - b1 * f4_E2[1]),
-			s * (b2 * f4_E1[2] - b1 * f4_E2[2])
-		};
-		GMfloat bitangents[3] = {
-			s * (-t2 * f4_E1[0] + t1 * f4_E2[0]),
-			s * (-t2 * f4_E1[1] + t1 * f4_E2[1]),
-			s * (-t2 * f4_E1[2] + t1 * f4_E2[2])
-		};
-
-		GMVec3 tangentVector = FastNormalize(GMVec3(tangents[0], tangents[1], tangents[2]));
-		GMVec3 bitangentVector = FastNormalize(GMVec3(bitangents[0], bitangents[1], bitangents[2]));
-		GMFloat4 f4_tangentVector, f4_bitangentVector;
-		tangentVector.loadFloat4(f4_tangentVector);
-		bitangentVector.loadFloat4(f4_bitangentVector);
-
-		currentVertex.tangents[0] = f4_tangentVector[0];
-		currentVertex.tangents[1] = f4_tangentVector[1];
-		currentVertex.tangents[2] = f4_tangentVector[2];
-
-		currentVertex.bitangents[0] = f4_bitangentVector[0];
-		currentVertex.bitangents[1] = f4_bitangentVector[1];
-		currentVertex.bitangents[2] = f4_bitangentVector[2];
-	}
-
-	enum VertexPosition
-	{
-		Left,
-		Right,
-		Up,
-		Down,
-	};
-
-	GMVertex& getAdjacentVertex(Vector<GMVertex>& vertices, GMsize_t x, GMsize_t y, GMsize_t sliceM, VertexPosition pos)
-	{
-		static GMVertex s_invalid;
-		switch (pos)
-		{
-		case Left:
-			return getVertex(x - 1, y);
-		case Right:
-			return getVertex(x + 1, y);
-		case Up:
-			return getVertex(x, y + 1);
-		case Down:
-			return getVertex(x, y - 1);
-		default:
-			GM_ASSERT(false);
-			return s_invalid;
-		}
-	}
-
-	void calculateNormals(GMVertices& vertices, GMint32 sliceM, GMint32 sliceN)
-	{
-		GM_ASSERT(vertices.size() == (sliceM + 1) * (sliceN + 1));
-		for (GMsize_t i = 0; i < sliceN + 1; ++i)
-		{
-			for (GMsize_t j = 0; j < sliceM + 1; ++j)
-			{
-				// 角上的顶点，直接计算Normal，边上的顶点取2个三角形Normal平均值，中间的则取4个
-				// 四角的情况
-				if (i == 0 && j == 0) //左下角
-				{
-					GMVec3 normal = calculateNormal(getVertex(j, i), getAdjVert(j, i, Up), getAdjVert(j, i, Right));
-					getVertex(0, 0).normals = { normal.getX(), normal.getY(), normal.getZ() };
-				}
-				else if (i == 0 && j == sliceM) //右下角
-				{
-					GMVec3 normal = calculateNormal(getVertex(j, i), getAdjVert(j, i, Left), getAdjVert(j, i, Up));
-					getVertex(0, 0).normals = { normal.getX(), normal.getY(), normal.getZ() };
-				}
-				else if (i == sliceN && j == 0)
-				{
-					GMVec3 normal = calculateNormal(getVertex(j, i), getAdjVert(j, i, Right), getAdjVert(j, i, Down));
-					getVertex(0, 0).normals = { normal.getX(), normal.getY(), normal.getZ() };
-				}
-				else if (i == sliceN && j == sliceM)
-				{
-					GMVec3 normal = calculateNormal(getVertex(j, i), getAdjVert(j, i, Down), getAdjVert(j, i, Left));
-					getVertex(0, 0).normals = { normal.getX(), normal.getY(), normal.getZ() };
-				}
-				// 四条边的情况
-				else if (i == 0)
-				{
-					GMVec3 normal0 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Left), getAdjVert(j, i, Up));
-					GMVec3 normal1 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Up), getAdjVert(j, i, Right));
-					GMVec3 normal = Normalize((normal0 + normal1) / 2);
-					getVertex(j, i).normals = { normal.getX(), normal.getY(), normal.getZ() };
-				}
-				else if (j == 0)
-				{
-					GMVec3 normal0 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Up), getAdjVert(j, i, Right));
-					GMVec3 normal1 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Right), getAdjVert(j, i, Down));
-					GMVec3 normal = Normalize((normal0 + normal1) / 2);
-					getVertex(j, i).normals = { normal.getX(), normal.getY(), normal.getZ() };
-				}
-				else if (j == sliceM)
-				{
-					GMVec3 normal0 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Left), getAdjVert(j, i, Up));
-					GMVec3 normal1 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Down), getAdjVert(j, i, Left));
-					GMVec3 normal = Normalize((normal0 + normal1) / 2);
-					getVertex(j, i).normals = { normal.getX(), normal.getY(), normal.getZ() };
-				}
-				else if (i == sliceN)
-				{
-					GMVec3 normal0 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Right), getAdjVert(j, i, Down));
-					GMVec3 normal1 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Down), getAdjVert(j, i, Left));
-					GMVec3 normal = Normalize((normal0 + normal1) / 2);
-					getVertex(j, i).normals = { normal.getX(), normal.getY(), normal.getZ() };
-				}
-				// 中央
-				else
-				{
-					GMVec3 normal0 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Left), getAdjVert(j, i, Up));
-					GMVec3 normal1 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Up), getAdjVert(j, i, Right));
-					GMVec3 normal2 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Right), getAdjVert(j, i, Down));
-					GMVec3 normal3 = calculateNormal(getVertex(j, i), getAdjVert(j, i, Down), getAdjVert(j, i, Left));
-					GMVec3 normal = Normalize((normal0 + normal1 + normal2 + normal3) / 4);
-					getVertex(j, i).normals = { normal.getX(), normal.getY(), normal.getZ() };
-				}
-			}
-		}
-	}
-
-	void calculateNormals2(GMVertices& vertices, const Vector<GMWaveDescription>& ds, GMfloat duration)
+	void calculateNormals(GMVertices& vertices, const Vector<GMWaveDescription>& ds, GMfloat duration)
 	{
 		for (GMVertex& v : vertices)
 		{
-			GMfloat x = 0, y = 0, z = 0;
+			GMfloat x = 0, y = 1, z = 0;
 			for (GMint32 i = 0; i < ds.size(); ++i)
 			{
-				GMfloat fi = 2 * ds[i].speed / ds[i].waveLength;
-				GMfloat wa = ds[i].waveLength * ds[i].amplitude;
-				GMfloat arg = ds[i].waveLength * Dot(ds[i].direction, GMVec3(v.positions[0], v.positions[1], v.positions[2])) + fi * duration;
-				GMfloat c = Cos(arg);
-				GMfloat s = Sin(arg);
-				x += ds[i].direction.getX() * v.positions[0] * wa * c;
-				y += ds[i].steepness * wa * s;
-				z += ds[i].direction.getZ() * v.positions[2] * wa * c;
+				GMfloat wi = 2 / ds[i].waveLength;
+				GMfloat wa = wi * ds[i].amplitude;
+				GMfloat phi = ds[i].speed * wi;
+				GMfloat rad = wi * Dot(ds[i].direction, GMVec3(v.positions[0], v.positions[1], v.positions[2])) + phi * duration;
+				GMfloat c = Cos(rad);
+				GMfloat s = Sin(rad);
+				GMfloat Qi = ds[i].steepness / (ds[i].amplitude * wi * ds.size());
+				x -= ds[i].direction.getX() * wa * c;
+				y -= Qi * wa * s;
+				z -= ds[i].direction.getZ() * wa * c;
 			}
 
-			GMVec3 n = Normalize(GMVec3(-x, 1 - y, -z));
+			GMVec3 n = Normalize(GMVec3(x, y, z));
 			v.normals = { n.getX(), n.getY(), n.getZ() };
-		}
-	}
-
-	void calculateTangentSpace(GMVertices& vertices, GMint32 sliceM, GMint32 sliceN)
-	{
-		for (GMsize_t i = 0; i < sliceN + 1; ++i)
-		{
-			for (GMsize_t j = 0; j < sliceM + 1; ++j)
-			{
-				if (i == 0 && j == 0) //左下角
-				{
-					calculateTangent(getVertex(j, i), getAdjVert(j, i, Up), getAdjVert(j, i, Right));
-				}
-				else if (i == 0 && j == sliceM) //右下角
-				{
-					calculateTangent(getVertex(j, i), getAdjVert(j, i, Left), getAdjVert(j, i, Up));
-				}
-				else if (i == sliceN && j == 0)
-				{
-					calculateTangent(getVertex(j, i), getAdjVert(j, i, Right), getAdjVert(j, i, Down));
-				}
-				else if (i == sliceN && j == sliceM)
-				{
-					calculateTangent(getVertex(j, i), getAdjVert(j, i, Down), getAdjVert(j, i, Left));
-				}
-				// 四条边的情况
-				else if (i == 0)
-				{
-					calculateTangent(getVertex(j, i), getAdjVert(j, i, Left), getAdjVert(j, i, Up));
-				}
-				else if (j == 0)
-				{
-					calculateTangent(getVertex(j, i), getAdjVert(j, i, Up), getAdjVert(j, i, Right));
-				}
-				else if (j == sliceM)
-				{
-					calculateTangent(getVertex(j, i), getAdjVert(j, i, Left), getAdjVert(j, i, Up));
-				}
-				else if (i == sliceN)
-				{
-					calculateTangent(getVertex(j, i), getAdjVert(j, i, Right), getAdjVert(j, i, Down));
-				}
-				// 中央
-				else
-				{
-					calculateTangent(getVertex(j, i), getAdjVert(j, i, Left), getAdjVert(j, i, Up));
-				}
-			}
 		}
 	}
 
@@ -326,25 +109,25 @@ namespace
 		scene = GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, m));
 	}
 
-	GMfloat gerstner_x(const GMWaveDescription& desc, GMVec3 pos, GMfloat targ)
+	GMfloat gerstner_x(GMfloat q, const GMWaveDescription& desc, GMVec3 pos, GMfloat rad)
 	{
 		if (FuzzyCompare(desc.steepness, 0))
 			return 0;
 
-		return desc.steepness * desc.amplitude * Dot(desc.direction, GMVec3(pos.getX(), 0, 0)) * Cos(targ);
+		return q * desc.amplitude * desc.direction.getX() * pos.getX() * Cos(rad);
 	}
 
-	GMfloat gerstner_y(const GMWaveDescription& desc, GMVec3 pos, GMfloat targ)
+	GMfloat gerstner_y(const GMWaveDescription& desc, GMVec3 pos, GMfloat rad)
 	{
-		return desc.amplitude * Sin(targ);
+		return desc.amplitude * Sin(rad);
 	}
 
-	GMfloat gerstner_z(const GMWaveDescription& desc, GMVec3 pos, GMfloat targ)
+	GMfloat gerstner_z(GMfloat q, const GMWaveDescription& desc, GMVec3 pos, GMfloat rad)
 	{
-		if (FuzzyCompare(desc.steepness, 0))
+		if (FuzzyCompare(q, 0))
 			return 0;
 
-		return desc.steepness * desc.amplitude * Dot(desc.direction, GMVec3(0, 0, pos.getZ())) * Cos(targ);
+		return q * desc.amplitude * desc.direction.getZ() * pos.getZ() * Cos(rad);
 	}
 }
 
@@ -376,19 +159,19 @@ void GMWaveGameObject::initShader(const IRenderContext* context)
 		L"uniform int GM_Ext_Wave_WaveCount = 1;"
 		L"uniform float GM_Ext_Wave_Duration = 0;"
 		L"\n"
-		L"float GM_Ext_Wave_gerstner_x(GMExt_Wave_WaveDescription desc, vec3 pos, float targ)\n"
+		L"float GM_Ext_Wave_gerstner_x(float q, GMExt_Wave_WaveDescription desc, vec3 pos, float rad)\n"
 		L"{"
-		L"    return desc.Steepness * desc.Amplitude * dot(desc.Direction, vec3(pos.x, 0, 0)) * cos(targ);"
+		L"    return q * desc.Amplitude * dot(desc.Direction, vec3(pos.x, 0, 0)) * cos(rad);"
 		L"}"
 		L"\n"
-		L"float GM_Ext_Wave_gerstner_y(GMExt_Wave_WaveDescription desc, vec3 pos, float targ)\n"
+		L"float GM_Ext_Wave_gerstner_y(GMExt_Wave_WaveDescription desc, vec3 pos, float rad)\n"
 		L"{"
-		L"    return desc.Amplitude * sin(targ);"
+		L"    return desc.Amplitude * sin(rad);"
 		L"}"
 		L"\n"
-		L"float GM_Ext_Wave_gerstner_z(GMExt_Wave_WaveDescription desc, vec3 pos, float targ)\n"
+		L"float GM_Ext_Wave_gerstner_z(float q, GMExt_Wave_WaveDescription desc, vec3 pos, float rad)\n"
 		L"{"
-		L"    return desc.Steepness * desc.Amplitude * dot(desc.Direction, vec3(0, 0, pos.z)) * cos(targ);"
+		L"    return q * desc.Amplitude * dot(desc.Direction, vec3(0, 0, pos.z)) * cos(rad);"
 		L"}"
 		L"\n"
 		L"void main()"
@@ -402,11 +185,13 @@ void GMWaveGameObject::initShader(const IRenderContext* context)
 		L"        float gerstner_z_sum = 0;"
 		L"        for (int i = 0; i < GM_Ext_Wave_WaveCount; ++i)"
 		L"        {"
-		L"            float fi = 2 * GM_Ext_Wave_WaveDescriptions[i].Speed / GM_Ext_Wave_WaveDescriptions[i].WaveLength;"
-		L"            float targ = GM_Ext_Wave_WaveDescriptions[i].WaveLength * (GM_Ext_Wave_WaveDescriptions[i].Direction.x * p.x + GM_Ext_Wave_WaveDescriptions[i].Direction.z * p.z) + fi * GM_Ext_Wave_Duration;"
-		L"            gerstner_x_sum += GM_Ext_Wave_gerstner_x(GM_Ext_Wave_WaveDescriptions[i], p.xyz, targ);"
-		L"            gerstner_y_sum += GM_Ext_Wave_gerstner_y(GM_Ext_Wave_WaveDescriptions[i], p.xyz, targ);"
-		L"            gerstner_z_sum += GM_Ext_Wave_gerstner_z(GM_Ext_Wave_WaveDescriptions[i], p.xyz, targ);"
+		L"            float wi = 2.f / GM_Ext_Wave_WaveDescriptions[i].WaveLength;"
+		L"            float phi = GM_Ext_Wave_WaveDescriptions[i].Speed * wi;"
+		L"            float rad = wi * (GM_Ext_Wave_WaveDescriptions[i].Direction.x * p.x + GM_Ext_Wave_WaveDescriptions[i].Direction.z * p.z) + phi * GM_Ext_Wave_Duration;"
+		L"            float Qi = GM_Ext_Wave_WaveDescriptions[i].Steepness / (GM_Ext_Wave_WaveDescriptions[i].Amplitude * wi * GM_Ext_Wave_WaveCount);"
+		L"            gerstner_x_sum += GM_Ext_Wave_gerstner_x(Qi, GM_Ext_Wave_WaveDescriptions[i], p.xyz, rad);"
+		L"            gerstner_y_sum += GM_Ext_Wave_gerstner_y(GM_Ext_Wave_WaveDescriptions[i], p.xyz, rad);"
+		L"            gerstner_z_sum += GM_Ext_Wave_gerstner_z(Qi, GM_Ext_Wave_WaveDescriptions[i], p.xyz, rad);"
 		L"        }"
 		L""
 		L"        p = vec4(p.x + gerstner_x_sum, gerstner_y_sum, p.z + gerstner_z_sum, 1);"
@@ -546,6 +331,7 @@ void GMWaveGameObject::updateEachVertex()
 	if (d->isPlaying)
 	{
 		GMVertices vertices = d->vertices;
+		calculateNormals(vertices, d->waveDescriptions, d->duration);
 		for (GMVertex& vertex : vertices)
 		{
 			GMfloat gerstner_x_sum = 0;
@@ -555,11 +341,13 @@ void GMWaveGameObject::updateEachVertex()
 
 			for (GMsize_t i = 0; i < d->waveDescriptions.size(); ++i)
 			{
-				GMfloat fi = 2 * d->waveDescriptions[i].speed / d->waveDescriptions[i].waveLength;
-				GMfloat triarg = d->waveDescriptions[i].waveLength * (d->waveDescriptions[i].direction.getX() * pos.getX() + d->waveDescriptions[i].direction.getZ() * pos.getZ()) + fi * d->duration;
-				gerstner_x_sum += gerstner_x(d->waveDescriptions[i], pos, triarg);
-				gerstner_y_sum += gerstner_y(d->waveDescriptions[i], pos, triarg);
-				gerstner_z_sum += gerstner_z(d->waveDescriptions[i], pos, triarg);
+				GMfloat wi = 2 / d->waveDescriptions[i].waveLength;
+				GMfloat phi = d->waveDescriptions[i].speed * wi;
+				GMfloat rad = wi * (d->waveDescriptions[i].direction.getX() * pos.getX() + d->waveDescriptions[i].direction.getZ() * pos.getZ()) + phi * d->duration;
+				GMfloat Qi = d->waveDescriptions[i].steepness / (d->waveDescriptions[i].amplitude * wi * d->waveDescriptions.size());
+				gerstner_x_sum += gerstner_x(Qi, d->waveDescriptions[i], pos, rad);
+				gerstner_y_sum += gerstner_y(d->waveDescriptions[i], pos, rad);
+				gerstner_z_sum += gerstner_z(Qi, d->waveDescriptions[i], pos, rad);
 			}
 
 			vertex.positions = {
@@ -568,10 +356,6 @@ void GMWaveGameObject::updateEachVertex()
 				vertex.positions[2] + gerstner_z_sum
 			};
 		}
-
-		calculateNormals(vertices, getObjectDescription().sliceM, getObjectDescription().sliceN);
-		//calculateNormals2(vertices, d->waveDescriptions, d->duration);
-		//calculateTangentSpace(vertices, getObjectDescription().sliceM, getObjectDescription().sliceN);
 
 		GMModelDataProxy* proxy = getModel()->getModelDataProxy();
 		proxy->beginUpdateBuffer(GMModelBufferType::VertexBuffer);
