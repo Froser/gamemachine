@@ -28,7 +28,7 @@ namespace
 				GMfloat wi = 2 / ds[i].waveLength;
 				GMfloat wa = wi * ds[i].amplitude;
 				GMfloat phi = ds[i].speed * wi;
-				GMfloat rad = wi * Dot(ds[i].direction, GMVec3(v.positions[0], v.positions[1], v.positions[2])) + phi * duration;
+				GMfloat rad = wi * Dot(ds[i].direction, GMVec3(v.positions[0], 0, v.positions[2])) + phi * duration;
 				GMfloat c = Cos(rad);
 				GMfloat s = Sin(rad);
 				GMfloat Qi = ds[i].steepness / (ds[i].amplitude * wi * ds.size());
@@ -39,6 +39,41 @@ namespace
 
 			GMVec3 n = Normalize(GMVec3(x, y, z));
 			v.normals = { n.getX(), n.getY(), n.getZ() };
+		}
+	}
+
+	void calculateTangent(GMVertices& vertices, const Vector<GMWaveDescription>& ds, GMfloat duration)
+	{
+		for (GMVertex& v : vertices)
+		{
+			GMfloat x = 0, y = 0, z = 1;
+			for (GMint32 i = 0; i < ds.size(); ++i)
+			{
+				GMfloat wi = 2 / ds[i].waveLength;
+				GMfloat wa = wi * ds[i].amplitude;
+				GMfloat phi = ds[i].speed * wi;
+				GMfloat rad = wi * Dot(ds[i].direction, GMVec3(v.positions[0], 0, v.positions[2])) + phi * duration;
+				GMfloat Qi = ds[i].steepness / (ds[i].amplitude * wi * ds.size());
+				GMfloat c = Cos(rad);
+				GMfloat s = Sin(rad);
+				x -= Qi * ds[i].direction.getX() * ds[i].direction.getY() * wa * s;
+				y -= Qi * ds[i].direction.getY() * ds[i].direction.getY() * wa * s;
+				z += ds[i].direction.getY() * wa * c;
+			}
+
+			GMVec3 n = Normalize(GMVec3(x, y, z));
+			v.tangents = { n.getX(), n.getY(), n.getZ() };
+		}
+	}
+
+	void calculateBitangent(GMVertices& vertices)
+	{
+		for (GMVertex& v : vertices)
+		{
+			GMVec3 n = GMVec3(v.normals[0], v.normals[1], v.normals[2]);
+			GMVec3 t = GMVec3(v.tangents[0], v.tangents[1], v.tangents[2]);
+			GMVec3 b = Cross(n, t);
+			v.bitangents = { b.getX(), b.getY(), b.getZ() };
 		}
 	}
 
@@ -332,6 +367,8 @@ void GMWaveGameObject::updateEachVertex()
 	{
 		GMVertices vertices = d->vertices;
 		calculateNormals(vertices, d->waveDescriptions, d->duration);
+		calculateTangent(vertices, d->waveDescriptions, d->duration);
+		calculateBitangent(vertices);
 		for (GMVertex& vertex : vertices)
 		{
 			GMfloat gerstner_x_sum = 0;

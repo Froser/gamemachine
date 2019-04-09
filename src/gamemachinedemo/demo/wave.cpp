@@ -179,7 +179,7 @@ void Demo_Wave::init()
 	GMVec3 direction3 = Normalize(GMVec3(-1, 0, 0));
 	Vector<gm::GMWaveDescription> wd = {
 		{ 0.f, 2.5f, direction1, 2.f, 7.f },
-		{ 0.01f, 1.f, direction2, 3.f, 5.f },
+		// { 0.01f, 1.f, direction2, 3.f, 5.f },
 		//{ 0.03f, 1.5f, direction3, 5.f, 3.f },
 	};
 	wave->setWaveDescriptions(wd);
@@ -191,8 +191,8 @@ void Demo_Wave::init()
 	gm::GMToolUtil::addTextureToShader(waveModel->getShader(), texture, gm::GMTextureType::Diffuse);
 	gm::GMToolUtil::addTextureToShader(waveModel->getShader(), texture, gm::GMTextureType::Specular);
 
-	//texture = gm::GMToolUtil::createTexture(db->parentDemonstrationWorld->getContext(), L"water-normal.tga");
-	//gm::GMToolUtil::addTextureToShader(waveModel->getShader(), texture, gm::GMTextureType::NormalMap);
+	texture = gm::GMToolUtil::createTexture(db->parentDemonstrationWorld->getContext(), L"water-normal.tga");
+	gm::GMToolUtil::addTextureToShader(waveModel->getShader(), texture, gm::GMTextureType::NormalMap);
 
 	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setWrapS(gm::GMS_Wrap::Repeat);
 	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setWrapT(gm::GMS_Wrap::Repeat);
