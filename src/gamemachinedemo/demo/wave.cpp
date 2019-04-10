@@ -66,155 +66,9 @@ namespace
 
 void Demo_Wave::init()
 {
-	D(d);
-	D_BASE(db, DemoHandler);
 	Base::init();
-
-	getDemoWorldReference().reset(new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext()));
-	gm::GMWidget* widget = createDefaultWidget();
-	auto top = getClientAreaTop();
-
-	gm::GMControlButton* button = nullptr;
-	widget->addControl(button = gm::GMControlButton::createControl(
-		widget,
-		L"停止水波",
-		10,
-		top,
-		250,
-		30,
-		false
-	));
-
-	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
-		if (d->wave)
-			d->wave->stop();
-	});
-
-	widget->addControl(button = gm::GMControlButton::createControl(
-		widget,
-		L"继续水波",
-		10,
-		top += 40,
-		250,
-		30,
-		false
-	));
-
-	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
-		if (d->wave)
-			d->wave->play();
-	});
-
-	widget->addControl(button = gm::GMControlButton::createControl(
-		widget,
-		L"停止水流",
-		10,
-		top += 40,
-		250,
-		30,
-		false
-	));
-
-	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
-		setWaterFlow(false);
-	});
-
-	widget->addControl(button = gm::GMControlButton::createControl(
-		widget,
-		L"开始水流",
-		10,
-		top += 40,
-		250,
-		30,
-		false
-	));
-
-	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
-		setWaterFlow(true);
-	});
-
-	widget->addControl(button = gm::GMControlButton::createControl(
-		widget,
-		L"使用CPU/GPU渲染",
-		10,
-		top += 40,
-		250,
-		30,
-		false
-	));
-
-	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
-		auto acc = d->wave->getHandwareAcceleration();
-		d->wave->setHandwareAcceleration(acc == gm::GMWaveGameObjectHardwareAcceleration::GPU ? gm::GMWaveGameObjectHardwareAcceleration::CPU : gm::GMWaveGameObjectHardwareAcceleration::GPU);
-	});
-
-	widget->addControl(d->handwareAccelerationLabel = gm::GMControlLabel::createControl(
-		widget,
-		gm::GMString(),
-		GMVec4(1, 1, 1, 1),
-		10,
-		top += 40,
-		250,
-		30,
-		false
-	));
-
-	widget->setSize(widget->getSize().width, top + 40);
-
-	gm::GMWaveGameObjectDescription desc = {
-		-256.f,
-		-256.f,
-		512.f,
-		512.f,
-		80.f,
-		25,
-		25,
-		100,
-		100
-	};
-
-	gm::GMWaveGameObject* wave = gm::GMWaveGameObject::create(desc);
-	GMVec3 direction1 = Normalize(GMVec3(1, 0, 1));
-	GMVec3 direction2 = Normalize(GMVec3(-1, 0, 1));
-	GMVec3 direction3 = Normalize(GMVec3(-1, 0, 0));
-	Vector<gm::GMWaveDescription> wd = {
-		{ 0.f, 2.5f, direction1, 2.f, 7.f },
-		{ 0.03f, 1.f, direction2, 3.f, 5.f },
-		//{ 0.03f, 1.5f, direction3, 5.f, 3.f },
-	};
-	wave->setWaveDescriptions(wd);
-	wave->play();
-	d->wave = wave;
-	gm::GMModel* waveModel = d->wave->getModel();
-	gm::GMTextureAsset texture = gm::GMToolUtil::createTexture(db->parentDemonstrationWorld->getContext(), L"water.tga");
-	gm::GMToolUtil::addTextureToShader(waveModel->getShader(), texture, gm::GMTextureType::Ambient);
-	gm::GMToolUtil::addTextureToShader(waveModel->getShader(), texture, gm::GMTextureType::Diffuse);
-	gm::GMToolUtil::addTextureToShader(waveModel->getShader(), texture, gm::GMTextureType::Specular);
-
-	texture = gm::GMToolUtil::createTexture(db->parentDemonstrationWorld->getContext(), L"water-normal.tga");
-	gm::GMToolUtil::addTextureToShader(waveModel->getShader(), texture, gm::GMTextureType::NormalMap);
-
-	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setWrapS(gm::GMS_Wrap::MirroredRepeat);
-	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setWrapT(gm::GMS_Wrap::MirroredRepeat);
-	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Diffuse).setWrapS(gm::GMS_Wrap::MirroredRepeat);
-	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Diffuse).setWrapT(gm::GMS_Wrap::MirroredRepeat);
-	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Specular).setWrapS(gm::GMS_Wrap::MirroredRepeat);
-	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Specular).setWrapT(gm::GMS_Wrap::MirroredRepeat);
-	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::NormalMap).setWrapS(gm::GMS_Wrap::MirroredRepeat);
-	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::NormalMap).setWrapT(gm::GMS_Wrap::MirroredRepeat);
-
-	setWaterFlow(true);
-	waveModel->getShader().getMaterial().setAmbient(GMVec3(.4f, .4f, .4f));
-	waveModel->getShader().getMaterial().setDiffuse(GMVec3(.6f, .6f, .6f));
-	waveModel->getShader().getMaterial().setSpecular(GMVec3(.6f, .6f, .6f));
-	waveModel->getShader().getMaterial().setShininess(50);
-
-	asDemoGameWorld(getDemoWorldReference())->addObject(L"wave", d->wave);
-
-	d->skyObject = createCubeMap(getDemoWorldReference()->getContext());
-	d->skyObject->setScaling(Scale(GMVec3(1000, 1000, 1000)));
-	d->skyObject->setTranslation(Translate(GMVec3(0, 20, 0)));
-	asDemoGameWorld(getDemoWorldReference())->addObject(L"sky", d->skyObject);
+	createMenu();
+	createObject();
 }
 
 void Demo_Wave::event(gm::GameMachineHandlerEvent evt)
@@ -314,6 +168,162 @@ void Demo_Wave::onDeactivate()
 	d->activate = false;
 	setMouseTrace(false);
 	Base::onDeactivate();
+}
+
+void Demo_Wave::createMenu()
+{
+	D(d);
+	D_BASE(db, DemoHandler);
+	getDemoWorldReference().reset(new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext()));
+	gm::GMWidget* widget = createDefaultWidget();
+	auto top = getClientAreaTop();
+
+	gm::GMControlButton* button = nullptr;
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
+		L"停止水波",
+		10,
+		top,
+		250,
+		30,
+		false
+	));
+
+	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		if (d->wave)
+			d->wave->stop();
+	});
+
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
+		L"继续水波",
+		10,
+		top += 40,
+		250,
+		30,
+		false
+	));
+
+	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		if (d->wave)
+			d->wave->play();
+	});
+
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
+		L"停止水流",
+		10,
+		top += 40,
+		250,
+		30,
+		false
+	));
+
+	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		setWaterFlow(false);
+	});
+
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
+		L"开始水流",
+		10,
+		top += 40,
+		250,
+		30,
+		false
+	));
+
+	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		setWaterFlow(true);
+	});
+
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
+		L"使用CPU/GPU渲染",
+		10,
+		top += 40,
+		250,
+		30,
+		false
+	));
+
+	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		auto acc = d->wave->getHandwareAcceleration();
+		d->wave->setHandwareAcceleration(acc == gm::GMWaveGameObjectHardwareAcceleration::GPU ? gm::GMWaveGameObjectHardwareAcceleration::CPU : gm::GMWaveGameObjectHardwareAcceleration::GPU);
+	});
+
+	widget->addControl(d->handwareAccelerationLabel = gm::GMControlLabel::createControl(
+		widget,
+		gm::GMString(),
+		GMVec4(1, 1, 1, 1),
+		10,
+		top += 40,
+		250,
+		30,
+		false
+	));
+
+	widget->setSize(widget->getSize().width, top + 40);
+}
+
+void Demo_Wave::createObject()
+{
+	D(d);
+	D_BASE(db, Base);
+	gm::GMWaveGameObjectDescription desc = {
+		-256.f,
+		-256.f,
+		512.f,
+		512.f,
+		80.f,
+		50,
+		50,
+		100,
+		100
+	};
+
+	gm::GMWaveGameObject* wave = gm::GMWaveGameObject::create(desc);
+	GMVec3 direction1 = Normalize(GMVec3(1, 0, 1));
+	GMVec3 direction2 = Normalize(GMVec3(-1, 0, 1));
+	GMVec3 direction3 = Normalize(GMVec3(-1, 0, 0));
+	Vector<gm::GMWaveDescription> wd = {
+		{ 0.f, 1.25f, direction1, 2.f, 3.f },
+		{ 0.03f, .5f, direction2, 3.f, 1.5f },
+		//{ 0.03f, 1.5f, direction3, 5.f, 3.f },
+	};
+	wave->setWaveDescriptions(wd);
+	wave->play();
+	d->wave = wave;
+	gm::GMModel* waveModel = d->wave->getModel();
+	gm::GMTextureAsset texture = gm::GMToolUtil::createTexture(db->parentDemonstrationWorld->getContext(), L"water.tga");
+	gm::GMToolUtil::addTextureToShader(waveModel->getShader(), texture, gm::GMTextureType::Ambient);
+	gm::GMToolUtil::addTextureToShader(waveModel->getShader(), texture, gm::GMTextureType::Diffuse);
+	gm::GMToolUtil::addTextureToShader(waveModel->getShader(), texture, gm::GMTextureType::Specular);
+
+	texture = gm::GMToolUtil::createTexture(db->parentDemonstrationWorld->getContext(), L"water-normal.tga");
+	gm::GMToolUtil::addTextureToShader(waveModel->getShader(), texture, gm::GMTextureType::NormalMap);
+
+	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setWrapS(gm::GMS_Wrap::MirroredRepeat);
+	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Ambient).setWrapT(gm::GMS_Wrap::MirroredRepeat);
+	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Diffuse).setWrapS(gm::GMS_Wrap::MirroredRepeat);
+	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Diffuse).setWrapT(gm::GMS_Wrap::MirroredRepeat);
+	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Specular).setWrapS(gm::GMS_Wrap::MirroredRepeat);
+	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::Specular).setWrapT(gm::GMS_Wrap::MirroredRepeat);
+	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::NormalMap).setWrapS(gm::GMS_Wrap::MirroredRepeat);
+	waveModel->getShader().getTextureList().getTextureSampler(gm::GMTextureType::NormalMap).setWrapT(gm::GMS_Wrap::MirroredRepeat);
+
+	setWaterFlow(true);
+	waveModel->getShader().getMaterial().setAmbient(GMVec3(.4f, .4f, .4f));
+	waveModel->getShader().getMaterial().setDiffuse(GMVec3(.6f, .6f, .6f));
+	waveModel->getShader().getMaterial().setSpecular(GMVec3(.6f, .6f, .6f));
+	waveModel->getShader().getMaterial().setShininess(50);
+
+	asDemoGameWorld(getDemoWorldReference())->addObject(L"wave", d->wave);
+
+	d->skyObject = createCubeMap(getDemoWorldReference()->getContext());
+	d->skyObject->setScaling(Scale(GMVec3(1000, 1000, 1000)));
+	d->skyObject->setTranslation(Translate(GMVec3(0, 20, 0)));
+	asDemoGameWorld(getDemoWorldReference())->addObject(L"sky", d->skyObject);
 }
 
 void Demo_Wave::setMouseTrace(bool enabled)

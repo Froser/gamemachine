@@ -33,7 +33,10 @@ protected:
 	virtual void onActivate() override;
 	virtual void onDeactivate() override;
 
-private:
+	virtual void createMenu();
+	virtual void createObject();
+
+protected:
 	void setMouseTrace(bool enabled);
 	void setWaterFlow(bool flow);
 
@@ -43,6 +46,11 @@ protected:
 		static gm::GMString desc = L"绘制一个水波。晃动鼠标以调整视角。R键显示鼠标。";
 		return desc;
 	}
+};
+
+GM_PRIVATE_OBJECT(Demo_CleanWater)
+{
+	gm::GMGameObject* ground = nullptr;
 };
 
 #endif
