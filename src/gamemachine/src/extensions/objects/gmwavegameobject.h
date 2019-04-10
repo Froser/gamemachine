@@ -48,6 +48,15 @@ enum class GMWaveGameObjectHardwareAcceleration
 	CPU,
 };
 
+#if GM_USE_DX11
+struct GMWaveIndices_Dx11
+{
+	GMint32 isPlaying;
+	GMint32 waveCount;
+	GMint32 duration;
+};
+#endif
+
 GM_PRIVATE_OBJECT(GMWaveGameObject)
 {
 	GMWaveGameObjectDescription objectDescription;
@@ -60,6 +69,10 @@ GM_PRIVATE_OBJECT(GMWaveGameObject)
 	// GPU 相关变量
 	Vector<Vector<GMWaveDescriptionIndices>> waveIndices;
 	Vector<GMWaveIndices> globalIndices;
+
+#if GM_USE_DX11
+	GMWaveIndices_Dx11 dxWaveEffects;
+#endif
 
 	GMWaveGameObjectHardwareAcceleration acceleration = GMWaveGameObjectHardwareAcceleration::GPU;
 };

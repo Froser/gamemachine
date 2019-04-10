@@ -130,6 +130,7 @@ namespace
 			GM_ASSERT(match.size() >= 3);
 			value = match[1].str();
 		}
+		GM_ASSERT(!value.empty());
 		return value;
 	}
 
@@ -145,6 +146,7 @@ namespace
 			GM_ASSERT(match.size() >= 3);
 			value = match[1].str();
 		}
+		GM_ASSERT(!value.empty());
 		return value;
 	}
 

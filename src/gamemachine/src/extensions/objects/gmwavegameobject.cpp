@@ -2,8 +2,19 @@
 #include "gmwavegameobject.h"
 #include <gmutilities.h>
 #include <gmgl/shader_constants.h>
+#if GM_USE_DX11
+#include <gmdxincludes.h>
+#endif
 
 #define getVertexIndex(x, y) ((x) + (y) * (sliceM + 1))
+#define __L(txt) L ## txt
+#define _L(txt) __L(txt)
+#define WAVE_DESCRIPTION "GM_Ext_Wave_WaveDescriptions"
+#define STEEPNESS "Steepness"
+#define AMPLITUDE "Amplitude"
+#define DIRECTION "Direction"
+#define SPEED "Speed"
+#define WAVELENGTH "WaveLength"
 
 struct GMWaveDescriptionStrings
 {
@@ -229,6 +240,67 @@ void GMWaveGameObject::initShader(const IRenderContext* context)
 		L"    _bitangent = vec4(cross(_normal.xyz, _tangent.xyz), 1);"
 		L"}"
 	);
+
+	vertexTech.setCode(
+		GMRenderEnvironment::DirectX11,
+		L"struct GMExt_Wave_WaveDescription\n"
+		L"{\n"
+		L"    float Steepness;\n"
+		L"    float Amplitude;\n"
+		L"    float3 Direction;\n"
+		L"    float Speed;\n"
+		L"    float WaveLength;\n"
+		L"};\n"
+		L""
+		L"static const int GM_MaxWaves = 10;\n"
+		L"GMExt_Wave_WaveDescription GM_Ext_Wave_WaveDescriptions[GM_MaxWaves];\n"
+		L"bool GM_Ext_Wave_IsWavePlaying = 0;\n"
+		L"int GM_Ext_Wave_WaveCount = 1;\n"
+		L"float GM_Ext_Wave_Duration = 0;\n"
+		L""
+		L"VS_OUTPUT VS_GerstnerWave( VS_INPUT input )\n"
+		L"{\n"
+		L"    VS_OUTPUT output;\n"
+		L"    output.Position = GM_ToFloat4(input.Position);\n"
+		L"    float4 p = float4(output.Position.x, 0, output.Position.z, 1);\n"
+		L"    float3 n = float3(0, 1, 0);\n"
+		L"    float3 t = float3(0, 0, 1);\n"
+		L"    if (GM_Ext_Wave_IsWavePlaying)\n"
+		L"    {\n"
+		L"        for (int i = 0; i < GM_Ext_Wave_WaveCount; ++i)\n"
+		L"        {\n"
+		L"            float wi = 2.f / GM_Ext_Wave_WaveDescriptions[i].WaveLength;\n"
+		L"            float phi = GM_Ext_Wave_WaveDescriptions[i].Speed * wi;\n"
+		L"            float rad = wi * dot(GM_Ext_Wave_WaveDescriptions[i].Direction.xz, output.Position.xz) + phi * GM_Ext_Wave_Duration;\n"
+		L"            float Qi = GM_Ext_Wave_WaveDescriptions[i].Steepness / (GM_Ext_Wave_WaveDescriptions[i].Amplitude * wi * GM_Ext_Wave_WaveCount);\n"
+		L"            float C = cos(rad);\n"
+		L"            float S = sin(rad);\n"
+		L"            p += float4(Qi * GM_Ext_Wave_WaveDescriptions[i].Amplitude * GM_Ext_Wave_WaveDescriptions[i].Direction.x * output.Position.x * C,\n"
+		L"                    GM_Ext_Wave_WaveDescriptions[i].Amplitude * S,\n"
+		L"                    Qi * GM_Ext_Wave_WaveDescriptions[i].Amplitude * GM_Ext_Wave_WaveDescriptions[i].Direction.z * output.Position.z * C, 0);\n"
+		L"            float wa = wi * GM_Ext_Wave_WaveDescriptions[i].Amplitude;\n"
+		L"            n.xz -= GM_Ext_Wave_WaveDescriptions[i].Direction.xz * C;\n"
+		L"            n.y -= Qi * wa * S;\n"
+		L"            t.x -= Qi * GM_Ext_Wave_WaveDescriptions[i].Direction.x * GM_Ext_Wave_WaveDescriptions[i].Direction.y * wa * S;\n"
+		L"            t.y -= Qi * GM_Ext_Wave_WaveDescriptions[i].Direction.y * GM_Ext_Wave_WaveDescriptions[i].Direction.y * wa * S;\n"
+		L"            t.z += GM_Ext_Wave_WaveDescriptions[i].Direction.y * wa * C;\n"
+		L"        }\n"
+		L"    }\n"
+		L"    "
+		L"    output.Position = mul(output.Position, GM_WorldMatrix);\n"
+		L"    output.WorldPos = output.Position;\n"
+		L"    output.Position = mul(output.Position, GM_ViewMatrix);\n"
+		L"    output.Position = mul(output.Position, GM_ProjectionMatrix);\n"
+		L"    output.Normal = GM_ToFloat4(normalize(n));\n"
+		L"    output.Texcoord = input.Texcoord;\n"
+		L"    output.Tangent = GM_ToFloat4(normalize(t));\n"
+		L"    output.Bitangent = GM_ToFloat4(cross(output.Normal.xyz, output.Tangent.xyz));\n"
+		L"    output.Lightmap = input.Lightmap;\n"
+		L"    output.Color = input.Color;\n"
+		L"    output.Z = output.Position.z;\n"
+		L"    return output;\n"
+		L"}\n"
+	);
 	techs.addRenderTechnique(vertexTech);
 	s_techId = engine->getRenderTechniqueManager()->addRenderTechniques(techs);
 }
@@ -301,21 +373,21 @@ void GMWaveGameObject::onRenderShader(GMModel* model, IShaderProgram* shaderProg
 		static const GMString s_isPlaying = L"GM_Ext_Wave_IsWavePlaying";
 		static const GMString s_waveCount = L"GM_Ext_Wave_WaveCount";
 		static const GMString s_duration = L"GM_Ext_Wave_Duration";
-		static std::once_flag s_flag;
 		constexpr GMint32 MAX_WAVES = 10;
 
 		if (GM.getRunningStates().renderEnvironment == GMRenderEnvironment::OpenGL)
 		{
+			static std::once_flag s_flag;
 			std::call_once(s_flag, [MAX_WAVES](Vector<GMWaveDescriptionStrings>& strings) {
 				strings.resize(MAX_WAVES);
 				for (GMint32 i = 0; i < MAX_WAVES; ++i)
 				{
 					GMString strIdx = GMString(i);
-					strings[i].steepness = L"GM_Ext_Wave_WaveDescriptions[" + strIdx + L"].Steepness";
-					strings[i].amplitude = L"GM_Ext_Wave_WaveDescriptions[" + strIdx + L"].Amplitude";
-					strings[i].direction = L"GM_Ext_Wave_WaveDescriptions[" + strIdx + L"].Direction";
-					strings[i].speed = L"GM_Ext_Wave_WaveDescriptions[" + strIdx + L"].Speed";
-					strings[i].waveLength = L"GM_Ext_Wave_WaveDescriptions[" + strIdx + L"].WaveLength";
+					strings[i].steepness = _L(WAVE_DESCRIPTION) L"[" + strIdx + L"]." _L(STEEPNESS);
+					strings[i].amplitude = _L(WAVE_DESCRIPTION) L"[" + strIdx + L"]." _L(AMPLITUDE);
+					strings[i].direction = _L(WAVE_DESCRIPTION) L"[" + strIdx + L"]." _L(DIRECTION);
+					strings[i].speed = _L(WAVE_DESCRIPTION) L"[" + strIdx + L"]." _L(SPEED);
+					strings[i].waveLength = _L(WAVE_DESCRIPTION) L"[" + strIdx + L"]." _L(WAVELENGTH);
 				}
 			}, s_waveDescriptionStrings);
 
@@ -351,6 +423,39 @@ void GMWaveGameObject::onRenderShader(GMModel* model, IShaderProgram* shaderProg
 					getVariableIndex(shaderProgram, d->waveIndices[prog][i].waveLength, s_waveDescriptionStrings[i].waveLength),
 					d->waveDescriptions[i].waveLength);
 			}
+		}
+		else
+		{
+#if GM_USE_DX11
+			static std::once_flag s_flag;
+			std::call_once(s_flag, [d, shaderProgram]() {
+				d->dxWaveEffects.isPlaying = shaderProgram->getIndex(s_isPlaying);
+				d->dxWaveEffects.waveCount = shaderProgram->getIndex(s_waveCount);
+				d->dxWaveEffects.duration = shaderProgram->getIndex(s_duration);
+			});
+			GMint32 waveCount = gm_sizet_to_int(d->waveDescriptions.size());
+			shaderProgram->setBool(d->dxWaveEffects.isPlaying, d->isPlaying);
+			shaderProgram->setInt(d->dxWaveEffects.waveCount, waveCount);
+			shaderProgram->setFloat(d->dxWaveEffects.duration, d->duration);
+
+			GMComPtr<ID3DX11Effect> effect;
+			shaderProgram->getInterface(GameMachineInterfaceID::D3D11Effect, (void**)&effect);
+			for (GMint32 i = 0; i < waveCount; ++i)
+			{
+				GM_ASSERT(effect);
+				auto descriptions = effect->GetVariableByName(WAVE_DESCRIPTION);
+				GM_ASSERT(descriptions->IsValid());
+				auto description = descriptions->GetElement(i);
+				GM_ASSERT(description->IsValid());
+				GM_DX_HR(description->GetMemberByName(STEEPNESS)->AsScalar()->SetFloat(d->waveDescriptions[i].steepness));
+				GM_DX_HR(description->GetMemberByName(AMPLITUDE)->AsScalar()->SetFloat(d->waveDescriptions[i].amplitude));
+				GM_DX_HR(description->GetMemberByName(DIRECTION)->AsVector()->SetFloatVector(ValuePointer(d->waveDescriptions[i].direction)));
+				GM_DX_HR(description->GetMemberByName(SPEED)->AsScalar()->SetFloat(d->waveDescriptions[i].speed));
+				GM_DX_HR(description->GetMemberByName(WAVELENGTH)->AsScalar()->SetFloat(d->waveDescriptions[i].waveLength));
+			}
+#else
+			GM_ASSERT(false);
+#endif
 		}
 	}
 }
