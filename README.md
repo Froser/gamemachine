@@ -55,7 +55,9 @@
 
 ## 如何学习、改进GameMachine
   因本人能力有限，无法做到尽善尽美，欢迎大家一起来提升和改进GameMachine。以下是GameMachine文件夹下的目录结构：
-  * extensions: 扩展功能。扩展功能是没有放在GameMachine主要功能中的一些功能模块。目前只实现了雷神之锤3的BSP文件的读取。并且，demo中还实现了雷神之锤3的场景的渲染和人物的移动。你可以用手柄或者键盘来移动玩家。
+  * extensions: 扩展功能。扩展功能是没有放在GameMachine主要功能中的一些功能模块。
+    * 雷神之锤3的BSP文件的读取。并且，demo中还实现了雷神之锤3的场景的渲染和人物的移动。你可以用手柄或者键盘来移动玩家。
+    * Gerstner波，模拟水面。
   * foundation: 基本框架，如主程序流程、工具类、字符串类、基本定义等。
   * gmdata: 数据相关类，如解析图片、解析模型、模型数据结构等。
   * gmengine: 渲染流水线的实现。它目前具体由gmgl和gmdx11实现。
@@ -68,3 +70,4 @@
 ![Quake 3](https://github.com/Froser/gamemachine/blob/master/manual/pic/1.png)
 ![Spotlight](https://github.com/Froser/gamemachine/blob/master/manual/pic/2.png)
 ![Collision](https://github.com/Froser/gamemachine/blob/master/manual/pic/3.png)
+![Gerstner wave](https://github.com/Froser/gamemachine/blob/master/manual/pic/4.png)
