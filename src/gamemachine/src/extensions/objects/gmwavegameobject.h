@@ -37,7 +37,6 @@ struct GMWaveDescriptionIndices
 
 struct GMWaveIndices
 {
-	GMint32 isPlaying;
 	GMint32 waveCount;
 	GMint32 duration;
 };
@@ -51,7 +50,6 @@ enum class GMWaveGameObjectHardwareAcceleration
 #if GM_USE_DX11
 struct GMWaveIndices_Dx11
 {
-	GMint32 isPlaying;
 	GMint32 waveCount;
 	GMint32 duration;
 };

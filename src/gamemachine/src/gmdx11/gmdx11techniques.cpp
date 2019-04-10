@@ -1137,11 +1137,13 @@ void GMDx11Technique::passAllAndDraw(GMModel* model)
 {
 	D(d);
 	D3DX11_TECHNIQUE_DESC techDesc;
-	GM_DX_HR(getTechnique()->GetDesc(&techDesc));
+	ID3DX11EffectTechnique* tech = getTechnique();
+	GM_ASSERT(tech);
+	GM_DX_HR(tech->GetDesc(&techDesc));
 
 	for (GMuint32 p = 0; p < techDesc.Passes; ++p)
 	{
-		ID3DX11EffectPass* pass = getTechnique()->GetPassByIndex(p);
+		ID3DX11EffectPass* pass = tech->GetPassByIndex(p);
 		pass->Apply(0, d->deviceContext);
 		if (model->getDrawMode() == GMModelDrawMode::Vertex)
 			d->deviceContext->Draw(gm_sizet_to<UINT>(model->getVerticesCount()), 0);

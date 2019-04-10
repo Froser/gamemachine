@@ -201,7 +201,6 @@ void GMWaveGameObject::initShader(const IRenderContext* context)
 		L""
 		L"const int GM_MaxWaves = 10;"
 		L"uniform GMExt_Wave_WaveDescription GM_Ext_Wave_WaveDescriptions[GM_MaxWaves];"
-		L"uniform int GM_Ext_Wave_IsWavePlaying = 0;"
 		L"uniform int GM_Ext_Wave_WaveCount = 1;"
 		L"uniform float GM_Ext_Wave_Duration = 0;"
 		L"\n"
@@ -211,28 +210,24 @@ void GMWaveGameObject::initShader(const IRenderContext* context)
 		L"    vec4 p = vec4(position.x, 0, position.z, 1);"
 		L"    vec3 n = vec3(0, 1, 0);"
 		L"    vec3 t = vec3(0, 0, 1);"
-		L"    if (GM_Ext_Wave_IsWavePlaying != 0)"
+		L"    for (int i = 0; i < GM_Ext_Wave_WaveCount; ++i)"
 		L"    {"
-		L"        for (int i = 0; i < GM_Ext_Wave_WaveCount; ++i)"
-		L"        {"
-		L"            float wi = 2.f / GM_Ext_Wave_WaveDescriptions[i].WaveLength;"
-		L"            float phi = GM_Ext_Wave_WaveDescriptions[i].Speed * wi;"
-		L"            float rad = wi * dot(GM_Ext_Wave_WaveDescriptions[i].Direction.xz, position.xz) + phi * GM_Ext_Wave_Duration;"
-		L"            float Qi = GM_Ext_Wave_WaveDescriptions[i].Steepness / (GM_Ext_Wave_WaveDescriptions[i].Amplitude * wi * GM_Ext_Wave_WaveCount);"
-		L"            float C = cos(rad);"
-		L"            float S = sin(rad);"
-		L"            p += vec4(Qi * GM_Ext_Wave_WaveDescriptions[i].Amplitude * GM_Ext_Wave_WaveDescriptions[i].Direction.x * position.x * C,"
-		L"                      GM_Ext_Wave_WaveDescriptions[i].Amplitude * S,"
-		L"                      Qi * GM_Ext_Wave_WaveDescriptions[i].Amplitude * GM_Ext_Wave_WaveDescriptions[i].Direction.z * position.z * C, 0);"
-		L"            float wa = wi * GM_Ext_Wave_WaveDescriptions[i].Amplitude;"
-		L"            n.xz -= GM_Ext_Wave_WaveDescriptions[i].Direction.xz * C;"
-		L"            n.y -= Qi * wa * S;"
-		L"            t.x -= Qi * GM_Ext_Wave_WaveDescriptions[i].Direction.x * GM_Ext_Wave_WaveDescriptions[i].Direction.y * wa * S;"
-		L"            t.y -= Qi * GM_Ext_Wave_WaveDescriptions[i].Direction.y * GM_Ext_Wave_WaveDescriptions[i].Direction.y * wa * S;"
-		L"            t.z += GM_Ext_Wave_WaveDescriptions[i].Direction.y * wa * C;"
-		L"        }"
+		L"        float wi = 2.f / GM_Ext_Wave_WaveDescriptions[i].WaveLength;"
+		L"        float phi = GM_Ext_Wave_WaveDescriptions[i].Speed * wi;"
+		L"        float rad = wi * dot(GM_Ext_Wave_WaveDescriptions[i].Direction.xz, position.xz) + phi * GM_Ext_Wave_Duration;"
+		L"        float Qi = GM_Ext_Wave_WaveDescriptions[i].Steepness / (GM_Ext_Wave_WaveDescriptions[i].Amplitude * wi * GM_Ext_Wave_WaveCount);"
+		L"        float C = cos(rad);"
+		L"        float S = sin(rad);"
+		L"        p += vec4(Qi * GM_Ext_Wave_WaveDescriptions[i].Amplitude * GM_Ext_Wave_WaveDescriptions[i].Direction.x * position.x * C,"
+		L"                  GM_Ext_Wave_WaveDescriptions[i].Amplitude * S,"
+		L"                  Qi * GM_Ext_Wave_WaveDescriptions[i].Amplitude * GM_Ext_Wave_WaveDescriptions[i].Direction.z * position.z * C, 0);"
+		L"        float wa = wi * GM_Ext_Wave_WaveDescriptions[i].Amplitude;"
+		L"        n.xz -= GM_Ext_Wave_WaveDescriptions[i].Direction.xz * C;"
+		L"        n.y -= Qi * wa * S;"
+		L"        t.x -= Qi * GM_Ext_Wave_WaveDescriptions[i].Direction.x * GM_Ext_Wave_WaveDescriptions[i].Direction.y * wa * S;"
+		L"        t.y -= Qi * GM_Ext_Wave_WaveDescriptions[i].Direction.y * GM_Ext_Wave_WaveDescriptions[i].Direction.y * wa * S;"
+		L"        t.z += GM_Ext_Wave_WaveDescriptions[i].Direction.y * wa * C;"
 		L"    }"
-		L""
 		L"    _model3d_position_world = GM_WorldMatrix * p;"
 		L"    gl_Position = (GM_ProjectionMatrix * GM_ViewMatrix * _model3d_position_world);"
 		L"    _normal = vec4(normalize(n), 1);"
@@ -254,9 +249,8 @@ void GMWaveGameObject::initShader(const IRenderContext* context)
 		L""
 		L"static const int GM_MaxWaves = 10;\n"
 		L"GMExt_Wave_WaveDescription GM_Ext_Wave_WaveDescriptions[GM_MaxWaves];\n"
-		L"bool GM_Ext_Wave_IsWavePlaying = 0;\n"
-		L"int GM_Ext_Wave_WaveCount = 1;\n"
-		L"float GM_Ext_Wave_Duration = 0;\n"
+		L"int GM_Ext_Wave_WaveCount;\n"
+		L"float GM_Ext_Wave_Duration;\n"
 		L""
 		L"VS_OUTPUT VS_GerstnerWave( VS_INPUT input )\n"
 		L"{\n"
@@ -265,28 +259,25 @@ void GMWaveGameObject::initShader(const IRenderContext* context)
 		L"    float4 p = float4(output.Position.x, 0, output.Position.z, 1);\n"
 		L"    float3 n = float3(0, 1, 0);\n"
 		L"    float3 t = float3(0, 0, 1);\n"
-		L"    if (GM_Ext_Wave_IsWavePlaying)\n"
+		L"    for (int i = 0; i < GM_Ext_Wave_WaveCount; ++i)\n"
 		L"    {\n"
-		L"        for (int i = 0; i < GM_Ext_Wave_WaveCount; ++i)\n"
-		L"        {\n"
-		L"            float wi = 2.f / GM_Ext_Wave_WaveDescriptions[i].WaveLength;\n"
-		L"            float phi = GM_Ext_Wave_WaveDescriptions[i].Speed * wi;\n"
-		L"            float rad = wi * dot(GM_Ext_Wave_WaveDescriptions[i].Direction.xz, output.Position.xz) + phi * GM_Ext_Wave_Duration;\n"
-		L"            float Qi = GM_Ext_Wave_WaveDescriptions[i].Steepness / (GM_Ext_Wave_WaveDescriptions[i].Amplitude * wi * GM_Ext_Wave_WaveCount);\n"
-		L"            float C = cos(rad);\n"
-		L"            float S = sin(rad);\n"
-		L"            p += float4(Qi * GM_Ext_Wave_WaveDescriptions[i].Amplitude * GM_Ext_Wave_WaveDescriptions[i].Direction.x * output.Position.x * C,\n"
-		L"                    GM_Ext_Wave_WaveDescriptions[i].Amplitude * S,\n"
-		L"                    Qi * GM_Ext_Wave_WaveDescriptions[i].Amplitude * GM_Ext_Wave_WaveDescriptions[i].Direction.z * output.Position.z * C, 0);\n"
-		L"            float wa = wi * GM_Ext_Wave_WaveDescriptions[i].Amplitude;\n"
-		L"            n.xz -= GM_Ext_Wave_WaveDescriptions[i].Direction.xz * C;\n"
-		L"            n.y -= Qi * wa * S;\n"
-		L"            t.x -= Qi * GM_Ext_Wave_WaveDescriptions[i].Direction.x * GM_Ext_Wave_WaveDescriptions[i].Direction.y * wa * S;\n"
-		L"            t.y -= Qi * GM_Ext_Wave_WaveDescriptions[i].Direction.y * GM_Ext_Wave_WaveDescriptions[i].Direction.y * wa * S;\n"
-		L"            t.z += GM_Ext_Wave_WaveDescriptions[i].Direction.y * wa * C;\n"
-		L"        }\n"
+		L"        float wi = 2.f / GM_Ext_Wave_WaveDescriptions[i].WaveLength;\n"
+		L"        float phi = GM_Ext_Wave_WaveDescriptions[i].Speed * wi;\n"
+		L"        float rad = wi * dot(GM_Ext_Wave_WaveDescriptions[i].Direction.xz, output.Position.xz) + phi * GM_Ext_Wave_Duration;\n"
+		L"        float Qi = GM_Ext_Wave_WaveDescriptions[i].Steepness / (GM_Ext_Wave_WaveDescriptions[i].Amplitude * wi * GM_Ext_Wave_WaveCount);\n"
+		L"        float C = cos(rad);\n"
+		L"        float S = sin(rad);\n"
+		L"        p += float4(Qi * GM_Ext_Wave_WaveDescriptions[i].Amplitude * GM_Ext_Wave_WaveDescriptions[i].Direction.x * output.Position.x * C,\n"
+		L"                GM_Ext_Wave_WaveDescriptions[i].Amplitude * S,\n"
+		L"                Qi * GM_Ext_Wave_WaveDescriptions[i].Amplitude * GM_Ext_Wave_WaveDescriptions[i].Direction.z * output.Position.z * C, 0);\n"
+		L"        float wa = wi * GM_Ext_Wave_WaveDescriptions[i].Amplitude;\n"
+		L"        n.xz -= GM_Ext_Wave_WaveDescriptions[i].Direction.xz * C;\n"
+		L"        n.y -= Qi * wa * S;\n"
+		L"        t.x -= Qi * GM_Ext_Wave_WaveDescriptions[i].Direction.x * GM_Ext_Wave_WaveDescriptions[i].Direction.y * wa * S;\n"
+		L"        t.y -= Qi * GM_Ext_Wave_WaveDescriptions[i].Direction.y * GM_Ext_Wave_WaveDescriptions[i].Direction.y * wa * S;\n"
+		L"        t.z += GM_Ext_Wave_WaveDescriptions[i].Direction.y * wa * C;\n"
 		L"    }\n"
-		L"    "
+		L"    output.Position = p;"
 		L"    output.Position = mul(output.Position, GM_WorldMatrix);\n"
 		L"    output.WorldPos = output.Position;\n"
 		L"    output.Position = mul(output.Position, GM_ViewMatrix);\n"
@@ -347,7 +338,8 @@ void GMWaveGameObject::update(GMDuration dt)
 {
 	D(d);
 	D_BASE(db, Base);
-	d->duration += dt;
+	if (d->isPlaying)
+		d->duration += dt;
 
 	// 使用CPU进行运算，需要手动update每个顶点
 	if (!d->waveModel)
@@ -370,7 +362,6 @@ void GMWaveGameObject::onRenderShader(GMModel* model, IShaderProgram* shaderProg
 	if (d->acceleration == GMWaveGameObjectHardwareAcceleration::GPU)
 	{
 		static Vector<GMWaveDescriptionStrings> s_waveDescriptionStrings;
-		static const GMString s_isPlaying = L"GM_Ext_Wave_IsWavePlaying";
 		static const GMString s_waveCount = L"GM_Ext_Wave_WaveCount";
 		static const GMString s_duration = L"GM_Ext_Wave_Duration";
 		constexpr GMint32 MAX_WAVES = 10;
@@ -398,7 +389,6 @@ void GMWaveGameObject::onRenderShader(GMModel* model, IShaderProgram* shaderProg
 			if (d->waveIndices[prog].size() <= waveCount)
 				d->waveIndices[prog].resize(waveCount + 1);
 
-			shaderProgram->setInt(getVariableIndex(shaderProgram, d->globalIndices[prog].isPlaying, s_isPlaying), d->isPlaying ? 1 : 0);
 			shaderProgram->setInt(getVariableIndex(shaderProgram, d->globalIndices[prog].waveCount, s_waveCount), waveCount);
 			shaderProgram->setFloat(getVariableIndex(shaderProgram, d->globalIndices[prog].duration, s_duration), d->duration);
 			for (GMint32 i = 0; i < waveCount; ++i)
@@ -429,12 +419,10 @@ void GMWaveGameObject::onRenderShader(GMModel* model, IShaderProgram* shaderProg
 #if GM_USE_DX11
 			static std::once_flag s_flag;
 			std::call_once(s_flag, [d, shaderProgram]() {
-				d->dxWaveEffects.isPlaying = shaderProgram->getIndex(s_isPlaying);
 				d->dxWaveEffects.waveCount = shaderProgram->getIndex(s_waveCount);
 				d->dxWaveEffects.duration = shaderProgram->getIndex(s_duration);
 			});
 			GMint32 waveCount = gm_sizet_to_int(d->waveDescriptions.size());
-			shaderProgram->setBool(d->dxWaveEffects.isPlaying, d->isPlaying);
 			shaderProgram->setInt(d->dxWaveEffects.waveCount, waveCount);
 			shaderProgram->setFloat(d->dxWaveEffects.duration, d->duration);
 

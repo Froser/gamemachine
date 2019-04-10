@@ -105,7 +105,7 @@ namespace
 
 	GMString getVS(const GMString& code)
 	{
-		static const GMString expr = L"VS_OUTPUT (.+)(.*)\\(VS_INPUT (.+)\\)(.*)";
+		static const GMString expr = L"VS_OUTPUT (.+)(.*)\\((.*)VS_INPUT (.+)\\)(.*)";
 		std::string value;
 		std::regex regPair(expr.toStdString());
 		std::smatch match;
@@ -115,12 +115,13 @@ namespace
 			GM_ASSERT(match.size() >= 3);
 			value = match[1].str();
 		}
+		GM_ASSERT(!value.empty());
 		return value;
 	}
 
 	GMString getPS(const GMString& code)
 	{
-		static const std::string expr = "float4 (.+)(.*)\\(PS_INPUT (.+)\\)(.*)SV_TARGET(.*)";
+		static const std::string expr = "float4 (.+)(.*)\\((.*)PS_INPUT (.+)\\)(.*)SV_TARGET(.*)";
 		std::string value;
 		std::regex regPair(expr);
 		std::smatch match;
