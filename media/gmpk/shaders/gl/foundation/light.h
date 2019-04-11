@@ -191,24 +191,24 @@ struct PS_3D_INPUT
     int IlluminationModel;
 };
 
-vec3 GM_CalculateRefractionByNormalWorld(vec3 worldPos, vec3 normal_world_N, float Refractivity)
+vec3 GM_CalculateRefractionByNormalWorld(vec3 worldPos, vec3 normal_world_N, float refractivity)
 {
-    if (Refractivity == 0.f)
+    if (refractivity == 0.f)
         return vec3(0, 0, 0);
 
     vec3 I = normalize(worldPos - GM_ViewPosition.xyz);
-    vec3 R = refract(I, normal_world_N, Refractivity);
+    vec3 R = refract(I, normal_world_N, refractivity);
     return texture(GM_CubeMapTextureAttribute, vec3(R.x, R.y, R.z)).rgb;
 }
 
-vec3 GM_CalculateRefractionByNormalTangent(vec3 worldPos, GMTangentSpace tangentSpace, float Refractivity)
+vec3 GM_CalculateRefractionByNormalTangent(vec3 worldPos, GMTangentSpace tangentSpace, float refractivity)
 {
-    if (Refractivity == 0.f)
+    if (refractivity == 0.f)
         return vec3(0, 0, 0);
     
     // 如果是切线空间，计算会复杂点，要将切线空间的法线换算回世界空间
     vec3 normal_world_N = normalize(mat3(GM_InverseViewMatrix) * transpose(tangentSpace.TBN) * tangentSpace.Normal_Tangent_N);
-    return GM_CalculateRefractionByNormalWorld(worldPos, normal_world_N, Refractivity);
+    return GM_CalculateRefractionByNormalWorld(worldPos, normal_world_N, refractivity);
 }
 
 float GM_CalculateShadow(PS_3D_INPUT vertex)

@@ -394,7 +394,7 @@ void GMWaveGameObject::onRenderShader(GMModel* model, IShaderProgram* shaderProg
 			if (d->waveIndices[prog].size() <= waveCount)
 				d->waveIndices[prog].resize(waveCount + 1);
 
-			shaderProgram->setInt(getVariableIndex(shaderProgram, d->globalIndices[prog].waveCount, s_waveCount), waveCount);
+			shaderProgram->setInt(getVariableIndex(shaderProgram, d->globalIndices[prog].waveCount, s_waveCount), gm_sizet_to_int(waveCount));
 			shaderProgram->setFloat(getVariableIndex(shaderProgram, d->globalIndices[prog].duration, s_duration), d->duration);
 			for (GMint32 i = 0; i < gm_sizet_to_int(waveCount); ++i)
 			{

@@ -36,7 +36,7 @@ void GM_Model3D()
     GMTangentSpace tangentSpace;
     if (GM_IsTangentSpaceInvalid(_tangent.xyz, _bitangent.xyz))
     {
-        tangentSpace = GM_CalculateTangentSpaceRuntime(vertex.WorldPos, _uv, normal_World_N, GM_NormalMapTextureAttribute);
+        tangentSpace = GM_CalculateTangentSpaceRuntime(vertex.WorldPos, _uv, _normal.xyz, GM_NormalMapTextureAttribute);
     }
     else
     {
@@ -51,22 +51,28 @@ void GM_Model3D()
         tangentSpace.Normal_Tangent_N = GM_SampleTextures(GM_NormalMapTextureAttribute, _uv).rgb * 2.0 - 1.0;
     }
 
+    vertex.HasNormalMap = GM_NormalMapTextureAttribute.Enabled != 0;
+
     /// Start Debug Option
     if (GM_Debug_Normal == GM_Debug_Normal_WorldSpace)
     {
-        _frag_color = normalToTexture(vertex.Normal_World_N.xyz);
+        if (vertex.HasNormalMap)
+            _frag_color = normalToTexture(normalize(mat3(GM_InverseViewMatrix) * transpose(tangentSpace.TBN) * tangentSpace.Normal_Tangent_N));
+        else
+            _frag_color = normalToTexture(vertex.Normal_World_N.xyz);
         return;
     }
     else if (GM_Debug_Normal == GM_Debug_Normal_EyeSpace)
     {
-        _frag_color = normalToTexture(vertex.Normal_Eye_N.xyz);
+        if (vertex.HasNormalMap)
+            _frag_color = normalToTexture(normalize(transpose(tangentSpace.TBN) * tangentSpace.Normal_Tangent_N));
+        else
+            _frag_color = normalToTexture(vertex.Normal_Eye_N.xyz);
         return;
     }
     /// End Debug Option
 
     vertex.TangentSpace = tangentSpace;
-
-    vertex.HasNormalMap = GM_NormalMapTextureAttribute.Enabled != 0;
     vertex.IlluminationModel = GM_IlluminationModel;
     if (GM_IlluminationModel == GM_IlluminationModel_Phong)
     {

@@ -894,11 +894,17 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
     /// Start Debug Option
     if (GM_Debug_Normal == GM_Debug_Normal_WorldSpace)
     {
-        return GM_NormalToTexture(commonInput.Normal_World_N.xyz);
+        if (commonInput.HasNormalMap)
+            return GM_NormalToTexture(normalize(mul(mul(tangentSpace.Normal_Tangent_N, transpose(tangentSpace.TBN)), GM_ToFloat3x3(GM_InverseViewMatrix))));
+        else
+            return GM_NormalToTexture(commonInput.Normal_World_N.xyz);
     }
     else if (GM_Debug_Normal == GM_Debug_Normal_EyeSpace)
     {
-        return GM_NormalToTexture(commonInput.Normal_Eye_N.xyz);
+        if (commonInput.HasNormalMap)
+            return GM_NormalToTexture(normalize(mul(tangentSpace.Normal_Tangent_N, transpose(tangentSpace.TBN))));
+        else
+            return GM_NormalToTexture(commonInput.Normal_Eye_N.xyz);
     }
     /// End Debug Option
 
