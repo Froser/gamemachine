@@ -34,7 +34,7 @@ namespace
 		for (GMVertex& v : vertices)
 		{
 			GMfloat x = 0, y = 1, z = 0;
-			for (GMint32 i = 0; i < ds.size(); ++i)
+			for (GMint32 i = 0; i < gm_sizet_to_int(ds.size()); ++i)
 			{
 				GMfloat wi = 2 / ds[i].waveLength;
 				GMfloat wa = wi * ds[i].amplitude;
@@ -58,7 +58,7 @@ namespace
 		for (GMVertex& v : vertices)
 		{
 			GMfloat x = 0, y = 0, z = 1;
-			for (GMint32 i = 0; i < ds.size(); ++i)
+			for (GMint32 i = 0; i < gm_sizet_to_int(ds.size()); ++i)
 			{
 				GMfloat wi = 2 / ds[i].waveLength;
 				GMfloat wa = wi * ds[i].amplitude;
@@ -117,8 +117,13 @@ namespace
 				GMfloat x_distance = x - x_start;
 				y = 0;
 
-				u = (x_distance) / desc.textureLength;
-				v = (z - z_start) / desc.textureHeight;
+				u = (x_distance) / desc.textureLength * desc.textureScaleLength;
+				v = (z - z_start) / desc.textureHeight * desc.textureScaleHeight;
+
+				if (u > 1)
+					u -= 1;
+				if (v > 1)
+					v -= 1;
 
 				GMVertex vert = { { x, y, z },{ 0, 0, 0 },{ u, v } };
 				vertices.push_back(std::move(vert));
@@ -385,13 +390,13 @@ void GMWaveGameObject::onRenderShader(GMModel* model, IShaderProgram* shaderProg
 			// 传递参数
 			GMsize_t prog = verifyIndicesContainer(d->globalIndices, shaderProgram);
 			verifyIndicesContainer(d->waveIndices, shaderProgram);
-			GMint32 waveCount = gm_sizet_to_int(d->waveDescriptions.size());
+			GMsize_t waveCount = d->waveDescriptions.size();
 			if (d->waveIndices[prog].size() <= waveCount)
 				d->waveIndices[prog].resize(waveCount + 1);
 
 			shaderProgram->setInt(getVariableIndex(shaderProgram, d->globalIndices[prog].waveCount, s_waveCount), waveCount);
 			shaderProgram->setFloat(getVariableIndex(shaderProgram, d->globalIndices[prog].duration, s_duration), d->duration);
-			for (GMint32 i = 0; i < waveCount; ++i)
+			for (GMint32 i = 0; i < gm_sizet_to_int(waveCount); ++i)
 			{
 				shaderProgram->setFloat(
 					getVariableIndex(shaderProgram, d->waveIndices[prog][i].steepness, s_waveDescriptionStrings[i].steepness),

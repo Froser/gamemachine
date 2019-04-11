@@ -15,6 +15,8 @@ struct GMWaveGameObjectDescription
 	GMint32 sliceN; //!< 地形在z轴的分块数。
 	GMfloat textureLength; //!< 一块地形纹理在x轴的长度。
 	GMfloat textureHeight; //!< 一块地形纹理在z轴的长度。
+	GMfloat textureScaleLength; //!< 纹理在x轴的缩放比，如2表示x方向显示2个单位的纹理。
+	GMfloat textureScaleHeight; //!< 纹理在z轴的缩放比，如2表示z方向显示2个单位的纹理。
 };
 
 struct GMWaveDescription

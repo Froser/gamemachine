@@ -71,105 +71,6 @@ void Demo_Wave::init()
 	createObject();
 }
 
-void Demo_Wave::event(gm::GameMachineHandlerEvent evt)
-{
-	D(d);
-	Base::event(evt);
-	switch (evt)
-	{
-	case gm::GameMachineHandlerEvent::FrameStart:
-		break;
-	case gm::GameMachineHandlerEvent::FrameEnd:
-		break;
-	case gm::GameMachineHandlerEvent::Activate:
-	{
-		if (d->activate)
-		{
-			const static gm::GMfloat mouseSensitivity = 0.25f;
-			gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputManager();
-			gm::IMouseState& mouseState = inputManager->getMouseState();
-			auto ms = mouseState.state();
-			d->cameraUtility.update(Radian(-ms.deltaX * mouseSensitivity), Radian(-ms.deltaY * mouseSensitivity));
-
-			gm::IKeyboardState& kbState = inputManager->getKeyboardState();
-			if (kbState.keyTriggered(gm::GM_ASCIIToKey('R')))
-				setMouseTrace(!d->mouseTrace);
-		}
-		break;
-	}
-	case gm::GameMachineHandlerEvent::Update:
-		if (d->wave)
-			d->wave->update(GM.getRunningStates().lastFrameElpased);
-		if (d->handwareAccelerationLabel)
-			d->handwareAccelerationLabel->setText(d->wave->getHandwareAcceleration() == gm::GMWaveGameObjectHardwareAcceleration::CPU ? L"渲染方式：CPU" : L"渲染方式：GPU");
-		break;
-	case gm::GameMachineHandlerEvent::Render:
-		getDemoWorldReference()->renderScene();
-		break;
-	case gm::GameMachineHandlerEvent::Deactivate:
-		break;
-	case gm::GameMachineHandlerEvent::Terminate:
-		break;
-	default:
-		break;
-	}
-}
-
-void Demo_Wave::setLookAt()
-{
-	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
-	camera.setPerspective(Radian(75.f), 1.333f, .1f, 3200);
-
-	gm::GMCameraLookAt lookAt;
-	lookAt.lookDirection = Normalize(GMVec3(0, -.5f, 1));
-	lookAt.position = GMVec3(0, 10, 0);
-	camera.lookAt(lookAt);
-
-	D(d);
-	d->cameraUtility.setCamera(&camera);
-}
-
-void Demo_Wave::setDefaultLights()
-{
-	// 所有Demo的默认灯光属性
-	D(d);
-	if (isInited())
-	{
-		const gm::GMWindowStates& windowStates = getDemonstrationWorld()->getContext()->getWindow()->getWindowStates();
-
-		{
-			gm::ILight* light = nullptr;
-			GM.getFactory()->createLight(gm::GMLightType::PointLight, &light);
-			GM_ASSERT(light);
-			gm::GMfloat ambientIntensity[] = { .8f, .8f, .8f };
-			gm::GMfloat diffuseIntensity[] = { 1.2f, 1.2f, 1.2f };
-			light->setLightAttribute3(gm::GMLight::AmbientIntensity, ambientIntensity);
-			light->setLightAttribute3(gm::GMLight::DiffuseIntensity, diffuseIntensity);
-			light->setLightAttribute(gm::GMLight::SpecularIntensity, 1.f);
-
-			gm::GMfloat lightPos[] = { 100.f, 100.f, 100.f };
-			light->setLightAttribute3(gm::GMLight::Position, lightPos);
-			getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
-		}
-	}
-}
-
-void Demo_Wave::onActivate()
-{
-	D(d);
-	d->activate = true;
-	setMouseTrace(true);
-	Base::onActivate();
-}
-
-void Demo_Wave::onDeactivate()
-{
-	D(d);
-	d->activate = false;
-	setMouseTrace(false);
-	Base::onDeactivate();
-}
-
 void Demo_Wave::createMenu()
 {
 	D(d);
@@ -279,7 +180,9 @@ void Demo_Wave::createObject()
 		50,
 		50,
 		100,
-		100
+		100,
+		2,
+		2,
 	};
 
 	gm::GMWaveGameObject* wave = gm::GMWaveGameObject::create(desc);
@@ -324,6 +227,105 @@ void Demo_Wave::createObject()
 	d->skyObject->setScaling(Scale(GMVec3(1000, 1000, 1000)));
 	d->skyObject->setTranslation(Translate(GMVec3(0, 20, 0)));
 	asDemoGameWorld(getDemoWorldReference())->addObject(L"sky", d->skyObject);
+}
+
+void Demo_Wave::event(gm::GameMachineHandlerEvent evt)
+{
+	D(d);
+	Base::event(evt);
+	switch (evt)
+	{
+	case gm::GameMachineHandlerEvent::FrameStart:
+		break;
+	case gm::GameMachineHandlerEvent::FrameEnd:
+		break;
+	case gm::GameMachineHandlerEvent::Activate:
+	{
+		if (d->activate)
+		{
+			const static gm::GMfloat mouseSensitivity = 0.25f;
+			gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputManager();
+			gm::IMouseState& mouseState = inputManager->getMouseState();
+			auto ms = mouseState.state();
+			d->cameraUtility.update(Radian(-ms.deltaX * mouseSensitivity), Radian(-ms.deltaY * mouseSensitivity));
+
+			gm::IKeyboardState& kbState = inputManager->getKeyboardState();
+			if (kbState.keyTriggered(gm::GM_ASCIIToKey('R')))
+				setMouseTrace(!d->mouseTrace);
+		}
+		break;
+	}
+	case gm::GameMachineHandlerEvent::Update:
+		if (d->wave)
+			d->wave->update(GM.getRunningStates().lastFrameElpased);
+		if (d->handwareAccelerationLabel)
+			d->handwareAccelerationLabel->setText(d->wave->getHandwareAcceleration() == gm::GMWaveGameObjectHardwareAcceleration::CPU ? L"渲染方式：CPU" : L"渲染方式：GPU");
+		break;
+	case gm::GameMachineHandlerEvent::Render:
+		getDemoWorldReference()->renderScene();
+		break;
+	case gm::GameMachineHandlerEvent::Deactivate:
+		break;
+	case gm::GameMachineHandlerEvent::Terminate:
+		break;
+	default:
+		break;
+	}
+}
+
+void Demo_Wave::setLookAt()
+{
+	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
+	camera.setPerspective(Radian(75.f), 1.333f, .1f, 3200);
+
+	gm::GMCameraLookAt lookAt;
+	lookAt.lookDirection = Normalize(GMVec3(0, -.5f, 1));
+	lookAt.position = GMVec3(0, 10, 0);
+	camera.lookAt(lookAt);
+
+	D(d);
+	d->cameraUtility.setCamera(&camera);
+}
+
+void Demo_Wave::setDefaultLights()
+{
+	// 所有Demo的默认灯光属性
+	D(d);
+	if (isInited())
+	{
+		const gm::GMWindowStates& windowStates = getDemonstrationWorld()->getContext()->getWindow()->getWindowStates();
+
+		{
+			gm::ILight* light = nullptr;
+			GM.getFactory()->createLight(gm::GMLightType::PointLight, &light);
+			GM_ASSERT(light);
+			gm::GMfloat ambientIntensity[] = { .8f, .8f, .8f };
+			gm::GMfloat diffuseIntensity[] = { 1.6f, 1.6f, 1.6f };
+			light->setLightAttribute3(gm::GMLight::AmbientIntensity, ambientIntensity);
+			light->setLightAttribute3(gm::GMLight::DiffuseIntensity, diffuseIntensity);
+			light->setLightAttribute(gm::GMLight::SpecularIntensity, 1.f);
+
+			gm::GMfloat lightPos[] = { 100.f, 100.f, 100.f };
+			light->setLightAttribute3(gm::GMLight::Position, lightPos);
+			getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
+		}
+	}
+}
+
+void Demo_Wave::onActivate()
+{
+	D(d);
+	d->activate = true;
+	setMouseTrace(true);
+	Base::onActivate();
+}
+
+void Demo_Wave::onDeactivate()
+{
+	D(d);
+	d->activate = false;
+	setMouseTrace(false);
+	Base::onDeactivate();
 }
 
 void Demo_Wave::setMouseTrace(bool enabled)
