@@ -7,6 +7,7 @@
 GM_PRIVATE_OBJECT(Demo_Sponza)
 {
 	gm::GMGameObject* sponza = nullptr;
+	gm::GMGameObject* skyObject = nullptr;
 	gm::GMCameraUtility cameraUtility;
 	bool activate = false;
 	bool mouseTrace = false;

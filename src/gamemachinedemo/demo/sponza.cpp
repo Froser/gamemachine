@@ -3,9 +3,68 @@
 #include <gmgameobject.h>
 #include <gmmodelreader.h>
 #include <gmcontrols.h>
+#include <gmimagebuffer.h>
+
 #ifndef WHEEL_DELTA
 #define WHEEL_DELTA 120
 #endif
+
+namespace
+{
+	gm::GMCubeMapGameObject* createCubeMap(const gm::IRenderContext* context)
+	{
+		gm::GMGamePackage* pk = GM.getGamePackageManager();
+		gm::GMImage* slices[6] = { nullptr };
+		{
+			gm::GMBuffer buf;
+			pk->readFile(gm::GMPackageIndex::Textures, "cubemap/cubemap_posx.jpg", &buf);
+			gm::GMImageReader::load(buf.buffer, buf.size, &slices[0]);
+			GM_ASSERT(slices[0]);
+		}
+		{
+			gm::GMBuffer buf;
+			pk->readFile(gm::GMPackageIndex::Textures, "cubemap/cubemap_negx.jpg", &buf);
+			gm::GMImageReader::load(buf.buffer, buf.size, &slices[1]);
+			GM_ASSERT(slices[1]);
+		}
+		{
+			gm::GMBuffer buf;
+			pk->readFile(gm::GMPackageIndex::Textures, "cubemap/cubemap_posy.jpg", &buf);
+			gm::GMImageReader::load(buf.buffer, buf.size, &slices[2]);
+			GM_ASSERT(slices[2]);
+		}
+		{
+			gm::GMBuffer buf;
+			pk->readFile(gm::GMPackageIndex::Textures, "cubemap/cubemap_negy.jpg", &buf);
+			gm::GMImageReader::load(buf.buffer, buf.size, &slices[3]);
+			GM_ASSERT(slices[3]);
+		}
+		{
+			gm::GMBuffer buf;
+			pk->readFile(gm::GMPackageIndex::Textures, "cubemap/cubemap_posz.jpg", &buf);
+			gm::GMImageReader::load(buf.buffer, buf.size, &slices[4]);
+			GM_ASSERT(slices[4]);
+		}
+		{
+			gm::GMBuffer buf;
+			pk->readFile(gm::GMPackageIndex::Textures, "cubemap/cubemap_negz.jpg", &buf);
+			gm::GMImageReader::load(buf.buffer, buf.size, &slices[5]);
+			GM_ASSERT(slices[5]);
+		}
+
+		gm::GMCubeMapBuffer cubeMap(*slices[0], *slices[1], *slices[2], *slices[3], *slices[4], *slices[5]);
+		gm::GMTextureAsset cubeMapTex;
+		GM.getFactory()->createTexture(context, &cubeMap, cubeMapTex);
+
+		for (auto slice : slices)
+		{
+			gm::GM_delete(slice);
+		}
+
+		return new gm::GMCubeMapGameObject(cubeMapTex);
+	}
+
+}
 
 void Demo_Sponza::init()
 {
@@ -40,6 +99,10 @@ void Demo_Sponza::createObject()
 	gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(models);
 	d->sponza = new gm::GMGameObject(asset);
 	asDemoGameWorld(getDemoWorldReference())->addObject(L"sponza", d->sponza);
+
+	d->skyObject = createCubeMap(getDemoWorldReference()->getContext());
+	d->skyObject->setScaling(Scale(GMVec3(1500, 1500, 1500)));
+	asDemoGameWorld(getDemoWorldReference())->addObject(L"sky", d->skyObject);
 }
 
 void Demo_Sponza::event(gm::GameMachineHandlerEvent evt)
@@ -108,8 +171,8 @@ void Demo_Sponza::setDefaultLights()
 			gm::ILight* light = nullptr;
 			GM.getFactory()->createLight(gm::GMLightType::PointLight, &light);
 			GM_ASSERT(light);
-			gm::GMfloat ambientIntensity[] = { .8f, .8f, .8f };
-			gm::GMfloat diffuseIntensity[] = { 1.6f, 1.6f, 1.6f };
+			gm::GMfloat ambientIntensity[] = { .2f, .2f, .2f };
+			gm::GMfloat diffuseIntensity[] = { 1.f, 1.f, 1.f };
 			light->setLightAttribute3(gm::GMLight::AmbientIntensity, ambientIntensity);
 			light->setLightAttribute3(gm::GMLight::DiffuseIntensity, diffuseIntensity);
 			light->setLightAttribute(gm::GMLight::SpecularIntensity, 1.f);

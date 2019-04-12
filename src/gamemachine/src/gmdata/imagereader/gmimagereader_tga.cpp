@@ -540,6 +540,18 @@ if(tga) (tga)->last = code\
 			memcpy_s(dest + destOffset, rowBytes, source + srcOffset, rowBytes);
 		}
 	}
+
+	void copyTgaR(const TGA& tga, const GMbyte* source, GMbyte* dest)
+	{
+		// tga数据和我们所定义的图像坐标是颠倒的
+		size_t rowBytes = tga.hdr.width;
+		for (int i = tga.hdr.height - 1; i >= 0; --i)
+		{
+			size_t destOffset = rowBytes * (tga.hdr.height - i - 1);
+			size_t srcOffset = rowBytes * i;
+			memcpy_s(dest + destOffset, rowBytes, source + srcOffset, rowBytes);
+		}
+	}
 }
 
 bool GMImageReader_TGA::load(const GMbyte* data, size_t size, OUT GMImage** image)
@@ -573,7 +585,7 @@ bool GMImageReader_TGA::load(const GMbyte* data, size_t size, OUT GMImage** imag
 	imgData.internalFormat = GMImageInternalFormat::RGBA8;
 	imgData.channels = GMImageReader::DefaultChannels;
 
-	GMuint32 bufferSize = tga.hdr.width * tga.hdr.height * GMImageReader::DefaultChannels;
+	GMsize_t bufferSize = tga.hdr.width * tga.hdr.height * GMImageReader::DefaultChannels;
 	imgData.mip[0].data = new GMbyte[bufferSize];
 	imgData.size = bufferSize;
 	
@@ -597,6 +609,16 @@ bool GMImageReader_TGA::load(const GMbyte* data, size_t size, OUT GMImage** imag
 		// 再按照4通道的方法拷贝数据
 		copyTgaRgba(tga, tmpData, imgData.mip[0].data);
 		GM_delete_array(tmpData);
+	}
+	else if (channels == 1)
+	{
+		imgData.format = GMImageFormat::RED;
+		imgData.internalFormat = GMImageInternalFormat::RED8;
+		imgData.channels = 1;
+
+		GM_delete_array(imgData.mip[0].data);
+		imgData.mip[0].data = new GMbyte[tga.hdr.width * tga.hdr.height];
+		copyTgaR(tga, tgaData.img_data, imgData.mip[0].data);
 	}
 	else
 	{
