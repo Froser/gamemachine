@@ -69,6 +69,8 @@ set(SOURCES
 		demo/assimp.cpp
 		demo/customlight.h
 		demo/customlight.cpp
+		demo/sponza.h
+		demo/sponza.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)

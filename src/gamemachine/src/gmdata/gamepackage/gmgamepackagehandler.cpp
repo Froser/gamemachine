@@ -10,6 +10,7 @@
 
 GMDefaultGamePackageHandler::GMDefaultGamePackageHandler(GMGamePackage* pk)
 	: m_pk(pk)
+	, m_packageIndex(0)
 {
 
 }
@@ -59,6 +60,19 @@ void GMDefaultGamePackageHandler::beginReadFileFromPath(const GMString& path, GM
 	(*ar) = asyncResult;
 }
 
+GMString GMDefaultGamePackageHandler::pathOf(GMPackageIndex index, const GMString& fileName)
+{
+	resetPackageCandidate();
+	GMString result;
+	while (!GMPath::fileExists(result = pathRoot(index) + fileName))
+	{
+		if (!nextPackageCandidate())
+			break;
+	}
+	resetPackageCandidate();
+	return result;
+}
+
 void GMDefaultGamePackageHandler::init()
 {
 }
@@ -70,23 +84,23 @@ GMString GMDefaultGamePackageHandler::pathRoot(GMPackageIndex index)
 	switch (index)
 	{
 	case GMPackageIndex::Maps:
-		return d->packagePath + L"maps/";
+		return packagePath() + L"/maps/";
 	case GMPackageIndex::Shaders:
-		return d->packagePath + L"shaders/";
+		return packagePath() + L"/shaders/";
 	case GMPackageIndex::TexShaders:
-		return d->packagePath + L"texshaders/";
+		return packagePath() + L"/texshaders/";
 	case GMPackageIndex::Textures:
-		return d->packagePath + L"textures/";
+		return packagePath() + L"/textures/";
 	case GMPackageIndex::Models:
-		return d->packagePath + L"models/";
+		return packagePath() + L"/models/";
 	case GMPackageIndex::Audio:
-		return d->packagePath + L"audio/";
+		return packagePath() + L"/audio/";
 	case GMPackageIndex::Particle:
-		return d->packagePath + L"particles/";
+		return packagePath() + L"/particles/";
 	case GMPackageIndex::Scripts:
-		return d->packagePath + L"scripts/";
+		return packagePath() + L"/scripts/";
 	case GMPackageIndex::Fonts:
-		return d->packagePath + L"fonts/";
+		return packagePath() + L"/fonts/";
 	default:
 		GM_ASSERT(false);
 		break;
@@ -99,16 +113,39 @@ GMGamePackage* GMDefaultGamePackageHandler::gamePackage()
 	return m_pk;
 }
 
+GMString gm::GMDefaultGamePackageHandler::packagePath()
+{
+	PKD(d);
+	if (m_packageIndex == 0)
+		return d->packagePath;
+
+	return d->packagePath + GMString(m_packageIndex);
+}
+
 Vector<GMString> GMDefaultGamePackageHandler::getAllFiles(const GMString& directory)
 {
 	return GMPath::getAllFiles(directory, true);
+}
+
+void GMDefaultGamePackageHandler::resetPackageCandidate()
+{
+	m_packageIndex = 0;
+}
+
+bool GMDefaultGamePackageHandler::nextPackageCandidate()
+{
+	++m_packageIndex;
+	if (!GMPath::fileExists(packagePath()))
+		return false;
+	return true;
 }
 
 #define CHECK(err) if (err != UNZ_OK) return false
 
 GMZipGamePackageHandler::GMZipGamePackageHandler(GMGamePackage* pk)
 	: GMDefaultGamePackageHandler(pk)
-	, m_uf(nullptr)
+	, m_packageIndex(0)
+	, m_packageCount(1)
 {
 }
 
@@ -133,52 +170,81 @@ bool GMZipGamePackageHandler::readFileFromPath(const GMString& path, REF GMBuffe
 {
 	bool isRelativePath = (path.findLastOf('.') != GMString::npos);
 	GMString fileName = isRelativePath ? fromRelativePath(path).toStdString() : path.toStdString();
-	std::string stdFileName = fileName.toStdString();
-	if (UNZ_OK == unzLocateFile(m_uf, stdFileName.c_str(), false))
-	{
-		if (loadBuffer(fileName, buffer))
-			return true;
-	}
+	if (loadBuffer(fileName, buffer))
+		return true;
 
 	gm_warning(gm_dbg_wrap("cannot find path {0} "), GMString(path));
 	return false;
 }
 
-bool GMZipGamePackageHandler::loadZip()
+void gm::GMZipGamePackageHandler::initFiles()
 {
 	PKD(d);
 	releaseUnzFile();
+	m_ufs.clear();
 
-	// 打开zip
-	m_uf = unzOpen64(d->packagePath.toStdString().c_str());
-
-	// 获取文件名
-	unz_global_info64 gi;
-	GMint32 err = unzGetGlobalInfo64(m_uf, &gi);
-	CHECK(err);
-	for (GMint32 i = 0; i < gi.number_entry; i++)
+	// 遍历pk0, pk1, ..., pkn，寻找n
+	GMsize_t idx = d->packagePath.findLastOf('.');
+	if (idx > 0)
 	{
+		GMString nameWithoutAffix = d->packagePath.substr(0, idx);
+		m_packageCount = 1;
 		while (true)
 		{
-			char filename[FILENAME_MAX];
-			unz_file_info64 file_info;
-			err = unzGetCurrentFileInfo64(m_uf, &file_info, filename, sizeof(filename), NULL, 0, NULL, 0);
-			CHECK(err);
+			if (!GMPath::fileExists(nameWithoutAffix + ".pk" + GMString(m_packageCount)))
+				break;
+
+			++m_packageCount;
+		}
+	}
+
+	m_ufs.resize(m_packageCount);
+}
+
+bool GMZipGamePackageHandler::loadZip()
+{
+	PKD(d);
+	initFiles();
+
+	for (GMint32 n = 0; n < m_packageCount; ++n)
+	{
+		// 打开zip
+		GMsize_t idx = d->packagePath.findLastOf('.');
+		GM_ASSERT(idx > 0);
+		GMString nameWithoutAffix = d->packagePath.substr(0, idx);
+		GMString packagePath = nameWithoutAffix + ".pk" + GMString(n);
+		m_ufs[n] = unzOpen64(packagePath.toStdString().c_str());
+
+		// 获取文件名
+		unz_global_info64 gi;
+		GMint32 err = unzGetGlobalInfo64(m_ufs[n], &gi);
+		CHECK(err);
+		for (GMint32 i = 0; i < gi.number_entry; i++)
+		{
+			while (true)
+			{
+				char filename[FILENAME_MAX];
+				unz_file_info64 file_info;
+				err = unzGetCurrentFileInfo64(m_ufs[n], &file_info, filename, sizeof(filename), NULL, 0, NULL, 0);
+				CHECK(err);
 
 #if GM_WINDOWS
-			// 跳过文件夹
-			if (file_info.external_fa & FILE_ATTRIBUTE_DIRECTORY)
-				break;
+				// 跳过文件夹
+				if (file_info.external_fa & FILE_ATTRIBUTE_DIRECTORY)
+					break;
 #endif
-			GMBuffer* buf = new GMBuffer();
-			buf->needRelease = false;
-			m_buffers[filename] = buf;
-			break;
-		}
-		if ((i + 1) < gi.number_entry)
-		{
-			err = unzGoToNextFile(m_uf);
-			CHECK(err);
+				GMBuffer* buf = new GMBuffer();
+				buf->needRelease = false;
+				auto& b = m_buffers[filename];
+				b.first = n;
+				b.second = buf;
+				break;
+			}
+			if ((i + 1) < gi.number_entry)
+			{
+				err = unzGoToNextFile(m_ufs[n]);
+				CHECK(err);
+			}
 		}
 	}
 	return true;
@@ -186,10 +252,13 @@ bool GMZipGamePackageHandler::loadZip()
 
 void GMZipGamePackageHandler::releaseUnzFile()
 {
-	if (m_uf)
+	for (auto& uf : m_ufs)
 	{
-		unzClose(m_uf);
-		m_uf = nullptr;
+		if (uf)
+		{
+			unzClose(uf);
+			uf = nullptr;
+		}
 	}
 }
 
@@ -197,7 +266,7 @@ void GMZipGamePackageHandler::releaseBuffers()
 {
 	for (auto iter = m_buffers.begin(); iter != m_buffers.end(); iter++)
 	{
-		auto buffer = iter->second;
+		auto buffer = iter->second.second;
 		GM_delete(buffer->buffer);
 		GM_delete(buffer);
 	}
@@ -250,20 +319,27 @@ bool GMZipGamePackageHandler::loadBuffer(const GMString& path, REF GMBuffer* buf
 	if (iter == m_buffers.end())
 		return false;
 
-	GMBuffer* targetBuffer = iter->second;
+	GMBuffer* targetBuffer = iter->second.second;
 	if (targetBuffer->size > 0)
 	{
 		*buffer = *targetBuffer;
 		return true;
 	}
 
+	// 获取path的索引，取出相应的zip file
+	unzFile uf = m_ufs[iter->second.first];
+	std::string stdFileName = path.toStdString();
+	if (UNZ_OK != unzLocateFile(uf, stdFileName.c_str(), false))
+		return false;
+
 	// 获取文件属性，跳过目录
 	char filename[FILENAME_MAX];
 	unz_file_info64 file_info;
-	GMint32 err = unzGetCurrentFileInfo64(m_uf, &file_info, filename, sizeof(filename), NULL, 0, NULL, 0);
+
+	GMint32 err = unzGetCurrentFileInfo64(uf, &file_info, filename, sizeof(filename), NULL, 0, NULL, 0);
 	CHECK(err);
 
-	err = unzOpenCurrentFilePassword(m_uf, nullptr);
+	err = unzOpenCurrentFilePassword(uf, nullptr);
 	CHECK(err);
 
 #if GM_WINDOWS
@@ -277,7 +353,7 @@ bool GMZipGamePackageHandler::loadBuffer(const GMString& path, REF GMBuffer* buf
 	GMbyte* ptr = data;
 	do
 	{
-		err = unzReadCurrentFile(m_uf, ptr, bufSize);
+		err = unzReadCurrentFile(uf, ptr, bufSize);
 		if (err < 0)
 			return false;
 		if (err > 0)
@@ -287,7 +363,7 @@ bool GMZipGamePackageHandler::loadBuffer(const GMString& path, REF GMBuffer* buf
 	targetBuffer->needRelease = false;
 	targetBuffer->buffer = data;
 	targetBuffer->size = file_info.uncompressed_size;
-	m_buffers[filename] = targetBuffer;
+	iter->second.second = targetBuffer;
 	*buffer = *targetBuffer;
 	return true;
 }
@@ -336,4 +412,9 @@ GMString GMZipGamePackageHandler::pathRoot(GMPackageIndex index)
 		break;
 	}
 	return L"";
+}
+
+GMString GMZipGamePackageHandler::pathOf(GMPackageIndex index, const GMString& fileName)
+{
+	return pathRoot(index) + fileName;
 }

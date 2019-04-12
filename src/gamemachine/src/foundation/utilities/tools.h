@@ -222,7 +222,7 @@ struct GM_EXPORT GMPath
 	static GMString fullname(const GMString& dirName, const GMString& fullPath);
 	static GMString getCurrentPath();
 	static Vector<GMString> getAllFiles(const GMString& directory, bool recursive);
-	static bool directoryExists(const GMString& dir);
+	static bool fileExists(const GMString& dir);
 	static void createDirectory(const GMString& dir);
 	static GMString getSpecialFolderPath(SpecialFolder);
 };

@@ -315,6 +315,11 @@ GMWaveGameObject* GMWaveGameObject::create(const GMWaveGameObjectDescription& de
 	return ret;
 }
 
+bool gm::GMWaveGameObject::canDeferredRendering()
+{
+	return false;
+}
+
 void GMWaveGameObject::setWaveDescriptions(Vector<GMWaveDescription> desc)
 {
 	D(d);

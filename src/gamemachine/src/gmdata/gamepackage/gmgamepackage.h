@@ -37,7 +37,7 @@ GM_INTERFACE(IGamePackageHandler)
 	virtual void init() = 0;
 	virtual bool readFileFromPath(const GMString& path, REF GMBuffer* buffer) = 0;
 	virtual void beginReadFileFromPath(const GMString& path, GMAsyncCallback callback, OUT GMAsyncResult** ar) = 0;
-	virtual GMString pathRoot(GMPackageIndex index) = 0;
+	virtual GMString pathOf(GMPackageIndex index, const GMString& fileName) = 0;
 	virtual Vector<GMString> getAllFiles(const GMString& directory) = 0;
 };
 

@@ -32,6 +32,7 @@
 #include "demo/customshader.h"
 #include "demo/customlight.h"
 #include "demo/wave.h"
+#include "demo/sponza.h"
 
 #if GM_USE_DX11
 #include <gmdx11helper.h>
@@ -78,6 +79,7 @@ namespace
 		world->addDemo(L"自定义着色器: 使用自定义几何着色器进行渲染。", new Demo_CustomGeometryShader(world));
 		world->addDemo(L"自定义着色器: 实现聚光灯效果。", new Demo_CustomLight(world));
 		world->addDemo(L"LUA: 执行Lua脚本。", new Demo_Lua(world));
+		world->addDemo(L"场景渲染: 渲染Sponza场景。", new Demo_Sponza(world));
 		world->init();
 	}
 }

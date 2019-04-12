@@ -98,6 +98,7 @@ public:
 
 public:
 	virtual void onRenderShader(GMModel* model, IShaderProgram* shaderProgram) const;
+	virtual bool canDeferredRendering() override;
 
 private:
 	void updateEachVertex();

@@ -11,8 +11,6 @@ GMGamePackage::Data* GMGamePackage::gamePackageData()
 
 void GMGamePackage::loadPackage(const GMString& path)
 {
-	// TODO 可能读取多个pk，分优先级
-	// 这个以后再做
 	D(d);
 	size_t len = path.length();
 	char path_temp[FILENAME_MAX];
@@ -27,7 +25,7 @@ void GMGamePackage::loadPackage(const GMString& path)
 	if ((s.st_mode & S_IFMT) == S_IFDIR)
 	{
 		// 读取整个目录
-		d->packagePath = std::string(path_temp) + '/';
+		d->packagePath = std::string(path_temp);
 		createGamePackage(this, GMGamePackageType::Directory, &handler);
 	}
 	else
@@ -68,7 +66,7 @@ GMString GMGamePackage::pathOf(GMPackageIndex index, const GMString& filename)
 {
 	D(d);
 	GM_ASSERT(d->handler);
-	return d->handler->pathRoot(index) + filename;
+	return d->handler->pathOf(index, filename);
 }
 
 bool GMGamePackage::readFileFromPath(const GMString& path, REF GMBuffer* buffer)

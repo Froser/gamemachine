@@ -14,17 +14,23 @@ public:
 	virtual void init() override;
 	virtual bool readFileFromPath(const GMString& path, REF GMBuffer* buffer) override;
 	virtual void beginReadFileFromPath(const GMString& path, GMAsyncCallback callback, OUT GMAsyncResult** ar) override;
-	virtual GMString pathRoot(GMPackageIndex index) override;
+	virtual GMString pathOf(GMPackageIndex index, const GMString& fileName) override;
 	virtual Vector<GMString> getAllFiles(const GMString& directory) override;
 
 protected:
-	GMGamePackage* gamePackage();
+	virtual GMString pathRoot(GMPackageIndex index);
 
 protected:
-	class GMReadFileThread;
+	void resetPackageCandidate();
+	bool nextPackageCandidate();
+	GMGamePackage* gamePackage();
+	GMString packagePath();
 
 private:
 	GMGamePackage* m_pk;
+
+protected:
+	GMint32 m_packageIndex;
 };
 
 class GMZipGamePackageHandler : public GMDefaultGamePackageHandler
@@ -38,10 +44,14 @@ public:
 public:
 	virtual void init() override;
 	virtual bool readFileFromPath(const GMString& path, REF GMBuffer* buffer) override;
-	virtual GMString pathRoot(GMPackageIndex index) override;
+	virtual GMString pathOf(GMPackageIndex index, const GMString& fileName) override;
 	virtual Vector<GMString> getAllFiles(const GMString& directory) override;
 
+protected:
+	virtual GMString pathRoot(GMPackageIndex index) override;
+
 private:
+	void initFiles();
 	bool loadZip();
 	void releaseUnzFile();
 	void releaseBuffers();
@@ -49,8 +59,12 @@ private:
 	bool loadBuffer(const GMString& path, REF GMBuffer* buffer);
 
 private:
-	unzFile m_uf = nullptr;
-	HashMap<GMString, GMBuffer*, GMStringHashFunctor> m_buffers;
+	Vector<unzFile> m_ufs;
+	HashMap<GMString, Pair<GMint32, GMBuffer*>, GMStringHashFunctor> m_buffers;
+	GMint32 m_packageCount;
+
+protected:
+	GMint32 m_packageIndex;
 };
 
 END_NS

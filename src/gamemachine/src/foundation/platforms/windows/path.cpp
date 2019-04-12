@@ -82,7 +82,7 @@ Vector<GMString> GMPath::getAllFiles(const GMString& directory, bool recursive)
 	return res;
 }
 
-bool GMPath::directoryExists(const GMString& dir)
+bool GMPath::fileExists(const GMString& dir)
 {
 	WIN32_FIND_DATA findFileData;
 	HANDLE hFind;
@@ -95,7 +95,7 @@ bool GMPath::directoryExists(const GMString& dir)
 
 void GMPath::createDirectory(const GMString& dir)
 {
-	if (directoryExists(dir) || (dir.length() == 2 && dir.toStdWString()[1] == L':'))
+	if (fileExists(dir) || (dir.length() == 2 && dir.toStdWString()[1] == L':'))
 		return;
 
 	std::wstring stdUp = dir.toStdWString();
