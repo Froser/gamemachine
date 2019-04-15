@@ -292,7 +292,7 @@ void GMGLTechnique::activateTextureTransform(GMModel* model, GMTextureType type)
 	shaderProgram->setFloat(d->textureTransformIndices[index].ScaleS[typeIndex], 1.f);
 	shaderProgram->setFloat(d->textureTransformIndices[index].ScaleT[typeIndex], 1.f);
 
-	auto applyCallback = [&](GMS_TextureTransformType type, Pair<GMfloat, GMfloat>&& args) {
+	auto applyCallback = [&](const GMTextureAttributeBank*, GMS_TextureTransformType type, Pair<GMfloat, GMfloat>&& args) {
 		if (type == GMS_TextureTransformType::Scale)
 		{
 			shaderProgram->setFloat(d->textureTransformIndices[index].ScaleS[typeIndex], args.first);
@@ -310,7 +310,7 @@ void GMGLTechnique::activateTextureTransform(GMModel* model, GMTextureType type)
 	};
 
 	if (model)
-		model->getShader().getTextureList().getTextureSampler(type).applyTexMode(GM.getRunningStates().elapsedTime, applyCallback);
+		model->getShader().getTextureList().getTextureSampler(type).applyTexMode(GM.getRunningStates().elapsedTime, applyCallback, nullptr);
 }
 
 GMint32 GMGLTechnique::activateTexture(GMModel* model, GMTextureType type)

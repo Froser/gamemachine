@@ -839,7 +839,7 @@ void GMDx11Technique::applyTextureAttribute(GMModel* model, GMTextureAsset textu
 		GM_DX_TRY(bank->scaleX, bank->scaleX->SetFloat(1.f));
 		GM_DX_TRY(bank->scaleY, bank->scaleY->SetFloat(1.f));
 
-		auto applyCallback = [&](GMS_TextureTransformType type, Pair<GMfloat, GMfloat>&& args) {
+		auto applyCallback = [](const GMTextureAttributeBank* bank, GMS_TextureTransformType type, Pair<GMfloat, GMfloat>&& args) {
 			if (type == GMS_TextureTransformType::Scale)
 			{
 				GM_DX_TRY(bank->scaleX, bank->scaleX->SetFloat(args.first));
@@ -856,7 +856,7 @@ void GMDx11Technique::applyTextureAttribute(GMModel* model, GMTextureAsset textu
 			}
 		};
 
-		model->getShader().getTextureList().getTextureSampler(type).applyTexMode(GM.getRunningStates().elapsedTime, applyCallback);
+		model->getShader().getTextureList().getTextureSampler(type).applyTexMode(GM.getRunningStates().elapsedTime, applyCallback, bank);
 	}
 	else
 	{

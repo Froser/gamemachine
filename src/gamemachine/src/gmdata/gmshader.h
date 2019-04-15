@@ -32,6 +32,7 @@ GM_PRIVATE_OBJECT(GMTextureSampler)
 	GMS_Wrap wrapT = GMS_Wrap::Repeat;
 };
 
+struct GMTextureAttributeBank;
 class GMTextureSampler
 {
 	GM_DECLARE_PRIVATE_NGO(GMTextureSampler)
@@ -53,7 +54,7 @@ public:
 	GMTextureAsset getFrameByIndex(GMsize_t frameIndex);
 	GMsize_t addFrame(GMTextureAsset texture);
 	bool setTexture(GMsize_t frameIndex, GMTextureAsset texture);
-	void applyTexMode(GMfloat timeSeconds, std::function<void(GMS_TextureTransformType, Pair<GMfloat, GMfloat>&&)> callback);
+	void applyTexMode(GMfloat timeSeconds, std::function<void(const GMTextureAttributeBank*, GMS_TextureTransformType, Pair<GMfloat, GMfloat>&&)> callback, const GMTextureAttributeBank* bank);
 	GMTextureSampler& operator=(const GMTextureSampler& rhs);
 };
 

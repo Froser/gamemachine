@@ -69,7 +69,7 @@ GMTextureSampler& GMTextureSampler::operator=(const GMTextureSampler& rhs)
 	return *this;
 }
 
-void GMTextureSampler::applyTexMode(GMfloat timeSeconds, std::function<void(GMS_TextureTransformType, Pair<GMfloat, GMfloat>&&)> callback)
+void GMTextureSampler::applyTexMode(GMfloat timeSeconds, std::function<void(const GMTextureAttributeBank*, GMS_TextureTransformType, Pair<GMfloat, GMfloat>&&)> callback, const GMTextureAttributeBank* bank)
 {
 	GMuint32 n = 0;
 	const GMS_TextureTransform& tc = getTextureTransform(n);
@@ -80,13 +80,13 @@ void GMTextureSampler::applyTexMode(GMfloat timeSeconds, std::function<void(GMS_
 		case GMS_TextureTransformType::Scroll:
 		{
 			GMfloat s = timeSeconds * tc.p1, t = timeSeconds * tc.p2;
-			callback(tc.type, { s, t });
+			callback(bank, tc.type, { s, t });
 		}
 		break;
 		case GMS_TextureTransformType::Scale:
 		{
 			GMfloat s = tc.p1, t = tc.p2;
-			callback(tc.type, { s, t });
+			callback(bank, tc.type, { s, t });
 			break;
 		}
 		default:
