@@ -8,6 +8,7 @@ GM_PRIVATE_OBJECT(Demo_Sponza)
 {
 	gm::GMGameObject* sponza = nullptr;
 	gm::GMGameObject* skyObject = nullptr;
+	gm::GMControlLabel* cpu = nullptr;
 	gm::GMCameraUtility cameraUtility;
 	bool activate = false;
 	bool mouseTrace = false;
@@ -40,7 +41,7 @@ protected:
 protected:
 	const gm::GMString& getDescription() const
 	{
-		static gm::GMString desc = L"绘制一个Sponza。晃动鼠标以调整视角。WSAD移动视角";
+		static gm::GMString desc = L"绘制一个Sponza。晃动鼠标以调整视角。WSAD移动视角，R显示鼠标。";
 		return desc;
 	}
 };

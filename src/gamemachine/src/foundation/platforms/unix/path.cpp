@@ -54,35 +54,6 @@ namespace
 	 	}
 		return ret;
 	}
-
-	void getAllFiles(Vector<GMString>& v, const std::string& directory, bool recursive)
-	{
-		DIR* dir = NULL;
-		dirent* file = NULL;
-		dir = opendir(directory.c_str());
-		if (!dir)
-			return;
-
-		while ((file = readdir(dir)) != NULL)
-		{
-			if (file->d_type & DT_DIR)
-			{
-				if (GMString::stringEquals(file->d_name, ".") ||
-					GMString::stringEquals(file->d_name, ".."))
-				{
-					continue;
-				}
-
-				if (recursive)
-					::getAllFiles(v, GMPath::fullname(directory, file->d_name).toStdString(), recursive);
-			}
-			else
-			{
-				v.push_back(GMPath::fullname(directory, file->d_name));
-			}
-		}
-		closedir(dir);
-	}
 }
 
 GMString GMPath::directoryName(const GMString& fileName)
@@ -131,12 +102,4 @@ GMString GMPath::getSpecialFolderPath(SpecialFolder sf)
 	default:
 		return GMString();
 	}
-}
-
-Vector<GMString> GMPath::getAllFiles(const GMString& directory, bool recursive)
-{
-	Vector<GMString> res;
-	std::string d = directory.toStdString();
-	::getAllFiles(res, d, recursive);
-	return res;
 }

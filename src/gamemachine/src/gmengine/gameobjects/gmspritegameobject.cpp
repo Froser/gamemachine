@@ -42,6 +42,7 @@ const GMCamera& GMSpriteGameObject::getCamera() GM_NOEXCEPT
 void GMSpriteGameObject::update(GMDuration dt)
 {
 	D(d);
+	Base::update(dt);
 	GMVec3 direction(0), rate(0), moveSpeed(0), jumpSpeed(0);
 	bool moved = false, jumped = false, rateAssigned = false;
 	for (auto& movement : d->movements)

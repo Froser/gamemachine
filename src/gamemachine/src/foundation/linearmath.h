@@ -32,6 +32,10 @@ constexpr gm::GMfloat PI = 3.141592653f;
 #	define FLT_MAX 3.402823466e+38F
 #endif
 
+#ifndef FLT_MIN
+#	define FLT_MIN 1.175494351e-38F
+#endif
+
 #define GM_SIMD_EPSILON FLT_EPSILON
 
 // 数学函数
@@ -655,6 +659,8 @@ inline GMVec4 Reciprocal(const GMVec4& V);
 
 inline GMVec4 MinComponent(const GMVec4& V1, const GMVec4& V2);
 inline GMVec4 MaxComponent(const GMVec4& V1, const GMVec4& V2);
+inline GMVec3 MinComponent(const GMVec3& V1, const GMVec3& V2);
+inline GMVec3 MaxComponent(const GMVec3& V1, const GMVec3& V2);
 
 #include "linearmath.inl"
 

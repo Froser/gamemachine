@@ -599,8 +599,7 @@ void GMBSPGameWorld::importBSP()
 void GMBSPGameWorld::initShaders()
 {
 	D(d);
-	GMString texShadersPath = GM.getGamePackageManager()->pathOf(GMPackageIndex::TexShaders, "");
-	d->shaderLoader.init(texShadersPath, this, &d->render.renderData());
+	d->shaderLoader.init(this, &d->render.renderData());
 	d->shaderLoader.load();
 }
 

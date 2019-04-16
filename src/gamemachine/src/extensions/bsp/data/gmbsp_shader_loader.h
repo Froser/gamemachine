@@ -30,7 +30,7 @@ public:
 	~GMBSPShaderLoader();
 
 public:
-	void init(const GMString& directory, GMBSPGameWorld* world, GMBSPRenderData* bspRenderData);
+	void init(GMBSPGameWorld* world, GMBSPRenderData* bspRenderData);
 	void load();
 	bool findItem(const GMString& name, GMint32 lightmapId, REF GMShader* shader);
 

@@ -81,6 +81,54 @@ void Demo_Sponza::createMenu()
 	gm::GMWidget* widget = createDefaultWidget();
 	auto top = getClientAreaTop();
 
+	widget->addControl(d->cpu = gm::GMControlLabel::createControl(
+		widget,
+		L"CPU裁剪：开",
+		GMVec4(1, 1, 1, 1),
+		10,
+		top,
+		250,
+		30,
+		false
+	));
+
+	gm::GMControlButton* button = nullptr;
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
+		L"关闭CPU裁剪",
+		10,
+		top += 40,
+		250,
+		30,
+		false
+	));
+
+	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		if (d->sponza)
+		{
+			d->sponza->setCullOption(gm::GMGameObjectCullOption::None);
+			d->cpu->setText(L"CPU裁剪：关");
+		}
+	});
+
+	widget->addControl(button = gm::GMControlButton::createControl(
+		widget,
+		L"打开CPU裁剪",
+		10,
+		top += 40,
+		250,
+		30,
+		false
+	));
+
+	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		if (d->sponza)
+		{
+			d->sponza->setCullOption(gm::GMGameObjectCullOption::AABB);
+			d->cpu->setText(L"CPU裁剪：开");
+		}
+	});
+
 	widget->setSize(widget->getSize().width, top + 40);
 }
 
@@ -98,6 +146,7 @@ void Demo_Sponza::createObject()
 	gm::GMModelReader::load(loadSettings, models);
 	gm::GMAsset asset = getDemoWorldReference()->getAssets().addAsset(models);
 	d->sponza = new gm::GMGameObject(asset);
+	d->sponza->setCullOption(gm::GMGameObjectCullOption::AABB);
 	asDemoGameWorld(getDemoWorldReference())->addObject(L"sponza", d->sponza);
 
 	d->skyObject = createCubeMap(getDemoWorldReference()->getContext());
@@ -132,6 +181,8 @@ void Demo_Sponza::event(gm::GameMachineHandlerEvent evt)
 		break;
 	}
 	case gm::GameMachineHandlerEvent::Update:
+		if (d->sponza)
+			d->sponza->update(GM.getRunningStates().lastFrameElpased);
 		break;
 	case gm::GameMachineHandlerEvent::Render:
 		getDemoWorldReference()->renderScene();

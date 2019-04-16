@@ -348,6 +348,8 @@ void GMWaveGameObject::update(GMDuration dt)
 {
 	D(d);
 	D_BASE(db, Base);
+	Base::update(dt);
+
 	if (d->isPlaying)
 		d->duration += dt;
 

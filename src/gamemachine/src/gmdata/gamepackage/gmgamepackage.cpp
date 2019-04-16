@@ -55,13 +55,6 @@ void GMGamePackage::beginReadFile(GMPackageIndex index, const GMString& filename
 	return beginReadFileFromPath(p, callback, ar);
 }
 
-Vector<GMString> GMGamePackage::getAllFiles(const GMString& directory)
-{
-	D(d);
-	GM_ASSERT(d->handler);
-	return d->handler->getAllFiles(directory);
-}
-
 GMString GMGamePackage::pathOf(GMPackageIndex index, const GMString& filename)
 {
 	D(d);

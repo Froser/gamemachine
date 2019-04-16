@@ -117,10 +117,9 @@ GMBSPShaderLoader::~GMBSPShaderLoader()
 	}
 }
 
-void GMBSPShaderLoader::init(const GMString& directory, GMBSPGameWorld* world, GMBSPRenderData* bspRender)
+void GMBSPShaderLoader::init(GMBSPGameWorld* world, GMBSPRenderData* bspRender)
 {
 	D(d);
-	d->directory = directory;
 	d->world = world;
 	d->bspRender = bspRender;
 }
@@ -163,16 +162,10 @@ void GMBSPShaderLoader::load()
 {
 	D(d);
 	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
-	Vector<GMString> files = pk->getAllFiles(d->directory);
-
-	// load all item tag, but not parse them until item is needed
-	for (auto& file : files)
-	{
-		GMBuffer buf;
-		pk->readFileFromPath(file, &buf);
-		buf.convertToStringBuffer();
-		parse((const char*) buf.buffer);
-	}
+	GMBuffer buf;
+	pk->readFileFromPath(pk->pathOf(GMPackageIndex::Root, L"/texshaders/sfx"), &buf);
+	buf.convertToStringBuffer();
+	parse((const char*) buf.buffer);
 }
 
 bool GMBSPShaderLoader::findItem(const GMString& name, GMint32 lightmapId, REF GMShader* shader)

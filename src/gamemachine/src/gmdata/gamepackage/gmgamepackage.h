@@ -19,9 +19,9 @@ enum class GMGamePackageType
 */
 enum class GMPackageIndex
 {
+	Root, //!< 根目录
 	Maps, //!< 地图类型，存放在"资源包/maps"下
 	Shaders, //!< 着色器程序类型，如GLSL程序，存放在"资源包/shaders"下
-	TexShaders, //!< 特效类型，存放在"资源包/texshaders"下
 	Textures, //!< 纹理类型，存放在"资源包/textures"下
 	Models, //!< 模型类型，存放在"资源包/models"下
 	Audio, //!< 声音文件类型，存放在"资源包/audio"下
@@ -38,7 +38,6 @@ GM_INTERFACE(IGamePackageHandler)
 	virtual bool readFileFromPath(const GMString& path, REF GMBuffer* buffer) = 0;
 	virtual void beginReadFileFromPath(const GMString& path, GMAsyncCallback callback, OUT GMAsyncResult** ar) = 0;
 	virtual GMString pathOf(GMPackageIndex index, const GMString& fileName) = 0;
-	virtual Vector<GMString> getAllFiles(const GMString& directory) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMGamePackage)
@@ -91,14 +90,6 @@ public:
 	bool readFile(GMPackageIndex index, const GMString& filename, REF GMBuffer* buffer, REF GMString* fullFilename = nullptr);
 
 	void beginReadFile(GMPackageIndex index, const GMString& filename, GMAsyncCallback callback, OUT GMAsyncResult** ar, REF GMString* fullFilename = nullptr);
-
-	//! 获取资源包指定路径下的所有文件路径。
-	/*!
-	  调用此方法之前，确保loadPackage()被正常调用。
-	  \return 得到的所有文件路径。
-	  \sa loadPackage()
-	*/
-	Vector<GMString> getAllFiles(const GMString& directory);
 
 	//! 获取指定类型的指定文件的完整路径。
 	/*!

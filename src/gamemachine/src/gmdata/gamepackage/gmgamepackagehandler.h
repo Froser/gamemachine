@@ -15,7 +15,6 @@ public:
 	virtual bool readFileFromPath(const GMString& path, REF GMBuffer* buffer) override;
 	virtual void beginReadFileFromPath(const GMString& path, GMAsyncCallback callback, OUT GMAsyncResult** ar) override;
 	virtual GMString pathOf(GMPackageIndex index, const GMString& fileName) override;
-	virtual Vector<GMString> getAllFiles(const GMString& directory) override;
 
 protected:
 	virtual GMString pathRoot(GMPackageIndex index);
@@ -45,7 +44,6 @@ public:
 	virtual void init() override;
 	virtual bool readFileFromPath(const GMString& path, REF GMBuffer* buffer) override;
 	virtual GMString pathOf(GMPackageIndex index, const GMString& fileName) override;
-	virtual Vector<GMString> getAllFiles(const GMString& directory) override;
 
 protected:
 	virtual GMString pathRoot(GMPackageIndex index) override;

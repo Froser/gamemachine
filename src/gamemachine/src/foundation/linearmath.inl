@@ -131,6 +131,24 @@ namespace glm
 		return result;
 	}
 
+	inline vec3 minComponent(const vec3& V1, const vec3& V2)
+	{
+		vec4 result;
+		result[0] = (V1[0] < V2[0]) ? V1[0] : V2[0];
+		result[1] = (V1[1] < V2[1]) ? V1[1] : V2[1];
+		result[2] = (V1[2] < V2[2]) ? V1[2] : V2[2];
+		return result;
+	}
+
+	inline vec3 maxComponent(const vec3& V1, const vec3& V2)
+	{
+		vec4 result;
+		result[0] = (V1[0] > V2[0]) ? V1[0] : V2[0];
+		result[1] = (V1[1] > V2[1]) ? V1[1] : V2[1];
+		result[2] = (V1[2] > V2[2]) ? V1[2] : V2[2];
+		return result;
+	}
+
 	inline vec4 minComponent(const vec4& V1, const vec4& V2)
 	{
 		vec4 result;
@@ -1231,6 +1249,28 @@ inline GMVec4 MinComponent(const GMVec4& V1, const GMVec4& V2)
 inline GMVec4 MaxComponent(const GMVec4& V1, const GMVec4& V2)
 {
 	GMVec4 R;
+#if GM_USE_DX11
+	R.v_ = DirectX::XMVectorMax(V1.v_, V2.v_);
+#else
+	R.v_ = glm::maxComponent(V1.v_, V2.v_);
+#endif
+	return R;
+}
+
+inline GMVec3 MinComponent(const GMVec3& V1, const GMVec3& V2)
+{
+	GMVec3 R;
+#if GM_USE_DX11
+	R.v_ = DirectX::XMVectorMin(V1.v_, V2.v_);
+#else
+	R.v_ = glm::minComponent(V1.v_, V2.v_);
+#endif
+	return R;
+}
+
+inline GMVec3 MaxComponent(const GMVec3& V1, const GMVec3& V2)
+{
+	GMVec3 R;
 #if GM_USE_DX11
 	R.v_ = DirectX::XMVectorMax(V1.v_, V2.v_);
 #else

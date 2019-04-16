@@ -75,13 +75,6 @@ GMString GMPath::getCurrentPath()
 	return directoryName(fn);
 }
 
-Vector<GMString> GMPath::getAllFiles(const GMString& directory, bool recursive)
-{
-	Vector<GMString> res;
-	::getAllFiles(res, directory, recursive);
-	return res;
-}
-
 bool GMPath::fileExists(const GMString& dir)
 {
 	WIN32_FIND_DATA findFileData;

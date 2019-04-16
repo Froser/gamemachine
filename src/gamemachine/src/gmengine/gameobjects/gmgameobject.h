@@ -8,6 +8,12 @@
 
 BEGIN_NS
 
+enum class GMGameObjectCullOption
+{
+	None,
+	AABB,
+};
+
 GM_PRIVATE_OBJECT(GMGameObject)
 {
 	GMuint32 id = 0;
@@ -16,6 +22,14 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	const IRenderContext* context = nullptr;
 	bool autoUpdateTransformMatrix = true;
 	GMAsset asset;
+
+	GM_ALIGNED_16(struct) AABB
+	{
+		GMVec4 points[8];
+	};
+	GMGameObjectCullOption cullOption = GMGameObjectCullOption::None;
+	AlignedVector<AABB> cullAABB;
+	GMCamera* cullCamera = nullptr;
 
 	GM_ALIGNED_16(struct)
 	{
@@ -50,10 +64,10 @@ public:
 	void foreachModel(std::function<void(GMModel*)>);
 
 public:
-	virtual void onAppendingObjectToWorld() {}
+	virtual void onAppendingObjectToWorld();
 	virtual void onRemovingObjectFromWorld() {}
 	virtual void draw();
-	virtual void update(GMDuration dt) {}
+	virtual void update(GMDuration dt);
 	virtual bool canDeferredRendering();
 	virtual const IRenderContext* getContext();
 	virtual bool isSkeletalObject() const;
@@ -62,6 +76,7 @@ public:
 protected:
 	virtual void drawModel(const IRenderContext* context, GMModel* model);
 	virtual void endDraw();
+	virtual void makeAABB();
 
 public:
 	void updateTransformMatrix();
@@ -70,6 +85,7 @@ public:
 	void setRotation(const GMQuat& rotation);
 	void beginUpdateTransform();
 	void endUpdateTransform();
+	void setCullOption(GMGameObjectCullOption option, GMCamera* camera = nullptr);
 
 	inline const GMMat4& getTransform() const GM_NOEXCEPT
 	{

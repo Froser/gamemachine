@@ -83,12 +83,12 @@ GMString GMDefaultGamePackageHandler::pathRoot(GMPackageIndex index)
 
 	switch (index)
 	{
+	case GMPackageIndex::Root:
+		return packagePath();
 	case GMPackageIndex::Maps:
 		return packagePath() + L"/maps/";
 	case GMPackageIndex::Shaders:
 		return packagePath() + L"/shaders/";
-	case GMPackageIndex::TexShaders:
-		return packagePath() + L"/texshaders/";
 	case GMPackageIndex::Textures:
 		return packagePath() + L"/textures/";
 	case GMPackageIndex::Models:
@@ -120,11 +120,6 @@ GMString gm::GMDefaultGamePackageHandler::packagePath()
 		return d->packagePath;
 
 	return d->packagePath + GMString(m_packageIndex);
-}
-
-Vector<GMString> GMDefaultGamePackageHandler::getAllFiles(const GMString& directory)
-{
-	return GMPath::getAllFiles(directory, true);
 }
 
 void GMDefaultGamePackageHandler::resetPackageCandidate()
@@ -368,33 +363,18 @@ bool GMZipGamePackageHandler::loadBuffer(const GMString& path, REF GMBuffer* buf
 	return true;
 }
 
-Vector<GMString> GMZipGamePackageHandler::getAllFiles(const GMString& directory)
-{
-	Vector<GMString> result;
-	const std::wstring& d = directory.toStdWString();
-
-	for (auto& buffer : m_buffers)
-	{
-		if (buffer.first.toStdWString().compare(0, d.length(), d) == 0)
-		{
-			result.push_back(buffer.first);
-		}
-	}
-	return result;
-}
-
 GMString GMZipGamePackageHandler::pathRoot(GMPackageIndex index)
 {
 	PKD(d);
 
 	switch (index)
 	{
+	case GMPackageIndex::Root:
+		return L"";
 	case GMPackageIndex::Maps:
 		return L"maps/";
 	case GMPackageIndex::Shaders:
 		return L"shaders/";
-	case GMPackageIndex::TexShaders:
-		return L"texshaders/";
 	case GMPackageIndex::Textures:
 		return L"textures/";
 	case GMPackageIndex::Models:
