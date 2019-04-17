@@ -6,6 +6,12 @@
 #include "gmgameobject.h"
 BEGIN_NS
 
+enum class GMMovement
+{
+	Move,
+	Jump,
+};
+
 GM_ALIGNED_STRUCT(GMSpriteMovement)
 {
 	GMSpriteMovement() = default;
@@ -39,6 +45,7 @@ class GM_EXPORT GMSpriteGameObject : public GMGameObject
 	GM_DECLARE_PRIVATE_AND_BASE(GMSpriteGameObject, GMGameObject)
 
 public:
+	GMSpriteGameObject(GMfloat radius, const GMCamera& camera);
 	GMSpriteGameObject(GMfloat radius, const GMVec3& position = Zero<GMVec3>());
 
 public:
@@ -57,8 +64,8 @@ public:
 	//! 表示精灵朝着某个方向变化。
 	/*!
 	  此方法表示一个变化量。它会在原有的朝向上进行叠加，而不是将朝向调整为某一个值。
-	  \param pitchDegree 俯仰角，绕视角坐标系x轴旋转的弧度数。
-	  \param yawDegree 偏航角，绕视角坐标系y轴旋转的弧度数。
+	  \param pitch 俯仰角，绕视角坐标系x轴旋转的弧度数。
+	  \param yaw 偏航角，绕视角坐标系y轴旋转的弧度数。
 	*/
 	void look(GMfloat pitch, GMfloat yaw);
 	const GMCamera& getCamera() GM_NOEXCEPT;

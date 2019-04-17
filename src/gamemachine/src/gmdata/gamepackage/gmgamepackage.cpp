@@ -77,6 +77,14 @@ void GMGamePackage::beginReadFileFromPath(const GMString& path, GMAsyncCallback&
 	d->handler->beginReadFileFromPath(path, callback, ar);
 }
 
+
+bool GMGamePackage::exists(GMPackageIndex index, const GMString& filename)
+{
+	D(d);
+	GM_ASSERT(d->handler);
+	return d->handler->exists(index, filename);
+}
+
 void GMGamePackage::createGamePackage(GMGamePackage* pk, GMGamePackageType t, OUT IGamePackageHandler** handler)
 {
 	switch (t)

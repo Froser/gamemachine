@@ -200,5 +200,10 @@ public:
 	void setCamera(GMCamera* camera);
 };
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMCameraWalker)
+{
+	GMCamera* camera;
+};
+
 END_NS
 #endif

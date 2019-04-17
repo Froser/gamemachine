@@ -38,6 +38,7 @@ GM_INTERFACE(IGamePackageHandler)
 	virtual bool readFileFromPath(const GMString& path, REF GMBuffer* buffer) = 0;
 	virtual void beginReadFileFromPath(const GMString& path, GMAsyncCallback callback, OUT GMAsyncResult** ar) = 0;
 	virtual GMString pathOf(GMPackageIndex index, const GMString& fileName) = 0;
+	virtual bool exists(GMPackageIndex index, const GMString& fileName) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMGamePackage)
@@ -116,6 +117,8 @@ public:
 	*/
 	bool readFileFromPath(const GMString& path, REF GMBuffer* buffer);
 	void beginReadFileFromPath(const GMString& path, GMAsyncCallback& callback, OUT GMAsyncResult** ar);
+
+	bool exists(GMPackageIndex index, const GMString& filename);
 
 protected:
 	virtual void createGamePackage(GMGamePackage* pk, GMGamePackageType t, OUT IGamePackageHandler** handler);

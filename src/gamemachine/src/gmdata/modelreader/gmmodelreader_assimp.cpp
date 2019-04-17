@@ -114,7 +114,7 @@ namespace
 			GMTextureAsset tex = imp->getTextureMap()[name];
 			if (tex.isEmpty())
 			{
-				GMString imgPath = GMPath::fullname(GM.getGamePackageManager()->pathOf(GMPackageIndex::Models, imp->getSettings().directory), name);
+				GMString imgPath = GM.getGamePackageManager()->pathOf(GMPackageIndex::Models, imp->getSettings().directory + name);
 				GMToolUtil::createTextureFromFullPath(imp->getSettings().context, imgPath, tex);
 			}
 			if (!tex.isEmpty())

@@ -817,6 +817,7 @@ inline void GetTranslationFromMatrix(const GMMat4& M, GMFloat4& F)
 	F[0] = f16[3][0];
 	F[1] = f16[3][1];
 	F[2] = f16[3][2];
+	F[3] = 1.f;
 }
 
 inline void GetScalingFromMatrix(const GMMat4& M, GMFloat4& F)
@@ -826,6 +827,7 @@ inline void GetScalingFromMatrix(const GMMat4& M, GMFloat4& F)
 	F[0] = f16[0][0];
 	F[1] = f16[1][1];
 	F[2] = f16[2][2];
+	F[3] = 1.f;
 }
 
 inline void GetTranslationAndScalingFromMatrix(const GMMat4& M, GMFloat4& T, GMFloat4& S)
@@ -835,9 +837,11 @@ inline void GetTranslationAndScalingFromMatrix(const GMMat4& M, GMFloat4& T, GMF
 	T[0] = f16[3][0];
 	T[1] = f16[3][1];
 	T[2] = f16[3][2];
+	T[3] = 1.f;
 	S[0] = f16[0][0];
 	S[1] = f16[1][1];
 	S[2] = f16[2][2];
+	S[3] = 1.f;
 }
 
 inline GMMat4 Ortho(gm::GMfloat left, gm::GMfloat right, gm::GMfloat bottom, gm::GMfloat top, gm::GMfloat n, gm::GMfloat f)

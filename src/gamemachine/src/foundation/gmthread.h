@@ -208,5 +208,10 @@ public:
 	void unlock();
 };
 
+struct GMMutexRelease
+{
+	void operator()(GMMutex* mutex) { mutex->unlock(); }
+};
+
 END_NS
 #endif

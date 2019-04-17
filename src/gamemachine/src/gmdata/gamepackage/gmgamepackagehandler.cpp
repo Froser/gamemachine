@@ -62,6 +62,8 @@ void GMDefaultGamePackageHandler::beginReadFileFromPath(const GMString& path, GM
 
 GMString GMDefaultGamePackageHandler::pathOf(GMPackageIndex index, const GMString& fileName)
 {
+	GMOwnedPtr<GMMutex, GMMutexRelease> m(&m_mutex);
+	m->lock();
 	resetPackageCandidate();
 	GMString result;
 	while (!GMPath::fileExists(result = pathRoot(index) + fileName))
@@ -71,6 +73,21 @@ GMString GMDefaultGamePackageHandler::pathOf(GMPackageIndex index, const GMStrin
 	}
 	resetPackageCandidate();
 	return result;
+}
+
+bool GMDefaultGamePackageHandler::exists(GMPackageIndex index, const GMString& fileName)
+{
+	GMOwnedPtr<GMMutex, GMMutexRelease> m(&m_mutex);
+	m->lock();
+	resetPackageCandidate();
+	GMString result;
+	while (!GMPath::fileExists(result = pathRoot(index) + fileName))
+	{
+		if (!nextPackageCandidate())
+			return false;
+	}
+	resetPackageCandidate();
+	return true;
 }
 
 void GMDefaultGamePackageHandler::init()
@@ -223,11 +240,6 @@ bool GMZipGamePackageHandler::loadZip()
 				err = unzGetCurrentFileInfo64(m_ufs[n], &file_info, filename, sizeof(filename), NULL, 0, NULL, 0);
 				CHECK(err);
 
-#if GM_WINDOWS
-				// 跳过文件夹
-				if (file_info.external_fa & FILE_ATTRIBUTE_DIRECTORY)
-					break;
-#endif
 				GMBuffer* buf = new GMBuffer();
 				buf->needRelease = false;
 				auto& b = m_buffers[filename];
@@ -337,12 +349,6 @@ bool GMZipGamePackageHandler::loadBuffer(const GMString& path, REF GMBuffer* buf
 	err = unzOpenCurrentFilePassword(uf, nullptr);
 	CHECK(err);
 
-#if GM_WINDOWS
-	// 跳过文件夹
-	if (file_info.external_fa & FILE_ATTRIBUTE_DIRECTORY)
-		return false;
-#endif
-
 	// 构建数据
 	GMbyte* data = new GMbyte[file_info.uncompressed_size];
 	GMbyte* ptr = data;
@@ -397,4 +403,17 @@ GMString GMZipGamePackageHandler::pathRoot(GMPackageIndex index)
 GMString GMZipGamePackageHandler::pathOf(GMPackageIndex index, const GMString& fileName)
 {
 	return pathRoot(index) + fileName;
+}
+
+bool GMZipGamePackageHandler::exists(GMPackageIndex index, const GMString& fileName)
+{
+	GMString path = pathOf(index, fileName);
+	bool existed = (m_buffers.find(path) != m_buffers.end());
+	if (!fileName.endsWith(L'/') && !existed)
+	{
+		// 可能它是个目录
+		path = pathOf(index, fileName + L"/");
+		existed = (m_buffers.find(path) != m_buffers.end());
+	}
+	return existed;
 }

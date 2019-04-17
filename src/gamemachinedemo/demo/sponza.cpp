@@ -64,6 +64,63 @@ namespace
 		return new gm::GMCubeMapGameObject(cubeMapTex);
 	}
 
+	class DefaultPhysicsWorld : public gm::GMPhysicsWorld
+	{
+		using gm::GMPhysicsWorld::GMPhysicsWorld;
+
+	public:
+		virtual void update(gm::GMDuration dt, gm::GMGameObject* obj) override
+		{
+			gm::GMPhysicsObject* phy = obj->getPhysicsObject();
+			static GMVec3 s_z = GMVec3(0, 0, 1);
+
+			if (phy && !m_moved)
+			{
+				gm::GMMotionStates s = phy->getMotionStates();
+				const auto& currentTransform = s.transform;
+				GMFloat4 origin_f4;
+				GetTranslationFromMatrix(currentTransform, origin_f4);
+				GMVec4 origin;
+				origin.setFloat4(origin_f4);
+
+				GMVec4 initialVelocity;
+				{
+					// x方向，只能平移
+					GMVec3 lookAt = m_args.lookAt;
+					lookAt.setY(0);
+					GMVec3 dir = m_args.direction;
+					dir.setY(0);
+					dir.setZ(0);
+					GMQuat q1 = GMQuat(s_z, lookAt);
+					initialVelocity = GMVec4((dir * m_args.speed * m_args.rate) * q1 * dt, 0);
+				}
+
+				{
+					// yz方向
+					GMVec3 lookAt = m_args.lookAt;
+					GMVec3 dir = m_args.direction;
+					dir.setX(0);
+					GMQuat q1 = GMQuat(s_z, lookAt);
+					initialVelocity = initialVelocity + GMVec4((dir * m_args.speed * m_args.rate) * q1 * dt, 0);
+				}
+
+				origin = origin + initialVelocity;
+				s.transform = Translate(origin);
+				phy->setMotionStates(s);
+				m_moved = true;
+			}
+		}
+
+		virtual void applyMove(gm::GMPhysicsObject* phy, const gm::GMPhysicsMoveArgs& args) override
+		{
+			m_args = args;
+			m_moved = false;
+		}
+
+	private:
+		gm::GMPhysicsMoveArgs m_args;
+		bool m_moved = true;
+	};
 }
 
 void Demo_Sponza::init()
@@ -152,6 +209,12 @@ void Demo_Sponza::createObject()
 	d->skyObject = createCubeMap(getDemoWorldReference()->getContext());
 	d->skyObject->setScaling(Scale(GMVec3(1500, 1500, 1500)));
 	asDemoGameWorld(getDemoWorldReference())->addObject(L"sky", d->skyObject);
+
+	d->sprite = new gm::GMSpriteGameObject(10, getDemoWorldReference()->getContext()->getEngine()->getCamera());
+	d->sprite->setMoveSpeed(GMVec3(193));
+	d->sprite->setPhysicsObject(new gm::GMPhysicsObject());
+	asDemoGameWorld(getDemoWorldReference())->addObject(L"sprite", d->sprite);
+	gm::GMPhysicsWorld* pw = new DefaultPhysicsWorld(getDemoWorldReference().get());
 }
 
 void Demo_Sponza::event(gm::GameMachineHandlerEvent evt)
@@ -172,18 +235,53 @@ void Demo_Sponza::event(gm::GameMachineHandlerEvent evt)
 			gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputManager();
 			gm::IMouseState& mouseState = inputManager->getMouseState();
 			auto ms = mouseState.state();
-			d->cameraUtility.update(Radian(-ms.deltaX * mouseSensitivity), Radian(-ms.deltaY * mouseSensitivity));
+			if (d->sprite)
+				d->sprite->look(Radian(-ms.deltaY * mouseSensitivity), Radian(-ms.deltaX * mouseSensitivity));
 
 			gm::IKeyboardState& kbState = inputManager->getKeyboardState();
 			if (kbState.keyTriggered(gm::GM_ASCIIToKey('R')))
 				setMouseTrace(!d->mouseTrace);
 		}
+
+		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputManager();
+		static gm::GMfloat mouseSensitivity = 0.25f;
+		static gm::GMfloat joystickSensitivity = 0.0003f;
+
+		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
+		gm::IJoystickState& joyState = inputManager->getJoystickState();
+		gm::IMouseState& mouseState = inputManager->getMouseState();
+
+		gm::GMJoystickState state = joyState.state();
+		GMVec3 direction(0);
+		if (d->sprite)
+		{
+			if (kbState.keydown(gm::GM_ASCIIToKey('A')))
+				d->sprite->action(gm::GMMovement::Move, GMVec3(-1, 0, 0));
+			if (kbState.keydown(gm::GM_ASCIIToKey('D')))
+				d->sprite->action(gm::GMMovement::Move, GMVec3(1, 0, 0));
+			if (kbState.keydown(gm::GM_ASCIIToKey('S')))
+				d->sprite->action(gm::GMMovement::Move, GMVec3(0, 0, -1));
+			if (kbState.keydown(gm::GM_ASCIIToKey('W')))
+				d->sprite->action(gm::GMMovement::Move, GMVec3(0, 0, 1));
+
+			if (state.thumbLX > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+				d->sprite->action(gm::GMMovement::Move, GMVec3(1, 0, 0), GMVec3(gm::GMfloat(state.thumbLX) / SHRT_MAX));
+			if (state.thumbLX < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+				d->sprite->action(gm::GMMovement::Move, GMVec3(-1, 0, 0), GMVec3(gm::GMfloat(state.thumbLX) / SHRT_MIN));
+			if (state.thumbLY < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+				d->sprite->action(gm::GMMovement::Move, GMVec3(0, 0, -1), GMVec3(gm::GMfloat(state.thumbLY) / SHRT_MIN));
+			if (state.thumbLY > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+				d->sprite->action(gm::GMMovement::Move, GMVec3(0, 0, 1), GMVec3(gm::GMfloat(state.thumbLY) / SHRT_MAX));
+		}
 		break;
 	}
 	case gm::GameMachineHandlerEvent::Update:
-		if (d->sponza)
-			d->sponza->update(GM.getRunningStates().lastFrameElpased);
+	{
+		gm::GMfloat dt = GM.getRunningStates().lastFrameElpased;
+		getDemoWorldReference()->updateGameWorld(dt);
+		getDemonstrationWorld()->getContext()->getEngine()->setCamera(d->sprite->getCamera());
 		break;
+	}
 	case gm::GameMachineHandlerEvent::Render:
 		getDemoWorldReference()->renderScene();
 		break;
@@ -205,9 +303,6 @@ void Demo_Sponza::setLookAt()
 	lookAt.lookDirection = Normalize(GMVec3(0, 0, 1));
 	lookAt.position = GMVec3(0, 10, 0);
 	camera.lookAt(lookAt);
-
-	D(d);
-	d->cameraUtility.setCamera(&camera);
 }
 
 void Demo_Sponza::setDefaultLights()
@@ -227,8 +322,9 @@ void Demo_Sponza::setDefaultLights()
 			light->setLightAttribute3(gm::GMLight::AmbientIntensity, ambientIntensity);
 			light->setLightAttribute3(gm::GMLight::DiffuseIntensity, diffuseIntensity);
 			light->setLightAttribute(gm::GMLight::SpecularIntensity, 1.f);
+			light->setLightAttribute(gm::GMLight::AttenuationLinear, .0005f);
 
-			gm::GMfloat lightPos[] = { 100.f, 100.f, 100.f };
+			gm::GMfloat lightPos[] = { 0.f, 500.f, 0.f };
 			light->setLightAttribute3(gm::GMLight::Position, lightPos);
 			getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
 		}

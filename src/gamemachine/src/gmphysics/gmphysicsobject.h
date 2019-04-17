@@ -50,7 +50,7 @@ GM_PRIVATE_OBJECT(GMPhysicsObject)
 
 //! 表示一个物理对象
 /*!
-  物理对象拥有一些物理性质，如边界大小等。你不能直接创建它，而是应该根据GMPhysicsWorld::newPhysicsObject()来创建相应的GMPhysicsObject。
+  物理对象拥有一些物理性质，如边界大小等。
   \sa GMPhysicsWorld
 */
 class GM_EXPORT GMPhysicsObject : public GMObject
@@ -59,7 +59,7 @@ class GM_EXPORT GMPhysicsObject : public GMObject
 	GM_FRIEND_CLASS(GMPhysicsWorld);
 	GM_FRIEND_CLASS(GMGameObject);
 
-protected:
+public:
 	GMPhysicsObject() = default;
 
 public:

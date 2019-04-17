@@ -12,6 +12,16 @@ GMSpriteGameObject::GMSpriteGameObject(GMfloat radius, const GMVec3& position)
 	d->cameraUtility.setCamera(&d->camera);
 }
 
+
+GMSpriteGameObject::GMSpriteGameObject(GMfloat radius, const GMCamera& camera)
+{
+	D(d);
+	d->radius = radius;
+	d->camera = camera;
+	d->limitPitch = Radian(85.f);
+	d->cameraUtility.setCamera(&d->camera);
+}
+
 void GMSpriteGameObject::action(GMMovement movement, const GMVec3& direction, const GMVec3& rate)
 {
 	D(d);
@@ -66,23 +76,28 @@ void GMSpriteGameObject::update(GMDuration dt)
 	}
 	direction = FastNormalize(direction);
 
-	const GMVec3& lookDirection = d->camera.getLookAt().lookDirection;
-	if (moved)
+	if (auto phyObj = getPhysicsObject())
 	{
-		GMPhysicsMoveArgs args(lookDirection, direction, moveSpeed, rate);
-		GMPhysicsWorld* world = getWorld()->getPhysicsWorld();
-		world->applyMove(getPhysicsObject(), args);
-	}
+		const GMVec3& lookDirection = d->camera.getLookAt().lookDirection;
+		if (moved)
+		{
+			GMPhysicsMoveArgs args(lookDirection, direction, moveSpeed, rate);
+			GMPhysicsWorld* world = getWorld()->getPhysicsWorld();
+			if (world)
+				world->applyMove(getPhysicsObject(), args);
+		}
 
-	if (jumped)
-	{
-		GMPhysicsMoveArgs args(lookDirection, direction, jumpSpeed, rate);
-		GMPhysicsWorld* world = getWorld()->getPhysicsWorld();
-		world->applyJump(getPhysicsObject(), args);
-	}
+		if (jumped)
+		{
+			GMPhysicsMoveArgs args(lookDirection, direction, jumpSpeed, rate);
+			GMPhysicsWorld* world = getWorld()->getPhysicsWorld();
+			if (world)
+				world->applyJump(getPhysicsObject(), args);
+		}
 
-	GMFloat4 f4_position;
-	GetTranslationFromMatrix(getPhysicsObject()->getMotionStates().transform, f4_position);
-	d->camera.getLookAt().position.setFloat4(f4_position);
+		GMFloat4 f4_position;
+		GetTranslationFromMatrix(phyObj->getMotionStates().transform, f4_position);
+		d->camera.getLookAt().position.setFloat4(f4_position);
+	}
 	d->movements.clear();
 }

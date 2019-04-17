@@ -242,12 +242,6 @@ enum class GMShaderProgramType
 	FilterShaderProgram, //!< 滤镜着色器程序
 };
 
-enum class GMMovement
-{
-	Move,
-	Jump,
-};
-
 GM_INTERFACE_FROM(IShaderProgram, IQueriable)
 {
 	virtual void useProgram() = 0;

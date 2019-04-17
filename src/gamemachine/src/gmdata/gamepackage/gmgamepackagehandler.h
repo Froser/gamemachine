@@ -1,6 +1,7 @@
 ﻿#ifndef __GMGAMEPACKAGEHANDLER_H__
 #define __GMGAMEPACKAGEHANDLER_H__
 #include <gmcommon.h>
+#include <gmthread.h>
 #include "gmgamepackage.h"
 #include "contrib/minizip/unzip.h"
 BEGIN_NS
@@ -15,6 +16,7 @@ public:
 	virtual bool readFileFromPath(const GMString& path, REF GMBuffer* buffer) override;
 	virtual void beginReadFileFromPath(const GMString& path, GMAsyncCallback callback, OUT GMAsyncResult** ar) override;
 	virtual GMString pathOf(GMPackageIndex index, const GMString& fileName) override;
+	virtual bool exists(GMPackageIndex index, const GMString& fileName) override;
 
 protected:
 	virtual GMString pathRoot(GMPackageIndex index);
@@ -30,6 +32,7 @@ private:
 
 protected:
 	GMint32 m_packageIndex;
+	GMMutex m_mutex;
 };
 
 class GMZipGamePackageHandler : public GMDefaultGamePackageHandler
@@ -44,6 +47,7 @@ public:
 	virtual void init() override;
 	virtual bool readFileFromPath(const GMString& path, REF GMBuffer* buffer) override;
 	virtual GMString pathOf(GMPackageIndex index, const GMString& fileName) override;
+	virtual bool exists(GMPackageIndex index, const GMString& fileName) override;
 
 protected:
 	virtual GMString pathRoot(GMPackageIndex index) override;

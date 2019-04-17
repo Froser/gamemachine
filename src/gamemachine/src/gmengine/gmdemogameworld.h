@@ -32,7 +32,7 @@ public:
 	bool findGameObject(const GMGameObject* obj, REF GMString& name);
 
 private:
-	// 这个应该由appendObject来转调，appendObject会传入一个对象的名称
+	// 这个应该由addObject来转调，addObject会传入一个对象的名称
 	using GMGameWorld::addObjectAndInit;
 };
 
