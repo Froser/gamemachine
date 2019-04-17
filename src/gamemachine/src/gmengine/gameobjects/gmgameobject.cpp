@@ -144,21 +144,31 @@ void GMGameObject::update(GMDuration dt)
 		// 计算每个Model的AABB是否与相机Frustum有交集，如果没有，则不进行绘制
 		GM_ASSERT(d->cullAABB.size() == models.size());
 
-		static GMVec3 vertices[8];
-		for (GMsize_t i = 0; i < d->cullAABB.size(); ++i)
-		{
-			auto& shader = models[i].getModel()->getShader();
-
-			for (auto j = 0; j < 8; ++j)
+		GMAsync::blockedAsync(
+			GMAsync::Async,
+			GM.getRunningStates().systemInfo.numberOfProcessors,
+			d->cullAABB.begin(),
+			d->cullAABB.end(),
+			[d, &models, this](auto begin, auto end) {
+			// 计算一下数据偏移
+			for (auto iter = begin; iter != end; ++iter)
 			{
-				vertices[j] = d->cullAABB[i].points[j] * d->transforms.transformMatrix;
-			}
+				GMVec3 vertices[8];
+				GMsize_t offset = iter - d->cullAABB.begin();
+				auto& shader = models[offset].getModel()->getShader();
 
-			if (isInsideCameraFrustum(d->cullCamera ? d->cullCamera : &getContext()->getEngine()->getCamera(), vertices))
-				shader.setDiscard(false);
-			else
-				shader.setDiscard(true);
+				for (auto i = 0; i < 8; ++i)
+				{
+					vertices[i] = d->cullAABB[offset].points[i] * d->transforms.transformMatrix;
+				}
+
+				if (isInsideCameraFrustum(d->cullCamera ? d->cullCamera : &getContext()->getEngine()->getCamera(), vertices))
+					shader.setDiscard(false);
+				else
+					shader.setDiscard(true);
+			}
 		}
+		);
 	}
 }
 
