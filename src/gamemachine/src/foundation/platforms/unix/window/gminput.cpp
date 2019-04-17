@@ -43,6 +43,12 @@ namespace gm
 	private:
 		GMInput* m_host = nullptr;
 	};
+
+	class IMStateImpl : public IIMState
+	{
+	public:
+		virtual void activate(GMKeyboardLayout layout) { /*TODO*/ }
+	};
 }
 
 GMInput::GMInput(IWindow* window)
@@ -52,6 +58,7 @@ GMInput::GMInput(IWindow* window)
 	d->joystickImpl = new JoystickStateImpl(this);
 	d->mouseImpl = new MouseStateImpl(this);
 	d->keyboardImpl = new KeyboardStateImpl(this);
+	d->imImpl = new IMStateImpl();
 }
 
 GMInput::~GMInput()
@@ -60,6 +67,7 @@ GMInput::~GMInput()
 	GM_delete(d->mouseImpl);
 	GM_delete(d->joystickImpl);
 	GM_delete(d->keyboardImpl);
+	GM_delete(d->imImpl);
 }
 
 void GMInput::update()

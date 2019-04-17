@@ -714,6 +714,7 @@ void DemostrationEntrance::start()
 	D(d);
 	gm::IInput* inputManager = d->mainWindow->getInputManager();
 	getWorld()->resetCameraAndLights();
+	inputManager->getIMState().activate(gm::GMKL_United_States);
 	loadDemostrations(d->world);
 }
 
