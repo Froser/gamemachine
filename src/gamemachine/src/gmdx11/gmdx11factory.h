@@ -19,6 +19,7 @@ public:
 	virtual void createWhiteTexture(const IRenderContext* context, REF GMTextureAsset&) override;
 	virtual void createEmptyTexture(const IRenderContext* context, REF GMTextureAsset&) override;
 	virtual void createShaderPrograms(const IRenderContext* context, const GMRenderTechniqueManager& manager, REF Vector<IShaderProgram*>* out) override;
+	virtual bool createComputeShaderProgram(const IRenderContext* context, OUT IComputeShaderProgram** out) override;
 };
 
 END_NS

@@ -11,6 +11,7 @@
 #include "gmdx11helper.h"
 #include <regex>
 #include "gmdx11techniques.h"
+#include "gmdx11shaderprogram.h"
 
 void GMDx11Factory::createWindow(GMInstance instance, IWindow* parent, OUT IWindow** window)
 {
@@ -264,4 +265,14 @@ void GMDx11Factory::createShaderPrograms(const IRenderContext* context, const GM
 				out->push_back(shaderProgram);
 		}
 	}
+}
+
+bool GMDx11Factory::createComputeShaderProgram(const IRenderContext* context, OUT IComputeShaderProgram** out)
+{
+	if (out)
+	{
+		GMDx11ComputeShaderProgram* shaderProgram = new GMDx11ComputeShaderProgram(context);
+		*out = shaderProgram;
+	}
+	return true;
 }

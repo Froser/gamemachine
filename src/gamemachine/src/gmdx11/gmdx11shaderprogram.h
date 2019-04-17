@@ -43,5 +43,27 @@ private:
 	ID3DX11EffectClassInstanceVariable* getInstanceVariable(GMint32 index);
 };
 
+class GMDx11GraphicEngine;
+GM_PRIVATE_OBJECT_UNALIGNED(GMDx11ComputeShaderProgram)
+{
+	const IRenderContext* context = nullptr;
+	GMDx11GraphicEngine* engine = nullptr;
+	GMComPtr<ID3D11ComputeShader> shader;
+};
+
+class GM_EXPORT GMDx11ComputeShaderProgram : public IComputeShaderProgram
+{
+	GM_DECLARE_PRIVATE_NGO(GMDx11ComputeShaderProgram)
+
+public:
+	GMDx11ComputeShaderProgram(const IRenderContext* context);
+
+public:
+	virtual void dispatch(GMint32 threadGroupCountX, GMint32 threadGroupCountY, GMint32 threadGroupCountZ) override;
+	virtual void load(const GMString& path, const GMString& source, const GMString& entryPoint) override;
+	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
+	virtual bool setInterface(GameMachineInterfaceID id, void* in) override;
+};
+
 END_NS
 #endif

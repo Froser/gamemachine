@@ -119,3 +119,8 @@ void GMGLFactory::createShaderPrograms(const IRenderContext* context, const GMRe
 			out->push_back(shaderProgram);
 	}
 }
+
+bool GMGLFactory::createComputeShaderProgram(const IRenderContext* context, OUT IComputeShaderProgram** out)
+{
+	return false;
+}

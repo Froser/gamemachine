@@ -255,6 +255,12 @@ GM_INTERFACE_FROM(IShaderProgram, IQueriable)
 	virtual bool setInterfaceInstance(const GMString& interfaceName, const GMString& instanceName, GMShaderType type) = 0;
 };
 
+GM_INTERFACE_FROM(IComputeShaderProgram, IQueriable)
+{
+	virtual void dispatch(GMint32 threadGroupCountX, GMint32 threadGroupCountY, GMint32 threadGroupCountZ) = 0;
+	virtual void load(const GMString& path, const GMString& source, const GMString& entryPoint) = 0;
+};
+
 // 帧缓存
 enum class GMFramebufferFormat
 {
@@ -654,6 +660,7 @@ GM_INTERFACE(IFactory)
 	virtual void createWhiteTexture(const IRenderContext* context, REF GMTextureAsset&) = 0;
 	virtual void createEmptyTexture(const IRenderContext* context, REF GMTextureAsset&) = 0;
 	virtual void createShaderPrograms(const IRenderContext* context, const GMRenderTechniqueManager& manager, REF Vector<IShaderProgram*>* out) = 0;
+	virtual bool createComputeShaderProgram(const IRenderContext* context, OUT IComputeShaderProgram** out) = 0;
 };
 
 typedef WAVEFORMATEX GMWaveFormatEx;

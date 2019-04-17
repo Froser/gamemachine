@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmdx11shaderprogram.h"
 #include <linearmath.h>
+#include "gmdx11graphic_engine.h"
 
 GMDx11EffectShaderProgram::GMDx11EffectShaderProgram(GMComPtr<ID3DX11Effect> effect)
 {
@@ -112,9 +113,12 @@ bool GMDx11EffectShaderProgram::getInterface(GameMachineInterfaceID id, void** o
 	D(d);
 	if (id == GameMachineInterfaceID::D3D11Effect)
 	{
-		d->effect->AddRef();
-		(*out) = d->effect;
-		return true;
+		if (out)
+		{
+			d->effect->AddRef();
+			(*out) = d->effect;
+			return true;
+		}
 	}
 	return false;
 }
@@ -157,4 +161,78 @@ ID3DX11EffectClassInstanceVariable* GMDx11EffectShaderProgram::getInstanceVariab
 	ID3DX11EffectClassInstanceVariable* var = d->variables[index]->AsClassInstance();
 	GM_ASSERT(var->IsValid());
 	return var;
+}
+
+GMDx11ComputeShaderProgram::GMDx11ComputeShaderProgram(const IRenderContext* context)
+{
+	D(d);
+	d->context = context;
+	d->engine = gm_cast<GMDx11GraphicEngine*>(d->context->getEngine());
+}
+
+void GMDx11ComputeShaderProgram::dispatch(GMint32 threadGroupCountX, GMint32 threadGroupCountY, GMint32 threadGroupCountZ)
+{
+	D(d);
+	ID3D11DeviceContext* dc = d->engine->getDeviceContext();
+	dc->Dispatch(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
+}
+
+void GMDx11ComputeShaderProgram::load(const GMString& path, const GMString& source, const GMString& entryPoint)
+{
+	D(d);
+	GMComPtr<ID3D10Blob> errorMessage;
+	GMComPtr<ID3D10Blob> shaderBuffer;
+	UINT flag = D3DCOMPILE_ENABLE_STRICTNESS;
+#if GM_DEBUG
+	flag |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+#endif
+
+	std::string stdCode = source.toStdString();
+	std::string stdPath = path.toStdString();
+	std::string stdEntryPoint = path.toStdString();
+	GM_DX_HR(D3DX11CompileFromMemory(
+		stdCode.c_str(),
+		stdCode.length(),
+		stdPath.c_str(),
+		NULL,
+		NULL,
+		stdEntryPoint.c_str(),
+		"cs_5_0",
+		flag,
+		0,
+		NULL,
+		&shaderBuffer,
+		&errorMessage,
+		NULL
+	));
+
+	ID3D11Device* device = d->engine->getDevice();
+	device->CreateComputeShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), nullptr, &d->shader);
+}
+
+bool GMDx11ComputeShaderProgram::setInterface(GameMachineInterfaceID id, void* in)
+{
+	return false;
+}
+
+bool GMDx11ComputeShaderProgram::getInterface(GameMachineInterfaceID id, void** out)
+{
+	D(d);
+	switch (id)
+	{
+	case gm::GameMachineInterfaceID::D3D11ShaderProgram:
+	{
+		if (out)
+		{
+			d->shader->AddRef();
+			(*out) = d->shader;
+			return true;
+		}
+	}
+	case gm::GameMachineInterfaceID::CustomInterfaceBegin:
+		break;
+	default:
+		break;
+	}
+	return false;
 }
