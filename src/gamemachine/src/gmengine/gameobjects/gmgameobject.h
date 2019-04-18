@@ -30,6 +30,14 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	GMGameObjectCullOption cullOption = GMGameObjectCullOption::None;
 	AlignedVector<AABB> cullAABB;
 	GMCamera* cullCamera = nullptr;
+	IComputeShaderProgram* cullShaderProgram = nullptr;
+	GMComputeBufferHandle cullBufferHandle = 0;
+	GMComputeBufferHandle cullBufferGPUResultHandle = 0;
+	GMComputeBufferHandle cullBufferCPUResultHandle = 0;
+	GMComputeBufferHandle cullConstantBufferHandle = 0;
+	GMComputeSRVHandle cullSRVHandle = 0;
+	GMComputeUAVHandle cullResultHandle = 0;
+	bool cullGPUAccelerationValid = true;
 
 	GM_ALIGNED_16(struct)
 	{
@@ -52,7 +60,7 @@ class GM_EXPORT GMGameObject : public GMObject
 public:
 	GMGameObject() = default;
 	GMGameObject(GMSceneAsset asset);
-	~GMGameObject() = default;
+	~GMGameObject();
 
 public:
 	void setAsset(GMSceneAsset asset);
@@ -62,6 +70,7 @@ public:
 	GMGameWorld* getWorld();
 	void setPhysicsObject(AUTORELEASE GMPhysicsObject* phyObj);
 	void foreachModel(std::function<void(GMModel*)>);
+	void setCullComputeShaderProgram(IComputeShaderProgram* shaderProgram);
 
 public:
 	virtual void onAppendingObjectToWorld();
@@ -77,6 +86,7 @@ protected:
 	virtual void drawModel(const IRenderContext* context, GMModel* model);
 	virtual void endDraw();
 	virtual void makeAABB();
+	virtual IComputeShaderProgram* getCullShaderProgram();
 
 public:
 	void updateTransformMatrix();
@@ -127,6 +137,12 @@ private:
 		D(d);
 		d->autoUpdateTransformMatrix = autoUpdateTransformMatrix;
 	}
+
+public:
+	static void setDefaultCullShaderProgram(IComputeShaderProgram* shaderProgram);
+
+private:
+	static IComputeShaderProgram* s_defaultComputeShaderProgram;
 };
 
 // GMSkyObject

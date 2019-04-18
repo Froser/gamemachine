@@ -163,8 +163,9 @@ GMint64 GMStopwatch::nowInCycle()
 
 void GMPlane::setFromPoints(const GMVec3 & p0, const GMVec3 & p1, const GMVec3 & p2)
 {
-	normal = Cross((p1 - p0), (p2 - p0));
-	normal = FastNormalize(normal);
+	GMVec3 n = Cross((p1 - p0), (p2 - p0));
+	n = FastNormalize(n);
+	setNormal(n);
 	calculateIntercept(p0);
 }
 
@@ -176,9 +177,9 @@ bool GMPlane::intersect3(const GMPlane & p2, const GMPlane & p3, GMVec3 & result
 		return false;										//no intersection
 
 	GMVec3 temp1, temp2, temp3;
-	temp1 = (Cross(p2.normal, p3.normal))*intercept;
-	temp2 = (Cross(p3.normal, normal))*p2.intercept;
-	temp3 = (Cross(normal, p2.normal))*p3.intercept;
+	temp1 = (Cross(GMVec3(p2.normal), GMVec3(p3.normal))) * getIntercept();
+	temp2 = (Cross(GMVec3(p3.normal), GMVec3(normal))) * p2.getIntercept();
+	temp3 = (Cross(GMVec3(normal), GMVec3(p2.normal))) * p3.getIntercept();
 
 	result = (temp1 + temp2 + temp3) / (-denominator);
 
@@ -187,7 +188,7 @@ bool GMPlane::intersect3(const GMPlane & p2, const GMPlane & p3, GMVec3 & result
 
 GMfloat GMPlane::getDistance(const GMVec3 & point) const
 {
-	return Dot(point, normal) + intercept;
+	return Dot(point, normal) + getIntercept();
 }
 
 PointPosition GMPlane::classifyPoint(const GMVec3 & point) const
@@ -206,17 +207,15 @@ PointPosition GMPlane::classifyPoint(const GMVec3 & point) const
 GMPlane GMPlane::lerp(const GMPlane & p2, GMfloat factor)
 {
 	GMPlane result;
-	result.normal = normal * (1.0f - factor) + p2.normal * factor;
-	result.normal = FastNormalize(result.normal);
-
-	result.intercept = intercept*(1.0f - factor) + p2.intercept*factor;
-
+	GMVec3 n = normal * (1.0f - factor) + p2.normal * factor;
+	result.setNormal(FastNormalize(n));
+	result.setIntercept(getIntercept() * (1.0f - factor) + p2.getIntercept() *factor);
 	return result;
 }
 
 bool GMPlane::operator ==(const GMPlane & rhs) const
 {
-	if ((normal == rhs.normal) && (intercept == rhs.intercept))
+	if (normal == rhs.normal)
 		return true;
 
 	return false;

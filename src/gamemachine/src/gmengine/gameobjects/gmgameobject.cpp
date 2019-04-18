@@ -41,11 +41,28 @@ namespace
 	}
 }
 
+IComputeShaderProgram* GMGameObject::s_defaultComputeShaderProgram = nullptr;
+
 GMGameObject::GMGameObject(GMAsset asset)
 	: GMGameObject()
 {
 	setAsset(asset);
 	updateTransformMatrix();
+}
+
+
+GMGameObject::~GMGameObject()
+{
+	D(d);
+	if (auto shaderProgram = getCullShaderProgram())
+	{
+		shaderProgram->release(d->cullBufferHandle);
+		shaderProgram->release(d->cullBufferGPUResultHandle);
+		shaderProgram->release(d->cullBufferCPUResultHandle);
+		shaderProgram->release(d->cullConstantBufferHandle);
+		shaderProgram->release(d->cullSRVHandle);
+		shaderProgram->release(d->cullResultHandle);
+	}
 }
 
 void GMGameObject::setAsset(GMAsset asset)
@@ -120,6 +137,13 @@ void GMGameObject::foreachModel(std::function<void(GMModel*)> cb)
 	}
 }
 
+
+void GMGameObject::setCullComputeShaderProgram(IComputeShaderProgram* shaderProgram)
+{
+	D(d);
+	d->cullShaderProgram = shaderProgram;
+}
+
 void GMGameObject::onAppendingObjectToWorld()
 {
 	D(d);
@@ -140,35 +164,107 @@ void GMGameObject::update(GMDuration dt)
 	D(d);
 	if (d->cullOption == GMGameObjectCullOption::AABB)
 	{
-		Vector<GMAsset>& models = getScene()->getModels();
-		// 计算每个Model的AABB是否与相机Frustum有交集，如果没有，则不进行绘制
-		GM_ASSERT(d->cullAABB.size() == models.size());
+		struct CullResult
+		{
+			GMint32 visible = false;
+		};
+		constexpr GMuint32 sz = 512;
+		CullResult result[sz]; //TODO
 
-		GMAsync::blockedAsync(
-			GMAsync::Async,
-			GM.getRunningStates().systemInfo.numberOfProcessors,
-			d->cullAABB.begin(),
-			d->cullAABB.end(),
-			[d, &models, this](auto begin, auto end) {
-			// 计算一下数据偏移
-			for (auto iter = begin; iter != end; ++iter)
+		typedef GMVec4 FrustumPlanes[6];
+
+		IComputeShaderProgram* cullShaderProgram = getCullShaderProgram();
+		if (cullShaderProgram && d->cullGPUAccelerationValid)
+		{
+			if (!d->cullBufferHandle)
 			{
-				GMVec3 vertices[8];
-				GMsize_t offset = iter - d->cullAABB.begin();
-				auto& shader = models[offset].getModel()->getShader();
-
-				for (auto i = 0; i < 8; ++i)
+				typedef std::remove_reference_t<decltype(d->cullAABB[0])> AABB;
+				if (cullShaderProgram->createBuffer(sizeof(AABB), gm_sizet_to_uint(d->cullAABB.size()), d->cullAABB.data(), GMComputeBufferType::Structured, &d->cullBufferHandle) &&
+					cullShaderProgram->createBuffer(sizeof(CullResult), gm_sizet_to_uint(sz), result, GMComputeBufferType::Structured, &d->cullBufferGPUResultHandle) &&
+					cullShaderProgram->createBuffer(sizeof(FrustumPlanes), 1u, NULL, GMComputeBufferType::Constant, &d->cullConstantBufferHandle) &&
+					cullShaderProgram->createBufferShaderResourceView(d->cullBufferHandle, &d->cullSRVHandle) &&
+					cullShaderProgram->createBufferUnorderedAccessView(d->cullBufferGPUResultHandle, &d->cullResultHandle))
 				{
-					vertices[i] = d->cullAABB[offset].points[i] * d->transforms.transformMatrix;
+					// create succeed
 				}
-
-				if (isInsideCameraFrustum(d->cullCamera ? d->cullCamera : &getContext()->getEngine()->getCamera(), vertices))
-					shader.setDiscard(false);
 				else
-					shader.setDiscard(true);
+				{
+					gm_warning(gm_dbg_wrap("GMGameObject create buffer or resource view failed. Cull Compute shader has been shut down for current game object."));
+					d->cullGPUAccelerationValid = false;
+					return;
+				}
 			}
+
+			GMCamera* camera = d->cullCamera ? d->cullCamera : &getContext()->getEngine()->getCamera();
+			GMFrustumPlanes planes;
+			camera->getFrustum().getPlanes(planes);
+			FrustumPlanes p;
+			p[0] = planes.nearPlane.getPlane();
+			p[1] = planes.farPlane.getPlane();
+			p[2] = planes.topPlane.getPlane();
+			p[3] = planes.bottomPlane.getPlane();
+			p[4] = planes.leftPlane.getPlane();
+			p[5] = planes.rightPlane.getPlane();
+
+			cullShaderProgram->setBuffer(d->cullConstantBufferHandle, &p, sizeof(FrustumPlanes));
+			GMComputeSRVHandle srvs[] = { d->cullSRVHandle };
+			cullShaderProgram->setShaderResourceView(1, srvs);
+			GMComputeUAVHandle uavs[] = { d->cullResultHandle };
+			cullShaderProgram->setUnorderedAccessView(1, uavs);
+			cullShaderProgram->dispatch(gm_sizet_to_uint(d->cullAABB.size()), 1, 1);
+			
+			// TODO 可能会存在越界
+			if (!d->cullBufferCPUResultHandle)
+			{
+				if (!cullShaderProgram->createBufferFrom(d->cullBufferGPUResultHandle, &d->cullBufferCPUResultHandle))
+				{
+					gm_warning(gm_dbg_wrap("GMGameObject create buffer from gpu result buffer failed. Cull Compute shader has been shut down for current game object."));
+					d->cullGPUAccelerationValid = false;
+				}
+			}
+
+			cullShaderProgram->copyBuffer(d->cullBufferCPUResultHandle, d->cullBufferGPUResultHandle);
+			CullResult* resultPtr = static_cast<CullResult*>(cullShaderProgram->mapBuffer(d->cullBufferCPUResultHandle));
+			Vector<GMAsset>& models = getScene()->getModels();
+			for (GMsize_t i = 0; i < models.size(); ++i)
+			{
+				auto& shader = models[i].getModel()->getShader();
+				shader.setDiscard(resultPtr[i].visible == 0);
+			}
+			cullShaderProgram->unmapBuffer(d->cullBufferGPUResultHandle);
 		}
-		);
+		else
+		{
+			Vector<GMAsset>& models = getScene()->getModels();
+			// 计算每个Model的AABB是否与相机Frustum有交集，如果没有，则不进行绘制
+			GM_ASSERT(d->cullAABB.size() == models.size());
+
+			GMAsync::blockedAsync(
+				GMAsync::Async,
+				GM.getRunningStates().systemInfo.numberOfProcessors,
+				d->cullAABB.begin(),
+				d->cullAABB.end(),
+				[d, &models, this](auto begin, auto end) {
+				// 计算一下数据偏移
+				for (auto iter = begin; iter != end; ++iter)
+				{
+					GMVec3 vertices[8];
+					GMsize_t offset = iter - d->cullAABB.begin();
+					auto& shader = models[offset].getModel()->getShader();
+
+					for (auto i = 0; i < 8; ++i)
+					{
+						vertices[i] = d->cullAABB[offset].points[i] * d->transforms.transformMatrix;
+					}
+
+					if (isInsideCameraFrustum(d->cullCamera ? d->cullCamera : &getContext()->getEngine()->getCamera(), vertices))
+						shader.setDiscard(false);
+					else
+						shader.setDiscard(true);
+				}
+			}
+			);
+		}
 	}
 }
 
@@ -267,6 +363,12 @@ void GMGameObject::setCullOption(GMGameObjectCullOption option, GMCamera* camera
 	}
 }
 
+
+void GMGameObject::setDefaultCullShaderProgram(IComputeShaderProgram* shaderProgram)
+{
+	s_defaultComputeShaderProgram = shaderProgram;
+}
+
 void GMGameObject::drawModel(const IRenderContext* context, GMModel* model)
 {
 	D(d);
@@ -329,6 +431,13 @@ void GMGameObject::makeAABB()
 		};
 		d->cullAABB.push_back(aabb);
 	}
+}
+
+
+IComputeShaderProgram* GMGameObject::getCullShaderProgram()
+{
+	D(d);
+	return s_defaultComputeShaderProgram ? s_defaultComputeShaderProgram : d->cullShaderProgram;
 }
 
 GMCubeMapGameObject::GMCubeMapGameObject(GMTextureAsset texture)

@@ -235,7 +235,7 @@ void GMBSPMove::stepSlideMove(GMDuration dt, bool hasGravity)
 		d->movementState.origin = t.endpos;
 	if (t.fraction < 1.f)
 	{
-		clipVelocity(d->movementState.velocity, t.plane.normal, d->movementState.velocity, OVERCLIP);
+		clipVelocity(d->movementState.velocity, t.plane.getNormal(), d->movementState.velocity, OVERCLIP);
 		if (d->movementState.velocity.getY() < CLIP_IGNORE)
 			d->movementState.velocity.setY(0);
 	}
@@ -261,7 +261,7 @@ bool GMBSPMove::slideMove(GMDuration dt, bool hasGravity)
 
 	AlignedVector<GMVec3> planes;
 	if (!d->movementState.freefall)
-		planes.push_back(d->movementState.groundTrace.plane.normal);
+		planes.push_back(d->movementState.groundTrace.plane.getNormal());
 
 	planes.push_back(FastNormalize(velocity));
 
@@ -294,13 +294,13 @@ bool GMBSPMove::slideMove(GMDuration dt, bool hasGravity)
 		GMuint32 i;
 		for (i = 0; i < planes.size(); i++)
 		{
-			if (Dot(moveTrace.plane.normal, planes[i]) > 0.99)
-				velocity += moveTrace.plane.normal;
+			if (Dot(moveTrace.plane.getNormal(), planes[i]) > 0.99)
+				velocity += moveTrace.plane.getNormal();
 		}
 		if (i < planes.size())
 			continue;
 
-		planes.push_back(moveTrace.plane.normal);
+		planes.push_back(moveTrace.plane.getNormal());
 
 		//
 		// modify velocity so it parallels all of the clip planes

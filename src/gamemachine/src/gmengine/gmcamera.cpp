@@ -54,23 +54,12 @@ void GMFrustum::getPlanes(GMFrustumPlanes& planes) const
 		bottom
 	);
 
-	planes.rightPlane.normal = GMVec3(right);
-	planes.rightPlane.intercept = right.getW();
-
-	planes.leftPlane.normal = GMVec3(left);
-	planes.leftPlane.intercept = left.getW();
-
-	planes.topPlane.normal = GMVec3(top);
-	planes.topPlane.intercept = top.getW();
-
-	planes.bottomPlane.normal = GMVec3(bottom);
-	planes.bottomPlane.intercept = bottom.getW();
-
-	planes.nearPlane.normal = GMVec3(n);
-	planes.nearPlane.intercept = n.getW();
-
-	planes.farPlane.normal = GMVec3(f);
-	planes.farPlane.intercept = f.getW();
+	planes.rightPlane = right;
+	planes.leftPlane = left;
+	planes.topPlane = top;
+	planes.bottomPlane = bottom;
+	planes.nearPlane = n;
+	planes.farPlane = f;
 }
 
 //is a bounding box in the Frustum?

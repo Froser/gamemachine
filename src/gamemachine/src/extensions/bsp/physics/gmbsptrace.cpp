@@ -195,7 +195,7 @@ void GMBSPTrace::trace(const GMVec3& start, const GMVec3& end, const GMVec3& ori
 	// Otherwise, the normal on the plane should have unit length
 	GM_ASSERT(tw.trace.allsolid ||
 		tw.trace.fraction == 1.0 ||
-		LengthSq(tw.trace.plane.normal) > 0.9999f);
+		LengthSq(tw.trace.plane.getNormal()) > 0.9999f);
 	trace = tw.trace;
 }
 
@@ -230,7 +230,7 @@ void GMBSPTrace::traceThroughTree(GMBSPTraceWork& tw, GMint32 num, GMfloat p1f, 
 	// 如果平面是与坐标系垂直，可以直接用p[plane->planeType]来拿距离
 	GMfloat t1, t2, offset;
 
-	GMfloat dist = plane->intercept;
+	GMfloat dist = plane->getIntercept();
 	GMFloat4 f4_p1, f4_p2, f4_extents;
 	p1.loadFloat4(f4_p1);
 	p2.loadFloat4(f4_p2);
@@ -243,8 +243,8 @@ void GMBSPTrace::traceThroughTree(GMBSPTraceWork& tw, GMint32 num, GMfloat p1f, 
 	}
 	else
 	{
-		t1 = Dot(plane->normal, p1) + dist;
-		t2 = Dot(plane->normal, p2) + dist;
+		t1 = Dot(plane->getNormal(), p1) + dist;
+		t2 = Dot(plane->getNormal(), p2) + dist;
 		if (tw.isPoint) {
 			offset = 0;
 		}
@@ -508,8 +508,7 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 				}
 
 				tw.trace.fraction = enterFrac;
-				tw.trace.plane.normal = MakeVector3(bestplane);
-				tw.trace.plane.intercept = bestplane.getW();
+				tw.trace.plane = bestplane;
 			}
 		}
 	}
@@ -597,8 +596,8 @@ void GMBSPTrace::tracePointThroughPatchCollide(GMBSPTraceWork& tw, const GMBSPPa
 				tw.trace.fraction = 0;
 			}
 
-			tw.trace.plane.normal = MakeVector3(planes->plane);
-			tw.trace.plane.intercept = intercept;
+			tw.trace.plane.setNormal(MakeVector3(planes->plane));
+			tw.trace.plane.setIntercept(intercept);
 		}
 	}
 }
@@ -672,10 +671,10 @@ void GMBSPTrace::traceThroughBrush(GMBSPTraceWork& tw, GMBSP_Physics_Brush *brus
 			plane = &pw.planes[side->side->planeNum];
 
 			// adjust the plane distance apropriately for radius
-			GMfloat dist = plane->intercept - tw.sphere.radius;
+			GMfloat dist = plane->getIntercept() - tw.sphere.radius;
 
 			// find the closest point on the capsule to the plane
-			GMfloat t = Dot(plane->normal, tw.sphere.offset);
+			GMfloat t = Dot(plane->getNormal(), tw.sphere.offset);
 			if (t > 0)
 			{
 				startp = tw.start - tw.sphere.offset;
@@ -687,8 +686,8 @@ void GMBSPTrace::traceThroughBrush(GMBSPTraceWork& tw, GMBSP_Physics_Brush *brus
 				endp = tw.end + tw.sphere.offset;
 			}
 
-			GMfloat d1 = Dot(startp, plane->normal) + dist;
-			GMfloat d2 = Dot(endp, plane->normal) + dist;
+			GMfloat d1 = Dot(startp, plane->getNormal()) + dist;
+			GMfloat d2 = Dot(endp, plane->getNormal()) + dist;
 
 			if (d2 > 0) {
 				getout = true;	// endpoint is not in solid
@@ -742,11 +741,11 @@ void GMBSPTrace::traceThroughBrush(GMBSPTraceWork& tw, GMBSP_Physics_Brush *brus
 			plane = &pw.planes[side->side->planeNum];
 
 			// adjust the plane distance apropriately for mins/maxs
-			GMfloat bound = Dot(tw.offsets[plane->signbits], plane->normal);
-			GMfloat dist = plane->intercept + bound;
+			GMfloat bound = Dot(tw.offsets[plane->signbits], plane->getNormal());
+			GMfloat dist = plane->getIntercept() + bound;
 
-			GMfloat d1 = Dot(tw.start, plane->normal) + dist;
-			GMfloat d2 = Dot(tw.end, plane->normal) + dist;
+			GMfloat d1 = Dot(tw.start, plane->getNormal()) + dist;
+			GMfloat d2 = Dot(tw.end, plane->getNormal()) + dist;
 
 			if (d2 > 0) {
 				getout = true;	// endpoint is not in solid

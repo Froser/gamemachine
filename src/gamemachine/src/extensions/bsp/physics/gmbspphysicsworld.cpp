@@ -101,10 +101,10 @@ void GMBSPPhysicsWorld::generatePhysicsPlaneData()
 	d->planes.resize(bsp.numplanes);
 	for (GMint32 i = 0; i < bsp.numplanes; i++)
 	{
-		bsp.planes[i].normal.loadFloat4(f4_normal);
+		bsp.planes[i].getNormal().loadFloat4(f4_normal);
 		d->planes[i] = bsp.planes[i];
 		d->planes[i].planeType = PlaneTypeForNormal(f4_normal);
-		d->planes[i].signbits = signbitsForNormal(GMVec4(d->planes[i].normal, 0));
+		d->planes[i].signbits = signbitsForNormal(GMVec4(d->planes[i].getNormal(), 0));
 	}
 }
 
@@ -134,8 +134,8 @@ void GMBSPPhysicsWorld::generatePhysicsBrushData()
 		b->brush = &bsp.brushes[i];
 		b->sides = &d->brushsides[b->brush->firstSide];
 		b->contents = bsp.shaders[b->brush->shaderNum].contentFlags;
-		b->bounds[0] = GMVec3(-b->sides[0].plane->intercept, -b->sides[2].plane->intercept, -b->sides[4].plane->intercept);
-		b->bounds[1] = GMVec3(b->sides[1].plane->intercept, b->sides[3].plane->intercept, b->sides[5].plane->intercept);
+		b->bounds[0] = GMVec3(-b->sides[0].plane->getIntercept(), -b->sides[2].plane->getIntercept(), -b->sides[4].plane->getIntercept());
+		b->bounds[1] = GMVec3(b->sides[1].plane->getIntercept(), b->sides[3].plane->getIntercept(), b->sides[5].plane->getIntercept());
 	}
 }
 

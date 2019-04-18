@@ -87,35 +87,46 @@ enum PointPosition
 
 GM_ALIGNED_STRUCT(GMPlane)
 {
-	GMPlane() : normal(GMVec3(0.0f, 0.0f, 0.0f)), intercept(0.0f)
+	GMPlane() : normal(GMVec4(0.0f, 0.0f, 0.0f, 0.0f))
 	{
 	}
 
-	GMPlane(const GMVec3& newNormal, GMfloat newIntercept) : normal(newNormal), intercept(newIntercept)
+	GMPlane(const GMVec4& plane) : normal(plane)
 	{
+
 	}
 
 	GMPlane(const GMPlane & rhs)
 	{
 		normal = rhs.normal;
-		intercept = rhs.intercept;
 	}
 
 	GMPlane& operator=(const GMPlane& plane)
 	{
 		normal = plane.normal;
-		intercept = plane.intercept;
 		return *this;
 	}
 
-	void setNormal(const GMVec3 & rhs) { normal = rhs; }
-	void setIntercept(GMfloat newIntercept) { intercept = newIntercept; }
+	void setNormal(const GMVec3 & rhs)
+	{
+		normal = GMVec4(rhs, getIntercept());
+	}
+	
+	inline void setIntercept(GMfloat newIntercept)
+	{
+		normal.setW(newIntercept);
+	}
+
 	void setFromPoints(const GMVec3 & p0, const GMVec3 & p1, const GMVec3 & p2);
 
-	void calculateIntercept(const GMVec3 & pointOnPlane) { intercept = - Dot(normal, pointOnPlane); }
+	void calculateIntercept(const GMVec3 & pointOnPlane)
+	{
+		setIntercept(-Dot(GMVec3(normal), pointOnPlane));
+	}
 
-	GMVec3 getNormal() { return normal; }
-	GMfloat getIntercept() { return intercept; }
+	inline GMVec3 getNormal() const { return normal; }
+	inline GMfloat getIntercept() const { return normal.getW(); }
+	inline GMVec4 getPlane() const { return normal; }
 
 	//find point of intersection of 3 planes
 	bool intersect3(const GMPlane & p2, const GMPlane & p3, GMVec3 & result);
@@ -133,12 +144,12 @@ GM_ALIGNED_STRUCT(GMPlane)
 	}
 
 	//unary operators
-	GMPlane operator-(void) const { return GMPlane(-normal, -intercept); }
+	GMPlane operator-(void) const { return GMPlane(-normal); }
 	GMPlane operator+(void) const { return (*this); }
 
+private:
 	//member variables
-	GMVec3 normal;	//X.N+intercept=0
-	GMfloat intercept;
+	GMVec4 normal;	//X.N+intercept=0
 };
 
 //GMFrustumPlanes

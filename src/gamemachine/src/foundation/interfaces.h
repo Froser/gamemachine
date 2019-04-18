@@ -255,10 +255,30 @@ GM_INTERFACE_FROM(IShaderProgram, IQueriable)
 	virtual bool setInterfaceInstance(const GMString& interfaceName, const GMString& instanceName, GMShaderType type) = 0;
 };
 
+enum class GMComputeBufferType
+{
+	Structured,
+	Constant,
+};
+typedef void *GMComputeHandle;
+typedef GMComputeHandle GMComputeBufferHandle;
+typedef GMComputeHandle GMComputeSRVHandle;
+typedef GMComputeHandle GMComputeUAVHandle;
 GM_INTERFACE_FROM(IComputeShaderProgram, IQueriable)
 {
 	virtual void dispatch(GMint32 threadGroupCountX, GMint32 threadGroupCountY, GMint32 threadGroupCountZ) = 0;
 	virtual void load(const GMString& path, const GMString& source, const GMString& entryPoint) = 0;
+	virtual bool createBufferFrom(GMComputeBufferHandle bufferSrc, OUT GMComputeBufferHandle* bufferOut) = 0;
+	virtual bool createBuffer(GMuint32 elementSize, GMuint32 uCount, void* pInitData, GMComputeBufferType type, OUT GMComputeBufferHandle* ppBufOut) = 0;
+	virtual bool createBufferShaderResourceView(GMComputeBufferHandle, OUT GMComputeSRVHandle*) = 0;
+	virtual bool createBufferUnorderedAccessView(GMComputeBufferHandle, OUT GMComputeUAVHandle*) = 0;
+	virtual void setShaderResourceView(GMuint32 num, GMComputeSRVHandle* handles) = 0;
+	virtual void setUnorderedAccessView(GMuint32 num, GMComputeUAVHandle* handles) = 0;
+	virtual void setBuffer(GMComputeBufferHandle handle, void* data, GMuint32 sizeInBytes) = 0;
+	virtual void copyBuffer(GMComputeBufferHandle dest, GMComputeBufferHandle src) = 0;
+	virtual void* mapBuffer(GMComputeBufferHandle handle) = 0;
+	virtual void unmapBuffer(GMComputeBufferHandle handle) = 0;
+	virtual void release(GMComputeHandle) = 0;
 };
 
 // 帧缓存

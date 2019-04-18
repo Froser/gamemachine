@@ -84,6 +84,26 @@ namespace
 
 		world->init();
 	}
+
+	gm::IComputeShaderProgram* createComputeShader(
+		const gm::IRenderContext* context,
+		const gm::GMString& path,
+		const gm::GMString& entryPoint
+	)
+	{
+		gm::IComputeShaderProgram* shaderProgram = nullptr;
+		gm::GMBuffer buffer;
+		gm::GMString filename;
+		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, path, &buffer, &filename);
+		buffer.convertToStringBuffer();
+
+		if (GM.getFactory()->createComputeShaderProgram(context, &shaderProgram))
+		{
+			shaderProgram->load(filename, gm::GMString((char*)buffer.buffer), entryPoint);
+		}
+		return shaderProgram;
+	}
+
 }
 
 DemoHandler::DemoHandler(DemonstrationWorld* parentDemonstrationWorld)
@@ -770,6 +790,7 @@ DemostrationEntrance::~DemostrationEntrance()
 {
 	D(d);
 	gm::GM_delete(d->world);
+	gm::GM_delete(d->defaultCullShaderProgram);
 }
 
 void DemostrationEntrance::onLoadShaders(const gm::IRenderContext* context)
@@ -798,6 +819,16 @@ void DemostrationEntrance::onLoadShaders(const gm::IRenderContext* context)
 	{
 #if GM_USE_DX11
 		gm::GMDx11Helper::loadShader(context, L"dx11/effect.fx");
+
+		d->defaultCullShaderProgram = createComputeShader(context,
+			L"dx11/frustumcull.hlsl",
+			L"Main"
+		);
+
+		if (d->defaultCullShaderProgram)
+		{
+			gm::GMGameObject::setDefaultCullShaderProgram(d->defaultCullShaderProgram);
+		}
 #else
 		GM_ASSERT(false);
 #endif

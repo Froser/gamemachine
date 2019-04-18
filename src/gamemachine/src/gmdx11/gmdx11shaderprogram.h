@@ -49,6 +49,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMDx11ComputeShaderProgram)
 	const IRenderContext* context = nullptr;
 	GMDx11GraphicEngine* engine = nullptr;
 	GMComPtr<ID3D11ComputeShader> shader;
+	GMuint32 SRV_UAV_CB_count[3] = { 0 };
 };
 
 class GM_EXPORT GMDx11ComputeShaderProgram : public IComputeShaderProgram
@@ -61,8 +62,24 @@ public:
 public:
 	virtual void dispatch(GMint32 threadGroupCountX, GMint32 threadGroupCountY, GMint32 threadGroupCountZ) override;
 	virtual void load(const GMString& path, const GMString& source, const GMString& entryPoint) override;
+	virtual bool createBufferFrom(GMComputeBufferHandle bufferSrc, OUT GMComputeBufferHandle* bufferOut) override;
+	virtual bool createBuffer(GMuint32 elementSize, GMuint32 count, void* pInitData, GMComputeBufferType type, OUT GMComputeBufferHandle* ppBufOut) override;
+	virtual void release(GMComputeBufferHandle) override;
+	virtual bool createBufferShaderResourceView(GMComputeBufferHandle, OUT GMComputeSRVHandle*) override;
+	virtual bool createBufferUnorderedAccessView(GMComputeBufferHandle, OUT GMComputeUAVHandle*) override;
+	virtual void setShaderResourceView(GMuint32, GMComputeSRVHandle*) override;
+	virtual void setUnorderedAccessView(GMuint32, GMComputeUAVHandle*) override;
+	virtual void setBuffer(GMComputeBufferHandle, void*, GMuint32) override;
+	virtual void copyBuffer(GMComputeBufferHandle dest, GMComputeBufferHandle src) override;
+	virtual void* mapBuffer(GMComputeBufferHandle handle) override;
+	virtual void unmapBuffer(GMComputeBufferHandle handle) override;
+
+public:
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
 	virtual bool setInterface(GameMachineInterfaceID id, void* in) override;
+
+private:
+	void cleanUp();
 };
 
 END_NS

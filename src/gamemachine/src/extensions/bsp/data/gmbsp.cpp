@@ -186,8 +186,7 @@ void GMBSP::loadPlanes()
 		d->planes.resize(length);
 		for (GMint32 i = 0; i < num; i++)
 		{
-			d->planes[i].normal = GMVec3(t[i].p[0], t[i].p[1], t[i].p[2]);
-			d->planes[i].intercept = t[i].p[3];
+			d->planes[i] = GMVec4(t[i].p[0], t[i].p[1], t[i].p[2], t[i].p[3]);
 		}
 	}
 	else
@@ -374,12 +373,14 @@ void GMBSP::toDxCoord()
 
 	for (GMint32 i = 0; i < d->numplanes; ++i)
 	{
-		GMfloat _y = d->planes[i].normal.getY();
-		d->planes[i].normal.setY(d->planes[i].normal.getZ());
-		d->planes[i].normal.setZ(_y);
-		GM_ASSERT(Fabs(Length(d->planes[i].normal) - 1) < 0.01);
+		GMVec3 n = d->planes[i].getNormal();
+		GMfloat _y = n.getY();
+		n.setY(n.getZ());
+		n.setZ(_y);
+		d->planes[i].setNormal(n);
+		GM_ASSERT(Fabs(Length(d->planes[i].getNormal()) - 1) < 0.01);
 
-		d->planes[i].intercept = -d->planes[i].intercept;
+		d->planes[i].setIntercept(-d->planes[i].getIntercept());
 	}
 }
 
