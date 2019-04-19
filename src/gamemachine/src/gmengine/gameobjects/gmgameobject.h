@@ -36,12 +36,12 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	Vector<CullResult> cullResult;
 	GMCamera* cullCamera = nullptr;
 	IComputeShaderProgram* cullShaderProgram = nullptr;
-	GMComputeBufferHandle cullBufferHandle = 0;
-	GMComputeBufferHandle cullBufferGPUResultHandle = 0;
-	GMComputeBufferHandle cullBufferCPUResultHandle = 0;
-	GMComputeBufferHandle cullConstantBufferHandle = 0;
-	GMComputeSRVHandle cullSRVHandle = 0;
-	GMComputeUAVHandle cullResultHandle = 0;
+	GMComputeBufferHandle cullAABBsBuffer = 0;
+	GMComputeBufferHandle cullGPUResultBuffer = 0;
+	GMComputeBufferHandle cullCPUResultBuffer = 0;
+	GMComputeBufferHandle cullFrustumBuffer = 0;
+	GMComputeSRVHandle cullAABBsSRV = 0;
+	GMComputeUAVHandle cullResultUAV = 0;
 	GMsize_t cullSize = 0;
 	bool cullGPUAccelerationValid = true;
 

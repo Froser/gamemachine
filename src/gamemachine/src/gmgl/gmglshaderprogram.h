@@ -79,7 +79,8 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLComputeShaderProgram)
 	const IRenderContext* context = nullptr;
 	GMuint32 shaderProgram = 0;
 	GMuint32 shaderId = 0;
-	GMuint32 uniformBase = 0;
+	GMuint32 ssboBase = 0;
+	GMuint32 uboBase = 0;
 };
 
 class GM_EXPORT GMGLComputeShaderProgram : public IComputeShaderProgram
@@ -93,17 +94,18 @@ public:
 public:
 	virtual void dispatch(GMint32 threadGroupCountX, GMint32 threadGroupCountY, GMint32 threadGroupCountZ) override;
 	virtual void load(const GMString& path, const GMString& source, const GMString& entryPoint) override;
-	virtual bool createBufferFrom(GMComputeBufferHandle bufferSrc, OUT GMComputeBufferHandle* bufferOut) override;
+	virtual bool createReadOnlyBufferFrom(GMComputeBufferHandle bufferSrc, OUT GMComputeBufferHandle* bufferOut) override;
 	virtual bool createBuffer(GMuint32 elementSize, GMuint32 count, void* initData, GMComputeBufferType type, OUT GMComputeBufferHandle* ppBufOut) override;
 	virtual void release(GMComputeBufferHandle) override;
 	virtual bool createBufferShaderResourceView(GMComputeBufferHandle, OUT GMComputeSRVHandle*) override;
 	virtual bool createBufferUnorderedAccessView(GMComputeBufferHandle, OUT GMComputeUAVHandle*) override;
 	virtual void setShaderResourceView(GMuint32, GMComputeSRVHandle*) override;
 	virtual void setUnorderedAccessView(GMuint32, GMComputeUAVHandle*) override;
-	virtual void setBuffer(GMComputeBufferHandle, void*, GMuint32) override;
+	virtual void setConstantBuffer(GMComputeBufferHandle, void*, GMuint32) override;
 	virtual void copyBuffer(GMComputeBufferHandle dest, GMComputeBufferHandle src) override;
 	virtual void* mapBuffer(GMComputeBufferHandle handle) override;
 	virtual void unmapBuffer(GMComputeBufferHandle handle) override;
+	virtual bool canRead(GMComputeBufferHandle handle) override;
 
 public:
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;

@@ -498,7 +498,7 @@ void GMGLComputeShaderProgram::load(const GMString& path, const GMString& source
 	}
 }
 
-bool GMGLComputeShaderProgram::createBufferFrom(GMComputeBufferHandle bufferSrc, OUT GMComputeBufferHandle* bufferOut)
+bool GMGLComputeShaderProgram::createReadOnlyBufferFrom(GMComputeBufferHandle bufferSrc, OUT GMComputeBufferHandle* bufferOut)
 {
 	GMuint32 src = (GMuint32)bufferSrc;
 	GMGLBeginGetErrorsAndCheck();
@@ -518,9 +518,20 @@ bool GMGLComputeShaderProgram::createBuffer(GMuint32 elementSize, GMuint32 count
 	GMuint32 buf = 0;
 	GMGLBeginGetErrorsAndCheck();
 	glGenBuffers(1, &buf);
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, buf);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, elementSize * count, pInitData, type == GMComputeBufferType::Structured ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+	if (type == GMComputeBufferType::Structured)
+	{
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, buf);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, elementSize * count, pInitData, GL_STATIC_DRAW);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+	}
+	else
+	{
+		GM_ASSERT(type == GMComputeBufferType::Constant);
+		glBindBuffer(GL_UNIFORM_BUFFER, buf);
+		glBufferData(GL_UNIFORM_BUFFER, elementSize * count, pInitData, GL_STATIC_DRAW);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	}
 	GMGLEndGetErrorsAndCheck();
 	*ppBufOut = (GMComputeBufferHandle) buf;
 	return buf != 0;
@@ -555,7 +566,7 @@ void GMGLComputeShaderProgram::setShaderResourceView(GMuint32 cnt, GMComputeSRVH
 		GMuint32 buf = (GMuint32)srvs[i];
 		GMGLBeginGetErrorsAndCheck();
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, buf);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, d->uniformBase++, buf);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, d->ssboBase++, buf);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 		GMGLEndGetErrorsAndCheck();
 	}
@@ -566,14 +577,14 @@ void GMGLComputeShaderProgram::setUnorderedAccessView(GMuint32 cnt, GMComputeUAV
 	setShaderResourceView(cnt, uavs);
 }
 
-void GMGLComputeShaderProgram::setBuffer(GMComputeBufferHandle handle, void* dataPtr, GMuint32 sz)
+void GMGLComputeShaderProgram::setConstantBuffer(GMComputeBufferHandle handle, void* dataPtr, GMuint32 sz)
 {
 	D(d);
 	GMuint32 buf = (GMuint32) handle;
 	GMGLBeginGetErrorsAndCheck();
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, buf);
 	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sz, dataPtr);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, d->uniformBase++, buf);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, d->uboBase++, buf);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	GMGLEndGetErrorsAndCheck();
 }
@@ -615,6 +626,12 @@ void GMGLComputeShaderProgram::unmapBuffer(GMComputeBufferHandle handle)
 	GMGLEndGetErrorsAndCheck();
 }
 
+
+bool GMGLComputeShaderProgram::canRead(GMComputeBufferHandle handle)
+{
+	return true;
+}
+
 bool GMGLComputeShaderProgram::setInterface(GameMachineInterfaceID id, void* in)
 {
 	return false;
@@ -635,5 +652,6 @@ void GMGLComputeShaderProgram::dispose()
 void GMGLComputeShaderProgram::cleanUp()
 {
 	D(d);
-	d->uniformBase = 0;
+	d->ssboBase = 0;
+	d->uboBase = 0;
 }

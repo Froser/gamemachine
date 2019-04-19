@@ -252,23 +252,23 @@ void GMGameObject::releaseAllBufferHandle()
 	D(d);
 	if (auto shaderProgram = getCullShaderProgram())
 	{
-		shaderProgram->release(d->cullBufferHandle);
-		d->cullBufferHandle = 0;
+		shaderProgram->release(d->cullAABBsBuffer);
+		d->cullAABBsBuffer = 0;
 
-		shaderProgram->release(d->cullBufferGPUResultHandle);
-		d->cullBufferGPUResultHandle = 0;
+		shaderProgram->release(d->cullGPUResultBuffer);
+		d->cullGPUResultBuffer = 0;
 
-		shaderProgram->release(d->cullBufferCPUResultHandle);
-		d->cullBufferCPUResultHandle = 0;
+		shaderProgram->release(d->cullCPUResultBuffer);
+		d->cullCPUResultBuffer = 0;
 
-		shaderProgram->release(d->cullConstantBufferHandle);
-		d->cullConstantBufferHandle = 0;
+		shaderProgram->release(d->cullFrustumBuffer);
+		d->cullFrustumBuffer = 0;
 
-		shaderProgram->release(d->cullSRVHandle);
-		d->cullSRVHandle = 0;
+		shaderProgram->release(d->cullAABBsSRV);
+		d->cullAABBsSRV = 0;
 
-		shaderProgram->release(d->cullResultHandle);
-		d->cullResultHandle = 0;
+		shaderProgram->release(d->cullResultUAV);
+		d->cullResultUAV = 0;
 	}
 }
 
@@ -365,12 +365,12 @@ void GMGameObject::cull()
 				releaseAllBufferHandle();
 
 				typedef std::remove_reference_t<decltype(d->cullAABB[0])> AABB;
-				if (cullShaderProgram->createBuffer(sizeof(AABB), gm_sizet_to_uint(d->cullSize), d->cullAABB.data(), GMComputeBufferType::Structured, &d->cullBufferHandle) &&
-					cullShaderProgram->createBuffer(sizeof(CullResult), gm_sizet_to_uint(d->cullSize), d->cullResult.data(), GMComputeBufferType::Structured, &d->cullBufferGPUResultHandle) &&
-					cullShaderProgram->createBuffer(sizeof(GMFrustumPlanes), 1u, NULL, GMComputeBufferType::Constant, &d->cullConstantBufferHandle) &&
-					cullShaderProgram->createBufferShaderResourceView(d->cullBufferHandle, &d->cullSRVHandle) &&
-					cullShaderProgram->createBufferFrom(d->cullBufferGPUResultHandle, &d->cullBufferCPUResultHandle) &&
-					cullShaderProgram->createBufferUnorderedAccessView(d->cullBufferGPUResultHandle, &d->cullResultHandle))
+				if (cullShaderProgram->createBuffer(sizeof(AABB), gm_sizet_to_uint(d->cullSize), d->cullAABB.data(), GMComputeBufferType::Structured, &d->cullAABBsBuffer) &&
+					cullShaderProgram->createBuffer(sizeof(CullResult), gm_sizet_to_uint(d->cullSize), d->cullResult.data(), GMComputeBufferType::Structured, &d->cullGPUResultBuffer) &&
+					cullShaderProgram->createBuffer(sizeof(GMFrustumPlanes), 1u, NULL, GMComputeBufferType::Constant, &d->cullFrustumBuffer) &&
+					cullShaderProgram->createBufferShaderResourceView(d->cullAABBsBuffer, &d->cullAABBsSRV) &&
+					cullShaderProgram->createReadOnlyBufferFrom(d->cullGPUResultBuffer, &d->cullCPUResultBuffer) &&
+					cullShaderProgram->createBufferUnorderedAccessView(d->cullGPUResultBuffer, &d->cullResultUAV))
 				{
 					// create succeed
 				}
@@ -385,21 +385,25 @@ void GMGameObject::cull()
 			GMCamera* camera = d->cullCamera ? d->cullCamera : &getContext()->getEngine()->getCamera();
 			GMFrustumPlanes planes;
 			camera->getFrustum().getPlanes(planes);
-			cullShaderProgram->setBuffer(d->cullConstantBufferHandle, &planes, sizeof(GMFrustumPlanes));
-			GMComputeSRVHandle srvs[] = { d->cullSRVHandle };
+			cullShaderProgram->setConstantBuffer(d->cullFrustumBuffer, &planes, sizeof(GMFrustumPlanes));
+			GMComputeSRVHandle srvs[] = { d->cullAABBsSRV };
 			cullShaderProgram->setShaderResourceView(1, srvs);
-			GMComputeUAVHandle uavs[] = { d->cullResultHandle };
+			GMComputeUAVHandle uavs[] = { d->cullResultUAV };
 			cullShaderProgram->setUnorderedAccessView(1, uavs);
 			cullShaderProgram->dispatch(gm_sizet_to_uint(d->cullAABB.size()), 1, 1);
-			cullShaderProgram->copyBuffer(d->cullBufferCPUResultHandle, d->cullBufferGPUResultHandle);
-			CullResult* resultPtr = static_cast<CullResult*>(cullShaderProgram->mapBuffer(d->cullBufferCPUResultHandle));
+
+			bool canReadFromGPU = cullShaderProgram->canRead(d->cullGPUResultBuffer);
+			GMComputeBufferHandle resultHandle = canReadFromGPU ? d->cullGPUResultBuffer : d->cullCPUResultBuffer;
+			if (!canReadFromGPU)
+				cullShaderProgram->copyBuffer(resultHandle, d->cullGPUResultBuffer);
+			CullResult* resultPtr = static_cast<CullResult*>(cullShaderProgram->mapBuffer(resultHandle));
 			Vector<GMAsset>& models = getScene()->getModels();
 			for (GMsize_t i = 0; i < models.size(); ++i)
 			{
 				auto& shader = models[i].getModel()->getShader();
 				shader.setDiscard(resultPtr[i].visible == 0);
 			}
-			cullShaderProgram->unmapBuffer(d->cullBufferCPUResultHandle);
+			cullShaderProgram->unmapBuffer(d->cullCPUResultBuffer);
 		}
 		else
 		{

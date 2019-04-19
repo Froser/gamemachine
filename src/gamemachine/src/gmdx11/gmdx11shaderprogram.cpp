@@ -252,7 +252,7 @@ void GMDx11ComputeShaderProgram::load(const GMString& path, const GMString& sour
 }
 
 
-bool GMDx11ComputeShaderProgram::createBufferFrom(GMComputeBufferHandle bufferSrc, OUT GMComputeBufferHandle* bufferOut)
+bool GMDx11ComputeShaderProgram::createReadOnlyBufferFrom(GMComputeBufferHandle bufferSrc, OUT GMComputeBufferHandle* bufferOut)
 {
 	D(d);
 	if (bufferOut)
@@ -422,7 +422,7 @@ void GMDx11ComputeShaderProgram::setUnorderedAccessView(GMuint32 num, GMComputeU
 	}
 }
 
-void GMDx11ComputeShaderProgram::setBuffer(GMComputeBufferHandle handle, void* dataPtr, GMuint32 sizeInBytes)
+void GMDx11ComputeShaderProgram::setConstantBuffer(GMComputeBufferHandle handle, void* dataPtr, GMuint32 sizeInBytes)
 {
 	D(d);
 	if (handle)
@@ -462,6 +462,15 @@ void GMDx11ComputeShaderProgram::unmapBuffer(GMComputeBufferHandle handle)
 	ID3D11DeviceContext* dc = d->engine->getDeviceContext();
 	ID3D11Buffer* buffer = static_cast<ID3D11Buffer*>(handle);
 	dc->Unmap(buffer, 0);
+}
+
+
+bool GMDx11ComputeShaderProgram::canRead(GMComputeBufferHandle handle)
+{
+	ID3D11Buffer* buffer = static_cast<ID3D11Buffer*>(handle);
+	D3D11_BUFFER_DESC desc = { 0 };
+	buffer->GetDesc(&desc);
+	return desc.CPUAccessFlags & D3D11_CPU_ACCESS_READ;
 }
 
 bool GMDx11ComputeShaderProgram::setInterface(GameMachineInterfaceID id, void* in)

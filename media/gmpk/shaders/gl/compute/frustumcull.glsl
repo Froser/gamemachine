@@ -6,23 +6,22 @@ struct Vertices
 	vec4 vertices[8];
 };
 
-layout(std140, binding = 0) buffer FrustumPlanes
+layout(std140, binding = 0) uniform FrustumPlanes
 {
 	vec4 planes[6]; // //Normal & intercept. X.N + intercept = 0
 };
 
-layout(std140, binding = 1) buffer AABB
+layout(std140, binding = 0) buffer AABB
 {
 	Vertices vertices[]; // AABB
 };
 
-layout(std140, binding = 2) buffer Result
+layout(std140, binding = 1) buffer Result
 {
 	int visible[];
 };
 
 layout (local_size_x = 1, local_size_y = 1) in;
-
 
 const float EPSILON = 0.01f;
 const int POINT_ON_PLANE = 0;
