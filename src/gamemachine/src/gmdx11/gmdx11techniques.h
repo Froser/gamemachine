@@ -36,7 +36,7 @@ GM_PRIVATE_OBJECT(GMDx11Technique)
 	GMOwnedPtr<GMDx11RasterizerStates> rasterizerStates;
 	GMOwnedPtr<GMDx11BlendStates> blendStates;
 	GMOwnedPtr<GMDx11DepthStencilStates> depthStencilStates;
-	GMOwnedPtr<GMDx11EffectVariableBank> bank;
+	GMDx11EffectVariableBank* bank = nullptr;
 
 	GMComPtr<ID3D11InputLayout> inputLayout;
 	GMComPtr<ID3DX11Effect> effect;
@@ -61,7 +61,7 @@ class GMDx11Technique : public GMObject, public ITechnique
 
 public:
 	GMDx11Technique(const IRenderContext* context);
-	~GMDx11Technique() = default;
+	~GMDx11Technique();
 
 public:
 	virtual void beginScene(GMScene* scene) override;

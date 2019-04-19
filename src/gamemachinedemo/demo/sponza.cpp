@@ -140,7 +140,7 @@ void Demo_Sponza::createMenu()
 
 	widget->addControl(d->cpu = gm::GMControlLabel::createControl(
 		widget,
-		L"CPU裁剪：开",
+		L"裁剪：开",
 		GMVec4(1, 1, 1, 1),
 		10,
 		top,
@@ -152,7 +152,7 @@ void Demo_Sponza::createMenu()
 	gm::GMControlButton* button = nullptr;
 	widget->addControl(button = gm::GMControlButton::createControl(
 		widget,
-		L"关闭CPU裁剪",
+		L"关闭裁剪",
 		10,
 		top += 40,
 		250,
@@ -164,13 +164,13 @@ void Demo_Sponza::createMenu()
 		if (d->sponza)
 		{
 			d->sponza->setCullOption(gm::GMGameObjectCullOption::None);
-			d->cpu->setText(L"CPU裁剪：关");
+			d->cpu->setText(L"裁剪：关");
 		}
 	});
 
 	widget->addControl(button = gm::GMControlButton::createControl(
 		widget,
-		L"打开CPU裁剪",
+		L"打开裁剪",
 		10,
 		top += 40,
 		250,
@@ -182,7 +182,7 @@ void Demo_Sponza::createMenu()
 		if (d->sponza)
 		{
 			d->sponza->setCullOption(gm::GMGameObjectCullOption::AABB);
-			d->cpu->setText(L"CPU裁剪：开");
+			d->cpu->setText(L"裁剪：开");
 		}
 	});
 
@@ -195,7 +195,7 @@ void Demo_Sponza::createObject()
 	D_BASE(db, Base);
 	
 	gm::GMModelLoadSettings loadSettings(
-		"sarah/n901.obj",
+		"sponza/sponza.obj",
 		getDemoWorldReference()->getContext()
 	);
 

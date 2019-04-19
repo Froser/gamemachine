@@ -23,12 +23,17 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	bool autoUpdateTransformMatrix = true;
 	GMAsset asset;
 
+	struct CullResult
+	{
+		GMint32 visible = false;
+	};
 	GM_ALIGNED_16(struct) AABB
 	{
 		GMVec4 points[8];
 	};
 	GMGameObjectCullOption cullOption = GMGameObjectCullOption::None;
 	AlignedVector<AABB> cullAABB;
+	Vector<CullResult> cullResult;
 	GMCamera* cullCamera = nullptr;
 	IComputeShaderProgram* cullShaderProgram = nullptr;
 	GMComputeBufferHandle cullBufferHandle = 0;
@@ -37,6 +42,7 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	GMComputeBufferHandle cullConstantBufferHandle = 0;
 	GMComputeSRVHandle cullSRVHandle = 0;
 	GMComputeUAVHandle cullResultHandle = 0;
+	GMsize_t cullSize = 0;
 	bool cullGPUAccelerationValid = true;
 
 	GM_ALIGNED_16(struct)
@@ -137,6 +143,8 @@ private:
 		D(d);
 		d->autoUpdateTransformMatrix = autoUpdateTransformMatrix;
 	}
+
+	void releaseAllBufferHandle();
 
 public:
 	static void setDefaultCullShaderProgram(IComputeShaderProgram* shaderProgram);

@@ -77,9 +77,6 @@ public:
 class GMAlignmentObject
 {
 	GM_DECLARE_ALIGNED_ALLOCATOR();
-
-public:
-	virtual ~GMAlignmentObject() {}
 };
 
 #define GM_ALIGNED_STRUCT_FROM(name, from) GM_ALIGNED_16(struct) name : public from

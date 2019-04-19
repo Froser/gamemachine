@@ -16,8 +16,10 @@ BEGIN_NS
 
 // 对象存储
 template <typename T>
-GM_ALIGNED_STRUCT(GMObjectPrivateBase)
+GM_ALIGNED_16(struct) GMObjectPrivateBase
 {
+	GM_DECLARE_ALIGNED_ALLOCATOR();
+	virtual ~GMObjectPrivateBase() {}
 };
 
 template <typename T>

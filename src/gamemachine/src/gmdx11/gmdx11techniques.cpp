@@ -346,7 +346,7 @@ GMDx11EffectVariableBank& GMDx11Technique::getVarBank()
 {
 	D(d);
 	if (!d->bank)
-		d->bank = gm_makeOwnedPtr<GMDx11EffectVariableBank>();
+		d->bank = new GMDx11EffectVariableBank();
 	return *d->bank;
 }
 
@@ -577,6 +577,12 @@ GMDx11Technique::GMDx11Technique(const IRenderContext* context)
 		d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
 		getVarBank().init(d->effect);
 	}
+}
+
+GMDx11Technique::~GMDx11Technique()
+{
+	D(d);
+	GM_delete(d->bank);
 }
 
 void GMDx11Technique::beginScene(GMScene* scene)
