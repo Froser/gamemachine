@@ -82,7 +82,7 @@ public:
 	virtual void onAppendingObjectToWorld();
 	virtual void onRemovingObjectFromWorld() {}
 	virtual void draw();
-	virtual void update(GMDuration dt);
+	virtual void update(GMDuration dt) {}
 	virtual bool canDeferredRendering();
 	virtual const IRenderContext* getContext();
 	virtual bool isSkeletalObject() const;
@@ -93,6 +93,7 @@ protected:
 	virtual void endDraw();
 	virtual void makeAABB();
 	virtual IComputeShaderProgram* getCullShaderProgram();
+	virtual void cull();
 
 public:
 	void updateTransformMatrix();
