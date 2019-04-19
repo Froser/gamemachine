@@ -10,6 +10,7 @@
 #include "gmgllight.h"
 #include "gmengine/ui/gmwindow.h"
 #include "gmglhelper.h"
+#include <GL/glew.h>
 
 void GMGLFactory::createWindow(GMInstance instance, IWindow* parent, OUT IWindow** window)
 {
@@ -122,5 +123,19 @@ void GMGLFactory::createShaderPrograms(const IRenderContext* context, const GMRe
 
 bool GMGLFactory::createComputeShaderProgram(const IRenderContext* context, OUT IComputeShaderProgram** out)
 {
-	return false;
+	static GMint32 s_glVersion[2];
+	static std::once_flag s_flag;
+	std::call_once(s_flag, [](GMint32* version) {
+		glGetIntegerv(GL_MAJOR_VERSION, &version[0]);
+		glGetIntegerv(GL_MINOR_VERSION, &version[1]);
+	}, s_glVersion);
+
+	if (s_glVersion[0] < 4 || (s_glVersion[0] == 4 && s_glVersion[1] < 3))
+		return false;
+
+	if (out)
+	{
+		*out = new GMGLComputeShaderProgram(context);
+	}
+	return true;
 }

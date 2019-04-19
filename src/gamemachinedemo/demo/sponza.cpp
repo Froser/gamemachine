@@ -195,7 +195,7 @@ void Demo_Sponza::createObject()
 	D_BASE(db, Base);
 	
 	gm::GMModelLoadSettings loadSettings(
-		"sponza/sponza.obj",
+		"sarah/n901.obj",
 		getDemoWorldReference()->getContext()
 	);
 

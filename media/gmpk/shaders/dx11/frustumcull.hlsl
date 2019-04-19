@@ -36,21 +36,21 @@ bool isBoundingBoxInside(float4 planes[6], AABB aabb)
 	for (int i = 0; i < 6; ++i)
 	{
 		//if a point is not behind this plane, try next plane
-		if (classifyPoint(aabb.vertices[0], planes[i]) != POINT_BEHIND_PLANE)
+		if (classifyPoint(aabb.vertices[0].xyz, planes[i]) != POINT_BEHIND_PLANE)
 			continue;
-		if (classifyPoint(aabb.vertices[1], planes[i]) != POINT_BEHIND_PLANE)
+		if (classifyPoint(aabb.vertices[1].xyz, planes[i]) != POINT_BEHIND_PLANE)
 			continue;
-		if (classifyPoint(aabb.vertices[2], planes[i]) != POINT_BEHIND_PLANE)
+		if (classifyPoint(aabb.vertices[2].xyz, planes[i]) != POINT_BEHIND_PLANE)
 			continue;
-		if (classifyPoint(aabb.vertices[3], planes[i]) != POINT_BEHIND_PLANE)
+		if (classifyPoint(aabb.vertices[3].xyz, planes[i]) != POINT_BEHIND_PLANE)
 			continue;
-		if (classifyPoint(aabb.vertices[4], planes[i]) != POINT_BEHIND_PLANE)
+		if (classifyPoint(aabb.vertices[4].xyz, planes[i]) != POINT_BEHIND_PLANE)
 			continue;
-		if (classifyPoint(aabb.vertices[5], planes[i]) != POINT_BEHIND_PLANE)
+		if (classifyPoint(aabb.vertices[5].xyz, planes[i]) != POINT_BEHIND_PLANE)
 			continue;
-		if (classifyPoint(aabb.vertices[6], planes[i]) != POINT_BEHIND_PLANE)
+		if (classifyPoint(aabb.vertices[6].xyz, planes[i]) != POINT_BEHIND_PLANE)
 			continue;
-		if (classifyPoint(aabb.vertices[7], planes[i]) != POINT_BEHIND_PLANE)
+		if (classifyPoint(aabb.vertices[7].xyz, planes[i]) != POINT_BEHIND_PLANE)
 			continue;
 
 		//All vertices of the box are behind this plane

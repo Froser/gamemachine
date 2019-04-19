@@ -253,11 +253,22 @@ void GMGameObject::releaseAllBufferHandle()
 	if (auto shaderProgram = getCullShaderProgram())
 	{
 		shaderProgram->release(d->cullBufferHandle);
+		d->cullBufferHandle = 0;
+
 		shaderProgram->release(d->cullBufferGPUResultHandle);
+		d->cullBufferGPUResultHandle = 0;
+
 		shaderProgram->release(d->cullBufferCPUResultHandle);
+		d->cullBufferCPUResultHandle = 0;
+
 		shaderProgram->release(d->cullConstantBufferHandle);
+		d->cullConstantBufferHandle = 0;
+
 		shaderProgram->release(d->cullSRVHandle);
+		d->cullSRVHandle = 0;
+
 		shaderProgram->release(d->cullResultHandle);
+		d->cullResultHandle = 0;
 	}
 }
 
@@ -297,7 +308,6 @@ void GMGameObject::endDraw()
 	d->drawContext.currentTechnique = nullptr;
 }
 
-
 void GMGameObject::makeAABB()
 {
 	D(d);
@@ -330,13 +340,11 @@ void GMGameObject::makeAABB()
 	}
 }
 
-
 IComputeShaderProgram* GMGameObject::getCullShaderProgram()
 {
 	D(d);
 	return s_defaultComputeShaderProgram ? s_defaultComputeShaderProgram : d->cullShaderProgram;
 }
-
 
 void GMGameObject::cull()
 {
@@ -391,7 +399,7 @@ void GMGameObject::cull()
 				auto& shader = models[i].getModel()->getShader();
 				shader.setDiscard(resultPtr[i].visible == 0);
 			}
-			cullShaderProgram->unmapBuffer(d->cullBufferGPUResultHandle);
+			cullShaderProgram->unmapBuffer(d->cullBufferCPUResultHandle);
 		}
 		else
 		{

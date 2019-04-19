@@ -269,7 +269,7 @@ GM_INTERFACE_FROM(IComputeShaderProgram, IQueriable)
 	virtual void dispatch(GMint32 threadGroupCountX, GMint32 threadGroupCountY, GMint32 threadGroupCountZ) = 0;
 	virtual void load(const GMString& path, const GMString& source, const GMString& entryPoint) = 0;
 	virtual bool createBufferFrom(GMComputeBufferHandle bufferSrc, OUT GMComputeBufferHandle* bufferOut) = 0;
-	virtual bool createBuffer(GMuint32 elementSize, GMuint32 uCount, void* pInitData, GMComputeBufferType type, OUT GMComputeBufferHandle* ppBufOut) = 0;
+	virtual bool createBuffer(GMuint32 elementSize, GMuint32 count, void* initData, GMComputeBufferType type, OUT GMComputeBufferHandle* bufOut) = 0;
 	virtual bool createBufferShaderResourceView(GMComputeBufferHandle, OUT GMComputeSRVHandle*) = 0;
 	virtual bool createBufferUnorderedAccessView(GMComputeBufferHandle, OUT GMComputeUAVHandle*) = 0;
 	virtual void setShaderResourceView(GMuint32 num, GMComputeSRVHandle* handles) = 0;

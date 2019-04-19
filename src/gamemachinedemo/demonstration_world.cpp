@@ -814,6 +814,16 @@ void DemostrationEntrance::onLoadShaders(const gm::IRenderContext* context)
 			L"gl/filters/filters.vert",
 			L"gl/filters/filters.frag"
 		);
+
+		d->defaultCullShaderProgram = createComputeShader(context,
+			L"gl/compute/frustumcull.glsl",
+			L"Main"
+		);
+
+		if (d->defaultCullShaderProgram)
+		{
+			gm::GMGameObject::setDefaultCullShaderProgram(d->defaultCullShaderProgram);
+		}
 	}
 	else
 	{
