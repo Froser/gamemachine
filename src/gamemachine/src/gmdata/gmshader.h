@@ -216,7 +216,8 @@ GM_PRIVATE_OBJECT(GMShader)
 	GMS_BlendOp blendOpAlpha = GMS_BlendOp::Add;
 	GMS_VertexColorOp vertexColorOp = GMS_VertexColorOp::DoNotUseVertexColor;
 	bool blend = false;
-	bool discard = false;
+	bool visible = true;
+	bool culled = false;
 	bool noDepthTest = false;
 	bool drawBorder = false;
 	GMVec3 lineColor = GMVec3(0);
@@ -227,6 +228,7 @@ GM_PRIVATE_OBJECT(GMShader)
 GM_ALIGNED_16(class) GMShader : public IDestroyObject
 {
 	GM_DECLARE_PRIVATE_NGO(GMShader)
+	GM_FRIEND_CLASS(GMGameObject)
 	GM_DECLARE_ALIGNED_ALLOCATOR()
 
 public:
@@ -243,7 +245,7 @@ public:
 	GM_DECLARE_PROPERTY(BlendFactorDestAlpha, blendFactorDestAlpha);
 	GM_DECLARE_PROPERTY(BlendOpAlpha, blendOpAlpha);
 	GM_DECLARE_PROPERTY(Blend, blend);
-	GM_DECLARE_PROPERTY(Discard, discard);
+	GM_DECLARE_PROPERTY(Visible, visible);
 	GM_DECLARE_PROPERTY(NoDepthTest, noDepthTest);
 	GM_DECLARE_PROPERTY(TextureList, textureList);
 	GM_DECLARE_PROPERTY(LineColor, lineColor);
@@ -268,6 +270,21 @@ public:
 	{
 		setBlendOpRGB(op);
 		setBlendOpAlpha(op);
+	}
+
+	// GMGameObject:
+private:
+	inline void setCulled(bool culled)
+	{
+		// 设置一个物体是否被裁剪，如果为true，则表示它不在frustum内，一般情况下不进行绘制
+		D(d);
+		d->culled = culled;
+	}
+
+	inline bool isCulled()
+	{
+		D(d);
+		return d->culled;
 	}
 };
 END_NS

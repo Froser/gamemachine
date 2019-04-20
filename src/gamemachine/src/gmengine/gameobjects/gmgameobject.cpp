@@ -241,7 +241,7 @@ void GMGameObject::setCullOption(GMGameObjectCullOption option, GMCamera* camera
 		for (GMsize_t i = 0; i < d->cullAABB.size(); ++i)
 		{
 			auto& shader = models[i].getModel()->getShader();
-			shader.setDiscard(false);
+			shader.setVisible(true);
 		}
 	}
 }
@@ -280,10 +280,9 @@ void GMGameObject::setDefaultCullShaderProgram(IComputeShaderProgram* shaderProg
 void GMGameObject::drawModel(const IRenderContext* context, GMModel* model)
 {
 	D(d);
-	IGraphicEngine* engine = context->getEngine();
-	if (model->getShader().getDiscard())
+	if (!model->getShader().getVisible() || model->getShader().isCulled())
 		return;
-
+	IGraphicEngine* engine = context->getEngine();
 	ITechnique* technique = engine->getTechnique(model->getType());
 	if (technique != d->drawContext.currentTechnique)
 	{
@@ -401,7 +400,7 @@ void GMGameObject::cull()
 			for (GMsize_t i = 0; i < models.size(); ++i)
 			{
 				auto& shader = models[i].getModel()->getShader();
-				shader.setDiscard(resultPtr[i].visible == 0);
+				shader.setCulled(resultPtr[i].visible == 0);
 			}
 			cullShaderProgram->unmapBuffer(d->cullCPUResultBuffer);
 		}
@@ -430,9 +429,9 @@ void GMGameObject::cull()
 					}
 
 					if (isInsideCameraFrustum(d->cullCamera ? d->cullCamera : &getContext()->getEngine()->getCamera(), vertices))
-						shader.setDiscard(false);
+						shader.setCulled(false);
 					else
-						shader.setDiscard(true);
+						shader.setCulled(true);
 				}
 			}
 			);

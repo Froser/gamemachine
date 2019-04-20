@@ -539,12 +539,12 @@ void GMBSPShaderLoader::parse_map_tcMod(GMShader& shader, GMXMLElement* elem)
 void GMBSPShaderLoader::createSky(GMShader& shader)
 {
 	D(d);
-	shader.setDiscard(true);
+	shader.setVisible(false);
 	if (!d->world->getSky())
 	{
 		GMShader skyShader = shader;
 
-		skyShader.setDiscard(false);
+		skyShader.setVisible(true);
 		skyShader.setCull(GMS_Cull::None);
 		skyShader.setBlend(false);
 
