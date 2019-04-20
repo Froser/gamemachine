@@ -190,6 +190,7 @@ int main(int argc, char* argv[])
 			resultPtr = static_cast<GMint32*>(prog->mapBuffer(cpuResult));
 			correct = verify(c, resultPtr, sz);
 			prog->unmapBuffer(cpuResult);
+			prog->release(cpuResult);
 		}
 		stopwatch.stop();
 		printf("Verifing finished. Elapsed: %f. Result: %s.\r\n", stopwatch.timeInSecond(), correct ? "Correct" : "Incorrect");
