@@ -247,7 +247,7 @@ void GMDx11ComputeShaderProgram::load(const GMString& path, const GMString& sour
 	else
 	{
 		ID3D11Device* device = d->engine->getDevice();
-		device->CreateComputeShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), nullptr, &d->shader);
+		GM_DX_HR(device->CreateComputeShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), nullptr, &d->shader));
 	}
 }
 
@@ -470,7 +470,7 @@ bool GMDx11ComputeShaderProgram::canRead(GMComputeBufferHandle handle)
 	ID3D11Buffer* buffer = static_cast<ID3D11Buffer*>(handle);
 	D3D11_BUFFER_DESC desc = { 0 };
 	buffer->GetDesc(&desc);
-	return desc.CPUAccessFlags & D3D11_CPU_ACCESS_READ;
+	return !!(desc.CPUAccessFlags & D3D11_CPU_ACCESS_READ);
 }
 
 bool GMDx11ComputeShaderProgram::setInterface(GameMachineInterfaceID id, void* in)

@@ -817,7 +817,7 @@ void DemostrationEntrance::onLoadShaders(const gm::IRenderContext* context)
 
 		d->defaultCullShaderProgram = createComputeShader(context,
 			L"gl/compute/frustumcull.glsl",
-			L"Main"
+			L"main"
 		);
 
 		if (d->defaultCullShaderProgram)

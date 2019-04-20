@@ -81,8 +81,7 @@ void GMGLGraphicEngine::installShaders()
 	D_BASE(d, Base);
 	if (!getShaderLoadCallback())
 	{
-		gm_error(gm_dbg_wrap("You must specify a IShaderLoadCallback"));
-		GM_ASSERT(false);
+		gm_warning(gm_dbg_wrap("An IShaderLoadCallback is missing."));
 		return;
 	}
 

@@ -309,7 +309,8 @@ void GameMachine::finalize()
 {
 	D(d);
 	eachHandler([](auto, auto handler) {
-		handler->event(GameMachineHandlerEvent::Terminate);
+		if (handler)
+			handler->event(GameMachineHandlerEvent::Terminate);
 	});
 
 	for (auto iter = d->managerQueue.rbegin(); iter != d->managerQueue.rend(); ++iter)
