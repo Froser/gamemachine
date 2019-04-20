@@ -11,12 +11,12 @@ layout(std140, binding = 0) uniform FrustumPlanes
 	vec4 planes[6]; // //Normal & intercept. X.N + intercept = 0
 };
 
-layout(std140, binding = 0) buffer AABB
+layout(std430, binding = 1) buffer AABB
 {
 	Vertices vertices[]; // AABB
 };
 
-layout(std140, binding = 1) buffer Result
+layout(std430, binding = 2) buffer Result
 {
 	int visible[];
 };

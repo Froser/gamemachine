@@ -79,8 +79,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLComputeShaderProgram)
 	const IRenderContext* context = nullptr;
 	GMuint32 shaderProgram = 0;
 	GMuint32 shaderId = 0;
-	GMuint32 ssboBase = 0;
-	GMuint32 uboBase = 0;
+	GMuint32 boBase = 0;
 };
 
 class GM_EXPORT GMGLComputeShaderProgram : public IComputeShaderProgram

@@ -566,7 +566,7 @@ void GMGLComputeShaderProgram::setShaderResourceView(GMuint32 cnt, GMComputeSRVH
 		GMuint32 buf = (GMuint32)srvs[i];
 		GMGLBeginGetErrorsAndCheck();
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, buf);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, d->ssboBase++, buf);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, d->boBase++, buf);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 		GMGLEndGetErrorsAndCheck();
 	}
@@ -582,10 +582,10 @@ void GMGLComputeShaderProgram::setConstantBuffer(GMComputeBufferHandle handle, v
 	D(d);
 	GMuint32 buf = (GMuint32) handle;
 	GMGLBeginGetErrorsAndCheck();
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, buf);
-	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sz, dataPtr);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, d->uboBase++, buf);
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+	glBindBuffer(GL_UNIFORM_BUFFER, buf);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sz, dataPtr);
+	glBindBufferBase(GL_UNIFORM_BUFFER, d->boBase++, buf);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	GMGLEndGetErrorsAndCheck();
 }
 
@@ -652,6 +652,5 @@ void GMGLComputeShaderProgram::dispose()
 void GMGLComputeShaderProgram::cleanUp()
 {
 	D(d);
-	d->ssboBase = 0;
-	d->uboBase = 0;
+	d->boBase = 0;
 }
