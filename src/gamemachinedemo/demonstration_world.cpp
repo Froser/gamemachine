@@ -6,9 +6,9 @@
 #include <gmgl.h>
 #include <gmgraphicengine.h>
 #include <gmrendertechnique.h>
-#include <gmglhelper.h>
 #include <gmmodelreader.h>
 #include <gmtools.h>
+#include <gmshaderhelper.h>
 
 #include "demo/texture.h"
 #include "demo/normalmap.h"
@@ -33,10 +33,6 @@
 #include "demo/customlight.h"
 #include "demo/wave.h"
 #include "demo/sponza.h"
-
-#if GM_USE_DX11
-#include <gmdx11helper.h>
-#endif
 
 extern gm::GMRenderEnvironment GetRenderEnv();
 
@@ -84,26 +80,6 @@ namespace
 
 		world->init();
 	}
-
-	gm::IComputeShaderProgram* createComputeShader(
-		const gm::IRenderContext* context,
-		const gm::GMString& path,
-		const gm::GMString& entryPoint
-	)
-	{
-		gm::IComputeShaderProgram* shaderProgram = nullptr;
-		gm::GMBuffer buffer;
-		gm::GMString filename;
-		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, path, &buffer, &filename);
-		buffer.convertToStringBuffer();
-
-		if (GM.getFactory()->createComputeShaderProgram(context, &shaderProgram))
-		{
-			shaderProgram->load(filename, gm::GMString((char*)buffer.buffer), entryPoint);
-		}
-		return shaderProgram;
-	}
-
 }
 
 DemoHandler::DemoHandler(DemonstrationWorld* parentDemonstrationWorld)
@@ -800,47 +776,9 @@ void DemostrationEntrance::onLoadShaders(const gm::IRenderContext* context)
 	Demo_CustomAndDefaultShader::initCustomShader(context);
 	Demo_CustomLight::initCustomShader(context);
 	gm::GMWaveGameObject::initShader(context);
-	auto& env = GM.getRunningStates().renderEnvironment;
-	if (env == gm::GMRenderEnvironment::OpenGL)
-	{
-		gm::GMGLHelper::loadShader(
-			context,
-			L"gl/main.vert",
-			L"gl/main.frag",
-			L"gl/deferred/geometry_pass_main.vert",
-			L"gl/deferred/geometry_pass_main.frag",
-			L"gl/deferred/light_pass_main.vert",
-			L"gl/deferred/light_pass_main.frag",
-			L"gl/filters/filters.vert",
-			L"gl/filters/filters.frag"
-		);
 
-		d->defaultCullShaderProgram = createComputeShader(context,
-			L"gl/compute/frustumcull.glsl",
-			L"main"
-		);
-
-		if (d->defaultCullShaderProgram)
-		{
-			gm::GMGameObject::setDefaultCullShaderProgram(d->defaultCullShaderProgram);
-		}
-	}
-	else
-	{
-#if GM_USE_DX11
-		gm::GMDx11Helper::loadShader(context, L"dx11/effect.fx");
-
-		d->defaultCullShaderProgram = createComputeShader(context,
-			L"dx11/frustumcull.hlsl",
-			L"Main"
-		);
-
-		if (d->defaultCullShaderProgram)
-		{
-			gm::GMGameObject::setDefaultCullShaderProgram(d->defaultCullShaderProgram);
-		}
-#else
-		GM_ASSERT(false);
-#endif
-	}
+	// 使用预设的着色器程序
+	gm::GMShaderHelper::ShaderHelperResult result;
+	gm::GMShaderHelper::loadShader(context, &result);
+	d->defaultCullShaderProgram = result.cullShaderProgram;
 }

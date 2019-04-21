@@ -20,7 +20,7 @@ void Demo_Particle2D::init()
 	widget->setSize(widget->getSize().width, top + 40);
 
 	gm::GMParticleSystem* psFire = nullptr;
-	gm::GMToolUtil::createCocos2DParticleSystem(L"fire1.plist", gm::GMParticleModelType::Particle2D, &psFire, [](auto& description) {
+	gm::GMParticleSystem::createCocos2DParticleSystem(L"fire1.plist", gm::GMParticleModelType::Particle2D, &psFire, [](auto& description) {
 		// 由于采用Ortho视图，坐标系和正常的3D视图相反，y正方向向下，因此我们需要将发射方向旋转180度
 		description.setEmitterEmitAngle(description.getEmitterEmitAngle() + 180);
 	});
@@ -28,17 +28,17 @@ void Demo_Particle2D::init()
 	psFire->getEmitter()->getEffect()->setMotionMode(gm::GMParticleMotionMode::Relative);
 
 	gm::GMParticleSystem* psRadius = nullptr;
-	gm::GMToolUtil::createCocos2DParticleSystem(L"radius1.plist", gm::GMParticleModelType::Particle2D, &psRadius);
+	gm::GMParticleSystem::createCocos2DParticleSystem(L"radius1.plist", gm::GMParticleModelType::Particle2D, &psRadius);
 	psRadius->getEmitter()->setEmitPosition(GMVec3(800, 300, 0));
 	psRadius->getEmitter()->getEffect()->setMotionMode(gm::GMParticleMotionMode::Relative);
 
 	gm::GMParticleSystem* psStar = nullptr;
-	gm::GMToolUtil::createCocos2DParticleSystem(L"star.plist", gm::GMParticleModelType::Particle2D, &psStar);
+	gm::GMParticleSystem::createCocos2DParticleSystem(L"star.plist", gm::GMParticleModelType::Particle2D, &psStar);
 	psStar->getEmitter()->setEmitPosition(GMVec3(400, 600, 0));
 	psStar->getEmitter()->getEffect()->setMotionMode(gm::GMParticleMotionMode::Relative);
 
 	gm::GMParticleSystem* psLeaves = nullptr;
-	gm::GMToolUtil::createCocos2DParticleSystem(L"fallenLeaves.plist", gm::GMParticleModelType::Particle2D, &psLeaves);
+	gm::GMParticleSystem::createCocos2DParticleSystem(L"fallenLeaves.plist", gm::GMParticleModelType::Particle2D, &psLeaves);
 	psLeaves->getEmitter()->setEmitPosition(GMVec3(600, 0, 0));
 	psLeaves->getEmitter()->getEffect()->setMotionMode(gm::GMParticleMotionMode::Relative);
 
@@ -112,7 +112,7 @@ void Demo_ParticleBillboard::init()
 
 	for (auto position : positions)
 	{
-		gm::GMToolUtil::createCocos2DParticleSystem(L"fire1.plist", gm::GMParticleModelType::Particle3D, &psFire);
+		gm::GMParticleSystem::createCocos2DParticleSystem(L"fire1.plist", gm::GMParticleModelType::Particle3D, &psFire);
 		psFire->getEmitter()->setEmitPosition(position);
 		psFire->getEmitter()->getEffect()->setMotionMode(gm::GMParticleMotionMode::Free);
 		d->particleSystemManager->addParticleSystem(psFire);
