@@ -3,7 +3,6 @@
 #include "foundation/gamemachine.h"
 #include "gmengine/gmgameworld.h"
 #include "gmdata/gmimagebuffer.h"
-#include "gmengine/particle/gmparticle.h"
 
 #define getVertex(x, y) (vertices[(x) + (y) * (sliceM + 1)])
 #define getIndex(x, y) ((x) + (y) * (sliceM + 1))
@@ -678,26 +677,4 @@ bool GMToolUtil::createPBRTextures(
 		return true;
 	}
 	return false;
-}
-
-void GMToolUtil::createCocos2DParticleSystem(
-	const GMString& filename,
-	GMParticleModelType modelType,
-	OUT GMParticleSystem** particleSystem,
-	std::function<void(GMParticleDescription&)> descriptionCallback
-)
-{
-	if (particleSystem)
-	{
-		GMBuffer buf;
-		GM.getGamePackageManager()->readFile(GMPackageIndex::Particle, filename, &buf);
-		buf.convertToStringBuffer();
-
-		*particleSystem = new GMParticleSystem();
-		GMParticleDescription description = GMParticleSystem::createParticleDescriptionFromCocos2DPlist(gm::GMString((const char*)buf.buffer), modelType);
-		if (descriptionCallback)
-			descriptionCallback(description);
-
-		(*particleSystem)->setDescription(description);
-	}
 }

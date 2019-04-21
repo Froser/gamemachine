@@ -80,6 +80,8 @@ set(SOURCES
 		gmengine/gmprimitivemanager.cpp
 		gmengine/gmcsmhelper.h
 		gmengine/gmcsmhelper.cpp
+		gmengine/gmshaderhelper.h
+		gmengine/gmshaderhelper.cpp
 		gmengine/gameobjects/gmgameobject.h
 		gmengine/gameobjects/gmgameobject.cpp
 		gmengine/gameobjects/gmspritegameobject.h
@@ -88,12 +90,6 @@ set(SOURCES
 		gmengine/gameobjects/gm2dgameobject.cpp
 		gmengine/gameobjects/gmskeletalgameobject.h
 		gmengine/gameobjects/gmskeletalgameobject.cpp
-		gmengine/particle/gmparticle.h
-		gmengine/particle/gmparticle.cpp
-		gmengine/particle/gmparticleeffects.h
-		gmengine/particle/gmparticleeffects.cpp
-		gmengine/particle/gmparticlemodel.h
-		gmengine/particle/gmparticlemodel.cpp
 		gmengine/ui/gmwidget.h
 		gmengine/ui/gmwidget.cpp
 		gmengine/ui/gmwindow.h
@@ -252,6 +248,13 @@ set(SOURCES
 
 		extensions/objects/gmwavegameobject.h
 		extensions/objects/gmwavegameobject.cpp
+		
+		extensions/objects/particle/gmparticle.h
+		extensions/objects/particle/gmparticle.cpp
+		extensions/objects/particle/gmparticleeffects.h
+		extensions/objects/particle/gmparticleeffects.cpp
+		extensions/objects/particle/gmparticlemodel.h
+		extensions/objects/particle/gmparticlemodel.cpp
 	)
 
 set(WIN32_SOURCES

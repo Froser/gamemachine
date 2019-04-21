@@ -96,13 +96,6 @@ struct GM_EXPORT GMToolUtil
 		REF GMTextureAsset& metallicRoughnessAoTexture,
 		REF GMTextureAsset& normalTexture
 	);
-
-	static void createCocos2DParticleSystem(
-		const GMString& filename,
-		GMParticleModelType modelType,
-		OUT GMParticleSystem** particleSystem,
-		std::function<void(GMParticleDescription&)> descriptionCallback = std::function<void(GMParticleDescription&)>()
-	);
 };
 
 END_NS
