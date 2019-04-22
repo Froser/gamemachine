@@ -11,6 +11,8 @@ struct GMShaderHelper
 	};
 
 	static void loadShader(const IRenderContext* context, ShaderHelperResult* result);
+
+	static void loadExtensionShaders(const IRenderContext* context);
 };
 
 END_NS

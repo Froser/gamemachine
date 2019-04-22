@@ -3,14 +3,11 @@
 #include "foundation/gmasync.h"
 #include "foundation/gamemachine.h"
 
-#define __SHADER_CODE( _x ) L ## # _x
-#define SHADER_CODE( _x ) __SHADER_CODE( _x )
-
 namespace
 {
 	const GMVec4 s_rotateStartVector = GMVec4(0, 1, 0, 1);
 
-	auto GL_GRAVITY_COMPUTE = SHADER_CODE(
+	auto GL_GRAVITY_COMPUTE = GM_STRINGIFY_L(
 		#version 430 core\n
 
 		const int GM_MOTION_MODE_FREE = 0;
@@ -19,6 +16,7 @@ namespace
 		struct gravity_t
 		{
 			vec3 initialVelocity;
+			float _padding_; // initialVelocity's placeholder
 			float radialAcceleration;
 			float tangentialAcceleration;
 		};
@@ -117,6 +115,108 @@ namespace
 			}
 		}
 	);
+
+	auto DX11_GRAVITY_COMPUTE = GM_STRINGIFY_L(
+		static const int GM_MOTION_MODE_FREE = 0;
+		static const int GM_MOTION_MODE_RELATIVE = 1;
+
+		struct gravity_t
+		{
+			float4 initialVelocity;
+			float radialAcceleration;
+			float tangentialAcceleration;
+			float __padding__[2];
+		};
+
+		struct radius_t
+		{
+			float angle;
+			float degressPerSecond;
+			float radius;
+			float delatRadius;
+		};
+
+		struct particle_t
+		{
+			float4 color;
+			float4 deltaColor;
+			float4 position;
+			float4 startPosition;
+			float4 changePosition;
+			float4 velocity;
+			float size;
+			float currentSize;
+			float deltaSize;
+			float rotation;
+			float deltaRotation;
+			float remainingLife;
+			float __padding__[2];
+
+			gravity_t gravityModeData;
+			radius_t radiusModeData;
+		};\n
+
+		cbuffer Constant : register(b0)
+		{
+			float4 emitterPosition;
+			float4 gravity;
+			float dt;
+			int motionMode;
+		};\n
+
+		RWStructuredBuffer<particle_t> particles : register(u0);
+
+		[numthreads(1, 1, 1)]
+		void main(uint3 DTid : SV_DispatchThreadID)
+		{
+			uint gid = DTid.x;
+			/*
+			particles[gid].color = float4(1, 2, 3, 4);
+			particles[gid].deltaColor = float4(5, 6, 7, 8);
+			particles[gid].position = float4(9, 10, 11, 0);
+			particles[gid].startPosition = float4(12, 13, 14, 0);
+			particles[gid].changePosition = float4(15, 16, 17, 0);
+			particles[gid].velocity = float4(18, 19, 20, 0);
+			particles[gid].size = 21;
+			particles[gid].currentSize = 22;
+			particles[gid].deltaSize = 23;
+			particles[gid].rotation = 24;
+			particles[gid].deltaRotation = 25;
+			particles[gid].remainingLife = 26;
+			*/
+			particles[gid].remainingLife -= dt;
+			if (particles[gid].remainingLife > 0)
+			{
+				float3 offset = float3(0, 0, 0);
+				float3 radial = float3(0, 0, 0);
+				float3 tangential = float3(0, 0, 0);
+				if (abs(particles[gid].changePosition.x) > .01f &&
+					abs(particles[gid].changePosition.y) > .01f &&
+					abs(particles[gid].changePosition.z) > .01f)
+				{
+					radial = normalize(particles[gid].gravityModeData.initialVelocity.xyz);
+				}
+				tangential = radial;
+				radial *= particles[gid].gravityModeData.initialVelocity.xyz;
+
+				tangential.xyz = float3(-tangential.y, tangential.x, tangential.z);
+				tangential *= particles[gid].gravityModeData.tangentialAcceleration;
+
+				offset = (radial + tangential + gravity) * dt;
+
+				particles[gid].gravityModeData.initialVelocity.xyz += offset;
+				particles[gid].changePosition.xyz += particles[gid].gravityModeData.initialVelocity.xyz * dt;
+				particles[gid].color += particles[gid].deltaColor * dt;
+				particles[gid].size = max(0, particles[gid].size + particles[gid].deltaSize * dt);
+				particles[gid].rotation += particles[gid].deltaRotation * dt;
+
+				if (motionMode == GM_MOTION_MODE_RELATIVE)
+					particles[gid].position.xyz = particles[gid].changePosition.xyz + emitterPosition - particles[gid].startPosition.xyz;
+				else
+					particles[gid].position.xyz = particles[gid].changePosition.xyz;
+			}
+		}
+	);
 }
 
 GMParticleEffectImplBase::~GMParticleEffectImplBase()
@@ -183,13 +283,14 @@ bool GMParticleEffectImplBase::GPUUpdate(GMParticleEmitter* emitter, IComputeSha
 		}
 	}
 	shaderProgram->setBuffer(progParticles, GMComputeBufferType::Structured, particles.data(), sizeof(*particles[0].data()) * gm_sizet_to_uint(particles.size()));
-	shaderProgram->setUnorderedAccessView(1, &progParticlesUAV);
+	shaderProgram->bindUnorderedAccessView(1, &progParticlesUAV);
 
 	// 传入时间等变量
 	ConstantBuffer c = { emitter->getEmitPosition(), getGravityMode().getGravity(), dt, static_cast<GMint32>(getMotionMode()) };
 	if (!constant)
 		shaderProgram->createBuffer(sizeof(ConstantBuffer), 1, &c, GMComputeBufferType::Constant, &constant);
 	shaderProgram->setBuffer(constant, GMComputeBufferType::Constant, &c, sizeof(ConstantBuffer));
+	shaderProgram->bindConstantBuffer(constant);
 
 	// 开始计算
 	shaderProgram->dispatch(gm_sizet_to_uint(particles.size()), 1, 1);
@@ -197,8 +298,9 @@ bool GMParticleEffectImplBase::GPUUpdate(GMParticleEmitter* emitter, IComputeSha
 	bool canReadFromGPU = shaderProgram->canRead(progParticles);
 	if (!canReadFromGPU)
 	{
-		if (!particleCpuResult)
-			shaderProgram->createReadOnlyBufferFrom(progParticles, &particleCpuResult);
+		if (particleCpuResult)
+			shaderProgram->release(particleCpuResult);
+		shaderProgram->createReadOnlyBufferFrom(progParticles, &particleCpuResult);
 	}
 
 	// 处理结果
@@ -304,7 +406,11 @@ void GMGravityParticleEffect::CPUUpdate(GMParticleEmitter* emitter, GMDuration d
 
 GMString GMGravityParticleEffect::getCode()
 {
-	return GL_GRAVITY_COMPUTE;
+	if (GM.getRunningStates().renderEnvironment == GMRenderEnvironment::OpenGL)
+		return GL_GRAVITY_COMPUTE;
+
+	GM_ASSERT(GM.getRunningStates().renderEnvironment == GMRenderEnvironment::DirectX11);
+	return DX11_GRAVITY_COMPUTE;
 }
 
 GMString GMGravityParticleEffect::getEntry()

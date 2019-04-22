@@ -161,9 +161,9 @@ int main(int argc, char* argv[])
 		prog->createBufferShaderResourceView(bufferA, &srvA);
 		prog->createBufferShaderResourceView(bufferB, &srvB);
 		prog->createBufferUnorderedAccessView(bufferResult, &uav);
-		prog->setShaderResourceView(1, &srvA);
-		prog->setShaderResourceView(1, &srvB);
-		prog->setUnorderedAccessView(1, &uav);
+		prog->bindShaderResourceView(1, &srvA);
+		prog->bindShaderResourceView(1, &srvB);
+		prog->bindUnorderedAccessView(1, &uav);
 
 		stopwatch.start();
 		prog->dispatch(16, 1, 1);

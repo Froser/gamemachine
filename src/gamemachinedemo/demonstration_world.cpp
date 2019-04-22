@@ -775,9 +775,9 @@ void DemostrationEntrance::onLoadShaders(const gm::IRenderContext* context)
 	Demo_CustomGeometryShader::initCustomShader(context);
 	Demo_CustomAndDefaultShader::initCustomShader(context);
 	Demo_CustomLight::initCustomShader(context);
-	gm::GMWaveGameObject::initShader(context);
 
 	// 使用预设的着色器程序
+	gm::GMShaderHelper::loadExtensionShaders(context);
 	gm::GMShaderHelper::ShaderHelperResult result;
 	gm::GMShaderHelper::loadShader(context, &result);
 	d->defaultCullShaderProgram = result.cullShaderProgram;

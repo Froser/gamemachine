@@ -98,8 +98,9 @@ public:
 	virtual void release(GMComputeBufferHandle) override;
 	virtual bool createBufferShaderResourceView(GMComputeBufferHandle, OUT GMComputeSRVHandle*) override;
 	virtual bool createBufferUnorderedAccessView(GMComputeBufferHandle, OUT GMComputeUAVHandle*) override;
-	virtual void setShaderResourceView(GMuint32, GMComputeSRVHandle*) override;
-	virtual void setUnorderedAccessView(GMuint32, GMComputeUAVHandle*) override;
+	virtual void bindShaderResourceView(GMuint32, GMComputeSRVHandle*) override;
+	virtual void bindUnorderedAccessView(GMuint32, GMComputeUAVHandle*) override;
+	virtual void bindConstantBuffer(GMComputeBufferHandle handle) override;
 	virtual void setBuffer(GMComputeBufferHandle, GMComputeBufferType type, void*, GMuint32) override;
 	virtual void copyBuffer(GMComputeBufferHandle dest, GMComputeBufferHandle src) override;
 	virtual void* mapBuffer(GMComputeBufferHandle handle) override;

@@ -400,7 +400,7 @@ bool GMDx11ComputeShaderProgram::createBufferUnorderedAccessView(GMComputeBuffer
 	return SUCCEEDED( device->CreateUnorderedAccessView(pBuffer, &desc, (ID3D11UnorderedAccessView**)out) );
 }
 
-void GMDx11ComputeShaderProgram::setShaderResourceView(GMuint32 num, GMComputeSRVHandle* hs)
+void GMDx11ComputeShaderProgram::bindShaderResourceView(GMuint32 num, GMComputeSRVHandle* hs)
 {
 	D(d);
 	if (num > 0)
@@ -411,7 +411,7 @@ void GMDx11ComputeShaderProgram::setShaderResourceView(GMuint32 num, GMComputeSR
 	}
 }
 
-void GMDx11ComputeShaderProgram::setUnorderedAccessView(GMuint32 num, GMComputeUAVHandle* hs)
+void GMDx11ComputeShaderProgram::bindUnorderedAccessView(GMuint32 num, GMComputeUAVHandle* hs)
 {
 	D(d);
 	if (num > 0)
@@ -419,6 +419,19 @@ void GMDx11ComputeShaderProgram::setUnorderedAccessView(GMuint32 num, GMComputeU
 		ID3D11DeviceContext* dc = d->engine->getDeviceContext();
 		dc->CSSetUnorderedAccessViews(d->SRV_UAV_CB_count[1], num, (ID3D11UnorderedAccessView**)hs, NULL);
 		d->SRV_UAV_CB_count[1] += num;
+	}
+}
+
+void GMDx11ComputeShaderProgram::bindConstantBuffer(GMComputeBufferHandle handle)
+{
+	D(d);
+	if (handle)
+	{
+		ID3D11DeviceContext* dc = d->engine->getDeviceContext();
+		ID3D11Buffer* buffer = static_cast<ID3D11Buffer*>(handle);
+		ID3D11Buffer* ppCB[1] = { buffer };
+		dc->CSSetConstantBuffers(d->SRV_UAV_CB_count[2], 1, ppCB);
+		++d->SRV_UAV_CB_count[2];
 	}
 }
 
@@ -430,12 +443,21 @@ void GMDx11ComputeShaderProgram::setBuffer(GMComputeBufferHandle handle, GMCompu
 		ID3D11DeviceContext* dc = d->engine->getDeviceContext();
 		ID3D11Buffer* buffer = static_cast<ID3D11Buffer*>(handle);
 		D3D11_MAPPED_SUBRESOURCE mappedResource = { 0 };
-		GM_DX_HR(dc->Map(buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
-		memcpy(mappedResource.pData, dataPtr, sizeInBytes);
-		dc->Unmap(buffer, 0);
-		ID3D11Buffer* ppCB[1] = { buffer };
-		dc->CSSetConstantBuffers(d->SRV_UAV_CB_count[2], 1, ppCB);
-		++d->SRV_UAV_CB_count[2];
+
+		D3D11_BUFFER_DESC desc = { 0 };
+		buffer->GetDesc(&desc);
+		bool canWrite = desc.CPUAccessFlags & D3D11_CPU_ACCESS_WRITE;
+
+		if (canWrite)
+		{
+			GM_DX_HR(dc->Map(buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+			memcpy(mappedResource.pData, dataPtr, sizeInBytes);
+			dc->Unmap(buffer, 0);
+		}
+		else
+		{
+			dc->UpdateSubresource(buffer, 0, NULL, dataPtr, 0, 0);
+		}
 	}
 }
 
@@ -464,7 +486,6 @@ void GMDx11ComputeShaderProgram::unmapBuffer(GMComputeBufferHandle handle)
 	dc->Unmap(buffer, 0);
 }
 
-
 bool GMDx11ComputeShaderProgram::canRead(GMComputeBufferHandle handle)
 {
 	ID3D11Buffer* buffer = static_cast<ID3D11Buffer*>(handle);
@@ -472,7 +493,6 @@ bool GMDx11ComputeShaderProgram::canRead(GMComputeBufferHandle handle)
 	buffer->GetDesc(&desc);
 	return !!(desc.CPUAccessFlags & D3D11_CPU_ACCESS_READ);
 }
-
 
 GMsize_t GMDx11ComputeShaderProgram::getBufferSize(GMComputeBufferType type, GMComputeBufferHandle handle)
 {

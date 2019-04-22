@@ -42,10 +42,10 @@ void Demo_Particle2D::init()
 	psLeaves->getEmitter()->setEmitPosition(GMVec3(600, 0, 0));
 	psLeaves->getEmitter()->getEffect()->setMotionMode(gm::GMParticleMotionMode::Relative);
 
-	d->particleSystemManager->addParticleSystem(psFire);
-	d->particleSystemManager->addParticleSystem(psRadius);
+	//d->particleSystemManager->addParticleSystem(psFire);
+	//d->particleSystemManager->addParticleSystem(psRadius);
 	d->particleSystemManager->addParticleSystem(psStar);
-	d->particleSystemManager->addParticleSystem(psLeaves);
+	//d->particleSystemManager->addParticleSystem(psLeaves);
 }
 
 void Demo_Particle2D::setLookAt()

@@ -7,6 +7,8 @@
 #endif
 
 #include <gmglhelper.h>
+#include <extensions/objects/gmwavegameobject.h>
+#include <extensions/objects/particle/gmparticlemodel.h>
 
 namespace
 {
@@ -55,9 +57,7 @@ void GMShaderHelper::loadShader(const IRenderContext* context, ShaderHelperResul
 		);
 
 		if (cullShaderProgram)
-		{
 			GMGameObject::setDefaultCullShaderProgram(cullShaderProgram);
-		}
 	}
 	else
 	{
@@ -70,9 +70,7 @@ void GMShaderHelper::loadShader(const IRenderContext* context, ShaderHelperResul
 		);
 
 		if (cullShaderProgram)
-		{
 			GMGameObject::setDefaultCullShaderProgram(cullShaderProgram);
-		}
 #else
 		GM_ASSERT(false);
 #endif
@@ -80,4 +78,9 @@ void GMShaderHelper::loadShader(const IRenderContext* context, ShaderHelperResul
 
 	if (result)
 		result->cullShaderProgram = cullShaderProgram;
+}
+
+void GMShaderHelper::loadExtensionShaders(const IRenderContext* context)
+{
+	GMWaveGameObject::initShader(context);
 }

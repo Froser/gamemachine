@@ -558,7 +558,7 @@ bool GMGLComputeShaderProgram::createBufferUnorderedAccessView(GMComputeBufferHa
 	return true;
 }
 
-void GMGLComputeShaderProgram::setShaderResourceView(GMuint32 cnt, GMComputeSRVHandle* srvs)
+void GMGLComputeShaderProgram::bindShaderResourceView(GMuint32 cnt, GMComputeSRVHandle* srvs)
 {
 	D(d);
 	for (GMuint32 i = 0; i < cnt; ++i)
@@ -572,9 +572,19 @@ void GMGLComputeShaderProgram::setShaderResourceView(GMuint32 cnt, GMComputeSRVH
 	}
 }
 
-void GMGLComputeShaderProgram::setUnorderedAccessView(GMuint32 cnt, GMComputeUAVHandle* uavs)
+void GMGLComputeShaderProgram::bindUnorderedAccessView(GMuint32 cnt, GMComputeUAVHandle* uavs)
 {
-	setShaderResourceView(cnt, uavs);
+	bindShaderResourceView(cnt, uavs);
+}
+
+void GMGLComputeShaderProgram::bindConstantBuffer(GMComputeBufferHandle handle)
+{
+	D(d);
+	GMuint32 buf = (GMuint32)handle;
+	GMGLBeginGetErrorsAndCheck();
+	glBindBuffer(GL_UNIFORM_BUFFER, buf);
+	glBindBufferBase(GL_UNIFORM_BUFFER, d->boBase++, buf);
+	GMGLEndGetErrorsAndCheck();
 }
 
 void GMGLComputeShaderProgram::setBuffer(GMComputeBufferHandle handle, GMComputeBufferType type, void* dataPtr, GMuint32 sz)

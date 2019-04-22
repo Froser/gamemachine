@@ -217,6 +217,10 @@ using GMAtomic = std::atomic<T>;
 
 #define GM_FOREACH_ENUM_CLASS(var, start, end) for (decltype(start) var = start; (gm::GMint32) var < (gm::GMint32) end; var = (decltype(var))(((gm::GMint32)var)+1) )
 
+// 字符串化
+#define __GM_STRINGIFY_L( _x ) L ## # _x
+#define GM_STRINGIFY_L( _x ) __GM_STRINGIFY_L( _x )
+
 // 非WINDOWS下的数据类型
 #if GM_WINDOWS
 typedef WORD GMWord;

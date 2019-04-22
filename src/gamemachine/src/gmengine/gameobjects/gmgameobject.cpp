@@ -385,10 +385,11 @@ void GMGameObject::cull()
 			GMFrustumPlanes planes;
 			camera->getFrustum().getPlanes(planes);
 			cullShaderProgram->setBuffer(d->cullFrustumBuffer, GMComputeBufferType::Constant, &planes, sizeof(GMFrustumPlanes));
+			cullShaderProgram->bindConstantBuffer(d->cullFrustumBuffer);
 			GMComputeSRVHandle srvs[] = { d->cullAABBsSRV };
-			cullShaderProgram->setShaderResourceView(1, srvs);
+			cullShaderProgram->bindShaderResourceView(1, srvs);
 			GMComputeUAVHandle uavs[] = { d->cullResultUAV };
-			cullShaderProgram->setUnorderedAccessView(1, uavs);
+			cullShaderProgram->bindUnorderedAccessView(1, uavs);
 			cullShaderProgram->dispatch(gm_sizet_to_uint(d->cullAABB.size()), 1, 1);
 
 			bool canReadFromGPU = cullShaderProgram->canRead(d->cullGPUResultBuffer);
