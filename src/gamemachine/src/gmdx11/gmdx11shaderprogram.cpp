@@ -422,7 +422,7 @@ void GMDx11ComputeShaderProgram::setUnorderedAccessView(GMuint32 num, GMComputeU
 	}
 }
 
-void GMDx11ComputeShaderProgram::setConstantBuffer(GMComputeBufferHandle handle, void* dataPtr, GMuint32 sizeInBytes)
+void GMDx11ComputeShaderProgram::setBuffer(GMComputeBufferHandle handle, GMComputeBufferType type, void* dataPtr, GMuint32 sizeInBytes)
 {
 	D(d);
 	if (handle)
@@ -471,6 +471,15 @@ bool GMDx11ComputeShaderProgram::canRead(GMComputeBufferHandle handle)
 	D3D11_BUFFER_DESC desc = { 0 };
 	buffer->GetDesc(&desc);
 	return !!(desc.CPUAccessFlags & D3D11_CPU_ACCESS_READ);
+}
+
+
+GMsize_t GMDx11ComputeShaderProgram::getBufferSize(GMComputeBufferType type, GMComputeBufferHandle handle)
+{
+	ID3D11Buffer* buffer = static_cast<ID3D11Buffer*>(handle);
+	D3D11_BUFFER_DESC desc = { 0 };
+	buffer->GetDesc(&desc);
+	return desc.ByteWidth;
 }
 
 bool GMDx11ComputeShaderProgram::setInterface(GameMachineInterfaceID id, void* in)

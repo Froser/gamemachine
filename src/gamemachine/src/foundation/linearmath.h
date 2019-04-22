@@ -97,7 +97,7 @@ inline bool FuzzyCompare(gm::GMfloat p1, gm::GMfloat p2, gm::GMfloat qualifier =
 }
 
 #if GM_USE_DX11
-#define GMMATH_BEGIN_STRUCT(className, glStruct, dxStruct)	\
+#define GMMATH_BEGIN_STRUCT(className, glStruct, dxStruct, padding)	\
 	struct className							\
 	{											\
 		typedef dxStruct DataType;				\
@@ -129,8 +129,21 @@ inline bool FuzzyCompare(gm::GMfloat p1, gm::GMfloat p2, gm::GMfloat qualifier =
 			return DirectX::XMVectorGet##basis(v_);\
 		}
 
+#define GMMATH_BEGIN_STRUCT_NOPADDING(className, glStruct, dxStruct) GMMATH_BEGIN_STRUCT(className, glStruct, dxStruct, 0)
+
 #else
-#define GMMATH_BEGIN_STRUCT(className, glStruct, dxStruct)	\
+#define GMMATH_BEGIN_STRUCT(className, glStruct, dxStruct, padding)	\
+	struct className							\
+	{											\
+		typedef glStruct DataType;				\
+		glStruct v_;							\
+		int __padding[padding];					\
+												\
+	public:										\
+		className() = default;					\
+		className(const className& rhs) { v_ = rhs.v_; }
+
+#define GMMATH_BEGIN_STRUCT_NOPADDING(className, glStruct, dxStruct)	\
 	struct className							\
 	{											\
 		typedef glStruct DataType;				\
@@ -238,7 +251,7 @@ struct GMFloat16
 
 struct GMVec4;
 
-GMMATH_BEGIN_STRUCT(GMVec2, glm::vec2, DirectX::XMVECTOR)
+GMMATH_BEGIN_STRUCT(GMVec2, glm::vec2, DirectX::XMVECTOR, 2)
 GMMATH_LEN(2)
 GMMATH_LOAD_FLOAT4
 GMMATH_SET_FLOAT4(glm::make_vec2)
@@ -267,7 +280,7 @@ GMVec2(gm::GMfloat v0, gm::GMfloat v1)
 #endif
 GMMATH_END_STRUCT
 
-GMMATH_BEGIN_STRUCT(GMVec3, glm::vec3, DirectX::XMVECTOR)
+GMMATH_BEGIN_STRUCT(GMVec3, glm::vec3, DirectX::XMVECTOR, 1)
 GMMATH_LEN(3)
 GMMATH_SET_FLOAT4(glm::make_vec3)
 GMMATH_LOAD_FLOAT4
@@ -299,7 +312,7 @@ GMVec3(gm::GMfloat v0, gm::GMfloat v1, gm::GMfloat v2)
 inline GMVec3(const GMVec4& V);
 GMMATH_END_STRUCT
 
-GMMATH_BEGIN_STRUCT(GMVec4, glm::vec4, DirectX::XMVECTOR)
+GMMATH_BEGIN_STRUCT_NOPADDING(GMVec4, glm::vec4, DirectX::XMVECTOR)
 GMMATH_LEN(4)
 GMMATH_SET_FLOAT4(glm::make_vec4)
 GMMATH_LOAD_FLOAT4
@@ -340,7 +353,7 @@ GMVec4(const GMVec3& V, const gm::GMfloat W)
 }
 GMMATH_END_STRUCT
 
-GMMATH_BEGIN_STRUCT(GMMat4, glm::mat4, DirectX::XMMATRIX)
+GMMATH_BEGIN_STRUCT_NOPADDING(GMMat4, glm::mat4, DirectX::XMMATRIX)
 GMMATH_LEN(4)
 void loadFloat16(GMFloat16& f16) const
 {
@@ -392,7 +405,7 @@ GMVec4 operator[](gm::GMint32 i) const
 }
 GMMATH_END_STRUCT
 
-GMMATH_BEGIN_STRUCT(GMQuat, glm::quat, DirectX::XMVECTOR)
+GMMATH_BEGIN_STRUCT_NOPADDING(GMQuat, glm::quat, DirectX::XMVECTOR)
 GMMATH_LEN(4)
 GMMATH_SET_GET_(X, 0)
 GMMATH_SET_GET_(Y, 1)

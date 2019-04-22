@@ -384,7 +384,7 @@ void GMGameObject::cull()
 			GMCamera* camera = d->cullCamera ? d->cullCamera : &getContext()->getEngine()->getCamera();
 			GMFrustumPlanes planes;
 			camera->getFrustum().getPlanes(planes);
-			cullShaderProgram->setConstantBuffer(d->cullFrustumBuffer, &planes, sizeof(GMFrustumPlanes));
+			cullShaderProgram->setBuffer(d->cullFrustumBuffer, GMComputeBufferType::Constant, &planes, sizeof(GMFrustumPlanes));
 			GMComputeSRVHandle srvs[] = { d->cullAABBsSRV };
 			cullShaderProgram->setShaderResourceView(1, srvs);
 			GMComputeUAVHandle uavs[] = { d->cullResultUAV };

@@ -577,15 +577,18 @@ void GMGLComputeShaderProgram::setUnorderedAccessView(GMuint32 cnt, GMComputeUAV
 	setShaderResourceView(cnt, uavs);
 }
 
-void GMGLComputeShaderProgram::setConstantBuffer(GMComputeBufferHandle handle, void* dataPtr, GMuint32 sz)
+void GMGLComputeShaderProgram::setBuffer(GMComputeBufferHandle handle, GMComputeBufferType type, void* dataPtr, GMuint32 sz)
 {
 	D(d);
 	GMuint32 buf = (GMuint32) handle;
 	GMGLBeginGetErrorsAndCheck();
-	glBindBuffer(GL_UNIFORM_BUFFER, buf);
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sz, dataPtr);
-	glBindBufferBase(GL_UNIFORM_BUFFER, d->boBase++, buf);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	GLenum target = type == GMComputeBufferType::Constant ? GL_UNIFORM_BUFFER : GL_SHADER_STORAGE_BUFFER;
+	glBindBuffer(target, buf);
+	glBufferSubData(target, 0, sz, dataPtr);
+	if (type == GMComputeBufferType::Constant)
+		glBindBufferBase(target, d->boBase++, buf);
+	glBindBuffer(target, 0);
 	GMGLEndGetErrorsAndCheck();
 }
 
@@ -630,6 +633,18 @@ void GMGLComputeShaderProgram::unmapBuffer(GMComputeBufferHandle handle)
 bool GMGLComputeShaderProgram::canRead(GMComputeBufferHandle handle)
 {
 	return true;
+}
+
+
+GMsize_t GMGLComputeShaderProgram::getBufferSize(GMComputeBufferType type, GMComputeBufferHandle handle)
+{
+	GMint32 sz = 0;
+	GMuint32 buf = (GMuint32)handle;
+	GLenum target = type == GMComputeBufferType::Constant ? GL_UNIFORM_BUFFER : GL_SHADER_STORAGE_BUFFER;
+	glBindBuffer(target, buf);
+	glGetBufferParameteriv(target, GL_BUFFER_SIZE, &sz);
+	glBindBuffer(target, 0);
+	return static_cast<GMsize_t>(sz);
 }
 
 bool GMGLComputeShaderProgram::setInterface(GameMachineInterfaceID id, void* in)

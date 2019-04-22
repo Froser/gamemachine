@@ -66,6 +66,8 @@ namespace
 
 	class DefaultPhysicsWorld : public gm::GMPhysicsWorld
 	{
+		GM_DECLARE_ALIGNED_ALLOCATOR()
+
 		using gm::GMPhysicsWorld::GMPhysicsWorld;
 
 	public:

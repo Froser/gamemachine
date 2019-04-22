@@ -100,11 +100,12 @@ public:
 	virtual bool createBufferUnorderedAccessView(GMComputeBufferHandle, OUT GMComputeUAVHandle*) override;
 	virtual void setShaderResourceView(GMuint32, GMComputeSRVHandle*) override;
 	virtual void setUnorderedAccessView(GMuint32, GMComputeUAVHandle*) override;
-	virtual void setConstantBuffer(GMComputeBufferHandle, void*, GMuint32) override;
+	virtual void setBuffer(GMComputeBufferHandle, GMComputeBufferType type, void*, GMuint32) override;
 	virtual void copyBuffer(GMComputeBufferHandle dest, GMComputeBufferHandle src) override;
 	virtual void* mapBuffer(GMComputeBufferHandle handle) override;
 	virtual void unmapBuffer(GMComputeBufferHandle handle) override;
 	virtual bool canRead(GMComputeBufferHandle handle) override;
+	virtual GMsize_t getBufferSize(GMComputeBufferType type, GMComputeBufferHandle handle) override;
 
 public:
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;

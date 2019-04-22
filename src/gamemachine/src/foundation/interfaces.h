@@ -274,11 +274,12 @@ GM_INTERFACE_FROM(IComputeShaderProgram, IQueriable)
 	virtual bool createBufferUnorderedAccessView(GMComputeBufferHandle, OUT GMComputeUAVHandle*) = 0;
 	virtual void setShaderResourceView(GMuint32 num, GMComputeSRVHandle* handles) = 0;
 	virtual void setUnorderedAccessView(GMuint32 num, GMComputeUAVHandle* handles) = 0;
-	virtual void setConstantBuffer(GMComputeBufferHandle handle, void* data, GMuint32 sizeInBytes) = 0;
+	virtual void setBuffer(GMComputeBufferHandle handle, GMComputeBufferType type, void* data, GMuint32 sizeInBytes) = 0;
 	virtual void copyBuffer(GMComputeBufferHandle dest, GMComputeBufferHandle src) = 0;
 	virtual void* mapBuffer(GMComputeBufferHandle handle) = 0;
 	virtual void unmapBuffer(GMComputeBufferHandle handle) = 0;
 	virtual bool canRead(GMComputeBufferHandle handle) = 0;
+	virtual GMsize_t getBufferSize(GMComputeBufferType type, GMComputeBufferHandle handle) = 0;
 	virtual void release(GMComputeHandle) = 0;
 };
 

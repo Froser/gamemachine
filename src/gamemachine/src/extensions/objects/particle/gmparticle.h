@@ -165,14 +165,14 @@ public:
 	GMParticleDescription() = default;
 };
 
-GM_PRIVATE_OBJECT(GMParticle)
+GM_ALIGNED_16(struct) GM_PRIVATE_NAME(GMParticle)
 {
-	GMVec3 position = Zero<GMVec4>();
-	GMVec3 startPosition = Zero<GMVec4>();
-	GMVec3 changePosition = Zero<GMVec4>();
-	GMVec3 velocity = Zero<GMVec4>();
 	GMVec4 color = Zero<GMVec4>();
 	GMVec4 deltaColor = Zero<GMVec4>();
+	GMVec3 position = Zero<GMVec3>(); //xyz
+	GMVec3 startPosition = Zero<GMVec3>(); //xyz
+	GMVec3 changePosition = Zero<GMVec3>(); //xyz
+	GMVec3 velocity = Zero<GMVec3>(); //xyz
 	GMfloat size = 0;
 	GMfloat currentSize = 0;
 	GMfloat deltaSize = 0;
@@ -196,10 +196,9 @@ GM_PRIVATE_OBJECT(GMParticle)
 	} radiusModeData;
 };
 
-class GMParticle : public GMObject
+class GMParticle
 {
-	GM_DECLARE_PRIVATE(GMParticle)
-	GM_ALLOW_COPY_MOVE(GMParticle)
+	GM_DECLARE_PRIVATE_NGO(GMParticle)
 	GM_DECLARE_PROPERTY(Position, position)
 	GM_DECLARE_PROPERTY(StartPosition, startPosition)
 	GM_DECLARE_PROPERTY(ChangePosition, changePosition)
@@ -233,7 +232,7 @@ GM_PRIVATE_OBJECT(GMParticleEmitter)
 	GMDuration duration = 0;
 	GMVec3 rotationAxis = GMVec3(0, 0, 1);
 	GMOwnedPtr<GMParticleEffect> effect;
-	Vector<GMParticle*> particles;
+	Vector<GMParticle> particles;
 	bool canEmit = true;
 	GMParticleSystem* system = nullptr;
 	GMDuration emitCounter = 0;
@@ -262,7 +261,7 @@ public:
 	void setParticleEffect(GMParticleEffect* effect);
 	void addParticle();
 	void emitParticles(GMDuration dt);
-	void update(GMDuration dt);
+	void update(const IRenderContext* context, GMDuration dt);
 	void startEmit();
 	void stopEmit();
 
@@ -273,7 +272,7 @@ public:
 		return d->effect.get();
 	}
 
-	inline Vector<GMParticle*>& getParticles() GM_NOEXCEPT
+	inline Vector<GMParticle>& getParticles() GM_NOEXCEPT
 	{
 		D(d);
 		return d->particles;
@@ -305,6 +304,8 @@ GM_PRIVATE_OBJECT(GMParticleEffect)
 	GMfloat beginSpinV = 0;
 	GMfloat endSpin = 0;
 	GMfloat endSpinV = 0;
+	Map<const IRenderContext*, IComputeShaderProgram*> shaderPrograms;
+	bool GPUValid = true;
 };
 
 class GMParticleEffect : public GMObject
@@ -333,7 +334,11 @@ public:
 
 public:
 	virtual void initParticle(GMParticleEmitter* emitter, GMParticle* particle);
-	virtual void update(GMParticleEmitter* emitter, GMDuration dt) = 0;
+	virtual void update(GMParticleEmitter* emitter, const IRenderContext* context, GMDuration dt);
+
+protected:
+	virtual void CPUUpdate(GMParticleEmitter* emitter, GMDuration dt) = 0;
+	virtual bool GPUUpdate(GMParticleEmitter* emitter, IComputeShaderProgram* shaderProgram, GMDuration dt) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMParticleSystem)
@@ -356,7 +361,7 @@ public:
 
 public:
 	void setDescription(const GMParticleDescription& desc);
-	void update(GMDuration dt);
+	void update(const IRenderContext* context, GMDuration dt);
 	void render(const IRenderContext* context);
 
 public:
@@ -416,26 +421,10 @@ GM_PRIVATE_OBJECT(GMParticlePool)
 	GMsize_t capacity = 0;
 };
 
-class GMParticlePool : public GMObject
-{
-	GM_DECLARE_PRIVATE(GMParticlePool)
-
-public:
-	void init(GMsize_t count);
-	void freeAll();
-	GMParticle* alloc();
-	void free(GMParticle* particle);
-	GMsize_t getCapacity() GM_NOEXCEPT;
-
-private:
-	void expand(GMsize_t size);
-};
-
 GM_PRIVATE_OBJECT(GMParticleSystemManager)
 {
 	const IRenderContext* context;
 	Vector<GMOwnedPtr<GMParticleSystem>> particleSystems;
-	GMParticlePool pool;
 };
 
 class GM_EXPORT GMParticleSystemManager : public GMObject
@@ -449,13 +438,6 @@ public:
 	void addParticleSystem(AUTORELEASE GMParticleSystem* ps);
 	void render();
 	void update(GMDuration dt);
-
-public:
-	inline GMParticlePool& getPool() GM_NOEXCEPT
-	{
-		D(d);
-		return d->pool;
-	}
 };
 
 END_NS

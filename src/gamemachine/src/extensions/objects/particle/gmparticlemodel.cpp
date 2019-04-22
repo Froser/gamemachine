@@ -232,14 +232,14 @@ void GMParticleModel_2D::updateData(const IRenderContext* context, void* dataPtr
 		GMVertex* dataOffset = reinterpret_cast<GMVertex*>(dataPtr) + (begin - particles.begin()) * VerticesPerParticle;
 		for (auto iter = begin; iter != end; ++iter)
 		{
-			GMParticle* particle = *iter;
-			GMfloat he = particle->getSize() / 2.f;
+			GMParticle& particle = *iter;
+			GMfloat he = particle.getSize() / 2.f;
 			update6Vertices(
 				dataOffset,
-				particle->getPosition(),
+				particle.getPosition(),
 				he,
-				particle->getColor(),
-				Rotate(particle->getRotation(), GMVec3(0, 0, 1)),
+				particle.getColor(),
+				Rotate(particle.getRotation(), GMVec3(0, 0, 1)),
 				lookDirection
 			);
 			dataOffset += VerticesPerParticle;
@@ -267,17 +267,17 @@ void GMParticleModel_3D::updateData(const IRenderContext* context, void* dataPtr
 			GMVertex* dataOffset = reinterpret_cast<GMVertex*>(dataPtr) + (begin - particles.begin()) * VerticesPerParticle;
 			for (auto iter = begin; iter != end; ++iter)
 			{
-				GMParticle* particle = *iter;
-				GMfloat he = particle->getSize() / 2.f;
+				GMParticle& particle = *iter;
+				GMfloat he = particle.getSize() / 2.f;
 
 				update6Vertices(
 					dataOffset,
-					particle->getPosition(),
+					particle.getPosition(),
 					he,
-					particle->getColor(),
-					Rotate(particle->getRotation(), GMVec3(0, 0, 1)),
+					particle.getColor(),
+					Rotate(particle.getRotation(), GMVec3(0, 0, 1)),
 					lookDirection,
-					particle->getPosition().getZ()
+					particle.getPosition().getZ()
 				);
 				dataOffset += VerticesPerParticle;
 			}

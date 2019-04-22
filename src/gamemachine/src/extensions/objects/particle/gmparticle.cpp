@@ -196,10 +196,10 @@ void GMParticleSystem::setDescription(const GMParticleDescription& desc)
 	setParticleModel(createParticleModel(desc));
 }
 
-void GMParticleSystem::update(GMDuration dt)
+void GMParticleSystem::update(const IRenderContext* context, GMDuration dt)
 {
 	D(d);
-	d->emitter->update(dt);
+	d->emitter->update(context, dt);
 }
 
 void GMParticleSystem::render(const IRenderContext* context)
@@ -388,13 +388,9 @@ void GMParticleEmitter::addParticle()
 	D(d);
 	if (d->particles.size() < static_cast<GMsize_t>(getParticleCount()))
 	{
-		GMParticlePool& pool = d->system->getParticleSystemManager()->getPool();
-		GMParticle* particle = pool.alloc();
-		if (particle)
-		{
-			d->particles.push_back(particle);
-			d->effect->initParticle(this, particle);
-		}
+		GMParticle particle;
+		d->effect->initParticle(this, &particle);
+		d->particles.push_back(particle);
 	}
 }
 
@@ -429,13 +425,13 @@ void GMParticleEmitter::setParticleEffect(GMParticleEffect* effect)
 	d->effect.reset(effect);
 }
 
-void GMParticleEmitter::update(GMDuration dt)
+void GMParticleEmitter::update(const IRenderContext* context, GMDuration dt)
 {
 	D(d);
 	if (d->canEmit)
 	{
 		emitParticles(dt);
-		d->effect->update(this, dt);
+		d->effect->update(this, context, dt);
 	}
 }
 
@@ -449,71 +445,7 @@ void GMParticleEmitter::stopEmit()
 {
 	D(d);
 	d->canEmit = false;
-
-	auto& pool = getParticleSystem()->getParticleSystemManager()->getPool();
-	for (auto particle : d->particles)
-	{
-		pool.free(particle);
-	}
 	d->particles.clear();
-}
-
-void GMParticlePool::init(GMsize_t count)
-{
-	D(d);
-	d->capacity = count;
-	d->particlePool.reserve(count);
-	d->unused.reserve(count);
-	for (GMsize_t i = 0; i < count; ++i)
-	{
-		GMParticle* p = new GMParticle();
-		d->particlePool.emplace_back(GMOwnedPtr<GMParticle>(p));
-		d->unused.push_back(p);
-	}
-}
-
-void GMParticlePool::freeAll()
-{
-	D(d);
-	GMClearSTLContainer(d->particlePool);
-}
-
-GMParticle* GMParticlePool::alloc()
-{
-	D(d);
-	if (d->index < d->unused.size())
-		return d->unused[d->index++];
-
-	expand(d->capacity);
-	return d->unused[d->index++];
-}
-
-void GMParticlePool::free(GMParticle* particle)
-{
-	D(d);
-	d->unused[--d->index] = particle;
-}
-
-GMsize_t GMParticlePool::getCapacity() GM_NOEXCEPT
-{
-	D(d);
-	return d->particlePool.size();
-}
-
-void GMParticlePool::expand(GMsize_t size)
-{
-	D(d);
-	GMsize_t currentSize = d->particlePool.size();
-	GMsize_t targetSize = currentSize + d->capacity;
-	d->particlePool.resize(targetSize);
-	d->unused.resize(targetSize);
-	for (GMsize_t i = currentSize; i < targetSize; ++i)
-	{
-		GMParticle* p = new GMParticle();
-		d->particlePool[i] = GMOwnedPtr<GMParticle>(p);
-		d->unused[i] = p;
-	}
-	d->capacity = targetSize;
 }
 
 void GMParticleEffect::setParticleDescription(const GMParticleDescription& desc)
@@ -573,12 +505,37 @@ void GMParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle* part
 	particle->setDeltaRotation((endSpin - beginSpin) * remainingLifeRev);
 }
 
+
+void GMParticleEffect::update(GMParticleEmitter* emitter, const IRenderContext* context, GMDuration dt)
+{
+	D(d);
+	IComputeShaderProgram* computeShader = nullptr;
+	if (d->GPUValid)
+	{
+		if (!d->shaderPrograms[context])
+		{
+			if (GM.getFactory()->createComputeShaderProgram(context, &computeShader))
+				d->shaderPrograms[context] = computeShader;
+			else
+				d->GPUValid = false;
+		}
+		else
+		{
+			computeShader = d->shaderPrograms[context];
+		}
+		if (!GPUUpdate(emitter, computeShader, dt))
+			d->GPUValid = false;
+	}
+	else
+	{
+		CPUUpdate(emitter, dt);
+	}
+}
+
 GMParticleSystemManager::GMParticleSystemManager(const IRenderContext* context, GMsize_t particleCountHint)
 {
 	D(d);
 	d->context = context;
-	//事先分配若干个粒子
-	d->pool.init(particleCountHint); 
 }
 
 void GMParticleSystemManager::addParticleSystem(AUTORELEASE GMParticleSystem* ps)
@@ -603,6 +560,6 @@ void GMParticleSystemManager::update(GMDuration dt)
 	// 涉及到粒子池的分配，不能并行
 	for (decltype(auto) system : d->particleSystems)
 	{
-		system->update(dt);
+		system->update(d->context, dt);
 	}
 }
