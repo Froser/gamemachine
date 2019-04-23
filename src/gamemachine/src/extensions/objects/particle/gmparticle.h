@@ -192,7 +192,7 @@ GM_ALIGNED_16(struct) GM_PRIVATE_NAME(GMParticle)
 		GMfloat angle;
 		GMfloat degressPerSecond;
 		GMfloat radius;
-		GMfloat delatRadius;
+		GMfloat deltaRadius;
 	} radiusModeData;
 };
 

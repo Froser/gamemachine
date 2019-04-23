@@ -26,7 +26,7 @@ namespace
 			float angle;
 			float degressPerSecond;
 			float radius;
-			float delatRadius;
+			float deltaRadius;
 		};
 
 		struct particle_t
@@ -58,6 +58,7 @@ namespace
 		{
 			vec3 emitterPosition;
 			vec3 gravity;
+			vec3 rotationAxis;
 			float _padding_; // gravity's placeholder
 			float dt;
 			int motionMode;
@@ -116,7 +117,116 @@ namespace
 		}
 	);
 
-	auto DX11_GRAVITY_COMPUTE = GM_STRINGIFY_L(
+	auto GL_RADIAL_COMPUTE = GM_STRINGIFY_L(
+		#version 430 core\n
+
+		const int GM_MOTION_MODE_FREE = 0;
+		const int GM_MOTION_MODE_RELATIVE = 1;
+
+		struct gravity_t
+		{
+			vec3 initialVelocity;
+			float _padding_; // initialVelocity's placeholder
+			float radialAcceleration;
+			float tangentialAcceleration;
+		};
+
+		struct radius_t
+		{
+			float angle;
+			float degressPerSecond;
+			float radius;
+			float deltaRadius;
+		};
+
+		struct particle_t
+		{
+			vec4 color;
+			vec4 deltaColor;
+			vec3 position;
+			vec3 startPosition;
+			vec3 changePosition;
+			vec3 velocity;
+			float _padding_; // velocity's placeholder
+			float size;
+			float currentSize;
+			float deltaSize;
+			float rotation;
+			float deltaRotation;
+			float remainingLife;
+
+			gravity_t gravityModeData;
+			radius_t radiusModeData;
+		};\n
+
+		layout(std430, binding = 0) buffer Particle
+		{
+			particle_t particles[];
+		};\n
+
+		layout(std140, binding = 1) uniform Constant
+		{
+			vec3 emitterPosition;
+			vec3 gravity;
+			vec3 rotationAxis;
+			float _padding_; // gravity's placeholder
+			float dt;
+			int motionMode;
+		};
+
+		mat4 rotate(float angle, vec3 axis)
+		{
+			axis = normalize(axis);
+			float s = sin(angle);
+			float c = cos(angle);
+			float oc = 1.0 - c;
+			
+			return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,
+						oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,
+						oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,
+						0.0,                                0.0,                                0.0,                                1.0);
+		}
+		
+		layout(local_size_x = 1, local_size_y = 1) in;\n
+
+		void main(void)
+		{
+			uint gid = gl_GlobalInvocationID.x;
+			/*
+			particles[gid].color = vec4(1, 2, 3, 4);
+			particles[gid].deltaColor = vec4(5, 6, 7, 8);
+			particles[gid].position = vec3(9, 10, 11);
+			particles[gid].startPosition = vec3(12, 13, 14);
+			particles[gid].changePosition = vec3(15, 16, 17);
+			particles[gid].velocity = vec3(18, 19, 20);
+			particles[gid].size = 21;
+			particles[gid].currentSize = 22;
+			particles[gid].deltaSize = 23;
+			particles[gid].rotation = 24;
+			particles[gid].deltaRotation = 25;
+			particles[gid].remainingLife = 26;
+			*/
+			particles[gid].remainingLife -= dt;
+			if (particles[gid].remainingLife > 0)
+			{
+				particles[gid].radiusModeData.angle += particles[gid].radiusModeData.degressPerSecond * dt;
+				particles[gid].radiusModeData.radius += particles[gid].radiusModeData.deltaRadius * dt;
+				mat4 rotation = rotate(particles[gid].radiusModeData.angle, rotationAxis);
+				particles[gid].changePosition = (particles[gid].radiusModeData.radius * rotation * vec4(0, 1, 0, 1)).xyz;
+
+				if (motionMode == GM_MOTION_MODE_RELATIVE)
+					particles[gid].position = particles[gid].changePosition + particles[gid].startPosition;
+				else
+					particles[gid].position = particles[gid].changePosition + emitterPosition;
+
+				particles[gid].color += particles[gid].deltaColor * dt;
+				particles[gid].size = max(0, particles[gid].size + particles[gid].deltaSize * dt);
+				particles[gid].rotation += particles[gid].deltaRotation * dt;
+			}
+		}
+	);
+
+	auto DX11_COMPUTE = GM_STRINGIFY_L(
 		static const int GM_MOTION_MODE_FREE = 0;
 		static const int GM_MOTION_MODE_RELATIVE = 1;
 
@@ -133,7 +243,7 @@ namespace
 			float angle;
 			float degressPerSecond;
 			float radius;
-			float delatRadius;
+			float deltaRadius;
 		};
 
 		struct particle_t
@@ -160,14 +270,29 @@ namespace
 		{
 			float4 emitterPosition;
 			float4 gravity;
+			float4 rotationAxis;
 			float dt;
 			int motionMode;
 		};\n
 
+		float4x4 rotate(float angle, float3 axis)
+		{
+			axis = normalize(axis);
+			float s = sin(angle);
+			float c = cos(angle);
+			float oc = 1.0 - c;
+			
+			return float4x4
+			           (oc * axis.x * axis.x + c,           oc * axis.x * axis.y + axis.z * s,  oc * axis.z * axis.x - axis.y * s,  0.0,
+						oc * axis.x * axis.y - axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z + axis.x * s,  0.0,
+						oc * axis.z * axis.x + axis.y * s,  oc * axis.y * axis.z - axis.x * s,  oc * axis.z * axis.z + c,           0.0,
+						0.0,                                0.0,                                0.0,                                1.0);
+		}
+		
 		RWStructuredBuffer<particle_t> particles : register(u0);
 
 		[numthreads(1, 1, 1)]
-		void main(uint3 DTid : SV_DispatchThreadID)
+		void gravity_main(uint3 DTid : SV_DispatchThreadID)
 		{
 			uint gid = DTid.x;
 			/*
@@ -211,9 +336,46 @@ namespace
 				particles[gid].rotation += particles[gid].deltaRotation * dt;
 
 				if (motionMode == GM_MOTION_MODE_RELATIVE)
-					particles[gid].position.xyz = particles[gid].changePosition.xyz + emitterPosition - particles[gid].startPosition.xyz;
+					particles[gid].position.xyz = particles[gid].changePosition.xyz + emitterPosition.xyz - particles[gid].startPosition.xyz;
 				else
 					particles[gid].position.xyz = particles[gid].changePosition.xyz;
+			}
+		}
+
+		[numthreads(1, 1, 1)]
+		void radial_main(uint3 DTid : SV_DispatchThreadID)
+		{
+			uint gid = DTid.x;
+			/*
+			particles[gid].color = float4(1, 2, 3, 4);
+			particles[gid].deltaColor = float4(5, 6, 7, 8);
+			particles[gid].position = float4(9, 10, 11, 0);
+			particles[gid].startPosition = float4(12, 13, 14, 0);
+			particles[gid].changePosition = float4(15, 16, 17, 0);
+			particles[gid].velocity = float4(18, 19, 20, 0);
+			particles[gid].size = 21;
+			particles[gid].currentSize = 22;
+			particles[gid].deltaSize = 23;
+			particles[gid].rotation = 24;
+			particles[gid].deltaRotation = 25;
+			particles[gid].remainingLife = 26;
+			*/
+			particles[gid].remainingLife -= dt;
+			if (particles[gid].remainingLife > 0)
+			{
+				particles[gid].radiusModeData.angle += particles[gid].radiusModeData.degressPerSecond * dt;
+				particles[gid].radiusModeData.radius += particles[gid].radiusModeData.deltaRadius * dt;
+				float4x4 rotation = rotate(particles[gid].radiusModeData.angle, rotationAxis.xyz);
+				particles[gid].changePosition.xyz = particles[gid].radiusModeData.radius * mul(float4(0, 1, 0, 1), rotation).xyz;
+
+				if (motionMode == GM_MOTION_MODE_RELATIVE)
+					particles[gid].position.xyz = particles[gid].changePosition.xyz + particles[gid].startPosition.xyz;
+				else
+					particles[gid].position.xyz = particles[gid].changePosition.xyz + emitterPosition.xyz;
+
+				particles[gid].color += particles[gid].deltaColor * dt;
+				particles[gid].size = max(0, particles[gid].size + particles[gid].deltaSize * dt);
+				particles[gid].rotation += particles[gid].deltaRotation * dt;
 			}
 		}
 	);
@@ -244,6 +406,7 @@ bool GMParticleEffectImplBase::GPUUpdate(GMParticleEmitter* emitter, IComputeSha
 	{
 		GMVec3 emitterPosition;
 		GMVec3 gravity;
+		GMVec3 rotationAxis;
 		GMfloat dt;
 		GMint32 mode;
 	};
@@ -286,7 +449,7 @@ bool GMParticleEffectImplBase::GPUUpdate(GMParticleEmitter* emitter, IComputeSha
 	shaderProgram->bindUnorderedAccessView(1, &progParticlesUAV);
 
 	// 传入时间等变量
-	ConstantBuffer c = { emitter->getEmitPosition(), getGravityMode().getGravity(), dt, static_cast<GMint32>(getMotionMode()) };
+	ConstantBuffer c = { emitter->getEmitPosition(), getGravityMode().getGravity(), emitter->getRotationAxis(), dt, static_cast<GMint32>(getMotionMode()) };
 	if (!constant)
 		shaderProgram->createBuffer(sizeof(ConstantBuffer), 1, &c, GMComputeBufferType::Constant, &constant);
 	shaderProgram->setBuffer(constant, GMComputeBufferType::Constant, &c, sizeof(ConstantBuffer));
@@ -305,18 +468,18 @@ bool GMParticleEffectImplBase::GPUUpdate(GMParticleEmitter* emitter, IComputeSha
 
 	// 处理结果
 	{
-		// 再来更新每个粒子的状态
+		// 更新每个粒子的状态
 		GMComputeBufferHandle resultHandle = canReadFromGPU ? progParticles : particleCpuResult;
 		if (!canReadFromGPU)
 			shaderProgram->copyBuffer(resultHandle, progParticles);
 		typedef GM_PRIVATE_NAME(GMParticle) ParticleData;
-		ParticleData* resultPtr = static_cast<ParticleData*>(shaderProgram->mapBuffer(resultHandle));
+		const ParticleData* resultPtr = static_cast<ParticleData*>(shaderProgram->mapBuffer(resultHandle));
 		memcpy_s(particles.data(), sizeof(ParticleData) * particles.size(), resultPtr, sizeof(*particles[0].data()) * particles.size());
 
 		for (auto iter = particles.begin(); iter != particles.end();)
 		{
 			auto offset = iter - particles.begin();
-			if (resultPtr[offset].remainingLife <= 0)
+			if (particles[offset].getRemainingLife() <= 0)
 			{
 				iter = particles.erase(iter);
 			}
@@ -410,12 +573,16 @@ GMString GMGravityParticleEffect::getCode()
 		return GL_GRAVITY_COMPUTE;
 
 	GM_ASSERT(GM.getRunningStates().renderEnvironment == GMRenderEnvironment::DirectX11);
-	return DX11_GRAVITY_COMPUTE;
+	return DX11_COMPUTE;
 }
 
 GMString GMGravityParticleEffect::getEntry()
 {
-	return L"main";
+	if (GM.getRunningStates().renderEnvironment == GMRenderEnvironment::OpenGL)
+		return L"main";
+
+	GM_ASSERT(GM.getRunningStates().renderEnvironment == GMRenderEnvironment::DirectX11);
+	return L"gravity_main";
 }
 
 void GMRadialParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle* particle)
@@ -426,7 +593,7 @@ void GMRadialParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle
 	GMfloat endRadius = getRadiusMode().getEndRadius() + getRadiusMode().getEndRadiusV() * GMRandomMt19937::random_real(-1.f, 1.f);
 
 	particle->getRadiusModeData().radius = beginRadius;
-	particle->getRadiusModeData().delatRadius = (endRadius - beginRadius) / particle->getRemainingLife();
+	particle->getRadiusModeData().deltaRadius = (endRadius - beginRadius) / particle->getRemainingLife();
 
 	particle->getRadiusModeData().angle = emitter->getEmitAngle() + emitter->getEmitAngleV() * GMRandomMt19937::random_real(-1.f, 1.f);
 	particle->getRadiusModeData().degressPerSecond = Radian(getRadiusMode().getSpinPerSecond() + getRadiusMode().getSpinPerSecondV() * GMRandomMt19937::random_real(-1.f, 1.f));
@@ -442,7 +609,7 @@ void GMRadialParticleEffect::CPUUpdate(GMParticleEmitter* emitter, GMDuration dt
 		if (particle.getRemainingLife() > 0)
 		{
 			particle.getRadiusModeData().angle += particle.getRadiusModeData().degressPerSecond * dt;
-			particle.getRadiusModeData().radius += particle.getRadiusModeData().delatRadius * dt;
+			particle.getRadiusModeData().radius += particle.getRadiusModeData().deltaRadius * dt;
 
 			GMQuat rotationQuat = Rotate(particle.getRadiusModeData().angle, emitter->getRotationAxis());
 			GMVec3 changePosition = particle.getChangePosition();
@@ -474,10 +641,18 @@ void GMRadialParticleEffect::CPUUpdate(GMParticleEmitter* emitter, GMDuration dt
 
 GMString GMRadialParticleEffect::getCode()
 {
-	return L"";
+	if (GM.getRunningStates().renderEnvironment == GMRenderEnvironment::OpenGL)
+		return GL_RADIAL_COMPUTE;
+
+	GM_ASSERT(GM.getRunningStates().renderEnvironment == GMRenderEnvironment::DirectX11);
+	return DX11_COMPUTE;
 }
 
 GMString GMRadialParticleEffect::getEntry()
 {
-	return L"";
+	if (GM.getRunningStates().renderEnvironment == GMRenderEnvironment::OpenGL)
+		return L"main";
+
+	GM_ASSERT(GM.getRunningStates().renderEnvironment == GMRenderEnvironment::DirectX11);
+	return L"radial_main";
 }
