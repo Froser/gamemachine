@@ -2,6 +2,7 @@
 #include "gmparticleeffects.h"
 #include "foundation/gmasync.h"
 #include "foundation/gamemachine.h"
+#include <gmengine/gmcomputeshadermanager.h>
 
 namespace
 {
@@ -11,11 +12,6 @@ namespace
 	static GMString s_radialCode;
 	static GMString s_radialEntry;
 }
-
-Map<const IRenderContext*, IComputeShaderProgram*> GMGravityParticleEffect::s_program;
-Map<const IRenderContext*, IComputeShaderProgram*> GMRadialParticleEffect::s_program;
-Map<const IRenderContext*, GMAtomic<GMint32>> GMGravityParticleEffect::s_ref;
-Map<const IRenderContext*, GMAtomic<GMint32>> GMRadialParticleEffect::s_ref;
 
 GMParticleEffectImplBase::~GMParticleEffectImplBase()
 {
@@ -43,7 +39,6 @@ bool GMParticleEffectImplBase::GPUUpdate(GMParticleEmitter* emitter, const IRend
 	if (!d->context)
 	{
 		d->context = context;
-		onContextAttached(context);
 	}
 	else if (d->context != context)
 	{
@@ -53,6 +48,8 @@ bool GMParticleEffectImplBase::GPUUpdate(GMParticleEmitter* emitter, const IRend
 
 	// 获取计算着色器
 	IComputeShaderProgram* shaderProgram = getComputeShaderProgram(context);
+	if (!shaderProgram)
+		return false;
 
 	GM_ALIGNED_16(struct) ConstantBuffer
 	{
@@ -62,15 +59,6 @@ bool GMParticleEffectImplBase::GPUUpdate(GMParticleEmitter* emitter, const IRend
 		GMfloat dt;
 		GMint32 mode;
 	};
-
-	if (!d->loaded)
-	{
-		if (getCode().isEmpty())
-			return false;
-
-		shaderProgram->load(".", getCode(), getEntry());
-		d->loaded = true;
-	}
 
 	auto& particles = emitter->getParticles();
 	auto& progParticles = d->particles;
@@ -145,21 +133,6 @@ bool GMParticleEffectImplBase::GPUUpdate(GMParticleEmitter* emitter, const IRend
 	return true;
 }
 
-GMGravityParticleEffect::GMGravityParticleEffect()
-{
-}
-
-GMGravityParticleEffect::~GMGravityParticleEffect()
-{
-	D(d);
-	--s_ref[d->context];
-	if (s_ref[d->context] == 0)
-	{
-		GM_delete(s_program[d->context]);
-		s_program[d->context] = nullptr;
-	}
-}
-
 void GMGravityParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle* particle)
 {
 	GMParticleEffect::initParticle(emitter, particle);
@@ -232,7 +205,6 @@ void GMGravityParticleEffect::CPUUpdate(GMParticleEmitter* emitter, GMDuration d
 	}
 }
 
-
 GMString GMGravityParticleEffect::getCode()
 {
 	return s_gravityCode;
@@ -246,37 +218,16 @@ GMString GMGravityParticleEffect::getEntry()
 IComputeShaderProgram* GMGravityParticleEffect::getComputeShaderProgram(const IRenderContext* context)
 {
 	D(d);
-	auto& prog = s_program[context];
-	if (!prog)
-		GM.getFactory()->createComputeShaderProgram(context, &prog);
-	return prog;
-}
+	if (getCode().isEmpty())
+		return false;
 
-
-void GMGravityParticleEffect::onContextAttached(const IRenderContext* context)
-{
-	++s_ref[context];
+	return GMComputeShaderManager::instance().getComputeShaderProgram(context, GMCS_PARTICLE_GRAVITY, L".", getCode(), getEntry());
 }
 
 void GMGravityParticleEffect::setDefaultCodeAndEntry(const GMString& code, const GMString& entry)
 {
 	s_gravityCode = code;
 	s_gravityEntry = entry;
-}
-
-GMRadialParticleEffect::GMRadialParticleEffect()
-{
-}
-
-GMRadialParticleEffect::~GMRadialParticleEffect()
-{
-	D(d);
-	--s_ref[d->context];
-	if (s_ref[d->context] == 0)
-	{
-		GM_delete(s_program[d->context]);
-		s_program[d->context] = nullptr;
-	}
 }
 
 void GMRadialParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle* particle)
@@ -346,17 +297,14 @@ GMString GMRadialParticleEffect::getEntry()
 IComputeShaderProgram* GMRadialParticleEffect::getComputeShaderProgram(const IRenderContext* context)
 {
 	D(d);
-	if (!s_program[d->context])
-		GM.getFactory()->createComputeShaderProgram(context, &s_program[d->context]);
-	return s_program[d->context];
+	if (getCode().isEmpty())
+		return false;
+
+	return GMComputeShaderManager::instance().getComputeShaderProgram(context, GMCS_PARTICLE_RADIAL, L".", getCode(), getEntry());
 }
 
 void GMRadialParticleEffect::setDefaultCodeAndEntry(const GMString& code, const GMString& entry)
 {
 	s_radialCode = code;
 	s_radialEntry = entry;
-}
-void GMRadialParticleEffect::onContextAttached(const IRenderContext* context)
-{
-	++s_ref[context];
 }

@@ -10,6 +10,7 @@ GM_PRIVATE_OBJECT(GMParticleModel)
 	GMOwnedPtr<GMGameObject> particleObject;
 	GMModel* particleModel = nullptr;
 	GMParticleSystem* system = nullptr;
+	bool GPUValid = true;
 };
 
 //! 表示一个2D粒子，是一个四边形
@@ -39,7 +40,13 @@ protected:
 	);
 
 protected:
-	virtual void updateData(const IRenderContext* context, void* dataPtr) = 0;
+	virtual void updateData(const IRenderContext* context, void* dataPtr);
+	virtual void CPUUpdate(const IRenderContext* context, void* dataPtr) = 0;
+	virtual void GPUUpdate(IComputeShaderProgram*, const IRenderContext* context, void* dataPtr);
+	virtual GMString getCode() = 0;
+
+protected:
+	GMComputeBufferHandle prepareBuffers(IComputeShaderProgram*, const IRenderContext* context, void* dataPtr);
 };
 
 class GMParticleModel_2D : public GMParticleModel
@@ -47,16 +54,19 @@ class GMParticleModel_2D : public GMParticleModel
 public:
 	using GMParticleModel::GMParticleModel;
 
-	virtual void updateData(const IRenderContext* context, void* dataPtr) override;
+protected:
+	virtual void CPUUpdate(const IRenderContext* context, void* dataPtr) override;
+	virtual GMString getCode() override;
 };
 
-class GMParticleModel_3D : public GMParticleModel
+class GMParticleModel_3D : public GMParticleModel_2D
 {
 public:
-	using GMParticleModel::GMParticleModel;
+	using GMParticleModel_2D::GMParticleModel_2D;
 
-public:
-	virtual void updateData(const IRenderContext* context, void* dataPtr) override;
+protected:
+	virtual void CPUUpdate(const IRenderContext* context, void* dataPtr) override;
+	virtual GMString getCode() override;
 };
 
 END_NS

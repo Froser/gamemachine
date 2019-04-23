@@ -154,7 +154,6 @@ public:
 	  着色器的入口一定要为main。<BR>
 	*/
 	static void setDefaultCullShaderCode(const GMString& code);
-	static void releaseDefaultShaderProgram(const IRenderContext* context);
 
 private:
 	static GMString s_defaultComputeShaderCode;

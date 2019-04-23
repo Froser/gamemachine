@@ -2,6 +2,7 @@
 #include "foundation/gamemachine.h"
 #include "gmparticlemodel.h"
 #include "foundation/gmasync.h"
+#include <gmengine/gmcomputeshadermanager.h>
 
 namespace
 {
@@ -172,6 +173,59 @@ void GMParticleModel::update6Vertices(
 	};
 }
 
+void GMParticleModel::updateData(const IRenderContext* context, void* dataPtr)
+{
+	D(d);
+	return CPUUpdate(context, dataPtr);
+
+	if (d->GPUValid)
+	{
+		IComputeShaderProgram* prog = GMComputeShaderManager::instance().getComputeShaderProgram(context, GMCS_PARTICLE_DATA_TRANSFER, L".", getCode(), L"main");
+		GPUUpdate(prog, context, dataPtr);
+	}
+	else
+	{
+		CPUUpdate(context, dataPtr);
+	}
+}
+
+void GMParticleModel::GPUUpdate(IComputeShaderProgram* shaderProgram, const IRenderContext* context, void* dataPtr)
+{
+	D(d);
+	GMComputeBufferHandle futureResult = prepareBuffers(shaderProgram, context, dataPtr);
+
+	GMuint32 sz = gm_sizet_to_uint(d->system->getEmitter()->getParticles().size());
+	shaderProgram->dispatch(sz, 1, 1);
+
+	// 从futureResult获取结果，并拷贝到dataPtr
+}
+
+GMComputeBufferHandle GMParticleModel::prepareBuffers(IComputeShaderProgram* shaderProgram, const IRenderContext* context, void* dataPtr)
+{
+	struct Constant
+	{
+		GMVec3 lookDirection;
+	};
+
+	D(d);
+
+	// TODO 先写个轮廓
+	Constant c = { context->getEngine()->getCamera().getLookAt().lookDirection };
+	shaderProgram->createBuffer(sizeof(Constant), 1, &c, GMComputeBufferType::Constant, 00);
+	shaderProgram->bindConstantBuffer(00);
+
+	auto& particles = d->system->getEmitter()->getParticles();
+	shaderProgram->createBuffer(sizeof(particles[0]), gm_sizet_to_uint(particles.size()), particles.data(), GMComputeBufferType::Structured, 00);
+	shaderProgram->createBufferShaderResourceView(00, 00);
+	shaderProgram->bindShaderResourceView(1, 00);
+
+	// 创建结果
+	shaderProgram->createBuffer(00, gm_sizet_to_uint(particles.size()), dataPtr, GMComputeBufferType::Structured, 00);
+	shaderProgram->createBufferUnorderedAccessView(00, 00);
+	shaderProgram->bindUnorderedAccessView(1, 00);
+	return 00;
+}
+
 void GMParticleModel::render(const IRenderContext* context)
 {
 	D(d);
@@ -214,7 +268,7 @@ void GMParticleModel::render(const IRenderContext* context)
 	d->particleObject->draw();
 }
 
-void GMParticleModel_2D::updateData(const IRenderContext* context, void* dataPtr)
+void GMParticleModel_2D::CPUUpdate(const IRenderContext* context, void* dataPtr)
 {
 	D(d);
 	auto& particles = d->system->getEmitter()->getParticles();
@@ -248,7 +302,12 @@ void GMParticleModel_2D::updateData(const IRenderContext* context, void* dataPtr
 	);
 }
 
-void GMParticleModel_3D::updateData(const IRenderContext* context, void* dataPtr)
+GMString GMParticleModel_2D::getCode()
+{
+	return GMString();
+}
+
+void GMParticleModel_3D::CPUUpdate(const IRenderContext* context, void* dataPtr)
 {
 	D(d);
 	auto& particles = d->system->getEmitter()->getParticles();
@@ -263,24 +322,29 @@ void GMParticleModel_3D::updateData(const IRenderContext* context, void* dataPtr
 		particles.begin(),
 		particles.end(),
 		[&particles, dataPtr, this, &lookDirection](auto begin, auto end) {
-			// 计算一下数据偏移
-			GMVertex* dataOffset = reinterpret_cast<GMVertex*>(dataPtr) + (begin - particles.begin()) * VerticesPerParticle;
-			for (auto iter = begin; iter != end; ++iter)
-			{
-				GMParticle& particle = *iter;
-				GMfloat he = particle.getSize() / 2.f;
+		// 计算一下数据偏移
+		GMVertex* dataOffset = reinterpret_cast<GMVertex*>(dataPtr) + (begin - particles.begin()) * VerticesPerParticle;
+		for (auto iter = begin; iter != end; ++iter)
+		{
+			GMParticle& particle = *iter;
+			GMfloat he = particle.getSize() / 2.f;
 
-				update6Vertices(
-					dataOffset,
-					particle.getPosition(),
-					he,
-					particle.getColor(),
-					Rotate(particle.getRotation(), GMVec3(0, 0, 1)),
-					lookDirection,
-					particle.getPosition().getZ()
-				);
-				dataOffset += VerticesPerParticle;
-			}
+			update6Vertices(
+				dataOffset,
+				particle.getPosition(),
+				he,
+				particle.getColor(),
+				Rotate(particle.getRotation(), GMVec3(0, 0, 1)),
+				lookDirection,
+				particle.getPosition().getZ()
+			);
+			dataOffset += VerticesPerParticle;
 		}
+	}
 	);
+}
+
+GMString GMParticleModel_3D::getCode()
+{
+	return GMString();
 }

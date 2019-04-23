@@ -8,6 +8,7 @@
 #include "foundation/gmconfigs.h"
 #include "gmprimitivemanager.h"
 #include "gmcsmhelper.h"
+#include "gmcomputeshadermanager.h"
 
 static GMShaderVariablesDesc s_defaultShaderVariablesDesc =
 {
@@ -463,7 +464,7 @@ const GMMat4& GMGraphicEngine::getCascadeCameraVPMatrix(GMCascadeLevel level)
 void GMGraphicEngine::dispose()
 {
 	D(d);
-	GMGameObject::releaseDefaultShaderProgram(d->context);
+	GMComputeShaderManager::instance().disposeShaderPrograms(d->context);
 	GM_delete(d->filterFramebuffers);
 	GM_delete(d->filterQuad);
 	GM_delete(d->gBuffer);

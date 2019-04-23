@@ -4,6 +4,7 @@
 #include "gmdata/glyph/gmglyphmanager.h"
 #include "foundation/gamemachine.h"
 #include "gmassets.h"
+#include "../gmcomputeshadermanager.h"
 
 namespace
 {
@@ -39,8 +40,6 @@ namespace
 		frustum.getPlanes(planes);
 		return GMCamera::isBoundingBoxInside(planes, points);
 	}
-
-	static Map<const IRenderContext*, IComputeShaderProgram*> s_defaultComputeShaderPrograms;
 }
 
 GMString GMGameObject::s_defaultComputeShaderCode;
@@ -279,12 +278,6 @@ void GMGameObject::setDefaultCullShaderCode(const GMString& code)
 	s_defaultComputeShaderCode = code;
 }
 
-void GMGameObject::releaseDefaultShaderProgram(const IRenderContext* context)
-{
-	if (s_defaultComputeShaderPrograms[context])
-		GM_delete(s_defaultComputeShaderPrograms[context]);
-}
-
 void GMGameObject::drawModel(const IRenderContext* context, GMModel* model)
 {
 	D(d);
@@ -356,15 +349,12 @@ IComputeShaderProgram* GMGameObject::getCullShaderProgram()
 	if (d->cullShaderProgram)
 		return d->cullShaderProgram;
 
-	auto& defaultProgram = s_defaultComputeShaderPrograms[d->context];
-	if (defaultProgram)
-		return defaultProgram;
-
 	if (s_defaultComputeShaderCode.isEmpty())
 		return nullptr;
 
-	if (GM.getFactory()->createComputeShaderProgram(d->context, &defaultProgram))
-		defaultProgram->load(L".", s_defaultComputeShaderCode, L"main");
+	auto defaultProgram = GMComputeShaderManager::instance().getComputeShaderProgram(d->context, GMCS_GAMEOBJECT_CULL, L".", s_defaultComputeShaderCode, L"main");
+	if (defaultProgram)
+		return defaultProgram;
 
 	return defaultProgram;
 }

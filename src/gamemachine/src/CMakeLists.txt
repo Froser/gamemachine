@@ -82,6 +82,8 @@ set(SOURCES
 		gmengine/gmcsmhelper.cpp
 		gmengine/gmshaderhelper.h
 		gmengine/gmshaderhelper.cpp
+		gmengine/gmcomputeshadermanager.h
+		gmengine/gmcomputeshadermanager.cpp
 		gmengine/gameobjects/gmgameobject.h
 		gmengine/gameobjects/gmgameobject.cpp
 		gmengine/gameobjects/gmspritegameobject.h
