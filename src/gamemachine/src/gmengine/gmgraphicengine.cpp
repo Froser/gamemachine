@@ -136,18 +136,6 @@ GMGraphicEngine::GMGraphicEngine(const IRenderContext* context)
 	d->primitiveManager.reset(new GMPrimitiveManager(context));
 }
 
-GMGraphicEngine::~GMGraphicEngine()
-{
-	D(d);
-	GMGameObject::releaseDefaultShaderProgram(d->context);
-	GM_delete(d->filterFramebuffers);
-	GM_delete(d->filterQuad);
-	GM_delete(d->gBuffer);
-	GM_delete(d->shadowDepthFramebuffers);
-	GM_delete(d->defaultFramebuffers);
-	GM_delete(d->glyphManager);
-}
-
 void GMGraphicEngine::init()
 {
 	D(d);
@@ -472,6 +460,18 @@ const GMMat4& GMGraphicEngine::getCascadeCameraVPMatrix(GMCascadeLevel level)
 	return d->shadowCameraVPmatrices[level];
 }
 
+void GMGraphicEngine::dispose()
+{
+	D(d);
+	GMGameObject::releaseDefaultShaderProgram(d->context);
+	GM_delete(d->filterFramebuffers);
+	GM_delete(d->filterQuad);
+	GM_delete(d->gBuffer);
+	GM_delete(d->shadowDepthFramebuffers);
+	GM_delete(d->defaultFramebuffers);
+	GM_delete(d->glyphManager);
+}
+
 IGBuffer* GMGraphicEngine::createGBuffer()
 {
 	D(d);
@@ -541,6 +541,26 @@ GMPrimitiveManager* GMGraphicEngine::getPrimitiveManager()
 {
 	D(d);
 	return d->primitiveManager.get();
+}
+
+bool GMGraphicEngine::msgProc(const GMMessage& e)
+{
+	D(d);
+	switch (e.msgType)
+	{
+	case GameMachineMessageType::WindowAboutToDestroy:
+	{
+		if (e.object == d->context->getWindow())
+		{
+			// 窗口将会被销毁，在这里释放一些资源
+			// 这些资源依赖Window，所以在这里提前释放
+			dispose();
+			return true;
+		}
+	}
+	}
+
+	return false;
 }
 
 void GMGraphicEngine::createModelDataProxy(const IRenderContext* context, GMModel* model, bool transfer)

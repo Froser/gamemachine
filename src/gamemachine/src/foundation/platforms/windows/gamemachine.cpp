@@ -250,7 +250,7 @@ void GameMachine::translateSystemEvent(GMuint32 uMsg, GMWParam wParam, GMLParam 
 	switch (uMsg)
 	{
 	case WM_DESTROY:
-		newSystemEvent = new GMSystemEvent(GMSystemEventType::WindowDestroyed);
+		newSystemEvent = new GMSystemEvent(GMSystemEventType::WindowAboutToDestory);
 		break;
 	case WM_SIZE:
 		newSystemEvent = new GMSystemEvent(GMSystemEventType::WindowSizeChanged);

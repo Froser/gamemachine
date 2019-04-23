@@ -189,7 +189,7 @@ bool GMDx11GraphicEngine::msgProc(const GMMessage& e)
 	}
 	}
 
-	return false;
+	return Base::msgProc(e);
 }
 
 void GMDx11GraphicEngine::initShaders(const IRenderContext* context)

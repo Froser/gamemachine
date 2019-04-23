@@ -11,7 +11,7 @@ enum class GameMachineMessageType
 	QuitGameMachine, //!< 准备退出GameMachine的消息
 	CrashDown, //!< GameMachine崩溃时的消息
 	FrameUpdate, //!< 准备更新窗口一帧的消息
-	WindowDestoryed, //!< 当某个原生窗口被销毁时的消息
+	WindowAboutToDestroy, //!< 当某个原生窗口要被销毁时的消息
 	WindowSizeChanged, //!< 当某个原生窗口大小发生变化时的消息
 	Dx11Ready, //!< 如果使用DirectX11，DirectX11就绪时的消息
 	SystemMessage, //!< 操作系统产生消息时的消息
@@ -33,7 +33,7 @@ struct GMMessage
 enum class GMSystemEventType
 {
 	Unknown,
-	WindowDestroyed,
+	WindowAboutToDestory,
 	WindowSizeChanged,
 	KeyDown,
 	KeyUp,

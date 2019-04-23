@@ -21,8 +21,8 @@ bool GMWindow::handleSystemEvent(GMSystemEvent* event, REF GMLResult& result)
 
 	switch (event->getType())
 	{
-	case GMSystemEventType::WindowDestroyed:
-		GM.postMessage({ GameMachineMessageType::WindowDestoryed, 0, static_cast<IWindow*>(this) });
+	case GMSystemEventType::WindowAboutToDestory:
+		GM.postMessage({ GameMachineMessageType::WindowAboutToDestroy, 0, static_cast<IWindow*>(this) });
 		break;
 	case GMSystemEventType::WindowSizeChanged:
 		GM.postMessage({ GameMachineMessageType::WindowSizeChanged });
@@ -113,7 +113,7 @@ void GMWindow::msgProc(const GMMessage& message)
 			widget->render(elapsed);
 		}
 	}
-	else if (message.msgType == GameMachineMessageType::WindowDestoryed)
+	else if (message.msgType == GameMachineMessageType::WindowAboutToDestroy)
 	{
 		if (message.object == static_cast<IWindow*>(this))
 		{

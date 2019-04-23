@@ -251,7 +251,7 @@ class GMGraphicEngine : public GMObject, public IGraphicEngine
 
 public:
 	GMGraphicEngine(const IRenderContext* context);
-	~GMGraphicEngine();
+	~GMGraphicEngine() = default;
 
 public:
 	virtual void init() override;
@@ -278,6 +278,7 @@ public:
 	virtual void endBlend() override;
 	virtual GMRenderTechniqueManager* getRenderTechniqueManager() override;
 	virtual GMPrimitiveManager* getPrimitiveManager() override;
+	virtual bool msgProc(const GMMessage& e) override;
 	virtual void createModelDataProxy(const IRenderContext* context, GMModel* model, bool transfer = true) override;
 	virtual ICSMFramebuffers* getCSMFramebuffers();
 
@@ -334,6 +335,7 @@ protected:
 	}
 
 private:
+	void dispose();
 	IGBuffer* createGBuffer();
 	void setCascadeCamera(GMCascadeLevel level, const GMCamera& camera);
 
