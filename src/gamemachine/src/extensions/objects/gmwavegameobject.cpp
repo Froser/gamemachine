@@ -162,25 +162,25 @@ namespace
 		scene = GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, m));
 	}
 
-	GMfloat gerstner_x(GMfloat q, const GMWaveDescription& desc, GMVec3 pos, GMfloat rad)
+	GMfloat gerstner_x(GMfloat q, const GMWaveDescription& desc, GMfloat pos[3], GMfloat rad)
 	{
 		if (FuzzyCompare(desc.steepness, 0))
 			return 0;
 
-		return q * desc.amplitude * desc.direction[0] * pos.getX() * Cos(rad);
+		return q * desc.amplitude * desc.direction[0] * pos[0] * Cos(rad);
 	}
 
-	GMfloat gerstner_y(const GMWaveDescription& desc, GMVec3 pos, GMfloat rad)
+	GMfloat gerstner_y(const GMWaveDescription& desc, GMfloat rad)
 	{
 		return desc.amplitude * Sin(rad);
 	}
 
-	GMfloat gerstner_z(GMfloat q, const GMWaveDescription& desc, GMVec3 pos, GMfloat rad)
+	GMfloat gerstner_z(GMfloat q, const GMWaveDescription& desc, GMfloat pos[3], GMfloat rad)
 	{
 		if (FuzzyCompare(q, 0))
 			return 0;
 
-		return q * desc.amplitude * desc.direction[2] * pos.getZ() * Cos(rad);
+		return q * desc.amplitude * desc.direction[2] * pos[2] * Cos(rad);
 	}
 }
 
@@ -489,9 +489,9 @@ void GMWaveGameObject::updateEachVertex()
 				GMfloat phi = d->waveDescriptions[i].speed * wi;
 				GMfloat rad = wi * (d->waveDescriptions[i].direction[0] * pos.getX() + d->waveDescriptions[i].direction[2] * pos.getZ()) + phi * d->duration;
 				GMfloat Qi = d->waveDescriptions[i].steepness / (d->waveDescriptions[i].amplitude * wi * d->waveDescriptions.size());
-				gerstner_x_sum += gerstner_x(Qi, d->waveDescriptions[i], pos, rad);
-				gerstner_y_sum += gerstner_y(d->waveDescriptions[i], pos, rad);
-				gerstner_z_sum += gerstner_z(Qi, d->waveDescriptions[i], pos, rad);
+				gerstner_x_sum += gerstner_x(Qi, d->waveDescriptions[i], ValuePointer(pos), rad);
+				gerstner_y_sum += gerstner_y(d->waveDescriptions[i], rad);
+				gerstner_z_sum += gerstner_z(Qi, d->waveDescriptions[i], ValuePointer(pos), rad);
 			}
 
 			vertex.positions = {
