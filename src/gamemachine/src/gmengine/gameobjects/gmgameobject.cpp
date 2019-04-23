@@ -242,7 +242,7 @@ void GMGameObject::setCullOption(GMGameObjectCullOption option, GMCamera* camera
 		for (GMsize_t i = 0; i < d->cullAABB.size(); ++i)
 		{
 			auto& shader = models[i].getModel()->getShader();
-			shader.setVisible(true);
+			shader.setCulled(false);
 		}
 	}
 }
