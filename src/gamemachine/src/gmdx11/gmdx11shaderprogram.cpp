@@ -446,7 +446,7 @@ void GMDx11ComputeShaderProgram::setBuffer(GMComputeBufferHandle handle, GMCompu
 
 		D3D11_BUFFER_DESC desc = { 0 };
 		buffer->GetDesc(&desc);
-		bool canWrite = desc.CPUAccessFlags & D3D11_CPU_ACCESS_WRITE;
+		bool canWrite = !!(desc.CPUAccessFlags & D3D11_CPU_ACCESS_WRITE);
 
 		if (canWrite)
 		{
