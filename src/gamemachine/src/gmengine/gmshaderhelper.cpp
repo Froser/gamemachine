@@ -9,33 +9,22 @@
 #include <gmglhelper.h>
 #include <extensions/objects/gmwavegameobject.h>
 #include <extensions/objects/particle/gmparticlemodel.h>
+#include <extensions/objects/particle/gmparticleeffects.h>
 
 namespace
 {
-	IComputeShaderProgram* createComputeShader(
-		const IRenderContext* context,
-		const GMString& path,
-		const GMString& entryPoint
-	)
+	GMString getFileContent(const GMString& path)
 	{
-		IComputeShaderProgram* shaderProgram = nullptr;
 		GMBuffer buffer;
 		GMString filename;
 		GM.getGamePackageManager()->readFile(GMPackageIndex::Shaders, path, &buffer, &filename);
 		buffer.convertToStringBuffer();
-
-		if (GM.getFactory()->createComputeShaderProgram(context, &shaderProgram))
-		{
-			shaderProgram->load(filename, GMString((char*)buffer.buffer), entryPoint);
-		}
-		return shaderProgram;
+		return GMString((const char*)buffer.buffer);
 	}
 }
 
-void GMShaderHelper::loadShader(const IRenderContext* context, ShaderHelperResult* result)
+void GMShaderHelper::loadShader(const IRenderContext* context)
 {
-	GM_ASSERT(result);
-	IComputeShaderProgram* cullShaderProgram = nullptr;
 	auto& env = GM.getRunningStates().renderEnvironment;
 	if (env == GMRenderEnvironment::OpenGL)
 	{
@@ -51,36 +40,38 @@ void GMShaderHelper::loadShader(const IRenderContext* context, ShaderHelperResul
 			L"gl/filters/filters.frag"
 		);
 
-		cullShaderProgram = createComputeShader(context,
-			L"gl/compute/frustumcull.glsl",
-			L"main"
-		);
-
-		if (cullShaderProgram)
-			GMGameObject::setDefaultCullShaderProgram(cullShaderProgram);
+		GMGameObject::setDefaultCullShaderCode(getFileContent(L"gl/compute/frustumcull.glsl"));
 	}
 	else
 	{
 #if GM_USE_DX11
 		GMDx11Helper::loadShader(context, L"dx11/effect.fx");
-
-		cullShaderProgram = createComputeShader(context,
-			L"dx11/frustumcull.hlsl",
-			L"Main"
-		);
-
-		if (cullShaderProgram)
-			GMGameObject::setDefaultCullShaderProgram(cullShaderProgram);
+		GMGameObject::setDefaultCullShaderCode(getFileContent(L"dx11/compute/frustumcull.hlsl"));
 #else
 		GM_ASSERT(false);
 #endif
 	}
-
-	if (result)
-		result->cullShaderProgram = cullShaderProgram;
 }
 
 void GMShaderHelper::loadExtensionShaders(const IRenderContext* context)
 {
+	// Wave
 	GMWaveGameObject::initShader(context);
+
+	// Particles
+	auto& env = GM.getRunningStates().renderEnvironment;
+	if (env == GMRenderEnvironment::OpenGL)
+	{
+		GMGravityParticleEffect::setDefaultCodeAndEntry(getFileContent(L"gl/compute/particle_gravity.glsl"), L"main");
+		GMRadialParticleEffect::setDefaultCodeAndEntry(getFileContent(L"gl/compute/particle_radial.glsl"), L"main");
+	}
+	else
+	{
+#if GM_USE_DX11
+		GMGravityParticleEffect::setDefaultCodeAndEntry(getFileContent(L"dx11/compute/particle.hlsl"), L"gravity_main");
+		GMRadialParticleEffect::setDefaultCodeAndEntry(getFileContent(L"dx11/compute/particle.hlsl"), L"radial_main");
+#else
+		GM_ASSERT(false);
+#endif
+	}
 }

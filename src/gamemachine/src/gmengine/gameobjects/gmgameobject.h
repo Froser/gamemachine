@@ -148,10 +148,16 @@ private:
 	void releaseAllBufferHandle();
 
 public:
-	static void setDefaultCullShaderProgram(IComputeShaderProgram* shaderProgram);
+	//! 设置默认的裁剪程序。如果没有设置，那么GMGameObject将会采用CPU裁剪。
+	/*!
+	  为当前渲染环境（如DirectX11, OpenGL)设置裁剪的计算着色器代码。<BR>
+	  着色器的入口一定要为main。<BR>
+	*/
+	static void setDefaultCullShaderCode(const GMString& code);
+	static void releaseDefaultShaderProgram(const IRenderContext* context);
 
 private:
-	static IComputeShaderProgram* s_defaultComputeShaderProgram;
+	static GMString s_defaultComputeShaderCode;
 };
 
 // GMSkyObject

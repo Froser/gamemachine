@@ -5,12 +5,7 @@ BEGIN_NS
 
 struct GMShaderHelper
 {
-	struct ShaderHelperResult
-	{
-		IComputeShaderProgram* cullShaderProgram = nullptr;
-	};
-
-	static void loadShader(const IRenderContext* context, ShaderHelperResult* result);
+	static void loadShader(const IRenderContext* context);
 
 	static void loadExtensionShaders(const IRenderContext* context);
 };

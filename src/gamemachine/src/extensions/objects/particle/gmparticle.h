@@ -330,6 +330,9 @@ class GMParticleEffect : public GMObject
 	GM_DECLARE_PROPERTY(RadiusMode, radiusMode)
 
 public:
+	~GMParticleEffect() = default;
+
+public:
 	void setParticleDescription(const GMParticleDescription& desc);
 
 public:
@@ -338,7 +341,7 @@ public:
 
 protected:
 	virtual void CPUUpdate(GMParticleEmitter* emitter, GMDuration dt) = 0;
-	virtual bool GPUUpdate(GMParticleEmitter* emitter, IComputeShaderProgram* shaderProgram, GMDuration dt) = 0;
+	virtual bool GPUUpdate(GMParticleEmitter* emitter, const IRenderContext* context, GMDuration dt) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMParticleSystem)

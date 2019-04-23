@@ -165,7 +165,6 @@ GM_PRIVATE_OBJECT_UNALIGNED(DemostrationEntrance)
 	gm::IWindow* mainWindow = nullptr;
 	gm::GMDebugConfig debugConfig;
 	gm::GMRenderConfig renderConfig;
-	gm::IComputeShaderProgram* defaultCullShaderProgram = nullptr;
 };
 
 class DemostrationEntrance : public gm::IGameHandler, public gm::IShaderLoadCallback

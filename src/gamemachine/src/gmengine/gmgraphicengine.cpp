@@ -139,6 +139,7 @@ GMGraphicEngine::GMGraphicEngine(const IRenderContext* context)
 GMGraphicEngine::~GMGraphicEngine()
 {
 	D(d);
+	GMGameObject::releaseDefaultShaderProgram(d->context);
 	GM_delete(d->filterFramebuffers);
 	GM_delete(d->filterQuad);
 	GM_delete(d->gBuffer);

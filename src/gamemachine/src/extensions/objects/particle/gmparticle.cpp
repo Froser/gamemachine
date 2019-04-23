@@ -512,18 +512,7 @@ void GMParticleEffect::update(GMParticleEmitter* emitter, const IRenderContext* 
 	IComputeShaderProgram* computeShader = nullptr;
 	if (d->GPUValid)
 	{
-		if (!d->shaderPrograms[context])
-		{
-			if (GM.getFactory()->createComputeShaderProgram(context, &computeShader))
-				d->shaderPrograms[context] = computeShader;
-			else
-				d->GPUValid = false;
-		}
-		else
-		{
-			computeShader = d->shaderPrograms[context];
-		}
-		if (!GPUUpdate(emitter, computeShader, dt))
+		if (!GPUUpdate(emitter, context, dt))
 			d->GPUValid = false;
 	}
 	else

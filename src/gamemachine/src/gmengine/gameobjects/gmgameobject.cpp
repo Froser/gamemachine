@@ -39,9 +39,11 @@ namespace
 		frustum.getPlanes(planes);
 		return GMCamera::isBoundingBoxInside(planes, points);
 	}
+
+	static Map<const IRenderContext*, IComputeShaderProgram*> s_defaultComputeShaderPrograms;
 }
 
-IComputeShaderProgram* GMGameObject::s_defaultComputeShaderProgram = nullptr;
+GMString GMGameObject::s_defaultComputeShaderCode;
 
 GMGameObject::GMGameObject(GMAsset asset)
 	: GMGameObject()
@@ -272,9 +274,15 @@ void GMGameObject::releaseAllBufferHandle()
 	}
 }
 
-void GMGameObject::setDefaultCullShaderProgram(IComputeShaderProgram* shaderProgram)
+void GMGameObject::setDefaultCullShaderCode(const GMString& code)
 {
-	s_defaultComputeShaderProgram = shaderProgram;
+	s_defaultComputeShaderCode = code;
+}
+
+void GMGameObject::releaseDefaultShaderProgram(const IRenderContext* context)
+{
+	if (s_defaultComputeShaderPrograms[context])
+		GM_delete(s_defaultComputeShaderPrograms[context]);
 }
 
 void GMGameObject::drawModel(const IRenderContext* context, GMModel* model)
@@ -342,7 +350,23 @@ void GMGameObject::makeAABB()
 IComputeShaderProgram* GMGameObject::getCullShaderProgram()
 {
 	D(d);
-	return s_defaultComputeShaderProgram ? s_defaultComputeShaderProgram : d->cullShaderProgram;
+	if (!d->context)
+		return nullptr;
+
+	if (d->cullShaderProgram)
+		return d->cullShaderProgram;
+
+	auto& defaultProgram = s_defaultComputeShaderPrograms[d->context];
+	if (defaultProgram)
+		return defaultProgram;
+
+	if (s_defaultComputeShaderCode.isEmpty())
+		return nullptr;
+
+	if (GM.getFactory()->createComputeShaderProgram(d->context, &defaultProgram))
+		defaultProgram->load(L".", s_defaultComputeShaderCode, L"main");
+
+	return defaultProgram;
 }
 
 void GMGameObject::cull()

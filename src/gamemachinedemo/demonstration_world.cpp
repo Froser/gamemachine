@@ -766,7 +766,6 @@ DemostrationEntrance::~DemostrationEntrance()
 {
 	D(d);
 	gm::GM_delete(d->world);
-	gm::GM_delete(d->defaultCullShaderProgram);
 }
 
 void DemostrationEntrance::onLoadShaders(const gm::IRenderContext* context)
@@ -778,7 +777,5 @@ void DemostrationEntrance::onLoadShaders(const gm::IRenderContext* context)
 
 	// 使用预设的着色器程序
 	gm::GMShaderHelper::loadExtensionShaders(context);
-	gm::GMShaderHelper::ShaderHelperResult result;
-	gm::GMShaderHelper::loadShader(context, &result);
-	d->defaultCullShaderProgram = result.cullShaderProgram;
+	gm::GMShaderHelper::loadShader(context);
 }

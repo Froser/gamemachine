@@ -88,7 +88,6 @@ int main(int argc, char* argv[])
 	mainWindow->setHandler(new DemostrationEntrance(mainWindow));
 	GM.addWindow(mainWindow);
 
-	/*
 	gm::IWindow* mainWindow2 = nullptr;
 	windowDesc.windowName = "Window 2";
 	factory->createWindow(hInstance, mainWindow, &mainWindow2);
@@ -97,7 +96,6 @@ int main(int argc, char* argv[])
 	mainWindow2->showWindow();
 	mainWindow2->setHandler(new DemostrationEntrance(mainWindow2));
 	GM.addWindow(mainWindow2);
-	*/
 
 	GM.startGameMachine();
 	return 0;

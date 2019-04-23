@@ -48,7 +48,7 @@ GM_PRIVATE_OBJECT(GMWindow_OpenGL)
 {
 	BYTE depthBits, stencilBits;
 	HDC hDC = 0;
-	HGLRC hRC = 0;
+	GMSharedPtr<HGLRC> hRC;
 	GMWindow_OpenGL* parent = nullptr;
 };
 
@@ -62,7 +62,7 @@ public:
 	~GMWindow_OpenGL();
 
 public:
-	inline HGLRC getGLRC() GM_NOEXCEPT
+	inline GMSharedPtr<HGLRC> getGLRC() GM_NOEXCEPT
 	{
 		D(d);
 		return d->hRC;
@@ -92,7 +92,7 @@ public:
 	virtual void switchToContext() const override
 	{
 		D_OF(d, windowImpl);
-		wglMakeCurrent(d->hDC, d->hRC);
+		wglMakeCurrent(d->hDC, *d->hRC);
 	}
 
 private:
@@ -189,14 +189,17 @@ void GMWindow_OpenGL::onWindowCreated(const GMWindowDesc& wndAttrs)
 	RUN_AND_CHECK(::SetPixelFormat(d->hDC, nFormat, &pfd));
 	if (!d->parent)
 	{
-		RUN_AND_CHECK(d->hRC = wglCreateContext(d->hDC));
+		d->hRC = GMSharedPtr<HGLRC>(new HGLRC(wglCreateContext(d->hDC)), [](HGLRC* hRC) {
+			if (!wglDeleteContext(*hRC))
+				gm_error(gm_dbg_wrap("release Rendering Context failed."));
+		});
 	}
 	else
 	{
 		RUN_AND_CHECK(d->hRC = d->parent->getGLRC());
 	}
 
-	RUN_AND_CHECK(wglMakeCurrent(d->hDC, d->hRC));
+	RUN_AND_CHECK(wglMakeCurrent(d->hDC, *d->hRC));
 	return;
 
 EXIT:
@@ -256,15 +259,6 @@ void GMWindow_OpenGL::dispose()
 	::SetWindowLongPtr(getWindowHandle(), GWLP_USERDATA, NULL);
 	
 	gm::GMWindowHandle wnd = getWindowHandle();
-	if (!d->parent && d->hRC)
-	{
-		// 如果一个窗口有parent，则与parent使用相同的RC，因此RC由parent释放
-		if (!wglDeleteContext(d->hRC))
-			gm_error(gm_dbg_wrap("release Rendering Context failed."));
-
-		d->hRC = 0;
-	}
-
 	if (d->hDC && !::ReleaseDC(wnd, d->hDC))
 	{
 		gm_error(gm_dbg_wrap("release of Device Context failed."));
