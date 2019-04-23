@@ -23,7 +23,7 @@ struct GMWaveDescription
 {
 	GMfloat steepness; // between 0 and 1
 	GMfloat amplitude;
-	GMVec3 direction;
+	GMfloat direction[3];
 	GMfloat speed;
 	GMfloat waveLength;
 };

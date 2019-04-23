@@ -190,8 +190,8 @@ void Demo_Wave::createObject()
 	GMVec3 direction2 = Normalize(GMVec3(-1, 0, 1));
 	GMVec3 direction3 = Normalize(GMVec3(-1, 0, 0));
 	Vector<gm::GMWaveDescription> wd = {
-		{ 0.f, 1.25f, direction1, 2.f, 3.f },
-		{ 0.03f, .5f, direction2, 3.f, 1.5f },
+		{ 0.f, 1.25f, direction1.getX(), direction1.getY(), direction1.getZ(), 2.f, 3.f },
+		{ 0.03f, .5f, direction2.getX(), direction2.getY(), direction2.getZ(), 3.f, 1.5f },
 		//{ 0.03f, 1.5f, direction3, 5.f, 3.f },
 	};
 	wave->setWaveDescriptions(wd);

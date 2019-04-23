@@ -36,16 +36,17 @@ namespace
 			GMfloat x = 0, y = 1, z = 0;
 			for (GMint32 i = 0; i < gm_sizet_to_int(ds.size()); ++i)
 			{
+				GMVec3 direction = GMVec3(ds[i].direction[0], ds[i].direction[1], ds[i].direction[2]);
 				GMfloat wi = 2 / ds[i].waveLength;
 				GMfloat wa = wi * ds[i].amplitude;
 				GMfloat phi = ds[i].speed * wi;
-				GMfloat rad = wi * Dot(ds[i].direction, GMVec3(v.positions[0], 0, v.positions[2])) + phi * duration;
+				GMfloat rad = wi * Dot(direction, GMVec3(v.positions[0], 0, v.positions[2])) + phi * duration;
 				GMfloat c = Cos(rad);
 				GMfloat s = Sin(rad);
 				GMfloat Qi = ds[i].steepness / (ds[i].amplitude * wi * ds.size());
-				x -= ds[i].direction.getX() * wa * c;
+				x -= direction.getX() * wa * c;
 				y -= Qi * wa * s;
-				z -= ds[i].direction.getZ() * wa * c;
+				z -= direction.getZ() * wa * c;
 			}
 
 			GMVec3 n = Normalize(GMVec3(x, y, z));
@@ -60,16 +61,17 @@ namespace
 			GMfloat x = 0, y = 0, z = 1;
 			for (GMint32 i = 0; i < gm_sizet_to_int(ds.size()); ++i)
 			{
+				GMVec3 direction = GMVec3(ds[i].direction[0], ds[i].direction[1], ds[i].direction[2]);
 				GMfloat wi = 2 / ds[i].waveLength;
 				GMfloat wa = wi * ds[i].amplitude;
 				GMfloat phi = ds[i].speed * wi;
-				GMfloat rad = wi * Dot(ds[i].direction, GMVec3(v.positions[0], 0, v.positions[2])) + phi * duration;
+				GMfloat rad = wi * Dot(direction, GMVec3(v.positions[0], 0, v.positions[2])) + phi * duration;
 				GMfloat Qi = ds[i].steepness / (ds[i].amplitude * wi * ds.size());
 				GMfloat c = Cos(rad);
 				GMfloat s = Sin(rad);
-				x -= Qi * ds[i].direction.getX() * ds[i].direction.getY() * wa * s;
-				y -= Qi * ds[i].direction.getY() * ds[i].direction.getY() * wa * s;
-				z += ds[i].direction.getY() * wa * c;
+				x -= Qi * direction.getX() * direction.getY() * wa * s;
+				y -= Qi * direction.getY() * direction.getY() * wa * s;
+				z += direction.getY() * wa * c;
 			}
 
 			GMVec3 n = Normalize(GMVec3(x, y, z));
@@ -165,7 +167,7 @@ namespace
 		if (FuzzyCompare(desc.steepness, 0))
 			return 0;
 
-		return q * desc.amplitude * desc.direction.getX() * pos.getX() * Cos(rad);
+		return q * desc.amplitude * desc.direction[0] * pos.getX() * Cos(rad);
 	}
 
 	GMfloat gerstner_y(const GMWaveDescription& desc, GMVec3 pos, GMfloat rad)
@@ -178,7 +180,7 @@ namespace
 		if (FuzzyCompare(q, 0))
 			return 0;
 
-		return q * desc.amplitude * desc.direction.getZ() * pos.getZ() * Cos(rad);
+		return q * desc.amplitude * desc.direction[2] * pos.getZ() * Cos(rad);
 	}
 }
 
@@ -419,7 +421,7 @@ void GMWaveGameObject::onRenderShader(GMModel* model, IShaderProgram* shaderProg
 
 				shaderProgram->setVec3(
 					getVariableIndex(shaderProgram, d->waveIndices[prog][i].direction, s_waveDescriptionStrings[i].direction),
-					ValuePointer(d->waveDescriptions[i].direction));
+					d->waveDescriptions[i].direction);
 
 				shaderProgram->setFloat(
 					getVariableIndex(shaderProgram, d->waveIndices[prog][i].speed, s_waveDescriptionStrings[i].speed),
@@ -453,7 +455,7 @@ void GMWaveGameObject::onRenderShader(GMModel* model, IShaderProgram* shaderProg
 				GM_ASSERT(description->IsValid());
 				GM_DX_HR(description->GetMemberByName(STEEPNESS)->AsScalar()->SetFloat(d->waveDescriptions[i].steepness));
 				GM_DX_HR(description->GetMemberByName(AMPLITUDE)->AsScalar()->SetFloat(d->waveDescriptions[i].amplitude));
-				GM_DX_HR(description->GetMemberByName(DIRECTION)->AsVector()->SetFloatVector(ValuePointer(d->waveDescriptions[i].direction)));
+				GM_DX_HR(description->GetMemberByName(DIRECTION)->AsVector()->SetFloatVector(d->waveDescriptions[i].direction));
 				GM_DX_HR(description->GetMemberByName(SPEED)->AsScalar()->SetFloat(d->waveDescriptions[i].speed));
 				GM_DX_HR(description->GetMemberByName(WAVELENGTH)->AsScalar()->SetFloat(d->waveDescriptions[i].waveLength));
 			}
@@ -485,7 +487,7 @@ void GMWaveGameObject::updateEachVertex()
 			{
 				GMfloat wi = 2 / d->waveDescriptions[i].waveLength;
 				GMfloat phi = d->waveDescriptions[i].speed * wi;
-				GMfloat rad = wi * (d->waveDescriptions[i].direction.getX() * pos.getX() + d->waveDescriptions[i].direction.getZ() * pos.getZ()) + phi * d->duration;
+				GMfloat rad = wi * (d->waveDescriptions[i].direction[0] * pos.getX() + d->waveDescriptions[i].direction[2] * pos.getZ()) + phi * d->duration;
 				GMfloat Qi = d->waveDescriptions[i].steepness / (d->waveDescriptions[i].amplitude * wi * d->waveDescriptions.size());
 				gerstner_x_sum += gerstner_x(Qi, d->waveDescriptions[i], pos, rad);
 				gerstner_y_sum += gerstner_y(d->waveDescriptions[i], pos, rad);
