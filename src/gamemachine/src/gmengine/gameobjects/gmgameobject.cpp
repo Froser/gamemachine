@@ -251,26 +251,24 @@ void GMGameObject::setCullOption(GMGameObjectCullOption option, GMCamera* camera
 void GMGameObject::releaseAllBufferHandle()
 {
 	D(d);
-	if (auto shaderProgram = getCullShaderProgram())
-	{
-		shaderProgram->release(d->cullAABBsBuffer);
-		d->cullAABBsBuffer = 0;
+	auto& instance = GMComputeShaderManager::instance();
+	instance.releaseHandle(d->cullAABBsBuffer);
+	d->cullAABBsBuffer = 0;
 
-		shaderProgram->release(d->cullGPUResultBuffer);
-		d->cullGPUResultBuffer = 0;
+	instance.releaseHandle(d->cullGPUResultBuffer);
+	d->cullGPUResultBuffer = 0;
 
-		shaderProgram->release(d->cullCPUResultBuffer);
-		d->cullCPUResultBuffer = 0;
+	instance.releaseHandle(d->cullCPUResultBuffer);
+	d->cullCPUResultBuffer = 0;
 
-		shaderProgram->release(d->cullFrustumBuffer);
-		d->cullFrustumBuffer = 0;
+	instance.releaseHandle(d->cullFrustumBuffer);
+	d->cullFrustumBuffer = 0;
 
-		shaderProgram->release(d->cullAABBsSRV);
-		d->cullAABBsSRV = 0;
+	instance.releaseHandle(d->cullAABBsSRV);
+	d->cullAABBsSRV = 0;
 
-		shaderProgram->release(d->cullResultUAV);
-		d->cullResultUAV = 0;
-	}
+	instance.releaseHandle(d->cullResultUAV);
+	d->cullResultUAV = 0;
 }
 
 void GMGameObject::setDefaultCullShaderCode(const GMString& code)

@@ -64,7 +64,7 @@ public:
 	virtual void load(const GMString& path, const GMString& source, const GMString& entryPoint) override;
 	virtual bool createReadOnlyBufferFrom(GMComputeBufferHandle bufferSrc, OUT GMComputeBufferHandle* bufferOut) override;
 	virtual bool createBuffer(GMuint32 elementSize, GMuint32 count, void* pInitData, GMComputeBufferType type, OUT GMComputeBufferHandle* ppBufOut) override;
-	virtual void release(GMComputeBufferHandle) override;
+	virtual void release(GMComputeHandle) override;
 	virtual bool createBufferShaderResourceView(GMComputeBufferHandle, OUT GMComputeSRVHandle*) override;
 	virtual bool createBufferUnorderedAccessView(GMComputeBufferHandle, OUT GMComputeUAVHandle*) override;
 	virtual void bindShaderResourceView(GMuint32, GMComputeSRVHandle*) override;

@@ -37,7 +37,7 @@ public:
 	);
 
 	void disposeShaderPrograms(const IRenderContext*);
-	void releaseHandle(GMComputeBufferHandle handle);
+	void releaseHandle(GMComputeHandle handle);
 
 public:
 	static GMComputeShaderManager& instance();

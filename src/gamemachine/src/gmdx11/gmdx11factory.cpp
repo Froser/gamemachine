@@ -203,16 +203,10 @@ void GMDx11Factory::createShaderPrograms(const IRenderContext* context, const GM
 		}
 
 		if (!foundFx)
-		{
-			gm_error(gm_dbg_wrap("An effect file must be identified."));
 			return;
-		}
 
 		if (fxPath.isEmpty())
-		{
-			gm_error(gm_dbg_wrap("The Effect file path must be identified."));
 			return;
-		}
 
 		// 注入effect代码
 		fxCode += L"\n";

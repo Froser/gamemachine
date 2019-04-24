@@ -303,25 +303,26 @@ bool GMDx11ComputeShaderProgram::createBuffer(GMuint32 elementSize, GMuint32 cou
 	desc.ByteWidth = elementSize * count;
 	desc.StructureByteStride = elementSize;
 
+	ID3D11Buffer* ppBuf = nullptr;
 	if (pInitData)
 	{
 		D3D11_SUBRESOURCE_DATA InitData;
 		InitData.pSysMem = pInitData;
-		GM_DX_HR_RET(device->CreateBuffer(&desc, &InitData, (ID3D11Buffer**)ppBufOut));
+		GM_DX_HR_RET(device->CreateBuffer(&desc, &InitData, &ppBuf));
 	}
 	else
 	{
-		GM_DX_HR_RET(device->CreateBuffer(&desc, NULL, (ID3D11Buffer**)ppBufOut));
+		GM_DX_HR_RET(device->CreateBuffer(&desc, NULL, &ppBuf));
 	}
+	*ppBufOut = ppBuf;
 	return true;
 }
 
-void GMDx11ComputeShaderProgram::release(GMComputeBufferHandle h)
+void GMDx11ComputeShaderProgram::release(GMComputeHandle h)
 {
 	if (h)
 	{
-		ID3D11Buffer* buffer = static_cast<ID3D11Buffer*>(h);
-		buffer->Release();
+		h->Release();
 	}
 }
 
@@ -360,7 +361,10 @@ bool GMDx11ComputeShaderProgram::createBufferShaderResourceView(GMComputeBufferH
 		}
 	}
 
-	return SUCCEEDED( device->CreateShaderResourceView(pBuffer, &desc, (ID3D11ShaderResourceView**)out) );
+	ID3D11ShaderResourceView* srv = nullptr;
+	bool succeeded = SUCCEEDED( device->CreateShaderResourceView(pBuffer, &desc, &srv) );
+	*out = srv;
+	return succeeded;
 }
 
 bool GMDx11ComputeShaderProgram::createBufferUnorderedAccessView(GMComputeBufferHandle hBuffer, OUT GMComputeUAVHandle* out)
@@ -398,7 +402,10 @@ bool GMDx11ComputeShaderProgram::createBufferUnorderedAccessView(GMComputeBuffer
 		}
 	}
 
-	return SUCCEEDED( device->CreateUnorderedAccessView(pBuffer, &desc, (ID3D11UnorderedAccessView**)out) );
+	ID3D11UnorderedAccessView* uav = nullptr;
+	bool succeeded = SUCCEEDED( device->CreateUnorderedAccessView(pBuffer, &desc, &uav) );
+	*out = uav;
+	return succeeded;
 }
 
 void GMDx11ComputeShaderProgram::bindShaderResourceView(GMuint32 num, GMComputeSRVHandle* hs)
@@ -457,7 +464,8 @@ void GMDx11ComputeShaderProgram::setBuffer(GMComputeBufferHandle handle, GMCompu
 		}
 		else
 		{
-			dc->UpdateSubresource(buffer, 0, NULL, dataPtr, 0, 0);
+			if (dataPtr)
+				dc->UpdateSubresource(buffer, 0, NULL, dataPtr, 0, 0);
 		}
 	}
 }

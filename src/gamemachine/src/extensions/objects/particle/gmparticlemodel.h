@@ -62,7 +62,7 @@ protected:
 	virtual GMString getCode() = 0;
 
 protected:
-	GMComputeBufferHandle prepareBuffers(IComputeShaderProgram*, const IRenderContext* context, void* dataPtr, BufferFlags);
+	virtual GMComputeBufferHandle prepareBuffers(IComputeShaderProgram*, const IRenderContext* context, void* dataPtr, BufferFlags);
 
 private:
 	void disposeGPUHandles();
@@ -91,7 +91,7 @@ protected:
 	virtual GMString getCode() override;
 
 protected:
-	GMComputeBufferHandle prepareBuffers(IComputeShaderProgram*, const IRenderContext* context, void* dataPtr, BufferFlags);
+	virtual GMComputeBufferHandle prepareBuffers(IComputeShaderProgram*, const IRenderContext* context, void* dataPtr, BufferFlags);
 };
 
 END_NS

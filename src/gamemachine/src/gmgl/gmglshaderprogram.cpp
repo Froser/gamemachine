@@ -522,7 +522,7 @@ bool GMGLComputeShaderProgram::createBuffer(GMuint32 elementSize, GMuint32 count
 	if (type == GMComputeBufferType::Structured)
 	{
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, buf);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, elementSize * count, pInitData, GL_STATIC_DRAW);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, elementSize * count, pInitData, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
 	else
@@ -611,7 +611,7 @@ void GMGLComputeShaderProgram::copyBuffer(GMComputeBufferHandle destHandle, GMCo
 
 	glBindBuffer(GL_COPY_WRITE_BUFFER, dest);
 
-	GMint32 usage = GL_STATIC_DRAW;
+	GMint32 usage = GL_DYNAMIC_DRAW;
 	glGetBufferParameteriv(GL_COPY_WRITE_BUFFER, GL_BUFFER_USAGE, &usage);
 	glBufferData(GL_COPY_WRITE_BUFFER, size, nullptr, usage);
 	glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, size);

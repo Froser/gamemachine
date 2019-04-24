@@ -241,7 +241,7 @@ GMComputeBufferHandle GMParticleModel::prepareBuffers(IComputeShaderProgram* sha
 {
 	struct Constant
 	{
-		GMVec3 lookDirection;
+		GMMat4 billboardRotation;
 		int ignoreZ;
 	};
 
@@ -253,11 +253,14 @@ GMComputeBufferHandle GMParticleModel::prepareBuffers(IComputeShaderProgram* sha
 		shaderProgram->createBuffer(sizeof(Constant), 1, nullptr, GMComputeBufferType::Constant, &d->constantBuffer);
 		shaderProgram->createBuffer(sizeof(particles[0]), gm_sizet_to_uint(particles.size()), nullptr, GMComputeBufferType::Structured, &d->particleBuffer);
 		shaderProgram->createBufferShaderResourceView(d->particleBuffer, &d->particleView);
-		shaderProgram->createBuffer(sizeof(GMVertex) * 6, gm_sizet_to_uint(particles.size()), nullptr, GMComputeBufferType::Structured, &d->resultBuffer);
+		shaderProgram->createBuffer(sizeof(GMVertex), gm_sizet_to_uint(particles.size()) * 6, nullptr, GMComputeBufferType::Structured, &d->resultBuffer);
 		shaderProgram->createBufferUnorderedAccessView(d->resultBuffer, &d->resultView);
 	}
 
-	Constant c = { context->getEngine()->getCamera().getLookAt().lookDirection, flags & IgnorePosZ };
+	const static GMVec3 s_normal(0, 0, -1.f);
+	GMVec3 lookDir = -context->getEngine()->getCamera().getLookAt().lookDirection;
+	GMQuat rot = RotationTo(s_normal, lookDir, Zero<GMVec3>());
+	Constant c = { QuatToMatrix(rot), flags & IgnorePosZ };
 	shaderProgram->setBuffer(d->constantBuffer, GMComputeBufferType::Constant, &c, sizeof(c));
 	shaderProgram->bindConstantBuffer(d->constantBuffer);
 
@@ -274,19 +277,22 @@ GMComputeBufferHandle GMParticleModel::prepareBuffers(IComputeShaderProgram* sha
 void GMParticleModel::disposeGPUHandles()
 {
 	D(d);
-	GMComputeBufferHandle handles[] = {
-		d->constantBuffer,
-		d->particleBuffer,
-		d->particleView,
-		d->resultBuffer,
-		d->resultView,
-		d->resultBuffer_CPU,
+	GMComputeBufferHandle* handles[] = {
+		&d->constantBuffer,
+		&d->particleBuffer,
+		&d->particleView,
+		&d->resultBuffer,
+		&d->resultView,
+		&d->resultBuffer_CPU,
 	};
 
 	for (auto handle : handles)
 	{
-		if (handle)
-			GMComputeShaderManager::instance().releaseHandle(handle);
+		if (*handle)
+		{
+			GMComputeShaderManager::instance().releaseHandle(*handle);
+			*handle = 0;
+		}
 	}
 }
 

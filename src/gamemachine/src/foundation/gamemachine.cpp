@@ -316,6 +316,7 @@ void GameMachine::finalize()
 	for (auto iter = d->managerQueue.rbegin(); iter != d->managerQueue.rend(); ++iter)
 	{
 		GM_delete(*iter);
+		*iter = nullptr;
 	}
 
 	for (auto window : d->windows)

@@ -71,6 +71,7 @@ void GMShaderHelper::loadExtensionShaders(const IRenderContext* context)
 #if GM_USE_DX11
 		GMGravityParticleEffect::setDefaultCodeAndEntry(getFileContent(L"dx11/compute/particle.hlsl"), L"gravity_main");
 		GMRadialParticleEffect::setDefaultCodeAndEntry(getFileContent(L"dx11/compute/particle.hlsl"), L"radial_main");
+		GMParticleModel::setDefaultCode(getFileContent(L"dx11/compute/particle_transfer.hlsl"));
 #else
 		GM_ASSERT(false);
 #endif
