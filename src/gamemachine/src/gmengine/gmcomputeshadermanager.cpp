@@ -9,6 +9,9 @@ GMComputeShaderManager::~GMComputeShaderManager()
 	{
 		disposeShaderPrograms(iter->first);
 	}
+
+	if (d->deleter)
+		GM_delete(d->deleter);
 }
 
 IComputeShaderProgram* GMComputeShaderManager::getComputeShaderProgram(
@@ -23,6 +26,9 @@ IComputeShaderProgram* GMComputeShaderManager::getComputeShaderProgram(
 	auto& targetContainter = d->shaders[context];
 	if (targetContainter.size() <= i)
 		targetContainter.resize(i + 1);
+
+	if (code.isEmpty())
+		return nullptr;
 
 	auto& prog = targetContainter[i];
 	if (!prog)
@@ -48,6 +54,19 @@ void GMComputeShaderManager::disposeShaderPrograms(const IRenderContext* context
 		}
 	}
 	shaders.clear();
+}
+
+
+void GMComputeShaderManager::releaseHandle(GMComputeBufferHandle handle)
+{
+	D(d);
+	if (!d->deleter)
+		GM.getFactory()->createComputeShaderProgram(nullptr, &d->deleter);
+	
+	if (d->deleter)
+	{
+		d->deleter->release(handle);
+	}
 }
 
 GMComputeShaderManager& GMComputeShaderManager::instance()

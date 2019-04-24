@@ -64,6 +64,7 @@ void GMShaderHelper::loadExtensionShaders(const IRenderContext* context)
 	{
 		GMGravityParticleEffect::setDefaultCodeAndEntry(getFileContent(L"gl/compute/particle_gravity.glsl"), L"main");
 		GMRadialParticleEffect::setDefaultCodeAndEntry(getFileContent(L"gl/compute/particle_radial.glsl"), L"main");
+		GMParticleModel::setDefaultCode(getFileContent(L"gl/compute/particle_transfer.glsl"));
 	}
 	else
 	{

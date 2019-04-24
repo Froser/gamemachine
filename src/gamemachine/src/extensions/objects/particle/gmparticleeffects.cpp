@@ -115,18 +115,18 @@ bool GMParticleEffectImplBase::GPUUpdate(GMParticleEmitter* emitter, const IRend
 		const ParticleData* resultPtr = static_cast<ParticleData*>(shaderProgram->mapBuffer(resultHandle));
 		memcpy_s(particles.data(), sizeof(ParticleData) * particles.size(), resultPtr, sizeof(*particles[0].data()) * particles.size());
 
-		for (auto iter = particles.begin(); iter != particles.end();)
+		// 将存活的粒子放入临时容器，最后交换
+		Vector<GMParticle> tmp;
+		tmp.reserve(particles.size());
+		for (GMsize_t i = 0; i < particles.size(); ++i)
 		{
-			auto offset = iter - particles.begin();
-			if (particles[offset].getRemainingLife() <= 0)
+			auto& particle = particles[i];
+			if (particle.getRemainingLife() > 0)
 			{
-				iter = particles.erase(iter);
-			}
-			else
-			{
-				++iter;
+				tmp.push_back(particle);
 			}
 		}
+		particles.swap(tmp);
 
 		shaderProgram->unmapBuffer(resultHandle);
 	}

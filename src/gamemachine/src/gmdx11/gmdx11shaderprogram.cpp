@@ -176,7 +176,8 @@ GMDx11ComputeShaderProgram::GMDx11ComputeShaderProgram(const IRenderContext* con
 {
 	D(d);
 	d->context = context;
-	d->engine = gm_cast<GMDx11GraphicEngine*>(d->context->getEngine());
+	if (context)
+		d->engine = gm_cast<GMDx11GraphicEngine*>(d->context->getEngine());
 }
 
 void GMDx11ComputeShaderProgram::dispatch(GMint32 threadGroupCountX, GMint32 threadGroupCountY, GMint32 threadGroupCountZ)

@@ -11,9 +11,12 @@ enum GMComputeShader
 	GMCS_PARTICLE_DATA_TRANSFER,
 };
 
+typedef GMuint32 GMComputeToken;
+
 GM_PRIVATE_OBJECT_UNALIGNED(GMComputeShaderManager)
 {
 	Map<const IRenderContext*, Vector<IComputeShaderProgram*>> shaders;
+	IComputeShaderProgram* deleter = nullptr;
 };
 
 class GMComputeShaderManager
@@ -34,6 +37,7 @@ public:
 	);
 
 	void disposeShaderPrograms(const IRenderContext*);
+	void releaseHandle(GMComputeBufferHandle handle);
 
 public:
 	static GMComputeShaderManager& instance();

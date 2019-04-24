@@ -13,12 +13,19 @@ namespace
 			normal1.getY() - normal2.getY() < epsilon &&
 			normal1.getZ() - normal2.getZ() < epsilon);
 	}
+
+	static GMString s_code;
 }
 
 GMParticleModel::GMParticleModel(GMParticleSystem* system)
 {
 	D(d);
 	d->system = system;
+}
+
+GMParticleModel::~GMParticleModel()
+{
+	disposeGPUHandles();
 }
 
 GMGameObject* GMParticleModel::createGameObject(
@@ -176,11 +183,16 @@ void GMParticleModel::update6Vertices(
 void GMParticleModel::updateData(const IRenderContext* context, void* dataPtr)
 {
 	D(d);
-	return CPUUpdate(context, dataPtr);
-
 	if (d->GPUValid)
 	{
 		IComputeShaderProgram* prog = GMComputeShaderManager::instance().getComputeShaderProgram(context, GMCS_PARTICLE_DATA_TRANSFER, L".", getCode(), L"main");
+		if (!prog)
+		{
+			d->GPUValid = false;
+			CPUUpdate(context, dataPtr);
+			return;
+		}
+
 		GPUUpdate(prog, context, dataPtr);
 	}
 	else
@@ -192,38 +204,96 @@ void GMParticleModel::updateData(const IRenderContext* context, void* dataPtr)
 void GMParticleModel::GPUUpdate(IComputeShaderProgram* shaderProgram, const IRenderContext* context, void* dataPtr)
 {
 	D(d);
-	GMComputeBufferHandle futureResult = prepareBuffers(shaderProgram, context, dataPtr);
+	const GMuint32 sz = gm_sizet_to_uint(d->system->getEmitter()->getParticles().size());
+	if (sz > d->lastMaxSize)
+	{
+		d->lastMaxSize = sz;
+		d->particleSizeChanged = true;
+	}
+	else
+	{
+		d->particleSizeChanged = false;
+	}
 
-	GMuint32 sz = gm_sizet_to_uint(d->system->getEmitter()->getParticles().size());
+	GMComputeBufferHandle futureResult = prepareBuffers(shaderProgram, context, dataPtr, GMParticleModel::None);
 	shaderProgram->dispatch(sz, 1, 1);
 
 	// 从futureResult获取结果，并拷贝到dataPtr
+	bool canReadFromGPU = shaderProgram->canRead(futureResult);
+	if (!canReadFromGPU)
+	{
+		if (d->resultBuffer_CPU)
+			shaderProgram->release(d->resultBuffer_CPU);
+		shaderProgram->createReadOnlyBufferFrom(futureResult, &d->resultBuffer_CPU);
+	}
+
+	GMComputeBufferHandle resultHandle = canReadFromGPU ? futureResult : d->resultBuffer_CPU;
+	if (!canReadFromGPU)
+		shaderProgram->copyBuffer(resultHandle, futureResult);
+
+	void* resultPtr = shaderProgram->mapBuffer(resultHandle);
+	const GMsize_t verticesSize = sizeof(GMVertex) * 6 * sz; // 一个粒子6个顶点
+	memcpy_s(dataPtr, verticesSize, resultPtr, verticesSize);
+	shaderProgram->unmapBuffer(resultHandle);
 }
 
-GMComputeBufferHandle GMParticleModel::prepareBuffers(IComputeShaderProgram* shaderProgram, const IRenderContext* context, void* dataPtr)
+GMComputeBufferHandle GMParticleModel::prepareBuffers(IComputeShaderProgram* shaderProgram, const IRenderContext* context, void* dataPtr, BufferFlags flags)
 {
 	struct Constant
 	{
 		GMVec3 lookDirection;
+		int ignoreZ;
 	};
 
 	D(d);
-
-	// TODO 先写个轮廓
-	Constant c = { context->getEngine()->getCamera().getLookAt().lookDirection };
-	shaderProgram->createBuffer(sizeof(Constant), 1, &c, GMComputeBufferType::Constant, 00);
-	shaderProgram->bindConstantBuffer(00);
-
 	auto& particles = d->system->getEmitter()->getParticles();
-	shaderProgram->createBuffer(sizeof(particles[0]), gm_sizet_to_uint(particles.size()), particles.data(), GMComputeBufferType::Structured, 00);
-	shaderProgram->createBufferShaderResourceView(00, 00);
-	shaderProgram->bindShaderResourceView(1, 00);
+	if (!d->constantBuffer || d->particleSizeChanged)
+	{
+		disposeGPUHandles();
+		shaderProgram->createBuffer(sizeof(Constant), 1, nullptr, GMComputeBufferType::Constant, &d->constantBuffer);
+		shaderProgram->createBuffer(sizeof(particles[0]), gm_sizet_to_uint(particles.size()), nullptr, GMComputeBufferType::Structured, &d->particleBuffer);
+		shaderProgram->createBufferShaderResourceView(d->particleBuffer, &d->particleView);
+		shaderProgram->createBuffer(sizeof(GMVertex) * 6, gm_sizet_to_uint(particles.size()), nullptr, GMComputeBufferType::Structured, &d->resultBuffer);
+		shaderProgram->createBufferUnorderedAccessView(d->resultBuffer, &d->resultView);
+	}
+
+	Constant c = { context->getEngine()->getCamera().getLookAt().lookDirection, flags & IgnorePosZ };
+	shaderProgram->setBuffer(d->constantBuffer, GMComputeBufferType::Constant, &c, sizeof(c));
+	shaderProgram->bindConstantBuffer(d->constantBuffer);
+
+	shaderProgram->setBuffer(d->particleBuffer, GMComputeBufferType::Structured, particles.data(), sizeof(particles[0]) * gm_sizet_to_uint(particles.size()));
+	shaderProgram->bindShaderResourceView(1, &d->particleView);
 
 	// 创建结果
-	shaderProgram->createBuffer(00, gm_sizet_to_uint(particles.size()), dataPtr, GMComputeBufferType::Structured, 00);
-	shaderProgram->createBufferUnorderedAccessView(00, 00);
-	shaderProgram->bindUnorderedAccessView(1, 00);
-	return 00;
+	shaderProgram->setBuffer(d->resultBuffer, GMComputeBufferType::Structured, nullptr, sizeof(GMVertex) * 6 * gm_sizet_to_uint(particles.size()));
+	shaderProgram->bindUnorderedAccessView(1, &d->resultView);
+	return d->resultBuffer;
+}
+
+
+void GMParticleModel::disposeGPUHandles()
+{
+	D(d);
+	GMComputeBufferHandle handles[] = {
+		d->constantBuffer,
+		d->particleBuffer,
+		d->particleView,
+		d->resultBuffer,
+		d->resultView,
+		d->resultBuffer_CPU,
+	};
+
+	for (auto handle : handles)
+	{
+		if (handle)
+			GMComputeShaderManager::instance().releaseHandle(handle);
+	}
+}
+
+
+void GMParticleModel::setDefaultCode(const GMString& code)
+{
+	s_code = code;
 }
 
 void GMParticleModel::render(const IRenderContext* context)
@@ -304,7 +374,7 @@ void GMParticleModel_2D::CPUUpdate(const IRenderContext* context, void* dataPtr)
 
 GMString GMParticleModel_2D::getCode()
 {
-	return GMString();
+	return s_code;
 }
 
 void GMParticleModel_3D::CPUUpdate(const IRenderContext* context, void* dataPtr)
@@ -346,5 +416,10 @@ void GMParticleModel_3D::CPUUpdate(const IRenderContext* context, void* dataPtr)
 
 GMString GMParticleModel_3D::getCode()
 {
-	return GMString();
+	return s_code;
+}
+
+GMComputeBufferHandle GMParticleModel_3D::prepareBuffers(IComputeShaderProgram* shaderProgram, const IRenderContext* context, void* dataPtr, BufferFlags)
+{
+	return GMParticleModel::prepareBuffers(shaderProgram, context, dataPtr, GMParticleModel::IgnorePosZ);
 }
