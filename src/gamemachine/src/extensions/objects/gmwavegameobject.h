@@ -77,7 +77,7 @@ GM_PRIVATE_OBJECT(GMWaveGameObject)
 	GMWaveGameObjectHardwareAcceleration acceleration = GMWaveGameObjectHardwareAcceleration::GPU;
 };
 
-class GMWaveGameObject : public GMGameObject
+class GM_EXPORT GMWaveGameObject : public GMGameObject
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMWaveGameObject, GMGameObject)
 	GM_DECLARE_PROPERTY(ObjectDescription, objectDescription)

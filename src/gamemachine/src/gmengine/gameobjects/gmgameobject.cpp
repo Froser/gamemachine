@@ -364,11 +364,13 @@ void GMGameObject::cull()
 	D(d);
 	if (d->cullOption == GMGameObjectCullOption::AABB)
 	{
+		struct CullResult
+		{
+			GMint32 visible = 0;
+		};
+
 		bool sizeChanged = d->cullAABB.size() != d->cullSize;
 		d->cullSize = d->cullAABB.size();
-
-		typedef std::remove_reference_t<decltype(d->cullResult[0])> CullResult;
-		d->cullResult.resize(d->cullSize);
 
 		IComputeShaderProgram* cullShaderProgram = getCullShaderProgram();
 		if (cullShaderProgram && d->cullGPUAccelerationValid)
@@ -379,7 +381,7 @@ void GMGameObject::cull()
 
 				typedef std::remove_reference_t<decltype(d->cullAABB[0])> AABB;
 				if (cullShaderProgram->createBuffer(sizeof(AABB), gm_sizet_to_uint(d->cullSize), d->cullAABB.data(), GMComputeBufferType::Structured, &d->cullAABBsBuffer) &&
-					cullShaderProgram->createBuffer(sizeof(CullResult), gm_sizet_to_uint(d->cullSize), d->cullResult.data(), GMComputeBufferType::Structured, &d->cullGPUResultBuffer) &&
+					cullShaderProgram->createBuffer(sizeof(CullResult), gm_sizet_to_uint(d->cullSize), nullptr, GMComputeBufferType::Structured, &d->cullGPUResultBuffer) &&
 					cullShaderProgram->createBuffer(sizeof(GMFrustumPlanes), 1u, NULL, GMComputeBufferType::Constant, &d->cullFrustumBuffer) &&
 					cullShaderProgram->createBufferShaderResourceView(d->cullAABBsBuffer, &d->cullAABBsSRV) &&
 					cullShaderProgram->createReadOnlyBufferFrom(d->cullGPUResultBuffer, &d->cullCPUResultBuffer) &&

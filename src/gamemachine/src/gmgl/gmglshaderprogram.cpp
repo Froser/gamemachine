@@ -596,8 +596,6 @@ void GMGLComputeShaderProgram::setBuffer(GMComputeBufferHandle handle, GMCompute
 	GLenum target = type == GMComputeBufferType::Constant ? GL_UNIFORM_BUFFER : GL_SHADER_STORAGE_BUFFER;
 	glBindBuffer(target, buf);
 	glBufferSubData(target, 0, sz, dataPtr);
-	if (type == GMComputeBufferType::Constant)
-		glBindBufferBase(target, d->boBase++, buf);
 	glBindBuffer(target, 0);
 	GMGLEndGetErrorsAndCheck();
 }

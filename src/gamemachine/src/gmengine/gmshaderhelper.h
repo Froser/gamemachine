@@ -3,7 +3,7 @@
 #include <gmcommon.h>
 BEGIN_NS
 
-struct GMShaderHelper
+struct GM_EXPORT GMShaderHelper
 {
 	static void loadShader(const IRenderContext* context);
 

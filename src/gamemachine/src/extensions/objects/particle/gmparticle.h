@@ -353,7 +353,7 @@ GM_PRIVATE_OBJECT(GMParticleSystem)
 	GMOwnedPtr<IParticleModel> particleModel;
 };
 
-class GMParticleSystem : public GMObject
+class GM_EXPORT GMParticleSystem : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMParticleSystem)
 	GM_FRIEND_CLASS(GMParticleSystemManager)

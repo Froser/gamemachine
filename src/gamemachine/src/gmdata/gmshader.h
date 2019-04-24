@@ -33,7 +33,7 @@ GM_PRIVATE_OBJECT(GMTextureSampler)
 };
 
 struct GMTextureAttributeBank;
-class GMTextureSampler
+class GM_EXPORT GMTextureSampler
 {
 	GM_DECLARE_PRIVATE_NGO(GMTextureSampler)
 
