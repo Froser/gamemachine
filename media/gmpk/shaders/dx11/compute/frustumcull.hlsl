@@ -1,10 +1,10 @@
 // Compute Shader For Frustum Cull
-struct AABB
+struct AABB_t
 {
 	float4 vertices[8];
 };
 
-struct Result
+struct result_t
 {
 	int visible;
 };
@@ -31,7 +31,7 @@ int classifyPoint(float3 pt, float4 plane)
 	return POINT_ON_PLANE;
 }
 
-bool isBoundingBoxInside(float4 planes[6], AABB aabb)
+bool isBoundingBoxInside(float4 planes[6], AABB_t aabb)
 {
 	for (int i = 0; i < 6; ++i)
 	{
@@ -60,8 +60,8 @@ bool isBoundingBoxInside(float4 planes[6], AABB aabb)
 	return true;
 }
 
-StructuredBuffer<AABB> BufferAABB : register(t0);
-RWStructuredBuffer<Result> BufferOut : register(u0);
+StructuredBuffer<AABB_t> BufferAABB : register(t0);
+RWStructuredBuffer<result_t> BufferOut : register(u0);
 
 [numthreads(1, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )

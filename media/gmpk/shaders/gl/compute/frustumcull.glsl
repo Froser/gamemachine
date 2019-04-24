@@ -1,7 +1,7 @@
 // Compute Shader For Frustum Cull
 #version 430 core
 
-struct Vertices
+struct vertices_t
 {
 	vec4 vertices[8];
 };
@@ -13,7 +13,7 @@ layout(std140, binding = 0) uniform FrustumPlanes
 
 layout(std430, binding = 1) buffer AABB
 {
-	Vertices vertices[]; // AABB
+	vertices_t vertices[]; // AABB
 };
 
 layout(std430, binding = 2) buffer Result
@@ -40,7 +40,7 @@ int classifyPoint(vec3 pt, vec4 plane)
 	return POINT_ON_PLANE;
 }
 
-bool isBoundingBoxInside(vec4 planes[6], Vertices vertices)
+bool isBoundingBoxInside(vec4 planes[6], vertices_t vertices)
 {
 	for (int i = 0; i < 6; ++i)
 	{
