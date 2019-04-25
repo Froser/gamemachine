@@ -24,7 +24,7 @@ IComputeShaderProgram* GMComputeShaderManager::getComputeShaderProgram(
 {
 	D(d);
 	auto& targetContainter = d->shaders[context];
-	if (targetContainter.size() <= i)
+	if (gm_sizet_to_int(targetContainter.size()) <= i)
 		targetContainter.resize(i + 1);
 
 	if (code.isEmpty())
