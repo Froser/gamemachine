@@ -137,6 +137,11 @@ GMGraphicEngine::GMGraphicEngine(const IRenderContext* context)
 	d->primitiveManager.reset(new GMPrimitiveManager(context));
 }
 
+GMGraphicEngine::~GMGraphicEngine()
+{
+	dispose();
+}
+
 void GMGraphicEngine::init()
 {
 	D(d);
@@ -546,21 +551,6 @@ GMPrimitiveManager* GMGraphicEngine::getPrimitiveManager()
 
 bool GMGraphicEngine::msgProc(const GMMessage& e)
 {
-	D(d);
-	switch (e.msgType)
-	{
-	case GameMachineMessageType::WindowAboutToDestroy:
-	{
-		if (e.object == d->context->getWindow())
-		{
-			// 窗口将会被销毁，在这里释放一些资源
-			// 这些资源依赖Window，所以在这里提前释放
-			dispose();
-			return true;
-		}
-	}
-	}
-
 	return false;
 }
 

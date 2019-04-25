@@ -232,6 +232,7 @@ void DemoHandler::setDefaultLights()
 		gm::GMfloat ambientIntensity[] = { 0, 0, 0 };
 		light->setLightAttribute3(gm::GMLight::AmbientIntensity, ambientIntensity);
 
+		d->engine->removeLights();
 		d->engine->addLight(light);
 	}
 }

@@ -43,7 +43,7 @@ enum class GMAssetType
 
 GM_PRIVATE_OBJECT_UNALIGNED(GMAsset)
 {
-	GMAtomic<GMlong>* ref = nullptr;
+	GMSharedPtr<GMAtomic<GMlong>> ref;
 	GMAssetType type = GMAssetType::Invalid;
 	void* asset = nullptr;
 };

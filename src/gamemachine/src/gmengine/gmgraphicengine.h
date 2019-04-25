@@ -251,7 +251,7 @@ class GMGraphicEngine : public GMObject, public IGraphicEngine
 
 public:
 	GMGraphicEngine(const IRenderContext* context);
-	~GMGraphicEngine() = default;
+	~GMGraphicEngine();
 
 public:
 	virtual void init() override;

@@ -60,7 +60,7 @@ void GMComputeShaderManager::disposeShaderPrograms(const IRenderContext* context
 void GMComputeShaderManager::releaseHandle(GMComputeBufferHandle handle)
 {
 	D(d);
-	if (!d->deleter)
+	if (!d->deleter && GM.getFactory())
 		GM.getFactory()->createComputeShaderProgram(nullptr, &d->deleter);
 	
 	if (d->deleter)

@@ -203,6 +203,7 @@ int main(int argc, char* argv[])
 		prog->release(uav);
 	}
 
+	delete prog;
 	delete[] a;
 	delete[] b;
 	delete[] c;

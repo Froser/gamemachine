@@ -11,7 +11,7 @@ GM_DEFINE_ASSET_GETTER(GMPhysicsShape*, PhysicsShape, GMAssetType::PhysicsShape)
 GMAsset::GMAsset()
 {
 	D(d);
-	d->ref = new GMAtomic<GMlong>(1);
+	d->ref = std::make_shared<GMAtomic<GMlong>>(1);
 }
 
 GMAsset::GMAsset(GMAssetType type, void* asset)
@@ -117,7 +117,6 @@ void GMAsset::removeData()
 		break;
 	}
 	d->asset = nullptr;
-	GM_delete(d->ref);
 }
 
 const GMAsset& GMAsset::invalidAsset()

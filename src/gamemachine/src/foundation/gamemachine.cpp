@@ -319,6 +319,11 @@ void GameMachine::finalize()
 		*iter = nullptr;
 	}
 
+	// 清空内存
+	d->factory = nullptr;
+	d->gamePackageManager = nullptr;
+	d->statesManager = nullptr;
+
 	for (auto window : d->windows)
 	{
 		GM_delete(window);
