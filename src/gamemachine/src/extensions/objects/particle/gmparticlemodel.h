@@ -29,8 +29,8 @@ class GMParticleModel : public GMObject, public IParticleModel
 public:
 	enum BufferFlags
 	{
-		None = 0x00,
-		IgnorePosZ = 0x01,
+		None = 0x00, // 考虑粒子的所有坐标分量
+		IgnorePosZ = 0x01, // 计算粒子时不考虑粒子z坐标
 	};
 
 public:
@@ -51,7 +51,7 @@ protected:
 		const GMVec2& halfExtents,
 		const GMVec4& color,
 		const GMQuat& quat,
-		const GMVec3& lookAt,
+		const GMVec3& lookDirection,
 		GMfloat z = 0
 	);
 
@@ -62,7 +62,7 @@ protected:
 	virtual GMString getCode() = 0;
 
 protected:
-	virtual GMComputeBufferHandle prepareBuffers(IComputeShaderProgram*, const IRenderContext* context, void* dataPtr, BufferFlags);
+	virtual GMComputeBufferHandle prepareBuffers(IComputeShaderProgram*, const IRenderContext* context, void* dataPtr, BufferFlags = IgnorePosZ);
 
 private:
 	void disposeGPUHandles();

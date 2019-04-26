@@ -93,7 +93,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
 		float2(1, 0)
 	};
 
-	float z = 0;//(ignoreZ == 1) ? 0 : particles[gid].position.z;
+	float z = (ignoreZ != 0) ? 0 : particles[gid].position.z;
 	float halfExt = particles[gid].size / 2.f;
 	float4 raw[4] = {
 		float4(particles[gid].position.x - halfExt, particles[gid].position.y - halfExt, z, 1),
@@ -111,11 +111,11 @@ void main(uint3 DTid : SV_DispatchThreadID)
 	};
 
 	// 使用billboard效果
-	//if (ignoreZ != 0)
+	if (ignoreZ != 0)
 	{
 		float4x4 transToOrigin = translate(-particles[gid].position.xyz);
 		float4x4 transToPos = translate(particles[gid].position.xyz);
-		float4x4 tBillboard = transpose(billboardRotation);
+		float4x4 tBillboard = billboardRotation;
 		transformed[0] = mul(mul(mul(raw[0], transToOrigin), tBillboard), transToPos);
 		transformed[1] = mul(mul(mul(raw[1], transToOrigin), tBillboard), transToPos);
 		transformed[2] = mul(mul(mul(raw[2], transToOrigin), tBillboard), transToPos);

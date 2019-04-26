@@ -71,7 +71,7 @@ void GMParticleModel::update6Vertices(
 	const GMVec2& halfExtents,
 	const GMVec4& color,
 	const GMQuat& quat,
-	const GMVec3& lookAt,
+	const GMVec3& lookDirection,
 	GMfloat z
 )
 {
@@ -100,9 +100,9 @@ void GMParticleModel::update6Vertices(
 	};
 
 	// 当玩家没有直视粒子时，使用billboard效果
-	if (!normalFuzzyEquals(-lookAt, s_normal))
+	if (!normalFuzzyEquals(-lookDirection, s_normal))
 	{
-		GMQuat rot = RotationTo(s_normal, -lookAt, Zero<GMVec3>());
+		GMQuat rot = RotationTo(s_normal, -lookDirection, Zero<GMVec3>());
 
 		GMMat4 transToOrigin = Translate(-centerPt);
 		GMMat4 transToCenterPt = Translate(centerPt);
@@ -258,8 +258,8 @@ GMComputeBufferHandle GMParticleModel::prepareBuffers(IComputeShaderProgram* sha
 	}
 
 	const static GMVec3 s_normal(0, 0, -1.f);
-	GMVec3 lookDir = -context->getEngine()->getCamera().getLookAt().lookDirection;
-	GMQuat rot = RotationTo(s_normal, lookDir, Zero<GMVec3>());
+	GMVec3 lookDir = context->getEngine()->getCamera().getLookAt().lookDirection;
+	GMQuat rot = RotationTo(s_normal, -lookDir, Zero<GMVec3>());
 	Constant c = { QuatToMatrix(rot), flags & IgnorePosZ };
 	shaderProgram->setBuffer(d->constantBuffer, GMComputeBufferType::Constant, &c, sizeof(c));
 	shaderProgram->bindConstantBuffer(d->constantBuffer);
@@ -427,5 +427,5 @@ GMString GMParticleModel_3D::getCode()
 
 GMComputeBufferHandle GMParticleModel_3D::prepareBuffers(IComputeShaderProgram* shaderProgram, const IRenderContext* context, void* dataPtr, BufferFlags)
 {
-	return GMParticleModel::prepareBuffers(shaderProgram, context, dataPtr, GMParticleModel::IgnorePosZ);
+	return GMParticleModel::prepareBuffers(shaderProgram, context, dataPtr, GMParticleModel::None);
 }

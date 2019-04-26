@@ -101,7 +101,7 @@ void main(void)
         vec2(1, 0)
     };
 
-    float z = 0;// (ignoreZ == 1) ? 0 : particles[gid].position.z;
+    float z = (ignoreZ != 0) ? 0 : particles[gid].position.z;
     float halfExt = particles[gid].size / 2.f;
     vec4 raw[4] = {
         vec4(particles[gid].position.x - halfExt, particles[gid].position.y - halfExt, z, 1),
