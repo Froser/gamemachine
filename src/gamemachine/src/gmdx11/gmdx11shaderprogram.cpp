@@ -293,6 +293,13 @@ bool GMDx11ComputeShaderProgram::createBuffer(GMuint32 elementSize, GMuint32 cou
 	ZeroMemory(&desc, sizeof(desc));
 	if (type == GMComputeBufferType::Structured)
 	{
+		desc.Usage = D3D11_USAGE_DYNAMIC;
+		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	}
+	else if (type == GMComputeBufferType::UnorderedStructured)
+	{
 		desc.Usage = D3D11_USAGE_DEFAULT;
 		desc.BindFlags = D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE;
 		desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;

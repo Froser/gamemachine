@@ -519,7 +519,7 @@ bool GMGLComputeShaderProgram::createBuffer(GMuint32 elementSize, GMuint32 count
 	GMGLBeginGetErrorsAndCheck();
 	glGenBuffers(1, &buf);
 
-	if (type == GMComputeBufferType::Structured)
+	if (type == GMComputeBufferType::Structured || type == GMComputeBufferType::UnorderedStructured)
 	{
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, buf);
 		glBufferData(GL_SHADER_STORAGE_BUFFER, elementSize * count, pInitData, GL_DYNAMIC_DRAW);

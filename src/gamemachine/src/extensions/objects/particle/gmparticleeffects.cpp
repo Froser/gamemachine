@@ -69,7 +69,7 @@ bool GMParticleEffectImplBase::GPUUpdate(GMParticleEmitter* emitter, const IRend
 	// 粒子信息
 	if (!progParticles)
 	{
-		shaderProgram->createBuffer(sizeof(*particles[0].data()), gm_sizet_to_uint(particles.size()), nullptr, GMComputeBufferType::Structured, &progParticles);
+		shaderProgram->createBuffer(sizeof(*particles[0].data()), gm_sizet_to_uint(particles.size()), nullptr, GMComputeBufferType::UnorderedStructured, &progParticles);
 		shaderProgram->createBufferUnorderedAccessView(progParticles, &progParticlesUAV);
 	}
 	else
@@ -80,7 +80,7 @@ bool GMParticleEffectImplBase::GPUUpdate(GMParticleEmitter* emitter, const IRend
 		{
 			shaderProgram->release(progParticles);
 			shaderProgram->release(progParticlesUAV);
-			shaderProgram->createBuffer(sizeof(*particles[0].data()), gm_sizet_to_uint(particles.size()), particles.data(), GMComputeBufferType::Structured, &progParticles);
+			shaderProgram->createBuffer(sizeof(*particles[0].data()), gm_sizet_to_uint(particles.size()), particles.data(), GMComputeBufferType::UnorderedStructured, &progParticles);
 			shaderProgram->createBufferUnorderedAccessView(progParticles, &progParticlesUAV);
 		}
 	}

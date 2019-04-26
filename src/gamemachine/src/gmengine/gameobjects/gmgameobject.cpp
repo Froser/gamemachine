@@ -379,7 +379,7 @@ void GMGameObject::cull()
 
 				typedef std::remove_reference_t<decltype(d->cullAABB[0])> AABB;
 				if (cullShaderProgram->createBuffer(sizeof(AABB), gm_sizet_to_uint(d->cullSize), d->cullAABB.data(), GMComputeBufferType::Structured, &d->cullAABBsBuffer) &&
-					cullShaderProgram->createBuffer(sizeof(CullResult), gm_sizet_to_uint(d->cullSize), nullptr, GMComputeBufferType::Structured, &d->cullGPUResultBuffer) &&
+					cullShaderProgram->createBuffer(sizeof(CullResult), gm_sizet_to_uint(d->cullSize), nullptr, GMComputeBufferType::UnorderedStructured, &d->cullGPUResultBuffer) &&
 					cullShaderProgram->createBuffer(sizeof(GMFrustumPlanes), 1u, NULL, GMComputeBufferType::Constant, &d->cullFrustumBuffer) &&
 					cullShaderProgram->createBufferShaderResourceView(d->cullAABBsBuffer, &d->cullAABBsSRV) &&
 					cullShaderProgram->createReadOnlyBufferFrom(d->cullGPUResultBuffer, &d->cullCPUResultBuffer) &&

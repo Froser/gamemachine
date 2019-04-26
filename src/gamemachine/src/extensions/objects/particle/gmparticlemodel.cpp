@@ -253,7 +253,7 @@ GMComputeBufferHandle GMParticleModel::prepareBuffers(IComputeShaderProgram* sha
 		shaderProgram->createBuffer(sizeof(Constant), 1, nullptr, GMComputeBufferType::Constant, &d->constantBuffer);
 		shaderProgram->createBuffer(sizeof(particles[0]), gm_sizet_to_uint(particles.size()), nullptr, GMComputeBufferType::Structured, &d->particleBuffer);
 		shaderProgram->createBufferShaderResourceView(d->particleBuffer, &d->particleView);
-		shaderProgram->createBuffer(sizeof(GMVertex), gm_sizet_to_uint(particles.size()) * 6, nullptr, GMComputeBufferType::Structured, &d->resultBuffer);
+		shaderProgram->createBuffer(sizeof(GMVertex), gm_sizet_to_uint(particles.size()) * 6, nullptr, GMComputeBufferType::UnorderedStructured, &d->resultBuffer);
 		shaderProgram->createBufferUnorderedAccessView(d->resultBuffer, &d->resultView);
 	}
 

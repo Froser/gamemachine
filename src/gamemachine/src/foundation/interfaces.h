@@ -258,6 +258,7 @@ GM_INTERFACE_FROM(IShaderProgram, IQueriable)
 enum class GMComputeBufferType
 {
 	Structured,
+	UnorderedStructured,
 	Constant,
 };
 
