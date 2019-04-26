@@ -19,6 +19,7 @@ class GM_EXPORT GMDx11EffectShaderProgram : public IShaderProgram
 
 public:
 	GMDx11EffectShaderProgram(GMComPtr<ID3DX11Effect> effect);
+	~GMDx11EffectShaderProgram();
 
 public:
 	virtual void useProgram() override;

@@ -405,6 +405,13 @@ GMfloat GMString::parseFloat(const GMString& i, bool* ok)
 
 GMint32 GMString::parseInt(const GMString& i, bool* ok)
 {
+	if (i.isEmpty())
+	{
+		if (ok)
+			*ok = false;
+		return 0;
+	}
+
 	try
 	{
 		GMint32 v = std::stoi(i.toStdWString());

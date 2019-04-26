@@ -38,7 +38,7 @@ public:
 			else
 				GM.getGamePackageManager()->readFileFromPath(fn, &buffer);
 			buffer.needRelease = false;
-			return new Assimp::MemoryIOStream(buffer.buffer, buffer.size);
+			return new Assimp::MemoryIOStream(buffer.buffer, buffer.size, true);
 		}
 		else
 		{

@@ -175,89 +175,81 @@ namespace
 
 void GMDx11Factory::createShaderPrograms(const IRenderContext* context, const GMRenderTechniqueManager& manager, REF Vector<IShaderProgram*>* out)
 {
-	IShaderProgram* shaderProgram = context->getEngine()->getShaderProgram();
-	if (shaderProgram)
+	GMString fxCode;
+	GMString fxPath;
+	// 先找到原始的Effect代码
+	bool foundFx = false;
+	for (auto& renderTechniques : manager.getRenderTechniques())
 	{
-		gm_warning(gm_dbg_wrap("Shader program is inited. So this function won't work."));
-	}
-	else
-	{
-		GMString fxCode;
-		GMString fxPath;
-		// 先找到原始的Effect代码
-		bool foundFx = false;
-		for (auto& renderTechniques : manager.getRenderTechniques())
+		for (auto& technique : renderTechniques.getTechniques())
 		{
-			for (auto& technique : renderTechniques.getTechniques())
+			if (technique.getShaderType() == GMShaderType::Effect)
 			{
-				if (technique.getShaderType() == GMShaderType::Effect)
-				{
-					fxCode = technique.getCode(GMRenderEnvironment::DirectX11);
-					fxPath = technique.getPath(GMRenderEnvironment::DirectX11);
-					foundFx = true;
-					break;
-				}
-			}
-			if (foundFx)
+				fxCode = technique.getCode(GMRenderEnvironment::DirectX11);
+				fxPath = technique.getPath(GMRenderEnvironment::DirectX11);
+				foundFx = true;
 				break;
+			}
 		}
+		if (foundFx)
+			break;
+	}
 
-		if (!foundFx)
-			return;
+	if (!foundFx)
+		return;
 
-		if (fxPath.isEmpty())
-			return;
+	if (fxPath.isEmpty())
+		return;
 
-		// 注入effect代码
-		fxCode += L"\n";
-		for (auto& renderTechniques : manager.getRenderTechniques())
+	// 注入effect代码
+	fxCode += L"\n";
+	for (auto& renderTechniques : manager.getRenderTechniques())
+	{
+		bool skip = false;
+		GMString vs, ps, gs;
+		// 先通过匹配，获取VS, PS入口
+		for (auto& technique : renderTechniques.getTechniques())
 		{
-			bool skip = false;
-			GMString vs, ps, gs;
-			// 先通过匹配，获取VS, PS入口
-			for (auto& technique : renderTechniques.getTechniques())
+			if (technique.getShaderType() == GMShaderType::Effect)
 			{
-				if (technique.getShaderType() == GMShaderType::Effect)
-				{
-					skip = true;
-					break;
-				}
-
-				const GMString& code = technique.getCode(GMRenderEnvironment::DirectX11);
-
-				if (technique.getShaderType() == GMShaderType::Vertex)
-					vs = getVS(code);
-				else if (technique.getShaderType() == GMShaderType::Pixel)
-					ps = getPS(code);
-				else if (technique.getShaderType() == GMShaderType::Geometry)
-					gs = getGS(code);
-
-				fxCode += code;
-				fxCode += L"\n";
+				skip = true;
+				break;
 			}
 
-			// 跳过Effect着色器
-			if (skip)
-				continue;
+			const GMString& code = technique.getCode(GMRenderEnvironment::DirectX11);
 
-			// 拿到PS, VS后，通过s_technique11_template插入fx底部
-			fxCode += s_technique11_template
-				.replace(L"{vs}", L"CompileShader(vs_5_0," + (!vs.isEmpty() ? vs : getDefaultVS(fxCode)) + L"())")
-				.replace(L"{ps}", L"CompileShader(ps_5_0," + (!ps.isEmpty() ? ps : getDefaultPS(fxCode)) + L"())")
-				.replace(L"{gs}", gs.isEmpty() ? L"NULL" : L"CompileShader(gs_5_0," + gs + L"())")
-				.replace(L"{id}", GMDx11Technique::getTechniqueNameByTechniqueId(renderTechniques.getId()) );
+			if (technique.getShaderType() == GMShaderType::Vertex)
+				vs = getVS(code);
+			else if (technique.getShaderType() == GMShaderType::Pixel)
+				ps = getPS(code);
+			else if (technique.getShaderType() == GMShaderType::Geometry)
+				gs = getGS(code);
+
+			fxCode += code;
 			fxCode += L"\n";
 		}
 
-		// 生成
-		GMDx11Helper::loadEffectShader(context->getEngine(), fxCode, fxPath);
+		// 跳过Effect着色器
+		if (skip)
+			continue;
 
-		// 填充，当然Dx11下只有1个Shader
-		for (auto& renderTechniques : manager.getRenderTechniques())
-		{
-			if (out)
-				out->push_back(shaderProgram);
-		}
+		// 拿到PS, VS后，通过s_technique11_template插入fx底部
+		fxCode += s_technique11_template
+			.replace(L"{vs}", L"CompileShader(vs_5_0," + (!vs.isEmpty() ? vs : getDefaultVS(fxCode)) + L"())")
+			.replace(L"{ps}", L"CompileShader(ps_5_0," + (!ps.isEmpty() ? ps : getDefaultPS(fxCode)) + L"())")
+			.replace(L"{gs}", gs.isEmpty() ? L"NULL" : L"CompileShader(gs_5_0," + gs + L"())")
+			.replace(L"{id}", GMDx11Technique::getTechniqueNameByTechniqueId(renderTechniques.getId()) );
+		fxCode += L"\n";
+	}
+
+	// loadEffectShader会把生成的effect交给GMDx11GraphicEngine托管
+	// 我们所有的Technique只需要拿effect就可以了，而不能从GMRenderTechniqueManager中拿
+	GMDx11Helper::loadEffectShader(context->getEngine(), fxCode, fxPath);
+
+	for (auto& renderTechniques : manager.getRenderTechniques())
+	{
+		if (out)
+			out->push_back(nullptr);
 	}
 }
 

@@ -102,7 +102,7 @@ void GMDx11Texture::useTexture(GMint32 textureType)
 
 #if GM_DEBUG
 	// 必须确保effect没有发生变化（每一个texture对应一个effect），这样获取的Effect变量才准确
-	ID3DX11Effect* effect;
+	GMComPtr<ID3DX11Effect> effect;
 	d->context->getEngine()->getShaderProgram()->getInterface(GameMachineInterfaceID::D3D11Effect, (void**)&effect);
 	GM_ASSERT(d->effect == effect);
 #endif

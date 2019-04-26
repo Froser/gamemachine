@@ -81,7 +81,7 @@ IShaderProgram* GMDx11Helper::loadEffectShader(
 		&effect
 	));
 
-	GMDx11EffectShaderProgram* shaderProgram = new GMDx11EffectShaderProgram(effect);
+	IShaderProgram* shaderProgram = new GMDx11EffectShaderProgram(effect);
 	b = engine->setInterface(GameMachineInterfaceID::D3D11ShaderProgram, shaderProgram);
 	GM_ASSERT(b);
 

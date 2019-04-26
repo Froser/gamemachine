@@ -192,6 +192,7 @@ void GMWindow_OpenGL::onWindowCreated(const GMWindowDesc& wndAttrs)
 		d->hRC = GMSharedPtr<HGLRC>(new HGLRC(wglCreateContext(d->hDC)), [](HGLRC* hRC) {
 			if (!wglDeleteContext(*hRC))
 				gm_error(gm_dbg_wrap("release Rendering Context failed."));
+			GM_delete(hRC);
 		});
 	}
 	else

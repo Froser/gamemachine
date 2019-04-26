@@ -460,6 +460,17 @@ void GMGraphicEngine::setCascadeCamera(GMCascadeLevel level, const GMCamera& cam
 	d->shadowCameraVPmatrices[level] = camera.getViewMatrix() * camera.getProjectionMatrix();
 }
 
+void GMGraphicEngine::deleteLights()
+{
+	D(d);
+	for (auto light : d->lights)
+	{
+		GM_delete(light);
+	}
+
+	d->lights.clear();
+}
+
 const GMMat4& GMGraphicEngine::getCascadeCameraVPMatrix(GMCascadeLevel level)
 {
 	D(d);
@@ -469,6 +480,7 @@ const GMMat4& GMGraphicEngine::getCascadeCameraVPMatrix(GMCascadeLevel level)
 void GMGraphicEngine::dispose()
 {
 	D(d);
+	deleteLights();
 	GMComputeShaderManager::instance().disposeShaderPrograms(d->context);
 	GM_delete(d->filterFramebuffers);
 	GM_delete(d->filterQuad);
@@ -587,13 +599,7 @@ ILight* GMGraphicEngine::getLight(GMLightIndex index)
 
 void GMGraphicEngine::removeLights()
 {
-	D(d);
-	for (auto light : d->lights)
-	{
-		GM_delete(light);
-	}
-
-	d->lights.clear();
+	deleteLights();
 	update(GMUpdateDataType::LightChanged);
 }
 
