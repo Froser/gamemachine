@@ -157,7 +157,7 @@ int main(int argc, char* argv[])
 		GMComputeUAVHandle uav;
 		prog->createBuffer(sizeof(GMint32), sz, a, GMComputeBufferType::Structured, &bufferA);
 		prog->createBuffer(sizeof(GMint32), sz, b, GMComputeBufferType::Structured, &bufferB);
-		prog->createBuffer(sizeof(GMint32), sz, c, GMComputeBufferType::Structured, &bufferResult);
+		prog->createBuffer(sizeof(GMint32), sz, c, GMComputeBufferType::UnorderedStructured, &bufferResult);
 		prog->createBufferShaderResourceView(bufferA, &srvA);
 		prog->createBufferShaderResourceView(bufferB, &srvB);
 		prog->createBufferUnorderedAccessView(bufferResult, &uav);

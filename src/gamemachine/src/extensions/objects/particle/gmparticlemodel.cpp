@@ -107,10 +107,10 @@ void GMParticleModel::update6Vertices(
 		GMMat4 transToOrigin = Translate(-centerPt);
 		GMMat4 transToCenterPt = Translate(centerPt);
 		// 先移回原点，旋转之后再移会原位置
-		transformed[0] = raw[0] * transToOrigin * rot * transToCenterPt;
-		transformed[1] = raw[1] * transToOrigin * rot * transToCenterPt;
-		transformed[2] = raw[2] * transToOrigin * rot * transToCenterPt;
-		transformed[3] = raw[3] * transToOrigin * rot * transToCenterPt;
+		transformed[0] = transformed[0] * transToOrigin * rot * transToCenterPt;
+		transformed[1] = transformed[1] * transToOrigin * rot * transToCenterPt;
+		transformed[2] = transformed[2] * transToOrigin * rot * transToCenterPt;
+		transformed[3] = transformed[3] * transToOrigin * rot * transToCenterPt;
 	}
 
 	// 排列方式：
