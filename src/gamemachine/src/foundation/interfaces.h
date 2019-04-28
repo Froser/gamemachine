@@ -257,9 +257,9 @@ GM_INTERFACE_FROM(IShaderProgram, IQueriable)
 
 enum class GMComputeBufferType
 {
-	Structured,
-	UnorderedStructured,
-	Constant,
+	Structured, //!< 结构化缓存。它从CPU设置，并被GPU读取。
+	UnorderedStructured, //!< 无序访问的结构化缓存。它从GPU设置，不能从CPU写入。用来获取计算结果。
+	Constant, //!< 常量缓存。一般当作传入计算着色器的参数。
 };
 
 #if GM_USE_DX11
@@ -270,24 +270,164 @@ typedef void *GMComputeHandle;
 typedef GMComputeHandle GMComputeBufferHandle;
 typedef GMComputeHandle GMComputeSRVHandle;
 typedef GMComputeHandle GMComputeUAVHandle;
+
+//! GameMachine计算着色器。所有GPGPU相关计算的实例，由此类创建。
+/*!
+  正常情况下，可以从GameMachine的getFactory()中获取一个IComputeShaderProgram实例。
+*/
 GM_INTERFACE_FROM(IComputeShaderProgram, IQueriable)
 {
+	//! 触发并行计算。
+	/*!
+	  着色器装载后、所有缓存设置好之后，可以开始触发计算。<BR>
+	  此方法是同步的，在计算着色器完成计算之前，此线程将会被阻塞。
+	  \param threadGroupCountX 工作组第1维的数量。
+	  \param threadGroupCountY 工作组第2维的数量。
+	  \param threadGroupCountZ 工作组第3维的数量。
+	*/
 	virtual void dispatch(GMint32 threadGroupCountX, GMint32 threadGroupCountY, GMint32 threadGroupCountZ) = 0;
+
+	//! 读取一个计算着色器代码。
+	/*!
+	  如果一个着色器代码来自内存，那么path建议设置维"."。
+	  \param path 着色器代码路径。
+	  \param source 着色器代码内容。
+	  \param entryPoint 着色器代码入口。
+	*/
 	virtual void load(const GMString& path, const GMString& source, const GMString& entryPoint) = 0;
+
+	//! 从一个现有的缓存中创建一个新的缓存。
+	/*!
+	  新缓存会有旧缓存相同的大小和类型，但是内容为空，且是只读的。
+	  \param bufferSrc 缓存来源。
+	  \param bufferOut 新创建的缓存。
+	  \return 是否创建成功。
+	*/
 	virtual bool createReadOnlyBufferFrom(GMComputeBufferHandle bufferSrc, OUT GMComputeBufferHandle* bufferOut) = 0;
+
+	//! 创建一个缓存。
+	/*!
+	  缓存是CPU和GPU的桥梁。我们需要将数据放入缓存中，然后将缓存提交给GPU来进行计算。
+	  \param elementSize 缓存中一个元素的大小。
+	  \param count 缓存中元素的数量。
+	  \param initData 缓存数据。
+	  \param type 缓存类型。
+	  \param bufOut 创建的缓存。
+	  \return 是否创建成功。
+	*/
 	virtual bool createBuffer(GMuint32 elementSize, GMuint32 count, void* initData, GMComputeBufferType type, OUT GMComputeBufferHandle* bufOut) = 0;
-	virtual bool createBufferShaderResourceView(GMComputeBufferHandle, OUT GMComputeSRVHandle*) = 0;
-	virtual bool createBufferUnorderedAccessView(GMComputeBufferHandle, OUT GMComputeUAVHandle*) = 0;
+
+	//! 为一个有序的结构化缓存创建一个着色器缓存资源视图
+	/*!
+	  每当创建了一个缓存，都需要为缓存创建资源视图，这样缓存才能被使用。<BR>
+	  \param buf 需要创建视图的缓存。buf的类型一定要为GMComputeBufferType::Structured，否则结果是未定义的。
+	  \param srv 创建的资源视图。
+	  \return 是否创建成功。
+	  \sa GMComputeBufferType
+	*/
+	virtual bool createBufferShaderResourceView(GMComputeBufferHandle buf, OUT GMComputeSRVHandle* srv) = 0;
+
+	//! 为一个无序的结构化缓存创建一个着色器缓存资源视图
+	/*!
+	  每当创建了一个缓存，都需要为缓存创建资源视图，这样缓存才能被使用。<BR>
+	  \param buf 需要创建视图的缓存。buf的类型一定要为GMComputeBufferType::UnorderedStructured，否则结果是未定义的。
+	  \param srv 创建的资源视图。
+	  \return 是否创建成功。
+	  \sa GMComputeBufferType
+	*/
+	virtual bool createBufferUnorderedAccessView(GMComputeBufferHandle buf, OUT GMComputeUAVHandle* uav) = 0;
+
+	//! 绑定一个着色器资源视图。
+	/*!
+	  着色器的绑定入口将会和调用此方法的顺序保持一致。<BR>
+	  对于OpenGL，绑定点的编号(binding=n)和bindUnorderedAccessView、bindConstantBuffer共享，每次调用之后编号递增1。<BR>
+	  对于DirectX，绑定点的编号是独立的，如调用5次后，它表示的寄存器是register(t5)。<BR>
+	  \param num 绑定的个数。
+	  \param handles 绑定的有序访问结构化缓存视图。
+	  \sa bindUnorderedAccessView(), bindConstantBuffer()
+	*/
 	virtual void bindShaderResourceView(GMuint32 num, GMComputeSRVHandle* handles) = 0;
+
+	//! 绑定一个着色器资源视图。
+	/*!
+	  着色器的绑定入口将会和调用此方法的顺序保持一致。<BR>
+	  对于OpenGL，绑定点的编号(binding=n)和bindShaderResourceView、bindConstantBuffer共享，每次调用之后编号递增1。<BR>
+	  对于DirectX，绑定点的编号是独立的，如调用5次后，它表示的寄存器是register(u5)。<BR>
+	  \param num 绑定的个数。
+	  \param handles 绑定的无序访问结构化缓存视图。
+	  \sa bindShaderResourceView(), bindConstantBuffer()
+	*/
 	virtual void bindUnorderedAccessView(GMuint32 num, GMComputeUAVHandle* handles) = 0;
+
+	//! 绑定一个着色器资源视图。
+	/*!
+	  着色器的绑定入口将会和调用此方法的顺序保持一致。<BR>
+	  对于OpenGL，绑定点的编号(binding=n)和bindShaderResourceView、bindUnorderedAccessView共享，每次调用之后编号递增1。<BR>
+	  对于DirectX，绑定点的编号是独立的，如调用5次后，它表示的寄存器是register(b5)。<BR>
+	  \param num 绑定的个数。
+	  \param handles 绑定的常量缓存。
+	  \sa bindShaderResourceView(), bindUnorderedAccessView()
+	*/
 	virtual void bindConstantBuffer(GMComputeBufferHandle handle) = 0;
+
+	//! 为一个缓存设置数据。
+	/*!
+	  为一个缓存设置一段数据。
+	  \param handle 待设置的缓存。
+	  \param type 指定的缓存的类型，它一定要和缓存本身的类型一致，否则结果是未定义的。
+	  \param data 待设置的数据。
+	  \param sizeInBytes 待设置的数据大小，单位为字节。
+	  \sa GMComputeBufferType
+	*/
 	virtual void setBuffer(GMComputeBufferHandle handle, GMComputeBufferType type, void* data, GMuint32 sizeInBytes) = 0;
+
+	//! 拷贝一段缓存。
+	/*!
+	  \param dest 目标缓存。
+	  \param src 来源缓存。
+	*/
 	virtual void copyBuffer(GMComputeBufferHandle dest, GMComputeBufferHandle src) = 0;
+
+	//! 将缓存映射到一段内存中。
+	/*!
+	  某些缓存不能被CPU读取，在使用此方法前，先使用canRead()判断一下。
+	  \param handle 待映射缓存。
+	  \return 映射结果。
+	  \sa canRead
+	*/
 	virtual void* mapBuffer(GMComputeBufferHandle handle) = 0;
+
+	//! 结束一段映射。
+	/*!
+	  映射结束后，此端缓存将会被提交并更新到GPU。
+	  \param handle 待映射缓存。
+	  \return 映射结果。
+	*/
 	virtual void unmapBuffer(GMComputeBufferHandle handle) = 0;
+
+	//! 返回某个缓存是否能被CPU读取。
+	/*!
+	  \param handle 被判断的缓存。
+	  \return 是否能被CPU读取。
+	*/
 	virtual bool canRead(GMComputeBufferHandle handle) = 0;
+
+	//! 返回某个缓存的大小，单位为字节。
+	/*!
+	  \param type 指定该缓存类型，一定要和缓存原本的类型一致，否则结果是未定义的。
+	  \param handle 被判断的缓存。它必须和type指定的类型是一致的。
+	  \return 缓存大小。
+	  \sa GMComputeBufferType
+	*/
 	virtual GMsize_t getBufferSize(GMComputeBufferType type, GMComputeBufferHandle handle) = 0;
-	virtual void release(GMComputeHandle) = 0;
+
+	//! 释放一个着色器资源。
+	/*!
+	  着色器资源包括缓存、缓存资源视图、无序缓存资源视图。<BR>
+	  在资源使用完后一定要释放，否则会造成内存泄漏。
+	  \param handle 待释放资源。
+	*/
+	virtual void release(GMComputeHandle handle) = 0;
 };
 
 // 帧缓存
