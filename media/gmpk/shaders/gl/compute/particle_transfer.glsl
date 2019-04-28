@@ -101,6 +101,7 @@ void main(void)
         vec2(1, 0)
     };
 
+    // ignoreZ如果为1，表示忽略z坐标，这是个2D上的粒子渲染
     float z = (ignoreZ != 0) ? 0 : particles[gid].position.z;
     float halfExt = particles[gid].size / 2.f;
     vec4 raw[4] = {
@@ -119,14 +120,14 @@ void main(void)
     };
 
     // 使用billboard效果
-    if (ignoreZ != 0)
+    if (ignoreZ == 0)
     {
         mat4 transToOrigin = translate(-particles[gid].position);
         mat4 transToPos = translate(particles[gid].position);
-        transformed[0] = transToPos * billboardRotation * transToOrigin * raw[0];
-        transformed[1] = transToPos * billboardRotation * transToOrigin * raw[1];
-        transformed[2] = transToPos * billboardRotation * transToOrigin * raw[2];
-        transformed[3] = transToPos * billboardRotation * transToOrigin * raw[3];
+        transformed[0] = transToPos * billboardRotation * transToOrigin * transformed[0];
+        transformed[1] = transToPos * billboardRotation * transToOrigin * transformed[1];
+        transformed[2] = transToPos * billboardRotation * transToOrigin * transformed[2];
+        transformed[3] = transToPos * billboardRotation * transToOrigin * transformed[3];
     }
 
     // 排列方式：

@@ -459,7 +459,7 @@ void GMDx11ComputeShaderProgram::bindConstantBuffer(GMComputeBufferHandle handle
 void GMDx11ComputeShaderProgram::setBuffer(GMComputeBufferHandle handle, GMComputeBufferType type, void* dataPtr, GMuint32 sizeInBytes)
 {
 	D(d);
-	if (handle)
+	if (handle && dataPtr)
 	{
 		ID3D11DeviceContext* dc = d->engine->getDeviceContext();
 		ID3D11Buffer* buffer = static_cast<ID3D11Buffer*>(handle);
@@ -477,8 +477,8 @@ void GMDx11ComputeShaderProgram::setBuffer(GMComputeBufferHandle handle, GMCompu
 		}
 		else
 		{
-			if (dataPtr)
-				dc->UpdateSubresource(buffer, 0, NULL, dataPtr, 0, 0);
+			gm_error(gm_dbg_wrap("set a unordered access buffer is not allowed."));
+			GM_ASSERT(false);
 		}
 	}
 }

@@ -8,7 +8,9 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMParticleEffectImplBase)
 {
 	const IRenderContext* context = nullptr;
 	GMComputeBufferHandle particles = 0;
-	GMComputeUAVHandle particlesUAV = 0;
+	GMComputeSRVHandle particlesSRV = 0;
+	GMComputeBufferHandle particlesResult = 0;
+	GMComputeSRVHandle particlesUAV = 0;
 	GMComputeBufferHandle particleCpuResult = 0;
 	GMComputeBufferHandle constant = 0;
 };

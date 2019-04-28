@@ -20,6 +20,8 @@ GMParticleEffectImplBase::~GMParticleEffectImplBase()
 	{
 		auto handles = {
 			d->particles,
+			d->particlesSRV,
+			d->particlesResult,
 			d->particlesUAV,
 			d->particleCpuResult,
 			d->constant,
@@ -62,6 +64,8 @@ bool GMParticleEffectImplBase::GPUUpdate(GMParticleEmitter* emitter, const IRend
 
 	auto& particles = emitter->getParticles();
 	auto& progParticles = d->particles;
+	auto& progParticlesSRV = d->particlesSRV;
+	auto& progParticlesResult = d->particlesResult;
 	auto& progParticlesUAV = d->particlesUAV;
 	auto& particleCpuResult = d->particleCpuResult;
 	auto& constant = d->constant;
@@ -69,8 +73,11 @@ bool GMParticleEffectImplBase::GPUUpdate(GMParticleEmitter* emitter, const IRend
 	// 粒子信息
 	if (!progParticles)
 	{
-		shaderProgram->createBuffer(sizeof(*particles[0].data()), gm_sizet_to_uint(particles.size()), nullptr, GMComputeBufferType::UnorderedStructured, &progParticles);
-		shaderProgram->createBufferUnorderedAccessView(progParticles, &progParticlesUAV);
+		shaderProgram->createBuffer(sizeof(*particles[0].data()), gm_sizet_to_uint(particles.size()), nullptr, GMComputeBufferType::Structured, &progParticles);
+		shaderProgram->createBufferShaderResourceView(progParticles, &progParticlesSRV);
+
+		shaderProgram->createBuffer(sizeof(*particles[0].data()), gm_sizet_to_uint(particles.size()), nullptr, GMComputeBufferType::UnorderedStructured, &progParticlesResult);
+		shaderProgram->createBufferUnorderedAccessView(progParticlesResult, &progParticlesUAV);
 	}
 	else
 	{
@@ -79,13 +86,17 @@ bool GMParticleEffectImplBase::GPUUpdate(GMParticleEmitter* emitter, const IRend
 		if (sz < sizeof(*particles[0].data()) * (particles.size()))
 		{
 			shaderProgram->release(progParticles);
+			shaderProgram->release(progParticlesSRV);
+			shaderProgram->release(progParticlesResult);
 			shaderProgram->release(progParticlesUAV);
-			shaderProgram->createBuffer(sizeof(*particles[0].data()), gm_sizet_to_uint(particles.size()), particles.data(), GMComputeBufferType::UnorderedStructured, &progParticles);
-			shaderProgram->createBufferUnorderedAccessView(progParticles, &progParticlesUAV);
+			shaderProgram->createBuffer(sizeof(*particles[0].data()), gm_sizet_to_uint(particles.size()), particles.data(), GMComputeBufferType::Structured, &progParticles);
+			shaderProgram->createBufferShaderResourceView(progParticles, &progParticlesSRV);
+			shaderProgram->createBuffer(sizeof(*particles[0].data()), gm_sizet_to_uint(particles.size()), nullptr, GMComputeBufferType::UnorderedStructured, &progParticlesResult);
+			shaderProgram->createBufferUnorderedAccessView(progParticlesResult, &progParticlesUAV);
 		}
 	}
 	shaderProgram->setBuffer(progParticles, GMComputeBufferType::Structured, particles.data(), sizeof(*particles[0].data()) * gm_sizet_to_uint(particles.size()));
-	shaderProgram->bindUnorderedAccessView(1, &progParticlesUAV);
+	shaderProgram->bindShaderResourceView(1, &progParticlesSRV);
 
 	// 传入时间等变量
 	ConstantBuffer c = { emitter->getEmitPosition(), getGravityMode().getGravity(), emitter->getRotationAxis(), dt, static_cast<GMint32>(getMotionMode()) };
@@ -94,23 +105,26 @@ bool GMParticleEffectImplBase::GPUUpdate(GMParticleEmitter* emitter, const IRend
 	shaderProgram->setBuffer(constant, GMComputeBufferType::Constant, &c, sizeof(ConstantBuffer));
 	shaderProgram->bindConstantBuffer(constant);
 
+	// 绑定结果
+	shaderProgram->bindUnorderedAccessView(1, &progParticlesUAV);
+
 	// 开始计算
 	shaderProgram->dispatch(gm_sizet_to_uint(particles.size()), 1, 1);
 
-	bool canReadFromGPU = shaderProgram->canRead(progParticles);
+	bool canReadFromGPU = shaderProgram->canRead(progParticlesResult);
 	if (!canReadFromGPU)
 	{
 		if (particleCpuResult)
 			shaderProgram->release(particleCpuResult);
-		shaderProgram->createReadOnlyBufferFrom(progParticles, &particleCpuResult);
+		shaderProgram->createReadOnlyBufferFrom(progParticlesResult, &particleCpuResult);
 	}
 
 	// 处理结果
 	{
 		// 更新每个粒子的状态
-		GMComputeBufferHandle resultHandle = canReadFromGPU ? progParticles : particleCpuResult;
+		GMComputeBufferHandle resultHandle = canReadFromGPU ? progParticlesResult : particleCpuResult;
 		if (!canReadFromGPU)
-			shaderProgram->copyBuffer(resultHandle, progParticles);
+			shaderProgram->copyBuffer(resultHandle, progParticlesResult);
 		typedef GM_PRIVATE_NAME(GMParticle) ParticleData;
 		const ParticleData* resultPtr = static_cast<ParticleData*>(shaderProgram->mapBuffer(resultHandle));
 		memcpy_s(particles.data(), sizeof(ParticleData) * particles.size(), resultPtr, sizeof(*particles[0].data()) * particles.size());
