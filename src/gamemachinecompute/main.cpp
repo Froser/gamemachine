@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
 	IComputeShaderProgram* prog = nullptr;
 	if (!GM.getFactory()->createComputeShaderProgram(window->getContext(), &prog))
 	{
-		printf("Compute shader not support.");
+		printf("Compute shader is not supported.");
 	}
 	else
 	{
