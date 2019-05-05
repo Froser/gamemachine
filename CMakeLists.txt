@@ -148,33 +148,14 @@ macro(gm_begin_project)
 	endif(MSVC)
 	# DirectX Environments:
 	if(GM_USE_DX11)
-		set(GM_DX11_SDK_PATH "C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include")
-		set(GM_DX11_SDK_LIB86_PATH "C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Lib/x86")
-		set(GM_DX11_SDK_LIB64_PATH "C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Lib/x64")
+		set(GM_DX11_SDK_PATH ${DirectX_D3D11_INCLUDE_DIR})
 		include_directories(
 				${GM_DX11_SDK_PATH}
 			)
 
-		if (GM_TARGET_X86)
-			link_directories(
-					${GM_DX11_SDK_LIB86_PATH}
-				)
-		endif(GM_TARGET_X86)
-
-		if (GM_TARGET_64)
-			link_directories(
-					${GM_DX11_SDK_LIB64_PATH}
-				)
-		endif(GM_TARGET_64)
-
 		link_libraries(
-				dxgi.lib
-				d3d11.lib
-				d3dx10.lib
-				d3dx11.lib
-				dxerr.lib
-				d3dcompiler.lib
-				dxguid.lib
+				${DirectX_D3D11_LIBRARIES}
+				shlwapi.lib
 			)
 	endif(GM_USE_DX11)
 	

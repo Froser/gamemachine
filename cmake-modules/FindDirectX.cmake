@@ -87,12 +87,12 @@ if(WIN32) # The only platform it makes sense to check for DirectX SDK
       set(DirectX_D3D11_FOUND TRUE)
       set(DirectX_D3D11_INCLUDE_DIR ${DirectX_D3D11_INCLUDE_DIR})
       set(DirectX_D3D11_LIBRARIES ${DirectX_D3D11_LIBRARIES}
-	${DirectX_D3D11_LIBRARY}
-	${DirectX_D3DX11_LIBRARY}
-	${DirectX_DXGI_LIBRARY}
-	${DirectX_DXERR_LIBRARY}
-	${DirectX_DXGUID_LIBRARY}
-	${DirectX_D3DCOMPILER_LIBRARY}        	  
+        ${DirectX_D3D11_LIBRARY}
+        ${DirectX_D3DX11_LIBRARY}
+        ${DirectX_DXGI_LIBRARY}
+        ${DirectX_DXERR_LIBRARY}
+        ${DirectX_DXGUID_LIBRARY}
+        ${DirectX_D3DCOMPILER_LIBRARY}        	  
       )	
     endif ()
     mark_as_advanced(DirectX_D3D11_INCLUDE_DIR DirectX_D3D11_LIBRARY DirectX_D3DX11_LIBRARY)

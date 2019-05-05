@@ -4,6 +4,12 @@
 #include "foundation/gamemachine.h"
 #include <gmcom.h>
 #include "gmdx11shaderprogram.h"
+#include "gmdx11fxc.h"
+
+namespace
+{
+
+}
 
 IShaderProgram* GMDx11Helper::loadEffectShader(
 	IGraphicEngine* engine,
@@ -11,6 +17,13 @@ IShaderProgram* GMDx11Helper::loadEffectShader(
 	const GMString& filepath
 )
 {
+	// 先检查是否有fxc.exe生成fxc文件
+	GMDx11FXC fxc;
+	fxc.init();
+	GMDx11FXCDescription desc;
+	desc.code = code;
+	fxc.compile(desc);
+
 	GMComPtr<ID3D10Blob> errorMessage;
 	GMComPtr<ID3D10Blob> shaderBuffer;
 	HRESULT hr;
