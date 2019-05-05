@@ -95,6 +95,8 @@ class GMWindowFactory
 public:
 	static bool createWindowWithOpenGL(GMInstance instance, IWindow* parent, OUT IWindow** window);
 	static bool createWindowWithDx11(GMInstance instance, IWindow* parent, OUT IWindow** window);
+	static bool createTempWindow(GMbyte colorDepth, GMbyte alphaBits, GMbyte depthBits, GMbyte stencilBits, OUT GMWindowHandle& tmpWnd, OUT GMDeviceContextHandle& tmpDC, OUT GMOpenGLRenderContextHandle& tmpRC);
+	static bool destroyTempWindow(GMWindowHandle tmpWnd, GMDeviceContextHandle tmpDC, GMOpenGLRenderContextHandle tmpRC);
 };
 END_NS
 #endif

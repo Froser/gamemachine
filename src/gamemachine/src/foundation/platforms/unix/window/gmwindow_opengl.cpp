@@ -384,3 +384,13 @@ bool GMWindowFactory::createWindowWithOpenGL(GMInstance instance, IWindow* paren
 	}
 	return false;
 }
+
+bool GMWindowFactory::createTempWindow(GMbyte colorDepth, GMbyte alphaBits, GMbyte depthBits, GMbyte stencilBits, OUT GMWindowHandle& tmpWnd, OUT GMDeviceContextHandle& tmpDC, OUT GMOpenGLRenderContextHandle& tmpRC)
+{
+	return false;
+}
+
+bool GMWindowFactory::destroyTempWindow(GMWindowHandle tmpWnd, GMDeviceContextHandle tmpDC, GMOpenGLRenderContextHandle tmpRC)
+{
+
+}

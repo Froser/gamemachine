@@ -139,3 +139,54 @@ bool GMGLFactory::createComputeShaderProgram(const IRenderContext* context, OUT 
 	}
 	return true;
 }
+
+void GMGLFactory::createComputeContext(OUT const IRenderContext** out)
+{
+	class ComputeEngine : public GMGLGraphicEngine
+	{
+		using GMGLGraphicEngine::GMGLGraphicEngine;
+
+	public:
+		ComputeEngine(const IRenderContext* context)
+			: GMGLGraphicEngine(context)
+		{
+			// 需要先创建一个临时窗口，才能正常glewInit
+			GMWindowFactory::createTempWindow(32, 8, 24, 8, hwnd, dc, rc);
+			GLenum err = glewInit();
+			GM_ASSERT(err == GLEW_OK);
+		}
+
+		~ComputeEngine()
+		{
+			GMWindowFactory::destroyTempWindow(hwnd, dc, rc);
+		}
+
+	private:
+		GMWindowHandle hwnd;
+		GMDeviceContextHandle dc;
+		GMOpenGLRenderContextHandle rc;
+	};
+
+	class RenderContext : public GMRenderContext
+	{
+	public:
+		~RenderContext()
+		{
+			// Engine生命周期由Context管理
+			if (getEngine())
+				GM_delete(getEngine());
+		}
+
+	public:
+		virtual void switchToContext() const override
+		{
+		}
+	};
+
+	if (out)
+	{
+		RenderContext* ctx = new RenderContext();
+		ctx->setEngine(new ComputeEngine(ctx));
+		*out = ctx;
+	}
+}

@@ -100,6 +100,12 @@ bool GMDx11GraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
 	case GameMachineInterfaceID::D3D11ShaderProgram:
 		d->shaderProgram.reset(static_cast<IShaderProgram*>(in));
 		break;
+	case GameMachineInterfaceID::D3D11Device:
+		d->device = static_cast<ID3D11Device*>(in);
+		break;
+	case GameMachineInterfaceID::D3D11DeviceContext:
+		d->deviceContext = static_cast<ID3D11DeviceContext*>(in);
+		break;
 	default:
 		return false;
 	}
@@ -198,7 +204,7 @@ void GMDx11GraphicEngine::initShaders(const IRenderContext* context)
 	// 读取着色器
 	if (!getShaderLoadCallback())
 	{
-		gm_warning(gm_dbg_wrap("An IShaderLoadCallback is missing."));
+		gm_error(gm_dbg_wrap("An IShaderLoadCallback is missing."));
 		return;
 	}
 

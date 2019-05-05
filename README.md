@@ -16,7 +16,7 @@
 * sudo apt-get install libgl1-mesa-dev
 * sudo apt-get install libglu-dev
 * sudo apt-get install language-pack-zh-hans
-当安装完以上依赖后，使用CMake构建，即可完成编译。
+* **当安装完以上依赖后，使用CMake构建，即可完成编译。
 
 ## GameMachine提供的功能：
 - 底层功能
@@ -32,6 +32,7 @@
   - 提供键盘、鼠标、手柄消息封装等。
   - 声音播放封装。
   - UI控件及完备的事件机制。
+  - GPGPU计算框架。
   - 其它功能。
 
 - 集成的渲染功能
@@ -71,3 +72,4 @@
 ![Spotlight](https://github.com/Froser/gamemachine/blob/master/manual/pic/2.png)
 ![Collision](https://github.com/Froser/gamemachine/blob/master/manual/pic/3.png)
 ![Gerstner wave](https://github.com/Froser/gamemachine/blob/master/manual/pic/4.png)
+![GPGPU Compute](https://github.com/Froser/gamemachine/blob/master/manual/pic/5.png)

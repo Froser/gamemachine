@@ -54,14 +54,21 @@ void GameMachine::init(
 	registerManager(new GMGamePackage(), &d->gamePackageManager);
 	registerManager(new GMConfigs(), &d->statesManager);
 
-	d->clock.begin();
-	handleMessages();
-	updateGameMachineRunningStates();
+	if (desc.runningMode != GMGameMachineRunningMode::ComputeOnly)
+	{
+		d->clock.begin();
+		handleMessages();
+		updateGameMachineRunningStates();
 
-	eachHandler([=](auto window, auto handler) {
-		if (handler)
-			handler->init(window->getContext());
-	});
+		eachHandler([=](auto window, auto handler) {
+			if (handler)
+				handler->init(window->getContext());
+		});
+	}
+	else
+	{
+		d->factory->createComputeContext(&d->computeContext);
+	}
 
 	d->inited = true;
 }
@@ -121,6 +128,12 @@ void GameMachine::removeWindow(IWindow* window)
 {
 	D(d);
 	postMessage({ GameMachineMessageType::DeleteWindowLater, 0, window });
+}
+
+const IRenderContext* gm::GameMachine::getComputeContext()
+{
+	D(d);
+	return d->computeContext;
 }
 
 bool GameMachine::renderFrame(IWindow* window)
@@ -301,7 +314,8 @@ template <typename T, typename U>
 void GameMachine::registerManager(T* newObject, OUT U** manager)
 {
 	D(d);
-	*manager = newObject;
+	if (*manager != newObject)
+		*manager = newObject;
 	d->managerQueue.push_back(*manager);
 }
 
@@ -319,10 +333,12 @@ void GameMachine::finalize()
 		*iter = nullptr;
 	}
 
-	// 清空内存
 	d->factory = nullptr;
 	d->gamePackageManager = nullptr;
 	d->statesManager = nullptr;
+
+	GM_ASSERT(d->runningMode != GMGameMachineRunningMode::ComputeOnly || d->computeContext);
+	GM_delete(d->computeContext);
 
 	for (auto window : d->windows)
 	{

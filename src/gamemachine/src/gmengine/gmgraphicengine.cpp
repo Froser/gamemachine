@@ -134,7 +134,15 @@ GMGraphicEngine::GMGraphicEngine(const IRenderContext* context)
 	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
 	d->shadow.type = GMShadowSourceDesc::NoShadow;
 	d->renderTechniqueManager.reset(new GMRenderTechniqueManager(context));
-	d->primitiveManager.reset(new GMPrimitiveManager(context));
+
+	if (context->getWindow())
+	{
+		d->primitiveManager.reset(new GMPrimitiveManager(context));
+	}
+	else
+	{
+		gm_info(gm_dbg_wrap("You are in a compute only mode, so you cannot use primitive mananger because there's no render window."));
+	}
 }
 
 GMGraphicEngine::~GMGraphicEngine()

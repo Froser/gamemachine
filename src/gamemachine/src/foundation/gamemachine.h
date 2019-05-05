@@ -91,6 +91,7 @@ enum class GMGameMachineRunningMode
 {
 	GameMode, //!< 游戏模式。游戏模式下，GameMachine会按照固定帧率刷新画面。
 	ApplicationMode, //!< 应用模式。应用模式下，需要手动调用GameMachine更新方法才可以更新一帧画面。
+	ComputeOnly, //!< GameMachine只用于GPGPU计算，并不渲染画面。
 };
 
 //! 描述一个GameMachine的执行环境。
@@ -107,6 +108,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GameMachine)
 	bool inited = false;
 	bool gamemachinestarted = false;
 	Set<IWindow*> windows;
+	const IRenderContext* computeContext = nullptr;
 	IFactory* factory = nullptr;
 	GMGamePackage* gamePackageManager = nullptr;
 	GMConfigs* statesManager = nullptr;
@@ -253,6 +255,13 @@ public:
 	  移除后的窗口不再响应任何事件。
 	*/
 	void removeWindow(IWindow* window);
+
+	//! 获取用于计算的渲染上下文。
+	/*!
+	  只有GMGameMachineRunningMode::ComputeOnly模式才需要获取此上下文用于创建计算着色器，其它情况下将返回一个空值。
+	  \sa GameMachine::init(), GMGameMachineRunningMode
+	*/
+	const IRenderContext* getComputeContext();
 
 	//! 渲染一帧画面。
 	/*!

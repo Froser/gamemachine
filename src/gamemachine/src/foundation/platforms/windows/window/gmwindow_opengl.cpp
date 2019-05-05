@@ -42,6 +42,32 @@ namespace
 		::UpdateWindow(wnd);
 		return wnd;
 	}
+
+	PIXELFORMATDESCRIPTOR getDefaultPixelFormatDescriptor(GMbyte colorDepth, GMbyte alphaBits, GMbyte depthBits, GMbyte stencilBits)
+	{
+		PIXELFORMATDESCRIPTOR pfd =								//pfd tells windows how we want things to be
+		{
+			sizeof(PIXELFORMATDESCRIPTOR),						//size of Pixel format descriptor
+			1,													//Version Number
+			PFD_DRAW_TO_WINDOW |								//must support window
+			PFD_SUPPORT_OPENGL |								//must support opengl
+			PFD_DOUBLEBUFFER,									//must support double buffer
+			PFD_TYPE_RGBA,										//request RGBA format
+			colorDepth,											//select color depth
+			0, 0, 0, 0, 0, 0,									//color bits ignored
+			alphaBits,											//alpha buffer bits
+			0,													//shift bit ignored
+			0,													//no accumulation buffer
+			0, 0, 0, 0,											//accumulation bits ignored
+			depthBits,											//z buffer bits
+			stencilBits,										//stencil buffer bits
+			0,													//no auxiliary buffer
+			PFD_MAIN_PLANE,										//main drawing layer
+			0,													//reserved
+			0, 0, 0												//layer masks ignored
+		};
+		return pfd;
+	}
 }
 
 GM_PRIVATE_OBJECT(GMWindow_OpenGL)
@@ -121,50 +147,23 @@ GMWindow_OpenGL::~GMWindow_OpenGL()
 void GMWindow_OpenGL::onWindowCreated(const GMWindowDesc& wndAttrs)
 {
 	D(d);
-	gm::GMWindowDesc attrs = wndAttrs;
+	GMWindowDesc attrs = wndAttrs;
 	attrs.dwExStyle |= WS_EX_CLIENTEDGE;
 	attrs.dwStyle |= WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_BORDER | WS_CAPTION;
 
-	const gm::GMbyte colorDepth = 32, alphaBits = 8;
-	static PIXELFORMATDESCRIPTOR pfd =						//pfd tells windows how we want things to be
-	{
-		sizeof(PIXELFORMATDESCRIPTOR),						//size of Pixel format descriptor
-		1,													//Version Number
-		PFD_DRAW_TO_WINDOW |								//must support window
-		PFD_SUPPORT_OPENGL |								//must support opengl
-		PFD_DOUBLEBUFFER,									//must support double buffer
-		PFD_TYPE_RGBA,										//request RGBA format
-		colorDepth,											//select color depth
-		0, 0, 0, 0, 0, 0,									//color bits ignored
-		alphaBits,											//alpha buffer bits
-		0,													//shift bit ignored
-		0,													//no accumulation buffer
-		0, 0, 0, 0,											//accumulation bits ignored
-		d->depthBits,										//z buffer bits
-		d->stencilBits,										//stencil buffer bits
-		0,													//no auxiliary buffer
-		PFD_MAIN_PLANE,										//main drawing layer
-		0,													//reserved
-		0, 0, 0												//layer masks ignored
-	};
+	const GMbyte colorDepth = 32, alphaBits = 8;
 
 	HWND tmpWnd = NULL;
 	HDC tmpDC = NULL;
 	HGLRC tmpRC = NULL;
-	gm::GMint32 pixelFormat;
-	RUN_AND_CHECK(tmpWnd = createTempWindow());
-	RUN_AND_CHECK(tmpDC = ::GetDC(tmpWnd));
-	RUN_AND_CHECK(pixelFormat = ::ChoosePixelFormat(tmpDC, &pfd));
-	RUN_AND_CHECK(::SetPixelFormat(tmpDC, pixelFormat, &pfd));
-	RUN_AND_CHECK(tmpRC = wglCreateContext(tmpDC));
-	RUN_AND_CHECK(wglMakeCurrent(tmpDC, tmpRC));
+	RUN_AND_CHECK(GMWindowFactory::createTempWindow(colorDepth, alphaBits, d->depthBits, d->stencilBits, tmpWnd, tmpDC, tmpRC));
 	RUN_AND_CHECK(GLEW_OK == glewInit());
 
 	// 开始创建真正的Window
-	gm::GMWindowHandle wnd = getWindowHandle();
+	GMWindowHandle wnd = getWindowHandle();
 	RUN_AND_CHECK(d->hDC = ::GetDC(wnd));
 
-	gm::GMint32 pixAttribs[] =
+	GMint32 pixAttribs[] =
 	{
 		WGL_DRAW_TO_WINDOW_ARB,	GL_TRUE,
 		WGL_SUPPORT_OPENGL_ARB,	GL_TRUE,
@@ -179,13 +178,13 @@ void GMWindow_OpenGL::onWindowCreated(const GMWindowDesc& wndAttrs)
 		0
 	};
 
-	gm::GMint32 nFormat = 0;
-	gm::GMuint32 nCount = 0;
+	GMint32 nFormat = 0;
+	GMuint32 nCount = 0;
 	RUN_AND_CHECK(wglChoosePixelFormatARB(d->hDC, &pixAttribs[0], NULL, 1, &nFormat, (UINT*)&nCount));
 	RUN_AND_CHECK(wglMakeCurrent(NULL, NULL));
-	RUN_AND_CHECK(wglDeleteContext(tmpRC));
-	RUN_AND_CHECK(::ReleaseDC(tmpWnd, tmpDC));
-	RUN_AND_CHECK(::DestroyWindow(tmpWnd));
+	RUN_AND_CHECK(GMWindowFactory::destroyTempWindow(tmpWnd, tmpDC, tmpRC));
+
+	static PIXELFORMATDESCRIPTOR pfd = getDefaultPixelFormatDescriptor(colorDepth, alphaBits, d->depthBits, d->stencilBits);
 	RUN_AND_CHECK(::SetPixelFormat(d->hDC, nFormat, &pfd));
 	if (!d->parent)
 	{
@@ -206,12 +205,7 @@ void GMWindow_OpenGL::onWindowCreated(const GMWindowDesc& wndAttrs)
 EXIT:
 	// 走到这里来说明流程失败
 	dispose();
-	if (tmpWnd && tmpDC)
-		::ReleaseDC(tmpWnd, tmpDC);
-	if (tmpRC)
-		wglDeleteContext(tmpRC);
-	if (tmpWnd)
-		::DestroyWindow(tmpWnd);
+	GMWindowFactory::destroyTempWindow(tmpWnd, tmpDC, tmpRC);
 	wglMakeCurrent(NULL, NULL);
 	return;
 }
@@ -259,10 +253,10 @@ void GMWindow_OpenGL::dispose()
 	D(d);
 	::SetWindowLongPtr(getWindowHandle(), GWLP_USERDATA, NULL);
 	
-	gm::GMWindowHandle wnd = getWindowHandle();
-	if (d->hDC && !::ReleaseDC(wnd, d->hDC))
+	GMWindowHandle wnd = getWindowHandle();
+	if (d->hDC)
 	{
-		gm_error(gm_dbg_wrap("release of Device Context failed."));
+		::ReleaseDC(wnd, d->hDC);
 		d->hDC = 0;
 	}
 }
@@ -276,4 +270,37 @@ bool GMWindowFactory::createWindowWithOpenGL(GMInstance instance, IWindow* paren
 			return true;
 	}
 	return false;
+}
+
+bool GMWindowFactory::createTempWindow(GMbyte colorDepth, GMbyte alphaBits, GMbyte depthBits, GMbyte stencilBits, OUT GMWindowHandle& tmpWnd, OUT GMDeviceContextHandle& tmpDC, OUT GMOpenGLRenderContextHandle& tmpRC)
+{
+	auto pfd = ::getDefaultPixelFormatDescriptor(colorDepth, alphaBits, depthBits, stencilBits);
+	GMint32 pixelFormat = 0;
+
+	RUN_AND_CHECK(tmpWnd = ::createTempWindow());
+	RUN_AND_CHECK(tmpDC = ::GetDC(tmpWnd));
+	RUN_AND_CHECK(pixelFormat = ::ChoosePixelFormat(tmpDC, &pfd));
+	RUN_AND_CHECK(::SetPixelFormat(tmpDC, pixelFormat, &pfd));
+	RUN_AND_CHECK(tmpRC = wglCreateContext(tmpDC));
+	RUN_AND_CHECK(wglMakeCurrent(tmpDC, tmpRC));
+	return true;
+
+EXIT:
+	return false;
+}
+
+bool GMWindowFactory::destroyTempWindow(GMWindowHandle tmpWnd, GMDeviceContextHandle tmpDC, GMOpenGLRenderContextHandle tmpRC)
+{
+	BOOL sucRC = FALSE;
+	BOOL sucWnd = FALSE;
+	if (tmpDC)
+		ReleaseDC(tmpWnd, tmpDC);
+
+	if (tmpRC)
+		sucRC = wglDeleteContext(tmpRC);
+
+	if (tmpWnd)
+		sucWnd = DestroyWindow(tmpWnd);
+
+	return sucRC && sucWnd;
 }

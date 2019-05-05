@@ -187,6 +187,8 @@ GM_INTERFACE(IQueriable)
 #if GM_WINDOWS
 typedef HINSTANCE GMInstance;
 typedef HWND GMWindowHandle;
+typedef HDC GMDeviceContextHandle;
+typedef HGLRC GMOpenGLRenderContextHandle;
 struct GMWindowDesc
 {
 	bool createNewWindow = true; //!< 是否创建一个新窗口，或者是使用已经存在的窗口来渲染
@@ -201,8 +203,10 @@ struct GMWindowDesc
 	GMInstance instance;
 };
 #else
-typedef GMint32 GMWindowHandle;
-typedef GMint32 GMInstance;
+typedef GMsize_t GMWindowHandle;
+typedef GMsize_t GMInstance;
+typedef GMsize_t GMDeviceContextHandle;
+typedef GMsize_t GMOpenGLRenderContextHandle;
 struct GMWindowDesc
 {
 	bool createNewWindow = true; //!< 是否创建一个新窗口，或者是使用已经存在的窗口来渲染
@@ -830,6 +834,7 @@ GM_INTERFACE(IFactory)
 	virtual void createEmptyTexture(const IRenderContext* context, REF GMTextureAsset&) = 0;
 	virtual void createShaderPrograms(const IRenderContext* context, const GMRenderTechniqueManager& manager, REF Vector<IShaderProgram*>* out) = 0;
 	virtual bool createComputeShaderProgram(const IRenderContext* context, OUT IComputeShaderProgram** out) = 0;
+	virtual void createComputeContext(OUT const IRenderContext** out) = 0;
 };
 
 typedef WAVEFORMATEX GMWaveFormatEx;

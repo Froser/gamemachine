@@ -51,18 +51,18 @@ int main(int argc, char* argv[])
 #endif
 	}
 
-	IWindow* window = nullptr;
-	factory->createWindow(NULL, NULL, &window);
-	gm::GMWindowDesc windowDesc;
-	window->create(windowDesc);
-	GM.addWindow(window);
-
 	GMGameMachineDesc desc;
 	desc.factory = factory;
 	desc.renderEnvironment = env;
-	desc.runningMode = GMGameMachineRunningMode::ApplicationMode;
+	desc.runningMode = GMGameMachineRunningMode::ComputeOnly;
 	GM.init(desc);
-	GM.startGameMachineWithoutMessageLoop();
+	const IRenderContext* computeContext = GM.getComputeContext();
+	IComputeShaderProgram* prog = nullptr;
+	if (!GM.getFactory()->createComputeShaderProgram(computeContext, &prog))
+	{
+		printf("Compute shader is not supported.");
+		return -1;
+	}
 
 	/************************************************************************/
 	/* 生成很多个大数                                                        */
@@ -140,68 +140,60 @@ int main(int argc, char* argv[])
 		}
 	);
 
-	IComputeShaderProgram* prog = nullptr;
-	if (!GM.getFactory()->createComputeShaderProgram(window->getContext(), &prog))
+	if (env == GMRenderEnvironment::OpenGL)
+		prog->load(".", glcs, "main");
+	else
+		prog->load(".", dxcs, "main");
+
+	GMComputeBufferHandle bufferA, bufferB, bufferResult;
+	GMComputeSRVHandle srvA, srvB;
+	GMComputeUAVHandle uav;
+	prog->createBuffer(sizeof(GMint32), sz, a, GMComputeBufferType::Structured, &bufferA);
+	prog->createBuffer(sizeof(GMint32), sz, b, GMComputeBufferType::Structured, &bufferB);
+	prog->createBuffer(sizeof(GMint32), sz, c, GMComputeBufferType::UnorderedStructured, &bufferResult);
+	prog->createBufferShaderResourceView(bufferA, &srvA);
+	prog->createBufferShaderResourceView(bufferB, &srvB);
+	prog->createBufferUnorderedAccessView(bufferResult, &uav);
+	prog->bindShaderResourceView(1, &srvA);
+	prog->bindShaderResourceView(1, &srvB);
+	prog->bindUnorderedAccessView(1, &uav);
+
+	stopwatch.start();
+	prog->dispatch(16, 1, 1);
+	stopwatch.stop();
+	printf("GPU operation finished. Elapsed: %f\r\n", stopwatch.timeInSecond());
+
+	printf("Verifing...\r\n");
+	bool correct = false;
+
+	stopwatch.start();
+	bool canReadFromGPU = prog->canRead(bufferResult);
+	GMint32* resultPtr = nullptr;
+	if (canReadFromGPU)
 	{
-		printf("Compute shader is not supported.");
+		resultPtr = static_cast<GMint32*>(prog->mapBuffer(bufferResult));
+		correct = verify(c, resultPtr, sz);
+		prog->unmapBuffer(bufferResult);
 	}
 	else
 	{
-		if (env == GMRenderEnvironment::OpenGL)
-			prog->load(".", glcs, "main");
-		else
-			prog->load(".", dxcs, "main");
-
-		GMComputeBufferHandle bufferA, bufferB, bufferResult;
-		GMComputeSRVHandle srvA, srvB;
-		GMComputeUAVHandle uav;
-		prog->createBuffer(sizeof(GMint32), sz, a, GMComputeBufferType::Structured, &bufferA);
-		prog->createBuffer(sizeof(GMint32), sz, b, GMComputeBufferType::Structured, &bufferB);
-		prog->createBuffer(sizeof(GMint32), sz, c, GMComputeBufferType::UnorderedStructured, &bufferResult);
-		prog->createBufferShaderResourceView(bufferA, &srvA);
-		prog->createBufferShaderResourceView(bufferB, &srvB);
-		prog->createBufferUnorderedAccessView(bufferResult, &uav);
-		prog->bindShaderResourceView(1, &srvA);
-		prog->bindShaderResourceView(1, &srvB);
-		prog->bindUnorderedAccessView(1, &uav);
-
-		stopwatch.start();
-		prog->dispatch(16, 1, 1);
-		stopwatch.stop();
-		printf("GPU operation finished. Elapsed: %f\r\n", stopwatch.timeInSecond());
-
-		printf("Verifing...\r\n");
-		bool correct = false;
-
-		stopwatch.start();
-		bool canReadFromGPU = prog->canRead(bufferResult);
-		GMint32* resultPtr = nullptr;
-		if (canReadFromGPU)
-		{
-			resultPtr = static_cast<GMint32*>(prog->mapBuffer(bufferResult));
-			correct = verify(c, resultPtr, sz);
-			prog->unmapBuffer(bufferResult);
-		}
-		else
-		{
-			GMComputeBufferHandle cpuResult;
-			prog->createReadOnlyBufferFrom(bufferResult, &cpuResult);
-			prog->copyBuffer(cpuResult, bufferResult);
-			resultPtr = static_cast<GMint32*>(prog->mapBuffer(cpuResult));
-			correct = verify(c, resultPtr, sz);
-			prog->unmapBuffer(cpuResult);
-			prog->release(cpuResult);
-		}
-		stopwatch.stop();
-		printf("Verifing finished. Elapsed: %f. Result: %s.\r\n", stopwatch.timeInSecond(), correct ? "Correct" : "Incorrect");
-
-		prog->release(bufferA);
-		prog->release(bufferB);
-		prog->release(bufferResult);
-		prog->release(srvA);
-		prog->release(srvB);
-		prog->release(uav);
+		GMComputeBufferHandle cpuResult;
+		prog->createReadOnlyBufferFrom(bufferResult, &cpuResult);
+		prog->copyBuffer(cpuResult, bufferResult);
+		resultPtr = static_cast<GMint32*>(prog->mapBuffer(cpuResult));
+		correct = verify(c, resultPtr, sz);
+		prog->unmapBuffer(cpuResult);
+		prog->release(cpuResult);
 	}
+	stopwatch.stop();
+	printf("Verifing finished. Elapsed: %f. Result: %s.\r\n", stopwatch.timeInSecond(), correct ? "Correct" : "Incorrect");
+
+	prog->release(bufferA);
+	prog->release(bufferB);
+	prog->release(bufferResult);
+	prog->release(srvA);
+	prog->release(srvB);
+	prog->release(uav);
 
 	delete prog;
 	delete[] a;

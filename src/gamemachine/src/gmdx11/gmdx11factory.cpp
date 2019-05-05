@@ -262,3 +262,76 @@ bool GMDx11Factory::createComputeShaderProgram(const IRenderContext* context, OU
 	}
 	return true;
 }
+
+void GMDx11Factory::createComputeContext(OUT const IRenderContext** out)
+{
+	class ComputeEngine : public GMDx11GraphicEngine
+	{
+		using GMDx11GraphicEngine::GMDx11GraphicEngine;
+
+	public:
+		ComputeEngine(const IRenderContext* context)
+			: GMDx11GraphicEngine(context)
+		{
+			createDeviceAndContext();
+		}
+
+	private:
+		void createDeviceAndContext()
+		{
+			GMComPtr<ID3D11Device> device;
+			GMComPtr<ID3D11DeviceContext> deviceContext;
+			D3D_FEATURE_LEVEL featureLevels[] =
+			{
+				D3D_FEATURE_LEVEL_11_0,
+			};
+
+			UINT createFlags = 0;
+#if GM_DEBUG
+			createFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
+			GM_DX_HR(D3D11CreateDevice(
+				NULL,
+				D3D_DRIVER_TYPE_HARDWARE,
+				NULL,
+				createFlags,
+				featureLevels,
+				GM_array_size(featureLevels),
+				D3D11_SDK_VERSION,
+				&device,
+				NULL,
+				&deviceContext)
+			);
+
+			bool setSucceeded = false;
+			setSucceeded = setInterface(GameMachineInterfaceID::D3D11Device, device);
+			GM_ASSERT(setSucceeded);
+			setSucceeded = setInterface(GameMachineInterfaceID::D3D11DeviceContext, deviceContext);
+			GM_ASSERT(setSucceeded);
+		}
+	};
+
+	class RenderContext : public GMRenderContext
+	{
+	public:
+		~RenderContext()
+		{
+			// Engine生命周期由Context管理
+			if (getEngine())
+				GM_delete(getEngine());
+		}
+
+	public:
+		virtual void switchToContext() const override
+		{
+		}
+	};
+
+	if (out)
+	{
+		RenderContext* ctx = new RenderContext();
+		ctx->setEngine(new ComputeEngine(ctx));
+		*out = ctx;
+	}
+}
