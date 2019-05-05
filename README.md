@@ -4,8 +4,8 @@
 安装3.9.0以上版本的CMake，并构建Coding下的CMakeLists.txt。
 
 ### Windows下的构建方法:
-* 直接构建release，并将media/gm.pk0拷贝到release目录下，可以运行程序。
-* 如果运行debug，请将media/gm.pk0用WinRAR等压缩工具解压到D:/gmpk。
+* 直接构建release，并将media/gm.pk0、media/gm.pk1拷贝到release目录下，可以运行程序。
+* 如果运行debug，请将media/gm.pk0用WinRAR等压缩工具解压到D:/gmpk；将media/gm.pk1解压到D:/gmpk1
 * 对于没有安装DirectX11的环境的机器，可以将CMake中的GM_USE_DX11开关关闭，这样将编译没有DirectX11的渲染环境。
 
 **由于用到了诸多C++11/14的特性，只能使用VS2015及以上的版本编译**
