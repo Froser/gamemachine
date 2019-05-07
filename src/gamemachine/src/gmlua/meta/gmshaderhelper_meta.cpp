@@ -54,7 +54,7 @@ namespace
 		IRenderContextProxy context(L);
 		GMString path = GMArgumentHelper::popArgumentAsString(L, s_invoker);
 		GMArgumentHelper::popArgumentAsObject(L, context, s_invoker);
-		GMDx11Helper::loadShader(context.get(), path);
+		GMDx11Helper::loadShader(context.get(), path, L"main.gfx");
 #else
 #endif
 		return GMReturnValues();

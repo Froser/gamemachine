@@ -204,3 +204,15 @@ void GMBuffer::swap(GMBuffer& rhs)
 	GM_SWAP(size, rhs.size);
 	GM_SWAP(needRelease, rhs.needRelease);
 }
+
+GMBufferView::GMBufferView(const GMBuffer& rhs, GMsize_t offset)
+{
+	buffer = rhs.buffer + offset;
+	size = rhs.size - offset;
+	needRelease = false;
+}
+
+GMBufferView::~GMBufferView()
+{
+	GM_ASSERT(!needRelease);
+}

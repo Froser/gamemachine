@@ -45,7 +45,7 @@ void GMShaderHelper::loadShader(const IRenderContext* context)
 	else
 	{
 #if GM_USE_DX11
-		GMDx11Helper::loadShader(context, L"dx11/effect.fx");
+		GMDx11Helper::loadShader(context, L"dx11/effect.fx", L"main.gfx");
 		GMGameObject::setDefaultCullShaderCode(getFileContent(L"dx11/compute/frustumcull.hlsl"));
 #else
 		GM_ASSERT(false);

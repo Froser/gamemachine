@@ -49,6 +49,7 @@ GM_PRIVATE_OBJECT(GMRenderTechnique)
 	GMShaderType shaderType;
 	GMString code[static_cast<GMsize_t>(GMRenderEnvironment::EndOfRenderEnvironment)];
 	GMString path[static_cast<GMsize_t>(GMRenderEnvironment::EndOfRenderEnvironment)];
+	GMString prefetch[static_cast<GMsize_t>(GMRenderEnvironment::EndOfRenderEnvironment)];
 	GMRenderTechniques* parent = nullptr;
 };
 
@@ -77,9 +78,16 @@ public:
 		return d->path[static_cast<GMsize_t>(type)];
 	}
 
+	inline const GMString& getPrefetch(GMRenderEnvironment type) const GM_NOEXCEPT
+	{
+		D(d);
+		return d->prefetch[static_cast<GMsize_t>(type)];
+	}
+
 public:
 	void setCode(GMRenderEnvironment type, GMString code);
 	void setPath(GMRenderEnvironment type, GMString path);
+	void setPrefetch(GMRenderEnvironment type, GMString prefetch);
 
 friend_methods(GMRenderTechniqueManager):
 	void setId(GMRenderTechniqueID id);

@@ -292,10 +292,10 @@ void GMWaveGameObject::initShader(const IRenderContext* context)
 				output.WorldPos = output.Position;\n
 				output.Position = mul(output.Position, GM_ViewMatrix);\n
 				output.Position = mul(output.Position, GM_ProjectionMatrix);\n
-				output.Normal = GM_ToFloat4(normalize(n));\n
+				output.Normal = normalize(n);\n
 				output.Texcoord = input.Texcoord;\n
-				output.Tangent = GM_ToFloat4(normalize(t));\n
-				output.Bitangent = GM_ToFloat4(cross(output.Normal.xyz, output.Tangent.xyz));\n
+				output.Tangent = normalize(t);\n
+				output.Bitangent = cross(output.Normal.xyz, output.Tangent.xyz);\n
 				output.Lightmap = input.Lightmap;\n
 				output.Color = input.Color;\n
 				output.Z = output.Position.z;\n

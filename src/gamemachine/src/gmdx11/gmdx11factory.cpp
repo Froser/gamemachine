@@ -177,6 +177,7 @@ void GMDx11Factory::createShaderPrograms(const IRenderContext* context, const GM
 {
 	GMString fxCode;
 	GMString fxPath;
+	GMString prefetchFileName;
 	// 先找到原始的Effect代码
 	bool foundFx = false;
 	for (auto& renderTechniques : manager.getRenderTechniques())
@@ -187,6 +188,7 @@ void GMDx11Factory::createShaderPrograms(const IRenderContext* context, const GM
 			{
 				fxCode = technique.getCode(GMRenderEnvironment::DirectX11);
 				fxPath = technique.getPath(GMRenderEnvironment::DirectX11);
+				prefetchFileName = technique.getPrefetch(GMRenderEnvironment::DirectX11);
 				foundFx = true;
 				break;
 			}
@@ -244,7 +246,7 @@ void GMDx11Factory::createShaderPrograms(const IRenderContext* context, const GM
 
 	// loadEffectShader会把生成的effect交给GMDx11GraphicEngine托管
 	// 我们所有的Technique只需要拿effect就可以了，而不能从GMRenderTechniqueManager中拿
-	GMDx11Helper::loadEffectShader(context->getEngine(), fxCode, fxPath);
+	GMDx11Helper::loadEffectShader(context->getEngine(), fxCode, fxPath, prefetchFileName);
 
 	for (auto& renderTechniques : manager.getRenderTechniques())
 	{

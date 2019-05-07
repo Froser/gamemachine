@@ -432,5 +432,11 @@ public:
 	bool needRelease = false; // 表示是否需要手动释放
 };
 
+struct GM_EXPORT GMBufferView : public GMBuffer
+{
+	GMBufferView(const GMBuffer&, GMsize_t offset);
+	~GMBufferView();
+};
+
 END_NS
 #endif

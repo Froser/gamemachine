@@ -79,6 +79,12 @@ void GMRenderTechnique::setPath(GMRenderEnvironment type, GMString path)
 	d->path[static_cast<GMsize_t>(type)] = std::move(path);
 }
 
+void GMRenderTechnique::setPrefetch(GMRenderEnvironment type, GMString prefetch)
+{
+	D(d);
+	d->prefetch[static_cast<GMsize_t>(type)] = std::move(prefetch);
+}
+
 void GMRenderTechniques::addRenderTechnique(GMRenderTechnique technique)
 {
 	D(d);

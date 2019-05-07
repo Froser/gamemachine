@@ -13,6 +13,7 @@ include_directories(
 		../../3rdparty/glm-0.9.9-a2
 		../../3rdparty/bullet3-2.87/src
 		../../3rdparty/assimp-3.3.1/include
+		../../3rdparty/cryptocpp-8.2.0
 	)
 
 set(SOURCES
@@ -170,6 +171,8 @@ set(SOURCES
 		foundation/gmtransaction.cpp
 		foundation/gmasync.h
 		foundation/gmasync.cpp
+		foundation/gmcryptographic.h
+		foundation/gmcryptographic.cpp
 
 		gmlua/gmlua.h
 		gmlua/gmlua.cpp

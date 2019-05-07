@@ -12,22 +12,25 @@ struct GM_EXPORT GMDx11Helper
 {
 	//! 从GM的包中读取一个着色器文件，并编译到DirectX11环境。
 	/*!
+	  函数将会首先尝试在prefetch文件夹获取预编译的文件，如果不匹配则尝试查找FXC来生成预编译文件，如果仍然失败则在运行时编译着色器。
 	  调用此函数时，确认GMGamePackage已经初始化。如果读取失败，或者着色器文件编译失败，则返回E_FAIL。
 	  \param engine 需要添加到的绘制引擎
 	  \param code 着色器文件内容。
 	  \param filepath 包含此着色器文件的路径。
-	  \param type 着色器类型，目前只能为GMShaderType::Effect。
+	  \param gfxCandidate 预编译文件，如果为空则跳过尝试读取预编译的过程。
 	  \return 操作是否成功。
 	*/
 	static IShaderProgram* loadEffectShader(
 		IGraphicEngine* engine,
 		const GMString& code,
-		const GMString& filepath
+		const GMString& filepath,
+		const GMString& gfxCandidate
 	);
 
 	static void loadShader(
 		const IRenderContext* context,
-		const GMString& effectFilePath
+		const GMString& effectFilePath,
+		const GMString& gfxCandidate
 	);
 
 	//! 返回一个默认的采样器描述。

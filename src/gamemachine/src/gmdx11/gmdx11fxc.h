@@ -9,9 +9,9 @@ BEGIN_NS
 
 struct GMDx11FXCDescription
 {
-	GMString fxc;
+	GMString fxcOutputDir;
 	GMString code;
-	GMString tempDir;
+	GMString codePath;
 	GMint32 optimizationLevel; // from 0-3
 	bool treatWarningsAsErrors;
 	bool debug;
@@ -20,22 +20,14 @@ struct GMDx11FXCDescription
 class GMDx11FXC
 {
 public:
-	void init();
-	bool compile(const GMDx11FXCDescription&);
-
-public:
-	inline bool isAvailable() GM_NOEXCEPT
-	{
-		return m_available;
-	}
+	bool canLoad(const GMString& code, const GMBuffer& fxcBuffer);
+	bool load(const GMBuffer& shaderBuffer, ID3D11Device* pDevice, ID3DX11Effect** ppEffect);
+	bool tryLoadCache(IN OUT GMDx11FXCDescription& desc, ID3D11Device* pDevice, ID3DX11Effect** ppEffect);
+	bool compile(IN OUT GMDx11FXCDescription&, ID3DBlob** ppCode, ID3DBlob** ppErrorMessages);
 
 private:
-	bool findFXC();
 	bool fillDescription(GMDx11FXCDescription*);
-
-private:
-	GMString m_fxc;
-	bool m_available = false;
+	bool makeFingerprints(const GMDx11FXCDescription& desc, ID3DBlob* pCode);
 };
 
 END_NS

@@ -118,6 +118,8 @@ GMString GMDefaultGamePackageHandler::pathRoot(GMPackageIndex index)
 		return packagePath() + L"/scripts/";
 	case GMPackageIndex::Fonts:
 		return packagePath() + L"/fonts/";
+	case GMPackageIndex::Prefetch:
+		return packagePath() + L"/prefetch/";
 	default:
 		GM_ASSERT(false);
 		break;
@@ -393,6 +395,8 @@ GMString GMZipGamePackageHandler::pathRoot(GMPackageIndex index)
 		return L"scripts/";
 	case GMPackageIndex::Fonts:
 		return L"fonts/";
+	case GMPackageIndex::Prefetch:
+		return L"prefetch/";
 	default:
 		GM_ASSERT(false);
 		break;
