@@ -7,7 +7,6 @@
 BEGIN_NS
 
 class GMModel;
-struct GMBuffer;
 struct GMModelLoadSettings;
 GM_INTERFACE(IModelReader)
 {

@@ -157,6 +157,8 @@ set(SOURCES
 		foundation/linearmath.inl
 		foundation/gmobject.h
 		foundation/gmobject.cpp
+		foundation/gmbuffer.h
+		foundation/gmbuffer.cpp
 		foundation/gamemachine.h
 		foundation/gamemachine.cpp
 		foundation/interfaces.h

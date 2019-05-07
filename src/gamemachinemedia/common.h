@@ -2,6 +2,7 @@
 #define __GMM_COMMON_H__
 
 #include <defines.h>
+#include <gmbuffer.h>
 #if GM_WINDOWS
 #	include <windows.h>
 #endif

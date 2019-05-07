@@ -85,7 +85,7 @@ macro(gm_link_bullet3 libraryName ACCESS)
 	message("GameMachine: ${libraryName} was linked against bullet3.")
 endmacro(gm_link_bullet3)
 
-macro(gm_set_target_properties)
+macro(gm_set_target_properties libraryName)
 	if(MSVC)
 		set_target_properties(${libraryName} PROPERTIES COMPILE_FLAGS "/W3" )
 		set_target_properties(${libraryName} PROPERTIES COMPILE_FLAGS "/WX" )

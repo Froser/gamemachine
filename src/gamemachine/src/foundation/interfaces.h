@@ -64,6 +64,7 @@ struct GMCameraLookAt;
 struct GMShadowSourceDesc;
 
 class GMAsset;
+class GMBuffer;
 typedef GMAsset GMModelAsset;
 typedef GMAsset GMSceneAsset;
 typedef GMAsset GMPhysicsShapeAsset;

@@ -255,7 +255,6 @@ private:
 };
 
 typedef GMBSPPrivate BSPData;
-struct GMBuffer;
 class GMBSP : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMBSP);

@@ -3,6 +3,7 @@
 #include <gmmcommon.h>
 #include <gminterfaces.h>
 #include <gmobject.h>
+#include <gmbuffer.h>
 
 BEGIN_MEDIA_NS
 
