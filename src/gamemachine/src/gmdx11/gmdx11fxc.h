@@ -12,9 +12,9 @@ struct GMDx11FXCDescription
 	GMString fxcOutputDir;
 	GMString code;
 	GMString codePath;
-	GMint32 optimizationLevel; // from 0-3
-	bool treatWarningsAsErrors;
-	bool debug;
+	GMint32 optimizationLevel = 1; // from 0-3
+	bool treatWarningsAsErrors = true;
+	bool debug = false;
 };
 
 class GMDx11FXC

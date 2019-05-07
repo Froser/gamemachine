@@ -242,11 +242,9 @@ bool GMZipGamePackageHandler::loadZip()
 				err = unzGetCurrentFileInfo64(m_ufs[n], &file_info, filename, sizeof(filename), NULL, 0, NULL, 0);
 				CHECK(err);
 
-				GMBuffer* buf = new GMBuffer();
-				buf->needRelease = false;
 				auto& b = m_buffers[filename];
 				b.first = n;
-				b.second = buf;
+				b.second.needRelease = false;
 				break;
 			}
 			if ((i + 1) < gi.number_entry)
@@ -276,8 +274,7 @@ void GMZipGamePackageHandler::releaseBuffers()
 	for (auto iter = m_buffers.begin(); iter != m_buffers.end(); iter++)
 	{
 		auto buffer = iter->second.second;
-		GM_delete(buffer->buffer);
-		GM_delete(buffer);
+		GM_delete(buffer.buffer);
 	}
 }
 
@@ -328,10 +325,10 @@ bool GMZipGamePackageHandler::loadBuffer(const GMString& path, REF GMBuffer* buf
 	if (iter == m_buffers.end())
 		return false;
 
-	GMBuffer* targetBuffer = iter->second.second;
-	if (targetBuffer->size > 0)
+	GMBuffer& targetBuffer = iter->second.second;
+	if (targetBuffer.size > 0)
 	{
-		*buffer = *targetBuffer;
+		*buffer = targetBuffer;
 		return true;
 	}
 
@@ -363,11 +360,11 @@ bool GMZipGamePackageHandler::loadBuffer(const GMString& path, REF GMBuffer* buf
 			ptr += err;
 	} while (err > 0);
 
-	targetBuffer->needRelease = false;
-	targetBuffer->buffer = data;
-	targetBuffer->size = file_info.uncompressed_size;
+	targetBuffer.needRelease = false;
+	targetBuffer.buffer = data;
+	targetBuffer.size = file_info.uncompressed_size;
 	iter->second.second = targetBuffer;
-	*buffer = *targetBuffer;
+	*buffer = targetBuffer;
 	return true;
 }
 

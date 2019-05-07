@@ -37,8 +37,19 @@ public:
 				GM.getGamePackageManager()->readFile(GMPackageIndex::Models, fn, &buffer);
 			else
 				GM.getGamePackageManager()->readFileFromPath(fn, &buffer);
-			buffer.needRelease = false;
-			return new Assimp::MemoryIOStream(buffer.buffer, buffer.size, true);
+
+			// 如果是一个会自动释放的资源，说明这个缓存是一个来自GamePackageManager的拷贝。此时应该生成一份副本交给MemoryIOStream。
+			// 如果是一个不会自动释放的资源，说明拿到的是一个GameMachineManager缓存的原始数据，生命周期由GameMachineManager管理。
+			if (buffer.needRelease)
+			{
+				GMbyte* data = new GMbyte[buffer.size];
+				memcpy_s(data, buffer.size, buffer.buffer, buffer.size);
+				return new Assimp::MemoryIOStream(data, buffer.size, true);
+			}
+			else
+			{
+				return new Assimp::MemoryIOStream(buffer.buffer, buffer.size);
+			}
 		}
 		else
 		{

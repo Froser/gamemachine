@@ -62,7 +62,7 @@ private:
 
 private:
 	Vector<unzFile> m_ufs;
-	HashMap<GMString, Pair<GMint32, GMBuffer*>, GMStringHashFunctor> m_buffers;
+	HashMap<GMString, Pair<GMint32, GMBuffer>, GMStringHashFunctor> m_buffers;
 	GMint32 m_packageCount;
 
 protected:

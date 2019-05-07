@@ -104,6 +104,20 @@ namespace
 		contentPtr = uOffset + 16;
 		return true;
 	}
+
+	void sourceCodeToBufferW(const GMString& code, REF GMBuffer& buffer)
+	{
+		buffer.size = code.length() * sizeof(GMwchar);
+		buffer.buffer = (GMbyte*) code.c_str();
+		buffer.needRelease = false;
+	}
+
+	void sourceCodeToBufferA(const std::string& code, REF GMBuffer& buffer)
+	{
+		buffer.size = code.length();
+		buffer.buffer = (GMbyte*)code.c_str();
+		buffer.needRelease = false;
+	}
 }
 
 bool GMDx11FXC::canLoad(const GMString& code, const GMBuffer& fxcBuffer)
@@ -122,9 +136,7 @@ bool GMDx11FXC::canLoad(const GMString& code, const GMBuffer& fxcBuffer)
 	}
 
 	GMBuffer sourceCode;
-	sourceCode.size = code.length() * sizeof(GMwchar);
-	sourceCode.buffer = new GMbyte[sourceCode.size];
-	sourceCode.needRelease = true;
+	sourceCodeToBufferW(code, sourceCode);
 	GMBuffer md5;
 	GMCryptographic::hash(sourceCode, GMCryptographic::MD5, md5);
 	GM_ASSERT(md5.size == 16);
@@ -145,9 +157,7 @@ bool GMDx11FXC::compile(GMDx11FXCDescription& desc, ID3DBlob** ppCode, ID3DBlob*
 
 	GMBuffer bufCode;
 	std::string strCode = desc.code.toStdString();
-	bufCode.size = strCode.length();
-	bufCode.buffer = (GMbyte*)strCode.c_str();
-	bufCode.needRelease = false;
+	sourceCodeToBufferA(strCode, bufCode);
 
 	UINT flags1 = D3DCOMPILE_ENABLE_STRICTNESS;
 	if (desc.debug)
@@ -163,7 +173,10 @@ bool GMDx11FXC::compile(GMDx11FXCDescription& desc, ID3DBlob** ppCode, ID3DBlob*
 	else if (desc.optimizationLevel == 3)
 		flags1 |= D3DCOMPILE_OPTIMIZATION_LEVEL3;
 	else
+	{
+		flags1 |= D3DCOMPILE_OPTIMIZATION_LEVEL1;
 		gm_warning(gm_dbg_wrap("Unrecognized optimization level. Use default."));
+	}
 
 	gm_info(gm_dbg_wrap("Compiling HLSL code..."));
 	if (SUCCEEDED(D3DCompile(
@@ -244,14 +257,6 @@ bool GMDx11FXC::fillDescription(GMDx11FXCDescription* desc)
 			return false;
 	}
 
-	const GMDx11FXCDescription descDefault;
-	if (desc->optimizationLevel == descDefault.optimizationLevel)
-		desc->optimizationLevel = 1;
-	if (desc->debug == descDefault.debug)
-		desc->debug = false;
-	if (desc->treatWarningsAsErrors == descDefault.treatWarningsAsErrors)
-		desc->treatWarningsAsErrors = true;
-
 	return true;
 }
 
@@ -266,9 +271,7 @@ bool GMDx11FXC::makeFingerprints(const GMDx11FXCDescription& desc, ID3DBlob* pCo
 		return false;
 
 	GMBuffer sourceCode;
-	sourceCode.size = desc.code.length() * sizeof(GMwchar);
-	sourceCode.buffer = new GMbyte[sourceCode.size];
-	sourceCode.needRelease = true;
+	sourceCodeToBufferW(desc.code, sourceCode);
 
 	GMBuffer md5;
 	GMCryptographic::hash(sourceCode, GMCryptographic::MD5, md5);
@@ -276,29 +279,29 @@ bool GMDx11FXC::makeFingerprints(const GMDx11FXCDescription& desc, ID3DBlob* pCo
 	// 准备一块空间content，这段缓存就是最终文件的内容
 	GM_ASSERT(md5.size == 16);
 	constexpr GMsize_t HEADER_LEN = GM_HEADER_LEN + sizeof(Version) + 16; //16表示16字节的MD5
-	GMBuffer content;
-	content.size = HEADER_LEN;
-	content.buffer = new GMbyte[content.size];
+	GMBuffer header;
+	header.size = HEADER_LEN;
+	header.buffer = new GMbyte[header.size];
 
 	// 写 "GameMachine"
 	GMsize_t uOffset = GM_HEADER_LEN;
-	memcpy_s(content.buffer, content.size, GM_HEADER, uOffset);
+	memcpy_s(header.buffer, header.size, GM_HEADER, uOffset);
 
 	// 写 版本号 Major Minor
 	Version version = {
 		GM_FXC_VERSION_MAJOR,
 		GM_FXC_VERSION_MINOR,
 	};
-	memcpy_s(content.buffer + uOffset, content.size - uOffset, &version, sizeof(Version));
+	memcpy_s(header.buffer + uOffset, header.size - uOffset, &version, sizeof(Version));
 	uOffset += sizeof(Version);
 
 	// 写MD5
-	memcpy_s(content.buffer + uOffset, content.size - uOffset, md5.buffer, md5.size);
+	memcpy_s(header.buffer + uOffset, header.size - uOffset, md5.buffer, md5.size);
 	uOffset += md5.size;
 
 	// 获取编译好的二进制代码
 	SetFilePointer(hFile, 0, NULL, FILE_BEGIN);
-	if (!WriteFile(hFile, content.buffer, (DWORD) content.size, NULL, NULL))
+	if (!WriteFile(hFile, header.buffer, (DWORD) header.size, NULL, NULL))
 		return false;
 
 	if (!WriteFile(hFile, pCode->GetBufferPointer(), pCode->GetBufferSize(), NULL, NULL))

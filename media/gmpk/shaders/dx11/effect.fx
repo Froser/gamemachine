@@ -501,7 +501,7 @@ float4 GM_IlluminateRefraction(
     GMTangentSpace tangentSpace,
     float refractivity
     )
-{f
+{
     if (refractivity == 0)
         return float4(0, 0, 0, 0);
 

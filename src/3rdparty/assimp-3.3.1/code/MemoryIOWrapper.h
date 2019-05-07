@@ -59,12 +59,11 @@ class MemoryIOStream : public IOStream
 {
     //friend class MemoryIOSystem;
 public:
-    MemoryIOStream (const uint8_t* buff, size_t len, bool own = false)
+    MemoryIOStream (const uint8_t* buff, size_t len, bool ownBuffer = false)
         : buffer (buff)
         , length(len)
         , pos((size_t)0)
-        , own(own)
-    {
+        , own(ownBuffer) {
     }
 
 public:

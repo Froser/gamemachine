@@ -3,6 +3,8 @@
 #include "gmdata/gmmodel.h"
 #include "gmphysics/gmphysicsshape.h"
 
+static GMAsset s_invalid;
+
 GM_DEFINE_ASSET_GETTER(ITexture*, Texture, GMAssetType::Texture);
 GM_DEFINE_ASSET_GETTER(GMModel*, Model, GMAssetType::Model);
 GM_DEFINE_ASSET_GETTER(GMScene*, Scene, GMAssetType::Scene);
@@ -121,7 +123,6 @@ void GMAsset::removeData()
 
 const GMAsset& GMAsset::invalidAsset()
 {
-	static GMAsset s_invalid;
 	return s_invalid;
 }
 
