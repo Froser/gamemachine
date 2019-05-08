@@ -112,7 +112,7 @@ private:
 
 #define GM_DECLARE_SETTER_ACCESSOR(name, memberName, accessor, callback) \
 	accessor: \
-	template <typename T> void set##name(const T& arg) { D(d); d-> memberName = arg; callback; }
+	template <typename T> void set##name(T&& arg) { D(d); d-> memberName = std::forward<T>(arg); callback; }
 
 #define GM_DECLARE_GETTER(name, memberName) GM_DECLARE_GETTER_ACCESSOR(name, memberName, public, noop()) 
 #define GM_DECLARE_SETTER(name, memberName) GM_DECLARE_SETTER_ACCESSOR(name, memberName, public, noop()) 

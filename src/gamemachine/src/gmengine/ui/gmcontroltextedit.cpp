@@ -1026,16 +1026,16 @@ void GMControlTextEdit::resetCaretBlink()
 void GMControlTextEdit::copyToClipboard()
 {
 	D(d);
-	GMBuffer clipboardBuffer;
 	auto selectionStart = d->selectionStartCP;
 	auto selectionEnd = d->cp;
 	if (selectionStart > selectionEnd)
 		GM_SWAP(selectionStart, selectionEnd);
 
 	GMString subString = GMConvertion::toCurrentEnvironmentString(d->buffer->getBuffer().substr(selectionStart, selectionEnd - selectionStart));
-	clipboardBuffer.size = (subString.length() + 1) * sizeof(decltype(subString.c_str()[0])); //不能忘记\0
-	clipboardBuffer.buffer = const_cast<GMbyte*>(reinterpret_cast<const GMbyte*>(subString.c_str()));
-	clipboardBuffer.needRelease = false;
+	GMBuffer clipboardBuffer = GMBuffer::createBufferView(
+		const_cast<GMbyte*>(reinterpret_cast<const GMbyte*>(subString.c_str())),
+		(subString.length() + 1) * sizeof(decltype(subString.c_str()[0])) //不能忘记\0
+	);
 	GMClipboard::setData(GMClipboardMIME::UnicodeText, clipboardBuffer);
 }
 
@@ -1045,7 +1045,7 @@ void GMControlTextEdit::pasteFromClipboard()
 	GMScopeTransaction st(&d->transactionContext);
 	deleteSelectionText();
 	GMBuffer clipboardBuffer = GMClipboard::getData(GMClipboardMIME::UnicodeText);
-	GMString string(reinterpret_cast<GMwchar*>(clipboardBuffer.buffer));
+	GMString string(reinterpret_cast<GMwchar*>(clipboardBuffer.getData()));
 	string = string.replace("\r", "").replace("\n", "").replace("\t", " ");
 	if (d->buffer->insertString(d->cp, string))
 	{
@@ -1410,7 +1410,7 @@ void GMControlTextArea::pasteFromClipboard()
 	D_BASE(d, Base);
 	deleteSelectionText();
 	GMBuffer clipboardBuffer = GMClipboard::getData(GMClipboardMIME::UnicodeText);
-	GMString string(reinterpret_cast<GMwchar*>(clipboardBuffer.buffer));
+	GMString string(reinterpret_cast<GMwchar*>(clipboardBuffer.getData()));
 	string = GMConvertion::toCurrentEnvironmentString(string).replace("\t", " ");
 	if (d->buffer->insertString(d->cp, string))
 	{

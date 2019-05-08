@@ -1,86 +1,160 @@
 ﻿#include "stdafx.h"
 #include "gmbuffer.h"
+#include "foundation/debug.h"
 
-GMBuffer::~GMBuffer()
+GMBuffer::GMBuffer()
+	: isOwned(true)
+	, size(0)
+	, data(nullptr)
+	, ref(nullptr)
 {
-	if (needRelease)
+}
+
+GMBuffer::GMBuffer(const GMBuffer& buf)
+	: GMBuffer()
+{
+	*this = buf;
+}
+
+GMBuffer::GMBuffer(GMBuffer&& buf) GM_NOEXCEPT
+	: GMBuffer()
+{
+	*this = std::move(buf);
+}
+
+GMBuffer::GMBuffer(GMbyte* rhs, GMsize_t sz, bool owned)
+	: GMBuffer()
+{
+	ref = new GMAtomic<GMuint32>(1);
+	isOwned = owned;
+	size = sz;
+	if (isOwned)
 	{
-		GM_delete_array(buffer);
-	}
-}
-
-GMBuffer::GMBuffer(const GMBuffer& rhs)
-{
-	*this = rhs;
-}
-
-GMBuffer::GMBuffer(GMBuffer&& rhs) GM_NOEXCEPT
-{
-	swap(rhs);
-}
-
-GMBuffer& GMBuffer::operator =(GMBuffer&& rhs) GM_NOEXCEPT
-{
-	swap(rhs);
-	return *this;
-}
-
-GMBuffer& GMBuffer::operator =(const GMBuffer& rhs)
-{
-	this->needRelease = rhs.needRelease;
-	if (rhs.needRelease)
-	{
-		this->size = rhs.size;
-		buffer = new GMbyte[this->size];
-		memcpy_s(buffer, size, rhs.buffer, this->size);
+		data = new GMbyte[size];
+		if (rhs)
+			memcpy_s(data, size, rhs, size);
 	}
 	else
 	{
-		this->size = rhs.size;
-		this->buffer = rhs.buffer;
+		data = rhs;
+	}
+}
+
+GMBuffer::GMBuffer(GMBuffer& buf, GMsize_t offset)
+	: GMBuffer()
+{
+	isOwned = false;
+	data = buf.getData() + offset;
+	size = buf.getSize() - offset;
+}
+
+GMBuffer::~GMBuffer()
+{
+	releaseRef();
+}
+
+GMBuffer& GMBuffer::operator=(const GMBuffer& rhs)
+{
+	if (this != &rhs)
+	{
+		releaseRef();
+		size = rhs.size;
+		data = rhs.data;
+		ref = rhs.ref;
+		isOwned = rhs.isOwned;
+		addRef();
 	}
 	return *this;
 }
 
-void GMBuffer::convertToStringBuffer()
+GMBuffer& GMBuffer::operator=(GMBuffer&& rhs) GM_NOEXCEPT
 {
-	GMbyte* newBuffer = new GMbyte[size + 1];
-	memcpy_s(newBuffer, size, buffer, size);
-	newBuffer[size] = 0;
-	size++;
-	if (needRelease && buffer)
-		GM_delete_array(buffer);
-	needRelease = true;
-	buffer = newBuffer;
+	swap(rhs);
+	return *this;
 }
 
-void GMBuffer::convertToStringBufferW()
+GMBuffer GMBuffer::createBufferView(const GMBuffer& buf, GMsize_t offset)
 {
-	GMwchar* newBuffer = new GMwchar[size + 1];
-	memcpy_s(newBuffer, size, buffer, size);
-	newBuffer[size] = 0;
-	size += sizeof(GMwchar);
-	if (needRelease && buffer)
-		GM_delete_array(buffer);
-	needRelease = true;
-	buffer = reinterpret_cast<GMbyte*>(newBuffer);
+	return GMBuffer(const_cast<GMBuffer&>(buf), offset);
+}
+
+GMBuffer GMBuffer::createBufferView(GMbyte* data, GMsize_t size)
+{
+	return GMBuffer(data, size, false);
+}
+
+const GMbyte* GMBuffer::getData() const
+{
+	return data;
+}
+
+GMbyte* GMBuffer::getData()
+{
+	return data;
+}
+
+GMsize_t GMBuffer::getSize() const
+{
+	return size;
+}
+
+bool GMBuffer::isOwnedBuffer() const
+{
+	return isOwned;
+}
+
+void GMBuffer::resize(GMsize_t sz, GMbyte* d)
+{
+	if (sz > size)
+	{
+		*this = GMBuffer(d, sz, true);
+	}
+	else if (sz < size)
+	{
+		size = sz;
+		if (d)
+			memcpy_s(data, size, d, size);
+	}
 }
 
 void GMBuffer::swap(GMBuffer& rhs)
 {
-	GM_SWAP(buffer, rhs.buffer);
-	GM_SWAP(size, rhs.size);
-	GM_SWAP(needRelease, rhs.needRelease);
+	if (this != &rhs)
+	{
+		std::swap(size, rhs.size);
+		std::swap(data, rhs.data);
+		std::swap(ref, rhs.ref);
+		std::swap(isOwned, rhs.isOwned);
+	}
 }
 
-GMBufferView::GMBufferView(const GMBuffer& rhs, GMsize_t offset)
+void GMBuffer::convertToStringBuffer()
 {
-	buffer = rhs.buffer + offset;
-	size = rhs.size - offset;
-	needRelease = false;
+	GMBuffer buf;
+	buf.resize(size + 1);
+	memcpy_s(buf.data, size, data, size);
+	// 在末尾补0
+	buf.data[size] = 0;
+	*this = buf;
 }
 
-GMBufferView::~GMBufferView()
+void GMBuffer::addRef()
 {
-	GM_ASSERT(!needRelease);
+	if (ref)
+		++(*ref);
+}
+
+void GMBuffer::releaseRef()
+{
+	if (ref)
+	{
+		--(*ref);
+		if (*ref == 0)
+		{
+			size = 0;
+			GM_delete(ref);
+			if (isOwnedBuffer())
+				GM_delete_array(data);
+		}
+	}
 }

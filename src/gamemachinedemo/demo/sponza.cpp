@@ -18,37 +18,37 @@ namespace
 		{
 			gm::GMBuffer buf;
 			pk->readFile(gm::GMPackageIndex::Textures, "cubemap/cubemap_posx.jpg", &buf);
-			gm::GMImageReader::load(buf.buffer, buf.size, &slices[0]);
+			gm::GMImageReader::load(buf.getData(), buf.getSize(), &slices[0]);
 			GM_ASSERT(slices[0]);
 		}
 		{
 			gm::GMBuffer buf;
 			pk->readFile(gm::GMPackageIndex::Textures, "cubemap/cubemap_negx.jpg", &buf);
-			gm::GMImageReader::load(buf.buffer, buf.size, &slices[1]);
+			gm::GMImageReader::load(buf.getData(), buf.getSize(), &slices[1]);
 			GM_ASSERT(slices[1]);
 		}
 		{
 			gm::GMBuffer buf;
 			pk->readFile(gm::GMPackageIndex::Textures, "cubemap/cubemap_posy.jpg", &buf);
-			gm::GMImageReader::load(buf.buffer, buf.size, &slices[2]);
+			gm::GMImageReader::load(buf.getData(), buf.getSize(), &slices[2]);
 			GM_ASSERT(slices[2]);
 		}
 		{
 			gm::GMBuffer buf;
 			pk->readFile(gm::GMPackageIndex::Textures, "cubemap/cubemap_negy.jpg", &buf);
-			gm::GMImageReader::load(buf.buffer, buf.size, &slices[3]);
+			gm::GMImageReader::load(buf.getData(), buf.getSize(), &slices[3]);
 			GM_ASSERT(slices[3]);
 		}
 		{
 			gm::GMBuffer buf;
 			pk->readFile(gm::GMPackageIndex::Textures, "cubemap/cubemap_posz.jpg", &buf);
-			gm::GMImageReader::load(buf.buffer, buf.size, &slices[4]);
+			gm::GMImageReader::load(buf.getData(), buf.getSize(), &slices[4]);
 			GM_ASSERT(slices[4]);
 		}
 		{
 			gm::GMBuffer buf;
 			pk->readFile(gm::GMPackageIndex::Textures, "cubemap/cubemap_negz.jpg", &buf);
-			gm::GMImageReader::load(buf.buffer, buf.size, &slices[5]);
+			gm::GMImageReader::load(buf.getData(), buf.getSize(), &slices[5]);
 			GM_ASSERT(slices[5]);
 		}
 

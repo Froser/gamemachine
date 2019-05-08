@@ -64,12 +64,13 @@ bool GMUIParser<0>::Parse(GMUIConfiguration& configuration, GMXMLElement* root)
 
 				// 解析纹理
 				std::string textureAssetBase64 = textureElement->GetText();
-				GMBuffer textureBufferBase64;
-				textureBufferBase64.buffer = (GMbyte*)(textureAssetBase64.data());
-				textureBufferBase64.size = textureAssetBase64.length() + 1;
+				GMBuffer textureBufferBase64 = GMBuffer::createBufferView(
+					(GMbyte*)(textureAssetBase64.data()),
+					textureAssetBase64.length() + 1
+				);
 				GMBuffer texBuffer = GMConvertion::fromBase64(textureBufferBase64);
 				GMImage* image = nullptr;
-				GMImageReader::load(texBuffer.buffer, texBuffer.size, GMImageReader::ImageType_AUTO, &image);
+				GMImageReader::load(texBuffer.getData(), texBuffer.getSize(), GMImageReader::ImageType_AUTO, &image);
 				if (!image)
 				{
 					gm_warning(gm_dbg_wrap("Unrecognized image format, id = {0}, skipped."), GMString(id));
@@ -156,7 +157,7 @@ void GMUIConfiguration::initWidget(GMWidget* widget)
 bool GMUIConfiguration::import(const GMBuffer& buffer)
 {
 	GMXMLDocument xmlDocument;
-	GMXMLError err = xmlDocument.Parse(reinterpret_cast<const char*>(buffer.buffer), buffer.size);
+	GMXMLError err = xmlDocument.Parse(reinterpret_cast<const char*>(buffer.getData()), buffer.getSize());
 	if (err != GMXMLError::XML_SUCCESS)
 	{
 		gm_error(gm_dbg_wrap("Error in reading UI files. Reason: {0}"), xmlDocument.ErrorStr());

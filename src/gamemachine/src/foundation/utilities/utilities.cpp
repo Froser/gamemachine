@@ -543,7 +543,7 @@ GMTextureAsset GMToolUtil::createTexture(const IRenderContext* context, const GM
 	GMImage* img = nullptr;
 	GMBuffer buf;
 	GM.getGamePackageManager()->readFile(GMPackageIndex::Textures, filename, &buf);
-	GMImageReader::load(buf.buffer, buf.size, &img);
+	GMImageReader::load(buf.getData(), buf.getSize(), &img);
 	GM_ASSERT(img);
 
 	GMTextureAsset texture;
@@ -565,7 +565,7 @@ void GMToolUtil::createTextureFromFullPath(const IRenderContext* context, const 
 	GMImage* img = nullptr;
 	GMBuffer buf;
 	GM.getGamePackageManager()->readFileFromPath(filename, &buf);
-	GMImageReader::load(buf.buffer, buf.size, &img);
+	GMImageReader::load(buf.getData(), buf.getSize(), &img);
 	GM_ASSERT(img);
 
 	GM.getFactory()->createTexture(context, img, texture);
@@ -610,14 +610,14 @@ bool GMToolUtil::createPBRTextures(
 	GMImage* metallicImg = nullptr, *roughnessImg = nullptr, *aoImg = nullptr;
 
 	GM.getGamePackageManager()->readFile(GMPackageIndex::Textures, metallicPath, &metallicBuf);
-	if (!GMImageReader::load(metallicBuf.buffer, metallicBuf.size, &metallicImg))
+	if (!GMImageReader::load(metallicBuf.getData(), metallicBuf.getSize(), &metallicImg))
 	{
 		GM_delete(metallicImg);
 		return false;
 	}
 
 	GM.getGamePackageManager()->readFile(GMPackageIndex::Textures, roughnessPath, &roughnessBuf);
-	if (!GMImageReader::load(roughnessBuf.buffer, roughnessBuf.size, &roughnessImg))
+	if (!GMImageReader::load(roughnessBuf.getData(), roughnessBuf.getSize(), &roughnessImg))
 	{
 		GM_delete(metallicImg);
 		GM_delete(roughnessImg);
@@ -627,7 +627,7 @@ bool GMToolUtil::createPBRTextures(
 	if (!useWhiteAO)
 	{
 		GM.getGamePackageManager()->readFile(GMPackageIndex::Textures, aoPath, &aoBuf);
-		if (!GMImageReader::load(aoBuf.buffer, aoBuf.size, &aoImg))
+		if (!GMImageReader::load(aoBuf.getData(), aoBuf.getSize(), &aoImg))
 		{
 			GM_delete(metallicImg);
 			GM_delete(roughnessImg);

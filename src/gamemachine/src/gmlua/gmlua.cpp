@@ -231,7 +231,7 @@ GMLuaResult GMLua::runBuffer(const GMBuffer& buffer)
 	D(d);
 	GM_ASSERT(L);
 	loadLibrary();
-	GMLuaStates s = static_cast<GMLuaStates>(luaL_loadbuffer(L, (const char*)buffer.buffer, buffer.size, 0));
+	GMLuaStates s = static_cast<GMLuaStates>(luaL_loadbuffer(L, (const char*)buffer.getData(), buffer.getSize(), 0));
 	GMLuaResult lr = { s };
 	CHECK(lr);
 	lr = { static_cast<GMLuaStates>(lua_pcall(L, 0, LUA_MULTRET, 0)) };

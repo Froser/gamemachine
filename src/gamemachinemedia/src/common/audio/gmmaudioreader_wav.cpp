@@ -108,7 +108,7 @@ bool GMMAudioReader_Wav::load(gm::GMBuffer& buffer, OUT gm::IAudioFile** f)
 bool GMMAudioReader_Wav::test(const gm::GMBuffer& buffer)
 {
 	WAVEFILEHEADER header;
-	gm::GMMemoryStream ms(buffer.buffer, buffer.size);
+	gm::GMMemoryStream ms(buffer.getData(), buffer.getSize());
 	ms.read((gm::GMbyte*)&header, sizeof(header));
 	return strnEqual(header.szRIFF, "RIFF", 4) && strnEqual(header.szWAVE, "WAVE", 4);
 }

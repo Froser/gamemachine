@@ -38,12 +38,12 @@ namespace
 
 		virtual LPVOID STDMETHODCALLTYPE GetBufferPointer(void)
 		{
-			return buf.buffer;
+			return buf.getData();
 		}
 
 		virtual SIZE_T STDMETHODCALLTYPE GetBufferSize(void)
 		{
-			return buf.size;
+			return buf.getSize();
 		}
 
 		STDMETHOD(QueryInterface)(REFIID iid, LPVOID *ppv)
@@ -56,12 +56,12 @@ namespace
 			return E_NOINTERFACE;
 		}
 
-		ULONG AddRef()
+		STDMETHOD_(ULONG, AddRef)()
 		{
 			return ++refCount;
 		}
 
-		ULONG Release()
+		STDMETHOD_(ULONG, Release)()
 		{
 			if (--refCount > 0)
 			{
@@ -75,6 +75,13 @@ namespace
 			return 0;
 		}
 
+	public:
+		template <typename T>
+		static void createBlob(T&& buffer, OUT ID3DBlob** ppBlob)
+		{
+			if (ppBlob)
+				*ppBlob = new GMBlob(std::forward<T>(buffer));
+		}
 
 	private:
 		GMBuffer buf;
@@ -89,17 +96,17 @@ namespace
 
 	bool getFileHeaders(const GMBuffer& fxcBuffer, Version& version, GMbyte fingerprints[16], OUT GMsize_t& contentPtr)
 	{
-		GM_ASSERT(fxcBuffer.buffer);
+		GM_ASSERT(fxcBuffer.getData());
 
 		GMsize_t uOffset = 0;
-		if (memcmp(fxcBuffer.buffer, GM_HEADER, GM_HEADER_LEN) != 0)
+		if (memcmp(fxcBuffer.getData(), GM_HEADER, GM_HEADER_LEN) != 0)
 			return false;
 
 		uOffset += GM_HEADER_LEN;
-		memcpy_s(&version, sizeof(Version), fxcBuffer.buffer + uOffset, sizeof(Version));
+		memcpy_s(&version, sizeof(Version), fxcBuffer.getData() + uOffset, sizeof(Version));
 
 		uOffset += sizeof(Version);
-		memcpy_s(fingerprints, 16, fxcBuffer.buffer + uOffset, 16);
+		memcpy_s(fingerprints, 16, fxcBuffer.getData() + uOffset, 16);
 
 		contentPtr = uOffset + 16;
 		return true;
@@ -107,22 +114,18 @@ namespace
 
 	void sourceCodeToBufferW(const GMString& code, REF GMBuffer& buffer)
 	{
-		buffer.size = code.length() * sizeof(GMwchar);
-		buffer.buffer = (GMbyte*) code.c_str();
-		buffer.needRelease = false;
+		buffer = GMBuffer::createBufferView((GMbyte*)code.c_str(), code.length() * sizeof(GMwchar));
 	}
 
 	void sourceCodeToBufferA(const std::string& code, REF GMBuffer& buffer)
 	{
-		buffer.size = code.length();
-		buffer.buffer = (GMbyte*)code.c_str();
-		buffer.needRelease = false;
+		buffer = GMBuffer::createBufferView((GMbyte*)code.c_str(), code.length());
 	}
 }
 
 bool GMDx11FXC::canLoad(const GMString& code, const GMBuffer& fxcBuffer)
 {
-	if (!fxcBuffer.buffer)
+	if (!fxcBuffer.getData())
 		return false;
 
 	// 检查Header
@@ -139,9 +142,9 @@ bool GMDx11FXC::canLoad(const GMString& code, const GMBuffer& fxcBuffer)
 	sourceCodeToBufferW(code, sourceCode);
 	GMBuffer md5;
 	GMCryptographic::hash(sourceCode, GMCryptographic::MD5, md5);
-	GM_ASSERT(md5.size == 16);
+	GM_ASSERT(md5.getSize() == 16);
 
-	if (memcmp(fileFingerprints, md5.buffer, md5.size) != 0)
+	if (memcmp(fileFingerprints, md5.getData(), md5.getSize()) != 0)
 	{
 		gm_warning(gm_dbg_wrap("Shader code doesn't match fxc file."));
 		return false;
@@ -180,8 +183,8 @@ bool GMDx11FXC::compile(GMDx11FXCDescription& desc, ID3DBlob** ppCode, ID3DBlob*
 
 	gm_info(gm_dbg_wrap("Compiling HLSL code..."));
 	if (SUCCEEDED(D3DCompile(
-		bufCode.buffer,
-		bufCode.size,
+		bufCode.getData(),
+		bufCode.getSize(),
 		NULL,
 		NULL,
 		0,
@@ -207,8 +210,9 @@ bool GMDx11FXC::load(const GMBuffer& shaderBuffer, ID3D11Device* pDevice, ID3DX1
 	getFileHeaders(shaderBuffer, version, fingerprints, uOffset);
 	if (version.major == 1 && version.minor == 0)
 	{
-		GMBufferView gfxView (shaderBuffer, uOffset);
-		GMComPtr<ID3DBlob> shaderBufferBlob = new GMBlob(gfxView);
+		const GMBuffer gfxView = GMBuffer::createBufferView(shaderBuffer, uOffset);
+		GMComPtr<ID3DBlob> shaderBufferBlob;
+		GMBlob::createBlob(gfxView, &shaderBufferBlob);
 		return SUCCEEDED(D3DX11CreateEffectFromMemory(
 			shaderBufferBlob->GetBufferPointer(),
 			shaderBufferBlob->GetBufferSize(),
@@ -234,10 +238,8 @@ bool GMDx11FXC::tryLoadCache(GMDx11FXCDescription& desc, ID3D11Device* pDevice, 
 
 	GMBuffer buf;
 	DWORD dwSize = GetFileSize(hFile, NULL);
-	buf.buffer = new GMbyte[dwSize];
-	buf.size = dwSize;
-	buf.needRelease = true;
-	ReadFile(hFile, buf.buffer, (DWORD) buf.size, NULL, NULL);
+	buf.resize(dwSize);
+	ReadFile(hFile, buf.getData(), (DWORD) buf.getSize(), NULL, NULL);
 	CloseHandle(hFile);
 
 	return (canLoad(desc.code, buf) && load(buf, pDevice, ppEffect));
@@ -277,31 +279,30 @@ bool GMDx11FXC::makeFingerprints(const GMDx11FXCDescription& desc, ID3DBlob* pCo
 	GMCryptographic::hash(sourceCode, GMCryptographic::MD5, md5);
 
 	// 准备一块空间content，这段缓存就是最终文件的内容
-	GM_ASSERT(md5.size == 16);
+	GM_ASSERT(md5.getSize() == 16);
 	constexpr GMsize_t HEADER_LEN = GM_HEADER_LEN + sizeof(Version) + 16; //16表示16字节的MD5
 	GMBuffer header;
-	header.size = HEADER_LEN;
-	header.buffer = new GMbyte[header.size];
+	header.resize(HEADER_LEN);
 
 	// 写 "GameMachine"
 	GMsize_t uOffset = GM_HEADER_LEN;
-	memcpy_s(header.buffer, header.size, GM_HEADER, uOffset);
+	memcpy_s(header.getData(), header.getSize(), GM_HEADER, uOffset);
 
 	// 写 版本号 Major Minor
 	Version version = {
 		GM_FXC_VERSION_MAJOR,
 		GM_FXC_VERSION_MINOR,
 	};
-	memcpy_s(header.buffer + uOffset, header.size - uOffset, &version, sizeof(Version));
+	memcpy_s(header.getData() + uOffset, header.getSize() - uOffset, &version, sizeof(Version));
 	uOffset += sizeof(Version);
 
 	// 写MD5
-	memcpy_s(header.buffer + uOffset, header.size - uOffset, md5.buffer, md5.size);
-	uOffset += md5.size;
+	memcpy_s(header.getData() + uOffset, header.getSize() - uOffset, md5.getData(), md5.getSize());
+	uOffset += md5.getSize();
 
 	// 获取编译好的二进制代码
 	SetFilePointer(hFile, 0, NULL, FILE_BEGIN);
-	if (!WriteFile(hFile, header.buffer, (DWORD) header.size, NULL, NULL))
+	if (!WriteFile(hFile, header.getData(), (DWORD) header.getSize(), NULL, NULL))
 		return false;
 
 	if (!WriteFile(hFile, pCode->GetBufferPointer(), pCode->GetBufferSize(), NULL, NULL))

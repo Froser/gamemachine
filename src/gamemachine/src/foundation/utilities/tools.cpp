@@ -469,13 +469,11 @@ GMBuffer GMConvertion::fromBase64(const GMBuffer& base64)
 	GMuint32 buf = 0;
 	GMint32 nbits = 0;
 	GMBuffer tmp;
-	tmp.size = (base64.size * 3) / 4;
-	tmp.buffer = new GMbyte[tmp.size];
-	tmp.needRelease = true;
+	tmp.resize((base64.getSize() * 3) / 4);
 
 	GMsize_t offset = 0;
-	for (GMsize_t i = 0; i < base64.size; ++i) {
-		GMint32 ch = base64.buffer[i];
+	for (GMsize_t i = 0; i < base64.getSize(); ++i) {
+		GMint32 ch = base64.getData()[i];
 		GMint32 d;
 
 		if (ch >= 'A' && ch <= 'Z')
@@ -496,13 +494,13 @@ GMBuffer GMConvertion::fromBase64(const GMBuffer& base64)
 			nbits += 6;
 			if (nbits >= 8) {
 				nbits -= 8;
-				tmp.buffer[offset++] = buf >> nbits;
+				tmp.getData()[offset++] = buf >> nbits;
 				buf &= (1 << nbits) - 1;
 			}
 		}
 	}
 
-	tmp.size = offset;
+	tmp.resize(offset);
 	return std::move(tmp);
 }
 
@@ -514,25 +512,23 @@ GMBuffer GMConvertion::toBase64(const GMBuffer& buffer)
 	int padlen = 0;
 
 	GMBuffer tmp;
-	tmp.size = (buffer.size * 4) / 3 + 3;
-	tmp.buffer = new GMbyte[tmp.size];
-	tmp.needRelease = true;
+	tmp.resize((buffer.getSize() * 4) / 3 + 3);
 
 	GMsize_t i = 0;
-	char *out = reinterpret_cast<char*>(tmp.buffer);
-	while (i < buffer.size)
+	char *out = reinterpret_cast<char*>(tmp.getData());
+	while (i < buffer.getSize())
 	{
 		int chunk = 0;
-		chunk |= (int)((unsigned char)(buffer.buffer[i++])) << 16;
-		if (i == buffer.size)
+		chunk |= (int)((unsigned char)(buffer.getData()[i++])) << 16;
+		if (i == buffer.getSize())
 		{
 			padlen = 2;
 		}
 		else
 		{
-			chunk |= (int)((unsigned char)(buffer.buffer[i++])) << 8;
-			if (i == buffer.size) padlen = 1;
-			else chunk |= (int)((unsigned char)(buffer.buffer[i++]));
+			chunk |= (int)((unsigned char)(buffer.getData()[i++])) << 8;
+			if (i == buffer.getSize()) padlen = 1;
+			else chunk |= (int)((unsigned char)(buffer.getData()[i++]));
 		}
 
 		int j = (chunk & 0x00fc0000) >> 18;
@@ -547,7 +543,7 @@ GMBuffer GMConvertion::toBase64(const GMBuffer& buffer)
 		else *out++ = alphabet[m];
 	}
 
-	tmp.size = (out - reinterpret_cast<char*>(tmp.buffer));
+	tmp.resize(out - reinterpret_cast<char*>(tmp.getData()));
 	return tmp;
 }
 
@@ -557,16 +553,14 @@ GMZip::ErrorCode GMZip::inflate(const GMBuffer& buf, REF GMBuffer& out, GMsize_t
 	if (!sizeHint)
 		sizeHint = 1;
 
-	out.buffer = new GMbyte[sizeHint];
-	out.size = sizeHint;
-	out.needRelease = true;
+	out.resize(sizeHint);
 	z_stream stream;
 	stream.zalloc = (alloc_func)0;
 	stream.zfree = (free_func)0;
 	stream.opaque = (voidpf)0;
-	stream.next_in = buf.buffer;
-	stream.avail_in = (uInt) buf.size;
-	stream.next_out = out.buffer;
+	stream.next_in = (z_const Bytef *) buf.getData();
+	stream.avail_in = (uInt) buf.getSize();
+	stream.next_out = out.getData();
 	stream.avail_out = (uInt) sizeHint;
 	GMint32 err = Z_OK;
 	if ((err = inflateInit2(&stream, MAX_WBITS + 32)) != Z_OK)
@@ -597,17 +591,15 @@ GMZip::ErrorCode GMZip::inflate(const GMBuffer& buf, REF GMBuffer& out, GMsize_t
 		if (err != Z_STREAM_END)
 		{
 			// 内存不够的情况，重新生成一段数据
-			GM_delete_array(out.buffer);
 			GMsize_t newSize = sizeHint * (++sizeIncFactor);
-			out.buffer = new GMbyte[sizeHint];
-			out.size = sizeHint;
-			stream.next_out = out.buffer + sizeHint;
+			out.resize(newSize);
+			stream.next_out = out.getData() + sizeHint;
 			stream.avail_out = (uInt) sizeHint;
 			sizeHint *= sizeIncFactor;
 		}
 	}
 
-	out.size = sizeHint - stream.avail_out;
+	out.resize(sizeHint - stream.avail_out);
 	return translateError(inflateEnd(&stream));
 }
 

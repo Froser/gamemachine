@@ -32,7 +32,7 @@ namespace
 
 	FT_Error loadFace(const GMBuffer& buffer, FT_Face* face)
 	{
-		FT_Error err = FT_New_Memory_Face(g_lib.library, buffer.buffer, (FT_Long) buffer.size, 0, face);
+		FT_Error err = FT_New_Memory_Face(g_lib.library, buffer.getData(), (FT_Long) buffer.getSize(), 0, face);
 		return err;
 	}
 }

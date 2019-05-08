@@ -56,7 +56,6 @@ private:
 	void initFiles();
 	bool loadZip();
 	void releaseUnzFile();
-	void releaseBuffers();
 	GMString fromRelativePath(const GMString& in);
 	bool loadBuffer(const GMString& path, REF GMBuffer* buffer);
 

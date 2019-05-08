@@ -314,9 +314,9 @@ void GMParticleModel::render(const IRenderContext* context)
 			// 获取并设置纹理
 			GMImage* image = nullptr;
 			auto& buffer = d->system->getTextureBuffer();
-			if (buffer.buffer)
+			if (buffer.getData())
 			{
-				GMImageReader::load(buffer.buffer, buffer.size, &image);
+				GMImageReader::load(buffer.getData(), buffer.getSize(), &image);
 				if (image)
 				{
 					GMTextureAsset texture;

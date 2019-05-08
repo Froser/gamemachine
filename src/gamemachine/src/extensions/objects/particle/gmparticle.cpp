@@ -301,8 +301,7 @@ GMParticleDescription GMParticleSystem::createParticleDescriptionFromCocos2DPlis
 	// 如果存在Base64形式的粒子纹理，优先处理
 	if (!imageData.empty())
 	{
-		buf.buffer = (GMbyte*)(imageData.data());
-		buf.size = imageData.length() + 1; // \0
+		buf = GMBuffer::createBufferView((GMbyte*)(imageData.data()), imageData.length() + 1);
 
 		// Cocos2D 的纹理数据压缩过了，所以要解压
 		enum
@@ -339,7 +338,7 @@ void GMParticleSystem::createCocos2DParticleSystem(
 		buf.convertToStringBuffer();
 
 		*particleSystem = new GMParticleSystem();
-		GMParticleDescription description = GMParticleSystem::createParticleDescriptionFromCocos2DPlist(gm::GMString((const char*)buf.buffer), modelType);
+		GMParticleDescription description = GMParticleSystem::createParticleDescriptionFromCocos2DPlist(gm::GMString((const char*)buf.getData()), modelType);
 		if (descriptionCallback)
 			descriptionCallback(description);
 

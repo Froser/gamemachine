@@ -19,7 +19,7 @@ namespace
 		GMString filename;
 		GM.getGamePackageManager()->readFile(GMPackageIndex::Shaders, path, &buffer, &filename);
 		buffer.convertToStringBuffer();
-		return GMString((const char*)buffer.buffer);
+		return GMString((const char*)buffer.getData());
 	}
 }
 

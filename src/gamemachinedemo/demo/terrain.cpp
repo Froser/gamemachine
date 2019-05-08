@@ -18,7 +18,7 @@ void Demo_Terrain::init()
 	GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Textures, "map.png", &map);
 
 	gm::GMImage* imgMap = nullptr;
-	gm::GMImageReader::load(map.buffer, map.size, &imgMap);
+	gm::GMImageReader::load(map.getData(), map.getSize(), &imgMap);
 
 	gm::GMTerrainDescription desc = {
 		imgMap->getData().mip[0].data,

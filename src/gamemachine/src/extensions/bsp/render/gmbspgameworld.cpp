@@ -653,7 +653,7 @@ bool GMBSPGameWorld::findTexture(const GMString& textureFilename, OUT GMImage** 
 		if (!pk->readFile(GMPackageIndex::Textures, fn, &buf))
 			continue;
 
-		if (GMImageReader::load(buf.buffer, buf.size, img))
+		if (GMImageReader::load(buf.getData(), buf.getSize(), img))
 		{
 			gm_info(gm_dbg_wrap("loaded texture {0}"), fn);
 			return true;

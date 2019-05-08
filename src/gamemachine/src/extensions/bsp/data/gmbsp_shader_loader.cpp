@@ -83,7 +83,7 @@ namespace
 
 	void loadImage(const GMString& filename, const GMBuffer* buf, OUT GMImage** image)
 	{
-		if (GMImageReader::load(buf->buffer, buf->size, image))
+		if (GMImageReader::load(buf->getData(), buf->getSize(), image))
 			gm_info(gm_dbg_wrap("loaded texture {0} from shader"), filename);
 		else
 			gm_error(gm_dbg_wrap("texture {0} not found"), filename);
@@ -165,7 +165,7 @@ void GMBSPShaderLoader::load()
 	GMBuffer buf;
 	pk->readFileFromPath(pk->pathOf(GMPackageIndex::Root, L"/texshaders/sfx"), &buf);
 	buf.convertToStringBuffer();
-	parse((const char*) buf.buffer);
+	parse((const char*) buf.getData());
 }
 
 bool GMBSPShaderLoader::findItem(const GMString& name, GMint32 lightmapId, REF GMShader* shader)

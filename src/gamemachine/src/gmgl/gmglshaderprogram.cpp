@@ -362,7 +362,7 @@ void GMGLShaderProgram::expandInclude(const GMString& workingDir, const GMString
 	if (GM.getGamePackageManager()->readFileFromPath(include, &buf))
 	{
 		buf.convertToStringBuffer();
-		source = expandSource(include, GMString((char*)buf.buffer)) + GM_CRLF;
+		source = expandSource(include, GMString((char*)buf.getData())) + GM_CRLF;
 	}
 	else
 	{

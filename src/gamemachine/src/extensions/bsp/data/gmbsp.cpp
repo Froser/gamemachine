@@ -150,7 +150,7 @@ BSPData& GMBSP::bspData()
 void GMBSP::swapBsp()
 {
 	D(d);
-	d->header = (GMBSPHeader*)d->buffer->buffer;
+	d->header = (GMBSPHeader*)d->buffer->getData();
 
 	if (d->header->ident != BSP_IDENT) {
 		gm_error(gm_dbg_wrap("Invalid IBSP file"));

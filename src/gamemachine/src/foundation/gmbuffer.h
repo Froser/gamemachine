@@ -1,36 +1,45 @@
 ﻿#ifndef __GMBUFFER_H__
 #define __GMBUFFER_H__
-#include <gmcommon.h>
+#include <defines.h>
 BEGIN_NS
 
-// 缓存类，用于存储缓存数据
 class GM_EXPORT GMBuffer : public IDestroyObject
 {
 public:
-	GMBuffer() = default;
+	GMBuffer();
+	GMBuffer(const GMBuffer&);
+	GMBuffer(GMBuffer&&) GM_NOEXCEPT;
+	GMBuffer(GMbyte* data, GMsize_t size, bool isOwned = true);
 	~GMBuffer();
 
-	GMBuffer(const GMBuffer& rhs);
-	GMBuffer(GMBuffer&& rhs) GM_NOEXCEPT;
-	GMBuffer& operator =(GMBuffer&& rhs) GM_NOEXCEPT;
-	GMBuffer& operator =(const GMBuffer& rhs);
+	GMBuffer& operator=(const GMBuffer&);
+	GMBuffer& operator=(GMBuffer&&) GM_NOEXCEPT;
+
+private:
+	GMBuffer(GMBuffer& buf, GMsize_t offset);
 
 public:
-	void convertToStringBuffer();
-	void convertToStringBufferW();
+	static GMBuffer createBufferView(const GMBuffer& buf, GMsize_t offset);
+	static GMBuffer createBufferView(GMbyte* data, GMsize_t size);
+
+public:
+	const GMbyte* getData() const;
+	GMbyte* getData();
+	GMsize_t getSize() const;
+	bool isOwnedBuffer() const;
+	void resize(GMsize_t, GMbyte* = nullptr);
 	void swap(GMBuffer& rhs);
+	void convertToStringBuffer();
 
-public:
-	GMbyte* buffer = nullptr;
-	GMsize_t size = 0;
-	bool needRelease = false; // 表示是否需要手动释放
-};
+private:
+	void addRef();
+	void releaseRef();
 
-class GM_EXPORT GMBufferView : public GMBuffer
-{
-public:
-	GMBufferView(const GMBuffer&, GMsize_t offset);
-	~GMBufferView();
+private:
+	GMbyte* data;
+	GMsize_t size;
+	GMAtomic<GMuint32>* ref;
+	bool isOwned;
 };
 
 END_NS

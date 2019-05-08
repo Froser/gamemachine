@@ -103,7 +103,7 @@ void GMDx11Helper::loadShader(
 
 	GMRenderTechniques techs;
 	GMRenderTechnique tech(GMShaderType::Effect);
-	tech.setCode(GMRenderEnvironment::DirectX11, GMString(reinterpret_cast<const char*>(buf.buffer)));
+	tech.setCode(GMRenderEnvironment::DirectX11, GMString(reinterpret_cast<const char*>(buf.getData())));
 	tech.setPath(GMRenderEnvironment::DirectX11, path);
 	tech.setPrefetch(GMRenderEnvironment::DirectX11, gfxCandidate);
 	techs.addRenderTechnique(tech);

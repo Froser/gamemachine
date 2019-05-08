@@ -113,9 +113,9 @@ bool GMGLHelper::loadShader(
 		vertBuf.convertToStringBuffer();
 		pixBuf.convertToStringBuffer();
 
-		forwardVertex.code = GMString(reinterpret_cast<const char*>(vertBuf.buffer));
+		forwardVertex.code = GMString(reinterpret_cast<const char*>(vertBuf.getData()));
 		forwardVertex.path = vertPath;
-		forwardPixel.code = GMString(reinterpret_cast<const char*>(pixBuf.buffer));
+		forwardPixel.code = GMString(reinterpret_cast<const char*>(pixBuf.getData()));
 		forwardPixel.path = pixPath;
 	}
 
@@ -126,9 +126,9 @@ bool GMGLHelper::loadShader(
 		vertBuf.convertToStringBuffer();
 		pixBuf.convertToStringBuffer();
 
-		deferredGeometryVertex.code = GMString(reinterpret_cast<const char*>(vertBuf.buffer));
+		deferredGeometryVertex.code = GMString(reinterpret_cast<const char*>(vertBuf.getData()));
 		deferredGeometryVertex.path = vertPath;
-		deferredGeometryPixel.code = GMString(reinterpret_cast<const char*>(pixBuf.buffer));
+		deferredGeometryPixel.code = GMString(reinterpret_cast<const char*>(pixBuf.getData()));
 		deferredGeometryPixel.path = pixPath;
 	}
 
@@ -139,9 +139,9 @@ bool GMGLHelper::loadShader(
 		vertBuf.convertToStringBuffer();
 		pixBuf.convertToStringBuffer();
 
-		deferredLightVertex.code = GMString(reinterpret_cast<const char*>(vertBuf.buffer));
+		deferredLightVertex.code = GMString(reinterpret_cast<const char*>(vertBuf.getData()));
 		deferredLightVertex.path = vertPath;
-		deferredLightPixel.code = GMString(reinterpret_cast<const char*>(pixBuf.buffer));
+		deferredLightPixel.code = GMString(reinterpret_cast<const char*>(pixBuf.getData()));
 		deferredLightPixel.path = pixPath;
 	}
 
@@ -152,9 +152,9 @@ bool GMGLHelper::loadShader(
 		vertBuf.convertToStringBuffer();
 		pixBuf.convertToStringBuffer();
 
-		filtersVertex.code = GMString(reinterpret_cast<const char*>(vertBuf.buffer));
+		filtersVertex.code = GMString(reinterpret_cast<const char*>(vertBuf.getData()));
 		filtersVertex.path = vertPath;
-		filtersPixel.code = GMString(reinterpret_cast<const char*>(pixBuf.buffer));
+		filtersPixel.code = GMString(reinterpret_cast<const char*>(pixBuf.getData()));
 		filtersPixel.path = pixPath;
 	}
 

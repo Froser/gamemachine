@@ -482,7 +482,7 @@ WAVERESULT CWaves::LoadWaveBuffer(const gm::GMBuffer& buffer, WAVEID *pWaveID)
 	pWaveInfo->pFile = nullptr; //NOT A FILE
 	if (pWaveInfo)
 	{
-		gm::GMMemoryStream ms(buffer.buffer, buffer.size);
+		gm::GMMemoryStream ms(buffer.getData(), buffer.getSize());
 		if (WAVE_SUCCEEDED(wr = ParseBuffer(ms, pWaveInfo)))
 		{
 			pWaveInfo->pData = new char[pWaveInfo->ulDataSize];

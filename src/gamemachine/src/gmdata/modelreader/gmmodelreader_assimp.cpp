@@ -32,24 +32,14 @@ public:
 			}
 			fn.append(pFile);
 			GMBuffer buffer;
-
 			if (m_settings.type == GMModelPathType::Relative)
 				GM.getGamePackageManager()->readFile(GMPackageIndex::Models, fn, &buffer);
 			else
 				GM.getGamePackageManager()->readFileFromPath(fn, &buffer);
 
-			// 如果是一个会自动释放的资源，说明这个缓存是一个来自GamePackageManager的拷贝。此时应该生成一份副本交给MemoryIOStream。
-			// 如果是一个不会自动释放的资源，说明拿到的是一个GameMachineManager缓存的原始数据，生命周期由GameMachineManager管理。
-			if (buffer.needRelease)
-			{
-				GMbyte* data = new GMbyte[buffer.size];
-				memcpy_s(data, buffer.size, buffer.buffer, buffer.size);
-				return new Assimp::MemoryIOStream(data, buffer.size, true);
-			}
-			else
-			{
-				return new Assimp::MemoryIOStream(buffer.buffer, buffer.size);
-			}
+			GMbyte* data = new GMbyte[buffer.getSize()];
+			memcpy_s(data, buffer.getSize(), buffer.getData(), buffer.getSize());
+			return new Assimp::MemoryIOStream(data, buffer.getSize(), true);
 		}
 		else
 		{
@@ -380,10 +370,10 @@ bool GMModelReader_Assimp::load(const GMModelLoadSettings& settings, GMBuffer& b
 
 	const std::string fileName = GMPath::filename(d->settings.filename).toStdString();
 	const aiScene* scene = imp.ReadFileFromMemory(
-		buffer.buffer, 
-		buffer.size, 
+		buffer.getData(), 
+		buffer.getSize(), 
 		flag,
-		new GamePackageIOSystem(d->settings, (const uint8_t*)buffer.buffer, buffer.size),
+		new GamePackageIOSystem(d->settings, (const uint8_t*)buffer.getData(), buffer.getSize()),
 		fileName.c_str()
 	);
 
@@ -416,7 +406,7 @@ bool GMModelReader_Assimp::test(const GMModelLoadSettings& settings, const GMBuf
 	constexpr GMsize_t bufferSize(Assimp::Importer::MaxLenHint + 28);
 	const std::string fileName = GMPath::filename(settings.filename).toStdString();
 
-	GamePackageIOSystem ioHandler(settings, buffer.buffer, buffer.size);
+	GamePackageIOSystem ioHandler(settings, buffer.getData(), buffer.getSize());
 	Assimp::Importer imp;
 	auto cnt = imp.GetImporterCount();
 	for (decltype(cnt) i = 0; i < cnt; ++i)

@@ -394,9 +394,7 @@ inline void GM_delete(IDestroyObject*& o)
 	if (o)
 	{
 		o->destroy();
-#if GM_DEBUG
 		o = nullptr;
-#endif
 	}
 }
 
@@ -406,9 +404,7 @@ inline void GM_delete(T*& o)
 	if (o)
 	{
 		delete o;
-#if GM_DEBUG
 		o = nullptr;
-#endif
 	}
 }
 
@@ -434,9 +430,7 @@ inline void GM_delete_array(T*& o)
 	if (o)
 	{
 		delete[] o;
-#if GM_DEBUG
 		o = nullptr;
-#endif
 	}
 }
 

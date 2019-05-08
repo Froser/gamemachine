@@ -29,12 +29,9 @@ bool GMDefaultGamePackageHandler::readFileFromPath(const GMString& path, REF GMB
 			return false;
 		}
 
-		buffer->size = size;
-		buffer->buffer = new GMbyte[buffer->size];
-		buffer->needRelease = true;
-
+		buffer->resize(size);
 		file.seekg(0, std::ios::beg);
-		file.read(reinterpret_cast<char*>(buffer->buffer), size);
+		file.read(reinterpret_cast<char*>(buffer->getData()), size);
 		file.close();
 		return true;
 	}
@@ -177,7 +174,6 @@ void GMZipGamePackageHandler::init()
 GMZipGamePackageHandler::~GMZipGamePackageHandler()
 {
 	releaseUnzFile();
-	releaseBuffers();
 }
 
 bool GMZipGamePackageHandler::readFileFromPath(const GMString& path, REF GMBuffer* buffer)
@@ -244,7 +240,6 @@ bool GMZipGamePackageHandler::loadZip()
 
 				auto& b = m_buffers[filename];
 				b.first = n;
-				b.second.needRelease = false;
 				break;
 			}
 			if ((i + 1) < gi.number_entry)
@@ -266,15 +261,6 @@ void GMZipGamePackageHandler::releaseUnzFile()
 			unzClose(uf);
 			uf = nullptr;
 		}
-	}
-}
-
-void GMZipGamePackageHandler::releaseBuffers()
-{
-	for (auto iter = m_buffers.begin(); iter != m_buffers.end(); iter++)
-	{
-		auto buffer = iter->second.second;
-		GM_delete(buffer.buffer);
 	}
 }
 
@@ -326,7 +312,7 @@ bool GMZipGamePackageHandler::loadBuffer(const GMString& path, REF GMBuffer* buf
 		return false;
 
 	GMBuffer& targetBuffer = iter->second.second;
-	if (targetBuffer.size > 0)
+	if (targetBuffer.getSize() > 0)
 	{
 		*buffer = targetBuffer;
 		return true;
@@ -349,8 +335,8 @@ bool GMZipGamePackageHandler::loadBuffer(const GMString& path, REF GMBuffer* buf
 	CHECK(err);
 
 	// 构建数据
-	GMbyte* data = new GMbyte[file_info.uncompressed_size];
-	GMbyte* ptr = data;
+	targetBuffer.resize(file_info.uncompressed_size);
+	GMbyte* ptr = targetBuffer.getData();
 	do
 	{
 		err = unzReadCurrentFile(uf, ptr, bufSize);
@@ -360,10 +346,6 @@ bool GMZipGamePackageHandler::loadBuffer(const GMString& path, REF GMBuffer* buf
 			ptr += err;
 	} while (err > 0);
 
-	targetBuffer.needRelease = false;
-	targetBuffer.buffer = data;
-	targetBuffer.size = file_info.uncompressed_size;
-	iter->second.second = targetBuffer;
 	*buffer = targetBuffer;
 	return true;
 }

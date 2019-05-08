@@ -32,13 +32,13 @@ void GMClipboard::setData(GMClipboardMIME mime, const GMBuffer& buffer)
 
 	if (OpenClipboard(NULL))
 	{
-		HGLOBAL handle = GlobalAlloc(GMEM_MOVEABLE, buffer.size);
+		HGLOBAL handle = GlobalAlloc(GMEM_MOVEABLE, buffer.getSize());
 		if (handle)
 		{
 			GMbyte* ptr = static_cast<GMbyte*>(GlobalLock(handle));
 			if (ptr)
 			{
-				memcpy_s(ptr, buffer.size, buffer.buffer, buffer.size);
+				memcpy_s(ptr, buffer.getSize(), buffer.getData(), buffer.getSize());
 				GlobalUnlock(handle);
 			}
 			SetClipboardData(toWindowsClipboardFormat(mime), handle);
@@ -59,9 +59,8 @@ GMBuffer GMClipboard::getData(GMClipboardMIME mime)
 		if (handle)
 		{
 			SIZE_T sz = GlobalSize(handle);
-			buffer.buffer = new GMbyte[sz];
-			buffer.size = sz;
-			memcpy_s(buffer.buffer, sz, static_cast<GMbyte*>(GlobalLock(handle)), sz);
+			buffer.resize(sz);
+			memcpy_s(buffer.getData(), sz, static_cast<GMbyte*>(GlobalLock(handle)), sz);
 
 			if (mime == GMClipboardMIME::Text || mime == GMClipboardMIME::UnicodeText)
 				buffer.convertToStringBuffer();

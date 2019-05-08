@@ -251,7 +251,7 @@ bool GMMAudioReader_MP3::load(gm::GMBuffer& buffer, OUT gm::IAudioFile** f)
 bool GMMAudioReader_MP3::test(const gm::GMBuffer& buffer)
 {
 	char header[3];
-	gm::GMMemoryStream ms(buffer.buffer, buffer.size);
+	gm::GMMemoryStream ms(buffer.getData(), buffer.getSize());
 	ms.read((gm::GMbyte*)&header, sizeof(header));
 	return strnEqual(header, "ID3", 3);
 }

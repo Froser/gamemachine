@@ -63,6 +63,9 @@ bool GMParticleEffectImplBase::GPUUpdate(GMParticleEmitter* emitter, const IRend
 	};
 
 	auto& particles = emitter->getParticles();
+	if (particles.empty())
+		return true;
+
 	auto& progParticles = d->particles;
 	auto& progParticlesSRV = d->particlesSRV;
 	auto& progParticlesResult = d->particlesResult;
