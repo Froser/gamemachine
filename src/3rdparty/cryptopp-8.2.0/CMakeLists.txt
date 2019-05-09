@@ -1065,10 +1065,13 @@ endif ()
 # see https://github.com/noloader/cryptopp-cmake/issues/32
 if (BUILD_STATIC)
   add_custom_target(static DEPENDS cryptopp-static)
+  gm_folder(static)
 endif ()
 if (BUILD_SHARED)
   add_custom_target(shared DEPENDS cryptopp-shared)
+  gm_folder(shared)
   add_custom_target(dynamic DEPENDS cryptopp-shared)
+  gm_folder(dynamic)
 endif ()
 
 #============================================================================
