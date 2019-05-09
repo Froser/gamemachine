@@ -47,14 +47,6 @@ bool GMGamePackage::readFile(GMPackageIndex index, const GMString& filename, REF
 	return readFileFromPath(p, buffer);
 }
 
-void GMGamePackage::beginReadFile(GMPackageIndex index, const GMString& filename, GMAsyncCallback callback, OUT GMAsyncResult** ar, REF GMString* fullFilename)
-{
-	GMString p = pathOf(index, filename);
-	if (fullFilename)
-		*fullFilename = p;
-	return beginReadFileFromPath(p, callback, ar);
-}
-
 GMString GMGamePackage::pathOf(GMPackageIndex index, const GMString& filename)
 {
 	D(d);
@@ -70,13 +62,6 @@ bool GMGamePackage::readFileFromPath(const GMString& path, REF GMBuffer* buffer)
 	hook<const GMString&, GMBuffer*>("GMGamePackage_readFileFromPath", path, buffer);
 	return b;
 }
-
-void GMGamePackage::beginReadFileFromPath(const GMString& path, GMAsyncCallback& callback, OUT GMAsyncResult** ar)
-{
-	D(d);
-	d->handler->beginReadFileFromPath(path, callback, ar);
-}
-
 
 bool GMGamePackage::exists(GMPackageIndex index, const GMString& filename)
 {

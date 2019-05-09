@@ -101,6 +101,7 @@ GM_PRIVATE_OBJECT(DemonstrationWorld)
 	gm::GMOwnedPtr<gm::GMUIConfiguration> configuration;
 	gm::GMGameObject* logoObj = nullptr;
 	gm::GMAnimation logoAnimation;
+	gm::GMFuture<void> logoLoadedFuture;
 };
 
 class DemonstrationWorld : public gm::GMGameWorld

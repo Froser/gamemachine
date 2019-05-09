@@ -14,7 +14,6 @@ public:
 public:
 	virtual void init() override;
 	virtual bool readFileFromPath(const GMString& path, REF GMBuffer* buffer) override;
-	virtual void beginReadFileFromPath(const GMString& path, GMAsyncCallback callback, OUT GMAsyncResult** ar) override;
 	virtual GMString pathOf(GMPackageIndex index, const GMString& fileName) override;
 	virtual bool exists(GMPackageIndex index, const GMString& fileName) override;
 

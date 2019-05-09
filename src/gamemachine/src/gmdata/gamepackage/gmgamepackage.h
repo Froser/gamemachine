@@ -37,7 +37,6 @@ GM_INTERFACE(IGamePackageHandler)
 	virtual ~IGamePackageHandler() {}
 	virtual void init() = 0;
 	virtual bool readFileFromPath(const GMString& path, REF GMBuffer* buffer) = 0;
-	virtual void beginReadFileFromPath(const GMString& path, GMAsyncCallback callback, OUT GMAsyncResult** ar) = 0;
 	virtual GMString pathOf(GMPackageIndex index, const GMString& fileName) = 0;
 	virtual bool exists(GMPackageIndex index, const GMString& fileName) = 0;
 };
@@ -91,8 +90,6 @@ public:
 	*/
 	bool readFile(GMPackageIndex index, const GMString& filename, REF GMBuffer* buffer, REF GMString* fullFilename = nullptr);
 
-	void beginReadFile(GMPackageIndex index, const GMString& filename, GMAsyncCallback callback, OUT GMAsyncResult** ar, REF GMString* fullFilename = nullptr);
-
 	//! 获取指定类型的指定文件的完整路径。
 	/*!
 	  GameMachine建议将同种资源类型的文件（如声音文件、图像文件、着色器程序等），分别放在它们对于的文件夹内。
@@ -117,7 +114,6 @@ public:
 	  \hook GMGamePackage_readFileFromPath
 	*/
 	bool readFileFromPath(const GMString& path, REF GMBuffer* buffer);
-	void beginReadFileFromPath(const GMString& path, GMAsyncCallback& callback, OUT GMAsyncResult** ar);
 
 	bool exists(GMPackageIndex index, const GMString& filename);
 

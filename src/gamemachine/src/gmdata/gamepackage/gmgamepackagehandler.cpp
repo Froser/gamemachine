@@ -42,21 +42,6 @@ bool GMDefaultGamePackageHandler::readFileFromPath(const GMString& path, REF GMB
 	return false;
 }
 
-void GMDefaultGamePackageHandler::beginReadFileFromPath(const GMString& path, GMAsyncCallback callback, OUT GMAsyncResult** ar)
-{
-	auto f = [this, path, callback](GMAsyncResult* r) {
-		this->readFileFromPath(path, reinterpret_cast<GMBuffer*>(r->state()));
-		r->setComplete();
-		callback(r);
-	};
-
-	GMAsyncResult* asyncResult = new GMAsyncResult();
-	GMFuture<void> future = GMAsync::async(GMAsync::Async, f, asyncResult);
-	asyncResult->setFuture(std::move(future));
-	GM_ASSERT(ar);
-	(*ar) = asyncResult;
-}
-
 GMString GMDefaultGamePackageHandler::pathOf(GMPackageIndex index, const GMString& fileName)
 {
 	GMOwnedPtr<GMMutex, GMMutexRelease> m(&m_mutex);

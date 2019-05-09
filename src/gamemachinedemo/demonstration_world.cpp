@@ -478,7 +478,7 @@ void DemonstrationWorld::init()
 	D(d);
 	gm::GMGamePackage* package = GM.getGamePackageManager();
 	gm::IGraphicEngine* engine = getContext()->getEngine();
-	engine->getDefaultFramebuffers()->setClearColor(ValuePointer(gm::GMConvertion::hexToRGB(L"#041B4B")));
+	engine->getDefaultFramebuffers()->setClearColor(ValuePointer(gm::GMConvertion::hexToRGB(L"#000000")));
 	gm::GMFontHandle stxingka = engine->getGlyphManager()->addFontByFileName("STXINGKA.TTF");
 
 	/*
@@ -573,51 +573,54 @@ void DemonstrationWorld::init()
 void DemonstrationWorld::initObjects()
 {
 	D(d);
-	gm::GMGamePackage& pk = *GM.getGamePackageManager();
-	gm::GMModelLoadSettings loadSettings(
-		"love/love.obj",
-		getContext()
-	);
+	d->logoLoadedFuture = gm::GMAsync::async(gm::GMAsync::Async, [this, d]() {
+		gm::GMGamePackage& pk = *GM.getGamePackageManager();
+		gm::GMModelLoadSettings loadSettings(
+			"dragon/dragon.obj",
+			getContext()
+		);
 
-	gm::GMAsset models;
-	bool b = gm::GMModelReader::load(loadSettings, models);
-	GM_ASSERT(b);
-	d->logoObj = new gm::GMGameObject(models);
-	d->logoObj->setScaling(Scale(GMVec3(.01f, .01f, .01f)));
-	d->logoObj->setTranslation(Translate(GMVec3(0, -.2f, 0)));
+		gm::GMAsset models;
+		bool b = gm::GMModelReader::load(loadSettings, models);
 
-	// 创建动画
-	GMFloat4 t4, s4;
-	GetTranslationFromMatrix(d->logoObj->getTranslation(), t4);
-	GetScalingFromMatrix(d->logoObj->getScaling(), s4);
-	GMVec4 t, s;
-	t.setFloat4(t4);
-	s.setFloat4(s4);
-	d->logoAnimation.setTargetObjects(d->logoObj);
-	d->logoAnimation.addKeyFrame(new gm::GMGameObjectKeyframe(
-		t,
-		s,
-		(Rotate(PI * 2 / 3, (GMVec3(0, 1, 0)))),
-		1.5f
-	));
-	d->logoAnimation.addKeyFrame(new gm::GMGameObjectKeyframe(
-		t,
-		s,
-		(Rotate(PI * 4 / 3, (GMVec3(0, 1, 0)))),
-		3.f
-	));
-	d->logoAnimation.addKeyFrame(new gm::GMGameObjectKeyframe(
-		t,
-		s,
-		(Rotate(PI * 2, (GMVec3(0, 1, 0)))),
-		4.5f
-	));
-	d->logoAnimation.setPlayLoop(true);
-	d->logoAnimation.play();
+		GM_ASSERT(b);
+		d->logoObj = new gm::GMGameObject(models);
+		d->logoObj->setScaling(Scale(GMVec3(.05f, .05f, .05f)));
+		d->logoObj->setTranslation(Translate(GMVec3(0, -.2f, 0)));
 
-	// 加入容器
-	addObjectAndInit(d->logoObj);
-	addToRenderList(d->logoObj);
+		// 创建动画
+		GMFloat4 t4, s4;
+		GetTranslationFromMatrix(d->logoObj->getTranslation(), t4);
+		GetScalingFromMatrix(d->logoObj->getScaling(), s4);
+		GMVec4 t, s;
+		t.setFloat4(t4);
+		s.setFloat4(s4);
+		d->logoAnimation.setTargetObjects(d->logoObj);
+		d->logoAnimation.addKeyFrame(new gm::GMGameObjectKeyframe(
+			t,
+			s,
+			(Rotate(PI * 2 / 3, (GMVec3(0, 1, 0)))),
+			1.5f
+		));
+		d->logoAnimation.addKeyFrame(new gm::GMGameObjectKeyframe(
+			t,
+			s,
+			(Rotate(PI * 4 / 3, (GMVec3(0, 1, 0)))),
+			3.f
+		));
+		d->logoAnimation.addKeyFrame(new gm::GMGameObjectKeyframe(
+			t,
+			s,
+			(Rotate(PI * 2, (GMVec3(0, 1, 0)))),
+			4.5f
+		));
+		d->logoAnimation.setPlayLoop(true);
+		d->logoAnimation.play();
+
+		// 加入容器
+		addObjectAndInit(d->logoObj);
+		addToRenderList(d->logoObj);
+	});
 }
 
 void DemonstrationWorld::switchDemo()
