@@ -574,6 +574,7 @@ void DemonstrationWorld::initObjects()
 {
 	D(d);
 	d->logoLoadedFuture = gm::GMAsync::async(gm::GMAsync::Async, [this, d]() {
+		getContext()->getWindow()->setMultithreadRenderingFlag(gm::GMMultithreadRenderingFlag::StartRenderOnMultiThread);
 		gm::GMGamePackage& pk = *GM.getGamePackageManager();
 		gm::GMModelLoadSettings loadSettings(
 			"dragon/dragon.obj",
@@ -582,44 +583,45 @@ void DemonstrationWorld::initObjects()
 
 		gm::GMAsset models;
 		bool b = gm::GMModelReader::load(loadSettings, models);
-
-		GM_ASSERT(b);
 		d->logoObj = new gm::GMGameObject(models);
-		d->logoObj->setScaling(Scale(GMVec3(.05f, .05f, .05f)));
-		d->logoObj->setTranslation(Translate(GMVec3(0, -.2f, 0)));
+		getContext()->getWindow()->setMultithreadRenderingFlag(gm::GMMultithreadRenderingFlag::EndRenderOnMultiThread);
+		mainThreadInvoke([d, this]() {
+			d->logoObj->setScaling(Scale(GMVec3(.05f, .05f, .05f)));
+			d->logoObj->setTranslation(Translate(GMVec3(0, -.2f, 0)));
 
-		// 创建动画
-		GMFloat4 t4, s4;
-		GetTranslationFromMatrix(d->logoObj->getTranslation(), t4);
-		GetScalingFromMatrix(d->logoObj->getScaling(), s4);
-		GMVec4 t, s;
-		t.setFloat4(t4);
-		s.setFloat4(s4);
-		d->logoAnimation.setTargetObjects(d->logoObj);
-		d->logoAnimation.addKeyFrame(new gm::GMGameObjectKeyframe(
-			t,
-			s,
-			(Rotate(PI * 2 / 3, (GMVec3(0, 1, 0)))),
-			1.5f
-		));
-		d->logoAnimation.addKeyFrame(new gm::GMGameObjectKeyframe(
-			t,
-			s,
-			(Rotate(PI * 4 / 3, (GMVec3(0, 1, 0)))),
-			3.f
-		));
-		d->logoAnimation.addKeyFrame(new gm::GMGameObjectKeyframe(
-			t,
-			s,
-			(Rotate(PI * 2, (GMVec3(0, 1, 0)))),
-			4.5f
-		));
-		d->logoAnimation.setPlayLoop(true);
-		d->logoAnimation.play();
-
-		// 加入容器
-		addObjectAndInit(d->logoObj);
-		addToRenderList(d->logoObj);
+			// 创建动画
+			GMFloat4 t4, s4;
+			GetTranslationFromMatrix(d->logoObj->getTranslation(), t4);
+			GetScalingFromMatrix(d->logoObj->getScaling(), s4);
+			GMVec4 t, s;
+			t.setFloat4(t4);
+			s.setFloat4(s4);
+			d->logoAnimation.setTargetObjects(d->logoObj);
+			d->logoAnimation.addKeyFrame(new gm::GMGameObjectKeyframe(
+				t,
+				s,
+				(Rotate(PI * 2 / 3, (GMVec3(0, 1, 0)))),
+				1.5f
+			));
+			d->logoAnimation.addKeyFrame(new gm::GMGameObjectKeyframe(
+				t,
+				s,
+				(Rotate(PI * 4 / 3, (GMVec3(0, 1, 0)))),
+				3.f
+			));
+			d->logoAnimation.addKeyFrame(new gm::GMGameObjectKeyframe(
+				t,
+				s,
+				(Rotate(PI * 2, (GMVec3(0, 1, 0)))),
+				4.5f
+			));
+			d->logoAnimation.setPlayLoop(true);
+			d->logoAnimation.play();
+			// 加入容器
+			addObjectAndInit(d->logoObj);
+			addToRenderList(d->logoObj);
+			resetCameraAndLights();
+		});
 	});
 }
 
@@ -664,6 +666,30 @@ void DemonstrationWorld::resetCameraAndLights()
 		light->setLightAttribute3(gm::GMLight::Position, lightPos);
 
 		engine->addLight(light);
+	}
+}
+
+void DemonstrationWorld::waitForExit()
+{
+	D(d);
+	if (d->logoLoadedFuture.valid())
+		d->logoLoadedFuture.wait();
+}
+
+void DemonstrationWorld::mainThreadInvoke(std::function<void()> function)
+{
+	D(d);
+	d->funcStack.push(function);
+}
+
+void DemonstrationWorld::invokeThreadFunctions()
+{
+	D(d);
+	if (!d->funcStack.empty())
+	{
+		std::function<void()> func = d->funcStack.top();
+		d->funcStack.pop();
+		func();
 	}
 }
 
@@ -737,6 +763,7 @@ void DemostrationEntrance::event(gm::GameMachineHandlerEvent evt)
 		switch (evt)
 		{
 		case gm::GameMachineHandlerEvent::FrameStart:
+			getWorld()->invokeThreadFunctions();
 			break;
 		case gm::GameMachineHandlerEvent::FrameEnd:
 			getWorld()->switchDemo();
@@ -753,6 +780,7 @@ void DemostrationEntrance::event(gm::GameMachineHandlerEvent evt)
 		case gm::GameMachineHandlerEvent::Deactivate:
 			break;
 		case gm::GameMachineHandlerEvent::Terminate:
+			getWorld()->waitForExit();
 			break;
 		default:
 			break;

@@ -13,6 +13,7 @@
 #include "gmglframebuffer.h"
 #include "gmglglyphmanager.h"
 #include "gmengine/gmcsmhelper.h"
+#include <gmwindow.h>
 
 extern "C"
 {
@@ -345,8 +346,16 @@ void GMGLUtility::blendFunc(
 
 void GMGLGraphicEngine::clearGLErrors()
 {
+	constexpr GMuint32 MAX_STACK = 100;
+	GMuint32 stack = 0;
 	while (glGetError() != GL_NO_ERROR)
 	{
+		++stack;
+		if (stack >= MAX_STACK)
+		{
+			gm_warning(gm_dbg_wrap("GL errors stack overflow."));
+			break;
+		}
 	}
 }
 

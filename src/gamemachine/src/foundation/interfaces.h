@@ -584,6 +584,12 @@ struct GMStencilOptions
 
 typedef GMsize_t GMLightIndex;
 
+enum class GMMultithreadRenderingFlag
+{
+	StartRenderOnMultiThread,
+	EndRenderOnMultiThread,
+};
+
 //! 图形绘制引擎接口
 /*!
   提供最基本的绘制功能。
@@ -817,6 +823,8 @@ GM_INTERFACE_FROM(IWindow, IQueriable)
 	virtual IGraphicEngine* getGraphicEngine() = 0;
 	virtual const IRenderContext* getContext() = 0;
 	virtual void setCursor(GMCursorType type) = 0;
+	virtual bool canClose() = 0;
+	virtual void setMultithreadRenderingFlag(GMMultithreadRenderingFlag) = 0;
 	virtual GMWindowProcHandler getProcHandler() = 0;
 };
 

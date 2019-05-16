@@ -129,6 +129,7 @@ IFramebuffers* GMFramebuffersStack::peek()
 GMGraphicEngine::GMGraphicEngine(const IRenderContext* context)
 {
 	D(d);
+	d->mtid = GMThread::getCurrentThreadId();
 	d->context = context;
 	d->renderConfig = GM.getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
 	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();

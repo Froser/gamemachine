@@ -5,6 +5,7 @@
 #include <gmmodel.h>
 #include <gmcamera.h>
 #include <gmrendertechnique.h>
+#include <gmthread.h>
 BEGIN_NS
 
 template <typename T>
@@ -220,6 +221,7 @@ public:
 
 GM_PRIVATE_OBJECT(GMGraphicEngine)
 {
+	GMThreadId mtid = 0;
 	const IRenderContext* context = nullptr;
 	GMCamera camera;
 	GMGlyphManager* glyphManager = nullptr;
@@ -280,6 +282,8 @@ public:
 	virtual GMPrimitiveManager* getPrimitiveManager() override;
 	virtual bool msgProc(const GMMessage& e) override;
 	virtual void createModelDataProxy(const IRenderContext* context, GMModel* model, bool transfer = true) override;
+
+public:
 	virtual ICSMFramebuffers* getCSMFramebuffers();
 
 protected:

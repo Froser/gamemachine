@@ -34,6 +34,7 @@ enum class GMSystemEventType
 {
 	Unknown,
 	WindowAboutToDestory,
+	WindowAboutToClose,
 	WindowSizeChanged,
 	KeyDown,
 	KeyUp,

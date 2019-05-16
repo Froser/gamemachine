@@ -19,7 +19,7 @@ public:
 	}
 };
 
-GM_PRIVATE_OBJECT(GMWindow_Dx11)
+GM_PRIVATE_OBJECT_UNALIGNED(GMWindow_Dx11)
 {
 	static GMComPtr<ID3D11Device> device;
 	static GMComPtr<ID3D11DeviceContext> deviceContext;
@@ -38,7 +38,8 @@ GMComPtr<ID3D11DeviceContext> GM_PRIVATE_NAME(GMWindow_Dx11)::deviceContext;
 
 class GMWindow_Dx11 : public GMWindow
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMWindow_Dx11, GMWindow)
+	GM_DECLARE_PRIVATE_NGO(GMWindow_Dx11)
+	typedef GMWindow Base;
 
 public:
 	GMWindow_Dx11() = default;

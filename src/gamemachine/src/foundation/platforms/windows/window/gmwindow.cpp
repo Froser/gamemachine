@@ -44,6 +44,7 @@ namespace
 			GMScopedPtr<GMSystemEvent> guard(sysEvent);
 			if (!pGMWindow->handleSystemEvent(sysEvent, lRes))
 				return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
+			return lRes;
 		}
 		return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
 	}
@@ -288,6 +289,11 @@ void GMWindow::showWindow()
 void GMWindow::onWindowDestroyed()
 {
 	D(d);
+	if (d->handler)
+	{
+		d->handler->event(GameMachineHandlerEvent::Terminate);
+	}
+
 	if (d->ownedHandle)
 	{
 		GMWindowHandle hwnd = getWindowHandle();
@@ -295,4 +301,8 @@ void GMWindow::onWindowDestroyed()
 		auto s = s_hwndMap.erase(hwnd);
 		GM_ASSERT(s > 0);
 	}
+}
+
+void GMWindow::setMultithreadRenderingFlag(GMMultithreadRenderingFlag)
+{
 }

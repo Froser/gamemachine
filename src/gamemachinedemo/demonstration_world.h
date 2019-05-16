@@ -102,6 +102,7 @@ GM_PRIVATE_OBJECT(DemonstrationWorld)
 	gm::GMGameObject* logoObj = nullptr;
 	gm::GMAnimation logoAnimation;
 	gm::GMFuture<void> logoLoadedFuture;
+	Stack<std::function<void()>> funcStack;
 };
 
 class DemonstrationWorld : public gm::GMGameWorld
@@ -124,6 +125,9 @@ public:
 	void init();
 	void switchDemo();
 	void resetCameraAndLights();
+	void waitForExit();
+	void mainThreadInvoke(std::function<void()>);
+	void invokeThreadFunctions();
 
 public:
 	gm::IWindow* getMainWindow()

@@ -83,7 +83,7 @@ namespace
 	}
 }
 
-GM_PRIVATE_OBJECT(GMWindow_OpenGL)
+GM_PRIVATE_OBJECT_UNALIGNED(GMWindow_OpenGL)
 {
 	GMWindow_OpenGL* parent = nullptr;
 	GLXFBConfig fbConfig = nullptr;
@@ -93,7 +93,8 @@ GM_PRIVATE_OBJECT(GMWindow_OpenGL)
 
 class GMWindow_OpenGL : public GMWindow
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMWindow_OpenGL, GMWindow)
+	GM_DECLARE_PRIVATE_NGO(GMWindow_OpenGL)
+	typedef GMWindow Base;
 
 public:
 	GMWindow_OpenGL(IWindow* parent);

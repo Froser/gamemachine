@@ -19,10 +19,16 @@ bool GMWindow::handleSystemEvent(GMSystemEvent* event, REF GMLResult& result)
 	if (!event)
 		return false;
 
+	bool r = false;
 	switch (event->getType())
 	{
 	case GMSystemEventType::WindowAboutToDestory:
+	{
 		GM.postMessage({ GameMachineMessageType::WindowAboutToDestroy, 0, static_cast<IWindow*>(this) });
+		break;
+	}
+	case GMSystemEventType::WindowAboutToClose:
+		r = !canClose();
 		break;
 	case GMSystemEventType::WindowSizeChanged:
 		GM.postMessage({ GameMachineMessageType::WindowSizeChanged });
@@ -44,7 +50,7 @@ bool GMWindow::handleSystemEvent(GMSystemEvent* event, REF GMLResult& result)
 		if (widget->handleSystemEvent(event))
 			return true;
 	}
-	return false;
+	return r;
 }
 
 bool GMWindow::addWidget(GMWidget* widget)
@@ -90,6 +96,11 @@ void GMWindow::setCursor(GMCursorType cursorType)
 	d->cursor = cursorType;
 }
 
+bool GMWindow::canClose()
+{
+	return true;
+}
+
 void GMWindow::msgProc(const GMMessage& message)
 {
 	D(d);
@@ -117,9 +128,13 @@ void GMWindow::msgProc(const GMMessage& message)
 	{
 		if (message.object == static_cast<IWindow*>(this))
 		{
+			// 移除HWND
 			onWindowDestroyed();
-			// 窗口已经被Destory，因此HWND设置为0
+
+			// 窗口(HWND)已经被Destory，因此HWND设置为0
 			setWindowHandle(0, false);
+
+			// 删除GM的IWindow对象
 			GM.removeWindow(this);
 		}
 	}

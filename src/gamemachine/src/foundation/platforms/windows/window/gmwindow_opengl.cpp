@@ -4,6 +4,8 @@
 #include "gmengine/ui/gmwindow.h"
 #include "foundation/gamemachine.h"
 #include "gmgl/gmglgraphic_engine.h"
+#include "foundation/gmthread.h"
+#include "foundation/utilities/tools.h"
 
 #define EXIT __exit
 #define RUN_AND_CHECK(i) if (!(i)) { GM_ASSERT(false); goto EXIT; }
@@ -70,34 +72,115 @@ namespace
 	}
 }
 
+/*
+ 创建WINDOW_SHARE_RC_CNT个共享RC用于多线程，每个用于单独的窗口。
+ 一旦窗口数量多余WINDOW_SHARE_RC_CNT, 第WINDOW_SHARE_RC_CNT+N(N>0)个窗口的多线程将会出现问题。
+*/
+constexpr GMuint32 WINDOW_SHARE_RC_CNT = 16; 
+
+class HRCManager
+{
+public:
+	HRCManager()
+	{
+		avails.init(WINDOW_SHARE_RC_CNT);
+		avails.setAll();
+	}
+
+	~HRCManager()
+	{
+		for (GMuint32 i = 0; i < WINDOW_SHARE_RC_CNT; ++i)
+		{
+			if (hRCShares[i])
+				wglDeleteContext(hRCShares[i]);
+		}
+	}
+
+	void init(HDC hDC, HGLRC hRC)
+	{
+		for (GMuint32 i = 0; i < WINDOW_SHARE_RC_CNT; ++i)
+		{
+			hRCShares[i] = HGLRC(wglCreateContext(hDC));
+			RUN_AND_CHECK(wglShareLists(hRCShares[i], hRC));
+		}
+	EXIT:
+		return;
+	}
+
+	HGLRC getAvailable()
+	{
+		GMOwnedPtr<GMMutex, GMMutexRelease> mutexGuard(&mutex);
+		GMuint32 index = 0;
+		for (index = 0; index < WINDOW_SHARE_RC_CNT ; ++index)
+		{
+			if (avails.isSet(index))
+			{
+				avails.clear(index);
+				return hRCShares[index];
+			}
+		}
+		return 0;
+	}
+
+	void giveBack(HGLRC hRC)
+	{
+		GMuint32 index = 0;
+		for (index = 0; index < WINDOW_SHARE_RC_CNT; ++index)
+		{
+			if (hRCShares[index] == hRC)
+			{
+				avails.set(index);
+				return;
+			}
+		}
+		GM_ASSERT(false);
+	}
+
+private:
+	HGLRC hRCShares[WINDOW_SHARE_RC_CNT];
+	Bitset avails;
+	GMMutex mutex;
+};
+
 GM_PRIVATE_OBJECT(GMWindow_OpenGL)
 {
 	BYTE depthBits, stencilBits;
 	HDC hDC = 0;
+	GMuint32 windowID = 0;
 	GMSharedPtr<HGLRC> hRC;
+	GMSharedPtr<HRCManager> hRCShareManager;
+	GMThreadId mtid = 0;
 	GMWindow_OpenGL* parent = nullptr;
 };
 
 class GMWindow_OpenGL : public GMWindow
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMWindow_OpenGL, GMWindow)
+	GM_DECLARE_PRIVATE_NGO(GMWindow_OpenGL)
 	GM_FRIEND_CLASS(GMGLRenderContext)
+	typedef GMWindow Base;
 
 public:
 	GMWindow_OpenGL(IWindow* parent);
 	~GMWindow_OpenGL();
 
 public:
-	inline GMSharedPtr<HGLRC> getGLRC() GM_NOEXCEPT
+	inline GMSharedPtr<HGLRC> getGLRC()
 	{
 		D(d);
 		return d->hRC;
+	}
+
+	inline GMSharedPtr<HRCManager> getRCShareManager()
+	{
+		D(d);
+		return d->hRCShareManager;
 	}
 
 public:
 	virtual void msgProc(const GMMessage& message) override;
 	virtual IGraphicEngine* getGraphicEngine() override;
 	virtual const IRenderContext* getContext() override;
+	virtual void setMultithreadRenderingFlag(GMMultithreadRenderingFlag) override;
 
 protected:
 	virtual void onWindowCreated(const GMWindowDesc& wndAttrs) override;
@@ -128,6 +211,7 @@ private:
 GMWindow_OpenGL::GMWindow_OpenGL(IWindow* parent)
 {
 	D(d);
+	d->mtid = GMThread::getCurrentThreadId();
 	d->depthBits = 24;
 	d->stencilBits = 8;
 
@@ -188,15 +272,19 @@ void GMWindow_OpenGL::onWindowCreated(const GMWindowDesc& wndAttrs)
 	RUN_AND_CHECK(::SetPixelFormat(d->hDC, nFormat, &pfd));
 	if (!d->parent)
 	{
-		d->hRC = GMSharedPtr<HGLRC>(new HGLRC(wglCreateContext(d->hDC)), [](HGLRC* hRC) {
+		auto glrcDeleter = [](HGLRC* hRC) {
 			if (!wglDeleteContext(*hRC))
 				gm_error(gm_dbg_wrap("release Rendering Context failed."));
 			GM_delete(hRC);
-		});
+		};
+		d->hRC = GMSharedPtr<HGLRC>(new HGLRC(wglCreateContext(d->hDC)), glrcDeleter);
+		d->hRCShareManager = GMSharedPtr<HRCManager>(new HRCManager());
+		d->hRCShareManager->init(d->hDC, *d->hRC);
 	}
 	else
 	{
 		RUN_AND_CHECK(d->hRC = d->parent->getGLRC());
+		RUN_AND_CHECK(d->hRCShareManager = d->parent->getRCShareManager());
 	}
 
 	RUN_AND_CHECK(wglMakeCurrent(d->hDC, *d->hRC));
@@ -235,6 +323,34 @@ const IRenderContext* GMWindow_OpenGL::getContext()
 	return d->context.get();
 }
 
+
+void GMWindow_OpenGL::setMultithreadRenderingFlag(GMMultithreadRenderingFlag flag)
+{
+	D(d);
+	GMThreadId tid = GMThread::getCurrentThreadId();
+	if (d->mtid == tid)
+		return;
+
+	if (flag == GMMultithreadRenderingFlag::StartRenderOnMultiThread)
+	{
+		HGLRC hRC = d->hRCShareManager->getAvailable();
+		if (hRC)
+		{
+			wglMakeCurrent(d->hDC, hRC);
+		}
+		else
+		{
+			gm_error(gm_dbg_wrap("Not enough shared rc. You cannot do multithread jobs in this window."));
+		}
+	}
+	else if(flag == GMMultithreadRenderingFlag::EndRenderOnMultiThread)
+	{
+		HGLRC hRC = wglGetCurrentContext();
+		d->hRCShareManager->giveBack(hRC);
+		wglMakeCurrent(NULL, NULL);
+	}
+}
+
 void GMWindow_OpenGL::swapBuffers() const
 {
 	D(d);
@@ -252,7 +368,7 @@ void GMWindow_OpenGL::dispose()
 {
 	D(d);
 	::SetWindowLongPtr(getWindowHandle(), GWLP_USERDATA, NULL);
-	
+
 	GMWindowHandle wnd = getWindowHandle();
 	if (d->hDC)
 	{

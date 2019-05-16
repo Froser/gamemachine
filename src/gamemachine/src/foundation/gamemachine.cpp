@@ -322,11 +322,6 @@ void GameMachine::registerManager(T* newObject, OUT U** manager)
 void GameMachine::finalize()
 {
 	D(d);
-	eachHandler([](auto, auto handler) {
-		if (handler)
-			handler->event(GameMachineHandlerEvent::Terminate);
-	});
-
 	for (auto iter = d->managerQueue.rbegin(); iter != d->managerQueue.rend(); ++iter)
 	{
 		GM_delete(*iter);

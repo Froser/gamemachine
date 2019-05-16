@@ -25,7 +25,7 @@ private:
 	IGraphicEngine* engine = nullptr;
 };
 
-GM_PRIVATE_OBJECT(GMWindow)
+GM_PRIVATE_OBJECT_UNALIGNED(GMWindow)
 {
 	GMOwnedPtr<IInput> input;
 	GMOwnedPtr<IGameHandler> handler;
@@ -40,9 +40,9 @@ GM_PRIVATE_OBJECT(GMWindow)
 	GMCursorType cursor = GMCursorType::Arrow;
 };
 
-class GMWindow : public GMObject, public IWindow
+class GMWindow : public IWindow
 {
-	GM_DECLARE_PRIVATE(GMWindow)
+	GM_DECLARE_PRIVATE_NGO(GMWindow)
 
 public:
 	GMWindow();
@@ -65,7 +65,9 @@ public:
 	virtual IGameHandler* getHandler() override;
 	virtual const GMWindowStates& getWindowStates() override;
 	virtual void setCursor(GMCursorType cursorType) override;
+	virtual bool canClose() override;
 	virtual GMWindowProcHandler getProcHandler() override;
+	virtual void setMultithreadRenderingFlag(GMMultithreadRenderingFlag) override;
 
 public:
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
