@@ -251,7 +251,7 @@ typedef HANDLE GMEventHandle;
 typedef void* GMEventHandle;
 #endif
 
-GM_PRIVATE_OBJECT(GMEvent)
+GM_PRIVATE_OBJECT_UNALIGNED(GMEvent)
 {
 	GMEventHandle handle;
 };

@@ -72,77 +72,44 @@ namespace
 	}
 }
 
-/*
- 创建WINDOW_SHARE_RC_CNT个共享RC用于多线程，每个用于单独的窗口。
- 一旦窗口数量多余WINDOW_SHARE_RC_CNT, 第WINDOW_SHARE_RC_CNT+N(N>0)个窗口的多线程将会出现问题。
-*/
-constexpr GMuint32 WINDOW_SHARE_RC_CNT = 16; 
-
 class HRCManager
 {
 public:
 	HRCManager()
 	{
-		avails.init(WINDOW_SHARE_RC_CNT);
-		avails.setAll();
 	}
 
 	~HRCManager()
 	{
-		for (GMuint32 i = 0; i < WINDOW_SHARE_RC_CNT; ++i)
-		{
-			if (hRCShares[i])
-				wglDeleteContext(hRCShares[i]);
-		}
+		if (hRCShare)
+			wglDeleteContext(hRCShare);
 	}
 
 	void init(HDC hDC, HGLRC hRC)
 	{
-		for (GMuint32 i = 0; i < WINDOW_SHARE_RC_CNT; ++i)
-		{
-			hRCShares[i] = HGLRC(wglCreateContext(hDC));
-			RUN_AND_CHECK(wglShareLists(hRCShares[i], hRC));
-		}
+		hRCShare = HGLRC(wglCreateContext(hDC));
+		RUN_AND_CHECK(wglShareLists(hRCShare, hRC));
 	EXIT:
 		return;
 	}
 
 	HGLRC getAvailable()
 	{
-		GMOwnedPtr<GMMutex, GMMutexRelease> mutexGuard(&mutex);
-		GMuint32 index = 0;
-		for (index = 0; index < WINDOW_SHARE_RC_CNT ; ++index)
-		{
-			if (avails.isSet(index))
-			{
-				avails.clear(index);
-				return hRCShares[index];
-			}
-		}
-		return 0;
+		mutex.lock();
+		return hRCShare;
 	}
 
 	void giveBack(HGLRC hRC)
 	{
-		GMuint32 index = 0;
-		for (index = 0; index < WINDOW_SHARE_RC_CNT; ++index)
-		{
-			if (hRCShares[index] == hRC)
-			{
-				avails.set(index);
-				return;
-			}
-		}
-		GM_ASSERT(false);
+		mutex.unlock();
 	}
 
 private:
-	HGLRC hRCShares[WINDOW_SHARE_RC_CNT];
-	Bitset avails;
+	HGLRC hRCShare = 0;
 	GMMutex mutex;
 };
 
-GM_PRIVATE_OBJECT(GMWindow_OpenGL)
+GM_PRIVATE_OBJECT_UNALIGNED(GMWindow_OpenGL)
 {
 	BYTE depthBits, stencilBits;
 	HDC hDC = 0;
@@ -340,7 +307,7 @@ void GMWindow_OpenGL::setMultithreadRenderingFlag(GMMultithreadRenderingFlag fla
 		}
 		else
 		{
-			gm_error(gm_dbg_wrap("Not enough shared rc. You cannot do multithread jobs in this window."));
+			gm_error(gm_dbg_wrap("No shared rc. You cannot do multithread jobs in this window."));
 		}
 	}
 	else if(flag == GMMultithreadRenderingFlag::EndRenderOnMultiThread)
