@@ -6,8 +6,38 @@
 #include <time.h>
 #include "foundation/gamemachine.h"
 
+
+#include "gmdx11/gmdx11texture.h"
+
 namespace
 {
+#if GM_DEBUG
+	bool checkTextureContext(GMTextureList& textureList, GMTextureType textureType, const IRenderContext* context)
+	{
+		auto& textureSampler = textureList.getTextureSampler(GMTextureType::Ambient);
+		for (GMuint32 i = 0; i < textureSampler.getFrameCount(); ++i)
+		{
+			GMDx11Texture* tex = static_cast<GMDx11Texture*>(textureSampler.getFrameByIndex(i).getTexture());
+			if (tex->data()->context != context)
+				return false;
+		}
+		return true;
+	}
+
+	void checkObjectContext(GMGameObject* obj, const IRenderContext* context)
+	{
+		// 检查obj中的上下文是否与context一致
+		auto scene = obj->getScene();
+		for (auto modelAsset : scene->getModels())
+		{
+			const auto& model = modelAsset.getModel();
+			auto& textureList = model->getShader().getTextureList();
+			GM_ASSERT(checkTextureContext(textureList, GMTextureType::Ambient, context));
+			GM_ASSERT(checkTextureContext(textureList, GMTextureType::Diffuse, context));
+		}
+	}
+#endif
+
 	bool needBlend(GMGameObject* object)
 	{
 		GMScene* scene = object->getScene();
@@ -34,6 +64,11 @@ void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
 	D(d);
 	obj->setWorld(this);
 	obj->setContext(getContext());
+
+#if GM_DEBUG
+	checkObjectContext(obj, getContext());
+#endif
+
 	obj->onAppendingObjectToWorld();
 	d->gameObjects.insert(GMOwnedPtr<GMGameObject>(obj));
 

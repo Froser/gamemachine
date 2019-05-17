@@ -313,8 +313,8 @@ void GMWindow_OpenGL::setMultithreadRenderingFlag(GMMultithreadRenderingFlag fla
 	else if(flag == GMMultithreadRenderingFlag::EndRenderOnMultiThread)
 	{
 		HGLRC hRC = wglGetCurrentContext();
-		d->hRCShareManager->giveBack(hRC);
 		wglMakeCurrent(NULL, NULL);
+		d->hRCShareManager->giveBack(hRC);
 	}
 }
 

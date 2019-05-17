@@ -577,15 +577,15 @@ void DemonstrationWorld::initObjects()
 		getContext()->getWindow()->setMultithreadRenderingFlag(gm::GMMultithreadRenderingFlag::StartRenderOnMultiThread);
 		gm::GMGamePackage& pk = *GM.getGamePackageManager();
 		gm::GMModelLoadSettings loadSettings(
-			"dragon/dragon.obj",
+			"sarah/n901.obj",
 			getContext()
 		);
 
 		gm::GMAsset models;
 		bool b = gm::GMModelReader::load(loadSettings, models);
 		d->logoObj = new gm::GMGameObject(models);
-		getContext()->getWindow()->setMultithreadRenderingFlag(gm::GMMultithreadRenderingFlag::EndRenderOnMultiThread);
-		mainThreadInvoke([d, this]() {
+		DemonstrationWorld* thisWorld = this;
+		mainThreadInvoke([d, thisWorld]() {
 			d->logoObj->setScaling(Scale(GMVec3(.05f, .05f, .05f)));
 			d->logoObj->setTranslation(Translate(GMVec3(0, -.2f, 0)));
 
@@ -618,10 +618,11 @@ void DemonstrationWorld::initObjects()
 			d->logoAnimation.setPlayLoop(true);
 			d->logoAnimation.play();
 			// 加入容器
-			addObjectAndInit(d->logoObj);
-			addToRenderList(d->logoObj);
-			resetCameraAndLights();
+			thisWorld->addObjectAndInit(d->logoObj);
+			thisWorld->addToRenderList(d->logoObj);
+			thisWorld->resetCameraAndLights();
 		});
+		getContext()->getWindow()->setMultithreadRenderingFlag(gm::GMMultithreadRenderingFlag::EndRenderOnMultiThread);
 	});
 }
 

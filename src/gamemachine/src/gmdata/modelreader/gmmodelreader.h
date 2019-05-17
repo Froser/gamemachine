@@ -71,7 +71,7 @@ public:
 public:
 	static bool load(const GMModelLoadSettings& settings, REF GMSceneAsset& asset);
 	static bool load(const GMModelLoadSettings& settings, EngineType type, REF GMSceneAsset& asset);
-	static IModelReader* getReader(EngineType type);
+	static IModelReader* createReader(EngineType type);
 
 private:
 	static EngineType test(const GMModelLoadSettings& settings, const GMBuffer& buffer);

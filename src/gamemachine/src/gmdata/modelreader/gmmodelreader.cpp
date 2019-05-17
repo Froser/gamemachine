@@ -8,31 +8,22 @@
 class GMModelReaderContainer : public GMObject
 {
 public:
-	GMModelReaderContainer()
-	{
-		// m_readers[GMModelReader::GMMd5] = new GMModelReader_MD5();
-		m_readers[GMModelReader::Assimp] = new GMModelReader_Assimp();
-	}
-
-	~GMModelReaderContainer()
-	{
-		for (auto iter = m_readers.begin(); iter != m_readers.end(); iter++)
-		{
-			GM_delete(iter->second);
-		}
-	}
-
 	IModelReader* getReader(GMModelReader::EngineType type)
 	{
-		GM_ASSERT(m_readers.find(type) != m_readers.end());
-		return m_readers[type];
+		switch (type)
+		{
+		case GMModelReader::Assimp:
+			return new GMModelReader_Assimp();
+			break;
+		default:
+			gm_error(gm_dbg_wrap("Reader type is not valid"));
+			break;
+		}
+		return nullptr;
 	}
-
-private:
-	Map<GMModelReader::EngineType, IModelReader*> m_readers;
 };
 
-IModelReader* GMModelReader::getReader(EngineType type)
+IModelReader* GMModelReader::createReader(EngineType type)
 {
 	static GMModelReaderContainer readers;
 	return readers.getReader(type);
@@ -40,9 +31,10 @@ IModelReader* GMModelReader::getReader(EngineType type)
 
 GMModelReader::EngineType GMModelReader::test(const GMModelLoadSettings& settings, const GMBuffer& buffer)
 {
-	for (EngineType i = ModelType_Begin; i < ModelType_End; i = (EngineType)((GMuint32)i + 1))
+	GM_FOREACH_ENUM_CLASS(i, ModelType_Begin, ModelType_End)
 	{
-		if (getReader(i)->test(settings, buffer))
+		GMOwnedPtr<IModelReader> reader(createReader(i));
+		if (reader->test(settings, buffer))
 			return i;
 	}
 	return ModelType_End;
@@ -70,5 +62,6 @@ bool GMModelReader::load(const GMModelLoadSettings& settings, EngineType type, R
 	if (type == ModelType_End)
 		return false;
 
-	return getReader(type)->load(settingsCache, buffer, asset);
+	GMOwnedPtr<IModelReader> reader(createReader(type));
+	return reader->load(settingsCache, buffer, asset);
 }
