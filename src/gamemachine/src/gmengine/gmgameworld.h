@@ -34,6 +34,8 @@ GM_PRIVATE_OBJECT(GMGameWorld)
 	GMAssets assets;
 	GMRenderPreference renderPreference = GMRenderPreference::PreferForwardRendering;
 	GMRenderList renderList;
+	GMMutex renderListMutex;
+	GMMutex addObjectMutex;
 };
 
 class GM_EXPORT GMGameWorld : public GMObject

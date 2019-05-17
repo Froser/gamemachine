@@ -11,33 +11,6 @@
 
 namespace
 {
-#if GM_DEBUG
-	bool checkTextureContext(GMTextureList& textureList, GMTextureType textureType, const IRenderContext* context)
-	{
-		auto& textureSampler = textureList.getTextureSampler(GMTextureType::Ambient);
-		for (GMuint32 i = 0; i < textureSampler.getFrameCount(); ++i)
-		{
-			GMDx11Texture* tex = static_cast<GMDx11Texture*>(textureSampler.getFrameByIndex(i).getTexture());
-			if (tex->data()->context != context)
-				return false;
-		}
-		return true;
-	}
-
-	void checkObjectContext(GMGameObject* obj, const IRenderContext* context)
-	{
-		// 检查obj中的上下文是否与context一致
-		auto scene = obj->getScene();
-		for (auto modelAsset : scene->getModels())
-		{
-			const auto& model = modelAsset.getModel();
-			auto& textureList = model->getShader().getTextureList();
-			GM_ASSERT(checkTextureContext(textureList, GMTextureType::Ambient, context));
-			GM_ASSERT(checkTextureContext(textureList, GMTextureType::Diffuse, context));
-		}
-	}
-#endif
-
 	bool needBlend(GMGameObject* object)
 	{
 		GMScene* scene = object->getScene();
@@ -62,13 +35,11 @@ GMGameWorld::GMGameWorld(const IRenderContext* context)
 void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
 {
 	D(d);
+	GMOwnedPtr<GMMutex, GMMutexRelease> mutexGuard(&d->addObjectMutex);
+	mutexGuard->lock();
+
 	obj->setWorld(this);
 	obj->setContext(getContext());
-
-#if GM_DEBUG
-	checkObjectContext(obj, getContext());
-#endif
-
 	obj->onAppendingObjectToWorld();
 	d->gameObjects.insert(GMOwnedPtr<GMGameObject>(obj));
 
@@ -122,6 +93,8 @@ void GMGameWorld::updateGameWorld(GMDuration dt)
 void GMGameWorld::clearRenderList()
 {
 	D(d);
+	GMOwnedPtr<GMMutex, GMMutexRelease> mutexGuard(&d->renderListMutex);
+	mutexGuard->lock();
 	d->renderList.deferred.clear();
 	d->renderList.forward.clear();
 }
@@ -139,6 +112,9 @@ void GMGameWorld::updateGameObjects(GMDuration dt, GMPhysicsWorld* phyw, const S
 void GMGameWorld::addToRenderList(GMGameObject* object)
 {
 	D(d);
+	GMOwnedPtr<GMMutex, GMMutexRelease> mutexGuard(&d->renderListMutex);
+	mutexGuard->lock();
+
 	if (object->canDeferredRendering())
 	{
 		d->renderList.deferred.push_back(object);

@@ -39,6 +39,8 @@ set(SOURCES
 		demo/sound.cpp
 		demo/literature.h
 		demo/literature.cpp
+		demo/async.h
+		demo/async.cpp
 		demo/model.h
 		demo/model.cpp
 		demo/csm.h

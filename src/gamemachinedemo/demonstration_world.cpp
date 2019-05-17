@@ -17,6 +17,7 @@
 #include "demo/light.h"
 #include "demo/sound.h"
 #include "demo/literature.h"
+#include "demo/async.h"
 #include "demo/model.h"
 #include "demo/csm.h"
 #include "demo/assimp.h"
@@ -52,7 +53,8 @@ namespace
 		world->addDemo(L"光照: 渲染一个聚光灯场景。", new Demo_Light_Spotlight(world));
 		world->addDemo(L"光照: 渲染一个聚光灯法线贴图场景。", new Demo_Light_Spotlight_Normalmap(world));
 		world->addDemo(L"声音: 演示播放音乐。", new Demo_Sound(world));
-		world->addDemo(L"文字: 使用排版引擎实现排版。", new Demo_Literature(world));
+		//world->addDemo(L"文字: 使用排版引擎实现排版。", new Demo_Literature(world));
+		world->addDemo(L"异步: 实现异步加载资源。", new Demo_Async(world));
 		world->addDemo(L"模型: 读取模型文件。", new Demo_Model(world));
 		world->addDemo(L"阴影: 使用CSM渲染场景。", new Demo_CSM(world));
 		// world->addDemo(L"模型: 使用ASSIMP读取各种模型文件。", new Demo_Assimp(world));
@@ -577,15 +579,14 @@ void DemonstrationWorld::initObjects()
 		getContext()->getWindow()->setMultithreadRenderingFlag(gm::GMMultithreadRenderingFlag::StartRenderOnMultiThread);
 		gm::GMGamePackage& pk = *GM.getGamePackageManager();
 		gm::GMModelLoadSettings loadSettings(
-			"sarah/n901.obj",
+			"dragon/dragon.obj",
 			getContext()
 		);
 
 		gm::GMAsset models;
 		bool b = gm::GMModelReader::load(loadSettings, models);
 		d->logoObj = new gm::GMGameObject(models);
-		DemonstrationWorld* thisWorld = this;
-		mainThreadInvoke([d, thisWorld]() {
+		mainThreadInvoke([d, this]() {
 			d->logoObj->setScaling(Scale(GMVec3(.05f, .05f, .05f)));
 			d->logoObj->setTranslation(Translate(GMVec3(0, -.2f, 0)));
 
@@ -618,9 +619,9 @@ void DemonstrationWorld::initObjects()
 			d->logoAnimation.setPlayLoop(true);
 			d->logoAnimation.play();
 			// 加入容器
-			thisWorld->addObjectAndInit(d->logoObj);
-			thisWorld->addToRenderList(d->logoObj);
-			thisWorld->resetCameraAndLights();
+			this->addObjectAndInit(d->logoObj);
+			this->addToRenderList(d->logoObj);
+			this->resetCameraAndLights();
 		});
 		getContext()->getWindow()->setMultithreadRenderingFlag(gm::GMMultithreadRenderingFlag::EndRenderOnMultiThread);
 	});
