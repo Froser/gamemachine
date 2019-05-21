@@ -3,9 +3,7 @@
 #endif
 
 #include <gamemachine.h>
-#if GM_USE_DX11
-#include <gmdx11.h>
-#endif
+#include <wrapper.h>
 #include <gmgl.h>
 #define STRINGIFY(x) #x
 
@@ -34,22 +32,7 @@ int main(int argc, char* argv[])
 		env = GMRenderEnvironment::DirectX11;
 
 	IFactory* factory = nullptr;
-	if (env == GMRenderEnvironment::OpenGL)
-	{
-		factory = new GMGLFactory();
-	}
-	else
-	{
-#if GM_USE_DX11
-		if (GMQueryCapability(GMCapability::SupportDirectX11))
-			factory = new GMDx11Factory();
-		else
-			factory = new GMGLFactory();
-#else
-		env = GMRenderEnvironment::OpenGL;
-		factory = new GMGLFactory();
-#endif
-	}
+	env = GMCreateFactory(env, GMRenderEnvironment::OpenGL, &factory);
 
 	GMGameMachineDesc desc;
 	desc.factory = factory;

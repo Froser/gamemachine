@@ -21,6 +21,7 @@ set(SOURCES
 		stdafx.h
 		common.h
 
+		wrapper/wrapper.h
 		wrapper/dx11wrapper.h
 		wrapper/dx11wrapper.cpp
 

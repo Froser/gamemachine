@@ -3,10 +3,7 @@
 #include "src/shell/mainwindow.h"
 
 #include <gmgl.h>
-#if GM_USE_DX11
-#include <gmdx11.h>
-#include <gmdx11helper.h>
-#endif
+#include <wrapper.h>
 
 #if GM_WINDOWS
 int WINAPI wWinMain(
@@ -28,14 +25,14 @@ int main(int argc, char* argv[])
 	IFactory* factory = nullptr;
 	if (wcscmp(lpCmdLine, L"-opengl") == 0)
 	{
-		factory = new GMGLFactory();
 		re = GMRenderEnvironment::OpenGL;
 	}
 	else
 	{
-		factory = new GMDx11Factory();
 		re = GMRenderEnvironment::DirectX11;
 	}
+
+	re = GMCreateFactory(re, GMRenderEnvironment::OpenGL, &factory);
 
 	GMGameMachineDesc desc;
 	desc.factory = factory;

@@ -2,16 +2,17 @@
 #define __GM_WRAPPER_H__
 #include <gmcommon.h>
 #include <dx11wrapper.h>
+#include "../gmgl/gmglfactory.h"
 BEGIN_NS
 
-GMRenderEnvironment GMCreateFactory(GMRenderEnvironment prefer, GMRenderEnvironment fallback, OUT IFactory** ppFactory)
+static GMRenderEnvironment GMCreateFactory(GMRenderEnvironment prefer, GMRenderEnvironment fallback, OUT IFactory** ppFactory)
 {
 	if (!ppFactory)
 		return GMRenderEnvironment::Invalid;
 
-	if (prefer == gm::GMRenderEnvironment::OpenGL)
+	if (prefer == GMRenderEnvironment::OpenGL)
 	{
-		*ppFactory = new gm::GMGLFactory();
+		*ppFactory = new GMGLFactory();
 		return prefer;
 	}
 	else
@@ -29,8 +30,8 @@ GMRenderEnvironment GMCreateFactory(GMRenderEnvironment prefer, GMRenderEnvironm
 		{
 			if (fallback == GMRenderEnvironment::OpenGL)
 			{
-				*ppFactory = new gm::GMGLFactory();
-				return gm::GMRenderEnvironment::OpenGL;
+				*ppFactory = new GMGLFactory();
+				return GMRenderEnvironment::OpenGL;
 			}
 			return GMRenderEnvironment::Invalid;
 		}

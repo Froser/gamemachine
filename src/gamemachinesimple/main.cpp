@@ -10,13 +10,7 @@
 #include <gmgraphicengine.h>
 #include <gmmodelreader.h>
 #include <gmlight.h>
-#if GM_USE_DX11
-#include <gmdx11.h>
-#include <gmdx11helper.h>
-#endif
-
-#define USE_OPENGL 1
-
+#include <wrapper.h>
 using namespace gm;
 
 class SimpleHandler : public IGameHandler, IShaderLoadCallback
@@ -213,21 +207,24 @@ public:
 		/************************************************************************/
 		/* 从先前指定的游戏包中，读取着色器                                        */
 		/************************************************************************/
-#if USE_OPENGL
-		GMGLHelper::loadShader(
-			context,
-			L"gl/main.vert",
-			L"gl/main.frag",
-			L"gl/deferred/geometry_pass_main.vert",
-			L"gl/deferred/geometry_pass_main.frag",
-			L"gl/deferred/light_pass_main.vert",
-			L"gl/deferred/light_pass_main.frag",
-			L"gl/filters/filters.vert",
-			L"gl/filters/filters.frag"
-		);
-#else
-		GMDx11Helper::loadShader(context, L"dx11/effect.fx");
-#endif
+		if (GM.getRunningStates().renderEnvironment == GMRenderEnvironment::OpenGL)
+		{
+			GMGLHelper::loadShader(
+				context,
+				L"gl/main.vert",
+				L"gl/main.frag",
+				L"gl/deferred/geometry_pass_main.vert",
+				L"gl/deferred/geometry_pass_main.frag",
+				L"gl/deferred/light_pass_main.vert",
+				L"gl/deferred/light_pass_main.frag",
+				L"gl/filters/filters.vert",
+				L"gl/filters/filters.frag"
+			);
+		}
+		else
+		{
+			DirectX11LoadShader(context, L"dx11/effect.fx");
+		}
 	}
 
 private:
@@ -251,12 +248,10 @@ int main(int argc, char* argv[])
 	/************************************************************************/
 	/* 设置好工厂类，以及窗口属性                                             */
 	/************************************************************************/
-#if USE_OPENGL
-	IFactory* factory = new GMGLFactory();
-#else
-	IFactory* factory = new GMDx11Factory();
-#endif
-	
+	IFactory* factory = nullptr;
+	GMRenderEnvironment env = GMRenderEnvironment::DirectX11;
+	env = GMCreateFactory(env, GMRenderEnvironment::OpenGL, &factory);
+	GM_ASSERT(env != GMRenderEnvironment::Invalid);
 	GMWindowDesc mainAttrs;
 
 #if !GM_WINDOWS
@@ -280,11 +275,7 @@ int main(int argc, char* argv[])
 	/************************************************************************/
 	gm::GMGameMachineDesc desc;
 	desc.factory = factory;
-#if USE_OPENGL
-	desc.renderEnvironment = GMRenderEnvironment::OpenGL;
-#else
-	desc.renderEnvironment = GMRenderEnvironment::DirectX11;
-#endif
+	desc.renderEnvironment = env;
 	GM.init(desc);
 
 	/************************************************************************/
