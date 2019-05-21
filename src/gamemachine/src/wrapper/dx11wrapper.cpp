@@ -9,11 +9,13 @@
 typedef IFactory* (*CREATE_PROC)();
 typedef void(*SHADER_LOAD_PROC)(const IRenderContext*, const GMString&);
 typedef void (*SHADER_EXT_LOAD_PROC)(const IRenderContext*);
+typedef void(*EXT_WAVE_OBJECT_SHADER_RENDER_PROC)(const gm::GMWaveGameObject* waveObject, IShaderProgram* shaderProgram);
 
 static HMODULE s_hDx11;
 static CREATE_PROC s_createProc;
 static SHADER_LOAD_PROC s_shaderProc;
 static SHADER_EXT_LOAD_PROC s_extensionShaderProc;
+static EXT_WAVE_OBJECT_SHADER_RENDER_PROC s_waveObjShaderRenderProc;
 
 extern "C"
 {
@@ -33,7 +35,7 @@ extern "C"
 
 			if (!s_createProc)
 			{
-				s_createProc = (CREATE_PROC)GetProcAddress(s_hDx11, "gmdx11_CreateDirectX11Factory");
+				s_createProc = (CREATE_PROC)GetProcAddress(s_hDx11, "gmdx11_createDirectX11Factory");
 				if (!s_createProc)
 				{
 					FreeLibrary(s_hDx11);
@@ -64,8 +66,9 @@ extern "C"
 				gm_error(gm_dbg_wrap("Method not found."));
 				return;
 			}
-			return s_shaderProc(context, path);
 		}
+		if (s_shaderProc)
+			return s_shaderProc(context, path);
 		gm_error(gm_dbg_wrap("Invoke method failed. This method shouldn't be invoked."));
 	}
 
@@ -79,8 +82,25 @@ extern "C"
 				gm_error(gm_dbg_wrap("Method not found."));
 				return;
 			}
-			return s_extensionShaderProc(context);
 		}
+		if (s_extensionShaderProc)
+			return s_extensionShaderProc(context);
+		gm_error(gm_dbg_wrap("Invoke method failed. This method shouldn't be invoked."));
+	}
+
+	void Ext_RenderWaveObjectShader(const gm::GMWaveGameObject* waveObject, IShaderProgram* shaderProgram)
+	{
+		if (!s_waveObjShaderRenderProc)
+		{
+			s_waveObjShaderRenderProc = (EXT_WAVE_OBJECT_SHADER_RENDER_PROC)GetProcAddress(s_hDx11, "gmdx11_ext_renderWaveObjectShader");
+			if (!s_waveObjShaderRenderProc)
+			{
+				gm_error(gm_dbg_wrap("Method not found."));
+				return;
+			}
+		}
+		if (s_waveObjShaderRenderProc)
+			return s_waveObjShaderRenderProc(waveObject, shaderProgram);
 		gm_error(gm_dbg_wrap("Invoke method failed. This method shouldn't be invoked."));
 	}
 }

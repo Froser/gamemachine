@@ -491,12 +491,18 @@ void GMGraphicEngine::dispose()
 	D(d);
 	deleteLights();
 	GMComputeShaderManager::instance().disposeShaderPrograms(d->context);
-	d->filterFramebuffers->destroy();
-	d->filterQuad->destroy();
-	d->gBuffer->destroy();
-	d->shadowDepthFramebuffers->destroy();
-	d->defaultFramebuffers->destroy();
-	d->glyphManager->destroy();
+	if (d->filterFramebuffers)
+		d->filterFramebuffers->destroy();
+	if (d->filterQuad)
+		d->filterQuad->destroy();
+	if (d->gBuffer)
+		d->gBuffer->destroy();
+	if (d->shadowDepthFramebuffers)
+		d->shadowDepthFramebuffers->destroy();
+	if (d->defaultFramebuffers)
+		d->defaultFramebuffers->destroy();
+	if (d->glyphManager)
+		d->glyphManager->destroy();
 }
 
 IGBuffer* GMGraphicEngine::createGBuffer()

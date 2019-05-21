@@ -4,7 +4,13 @@
 #include <math.h>
 #include <gmdxincludes.h>
 
-#if !GM_USE_DX11
+#if GM_DISABLE_DX_MATH
+#define GM_USE_DX_MATH 0
+#else
+#define GM_USE_DX_MATH GM_USE_DX_MATH
+#endif
+
+#if !GM_USE_DX_MATH
 // 如果使用DirectX，则不使用glm
 #define GLM_FORCE_INLINE
 #define GLM_ENABLE_EXPERIMENTAL
@@ -96,7 +102,7 @@ inline bool FuzzyCompare(gm::GMfloat p1, gm::GMfloat p2, gm::GMfloat qualifier =
 	return (Fabs(p1 - p2) <= 0.00001f * Min(Fabs(p1), Fabs(p2)));
 }
 
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 #define GMMATH_BEGIN_STRUCT(className, glStruct, dxStruct, padding)	\
 	struct className							\
 	{											\
@@ -188,11 +194,11 @@ struct GMFloat4
 	GMFloat4() = default;
 
 	GMFloat4(gm::GMfloat x, gm::GMfloat y, gm::GMfloat z, gm::GMfloat w)
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 		: v_(x, y, z, w)
 #endif
 	{
-#if !GM_USE_DX11
+#if !GM_USE_DX_MATH
 		v_[0] = x;
 		v_[1] = y;
 		v_[2] = z;
@@ -200,7 +206,7 @@ struct GMFloat4
 #endif
 	}
 
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	enum XYZW
 	{
 		X = 0,
@@ -257,7 +263,7 @@ GMMATH_LOAD_FLOAT4
 GMMATH_SET_FLOAT4(glm::make_vec2)
 GMMATH_SET_GET_(X, 0)
 GMMATH_SET_GET_(Y, 1)
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 GMVec2(gm::GMfloat v0)
 {
 	v_ = DirectX::XMVectorSet(v0, v0, 0, 0);
@@ -288,7 +294,7 @@ GMMATH_SET_GET_(X, 0)
 GMMATH_SET_GET_(Y, 1)
 GMMATH_SET_GET_(Z, 2)
 GMMATH_SET_GET_(W, 3)
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 GMVec3(gm::GMfloat v0)
 {
 	v_ = DirectX::XMVectorSet(v0, v0, v0, 0);
@@ -320,7 +326,7 @@ GMMATH_SET_GET_(X, 0)
 GMMATH_SET_GET_(Y, 1)
 GMMATH_SET_GET_(Z, 2)
 GMMATH_SET_GET_(W, 3)
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 GMVec4(gm::GMfloat v0)
 {
 	v_ = DirectX::XMVectorSet(v0, v0, v0, v0);
@@ -344,7 +350,7 @@ GMVec4(gm::GMfloat v0, gm::GMfloat v1, gm::GMfloat v2, gm::GMfloat v3)
 
 GMVec4(const GMVec3& V, const gm::GMfloat W)
 {
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	v_ = V.v_;
 	this->setW(W);
 #else
@@ -357,7 +363,7 @@ GMMATH_BEGIN_STRUCT_NOPADDING(GMMat4, glm::mat4, DirectX::XMMATRIX)
 GMMATH_LEN(4)
 void loadFloat16(GMFloat16& f16) const
 {
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	for (gm::GMint32 i = 0; i < 4; ++i)
 	{
 		GMFloat4& f4 = f16.v_[i];
@@ -374,7 +380,7 @@ void loadFloat16(GMFloat16& f16) const
 
 void setFloat16(const GMFloat16& f16)
 {
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	for (gm::GMint32 i = 0; i < 4; ++i)
 	{
 		const GMFloat4& f4 = f16.v_[i];
@@ -396,7 +402,7 @@ void setFloat16(const GMFloat16& f16)
 GMVec4 operator[](gm::GMint32 i) const
 {
 	GMVec4 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = v_.r[i];
 #else
 	R.v_ = v_[i];
@@ -413,7 +419,7 @@ GMMATH_SET_GET_(Z, 2)
 GMMATH_SET_GET_(W, 3)
 GMQuat(gm::GMfloat x, gm::GMfloat y, gm::GMfloat z, gm::GMfloat w)
 {
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	v_ = DirectX::XMVectorSet(x, y, z, w);
 #else
 	v_ = glm::quat(w, x, y, z);

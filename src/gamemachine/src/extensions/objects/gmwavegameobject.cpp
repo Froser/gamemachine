@@ -2,16 +2,11 @@
 #include "gmwavegameobject.h"
 #include <gmutilities.h>
 #include <gmgl/shader_constants.h>
+#include "wrapper/dx11wrapper.h"
 
 #define getVertexIndex(x, y) ((x) + (y) * (sliceM + 1))
 #define __L(txt) L ## txt
 #define _L(txt) __L(txt)
-#define WAVE_DESCRIPTION "GM_Ext_Wave_WaveDescriptions"
-#define STEEPNESS "Steepness"
-#define AMPLITUDE "Amplitude"
-#define DIRECTION "Direction"
-#define SPEED "Speed"
-#define WAVELENGTH "WaveLength"
 
 struct GMWaveDescriptionStrings
 {
@@ -377,8 +372,6 @@ void GMWaveGameObject::onRenderShader(GMModel* model, IShaderProgram* shaderProg
 	if (d->acceleration == GMWaveGameObjectHardwareAcceleration::GPU)
 	{
 		static Vector<GMWaveDescriptionStrings> s_waveDescriptionStrings;
-		static const GMString s_waveCount = L"GM_Ext_Wave_WaveCount";
-		static const GMString s_duration = L"GM_Ext_Wave_Duration";
 		constexpr GMint32 MAX_WAVES = 10;
 
 		if (GM.getRunningStates().renderEnvironment == GMRenderEnvironment::OpenGL)
@@ -404,8 +397,8 @@ void GMWaveGameObject::onRenderShader(GMModel* model, IShaderProgram* shaderProg
 			if (d->waveIndices[prog].size() <= waveCount)
 				d->waveIndices[prog].resize(waveCount + 1);
 
-			shaderProgram->setInt(getVariableIndex(shaderProgram, d->globalIndices[prog].waveCount, s_waveCount), gm_sizet_to_int(waveCount));
-			shaderProgram->setFloat(getVariableIndex(shaderProgram, d->globalIndices[prog].duration, s_duration), d->duration);
+			shaderProgram->setInt(getVariableIndex(shaderProgram, d->globalIndices[prog].waveCount, WAVE_COUNT), gm_sizet_to_int(waveCount));
+			shaderProgram->setFloat(getVariableIndex(shaderProgram, d->globalIndices[prog].duration, WAVE_DURATION), d->duration);
 			for (GMint32 i = 0; i < gm_sizet_to_int(waveCount); ++i)
 			{
 				shaderProgram->setFloat(
@@ -432,14 +425,21 @@ void GMWaveGameObject::onRenderShader(GMModel* model, IShaderProgram* shaderProg
 		else
 		{
 #if GM_USE_DX11
+			enum
+			{
+				WAVE_COUNT_ID,
+				WAVE_DURATION_ID,
+				LAST_ID,
+			};
 			static std::once_flag s_flag;
 			std::call_once(s_flag, [d, shaderProgram]() {
-				d->dxWaveEffects.waveCount = shaderProgram->getIndex(s_waveCount);
-				d->dxWaveEffects.duration = shaderProgram->getIndex(s_duration);
+				d->globalIndices.resize(1);
+				d->globalIndices[0].waveCount = shaderProgram->getIndex(WAVE_COUNT);
+				d->globalIndices[0].duration = shaderProgram->getIndex(WAVE_DURATION);
 			});
 			GMint32 waveCount = gm_sizet_to_int(d->waveDescriptions.size());
-			shaderProgram->setInt(d->dxWaveEffects.waveCount, waveCount);
-			shaderProgram->setFloat(d->dxWaveEffects.duration, d->duration);
+			shaderProgram->setInt(d->globalIndices[0].waveCount, waveCount);
+			shaderProgram->setFloat(d->globalIndices[0].duration, d->duration);
 
 			GMComPtr<ID3DX11Effect> effect;
 			shaderProgram->getInterface(GameMachineInterfaceID::D3D11Effect, (void**)&effect);
@@ -457,7 +457,7 @@ void GMWaveGameObject::onRenderShader(GMModel* model, IShaderProgram* shaderProg
 				GM_DX_HR(description->GetMemberByName(WAVELENGTH)->AsScalar()->SetFloat(d->waveDescriptions[i].waveLength));
 			}
 #else
-			GM_ASSERT(false);
+			Ext_RenderWaveObjectShader(this, shaderProgram);
 #endif
 		}
 	}

@@ -1,4 +1,4 @@
-﻿#if !GM_USE_DX11
+﻿#if !GM_USE_DX_MATH
 
 #ifndef XMISNAN
 static_assert(sizeof(unsigned int) == 4, "Wrong unsigned int size.");
@@ -175,7 +175,7 @@ const GMQuat g_GMQuat_identity = Identity<GMQuat>();
 
 inline GMVec3::GMVec3(const GMVec4& V)
 {
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	v_ = V.v_;
 #else
 	v_ = glm::vec3(V.v_[0], V.v_[1], V.v_[2]);
@@ -183,11 +183,11 @@ inline GMVec3::GMVec3(const GMVec4& V)
 }
 
 inline GMQuat::GMQuat(const GMVec3& U, const GMVec3& V)
-#if !GM_USE_DX11
+#if !GM_USE_DX_MATH
 	:v_(U.v_, V.v_)
 #endif
 {
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	gm::GMfloat norm_u_norm_v = Sqrt(Dot(U, U) * Dot(V, V));
 	gm::GMfloat real_part = norm_u_norm_v + Dot(U, V);
 	GMVec3 t;
@@ -214,7 +214,7 @@ template <>
 inline GMVec2 Zero()
 {
 	GMVec2 V;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	V.v_ = DirectX::XMVectorZero();
 #else
 	V.v_ = glm::zero<glm::vec2>();
@@ -226,7 +226,7 @@ template <>
 inline GMVec3 Zero()
 {
 	GMVec3 V;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	V.v_ = DirectX::XMVectorZero();
 #else
 	V.v_ = glm::zero<glm::vec3>();
@@ -238,7 +238,7 @@ template <>
 inline GMVec4 Zero()
 {
 	GMVec4 V;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	V.v_ = DirectX::XMVectorZero();
 #else
 	V.v_ = glm::zero<glm::vec4>();
@@ -250,7 +250,7 @@ template <>
 inline GMMat4 Zero()
 {
 	GMMat4 V;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	V.v_.r[0] = DirectX::g_XMZero;
 	V.v_.r[1] = DirectX::g_XMZero;
 	V.v_.r[2] = DirectX::g_XMZero;
@@ -264,7 +264,7 @@ inline GMMat4 Zero()
 inline GMMat4 __getIdentityMat4()
 {
 	GMMat4 v;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	v.v_ = DirectX::XMMatrixIdentity();
 #else
 	v.v_ = glm::identity<glm::mat4>();
@@ -275,7 +275,7 @@ inline GMMat4 __getIdentityMat4()
 inline GMQuat __getIdentityQuat()
 {
 	GMQuat v;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	v.v_ = DirectX::XMQuaternionIdentity();
 #else
 	v.v_ = glm::identity<glm::quat>();
@@ -286,7 +286,7 @@ inline GMQuat __getIdentityQuat()
 inline GMVec2 operator-(const GMVec2& V)
 {
 	GMVec2 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::operator-(V.v_);
 #else
 	R.v_ = -V.v_;
@@ -297,7 +297,7 @@ inline GMVec2 operator-(const GMVec2& V)
 inline GMVec3 operator-(const GMVec3& V)
 {
 	GMVec3 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::operator-(V.v_);
 #else
 	R.v_ = -V.v_;
@@ -308,7 +308,7 @@ inline GMVec3 operator-(const GMVec3& V)
 inline GMVec4 operator-(const GMVec4& V)
 {
 	GMVec4 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::operator-(V.v_);
 #else
 	R.v_ = -V.v_;
@@ -319,7 +319,7 @@ inline GMVec4 operator-(const GMVec4& V)
 inline GMVec2 operator+(const GMVec2& V1, const GMVec2& V2)
 {
 	GMVec2 V;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	V.v_ = DirectX::operator+(V1.v_, V2.v_);
 #else
 	V.v_ = V1.v_ + V2.v_;
@@ -330,7 +330,7 @@ inline GMVec2 operator+(const GMVec2& V1, const GMVec2& V2)
 inline GMVec2 operator-(const GMVec2& V1, const GMVec2& V2)
 {
 	GMVec2 V;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	V.v_ = DirectX::operator-(V1.v_, V2.v_);
 #else
 	V.v_ = V1.v_ - V2.v_;
@@ -341,7 +341,7 @@ inline GMVec2 operator-(const GMVec2& V1, const GMVec2& V2)
 inline GMVec3 operator+(const GMVec3& V1, const GMVec3& V2)
 {
 	GMVec3 V;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	V.v_ = DirectX::operator+(V1.v_, V2.v_);
 #else
 	V.v_ = V1.v_ + V2.v_;
@@ -351,7 +351,7 @@ inline GMVec3 operator+(const GMVec3& V1, const GMVec3& V2)
 
 inline GMVec3& operator+=(GMVec3& V1, const GMVec3& V2)
 {
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	DirectX::operator+=(V1.v_, V2.v_);
 #else
 	V1 = V1 + V2;
@@ -362,7 +362,7 @@ inline GMVec3& operator+=(GMVec3& V1, const GMVec3& V2)
 inline GMVec3 operator-(const GMVec3& V1, const GMVec3& V2)
 {
 	GMVec3 V;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	V.v_ = DirectX::operator-(V1.v_, V2.v_);
 #else
 	V.v_ = V1.v_ - V2.v_;
@@ -372,7 +372,7 @@ inline GMVec3 operator-(const GMVec3& V1, const GMVec3& V2)
 
 inline GMVec3& operator-=(GMVec3& V1, const GMVec3& V2)
 {
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	DirectX::operator-=(V1.v_, V2.v_);
 #else
 	V1 = V1 - V2;
@@ -383,7 +383,7 @@ inline GMVec3& operator-=(GMVec3& V1, const GMVec3& V2)
 inline GMVec3 operator*(const GMVec3& V1, gm::GMfloat S)
 {
 	GMVec3 V;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	V.v_ = DirectX::operator*(V1.v_, S);
 #else
 	V.v_ = V1.v_ * S;
@@ -393,7 +393,7 @@ inline GMVec3 operator*(const GMVec3& V1, gm::GMfloat S)
 
 inline GMVec3& operator*=(GMVec3& V1, gm::GMfloat S)
 {
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	DirectX::operator*=(V1.v_, S);
 #else
 	V1 = V1 * S;
@@ -410,7 +410,7 @@ inline GMVec3& operator*=(GMVec3& V1, const GMVec3& V2)
 inline GMVec3 operator/(const GMVec3& V1, gm::GMfloat S)
 {
 	GMVec3 V;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	V.v_ = DirectX::operator/(V1.v_, S);
 #else
 	V.v_ = V1.v_ / S;
@@ -420,7 +420,7 @@ inline GMVec3 operator/(const GMVec3& V1, gm::GMfloat S)
 
 inline GMVec3& operator/=(GMVec3& V1, gm::GMfloat S)
 {
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	DirectX::operator/=(V1.v_, S);
 #else
 	V1 = V1 / S;
@@ -431,7 +431,7 @@ inline GMVec3& operator/=(GMVec3& V1, gm::GMfloat S)
 inline GMVec4 operator/(const GMVec4& V1, gm::GMfloat S)
 {
 	GMVec4 V;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	V.v_ = DirectX::operator/(V1.v_, S);
 #else
 	V.v_ = V1.v_ / S;
@@ -442,7 +442,7 @@ inline GMVec4 operator/(const GMVec4& V1, gm::GMfloat S)
 inline GMVec4 operator+(const GMVec4& V1, const GMVec4& V2)
 {
 	GMVec4 V;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	V.v_ = DirectX::operator+(V1.v_, V2.v_);
 #else
 	V.v_ = V1.v_ + V2.v_;
@@ -453,7 +453,7 @@ inline GMVec4 operator+(const GMVec4& V1, const GMVec4& V2)
 inline GMVec4 operator-(const GMVec4& V1, const GMVec4& V2)
 {
 	GMVec4 V;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	V.v_ = DirectX::operator-(V1.v_, V2.v_);
 #else
 	V.v_ = V1.v_ - V2.v_;
@@ -464,7 +464,7 @@ inline GMVec4 operator-(const GMVec4& V1, const GMVec4& V2)
 inline GMVec4 operator*(const GMVec4& V, gm::GMfloat S)
 {
 	GMVec4 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::operator*(V.v_, S);
 #else
 	R.v_ = V.v_ * S;
@@ -487,7 +487,7 @@ inline GMMat4 operator+=(GMMat4& M1, const GMMat4& M2)
 
 inline bool operator==(const GMVec2& V1, const GMVec2& V2)
 {
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	return DirectX::XMVector2Equal(V1.v_, V2.v_);
 #else
 	return V1.v_ == V2.v_;
@@ -496,7 +496,7 @@ inline bool operator==(const GMVec2& V1, const GMVec2& V2)
 
 inline bool operator==(const GMVec3& V1, const GMVec3& V2)
 {
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	return DirectX::XMVector2Equal(V1.v_, V2.v_);
 #else
 	return V1.v_ == V2.v_;
@@ -505,7 +505,7 @@ inline bool operator==(const GMVec3& V1, const GMVec3& V2)
 
 inline bool operator==(const GMVec4& V1, const GMVec4& V2)
 {
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	return DirectX::XMVector4Equal(V1.v_, V2.v_);
 #else
 	return V1.v_ == V2.v_;
@@ -514,7 +514,7 @@ inline bool operator==(const GMVec4& V1, const GMVec4& V2)
 
 inline bool operator==(const GMQuat& Q1, const GMQuat& Q2)
 {
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	return DirectX::XMVector4Equal(Q1.v_, Q2.v_);
 #else
 	return Q1.v_ == Q2.v_;
@@ -524,7 +524,7 @@ inline bool operator==(const GMQuat& Q1, const GMQuat& Q2)
 inline GMMat4 operator*(const GMMat4& M1, const GMMat4& M2)
 {
 	GMMat4 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = M1.v_.operator*(M2.v_);
 #else
 	// opengl为列优先，为了计算先M1变换，再M2变换，应该用M2 * M1
@@ -556,7 +556,7 @@ inline bool operator!=(const GMQuat& Q1, const GMQuat& Q2)
 inline GMVec3 operator*(const GMVec3& V1, const GMVec3& V2)
 {
 	GMVec3 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::operator*(V1.v_, V2.v_);
 #else
 	R.v_ = V1.v_ * V2.v_;
@@ -567,7 +567,7 @@ inline GMVec3 operator*(const GMVec3& V1, const GMVec3& V2)
 inline GMVec4 operator*(const GMVec4& V1, const GMVec4& V2)
 {
 	GMVec4 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::operator*(V1.v_, V2.v_);
 #else
 	R.v_ = V1.v_ * V2.v_;
@@ -578,7 +578,7 @@ inline GMVec4 operator*(const GMVec4& V1, const GMVec4& V2)
 inline GMVec4 operator*(const GMVec4& V, const GMMat4& M)
 {
 	GMVec4 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::XMVector4Transform(V.v_, M.v_);
 #else
 	R.v_ = M.v_ * V.v_;
@@ -588,7 +588,7 @@ inline GMVec4 operator*(const GMVec4& V, const GMMat4& M)
 
 inline GMVec4 operator*(const GMVec4& V, const GMQuat& Q)
 {
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	return V * QuatToMatrix(Q);
 #else
 	GMVec4 R;
@@ -600,7 +600,7 @@ inline GMVec4 operator*(const GMVec4& V, const GMQuat& Q)
 inline GMVec3 operator*(const GMVec3& V, const GMQuat& Q)
 {
 	GMVec3 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::XMVector3Transform(V.v_, QuatToMatrix(Q).v_);
 #else
 	R.v_ = Q.v_ * V.v_;
@@ -611,7 +611,7 @@ inline GMVec3 operator*(const GMVec3& V, const GMQuat& Q)
 inline GMQuat operator*(const GMQuat& V, const GMQuat& Q)
 {
 	GMQuat R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::XMQuaternionMultiply(V.v_, Q.v_);
 #else
 	R.v_ = Q.v_ * V.v_;
@@ -629,7 +629,7 @@ inline GMMat4 operator*(gm::GMfloat V, const GMMat4& M)
 inline GMMat4 QuatToMatrix(const GMQuat& quat)
 {
 	GMMat4 mat;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	mat.v_ = DirectX::XMMatrixRotationQuaternion(quat.v_);
 #else
 	mat.v_ = glm::mat4_cast(quat.v_);
@@ -640,7 +640,7 @@ inline GMMat4 QuatToMatrix(const GMQuat& quat)
 inline GMMat4 LookAt(const GMVec3& position, const GMVec3& center, const GMVec3& up)
 {
 	GMMat4 mat;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	mat.v_ = DirectX::XMMatrixLookAtLH(position.v_, center.v_, up.v_);
 #else
 	mat.v_ = glm::lookAt(position.v_, center.v_, up.v_);
@@ -650,7 +650,7 @@ inline GMMat4 LookAt(const GMVec3& position, const GMVec3& center, const GMVec3&
 
 inline gm::GMfloat Dot(const GMVec2& V1, const GMVec2& V2)
 {
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	return DirectX::XMVectorGetX(DirectX::XMVector2Dot(V1.v_, V2.v_));
 #else
 	return glm::dot(V1.v_, V2.v_);
@@ -659,7 +659,7 @@ inline gm::GMfloat Dot(const GMVec2& V1, const GMVec2& V2)
 
 inline gm::GMfloat Dot(const GMVec3& V1, const GMVec3& V2)
 {
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	return DirectX::XMVectorGetX(DirectX::XMVector3Dot(V1.v_, V2.v_));
 #else
 	return glm::dot(V1.v_, V2.v_);
@@ -668,7 +668,7 @@ inline gm::GMfloat Dot(const GMVec3& V1, const GMVec3& V2)
 
 inline gm::GMfloat Dot(const GMVec4& V1, const GMVec4& V2)
 {
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	return DirectX::XMVectorGetX(DirectX::XMVector4Dot(V1.v_, V2.v_));
 #else
 	return glm::dot(V1.v_, V2.v_);
@@ -678,7 +678,7 @@ inline gm::GMfloat Dot(const GMVec4& V1, const GMVec4& V2)
 inline GMVec3 Normalize(const GMVec3& V)
 {
 	GMVec3 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::XMVector3Normalize(V.v_);
 #else
 	R.v_ = glm::safeNormalize(V.v_);
@@ -689,7 +689,7 @@ inline GMVec3 Normalize(const GMVec3& V)
 inline GMVec4 Normalize(const GMVec4& V)
 {
 	GMVec4 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::XMVector4Normalize(V.v_);
 #else
 	R.v_ = glm::safeNormalize(V.v_);
@@ -700,7 +700,7 @@ inline GMVec4 Normalize(const GMVec4& V)
 inline GMVec4 PlaneNormalize(const GMVec4& V)
 {
 	GMVec4 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::XMPlaneNormalize(V.v_);
 #else
 	GMVec3 N = V;
@@ -713,7 +713,7 @@ inline GMVec4 PlaneNormalize(const GMVec4& V)
 inline GMQuat Normalize(const GMQuat& Q)
 {
 	GMQuat R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::XMQuaternionNormalize(Q.v_);
 #else
 	R.v_ = glm::normalize(Q.v_);
@@ -724,7 +724,7 @@ inline GMQuat Normalize(const GMQuat& Q)
 inline GMVec3 FastNormalize(const GMVec3& V)
 {
 	GMVec3 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::XMVector3Normalize(V.v_);
 #else
 	R.v_ = glm::fastNormalize(V.v_);
@@ -740,7 +740,7 @@ inline GMVec3 MakeVector3(const gm::GMfloat* f)
 inline GMVec3 MakeVector3(const GMVec4& V)
 {
 	GMVec3 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = V.v_;
 #else
 	R.v_ = glm::make_vec3(V.v_);
@@ -751,7 +751,7 @@ inline GMVec3 MakeVector3(const GMVec4& V)
 inline GMVec4 CombineVector4(const GMVec3& V1, const GMVec4& V2)
 {
 	GMVec4 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = V1.v_;
 	R.setW(V2.getW());
 #else
@@ -763,7 +763,7 @@ inline GMVec4 CombineVector4(const GMVec3& V1, const GMVec4& V2)
 inline GMMat4 Translate(const GMVec3& V)
 {
 	GMMat4 M;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	M.v_ = DirectX::XMMatrixTranslationFromVector(V.v_);
 #else
 	M.v_ = glm::translate(V.v_);
@@ -774,7 +774,7 @@ inline GMMat4 Translate(const GMVec3& V)
 inline GMMat4 Translate(const GMVec4& V)
 {
 	GMMat4 M;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	M.v_ = DirectX::XMMatrixTranslationFromVector(V.v_);
 #else
 	M.v_ = glm::translate(V.v_);
@@ -785,7 +785,7 @@ inline GMMat4 Translate(const GMVec4& V)
 inline GMMat4 Scale(const GMVec3& V)
 {
 	GMMat4 M;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	M.v_ = DirectX::XMMatrixScalingFromVector(V.v_);
 #else
 	M.v_ = glm::scale(V.v_);
@@ -801,7 +801,7 @@ inline GMQuat Rotate(gm::GMfloat Angle, const GMVec3& Axis)
 inline GMQuat Rotate(const GMQuat& Start, gm::GMfloat Angle, const GMVec3& Axis)
 {
 	GMQuat Q;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	Q.v_ = DirectX::XMQuaternionMultiply(Start.v_, DirectX::XMQuaternionRotationAxis(Axis.v_, Angle));
 
 #else
@@ -847,7 +847,7 @@ inline void GetTranslationAndScalingFromMatrix(const GMMat4& M, GMFloat4& T, GMF
 inline GMMat4 Ortho(gm::GMfloat left, gm::GMfloat right, gm::GMfloat bottom, gm::GMfloat top, gm::GMfloat n, gm::GMfloat f)
 {
 	GMMat4 M;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	M.v_ = DirectX::XMMatrixOrthographicOffCenterLH(left, right, bottom, top, n, f);
 #else
 	M.v_ = glm::ortho(left, right, bottom, top, n, f);
@@ -857,7 +857,7 @@ inline GMMat4 Ortho(gm::GMfloat left, gm::GMfloat right, gm::GMfloat bottom, gm:
 
 inline gm::GMfloat Length(const GMVec3& V)
 {
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	GMFloat4 f;
 	DirectX::XMStoreFloat4(&f.v_, DirectX::XMVector3Length(V.v_));
 	return f[0];
@@ -868,7 +868,7 @@ inline gm::GMfloat Length(const GMVec3& V)
 
 inline gm::GMfloat Length(const GMVec4& V)
 {
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	return DirectX::XMVectorGetX(DirectX::XMVector4Length(V.v_));
 #else
 	return glm::length(V.v_);
@@ -877,7 +877,7 @@ inline gm::GMfloat Length(const GMVec4& V)
 
 inline gm::GMfloat LengthSq(const GMVec3& V)
 {
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	return DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(V.v_));
 #else
 	return glm::lengthSq(V.v_);
@@ -887,7 +887,7 @@ inline gm::GMfloat LengthSq(const GMVec3& V)
 inline GMVec3 Cross(const GMVec3& V1, const GMVec3& V2)
 {
 	GMVec3 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::XMVector3Cross(V1.v_, V2.v_);
 #else
 	R.v_ = glm::cross(V1.v_, V2.v_);
@@ -898,7 +898,7 @@ inline GMVec3 Cross(const GMVec3& V1, const GMVec3& V2)
 inline GMMat4 Perspective(gm::GMfloat fovy, gm::GMfloat aspect, gm::GMfloat n, gm::GMfloat f)
 {
 	GMMat4 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::XMMatrixPerspectiveFovLH(fovy, aspect, n, f);
 #else
 	R.v_ = glm::perspective(fovy, aspect, n, f);
@@ -909,7 +909,7 @@ inline GMMat4 Perspective(gm::GMfloat fovy, gm::GMfloat aspect, gm::GMfloat n, g
 inline GMMat4 Transpose(const GMMat4& M)
 {
 	GMMat4 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::XMMatrixTranspose(M.v_);
 #else
 	R.v_ = glm::transpose(M.v_);
@@ -920,7 +920,7 @@ inline GMMat4 Transpose(const GMMat4& M)
 inline GMMat4 Inverse(const GMMat4& M)
 {
 	GMMat4 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::XMMatrixInverse(nullptr, M.v_);
 #else
 	R.v_ = glm::inverse(M.v_);
@@ -930,7 +930,7 @@ inline GMMat4 Inverse(const GMMat4& M)
 
 inline GMMat4 InverseTranspose(const GMMat4& M)
 {
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	return Transpose(Inverse(M));
 #else
 	GMMat4 R;
@@ -942,7 +942,7 @@ inline GMMat4 InverseTranspose(const GMMat4& M)
 inline GMQuat Lerp(const GMQuat& Q1, const GMQuat& Q2, gm::GMfloat T)
 {
 	GMQuat R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::XMQuaternionSlerp(Q1.v_, Q2.v_, T);
 #else
 	R.v_ = glm::mix(Q1.v_, Q2.v_, T);
@@ -1006,7 +1006,7 @@ inline GMVec3 Unproject(
 )
 {
 	GMVec3 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = XMVector3Unproject(
 		V.v_,
 		ViewportX,
@@ -1104,7 +1104,7 @@ inline T Lerp(const T& S, const T& E, gm::GMfloat P)
 inline GMVec3 Inhomogeneous(const GMVec4& V)
 {
 	GMVec3 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = V.v_;
 	DirectX::operator/=(R.v_, V.getW());
 #else
@@ -1148,7 +1148,7 @@ inline void CopyToArray(const GMVec4& V, gm::GMfloat* array)
 	array[3] = f4[3];
 }
 
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 template <typename T>
 inline gm::GMfloat* ValuePointer(const T& data)
 {
@@ -1183,7 +1183,7 @@ inline gm::GMfloat* ValuePointer(const GMFloat4& data)
 inline GMVec4 SplatX(const GMVec4& V)
 {
 	GMVec4 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::XMVectorSplatX(V.v_);
 #else
 	auto v = V.getX();
@@ -1195,7 +1195,7 @@ inline GMVec4 SplatX(const GMVec4& V)
 inline GMVec4 SplatY(const GMVec4& V)
 {
 	GMVec4 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::XMVectorSplatY(V.v_);
 #else
 	auto v = V.getY();
@@ -1207,7 +1207,7 @@ inline GMVec4 SplatY(const GMVec4& V)
 inline GMVec4 SplatZ(const GMVec4& V)
 {
 	GMVec4 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::XMVectorSplatZ(V.v_);
 #else
 	auto v = V.getZ();
@@ -1219,7 +1219,7 @@ inline GMVec4 SplatZ(const GMVec4& V)
 inline GMVec4 SplatW(const GMVec4& V)
 {
 	GMVec4 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::XMVectorSplatW(V.v_);
 #else
 	auto v = V.getW();
@@ -1231,7 +1231,7 @@ inline GMVec4 SplatW(const GMVec4& V)
 inline GMVec4 Reciprocal(const GMVec4& V)
 {
 	GMVec4 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::XMVectorReciprocal(V.v_);
 #else
 	R.v_ = glm::reciprocal(V.v_);
@@ -1242,7 +1242,7 @@ inline GMVec4 Reciprocal(const GMVec4& V)
 inline GMVec4 MinComponent(const GMVec4& V1, const GMVec4& V2)
 {
 	GMVec4 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::XMVectorMin(V1.v_, V2.v_);
 #else
 	R.v_ = glm::minComponent(V1.v_, V2.v_);
@@ -1253,7 +1253,7 @@ inline GMVec4 MinComponent(const GMVec4& V1, const GMVec4& V2)
 inline GMVec4 MaxComponent(const GMVec4& V1, const GMVec4& V2)
 {
 	GMVec4 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::XMVectorMax(V1.v_, V2.v_);
 #else
 	R.v_ = glm::maxComponent(V1.v_, V2.v_);
@@ -1264,7 +1264,7 @@ inline GMVec4 MaxComponent(const GMVec4& V1, const GMVec4& V2)
 inline GMVec3 MinComponent(const GMVec3& V1, const GMVec3& V2)
 {
 	GMVec3 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::XMVectorMin(V1.v_, V2.v_);
 #else
 	R.v_ = glm::minComponent(V1.v_, V2.v_);
@@ -1275,7 +1275,7 @@ inline GMVec3 MinComponent(const GMVec3& V1, const GMVec3& V2)
 inline GMVec3 MaxComponent(const GMVec3& V1, const GMVec3& V2)
 {
 	GMVec3 R;
-#if GM_USE_DX11
+#if GM_USE_DX_MATH
 	R.v_ = DirectX::XMVectorMax(V1.v_, V2.v_);
 #else
 	R.v_ = glm::maxComponent(V1.v_, V2.v_);

@@ -401,6 +401,7 @@ else(GM_USE_DX11)
 		gm_set_target_properties(${gm_wrapper_name})
 
 		set_target_properties(${gm_wrapper_name} PROPERTIES DEFINE_SYMBOL GM_USE_DX11)
+		set_target_properties(${gm_wrapper_name} PROPERTIES COMPILE_OPTIONS /DGM_DISABLE_DX_MATH)
 		target_link_libraries(${gm_wrapper_name} PRIVATE ${gm_shared_name})
 		gm_use_gamemachine_dll(${gm_wrapper_name})
 		gm_end_project(${gm_wrapper_name})

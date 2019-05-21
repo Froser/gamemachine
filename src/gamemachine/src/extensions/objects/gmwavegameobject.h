@@ -4,6 +4,15 @@
 #include <gmgameobject.h>
 BEGIN_NS
 
+#define WAVE_COUNT L"GM_Ext_Wave_WaveCount"
+#define WAVE_DURATION L"GM_Ext_Wave_Duration"
+#define WAVE_DESCRIPTION "GM_Ext_Wave_WaveDescriptions"
+#define STEEPNESS "Steepness"
+#define AMPLITUDE "Amplitude"
+#define DIRECTION "Direction"
+#define SPEED "Speed"
+#define WAVELENGTH "WaveLength"
+
 struct GMWaveGameObjectDescription
 {
 	GMfloat terrainX; //!< 地形在x轴的起始位置。
@@ -49,14 +58,6 @@ enum class GMWaveGameObjectHardwareAcceleration
 	CPU,
 };
 
-#if GM_USE_DX11
-struct GMWaveIndices_Dx11
-{
-	GMint32 waveCount;
-	GMint32 duration;
-};
-#endif
-
 GM_PRIVATE_OBJECT(GMWaveGameObject)
 {
 	GMWaveGameObjectDescription objectDescription;
@@ -69,10 +70,6 @@ GM_PRIVATE_OBJECT(GMWaveGameObject)
 	// GPU 相关变量
 	Vector<Vector<GMWaveDescriptionIndices>> waveIndices;
 	Vector<GMWaveIndices> globalIndices;
-
-#if GM_USE_DX11
-	GMWaveIndices_Dx11 dxWaveEffects;
-#endif
 
 	GMWaveGameObjectHardwareAcceleration acceleration = GMWaveGameObjectHardwareAcceleration::GPU;
 };
@@ -108,4 +105,5 @@ private:
 };
 
 END_NS
+
 #endif
