@@ -16,8 +16,8 @@ GMGBuffer::GMGBuffer(const IRenderContext* context)
 GMGBuffer::~GMGBuffer()
 {
 	D(d);
-	GM_delete(d->quad);
-	GM_delete(d->geometryFramebuffers);
+	d->quad->destroy();
+	d->geometryFramebuffers->destroy();
 }
 
 void GMGBuffer::createQuad()

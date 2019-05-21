@@ -429,9 +429,9 @@ inline GMString operator +(const GMString& left, const GMString& right)
 	return left.data()->data + right.data()->data;
 }
 
-class GMStringReader
+class GM_EXPORT GMStringReader
 {
-	class Iterator
+	class GM_EXPORT Iterator
 	{
 	public:
 		Iterator(const Iterator& iter) : m_src(iter.m_src), m_start(iter.m_start), m_end(iter.m_end) {}

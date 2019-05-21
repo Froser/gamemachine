@@ -198,7 +198,7 @@ GMTypoEngine::GMTypoEngine(const IRenderContext* context)
 GMTypoEngine::~GMTypoEngine()
 {
 	D(d);
-	GM_delete(d->stateMachine);
+	d->stateMachine->destroy();
 }
 
 GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptions& options, GMsize_t start)
@@ -522,7 +522,7 @@ void GMTypoTextTransactionAtom::unexecute()
 GMTypoTextBuffer::~GMTypoTextBuffer()
 {
 	D(d);
-	GM_delete(d->engine);
+	d->engine->destroy();
 }
 
 void GMTypoTextBuffer::setBuffer(const GMString& buffer)

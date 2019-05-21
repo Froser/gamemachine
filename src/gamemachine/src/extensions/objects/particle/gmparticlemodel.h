@@ -22,7 +22,7 @@ GM_PRIVATE_OBJECT(GMParticleModel)
 };
 
 //! 表示一个2D粒子，是一个四边形
-class GMParticleModel : public GMObject, public IParticleModel
+class GM_EXPORT GMParticleModel : public GMObject, public IParticleModel
 {
 	GM_DECLARE_PRIVATE(GMParticleModel)
 

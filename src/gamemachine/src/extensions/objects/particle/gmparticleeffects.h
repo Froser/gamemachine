@@ -15,7 +15,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMParticleEffectImplBase)
 	GMComputeBufferHandle constant = 0;
 };
 
-class GMParticleEffectImplBase : public GMParticleEffect
+class GM_EXPORT GMParticleEffectImplBase : public GMParticleEffect
 {
 	GM_DECLARE_PRIVATE_NGO(GMParticleEffectImplBase)
 
@@ -31,7 +31,7 @@ protected:
 	virtual IComputeShaderProgram* getComputeShaderProgram(const IRenderContext* context) { return nullptr; }
 };
 
-class GMGravityParticleEffect : public GMParticleEffectImplBase
+class GM_EXPORT GMGravityParticleEffect : public GMParticleEffectImplBase
 {
 	typedef GMParticleEffectImplBase Base;
 
@@ -50,7 +50,7 @@ public:
 	static void setDefaultCodeAndEntry(const GMString& code, const GMString& entry);
 };
 
-class GMRadialParticleEffect : public GMParticleEffectImplBase
+class GM_EXPORT GMRadialParticleEffect : public GMParticleEffectImplBase
 {
 	typedef GMParticleEffectImplBase Base;
 

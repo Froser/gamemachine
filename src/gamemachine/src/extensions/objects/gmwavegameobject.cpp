@@ -2,9 +2,6 @@
 #include "gmwavegameobject.h"
 #include <gmutilities.h>
 #include <gmgl/shader_constants.h>
-#if GM_USE_DX11
-#include <gmdxincludes.h>
-#endif
 
 #define getVertexIndex(x, y) ((x) + (y) * (sliceM + 1))
 #define __L(txt) L ## txt

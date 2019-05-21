@@ -4,7 +4,7 @@
 
 BEGIN_NS
 
-class GM_EXPORT GMDx11Factory : public IFactory
+class GMDx11Factory : public IFactory
 {
 public:
 	virtual void createWindow(GMInstance instance, IWindow* parent, OUT IWindow** window) override;

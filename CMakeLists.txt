@@ -148,7 +148,7 @@ macro(gm_begin_project)
 		add_definitions(-D_GLIBCXX_USE_WCHAR_T)
 	endif(MSVC)
 	# DirectX Environments:
-	if(GM_USE_DX11)
+	if(GM_USE_DX11 OR GM_BUILD_WRAPPER)
 		set(GM_DX11_SDK_PATH ${DirectX_D3D11_INCLUDE_DIR})
 		include_directories(
 				${GM_DX11_SDK_PATH}
@@ -158,7 +158,7 @@ macro(gm_begin_project)
 				${DirectX_D3D11_LIBRARIES}
 				shlwapi.lib
 			)
-	endif(GM_USE_DX11)
+	endif()
 	
 endmacro(gm_begin_project)
 
@@ -201,6 +201,9 @@ if(WIN32)
 	option(GM_USE_DX11 "Use DirectX11 (SDK required)" ${DirectX_FOUND})
 endif(WIN32)
 
+if (WIN32 AND NOT GM_USE_DX11)
+	option(GM_BUILD_WRAPPER "Build GameMachine Wrapper" ON)
+endif()
 
 #About QT
 find_package(Qt5Core)

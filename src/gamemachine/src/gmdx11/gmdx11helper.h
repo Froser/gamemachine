@@ -8,7 +8,7 @@ BEGIN_NS
 /*!
   此类封装了很多Direct11的方法。每个方法都是以静态的形式访问。
 */
-struct GM_EXPORT GMDx11Helper
+struct GMDx11Helper
 {
 	//! 从GM的包中读取一个着色器文件，并编译到DirectX11环境。
 	/*!

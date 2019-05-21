@@ -171,7 +171,7 @@ using GMShaderVariablesDesc = GMShaderVariablesDesc_t<const GMString>;
 using GMShaderVariablesIndices = GMShaderVariablesDesc_t<GMint32>;
 
 constexpr GMCascadeLevel GMMaxCascades = 8;
-struct GMShadowSourceDesc
+struct GM_EXPORT GMShadowSourceDesc
 {
 	enum Type
 	{
@@ -209,7 +209,7 @@ GM_PRIVATE_OBJECT(GMFramebuffersStack)
 	Stack<IFramebuffers*> framebuffers;
 };
 
-class GMFramebuffersStack : public GMObject
+class GM_EXPORT GMFramebuffersStack : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMFramebuffersStack);
 
@@ -247,7 +247,7 @@ GM_PRIVATE_OBJECT(GMGraphicEngine)
 	bool isDrawingShadow = false;
 };
 
-class GMGraphicEngine : public GMObject, public IGraphicEngine
+class GM_EXPORT GMGraphicEngine : public GMObject, public IGraphicEngine
 {
 	GM_DECLARE_PRIVATE(GMGraphicEngine)
 

@@ -16,7 +16,7 @@ GM_PRIVATE_OBJECT(GMGBuffer)
 	GMGraphicEngine* engine = nullptr;
 };
 
-class GMGBuffer : public GMObject, public IGBuffer
+class GM_EXPORT GMGBuffer : public GMObject, public IGBuffer
 {
 	GM_DECLARE_PRIVATE(GMGBuffer)
 

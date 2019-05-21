@@ -4,7 +4,7 @@
 BEGIN_NS
 
 struct GMShadowSourceDesc;
-struct GMCSMHelper
+struct GM_EXPORT GMCSMHelper
 {
 	static void getFrustumIntervals(
 		const GMCamera& camera,

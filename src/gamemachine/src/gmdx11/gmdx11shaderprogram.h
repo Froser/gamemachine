@@ -13,7 +13,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMDx11EffectShaderProgram)
 	GMAtomic<GMint32> nextVariableIndex;
 };
 
-class GM_EXPORT GMDx11EffectShaderProgram : public IShaderProgram
+class GMDx11EffectShaderProgram : public IShaderProgram
 {
 	GM_DECLARE_PRIVATE_NGO(GMDx11EffectShaderProgram)
 
@@ -53,7 +53,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMDx11ComputeShaderProgram)
 	GMuint32 SRV_UAV_CB_count[3] = { 0 };
 };
 
-class GM_EXPORT GMDx11ComputeShaderProgram : public IComputeShaderProgram
+class GMDx11ComputeShaderProgram : public IComputeShaderProgram
 {
 	GM_DECLARE_PRIVATE_NGO(GMDx11ComputeShaderProgram)
 

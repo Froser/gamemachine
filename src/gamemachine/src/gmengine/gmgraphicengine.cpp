@@ -404,7 +404,7 @@ void GMGraphicEngine::generateShadowBuffer(const List<GMGameObject*>& forwardRen
 			d->shadow.width != d->lastShadow.width ||
 			d->shadow.height != d->lastShadow.height)
 		{
-			GM_delete(d->shadowDepthFramebuffers);
+			d->shadowDepthFramebuffers->destroy();
 			createShadowFramebuffers(&d->shadowDepthFramebuffers);
 			resetCSM();
 		}
@@ -474,7 +474,7 @@ void GMGraphicEngine::deleteLights()
 	D(d);
 	for (auto light : d->lights)
 	{
-		GM_delete(light);
+		light->destroy();
 	}
 
 	d->lights.clear();
@@ -491,12 +491,12 @@ void GMGraphicEngine::dispose()
 	D(d);
 	deleteLights();
 	GMComputeShaderManager::instance().disposeShaderPrograms(d->context);
-	GM_delete(d->filterFramebuffers);
-	GM_delete(d->filterQuad);
-	GM_delete(d->gBuffer);
-	GM_delete(d->shadowDepthFramebuffers);
-	GM_delete(d->defaultFramebuffers);
-	GM_delete(d->glyphManager);
+	d->filterFramebuffers->destroy();
+	d->filterQuad->destroy();
+	d->gBuffer->destroy();
+	d->shadowDepthFramebuffers->destroy();
+	d->defaultFramebuffers->destroy();
+	d->glyphManager->destroy();
 }
 
 IGBuffer* GMGraphicEngine::createGBuffer()

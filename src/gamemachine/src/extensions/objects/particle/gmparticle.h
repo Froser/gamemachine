@@ -308,7 +308,7 @@ GM_PRIVATE_OBJECT(GMParticleEffect)
 	bool GPUValid = true;
 };
 
-class GMParticleEffect : public GMObject
+class GM_EXPORT GMParticleEffect : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMParticleEffect)
 	GM_DECLARE_PROPERTY(Life, life)

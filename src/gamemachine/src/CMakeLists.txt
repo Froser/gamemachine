@@ -21,6 +21,9 @@ set(SOURCES
 		stdafx.h
 		common.h
 
+		wrapper/dx11wrapper.h
+		wrapper/dx11wrapper.cpp
+
 		gmdata/glyph/gmglyphmanager.h
 		gmdata/glyph/gmglyphmanager.cpp
 		gmdata/imagereader/gmimagereader.h
@@ -357,10 +360,6 @@ if(UNIX)
 	list(APPEND SOURCES ${UNIX_SOURCES})
 endif(UNIX)
 
-if(GM_USE_DX11)
-	list(APPEND SOURCES ${WIN32_DX11_SOURCES})
-endif(GM_USE_DX11)
-
 gm_source_group_by_dir(SOURCES)
 gm_add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
 
@@ -383,4 +382,29 @@ if(MSVC)
 	set_target_properties(${gm_shared_name} PROPERTIES DEFINE_SYMBOL GM_DLL)
 	gm_link_gamemachine_libraries(${gm_shared_name} PRIVATE)
 gm_end_project(${gm_shared_name})
+
+if(GM_USE_DX11)
+	list(APPEND SOURCES ${WIN32_DX11_SOURCES})
+else(GM_USE_DX11)
+	# 构建一个GameMachineWrapper，用于动态加载DirectX的功能
+	if(GM_BUILD_WRAPPER)
+		set(gm_wrapper_name gamemachinedx11)
+		set(WRAPPER_SOURCE
+			${WIN32_DX11_SOURCES}
+			gmdx11/main.h
+			gmdx11/main.cpp
+		)
+		gm_source_group_by_dir(WRAPPER_SOURCE)
+		add_library(${gm_wrapper_name} SHARED
+			${WRAPPER_SOURCE}
+		)
+		gm_set_target_properties(${gm_wrapper_name})
+
+		set_target_properties(${gm_wrapper_name} PROPERTIES DEFINE_SYMBOL GM_USE_DX11)
+		target_link_libraries(${gm_wrapper_name} PRIVATE ${gm_shared_name})
+		gm_use_gamemachine_dll(${gm_wrapper_name})
+		gm_end_project(${gm_wrapper_name})
+	endif(GM_BUILD_WRAPPER)
+endif(GM_USE_DX11)
+
 endif(MSVC)

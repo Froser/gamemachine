@@ -58,7 +58,7 @@ GM_PRIVATE_OBJECT(GMModelDataProxy)
 
 class GMPart;
 class GMModelBuffer;
-class GMModelDataProxy : public GMObject, public IQueriable
+class GM_EXPORT GMModelDataProxy : public GMObject, public IQueriable
 {
 	GM_DECLARE_PRIVATE(GMModelDataProxy)
 
@@ -129,7 +129,7 @@ GM_PRIVATE_OBJECT(GMModelBuffer)
 };
 
 //! 用来管理GMModelBuffer生命周期的类，包含引用计数功能。
-class GMModelBuffer : public GMObject
+class GM_EXPORT GMModelBuffer : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMModelBuffer)
 

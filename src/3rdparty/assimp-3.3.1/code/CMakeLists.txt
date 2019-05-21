@@ -188,7 +188,7 @@ IF (NOT MSVC) # MSVC SUPPORTS BIG OBJECT
   SET(ASSIMP_IMPORTERS_DISABLED "${ASSIMP_IMPORTERS_DISABLED} ${name}")
   add_definitions(-DASSIMP_BUILD_NO_${name}_IMPORTER)
   SET(ASSIMP_BUILD_${name}_IMPORTER FALSE)
-ENDIF (MSVC)
+ENDIF (NOT MSVC)
 
 # macro to add the CMake Option ADD_ASSIMP_IMPORTER_<name> which enables compile of loader
 # this way selective loaders can be compiled (reduces filesize + compile time)
@@ -458,7 +458,7 @@ IF (MSVC)
     STEPFileEncoding.cpp
     STEPFileEncoding.h
   )
-ENDIF (NOT MSVC)
+ENDIF (MSVC)
 
 if (MSVC AND ASSIMP_BUILD_IFC_IMPORTER)
   set_source_files_properties(IFCReaderGen.cpp PROPERTIES COMPILE_FLAGS "/bigobj")

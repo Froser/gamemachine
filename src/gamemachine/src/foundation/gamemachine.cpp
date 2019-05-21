@@ -5,6 +5,7 @@
 #include "gmconfigs.h"
 #include "gmengine/ui/gmwidget.h"
 #include "gmmessage.h"
+#include "wrapper/dx11wrapper.h"
 
 extern "C"
 {
@@ -14,10 +15,18 @@ extern "C"
 			return true;
 
 		if (cp == GMCapability::SupportDirectX11)
+		{
 #if GM_USE_DX11
 			return true;
 #else
-			return false;
+			enum { Unknown, Yes, No };
+			static bool s_canCreateDx11;
+			static std::once_flag s_flag;
+			std::call_once(s_flag, [](bool& canCreate) {
+				canCreate = CreateDirectX11Factory(nullptr);
+			}, s_canCreateDx11);
+			return s_canCreateDx11;
+		}
 #endif
 		GM_ASSERT(false);
 		return false;
@@ -283,7 +292,7 @@ bool GameMachine::handleMessage(const GMMessage& msg)
 	case GameMachineMessageType::DeleteLater:
 	{
 		GMObject* obj = static_cast<GMObject*>(msg.object);
-		GM_delete(obj);
+		obj->destroy();
 		break;
 	}
 	case GameMachineMessageType::DeleteWindowLater:
@@ -292,7 +301,7 @@ bool GameMachine::handleMessage(const GMMessage& msg)
 		if (window)
 		{
 			d->windows.erase(window);
-			GM_delete(window);
+			window->destroy();
 			if (d->windows.empty())
 				exit();
 		}

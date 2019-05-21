@@ -181,7 +181,7 @@ GM_PRIVATE_OBJECT(GMMutex)
 };
 
 //! 此类表示一个互斥量
-class GMMutex : public GMObject
+class GM_EXPORT GMMutex : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMMutex)
 

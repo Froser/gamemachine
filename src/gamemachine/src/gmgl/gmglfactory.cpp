@@ -174,7 +174,7 @@ void GMGLFactory::createComputeContext(OUT const IRenderContext** out)
 		{
 			// Engine生命周期由Context管理
 			if (getEngine())
-				GM_delete(getEngine());
+				getEngine()->destroy();
 		}
 
 	public:

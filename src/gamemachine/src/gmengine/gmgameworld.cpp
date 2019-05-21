@@ -6,9 +6,6 @@
 #include <time.h>
 #include "foundation/gamemachine.h"
 
-
-#include "gmdx11/gmdx11texture.h"
-
 namespace
 {
 	bool needBlend(GMGameObject* object)

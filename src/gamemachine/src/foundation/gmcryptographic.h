@@ -3,7 +3,7 @@
 #include <gmcommon.h>
 BEGIN_NS
 
-class GMCryptographic
+class GM_EXPORT GMCryptographic
 {
 public:
 	enum Alogrithm

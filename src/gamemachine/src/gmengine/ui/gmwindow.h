@@ -3,7 +3,7 @@
 #include <gmcommon.h>
 BEGIN_NS
 
-class GMRenderContext : public IRenderContext
+class GM_EXPORT GMRenderContext : public IRenderContext
 {
 public:
 	virtual IWindow* getWindow() const override;
@@ -40,7 +40,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMWindow)
 	GMCursorType cursor = GMCursorType::Arrow;
 };
 
-class GMWindow : public IWindow
+class GM_EXPORT GMWindow : public IWindow
 {
 	GM_DECLARE_PRIVATE_NGO(GMWindow)
 

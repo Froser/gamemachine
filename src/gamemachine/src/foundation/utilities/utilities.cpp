@@ -556,7 +556,7 @@ GMTextureAsset GMToolUtil::createTexture(const IRenderContext* context, const GM
 	if (height)
 		*height = img->getHeight();
 
-	GM_delete(img);
+	img->destroy();
 	return std::move(texture);
 }
 
@@ -577,7 +577,7 @@ void GMToolUtil::createTextureFromFullPath(const IRenderContext* context, const 
 	if (height)
 		*height = img->getHeight();
 
-	GM_delete(img);
+	img->destroy();
 }
 
 void GMToolUtil::addTextureToShader(GMShader& shader, GMAsset texture, GMTextureType type)
@@ -620,7 +620,7 @@ bool GMToolUtil::createPBRTextures(
 	if (!GMImageReader::load(roughnessBuf.getData(), roughnessBuf.getSize(), &roughnessImg))
 	{
 		GM_delete(metallicImg);
-		GM_delete(roughnessImg);
+		roughnessImg->destroy();
 		return false;
 	}
 
@@ -629,9 +629,9 @@ bool GMToolUtil::createPBRTextures(
 		GM.getGamePackageManager()->readFile(GMPackageIndex::Textures, aoPath, &aoBuf);
 		if (!GMImageReader::load(aoBuf.getData(), aoBuf.getSize(), &aoImg))
 		{
-			GM_delete(metallicImg);
-			GM_delete(roughnessImg);
-			GM_delete(aoImg);
+			metallicImg->destroy();
+			roughnessImg->destroy();
+			aoImg->destroy();
 			return false;
 		}
 	}
@@ -671,9 +671,9 @@ bool GMToolUtil::createPBRTextures(
 		}
 
 		GM.getFactory()->createTexture(context, &combinedImage, metallicRoughnessAoTexture);
-		GM_delete(metallicImg);
-		GM_delete(roughnessImg);
-		GM_delete(aoImg);
+		metallicImg->destroy();
+		roughnessImg->destroy();
+		aoImg->destroy();
 		return true;
 	}
 	return false;

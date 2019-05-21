@@ -8,6 +8,7 @@
 #include "demonstration_world.h"
 #include <gmdx11.h>
 #include <gmgl.h>
+#include <wrapper.h>
 
 namespace
 {
@@ -47,25 +48,11 @@ int main(int argc, char* argv[])
 	gm::GMRenderEnvironment env = gm::GMRenderEnvironment::OpenGL;
 	gm::GMInstance hInstance = 0; // Useless in unix
 #endif
-	SetRenderEnv(env);
 
 	gm::IFactory* factory = nullptr;
-	if (GetRenderEnv() == gm::GMRenderEnvironment::OpenGL)
-	{
-		factory = new gm::GMGLFactory();
-	}
-	else
-	{
-#if GM_USE_DX11
-		if (gm::GMQueryCapability(gm::GMCapability::SupportDirectX11))
-			factory = new gm::GMDx11Factory();
-		else
-			factory = new gm::GMGLFactory();
-#else
-		SetRenderEnv(gm::GMRenderEnvironment::OpenGL);
-		factory = new gm::GMGLFactory();
-#endif
-	}
+	env = GMCreateFactory(env, gm::GMRenderEnvironment::OpenGL, &factory);
+	GM_ASSERT(env != gm::GMRenderEnvironment::Invalid && factory);
+	SetRenderEnv(env);
 
 	gm::GMGameMachineDesc desc;
 	desc.factory = factory;

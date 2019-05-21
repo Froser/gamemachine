@@ -8,6 +8,7 @@
 #include <gmdx11helper.h>
 #endif
 #include <gmglhelper.h>
+#include "wrapper/dx11wrapper.h"
 
 #define NAME "GMShaderHelper"
 
@@ -48,14 +49,15 @@ namespace
 
 	GM_LUA_FUNC(loadShaderDx11)
 	{
-#if GM_USE_DX11
 		static const GMString s_invoker = NAME ".loadShaderDx11";
 		GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".loadShaderDx11");
 		IRenderContextProxy context(L);
 		GMString path = GMArgumentHelper::popArgumentAsString(L, s_invoker);
 		GMArgumentHelper::popArgumentAsObject(L, context, s_invoker);
+#if GM_USE_DX11
 		GMDx11Helper::loadShader(context.get(), path, L"main.gfx");
 #else
+		DirectX11LoadShader(context.get(), path);
 #endif
 		return GMReturnValues();
 	}

@@ -10,6 +10,7 @@
 #include <extensions/objects/gmwavegameobject.h>
 #include <extensions/objects/particle/gmparticlemodel.h>
 #include <extensions/objects/particle/gmparticleeffects.h>
+#include "wrapper/dx11wrapper.h"
 
 namespace
 {
@@ -48,7 +49,7 @@ void GMShaderHelper::loadShader(const IRenderContext* context)
 		GMDx11Helper::loadShader(context, L"dx11/effect.fx", L"main.gfx");
 		GMGameObject::setDefaultCullShaderCode(getFileContent(L"dx11/compute/frustumcull.hlsl"));
 #else
-		GM_ASSERT(false);
+		DirectX11LoadShader(context, L"dx11/effect.fx");
 #endif
 	}
 }
@@ -73,7 +74,7 @@ void GMShaderHelper::loadExtensionShaders(const IRenderContext* context)
 		GMRadialParticleEffect::setDefaultCodeAndEntry(getFileContent(L"dx11/compute/particle.hlsl"), L"radial_main");
 		GMParticleModel::setDefaultCode(getFileContent(L"dx11/compute/particle_transfer.hlsl"));
 #else
-		GM_ASSERT(false);
+		DirectX11LoadExtensionShaders(context);
 #endif
 	}
 }
