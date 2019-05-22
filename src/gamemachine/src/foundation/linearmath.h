@@ -7,7 +7,7 @@
 #if GM_DISABLE_DX_MATH
 #define GM_USE_DX_MATH 0
 #else
-#define GM_USE_DX_MATH GM_USE_DX_MATH
+#define GM_USE_DX_MATH GM_USE_DX11
 #endif
 
 #if !GM_USE_DX_MATH
@@ -139,7 +139,7 @@ inline bool FuzzyCompare(gm::GMfloat p1, gm::GMfloat p2, gm::GMfloat qualifier =
 
 #else
 #define GMMATH_BEGIN_STRUCT(className, glStruct, dxStruct, padding)	\
-	struct className							\
+	GM_ALIGNED_16(struct) className				\
 	{											\
 		typedef glStruct DataType;				\
 		glStruct v_;							\
@@ -150,7 +150,7 @@ inline bool FuzzyCompare(gm::GMfloat p1, gm::GMfloat p2, gm::GMfloat qualifier =
 		className(const className& rhs) { v_ = rhs.v_; }
 
 #define GMMATH_BEGIN_STRUCT_NOPADDING(className, glStruct, dxStruct)	\
-	struct className							\
+	GM_ALIGNED_16(struct) className				\
 	{											\
 		typedef glStruct DataType;				\
 		glStruct v_;							\

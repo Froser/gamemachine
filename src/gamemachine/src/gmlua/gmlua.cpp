@@ -298,15 +298,20 @@ GMLuaResult GMLua::protectedCall(const char* functionName, const std::initialize
 	D(d);
 	GMLuaResult lr = pcall(functionName, args, nRet);
 
-	GM_CHECK_LUA_STACK_BALANCE(nRet);
+	GM_CHECK_LUA_STACK_BALANCE(-nRet);
 	if (returns)
 	{
 		for (GMint32 i = 0; i < nRet; i++)
 		{
 			if (returns[i].isObject())
+			{
 				popTable(*returns[i].toObject());
+			}
 			else
+			{
+				POP_GUARD();
 				returns[i] = getTop();
+			}
 		}
 	}
 
@@ -357,7 +362,7 @@ GMLuaResult GMLua::pcall(const char* functionName, const std::initializer_list<G
 	else
 		offset--; // 没有functionName，说明它已经在顶部，到时候一起弹出，所以offset要减1
 
-	GM_CHECK_LUA_STACK_BALANCE(offset);
+	GM_CHECK_LUA_STACK_BALANCE(offset - gm_sizet_to_uint(args.size()));
 
 	for (const auto& var : args)
 	{
