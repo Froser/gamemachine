@@ -3,11 +3,8 @@
 
 #include <gmgl.h>
 #include <gmglhelper.h>
-#if GM_USE_DX11
-#include <gmdx11.h>
-#include <gmdx11helper.h>
-#endif
 #include "..\src\gmphysics\gmdiscretedynamicsworld.h"
+#include <gmshaderhelper.h>
 
 namespace core
 {
@@ -64,29 +61,8 @@ namespace core
 
 	void Handler::onLoadShaders(const IRenderContext* context)
 	{
-		auto& env = GM.getRunningStates().renderEnvironment;
-		if (env == gm::GMRenderEnvironment::OpenGL)
-		{
-			gm::GMGLHelper::loadShader(
-				context,
-				L"gl/main.vert",
-				L"gl/main.frag",
-				L"gl/deferred/geometry_pass_main.vert",
-				L"gl/deferred/geometry_pass_main.frag",
-				L"gl/deferred/light_pass_main.vert",
-				L"gl/deferred/light_pass_main.frag",
-				L"gl/filters/filters.vert",
-				L"gl/filters/filters.frag"
-			);
-		}
-		else
-		{
-#if GM_USE_DX11
-			gm::GMDx11Helper::loadShader(context, L"dx11/effect.fx");
-#else
-			GM_ASSERT(false);
-#endif
-		}
+		gm::GMShaderHelper::loadExtensionShaders(context);
+		gm::GMShaderHelper::loadShader(context);
 	}
 
 	void Handler::event(GameMachineHandlerEvent evt)

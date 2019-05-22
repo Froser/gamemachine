@@ -45,12 +45,7 @@ void GMShaderHelper::loadShader(const IRenderContext* context)
 	}
 	else
 	{
-#if GM_USE_DX11
-		GMDx11Helper::loadShader(context, L"dx11/effect.fx", L"main.gfx");
-		GMGameObject::setDefaultCullShaderCode(getFileContent(L"dx11/compute/frustumcull.hlsl"));
-#else
 		DirectX11LoadShader(context, L"dx11/effect.fx");
-#endif
 	}
 }
 
@@ -69,12 +64,6 @@ void GMShaderHelper::loadExtensionShaders(const IRenderContext* context)
 	}
 	else
 	{
-#if GM_USE_DX11
-		GMGravityParticleEffect::setDefaultCodeAndEntry(getFileContent(L"dx11/compute/particle.hlsl"), L"gravity_main");
-		GMRadialParticleEffect::setDefaultCodeAndEntry(getFileContent(L"dx11/compute/particle.hlsl"), L"radial_main");
-		GMParticleModel::setDefaultCode(getFileContent(L"dx11/compute/particle_transfer.hlsl"));
-#else
 		DirectX11LoadExtensionShaders(context);
-#endif
 	}
 }
