@@ -26,9 +26,10 @@ extern "C"
 				canCreate = CreateDirectX11Factory(nullptr);
 			}, s_canCreateDx11);
 			return s_canCreateDx11;
-		}
 #endif
-		GM_ASSERT(false);
+		}
+
+		GM_ASSERT(false); // wrong capability type
 		return false;
 	}
 }

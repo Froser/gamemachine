@@ -287,7 +287,8 @@ set(WIN32_SOURCES
 set(WIN32_DX11_SOURCES
 		foundation/utilities/gmcom.h
 		foundation/platforms/windows/window/gmwindow_dx11.cpp
-
+		gmdx11/main.h
+		gmdx11/main.cpp
 		gmdx11/gmdx11factory.h
 		gmdx11/gmdx11factory.cpp
 		gmdx11/gmdx11graphic_engine.h
@@ -361,6 +362,10 @@ if(UNIX)
 	list(APPEND SOURCES ${UNIX_SOURCES})
 endif(UNIX)
 
+if(GM_USE_DX11)
+	list(APPEND SOURCES ${WIN32_DX11_SOURCES})
+endif()
+
 gm_source_group_by_dir(SOURCES)
 gm_add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
 
@@ -384,16 +389,12 @@ if(MSVC)
 	gm_link_gamemachine_libraries(${gm_shared_name} PRIVATE)
 gm_end_project(${gm_shared_name})
 
-if(GM_USE_DX11)
-	list(APPEND SOURCES ${WIN32_DX11_SOURCES})
-else(GM_USE_DX11)
+if(NOT GM_USE_DX11)
 	# 构建一个GameMachineWrapper，用于动态加载DirectX的功能
 	if(GM_BUILD_WRAPPER)
 		set(gm_wrapper_name gamemachinedx11)
 		set(WRAPPER_SOURCE
 			${WIN32_DX11_SOURCES}
-			gmdx11/main.h
-			gmdx11/main.cpp
 		)
 		gm_source_group_by_dir(WRAPPER_SOURCE)
 		add_library(${gm_wrapper_name} SHARED

@@ -2,31 +2,12 @@
 #include <windows.h>
 #endif
 
+#include <wrapper.h>
 #include <gamemachine.h>
 #include <gmgl.h>
-#if GM_USE_DX11
-#include <gmdx11.h>
-#include <gmdx11helper.h>
-#endif
-
 #include <gmlua.h>
 #include <iostream>
 using namespace gm;
-
-namespace
-{
-	gm::GMRenderEnvironment s_env;
-
-	void SetRenderEnv(gm::GMRenderEnvironment env)
-	{
-		s_env = env;
-	}
-}
-
-gm::GMRenderEnvironment GetRenderEnv()
-{
-	return s_env;
-}
 
 struct ConsoleDebugOutput : public IDebugOutput
 {
@@ -67,34 +48,18 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-#if GM_WINDOWS
-#if GM_USE_DX11
 	gm::GMRenderEnvironment env = gm::GMRenderEnvironment::DirectX11;
 	if (args.size() >= 3)
 	{
 		if (args[2] == L"-opengl")
 			env = gm::GMRenderEnvironment::OpenGL;
 	}
-#else
-	gm::GMRenderEnvironment env = gm::GMRenderEnvironment::OpenGL;
-#endif
-
-#elif GM_UNIX
-	gm::GMRenderEnvironment env = gm::GMRenderEnvironment::OpenGL;
-#endif
-	SetRenderEnv(env);
 
 	// 初始化
 	GMGameMachineDesc desc;
-	desc.renderEnvironment = GetRenderEnv();
-#if GM_USE_DX11
-	if (GetRenderEnv() == GMRenderEnvironment::OpenGL)
-		desc.factory = new GMGLFactory();
-	else
-		desc.factory = new GMDx11Factory();
-#else
-	desc.factory = new GMGLFactory();
-#endif
+	env = GMCreateFactory(env, GMRenderEnvironment::OpenGL, &desc.factory);
+	desc.renderEnvironment = env;
+	
 	GM.init(desc);
 
 	// 读取Lua
