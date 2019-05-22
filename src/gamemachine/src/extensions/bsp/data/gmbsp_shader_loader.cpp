@@ -139,6 +139,12 @@ GMTextureAsset GMBSPShaderLoader::addTextureToTextureContainer(const GMString& n
 			return GMAsset::invalidAsset();
 		}
 
+		if (!buf.getData())
+		{
+			gm_warning(gm_dbg_wrap("file {0} is empty."), fn);
+			return GMAsset::invalidAsset();
+		}
+
 		GMImage* img = nullptr;
 		loadImage(fn.toStdWString().c_str(), &buf, &img);
 
@@ -163,7 +169,7 @@ void GMBSPShaderLoader::load()
 	D(d);
 	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 	GMBuffer buf;
-	pk->readFileFromPath(pk->pathOf(GMPackageIndex::Root, L"/texshaders/sfx"), &buf);
+	pk->readFileFromPath(pk->pathOf(GMPackageIndex::Root, L"texshaders/sfx"), &buf);
 	buf.convertToStringBuffer();
 	parse((const char*) buf.getData());
 }

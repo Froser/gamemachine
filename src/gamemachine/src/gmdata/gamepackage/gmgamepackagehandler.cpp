@@ -309,7 +309,6 @@ bool GMZipGamePackageHandler::loadBuffer(const GMString& path, REF GMBuffer* buf
 	if (UNZ_OK != unzLocateFile(uf, stdFileName.c_str(), false))
 		return false;
 
-	// 获取文件属性，跳过目录
 	char filename[FILENAME_MAX];
 	unz_file_info64 file_info;
 
