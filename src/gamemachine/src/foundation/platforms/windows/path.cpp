@@ -86,28 +86,6 @@ bool GMPath::fileExists(const GMString& dir)
 	return b;
 }
 
-void GMPath::createDirectory(const GMString& dir)
-{
-	if (fileExists(dir) || (dir.length() == 2 && dir.toStdWString()[1] == L':'))
-		return;
-
-	std::wstring stdUp = dir.toStdWString();
-	if (stdUp.back() == '/' || stdUp.back() == '\\')
-		stdUp = stdUp.substr(0, stdUp.length() - 1); //去掉斜杠和反斜杠
-	stdUp = directoryName(stdUp).toStdWString();
-	for (GMuint32 i = 0; i < stdUp.length(); i++)
-	{
-		if (stdUp[i] == '/')
-			stdUp[i] = '\\';
-	}
-	if (stdUp.back() == '/' || stdUp.back() == '\\')
-		stdUp = stdUp.substr(0, stdUp.length() - 1);
-
-	createDirectory(stdUp);
-	std::string strDir = GMString(dir).toStdString();
-	_mkdir(strDir.c_str());
-}
-
 GMString GMPath::getSpecialFolderPath(SpecialFolder sf)
 {
 	switch (sf)

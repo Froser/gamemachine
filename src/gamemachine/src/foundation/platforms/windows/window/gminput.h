@@ -26,10 +26,6 @@ private:
 	XInputSetState_Delegate m_xinputSetState;
 };
 
-class JoystickStateImpl;
-class MouseStateImpl;
-class KeyboardStateImpl;
-
 GM_PRIVATE_OBJECT(GMInput)
 {
 	enum { MAX_KEYS = 256 };
@@ -49,9 +45,9 @@ GM_PRIVATE_OBJECT(GMInput)
 	GMWheelState wheelState;
 
 	// implements
-	JoystickStateImpl* joystickImpl = nullptr;
-	MouseStateImpl* mouseImpl = nullptr;
-	KeyboardStateImpl* keyboardImpl = nullptr;
+	IJoystickState* joystickImpl = nullptr;
+	IMouseState* mouseImpl = nullptr;
+	IKeyboardState* keyboardImpl = nullptr;
 	IIMState* imImpl = nullptr;
 };
 
