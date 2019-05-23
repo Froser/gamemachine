@@ -214,7 +214,7 @@ void GameMachine::runEventLoop()
 		if (!renderFrame())
 			break;
 	}
-	terminate();
+	finalize();
 }
 
 void GameMachine::translateSystemEvent(GMuint32 uMsg, GMWParam wParam, GMLParam lParam, OUT GMSystemEvent** event)

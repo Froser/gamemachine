@@ -87,7 +87,7 @@ public:
 
 	void init(HDC hDC, HGLRC hRC)
 	{
-		hRCShare = HGLRC(wglCreateContext(hDC));
+		hRCShare = wglCreateContext(hDC);
 		RUN_AND_CHECK(wglShareLists(hRCShare, hRC));
 	EXIT:
 		return;
@@ -137,7 +137,7 @@ public:
 		return d->hRC;
 	}
 
-	inline GMSharedPtr<HRCManager> getRCShareManager()
+	GMSharedPtr<HRCManager> getRCShareManager()
 	{
 		D(d);
 		return d->hRCShareManager;

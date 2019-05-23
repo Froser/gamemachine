@@ -236,7 +236,7 @@ IComputeShaderProgram* GMGravityParticleEffect::getComputeShaderProgram(const IR
 {
 	D(d);
 	if (getCode().isEmpty())
-		return false;
+		return nullptr;
 
 	return GMComputeShaderManager::instance().getComputeShaderProgram(context, GMCS_PARTICLE_GRAVITY, L".", getCode(), getEntry());
 }
@@ -315,7 +315,7 @@ IComputeShaderProgram* GMRadialParticleEffect::getComputeShaderProgram(const IRe
 {
 	D(d);
 	if (getCode().isEmpty())
-		return false;
+		return nullptr;
 
 	return GMComputeShaderManager::instance().getComputeShaderProgram(context, GMCS_PARTICLE_RADIAL, L".", getCode(), getEntry());
 }

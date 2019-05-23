@@ -236,7 +236,7 @@ void GMGameObject::setCullOption(GMGameObjectCullOption option, GMCamera* camera
 	d->cullCamera = camera;
 
 	// 如果不需要事先裁剪，重置Shader状态
-	if (option == GMGameObjectCullOption::None)
+	if (option == GMGameObjectCullOption::NoCull)
 	{
 		Vector<GMAsset>& models = getScene()->getModels();
 		for (GMsize_t i = 0; i < d->cullAABB.size(); ++i)

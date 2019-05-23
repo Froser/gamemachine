@@ -101,6 +101,13 @@ IMouseState& GMInput::getMouseState()
 	return *d->mouseImpl;
 }
 
+IIMState& GMInput::getIMState()
+{
+	D(d);
+	GM_ASSERT(d->imImpl);
+	return *d->imImpl;
+}
+
 void GMInput::handleSystemEvent(GMSystemEvent* event)
 {
 	GMSystemEventType type = event->getType();

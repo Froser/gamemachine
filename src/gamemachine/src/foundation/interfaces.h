@@ -270,7 +270,7 @@ enum class GMComputeBufferType
 #if GM_USE_DX11
 typedef IUnknown *GMComputeHandle;
 #else
-typedef void *GMComputeHandle;
+typedef GMsize_t GMComputeHandle;
 #endif
 typedef GMComputeHandle GMComputeBufferHandle;
 typedef GMComputeHandle GMComputeSRVHandle;

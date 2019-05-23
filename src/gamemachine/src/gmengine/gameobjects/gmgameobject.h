@@ -10,7 +10,7 @@ BEGIN_NS
 
 enum class GMGameObjectCullOption
 {
-	None,
+	NoCull,
 	AABB,
 };
 
@@ -27,7 +27,7 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	{
 		GMVec4 points[8];
 	};
-	GMGameObjectCullOption cullOption = GMGameObjectCullOption::None;
+	GMGameObjectCullOption cullOption = GMGameObjectCullOption::NoCull;
 	AlignedVector<AABB> cullAABB;
 	GMCamera* cullCamera = nullptr;
 	IComputeShaderProgram* cullShaderProgram = nullptr;

@@ -28,7 +28,7 @@ protected:
 	~GMComputeShaderManager();
 
 public:
-	IComputeShaderProgram* GMComputeShaderManager::getComputeShaderProgram(
+	IComputeShaderProgram* getComputeShaderProgram(
 		const IRenderContext* context,
 		GMComputeShader i,
 		const GMString& path,

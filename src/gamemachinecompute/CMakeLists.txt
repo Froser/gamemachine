@@ -30,6 +30,8 @@ add_executable(${PROJECT_NAME}
 		${SOURCES}
 	)
 gm_gamemachine_project(${PROJECT_NAME} TRUE)
-set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE") 
+if(WIN32)
+	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE") 
+endif(WIN32)
 gm_add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
 gm_end_project(${PROJECT_NAME})

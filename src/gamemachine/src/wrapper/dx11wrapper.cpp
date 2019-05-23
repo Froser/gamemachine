@@ -7,6 +7,7 @@
 #include "gmdx11/main.h"
 #endif
 
+#if GM_WINDOWS
 typedef IFactory* (*CREATE_PROC)();
 typedef void(*SHADER_LOAD_PROC)(const IRenderContext*, const GMString&);
 typedef void (*SHADER_EXT_LOAD_PROC)(const IRenderContext*);
@@ -17,6 +18,7 @@ static CREATE_PROC s_createProc;
 static SHADER_LOAD_PROC s_shaderProc;
 static SHADER_EXT_LOAD_PROC s_extensionShaderProc;
 static EXT_WAVE_OBJECT_SHADER_RENDER_PROC s_waveObjShaderRenderProc;
+#endif
 
 extern "C"
 {
@@ -59,6 +61,7 @@ extern "C"
 
 	void DirectX11LoadShader(const IRenderContext* context, const GMString& path)
 	{
+#if GM_WINDOWS
 #if GM_USE_DX11
 		gmdx11_loadShader(context, path);
 #else
@@ -75,10 +78,14 @@ extern "C"
 			return s_shaderProc(context, path);
 		gm_error(gm_dbg_wrap("Invoke method failed. This method shouldn't be invoked."));
 #endif
+#else
+		GM_ASSERT(false); //shouldn't be here
+#endif
 	}
 
 	void DirectX11LoadExtensionShaders(const IRenderContext* context)
 	{
+#if GM_WINDOWS
 #if GM_USE_DX11
 		gmdx11_loadExtensionShaders(context);
 #else
@@ -95,10 +102,14 @@ extern "C"
 			return s_extensionShaderProc(context);
 		gm_error(gm_dbg_wrap("Invoke method failed. This method shouldn't be invoked."));
 #endif
+#else
+		GM_ASSERT(false); //shouldn't be here
+#endif
 	}
 
 	void Ext_RenderWaveObjectShader(const gm::GMWaveGameObject* waveObject, IShaderProgram* shaderProgram)
 	{
+#if GM_WINDOWS
 #if GM_USE_DX11
 		gmdx11_ext_renderWaveObjectShader(waveObject, shaderProgram);
 #else
@@ -114,6 +125,9 @@ extern "C"
 		if (s_waveObjShaderRenderProc)
 			return s_waveObjShaderRenderProc(waveObject, shaderProgram);
 		gm_error(gm_dbg_wrap("Invoke method failed. This method shouldn't be invoked."));
+#endif
+#else
+		GM_ASSERT(false); //shouldn't be here
 #endif
 	}
 }

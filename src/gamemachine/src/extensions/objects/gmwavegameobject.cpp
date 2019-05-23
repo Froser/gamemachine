@@ -183,10 +183,10 @@ void GMWaveGameObject::initShader(const IRenderContext* context)
 	GMRenderTechnique vertexTech(GMShaderType::Vertex);
 	vertexTech.setCode(
 		GMRenderEnvironment::OpenGL,
+		L"#version 330\n"
+		L"#include \"foundation/foundation.h\"\n"
+		L"#include \"foundation/vert_header.h\"\n"
 		GM_STRINGIFY_L(
-			#version 330\n
-			#include "foundation/foundation.h"\n
-			#include "foundation/vert_header.h"\n
 			out vec4 _model3d_position_world;
 			out vec3 _cubemap_uv;
 			

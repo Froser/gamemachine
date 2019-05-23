@@ -96,12 +96,11 @@ void GMWindow::onWindowDestroyed()
 {
 }
 
-bool GMWindow::canClose()
-{
-	return true;
-}
-
 GMWindowProcHandler GMWindow::getProcHandler()
 {
 	return &WndProc;
+}
+
+void GMWindow::setMultithreadRenderingFlag(GMMultithreadRenderingFlag)
+{
 }

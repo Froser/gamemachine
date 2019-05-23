@@ -81,9 +81,9 @@ int main(int argc, char* argv[])
 	/************************************************************************/
 	/* 创建GPU ComputeShader 来计算                                          */
 	/************************************************************************/
-	auto glcs = STRINGIFY(
-		#version 430 core\n
-
+	auto glcs = 
+		L"#version 430 core\n"
+		STRINGIFY(
 		layout(local_size_x = 16, local_size_y = 16) in; \n
 
 		layout(std430, binding = 0) buffer A\n

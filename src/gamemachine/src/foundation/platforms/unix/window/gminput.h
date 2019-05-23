@@ -28,9 +28,10 @@ GM_PRIVATE_OBJECT(GMInput)
 	GMWheelState wheelState;
 
 	// implements
-	JoystickStateImpl* joystickImpl = nullptr;
-	MouseStateImpl* mouseImpl = nullptr;
-	KeyboardStateImpl* keyboardImpl = nullptr;
+	IJoystickState* joystickImpl = nullptr;
+	IMouseState* mouseImpl = nullptr;
+	IKeyboardState* keyboardImpl = nullptr;
+	IIMState* imImpl = nullptr;
 };
 
 class GMInput :
@@ -52,6 +53,7 @@ public:
 	virtual IKeyboardState& getKeyboardState() override;
 	virtual IJoystickState& getJoystickState() override;
 	virtual IMouseState& getMouseState() override;
+	virtual IIMState& getIMState() override;
 	virtual void handleSystemEvent(GMSystemEvent* event) override;
 
 private:

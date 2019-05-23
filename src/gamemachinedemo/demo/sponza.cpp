@@ -165,7 +165,7 @@ void Demo_Sponza::createMenu()
 	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		if (d->sponza)
 		{
-			d->sponza->setCullOption(gm::GMGameObjectCullOption::None);
+			d->sponza->setCullOption(gm::GMGameObjectCullOption::NoCull);
 			d->cpu->setText(L"裁剪：关");
 		}
 	});

@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "check.h"
 #include <gmtools.h>
-#include <dirent.h>
+#include <unistd.h>
 
 namespace
 {
@@ -89,6 +89,12 @@ GMString GMPath::getCurrentPath()
 	char fn[MAX];
 	::GetModuleFileName(fn, MAX);
 	return directoryName(fn);
+}
+
+bool GMPath::fileExists(const GMString& dir)
+{
+	std::string d = dir.toStdString();
+	return access(d.c_str(), F_OK) == 0;
 }
 
 GMString GMPath::getSpecialFolderPath(SpecialFolder sf)
