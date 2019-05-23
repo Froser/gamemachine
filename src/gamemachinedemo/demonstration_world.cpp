@@ -75,7 +75,12 @@ namespace
 		world->addDemo(L"地形: 渲染一个水面。", new Demo_Wave(world));
 		world->addDemo(L"自定义着色器: 使用自定义顶点着色器进行渲染。", new Demo_CustomAndDefaultShader(world));
 		world->addDemo(L"自定义着色器: 使用自定义几何着色器进行渲染。", new Demo_CustomGeometryShader(world));
+#if GM_USE_DX11
 		world->addDemo(L"自定义着色器: 实现聚光灯效果。", new Demo_CustomLight(world));
+#else
+		if (GM.getRunningStates().renderEnvironment == gm::GMRenderEnvironment::OpenGL)
+			world->addDemo(L"自定义着色器: 实现聚光灯效果。", new Demo_CustomLight(world));
+#endif
 		world->addDemo(L"LUA: 执行Lua脚本。", new Demo_Lua(world));
 		if (GM.getGamePackageManager()->exists(gm::GMPackageIndex::Models, "sponza"))
 			world->addDemo(L"场景渲染: 渲染Sponza场景。", new Demo_Sponza(world));
