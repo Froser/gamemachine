@@ -23,7 +23,7 @@
 * 在CMake中指定GM_USE_DX11，将会构造出带DirectX11的GameMachine版本。此时请确保机器装有DirectX11 SDK。带DirectX11的GameMachine将采用带SIMD实现的线性代数库。
 * 若CMake未指定GM_USE_DX11，构造出的GameMachine将会采用非SIMD实现的线性代数库（具体优化取决于编译器）。此外，它会生成gamemachinedx11.dll，将它与gamemachine.dll放在一起，若用户有DirectX11环境，则将用DirectX渲染，否则以OpenGL渲染。
 * 如果用户拥有DirectX11环境，则建议使用GM_USE_DX11构造，它会得到更好的优化。若以兼容性为主，则不必以GM_USE_DX11构造，并请将gamemachinedx11.dll提供给用户。
-** 注意：只有使用gamemachine.dll时gamemachinedx11.dll才会有可能被加载。当用户使用静态版本的非GM_USE_DX11的GameMachine时，gamemachinedx11.dll不会被加载。**
+**注意：只有使用gamemachine.dll时gamemachinedx11.dll才会有可能被加载。当用户使用静态版本的非GM_USE_DX11的GameMachine时，gamemachinedx11.dll不会被加载。**
 
 ## GameMachine提供的功能：
 - 底层功能

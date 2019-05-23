@@ -37,13 +37,15 @@ void Demo_Async::init()
 		bool b = gm::GMModelReader::load(loadSettings, models);
 		gm::GMGameObject* obj = new gm::GMGameObject(models);
 
-		// 加入容器
-		obj->setScaling(Scale(GMVec3(.05f, .05f, .05f)));
-		obj->setTranslation(Translate(GMVec3(0, -.2f, 0)));
-		getDemoWorldReference()->addObjectAndInit(obj);
-		getDemoWorldReference()->addToRenderList(obj);
-		literature->getModel()->getShader().setVisible(false);
-		setDefaultLights();
+		mainThreadInvoke([literature, obj, this]() {
+			// 加入容器
+			obj->setScaling(Scale(GMVec3(.05f, .05f, .05f)));
+			obj->setTranslation(Translate(GMVec3(0, -.2f, 0)));
+			getDemoWorldReference()->addObjectAndInit(obj);
+			getDemoWorldReference()->addToRenderList(obj);
+			literature->getModel()->getShader().setVisible(false);
+			setDefaultLights();
+		});
 		context->getWindow()->setMultithreadRenderingFlag(gm::GMMultithreadRenderingFlag::EndRenderOnMultiThread);
 	});
 
@@ -76,6 +78,7 @@ void Demo_Async::event(gm::GameMachineHandlerEvent evt)
 	switch (evt)
 	{
 	case gm::GameMachineHandlerEvent::FrameStart:
+		invokeThreadFunctions();
 		break;
 	case gm::GameMachineHandlerEvent::FrameEnd:
 		break;
@@ -95,5 +98,22 @@ void Demo_Async::event(gm::GameMachineHandlerEvent evt)
 		break;
 	default:
 		break;
+	}
+}
+
+void Demo_Async::mainThreadInvoke(std::function<void()> function)
+{
+	D(d);
+	d->funcStack.push(function);
+}
+
+void Demo_Async::invokeThreadFunctions()
+{
+	D(d);
+	if (!d->funcStack.empty())
+	{
+		std::function<void()> func = d->funcStack.top();
+		d->funcStack.pop();
+		func();
 	}
 }

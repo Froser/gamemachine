@@ -8,6 +8,7 @@
 GM_PRIVATE_OBJECT_UNALIGNED(Demo_Async)
 {
 	gm::GMFuture<void> future;
+	Stack<std::function<void()>> funcStack;
 };
 
 class Demo_Async : public DemoHandler
@@ -22,6 +23,10 @@ public:
 	virtual void init() override;
 	virtual void event(gm::GameMachineHandlerEvent evt) override;
 	virtual void setDefaultLights() override;
+
+private:
+	void mainThreadInvoke(std::function<void()>);
+	void invokeThreadFunctions();
 
 protected:
 	const gm::GMString& getDescription() const

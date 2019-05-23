@@ -305,6 +305,7 @@ GMLuaResult GMLua::protectedCall(const char* functionName, const std::initialize
 		{
 			if (returns[i].isObject())
 			{
+				POP_GUARD();
 				popTable(*returns[i].toObject());
 			}
 			else
@@ -356,13 +357,8 @@ void GMLua::loadLibrary()
 GMLuaResult GMLua::pcall(const char* functionName, const std::initializer_list<GMVariant>& args, GMint32 nRet)
 {
 	D(d);
-	auto offset = nRet;
 	if (functionName)
 		lua_getglobal(L, functionName);
-	else
-		offset--; // 没有functionName，说明它已经在顶部，到时候一起弹出，所以offset要减1
-
-	GM_CHECK_LUA_STACK_BALANCE(offset - gm_sizet_to_uint(args.size()));
 
 	for (const auto& var : args)
 	{
