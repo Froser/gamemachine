@@ -260,3 +260,53 @@ GMsize_t GMSkeletalGameObject::getAnimationCount()
 
 	return scene->getAnimations()->getAnimationCount();
 }
+
+void GMSkeletalGameObject::setAnimation(GMsize_t index)
+{
+	D(d);
+	if (index >= getAnimationCount())
+	{
+		gm_error(gm_dbg_wrap("Animation index overflow. Max count is {0}"), GMString(gm_sizet_to_int(getAnimationCount())));
+		index = 0;
+	}
+	d->animationIndex = index;
+}
+
+Vector<GMString> GMSkeletalGameObject::getAnimationNames()
+{
+	GMScene* scene = getScene();
+	if (!scene)
+		return Vector<GMString>();
+
+	if (!scene->hasAnimation())
+		return Vector<GMString>();
+
+	D(d);
+	if (d->nameList.empty())
+	{
+		for (GMsize_t i = 0u; i < scene->getAnimations()->getAnimationCount(); ++i)
+		{
+			auto animation = scene->getAnimations()->getAnimation(i);
+			d->nameList.push_back(animation->name);
+		}
+	}
+	return d->nameList;
+}
+
+GMsize_t GMSkeletalGameObject::getAnimationIndexByName(const GMString& name)
+{
+	D(d);
+	GMScene* scene = getScene();
+	if (!scene)
+		return InvalidIndex;
+
+	if (!scene->hasAnimation())
+		return InvalidIndex;
+
+	Vector<GMString> animationNames = getAnimationNames();
+	auto findResult = std::find(animationNames.begin(), animationNames.end(), name);
+	if (findResult == animationNames.end())
+		return InvalidIndex;
+
+	return findResult - animationNames.begin();
+}

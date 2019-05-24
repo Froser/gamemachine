@@ -313,7 +313,7 @@ enum class GMOverflowStyle
 //! 表示控件在容器中的位置标识。
 enum class GMControlPositionFlag
 {
-	Auto, //!< 控件在容器中的位置是浮动的，这意味着为受到容器滚动条的影响。
+	Auto, //!< 控件在容器中的位置是浮动的，这意味着会受到容器滚动条的影响。
 	Fixed, //!< 控件在容器中的位置是固定的。
 };
 

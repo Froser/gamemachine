@@ -42,6 +42,7 @@ GM_PRIVATE_OBJECT(GMSkeletalGameObject)
 	bool playing = true;
 	GMVec4 skeletonColor = GMVec4(0, 1, 0, 1);
 	Map<GMModel*, GMSkeletalAnimationEvaluator*> modelEvaluatorMap;
+	Vector<GMString> nameList;
 	GMsize_t animationIndex = 0;
 };
 
@@ -49,6 +50,11 @@ class GM_EXPORT GMSkeletalGameObject : public GMGameObject
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMSkeletalGameObject, GMGameObject)
 	GM_DECLARE_PROPERTY(SkeletonColor, skeletonColor)
+
+	enum
+	{
+		InvalidIndex = -1,
+	};
 
 public:
 	enum { AutoPlayFrame = -1 };
@@ -64,7 +70,11 @@ public:
 	void play();
 	void pause();
 	void reset(bool update);
+
 	GMsize_t getAnimationCount();
+	void setAnimation(GMsize_t index);
+	Vector<GMString> getAnimationNames();
+	GMsize_t getAnimationIndexByName(const GMString& name);
 
 public:
 	inline bool isPlaying() GM_NOEXCEPT

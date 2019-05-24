@@ -107,6 +107,7 @@ GM_ALIGNED_STRUCT(GMSkeletalAnimation)
 {
 	GMfloat frameRate = 25;
 	GMDuration duration;
+	GMString name;
 	AlignedVector<GMSkeletalAnimationNode> nodes;
 };
 

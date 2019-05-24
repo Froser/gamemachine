@@ -245,6 +245,7 @@ namespace
 		{
 			GMSkeletalAnimation ani;
 			aiAnimation* animation = scene->mAnimations[a];
+			ani.name = animation->mName.C_Str();
 			ani.frameRate = animation->mTicksPerSecond;
 			ani.duration = animation->mDuration;
 

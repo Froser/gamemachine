@@ -28,7 +28,7 @@
 #include "demo/controls.h"
 #include "demo/lua.h"
 #include "demo/particle.h"
-#include "demo/md5mesh.h"
+#include "demo/animation.h"
 #include "demo/terrain.h"
 #include "demo/customshader.h"
 #include "demo/customlight.h"
@@ -71,6 +71,7 @@ namespace
 		world->addDemo(L"粒子系统: 渲染一个2D粒子系统。", new Demo_Particle2D(world));
 		world->addDemo(L"粒子系统: 渲染一个Billboard 3D粒子系统。", new Demo_ParticleBillboard(world));
 		world->addDemo(L"MD5: 渲染MD5骨骼动画。", new Demo_MD5Mesh(world));
+		world->addDemo(L"动画: 同一个物体播放不同动画。", new Demo_MultiAnimation(world));
 		world->addDemo(L"地形: 渲染一个地形。", new Demo_Terrain(world));
 		world->addDemo(L"地形: 渲染一个水面。", new Demo_Wave(world));
 		world->addDemo(L"自定义着色器: 使用自定义顶点着色器进行渲染。", new Demo_CustomAndDefaultShader(world));
