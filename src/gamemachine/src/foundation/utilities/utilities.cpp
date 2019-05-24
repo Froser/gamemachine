@@ -612,15 +612,18 @@ bool GMToolUtil::createPBRTextures(
 	GM.getGamePackageManager()->readFile(GMPackageIndex::Textures, metallicPath, &metallicBuf);
 	if (!GMImageReader::load(metallicBuf.getData(), metallicBuf.getSize(), &metallicImg))
 	{
-		GM_delete(metallicImg);
+		if (metallicImg)
+			metallicImg->destroy();
 		return false;
 	}
 
 	GM.getGamePackageManager()->readFile(GMPackageIndex::Textures, roughnessPath, &roughnessBuf);
 	if (!GMImageReader::load(roughnessBuf.getData(), roughnessBuf.getSize(), &roughnessImg))
 	{
-		GM_delete(metallicImg);
-		roughnessImg->destroy();
+		if (metallicImg)
+			metallicImg->destroy();
+		if (roughnessImg)
+			roughnessImg->destroy();
 		return false;
 	}
 
@@ -629,9 +632,12 @@ bool GMToolUtil::createPBRTextures(
 		GM.getGamePackageManager()->readFile(GMPackageIndex::Textures, aoPath, &aoBuf);
 		if (!GMImageReader::load(aoBuf.getData(), aoBuf.getSize(), &aoImg))
 		{
-			metallicImg->destroy();
-			roughnessImg->destroy();
-			aoImg->destroy();
+			if (metallicImg)
+				metallicImg->destroy();
+			if (roughnessImg)
+				roughnessImg->destroy();
+			if (aoImg)
+				aoImg->destroy();
 			return false;
 		}
 	}
@@ -671,9 +677,12 @@ bool GMToolUtil::createPBRTextures(
 		}
 
 		GM.getFactory()->createTexture(context, &combinedImage, metallicRoughnessAoTexture);
-		metallicImg->destroy();
-		roughnessImg->destroy();
-		aoImg->destroy();
+		if (metallicImg)
+			metallicImg->destroy();
+		if (roughnessImg)
+			roughnessImg->destroy();
+		if (aoImg)
+			aoImg->destroy();
 		return true;
 	}
 	return false;
