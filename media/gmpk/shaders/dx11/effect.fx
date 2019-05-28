@@ -53,8 +53,11 @@ static const int GM_VertexColorOp_Add = 3;
 //--------------------------------------------------------------------------------------
 // Bones And Animations
 //--------------------------------------------------------------------------------------
-int GM_UseBoneAnimation = 0;
+int GM_UseAnimation = 0;
 static const int GM_MaxBones = 128;
+static const int GM_NoAnimation = 0;
+static const int GM_SkeletalAnimation = 1;
+static const int GM_AffineAnimation = 2;
 matrix GM_Bones[GM_MaxBones];
 
 //--------------------------------------------------------------------------------------
@@ -812,13 +815,18 @@ VS_OUTPUT VS_3D( VS_INPUT input )
     VS_OUTPUT output;
     output.Position = GM_ToFloat4(input.Position);
 
-    if (GM_UseBoneAnimation != 0)
+    if (GM_UseAnimation == GM_SkeletalAnimation)
     {
         matrix boneTransform = GM_Bones[input.BoneIDs[0]] * input.Weights[0];
         boneTransform += GM_Bones[input.BoneIDs[1]] * input.Weights[1];
         boneTransform += GM_Bones[input.BoneIDs[2]] * input.Weights[2];
         boneTransform += GM_Bones[input.BoneIDs[3]] * input.Weights[3];
         output.Position = mul(output.Position, boneTransform);
+    }
+    else if (GM_UseAnimation == GM_AffineAnimation)
+    {
+        // 将仿射变换的值放到第1个Bones矩阵中
+        output.Position = mul(output.Position, GM_Bones[0]);
     }
 
     output.Position = mul(output.Position, GM_WorldMatrix);

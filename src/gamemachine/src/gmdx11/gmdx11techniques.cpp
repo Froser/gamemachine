@@ -371,6 +371,18 @@ void GMDx11Technique::updateBoneTransforms(IShaderProgram* shaderProgram, GMMode
 	}
 }
 
+void GMDx11Technique::updateNodeTransforms(IShaderProgram* shaderProgram, GMModel* model)
+{
+	D(d);
+	auto bones = d->effect->GetVariableByName(GM_VariablesDesc.Bones.toStdString().c_str());
+	const auto& transforms = model->getBoneTransformations();
+	if (!transforms.empty())
+	{
+		const auto& transform = transforms[0];
+		bones->GetElement(0)->AsMatrix()->SetMatrix(ValuePointer(transform));
+	}
+}
+
 void GMDx11Technique::setCascadeEndClip(GMCascadeLevel level, GMfloat endClip)
 {
 	D(d);
@@ -672,12 +684,13 @@ void GMDx11Technique::beginModel(GMModel* model, const GMGameObject* parent)
 	GM_ASSERT(d->techContext.currentScene);
 	if (d->techContext.currentScene->hasAnimation() && parent && parent->isSkeletalObject())
 	{
-		shaderProgram->setInt(VI(UseBoneAnimation), 1);
-		updateBoneTransforms(shaderProgram, model);
+		shaderProgram->setInt(VI(UseAnimation), 2);
+		//updateBoneTransforms(shaderProgram, model);
+		updateNodeTransforms(shaderProgram, model);
 	}
 	else
 	{
-		shaderProgram->setInt(VI(UseBoneAnimation), 0);
+		shaderProgram->setInt(VI(UseAnimation), 0);
 	}
 
 	if (parent)

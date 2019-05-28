@@ -134,7 +134,7 @@ bool GMDx11FXC::canLoad(const GMString& code, const GMBuffer& fxcBuffer)
 	GMsize_t contentOffset = 0;
 	if (!getFileHeaders(fxcBuffer, version, fileFingerprints, contentOffset))
 	{
-		gm_warning(gm_dbg_wrap("FXC wrong header."));
+		gm_warning(gm_dbg_wrap("GXC wrong header."));
 		return false;
 	}
 
@@ -146,7 +146,7 @@ bool GMDx11FXC::canLoad(const GMString& code, const GMBuffer& fxcBuffer)
 
 	if (memcmp(fileFingerprints, md5.getData(), md5.getSize()) != 0)
 	{
-		gm_warning(gm_dbg_wrap("Shader code doesn't match fxc file."));
+		gm_warning(gm_dbg_wrap("Shader code doesn't match gxc file."));
 		return false;
 	}
 

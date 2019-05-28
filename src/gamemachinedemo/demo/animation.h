@@ -42,6 +42,7 @@ public:
 
 	virtual void init() override;
 	virtual void setDefaultLights() override;
+	virtual void setLookAt() override;
 
 protected:
 	const gm::GMString& getDescription() const

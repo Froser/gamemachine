@@ -196,6 +196,7 @@ void Demo_MultiAnimation::init()
 
 	widget->setSize(widget->getSize().width, top + 40);
 
+	d->object->setScaling(Scale(GMVec3(.02f, .02f, .02f)));
 	asDemoGameWorld(getDemoWorldReference())->addObject("object", d->object);
 }
 
@@ -208,13 +209,19 @@ void Demo_MultiAnimation::setDefaultLights()
 			gm::ILight* light = nullptr;
 			GM.getFactory()->createLight(gm::GMLightType::PointLight, &light);
 			GM_ASSERT(light);
-			gm::GMfloat lightPos[] = { 1, 0, -3 };
+			gm::GMfloat lightPos[] = { -2, 2, 2 };
 			light->setLightAttribute3(gm::GMLight::Position, lightPos);
-			gm::GMfloat ambientIntensity[] = { .5f, .5f, .5f };
+			gm::GMfloat ambientIntensity[] = { .3f, .3f, .3f };
 			light->setLightAttribute3(gm::GMLight::AmbientIntensity, ambientIntensity);
 			gm::GMfloat diffuseIntensity[] = { .7f, .7f, .7f };
 			light->setLightAttribute3(gm::GMLight::DiffuseIntensity, diffuseIntensity);
 			getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
 		}
 	}
+}
+
+void Demo_MultiAnimation::setLookAt()
+{
+	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
+	camera.lookAt(gm::GMCameraLookAt::makeLookAt(GMVec3(-1, .5f, 0), GMVec3(2.35f, 0, 1.85f)));
 }

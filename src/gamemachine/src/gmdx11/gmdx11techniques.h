@@ -116,6 +116,7 @@ protected:
 private:
 	GMTextureAsset getWhiteTexture();
 	void updateBoneTransforms(IShaderProgram* shaderProgram, GMModel* model);
+	void updateNodeTransforms(IShaderProgram* shaderProgram, GMModel* model);
 
 protected:
 	virtual void setCascadeEndClip(GMCascadeLevel level, GMfloat endClip);

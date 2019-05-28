@@ -1,6 +1,7 @@
 ﻿#ifndef __GMSKELETON_H__
 #define __GMSKELETON_H__
 #include <gmcommon.h>
+#include <gmassets.h>
 BEGIN_NS
 
 class GMSkeletalAnimationEvaluator;
@@ -28,6 +29,7 @@ GM_PRIVATE_OBJECT(GMSkeletalNode)
 	GMSkeletalNode* parent = nullptr;
 	Vector<GMSkeletalNode*> children;
 	GMMat4 transformToParent;
+	GMMat4 globalTransform;
 };
 
 GM_ALIGNED_16(class) GMSkeletalNode
@@ -38,6 +40,7 @@ GM_ALIGNED_16(class) GMSkeletalNode
 	GM_DECLARE_PROPERTY(Parent, parent)
 	GM_DECLARE_PROPERTY(Children, children)
 	GM_DECLARE_PROPERTY(TransformToParent, transformToParent)
+	GM_DECLARE_PROPERTY(GlobalTransform, globalTransform)
 
 public:
 	~GMSkeletalNode()

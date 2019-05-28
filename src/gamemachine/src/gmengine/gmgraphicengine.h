@@ -8,6 +8,10 @@
 #include <gmthread.h>
 BEGIN_NS
 
+#define NO_ANIMATION 0
+#define SKELETAL_ANIMATION 1
+#define AFFINE_ANIMATION 2
+
 template <typename T>
 ITechnique* newTechnique(GMOwnedPtr<ITechnique>& ptr, const IRenderContext* context)
 {
@@ -118,7 +122,7 @@ struct GMShaderVariablesDesc_t
 
 	// 骨骼
 	T Bones;
-	T UseBoneAnimation;
+	T UseAnimation;
 
 	// 位置
 	T ViewPosition;

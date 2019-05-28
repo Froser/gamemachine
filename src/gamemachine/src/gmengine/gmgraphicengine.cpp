@@ -19,7 +19,7 @@ static GMShaderVariablesDesc s_defaultShaderVariablesDesc =
 	"GM_InverseViewMatrix",
 
 	"GM_Bones",
-	"GM_UseBoneAnimation",
+	"GM_UseAnimation",
 
 	"GM_ViewPosition",
 

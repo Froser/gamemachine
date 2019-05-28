@@ -20,6 +20,15 @@ namespace
 		GM_ASSERT(false);
 		return 0;
 	}
+
+	void assignNode(GMSkeletalNode* node, AlignedVector<GMMat4>& transforms)
+	{
+		transforms.push_back(node->getGlobalTransform());
+		for (auto child : node->getChildren())
+		{
+			assignNode(child, transforms);
+		}
+	}
 }
 
 GMSkeletalAnimationEvaluator::GMSkeletalAnimationEvaluator(GMSkeletalNode* root, GMSkeleton* skeleton)
@@ -41,12 +50,22 @@ void GMSkeletalAnimationEvaluator::update(GMDuration dt)
 	updateNode(animationTime, d->rootNode, Identity<GMMat4>());
 	AlignedVector<GMMat4>& transforms = d->transforms;
 
-	GMsize_t boneCount = d->skeleton->getBones().getBones().size();
-	transforms.resize(boneCount);
-
-	for (GMsize_t i = 0; i < boneCount; ++i)
+	if (d->skeleton)
 	{
-		transforms[i] = d->skeleton->getBones().getBones()[i].finalTransformation;
+		// 在骨骼动画中，transforms表示每个骨骼的变换
+		GMsize_t boneCount = d->skeleton->getBones().getBones().size();
+		transforms.resize(boneCount);
+
+		for (GMsize_t i = 0; i < boneCount; ++i)
+		{
+			transforms[i] = d->skeleton->getBones().getBones()[i].finalTransformation;
+		}
+	}
+	else
+	{
+		// 在非骨骼动画中，transforms表示每个结点的变换
+		transforms.clear();
+		assignNode(d->rootNode, transforms);
 	}
 }
 
@@ -60,7 +79,6 @@ void GMSkeletalAnimationEvaluator::updateNode(GMDuration animationTime, GMSkelet
 {
 	D(d);
 	const GMString& nodeName = node->getName();
-	const GMMat4& transformation = node->getTransformToParent();
 	const GMSkeletalAnimationNode* animationNode = findAnimationNode(nodeName);
 	GMMat4 nodeTransformation = node->getTransformToParent();
 	GMfloat factor = 0;
@@ -133,15 +151,20 @@ void GMSkeletalAnimationEvaluator::updateNode(GMDuration animationTime, GMSkelet
 	}
 
 	GMMat4 globalTransformation = nodeTransformation * parentTransformation;
+	node->setGlobalTransform(globalTransformation);
 
 	// 把变换结果保存
-	auto& boneMapping = d->skeleton->getBones().getBoneNameIndexMap();
-	auto& boneInfo = d->skeleton->getBones().getBones();
-	if (boneMapping.find(nodeName) != boneMapping.end())
+	if (d->skeleton)
 	{
-		GMsize_t idx = boneMapping[nodeName];
-		auto& bone = boneInfo[idx];
-		bone.finalTransformation = bone.offsetMatrix * globalTransformation * d->globalInverseTransform;
+		// 如果是骨骼动画，结果保存到骨骼节点
+		auto& boneMapping = d->skeleton->getBones().getBoneNameIndexMap();
+		auto& boneInfo = d->skeleton->getBones().getBones();
+		if (boneMapping.find(nodeName) != boneMapping.end())
+		{
+			GMsize_t idx = boneMapping[nodeName];
+			auto& bone = boneInfo[idx];
+			bone.finalTransformation = bone.offsetMatrix * globalTransformation * d->globalInverseTransform;
+		}
 	}
 
 	for (auto& child : node->getChildren())
@@ -180,21 +203,29 @@ void GMSkeletalGameObject::update(GMDuration dt)
 
 		for (auto& model : scene->getModels())
 		{
-			auto skeleton = model.getModel()->getSkeleton();
-			if (skeleton)
+			auto animations = scene->getAnimations();
+			if (animations)
 			{
-				auto animations = scene->getAnimations();
-				if (animations)
+				GMSkeleton* skeleton = model.getModel()->getSkeleton();
+				GMSkeletalAnimationEvaluator* evaluator = d->modelEvaluatorMap[model.getModel()];
+				if (!evaluator)
+					evaluator = d->modelEvaluatorMap[model.getModel()] = new GMSkeletalAnimationEvaluator(scene->getRootNode(), skeleton);
+
+				evaluator->setAnimation(animations->getAnimation(d->animationIndex));
+				evaluator->update(dt);
+
+				if (skeleton)
 				{
-					GMSkeletalAnimationEvaluator* evaluator = d->modelEvaluatorMap[model.getModel()];
-					if (!evaluator)
-						evaluator = d->modelEvaluatorMap[model.getModel()] = new GMSkeletalAnimationEvaluator(scene->getRootNode(), skeleton);
-
-					evaluator->setAnimation(animations->getAnimation(d->animationIndex));
-					evaluator->update(dt);
-
 					auto& transforms = evaluator->getTransforms();
 					model.getModel()->getBoneTransformations().swap(transforms);
+				}
+				else
+				{
+					// 不存在skeleton，只有纯粹的动画，所以只有最后一帧
+					auto& transforms = evaluator->getTransforms();
+					auto& modelTransforms = model.getModel()->getBoneTransformations();
+					modelTransforms.clear();
+					modelTransforms.push_back(*transforms.rbegin());
 				}
 			}
 		}

@@ -203,6 +203,7 @@ GM_PRIVATE_OBJECT(GMModel)
 	GMRenderTechniqueID techniqueId = 0;
 	GMModelAsset parentAsset;
 	GMOwnedPtr<GMSkeleton> skeleton;
+	// 骨骼变换矩阵，对于无骨骼的model，使用首个元素表示变换。
 	AlignedVector<GMMat4> boneTransformations;
 };
 

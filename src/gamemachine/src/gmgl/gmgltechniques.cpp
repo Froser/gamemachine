@@ -246,12 +246,12 @@ void GMGLTechnique::beginModel(GMModel* model, const GMGameObject* parent)
 	GM_ASSERT(d->techContext.currentScene);
 	if (d->techContext.currentScene->hasAnimation() && parent && parent->isSkeletalObject())
 	{
-		shaderProgram->setInt(VI(UseBoneAnimation), 1);
+		shaderProgram->setInt(VI(UseAnimation), 1);
 		updateBoneTransforms(shaderProgram, model);
 	}
 	else
 	{
-		shaderProgram->setInt(VI(UseBoneAnimation), 0);
+		shaderProgram->setInt(VI(UseAnimation), 0);
 	}
 
 	if (parent)
