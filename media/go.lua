@@ -128,7 +128,7 @@ handler.start = function()
 		material.specular = { 0, 0, 0 }
 	end
 
-	local gameobject = GMSkeletalGameObject.new()
+	local gameobject = GMGameObject.new()
 	gameobject:setAsset(asset)
 	gameobject:setTranslation(translate(0, -.5, 0))
 	gameobject:setScaling(scale(.02, .02, .02))
@@ -159,11 +159,10 @@ end
 handler.onLoadShaders = function(context)
 	if (GM.getRunningStates().renderEnvironment == 1) then--opengl
 		GMDebugger.info('OpenGL detected.')
-		GMShaderHelper.loadShaderOpenGL(context, 'gl/main.vert','gl/main.frag','gl/deferred/geometry_pass_main.vert','gl/deferred/geometry_pass_main.frag','gl/deferred/light_pass_main.vert','gl/deferred/light_pass_main.frag','gl/filters/filters.vert','gl/filters/filters.frag')
 	else
 		GMDebugger.info('DirectX11 detected.')
-		GMShaderHelper.loadShaderDx11(context, 'dx11/effect.fx')
 	end
+	GMShaderHelper.loadShader(context)
 end
 
 -- 设置处理器

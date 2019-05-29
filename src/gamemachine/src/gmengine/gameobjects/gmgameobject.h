@@ -8,6 +8,8 @@
 
 BEGIN_NS
 
+class GMAnimationGameObjectHelper;
+
 enum class GMGameObjectCullOption
 {
 	NoCull,
@@ -22,6 +24,7 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	const IRenderContext* context = nullptr;
 	bool autoUpdateTransformMatrix = true;
 	GMAsset asset;
+	GMAnimationGameObjectHelper* helper = nullptr;
 
 	GM_ALIGNED_16(struct) AABB
 	{
@@ -59,13 +62,20 @@ class GM_EXPORT GMGameObject : public GMObject
 	GM_DECLARE_PRIVATE(GMGameObject)
 
 public:
-	GMGameObject() = default;
+	enum
+	{
+		InvalidIndex = -1,
+	};
+
+public:
+	GMGameObject();
 	GMGameObject(GMSceneAsset asset);
 	~GMGameObject();
 
 public:
 	void setAsset(GMSceneAsset asset);
 	GMScene* getScene();
+	const GMScene* getScene() const;
 	GMModel* getModel();
 	void setWorld(GMGameWorld* world);
 	GMGameWorld* getWorld();
@@ -77,11 +87,21 @@ public:
 	virtual void onAppendingObjectToWorld();
 	virtual void onRemovingObjectFromWorld() {}
 	virtual void draw();
-	virtual void update(GMDuration dt) {}
+	virtual void update(GMDuration dt);
 	virtual bool canDeferredRendering();
 	virtual const IRenderContext* getContext();
-	virtual bool isSkeletalObject() const;
 	virtual void onRenderShader(GMModel*, IShaderProgram* shaderProgram) const {}
+
+	// 动画控制
+public:
+	void play();
+	void pause();
+	bool isPlaying();
+	void reset(bool update);
+	GMsize_t getAnimationCount();
+	void setAnimation(GMsize_t index);
+	Vector<GMString> getAnimationNames();
+	GMsize_t getAnimationIndexByName(const GMString& name);
 
 protected:
 	virtual void drawModel(const IRenderContext* context, GMModel* model);
@@ -98,6 +118,7 @@ public:
 	void beginUpdateTransform();
 	void endUpdateTransform();
 	void setCullOption(GMGameObjectCullOption option, GMCamera* camera = nullptr);
+	GMAnimationType getAnimationType() const;
 
 	inline const GMMat4& getTransform() const GM_NOEXCEPT
 	{

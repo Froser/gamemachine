@@ -327,18 +327,26 @@ public:
 #define GM_DEFINE_VERTEX_PROPERTY(name) \
 	inline auto& name() { D(d); return d->name; }
 
+enum class GMAnimationType
+{
+	NoAnimation,
+	SkeletalAnimation,
+	AffineAnimation,
+};
 
 GM_PRIVATE_OBJECT(GMScene)
 {
 	Vector<GMAsset> models;
 	GMOwnedPtr<GMSkeletalAnimations> animations;
 	GMOwnedPtr<GMSkeletalNode> skeletalRoot;
+	GMAnimationType animationType = GMAnimationType::NoAnimation;
 };
 
 class GM_EXPORT GMScene : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMScene)
 	GM_DECLARE_PROPERTY(Models, models)
+	GM_DECLARE_PROPERTY(AnimationType, animationType)
 
 public:
 	enum
@@ -368,6 +376,7 @@ public:
 	void setAnimations(AUTORELEASE GMSkeletalAnimations* animations)
 	{
 		D(d);
+		GM_ASSERT(d->animationType != GMAnimationType::NoAnimation);
 		d->animations.reset(animations);
 	}
 

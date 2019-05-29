@@ -4,7 +4,7 @@
 #include <gmassets.h>
 BEGIN_NS
 
-class GMSkeletalAnimationEvaluator;
+class GMAnimationEvaluator;
 struct GMSceneAnimatorNode;
 struct GMSkeletalAnimation;
 

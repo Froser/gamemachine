@@ -3,7 +3,6 @@
 #include <gmcontrols.h>
 #include <gmwidget.h>
 #include <gmmodelreader.h>
-#include <gmskeletalgameobject.h>
 
 void Demo_MD5Mesh::init()
 {
@@ -60,7 +59,7 @@ void Demo_MD5Mesh::init()
 		model.getModel()->getShader().getMaterial().setSpecular(GMVec3(0));
 	}
 
-	d->object = new gm::GMSkeletalGameObject(objectModel);
+	d->object = new gm::GMGameObject(objectModel);
 	d->object->setScaling(Scale(GMVec3(.02f, .02f, .02f)));
 	d->object->setTranslation(Translate(GMVec3(0, -.5f, 0)));
 	d->object->setRotation(Rotate(-PI / 2, GMVec3(1, 0, 0)) * Rotate(PI, GMVec3(0, 1, 0)));
@@ -136,7 +135,7 @@ void Demo_MultiAnimation::init()
 		model.getModel()->getShader().getMaterial().setSpecular(GMVec3(0));
 	}
 
-	d->object = new gm::GMSkeletalGameObject(objectModel);
+	d->object = new gm::GMGameObject(objectModel);
 	auto cnt = d->object->getAnimationCount();
 
 	gm::GMWidget* widget = createDefaultWidget();
@@ -153,7 +152,7 @@ void Demo_MultiAnimation::init()
 	));
 	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		auto index = d->object->getAnimationIndexByName("anim 1");
-		if (index != gm::GMSkeletalGameObject::InvalidIndex)
+		if (index != gm::GMGameObject::InvalidIndex)
 			d->object->setAnimation(index);
 		d->object->reset(true);
 		d->object->play();
@@ -171,7 +170,7 @@ void Demo_MultiAnimation::init()
 	));
 	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		auto index = d->object->getAnimationIndexByName("anim 2");
-		if (index != gm::GMSkeletalGameObject::InvalidIndex)
+		if (index != gm::GMGameObject::InvalidIndex)
 			d->object->setAnimation(index);
 		d->object->reset(true);
 		d->object->play();
@@ -188,7 +187,7 @@ void Demo_MultiAnimation::init()
 	));
 	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		auto index = d->object->getAnimationIndexByName("spin");
-		if (index != gm::GMSkeletalGameObject::InvalidIndex)
+		if (index != gm::GMGameObject::InvalidIndex)
 			d->object->setAnimation(index);
 		d->object->reset(true);
 		d->object->play();

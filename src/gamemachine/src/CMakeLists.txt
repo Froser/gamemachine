@@ -95,8 +95,8 @@ set(SOURCES
 		gmengine/gameobjects/gmspritegameobject.cpp
 		gmengine/gameobjects/gm2dgameobject.h
 		gmengine/gameobjects/gm2dgameobject.cpp
-		gmengine/gameobjects/gmskeletalgameobject.h
-		gmengine/gameobjects/gmskeletalgameobject.cpp
+		gmengine/gameobjects/gmanimationobjecthelper.h
+		gmengine/gameobjects/gmanimationobjecthelper.cpp
 		gmengine/ui/gmwidget.h
 		gmengine/ui/gmwidget.cpp
 		gmengine/ui/gmwindow.h
@@ -217,8 +217,6 @@ set(SOURCES
 		gmlua/meta/gmgameobject_meta.cpp
 		gmlua/meta/ilight_meta.h
 		gmlua/meta/ilight_meta.cpp
-		gmlua/meta/gmskeletalgameobject_meta.h
-		gmlua/meta/gmskeletalgameobject_meta.cpp
 		gmlua/meta/gmshader_meta.h
 		gmlua/meta/gmshader_meta.cpp
 		gmlua/meta/gmmodel_meta.h

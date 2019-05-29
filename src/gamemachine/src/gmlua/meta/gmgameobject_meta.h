@@ -14,6 +14,7 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(setTranslation);
 		GM_LUA_PROXY_FUNC(setRotation);
 		GM_LUA_PROXY_FUNC(setScaling);
+		GM_LUA_PROXY_FUNC(update);
 	};
 
 	class GMGameObjectProxy : public GMObjectProxy

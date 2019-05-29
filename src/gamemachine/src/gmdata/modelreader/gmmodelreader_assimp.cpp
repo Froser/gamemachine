@@ -353,7 +353,10 @@ namespace
 
 			// bones
 			if (part->HasBones())
+			{
+				s->setAnimationType(GMAnimationType::SkeletalAnimation);
 				processBones(imp, part, model);
+			}
 
 			s->addModelAsset(GMAsset(GMAssetType::Model, model));
 		}
@@ -387,6 +390,7 @@ bool GMModelReader_Assimp::load(const GMModelLoadSettings& settings, GMBuffer& b
 	GMScene* s = new GMScene();
 	if (scene->HasAnimations())
 	{
+		s->setAnimationType(GMAnimationType::AffineAnimation);
 		s->setRootNode(createNodeTree(scene->mRootNode, nullptr));
 	}
 

@@ -4,6 +4,7 @@
 #include "gmdata/glyph/gmglyphmanager.h"
 #include "foundation/gamemachine.h"
 #include "gmassets.h"
+#include "gmanimationobjecthelper.h"
 #include "../gmcomputeshadermanager.h"
 
 namespace
@@ -44,6 +45,12 @@ namespace
 
 GMString GMGameObject::s_defaultComputeShaderCode;
 
+GMGameObject::GMGameObject()
+{
+	D(d);
+	d->helper = new GMAnimationGameObjectHelper(this);
+}
+
 GMGameObject::GMGameObject(GMAsset asset)
 	: GMGameObject()
 {
@@ -51,10 +58,11 @@ GMGameObject::GMGameObject(GMAsset asset)
 	updateTransformMatrix();
 }
 
-
 GMGameObject::~GMGameObject()
 {
+	D(d);
 	releaseAllBufferHandle();
+	GM_delete(d->helper);
 }
 
 void GMGameObject::setAsset(GMAsset asset)
@@ -77,6 +85,12 @@ void GMGameObject::setAsset(GMAsset asset)
 }
 
 GMScene* GMGameObject::getScene()
+{
+	D(d);
+	return d->asset.getScene();
+}
+
+const GMScene* GMGameObject::getScene() const
 {
 	D(d);
 	return d->asset.getScene();
@@ -152,6 +166,17 @@ void GMGameObject::draw()
 	endDraw();
 }
 
+
+void GMGameObject::update(GMDuration dt)
+{
+	D(d);
+	if (getAnimationType() != GMAnimationType::NoAnimation)
+	{
+		GM_ASSERT(d->helper);
+		return d->helper->update(dt);
+	}
+}
+
 bool GMGameObject::canDeferredRendering()
 {
 	D(d);
@@ -180,9 +205,88 @@ const IRenderContext* GMGameObject::getContext()
 }
 
 
-bool GMGameObject::isSkeletalObject() const
+void GMGameObject::play()
 {
+	D(d);
+	if (getAnimationType() != GMAnimationType::NoAnimation)
+	{
+		GM_ASSERT(d->helper);
+		d->helper->play();
+	}
+}
+
+void GMGameObject::pause()
+{
+	D(d);
+	if (getAnimationType() != GMAnimationType::NoAnimation)
+	{
+		GM_ASSERT(d->helper);
+		d->helper->pause();
+	}
+}
+
+bool GMGameObject::isPlaying()
+{
+	D(d);
+	if (getAnimationType() != GMAnimationType::NoAnimation)
+	{
+		GM_ASSERT(d->helper);
+		return d->helper->isPlaying();
+	}
 	return false;
+}
+
+void GMGameObject::reset(bool update)
+{
+	D(d);
+	if (getAnimationType() != GMAnimationType::NoAnimation)
+	{
+		GM_ASSERT(d->helper);
+		d->helper->reset(update);
+	}
+}
+
+GMsize_t GMGameObject::getAnimationCount()
+{
+	D(d);
+	if (getAnimationType() != GMAnimationType::NoAnimation)
+	{
+		GM_ASSERT(d->helper);
+		return d->helper->getAnimationCount();
+	}
+	return 0;
+}
+
+void GMGameObject::setAnimation(GMsize_t index)
+{
+	D(d);
+	if (getAnimationType() != GMAnimationType::NoAnimation)
+	{
+		GM_ASSERT(d->helper);
+		d->helper->setAnimation(index);
+	}
+}
+
+Vector<GMString> GMGameObject::getAnimationNames()
+{
+	D(d);
+	if (getAnimationType() != GMAnimationType::NoAnimation)
+	{
+		GM_ASSERT(d->helper);
+		return d->helper->getAnimationNames();
+	}
+	return Vector<GMString>();
+}
+
+GMsize_t GMGameObject::getAnimationIndexByName(const GMString& name)
+{
+	D(d);
+	if (getAnimationType() != GMAnimationType::NoAnimation)
+	{
+		GM_ASSERT(d->helper);
+		return d->helper->getAnimationIndexByName(name);
+	}
+	return -1;
 }
 
 void GMGameObject::updateTransformMatrix()
@@ -247,6 +351,16 @@ void GMGameObject::setCullOption(GMGameObjectCullOption option, GMCamera* camera
 	}
 }
 
+
+GMAnimationType GMGameObject::getAnimationType() const
+{
+	const GMScene* scene = getScene();
+	if (scene)
+	{
+		return scene->getAnimationType();
+	}
+	return GMAnimationType::NoAnimation;
+}
 
 void GMGameObject::releaseAllBufferHandle()
 {

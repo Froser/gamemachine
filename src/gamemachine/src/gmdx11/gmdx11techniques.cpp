@@ -681,16 +681,14 @@ void GMDx11Technique::beginModel(GMModel* model, const GMGameObject* parent)
 	shaderProgram->setInt(VI(ColorVertexOp), static_cast<GMint32>(model->getShader().getVertexColorOp()));
 
 	// 骨骼动画
-	GM_ASSERT(d->techContext.currentScene);
-	if (d->techContext.currentScene->hasAnimation() && parent && parent->isSkeletalObject())
+	GMAnimationType at = parent->getAnimationType();
+	shaderProgram->setInt(VI(UseAnimation), static_cast<GMint32>(at));
+	if (parent && parent->getAnimationType() != GMAnimationType::NoAnimation)
 	{
-		shaderProgram->setInt(VI(UseAnimation), 2);
-		//updateBoneTransforms(shaderProgram, model);
-		updateNodeTransforms(shaderProgram, model);
-	}
-	else
-	{
-		shaderProgram->setInt(VI(UseAnimation), 0);
+		if (at == GMAnimationType::SkeletalAnimation)
+			updateBoneTransforms(shaderProgram, model);
+		else
+			updateNodeTransforms(shaderProgram, model);
 	}
 
 	if (parent)

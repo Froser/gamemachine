@@ -53,11 +53,11 @@ static const int GM_VertexColorOp_Add = 3;
 //--------------------------------------------------------------------------------------
 // Bones And Animations
 //--------------------------------------------------------------------------------------
-int GM_UseAnimation = 0;
 static const int GM_MaxBones = 128;
 static const int GM_NoAnimation = 0;
 static const int GM_SkeletalAnimation = 1;
 static const int GM_AffineAnimation = 2;
+int GM_UseAnimation = GM_NoAnimation;
 matrix GM_Bones[GM_MaxBones];
 
 //--------------------------------------------------------------------------------------

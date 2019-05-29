@@ -8,12 +8,12 @@
 
 namespace gm
 {
-	class GMSkeletalGameObject;
+	class GMGameObject;
 }
 
 GM_PRIVATE_OBJECT(Demo_MD5Mesh)
 {
-	gm::GMSkeletalGameObject* object = nullptr;
+	gm::GMGameObject* object = nullptr;
 };
 
 class Demo_MD5Mesh : public DemoHandler

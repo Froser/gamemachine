@@ -1,10 +1,10 @@
-﻿#ifndef __GMSKELETONGAMEOBJECT_H__
-#define __GMSKELETONGAMEOBJECT_H__
+﻿#ifndef __GMANIMATIONOBJECTHELPER_H__
+#define __GMANIMATIONOBJECTHELPER_H__
 #include <gmcommon.h>
 #include <gmgameobject.h>
 BEGIN_NS
 
-GM_PRIVATE_OBJECT(GMSkeletalAnimationEvaluator)
+GM_PRIVATE_OBJECT(GMAnimationEvaluator)
 {
 	const GMSkeletalAnimation* animation = nullptr;
 	GMDuration duration = 0;
@@ -14,9 +14,9 @@ GM_PRIVATE_OBJECT(GMSkeletalAnimationEvaluator)
 	GMMat4 globalInverseTransform;
 };
 
-class GMSkeletalAnimationEvaluator
+class GMAnimationEvaluator
 {
-	GM_DECLARE_PRIVATE_NGO(GMSkeletalAnimationEvaluator)
+	GM_DECLARE_PRIVATE_NGO(GMAnimationEvaluator)
 	GM_DECLARE_ALIGNED_ALLOCATOR()
 	GM_DECLARE_PROPERTY(Skeleton, skeleton)
 	GM_DECLARE_PROPERTY(RootNode, rootNode)
@@ -24,7 +24,7 @@ class GMSkeletalAnimationEvaluator
 	GM_DECLARE_GETTER(Transforms, transforms)
 
 public:
-	GMSkeletalAnimationEvaluator(GMSkeletalNode* root, GMSkeleton* skeleton);
+	GMAnimationEvaluator(GMSkeletalNode* root, GMSkeleton* skeleton);
 
 public:
 	void update(GMDuration dt);
@@ -35,38 +35,32 @@ private:
 	const GMSkeletalAnimationNode* findAnimationNode(const GMString& name);
 };
 
-GM_PRIVATE_OBJECT(GMSkeletalGameObject)
+GM_PRIVATE_OBJECT(GMAnimationGameObjectHelper)
 {
 	enum { AutoPlayFrame = -1 };
 
 	bool playing = true;
+	GMGameObject* host = nullptr;
 	GMVec4 skeletonColor = GMVec4(0, 1, 0, 1);
-	Map<GMModel*, GMSkeletalAnimationEvaluator*> modelEvaluatorMap;
+	Map<GMModel*, GMAnimationEvaluator*> modelEvaluatorMap;
 	Vector<GMString> nameList;
 	GMsize_t animationIndex = 0;
 };
 
-class GM_EXPORT GMSkeletalGameObject : public GMGameObject
+class GMAnimationGameObjectHelper
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMSkeletalGameObject, GMGameObject)
+	GM_DECLARE_PRIVATE_NGO(GMAnimationGameObjectHelper)
 	GM_DECLARE_PROPERTY(SkeletonColor, skeletonColor)
-
-	enum
-	{
-		InvalidIndex = -1,
-	};
 
 public:
 	enum { AutoPlayFrame = -1 };
-	using GMGameObject::GMGameObject;
-	~GMSkeletalGameObject();
+	GMAnimationGameObjectHelper(GMGameObject* host);
+	~GMAnimationGameObjectHelper();
 
 public:
-	virtual void update(GMDuration dt) override;
-	virtual bool isSkeletalObject() const override;
+	virtual void update(GMDuration dt);
 
 public:
-	void createSkeletonBonesObject();
 	void play();
 	void pause();
 	void reset(bool update);
@@ -82,9 +76,6 @@ public:
 		D(d);
 		return d->playing;
 	}
-
-private:
-	void updateSkeleton();
 };
 
 END_NS

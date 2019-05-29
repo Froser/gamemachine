@@ -243,15 +243,14 @@ void GMGLTechnique::beginModel(GMModel* model, const GMGameObject* parent)
 	shaderProgram->setInt(VI(ColorVertexOp), static_cast<GMint32>(model->getShader().getVertexColorOp()));
 
 	// 骨骼动画
-	GM_ASSERT(d->techContext.currentScene);
-	if (d->techContext.currentScene->hasAnimation() && parent && parent->isSkeletalObject())
+	GMAnimationType at = parent->getAnimationType();
+	shaderProgram->setInt(VI(UseAnimation), static_cast<GMint32>(at));
+	if (parent && parent->getAnimationType() != GMAnimationType::NoAnimation)
 	{
-		shaderProgram->setInt(VI(UseAnimation), 1);
-		updateBoneTransforms(shaderProgram, model);
-	}
-	else
-	{
-		shaderProgram->setInt(VI(UseAnimation), 0);
+		if (at == GMAnimationType::SkeletalAnimation)
+			updateBoneTransforms(shaderProgram, model);
+		else
+			updateNodeTransforms(shaderProgram, model);
 	}
 
 	if (parent)
@@ -669,6 +668,19 @@ void GMGLTechnique::updateBoneTransforms(IShaderProgram* shaderProgram, GMModel*
 	{
 		const auto& transform = transforms[i];
 		shaderProgram->setMatrix4(getVariableIndex(shaderProgram, d->boneVariableIndices[i], boneVarNames[i]), transform);
+	}
+}
+
+void GMGLTechnique::updateNodeTransforms(IShaderProgram* shaderProgram, GMModel* model)
+{
+	D(d);
+	static GMString boneVarNames0;
+	boneVarNames0 = (GMString(GM_VariablesDesc.Bones) + L"[0]");
+
+	const auto& transforms = model->getBoneTransformations();
+	if (!transforms.empty())
+	{
+		shaderProgram->setMatrix4(getVariableIndex(shaderProgram, d->boneVariableIndices[0], boneVarNames0), transforms[0]);
 	}
 }
 

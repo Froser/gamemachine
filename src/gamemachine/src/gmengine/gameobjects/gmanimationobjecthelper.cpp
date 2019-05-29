@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "gmskeletalgameobject.h"
+#include "gmanimationobjecthelper.h"
 #include "foundation/gmasync.h"
 #include "foundation/gamemachine.h"
 #include "gmengine/gmgameworld.h"
@@ -31,7 +31,7 @@ namespace
 	}
 }
 
-GMSkeletalAnimationEvaluator::GMSkeletalAnimationEvaluator(GMSkeletalNode* root, GMSkeleton* skeleton)
+GMAnimationEvaluator::GMAnimationEvaluator(GMSkeletalNode* root, GMSkeleton* skeleton)
 {
 	D(d);
 	setRootNode(root);
@@ -39,7 +39,7 @@ GMSkeletalAnimationEvaluator::GMSkeletalAnimationEvaluator(GMSkeletalNode* root,
 	d->globalInverseTransform = Inverse(root->getTransformToParent());
 }
 
-void GMSkeletalAnimationEvaluator::update(GMDuration dt)
+void GMAnimationEvaluator::update(GMDuration dt)
 {
 	D(d);
 	d->duration += dt;
@@ -69,13 +69,13 @@ void GMSkeletalAnimationEvaluator::update(GMDuration dt)
 	}
 }
 
-void GMSkeletalAnimationEvaluator::reset()
+void GMAnimationEvaluator::reset()
 {
 	D(d);
 	d->duration = 0;
 }
 
-void GMSkeletalAnimationEvaluator::updateNode(GMDuration animationTime, GMSkeletalNode* node, const GMMat4& parentTransformation)
+void GMAnimationEvaluator::updateNode(GMDuration animationTime, GMSkeletalNode* node, const GMMat4& parentTransformation)
 {
 	D(d);
 	const GMString& nodeName = node->getName();
@@ -173,7 +173,7 @@ void GMSkeletalAnimationEvaluator::updateNode(GMDuration animationTime, GMSkelet
 	}
 }
 
-const GMSkeletalAnimationNode* GMSkeletalAnimationEvaluator::findAnimationNode(const GMString& name)
+const GMSkeletalAnimationNode* GMAnimationEvaluator::findAnimationNode(const GMString& name)
 {
 	D(d);
 	for (auto& node : d->animation->nodes)
@@ -183,7 +183,14 @@ const GMSkeletalAnimationNode* GMSkeletalAnimationEvaluator::findAnimationNode(c
 	}
 	return nullptr;
 }
-GMSkeletalGameObject::~GMSkeletalGameObject()
+
+GMAnimationGameObjectHelper::GMAnimationGameObjectHelper(GMGameObject* host)
+{
+	D(d);
+	d->host = host;
+}
+
+GMAnimationGameObjectHelper::~GMAnimationGameObjectHelper()
 {
 	D(d);
 	for (auto& kv : d->modelEvaluatorMap)
@@ -192,12 +199,12 @@ GMSkeletalGameObject::~GMSkeletalGameObject()
 	}
 }
 
-void GMSkeletalGameObject::update(GMDuration dt)
+void GMAnimationGameObjectHelper::update(GMDuration dt)
 {
 	D(d);
 	if (d->playing)
 	{
-		GMScene* scene = getScene();
+		GMScene* scene = d->host->getScene();
 		if (!scene)
 			return;
 
@@ -207,9 +214,9 @@ void GMSkeletalGameObject::update(GMDuration dt)
 			if (animations)
 			{
 				GMSkeleton* skeleton = model.getModel()->getSkeleton();
-				GMSkeletalAnimationEvaluator* evaluator = d->modelEvaluatorMap[model.getModel()];
+				GMAnimationEvaluator* evaluator = d->modelEvaluatorMap[model.getModel()];
 				if (!evaluator)
-					evaluator = d->modelEvaluatorMap[model.getModel()] = new GMSkeletalAnimationEvaluator(scene->getRootNode(), skeleton);
+					evaluator = d->modelEvaluatorMap[model.getModel()] = new GMAnimationEvaluator(scene->getRootNode(), skeleton);
 
 				evaluator->setAnimation(animations->getAnimation(d->animationIndex));
 				evaluator->update(dt);
@@ -232,32 +239,19 @@ void GMSkeletalGameObject::update(GMDuration dt)
 	}
 }
 
-bool GMSkeletalGameObject::isSkeletalObject() const
-{
-	return true;
-}
-
-void GMSkeletalGameObject::createSkeletonBonesObject()
-{
-	D(d);
-	GMScene* scene = getScene();
-	if (!scene)
-		return;
-}
-
-void GMSkeletalGameObject::play()
+void GMAnimationGameObjectHelper::play()
 {
 	D(d);
 	d->playing = true;
 }
 
-void GMSkeletalGameObject::pause()
+void GMAnimationGameObjectHelper::pause()
 {
 	D(d);
 	d->playing = false;
 }
 
-void GMSkeletalGameObject::reset(bool update)
+void GMAnimationGameObjectHelper::reset(bool update)
 {
 	D(d);
 	for (auto& evaluator : d->modelEvaluatorMap)
@@ -279,10 +273,10 @@ void GMSkeletalGameObject::reset(bool update)
 	}
 }
 
-GMsize_t GMSkeletalGameObject::getAnimationCount()
+GMsize_t GMAnimationGameObjectHelper::getAnimationCount()
 {
 	D(d);
-	GMScene* scene = getScene();
+	GMScene* scene = d->host->getScene();
 	if (!scene)
 		return 0;
 
@@ -292,7 +286,7 @@ GMsize_t GMSkeletalGameObject::getAnimationCount()
 	return scene->getAnimations()->getAnimationCount();
 }
 
-void GMSkeletalGameObject::setAnimation(GMsize_t index)
+void GMAnimationGameObjectHelper::setAnimation(GMsize_t index)
 {
 	D(d);
 	if (index >= getAnimationCount())
@@ -303,16 +297,16 @@ void GMSkeletalGameObject::setAnimation(GMsize_t index)
 	d->animationIndex = index;
 }
 
-Vector<GMString> GMSkeletalGameObject::getAnimationNames()
+Vector<GMString> GMAnimationGameObjectHelper::getAnimationNames()
 {
-	GMScene* scene = getScene();
+	D(d);
+	GMScene* scene = d->host->getScene();
 	if (!scene)
 		return Vector<GMString>();
 
 	if (!scene->hasAnimation())
 		return Vector<GMString>();
 
-	D(d);
 	if (d->nameList.empty())
 	{
 		for (GMsize_t i = 0u; i < scene->getAnimations()->getAnimationCount(); ++i)
@@ -324,20 +318,20 @@ Vector<GMString> GMSkeletalGameObject::getAnimationNames()
 	return d->nameList;
 }
 
-GMsize_t GMSkeletalGameObject::getAnimationIndexByName(const GMString& name)
+GMsize_t GMAnimationGameObjectHelper::getAnimationIndexByName(const GMString& name)
 {
 	D(d);
-	GMScene* scene = getScene();
+	GMScene* scene = d->host->getScene();
 	if (!scene)
-		return InvalidIndex;
+		return GMGameObject::InvalidIndex;
 
 	if (!scene->hasAnimation())
-		return InvalidIndex;
+		return GMGameObject::InvalidIndex;
 
 	Vector<GMString> animationNames = getAnimationNames();
 	auto findResult = std::find(animationNames.begin(), animationNames.end(), name);
 	if (findResult == animationNames.end())
-		return InvalidIndex;
+		return GMGameObject::InvalidIndex;
 
 	return findResult - animationNames.begin();
 }

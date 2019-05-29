@@ -9,7 +9,6 @@
 #include "meta/gmmodelreader_meta.h"
 #include "meta/gmgameworld_meta.h"
 #include "meta/gmgameobject_meta.h"
-#include "meta/gmskeletalgameobject_meta.h"
 #include "meta/gmwidget_meta.h"
 #include "meta/gmcontrol_meta.h"
 // {{END META INCLUDES}}
@@ -27,7 +26,6 @@ namespace luaapi
 		GMModelReader_Meta().registerFunctions(L);
 		GMGameWorld_Meta().registerFunctions(L);
 		GMGameObject_Meta().registerFunctions(L);
-		GMSkeletalGameObject_Meta().registerFunctions(L);
 		GMWidgetResourceManager_Meta().registerFunctions(L);
 		GMUIConfiguration_Meta().registerFunctions(L);
 		GMControlButton_Meta().registerFunctions(L);

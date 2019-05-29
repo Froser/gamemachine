@@ -6,7 +6,7 @@ out vec4 _deferred_geometry_pass_position_world;
 
 void deferred_geometry_pass_calcCoords()
 {
-    if (GM_UseBoneAnimation != 0)
+    if (GM_UseAnimation == GM_SkeletalAnimation)
     {
         mat4 boneTransform = GM_Bones[boneIDs[0]] * weights[0];
         boneTransform += GM_Bones[boneIDs[1]] * weights[1];
@@ -15,6 +15,12 @@ void deferred_geometry_pass_calcCoords()
         position = boneTransform * position;
         normal = boneTransform * vec4(normal.xyz, 0);
     }
+    else if (GM_UseAnimation == GM_AffineAnimation)
+    {
+        // 将仿射变换的值放到第1个Bones矩阵中
+        position = GM_Bones[0] * position;
+    }
+
 
     gl_Position = GM_ProjectionMatrix * GM_ViewMatrix * GM_WorldMatrix * position;
     _deferred_geometry_pass_position_world = GM_WorldMatrix * position;

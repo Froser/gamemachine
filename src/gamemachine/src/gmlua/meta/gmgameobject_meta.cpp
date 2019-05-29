@@ -14,6 +14,7 @@ bool GMGameObjectProxy::registerMeta()
 	GM_META_FUNCTION(setTranslation);
 	GM_META_FUNCTION(setRotation);
 	GM_META_FUNCTION(setScaling);
+	GM_META_FUNCTION(update);
 	return Base::registerMeta();
 }
 
@@ -49,7 +50,7 @@ GM_LUA_PROXY_IMPL(GMGameObjectProxy, setTranslation)
 }
 
 /*
-* setTranslation([self], quat)
+ * setRotation([self], quat)
 */
 GM_LUA_PROXY_IMPL(GMGameObjectProxy, setRotation)
 {
@@ -66,7 +67,7 @@ GM_LUA_PROXY_IMPL(GMGameObjectProxy, setRotation)
 
 
 /*
-* setTranslation([self], matrix)
+ * setScaling([self], matrix)
 */
 GM_LUA_PROXY_IMPL(GMGameObjectProxy, setScaling)
 {
@@ -80,6 +81,20 @@ GM_LUA_PROXY_IMPL(GMGameObjectProxy, setScaling)
 	return GMReturnValues();
 }
 
+/*
+ * update([self], dt)
+*/
+GM_LUA_PROXY_IMPL(GMGameObjectProxy, update)
+{
+	static const GMString s_invoker = NAME ".update";
+	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".update");
+	GMGameObjectProxy self(L);
+	GMfloat dt = GMArgumentHelper::popArgument(L, s_invoker).toFloat(); //dt
+	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+	if (self)
+		self->update(dt);
+	return GMReturnValues();
+}
 namespace
 {
 	// {{BEGIN META FUNCTION}}

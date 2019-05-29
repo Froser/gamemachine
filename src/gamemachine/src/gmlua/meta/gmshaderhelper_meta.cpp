@@ -9,6 +9,7 @@
 #endif
 #include <gmglhelper.h>
 #include "wrapper/dx11wrapper.h"
+#include "gmengine/gmshaderhelper.h"
 
 #define NAME "GMShaderHelper"
 
@@ -62,12 +63,23 @@ namespace
 		return GMReturnValues();
 	}
 
+	GM_LUA_FUNC(loadShader)
+	{
+		static const GMString s_invoker = NAME ".loadShader";
+		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".loadShader");
+		IRenderContextProxy context(L);
+		GMArgumentHelper::popArgumentAsObject(L, context, s_invoker);
+		GMShaderHelper::loadShader(context.get());
+		return GMReturnValues();
+	}
+
 	// {{END META FUNCTION}}
 
 	GMLuaReg g_meta[] = {
 		// {{BEGIN META DECLARATIONS}}
 		GM_LUA_DECLARATIONS(loadShaderOpenGL),
 		GM_LUA_DECLARATIONS(loadShaderDx11),
+		GM_LUA_DECLARATIONS(loadShader),
 		// {{END META DECLARATIONS}}
 		{ 0, 0 }
 	};

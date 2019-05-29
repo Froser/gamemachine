@@ -7,7 +7,10 @@ uniform mat4 GM_InverseViewMatrix;
 
 const int GM_MaxBones = 128;
 uniform mat4 GM_Bones[GM_MaxBones];
-uniform int GM_UseBoneAnimation = 0;
+const int GM_NoAnimation = 0;
+const int GM_SkeletalAnimation = 1;
+const int GM_AffineAnimation = 2;
+uniform int GM_UseAnimation = GM_NoAnimation;
 
 // 类型变量
 uniform int GM_shader_type;

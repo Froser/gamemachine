@@ -113,6 +113,7 @@ protected:
 
 private:
 	void updateBoneTransforms(IShaderProgram* shaderProgram, GMModel* model);
+	void updateNodeTransforms(IShaderProgram* shaderProgram, GMModel* model);
 	void startDraw(GMModel* model);
 };
 
