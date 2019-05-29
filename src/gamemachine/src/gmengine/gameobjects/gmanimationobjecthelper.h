@@ -6,11 +6,11 @@ BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMAnimationEvaluator)
 {
-	const GMSkeletalAnimation* animation = nullptr;
+	const GMNodeAnimation* animation = nullptr;
 	GMDuration duration = 0;
 	AlignedVector<GMMat4> transforms;
 	GMSkeleton* skeleton = nullptr;
-	GMSkeletalNode* rootNode = nullptr;
+	GMNode* rootNode = nullptr;
 	GMMat4 globalInverseTransform;
 };
 
@@ -24,15 +24,15 @@ class GMAnimationEvaluator
 	GM_DECLARE_GETTER(Transforms, transforms)
 
 public:
-	GMAnimationEvaluator(GMSkeletalNode* root, GMSkeleton* skeleton);
+	GMAnimationEvaluator(GMNode* root, GMSkeleton* skeleton);
 
 public:
 	void update(GMDuration dt);
 	void reset();
 
 private:
-	void updateNode(GMDuration animationTime, GMSkeletalNode* node, const GMMat4& parentTransformation);
-	const GMSkeletalAnimationNode* findAnimationNode(const GMString& name);
+	void updateNode(GMDuration animationTime, GMNode* node, const GMMat4& parentTransformation);
+	const GMAnimationNode* findAnimationNode(const GMString& name);
 };
 
 GM_PRIVATE_OBJECT(GMAnimationGameObjectHelper)

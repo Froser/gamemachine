@@ -6,12 +6,148 @@
 #include <gmimage.h>
 #include <gmshader.h>
 #include <atomic>
-#include <gmskeleton.h>
 #include <gmrendertechnique.h>
 
 struct ID3D11Buffer;
 
 BEGIN_NS
+
+class GMAnimationEvaluator;
+struct GMSceneAnimatorNode;
+struct GMNodeAnimation;
+
+struct GMSkeletonWeight
+{
+	GMuint32 vertexId;
+	GMfloat weight;
+};
+
+GM_ALIGNED_STRUCT(GMSkeletalBone)
+{
+	GMString name;
+	GMMat4 offsetMatrix; //!< 从模型空间到绑定姿势的变换
+	GMModel* targetModel = nullptr;
+	Vector<GMSkeletonWeight> weights;
+	GMMat4 finalTransformation; //!< 所有的计算结果将会放到这里来
+};
+
+GM_PRIVATE_OBJECT(GMNode)
+{
+	GMString name;
+	GMNode* parent = nullptr;
+	Vector<GMNode*> children;
+	GMMat4 transformToParent;
+	GMMat4 globalTransform;
+	Vector<GMuint32> modelIndices;
+};
+
+GM_ALIGNED_16(class) GMNode
+{
+	GM_DECLARE_PRIVATE_NGO(GMNode)
+	GM_DECLARE_ALIGNED_ALLOCATOR()
+	GM_DECLARE_PROPERTY(Name, name)
+	GM_DECLARE_PROPERTY(Parent, parent)
+	GM_DECLARE_PROPERTY(Children, children)
+	GM_DECLARE_PROPERTY(ModelIndices, modelIndices)
+	GM_DECLARE_PROPERTY(TransformToParent, transformToParent)
+	GM_DECLARE_PROPERTY(GlobalTransform, globalTransform)
+
+public:
+	~GMNode()
+	{
+		for (auto& child : getChildren())
+		{
+			GM_delete(child);
+		}
+	}
+};
+
+GM_PRIVATE_OBJECT(GMSkeletalBones)
+{
+	AlignedVector<GMSkeletalBone> bones;
+	Map<GMString, GMsize_t> boneNameIndexMap;
+};
+
+class GMSkeletalBones
+{
+	GM_DECLARE_PRIVATE_NGO(GMSkeletalBones)
+	GM_DECLARE_ALIGNED_ALLOCATOR()
+	GM_DECLARE_PROPERTY(Bones, bones)
+	GM_DECLARE_PROPERTY(BoneNameIndexMap, boneNameIndexMap)
+};
+
+GM_PRIVATE_OBJECT(GMSkeleton)
+{
+	GMSkeletalBones bones;
+};
+
+class GMSkeleton
+{
+	GM_DECLARE_PRIVATE_NGO(GMSkeleton)
+	GM_DECLARE_ALIGNED_ALLOCATOR()
+	GM_DECLARE_PROPERTY(Bones, bones)
+
+public:
+	enum
+	{
+		BonesPerVertex = 4
+	};
+};
+
+//////////////////////////////////////////////////////////////////////////
+template <typename T>
+struct GMNodeAnimationKeyframe
+{
+	GMNodeAnimationKeyframe(GMDuration t, T&& v)
+		: time(t)
+		, value(v)
+	{
+	}
+
+	GMDuration time;
+	T value;
+};
+
+GM_ALIGNED_STRUCT(GMAnimationNode)
+{
+	GMString name;
+	AlignedVector<GMNodeAnimationKeyframe<GMVec3>> positions;
+	AlignedVector<GMNodeAnimationKeyframe<GMVec3>> scalings;
+	AlignedVector<GMNodeAnimationKeyframe<GMQuat>> rotations;
+};
+
+GM_ALIGNED_STRUCT(GMNodeAnimation)
+{
+	GMfloat frameRate = 25;
+	GMDuration duration;
+	GMString name;
+	AlignedVector<GMAnimationNode> nodes;
+};
+
+GM_PRIVATE_OBJECT(GMSkeletalAnimations)
+{
+	AlignedVector<GMNodeAnimation> animations;
+};
+
+GM_ALIGNED_16(class) GMSkeletalAnimations
+{
+	GM_DECLARE_PRIVATE_NGO(GMSkeletalAnimations)
+	GM_DECLARE_ALIGNED_ALLOCATOR()
+	GM_DECLARE_PROPERTY(Animations, animations)
+
+public:
+	inline GMNodeAnimation* getAnimation(GMsize_t index) GM_NOEXCEPT
+	{
+		D(d);
+		return &d->animations[index];
+	}
+
+	inline GMsize_t getAnimationCount()
+	{
+		D(d);
+		return d->animations.size();
+	}
+};
 
 class GMModel;
 class GMGameObject;
@@ -203,7 +339,7 @@ GM_PRIVATE_OBJECT(GMModel)
 	GMRenderTechniqueID techniqueId = 0;
 	GMModelAsset parentAsset;
 	GMOwnedPtr<GMSkeleton> skeleton;
-	Vector<GMSkeletalNode*> nodes;
+	Vector<GMNode*> nodes;
 	// 骨骼变换矩阵，对于无骨骼的model，使用首个元素表示变换。
 	AlignedVector<GMMat4> boneTransformations;
 };
@@ -340,7 +476,7 @@ GM_PRIVATE_OBJECT(GMScene)
 {
 	Vector<GMAsset> models;
 	GMOwnedPtr<GMSkeletalAnimations> animations;
-	GMOwnedPtr<GMSkeletalNode> skeletalRoot;
+	GMOwnedPtr<GMNode> root;
 	GMAnimationType animationType = GMAnimationType::NoAnimation;
 };
 
@@ -382,10 +518,10 @@ public:
 		d->animations.reset(animations);
 	}
 
-	void setRootNode(GMSkeletalNode* root)
+	void setRootNode(GMNode* root)
 	{
 		D(d);
-		d->skeletalRoot.reset(root);
+		d->root.reset(root);
 	}
 
 	bool hasAnimation() GM_NOEXCEPT
@@ -394,10 +530,10 @@ public:
 		return !!d->animations;
 	}
 
-	GMSkeletalNode* getRootNode()
+	GMNode* getRootNode()
 	{
 		D(d);
-		return d->skeletalRoot.get();
+		return d->root.get();
 	}
 
 	GMModel* operator[](GMsize_t i)

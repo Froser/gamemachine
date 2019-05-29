@@ -7,12 +7,12 @@
 namespace
 {
 	template <typename T>
-	GMsize_t findIndex(GMDuration animationTime, const AlignedVector<GMSkeletonAnimationKeyframe<T>>& frames)
+	GMsize_t findIndex(GMDuration animationTime, const AlignedVector<GMNodeAnimationKeyframe<T>>& frames)
 	{
 		GM_ASSERT(frames.size() > 0);
 		for (GMsize_t i = 0; i < frames.size() - 1; ++i)
 		{
-			const GMSkeletonAnimationKeyframe<T>& frame = frames[i + 1];
+			const GMNodeAnimationKeyframe<T>& frame = frames[i + 1];
 			if (animationTime < frame.time)
 				return i;
 		}
@@ -22,7 +22,7 @@ namespace
 	}
 }
 
-GMAnimationEvaluator::GMAnimationEvaluator(GMSkeletalNode* root, GMSkeleton* skeleton)
+GMAnimationEvaluator::GMAnimationEvaluator(GMNode* root, GMSkeleton* skeleton)
 {
 	D(d);
 	setRootNode(root);
@@ -60,11 +60,11 @@ void GMAnimationEvaluator::reset()
 	d->duration = 0;
 }
 
-void GMAnimationEvaluator::updateNode(GMDuration animationTime, GMSkeletalNode* node, const GMMat4& parentTransformation)
+void GMAnimationEvaluator::updateNode(GMDuration animationTime, GMNode* node, const GMMat4& parentTransformation)
 {
 	D(d);
 	const GMString& nodeName = node->getName();
-	const GMSkeletalAnimationNode* animationNode = findAnimationNode(nodeName);
+	const GMAnimationNode* animationNode = findAnimationNode(nodeName);
 	GMMat4 nodeTransformation = node->getTransformToParent();
 	GMfloat factor = 0;
 
@@ -158,7 +158,7 @@ void GMAnimationEvaluator::updateNode(GMDuration animationTime, GMSkeletalNode* 
 	}
 }
 
-const GMSkeletalAnimationNode* GMAnimationEvaluator::findAnimationNode(const GMString& name)
+const GMAnimationNode* GMAnimationEvaluator::findAnimationNode(const GMString& name)
 {
 	D(d);
 	for (auto& node : d->animation->nodes)

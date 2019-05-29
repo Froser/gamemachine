@@ -28,7 +28,7 @@ void GMScene::swap(GMScene* scene)
 	D_OF(d_rhs, scene);
 	using std::swap;
 	d->models.swap(d_rhs->models);
-	d->skeletalRoot.swap(d_rhs->skeletalRoot);
+	d->root.swap(d_rhs->root);
 }
 
 const IRenderContext* GMModelDataProxy::getContext()

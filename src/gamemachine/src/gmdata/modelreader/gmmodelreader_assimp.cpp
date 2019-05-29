@@ -222,9 +222,9 @@ namespace
 		}
 	}
 
-	GMSkeletalNode* createNodeTree(aiNode* node, GMSkeletalNode* parent)
+	GMNode* createNodeTree(aiNode* node, GMNode* parent)
 	{
-		GMSkeletalNode* sn = new GMSkeletalNode();
+		GMNode* sn = new GMNode();
 		sn->setName(node->mName.C_Str());
 		sn->setParent(parent);
 		sn->setTransformToParent(fromAiMatrix(node->mTransformation));
@@ -237,7 +237,7 @@ namespace
 
 		for (auto i = 0u; i < node->mNumChildren; ++i)
 		{
-			GMSkeletalNode* childNode = createNodeTree(node->mChildren[i], sn);
+			GMNode* childNode = createNodeTree(node->mChildren[i], sn);
 			sn->getChildren().push_back(childNode);
 		}
 
@@ -249,7 +249,7 @@ namespace
 		GMSkeletalAnimations* animations = new GMSkeletalAnimations();
 		for (auto a = 0u; a < scene->mNumAnimations; ++a)
 		{
-			GMSkeletalAnimation ani;
+			GMNodeAnimation ani;
 			aiAnimation* animation = scene->mAnimations[a];
 			ani.name = animation->mName.C_Str();
 			ani.frameRate = animation->mTicksPerSecond;
@@ -257,7 +257,7 @@ namespace
 
 			for (auto i = 0u; i < animation->mNumChannels; ++i)
 			{
-				GMSkeletalAnimationNode n;
+				GMAnimationNode n;
 				const aiNodeAnim* node = animation->mChannels[i];
 				n.name = node->mNodeName.C_Str();
 				for (auto j = 0u; j < node->mNumPositionKeys; ++j)
@@ -368,7 +368,7 @@ namespace
 		}
 	}
 
-	void assignModelForEachNode(GMSkeletalNode* node, GMScene* scene)
+	void assignModelForEachNode(GMNode* node, GMScene* scene)
 	{
 		for (GMint32 i : node->getModelIndices())
 		{
