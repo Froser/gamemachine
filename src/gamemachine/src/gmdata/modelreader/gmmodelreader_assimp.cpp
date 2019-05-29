@@ -229,6 +229,12 @@ namespace
 		sn->setParent(parent);
 		sn->setTransformToParent(fromAiMatrix(node->mTransformation));
 
+		for (GMuint32 i = 0; i < node->mNumMeshes; ++i)
+		{
+			auto& modelIndices = sn->getModelIndices();
+			modelIndices.push_back(node->mMeshes[i]);
+		}
+
 		for (auto i = 0u; i < node->mNumChildren; ++i)
 		{
 			GMSkeletalNode* childNode = createNodeTree(node->mChildren[i], sn);
@@ -361,6 +367,20 @@ namespace
 			s->addModelAsset(GMAsset(GMAssetType::Model, model));
 		}
 	}
+
+	void assignModelForEachNode(GMSkeletalNode* node, GMScene* scene)
+	{
+		for (GMint32 i : node->getModelIndices())
+		{
+			GMModel* model = scene->getModels()[i].getModel();
+			model->getNodes().push_back(node);
+		}
+
+		for (auto children : node->getChildren())
+		{
+			assignModelForEachNode(children, scene);
+		}
+	}
 }
 
 bool GMModelReader_Assimp::load(const GMModelLoadSettings& settings, GMBuffer& buffer, REF GMAsset& asset)
@@ -389,13 +409,15 @@ bool GMModelReader_Assimp::load(const GMModelLoadSettings& settings, GMBuffer& b
 
 	GMScene* s = new GMScene();
 	if (scene->HasAnimations())
-	{
 		s->setAnimationType(GMAnimationType::AffineAnimation);
-		s->setRootNode(createNodeTree(scene->mRootNode, nullptr));
-	}
+
+	s->setRootNode(createNodeTree(scene->mRootNode, nullptr));
 
 	// nodes
 	processMeshes(this, scene, s);
+
+	// assign
+	assignModelForEachNode(s->getRootNode(), s);
 
 	// animations
 	if (scene->HasAnimations())

@@ -30,6 +30,7 @@ GM_PRIVATE_OBJECT(GMSkeletalNode)
 	Vector<GMSkeletalNode*> children;
 	GMMat4 transformToParent;
 	GMMat4 globalTransform;
+	Vector<GMuint32> modelIndices;
 };
 
 GM_ALIGNED_16(class) GMSkeletalNode
@@ -39,6 +40,7 @@ GM_ALIGNED_16(class) GMSkeletalNode
 	GM_DECLARE_PROPERTY(Name, name)
 	GM_DECLARE_PROPERTY(Parent, parent)
 	GM_DECLARE_PROPERTY(Children, children)
+	GM_DECLARE_PROPERTY(ModelIndices, modelIndices)
 	GM_DECLARE_PROPERTY(TransformToParent, transformToParent)
 	GM_DECLARE_PROPERTY(GlobalTransform, globalTransform)
 

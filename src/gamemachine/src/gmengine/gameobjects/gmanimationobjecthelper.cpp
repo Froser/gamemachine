@@ -20,15 +20,6 @@ namespace
 		GM_ASSERT(false);
 		return 0;
 	}
-
-	void assignNode(GMSkeletalNode* node, AlignedVector<GMMat4>& transforms)
-	{
-		transforms.push_back(node->getGlobalTransform());
-		for (auto child : node->getChildren())
-		{
-			assignNode(child, transforms);
-		}
-	}
 }
 
 GMAnimationEvaluator::GMAnimationEvaluator(GMSkeletalNode* root, GMSkeleton* skeleton)
@@ -60,12 +51,6 @@ void GMAnimationEvaluator::update(GMDuration dt)
 		{
 			transforms[i] = d->skeleton->getBones().getBones()[i].finalTransformation;
 		}
-	}
-	else
-	{
-		// 在非骨骼动画中，transforms表示每个结点的变换
-		transforms.clear();
-		assignNode(d->rootNode, transforms);
 	}
 }
 
@@ -228,11 +213,14 @@ void GMAnimationGameObjectHelper::update(GMDuration dt)
 				}
 				else
 				{
-					// 不存在skeleton，只有纯粹的动画，所以只有最后一帧
-					auto& transforms = evaluator->getTransforms();
-					auto& modelTransforms = model.getModel()->getBoneTransformations();
-					modelTransforms.clear();
-					modelTransforms.push_back(*transforms.rbegin());
+					// global transform 都记录在了对应的node上，找到对应的node，赋值给boneTransformations[0]
+					for (auto node : model.getModel()->getNodes())
+					{
+						GM_ASSERT(node);
+						auto& modelTransforms = model.getModel()->getBoneTransformations();
+						modelTransforms.clear();
+						modelTransforms.push_back(node->getGlobalTransform());
+					}
 				}
 			}
 		}

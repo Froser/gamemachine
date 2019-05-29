@@ -3,6 +3,7 @@
 #include <defines.h>
 #include <math.h>
 #include <gmdxincludes.h>
+#include "./memory.h"
 
 #if GM_DISABLE_DX_MATH
 #define GM_USE_DX_MATH 0
@@ -141,6 +142,7 @@ inline bool FuzzyCompare(gm::GMfloat p1, gm::GMfloat p2, gm::GMfloat qualifier =
 #define GMMATH_BEGIN_STRUCT(className, glStruct, dxStruct, padding)	\
 	GM_ALIGNED_16(struct) className				\
 	{											\
+		GM_DECLARE_ALIGNED_ALLOCATOR()			\
 		typedef glStruct DataType;				\
 		glStruct v_;							\
 		int __padding[padding];					\
@@ -152,6 +154,7 @@ inline bool FuzzyCompare(gm::GMfloat p1, gm::GMfloat p2, gm::GMfloat qualifier =
 #define GMMATH_BEGIN_STRUCT_NOPADDING(className, glStruct, dxStruct)	\
 	GM_ALIGNED_16(struct) className				\
 	{											\
+		GM_DECLARE_ALIGNED_ALLOCATOR()			\
 		typedef glStruct DataType;				\
 		glStruct v_;							\
 												\

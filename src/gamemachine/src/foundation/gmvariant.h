@@ -2,6 +2,7 @@
 #define __GMVARIANT_H__
 #include <defines.h>
 #include <linearmath.h>
+#include "./memory.h"
 BEGIN_NS
 
 class GMString;

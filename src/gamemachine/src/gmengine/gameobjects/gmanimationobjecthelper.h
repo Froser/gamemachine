@@ -49,6 +49,7 @@ GM_PRIVATE_OBJECT(GMAnimationGameObjectHelper)
 
 class GMAnimationGameObjectHelper
 {
+	GM_DECLARE_ALIGNED_ALLOCATOR()
 	GM_DECLARE_PRIVATE_NGO(GMAnimationGameObjectHelper)
 	GM_DECLARE_PROPERTY(SkeletonColor, skeletonColor)
 
