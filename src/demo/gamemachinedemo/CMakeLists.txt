@@ -4,10 +4,10 @@ project (gamemachinedemo C CXX)
 gm_begin_project()
 
 include_directories(
-		../3rdparty/glm-0.9.9-a2
-		../gamemachine/include
-		../gamemachineui/include
-		../gamemachinemedia/include
+		../../3rdparty/glm-0.9.9-a2
+		../../gamemachine/include
+		../../gamemachineui/include
+		../../gamemachinemedia/include
 		./
 	)
 
@@ -83,12 +83,14 @@ add_executable(${PROJECT_NAME}
 		${SOURCES}
 	)
 gm_gamemachine_project(${PROJECT_NAME} TRUE)
+gm_folder_with_name(${PROJECT_NAME} gamemachinedemo)
 
 if(MSVC)
 	set (gamemachine_dll ${PROJECT_NAME}_dll)
 	add_executable(${gamemachine_dll}
 		${SOURCES}
 	)
+	gm_folder_with_name(${PROJECT_NAME}_dll gamemachinedemo)
 	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
 	set_target_properties(${gamemachine_dll} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
 	gm_gamemachine_project(${gamemachine_dll} FALSE)

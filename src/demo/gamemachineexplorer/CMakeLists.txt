@@ -16,11 +16,11 @@ include_directories(
 	)
 
 include_directories(
-		../3rdparty/glm-0.9.9-a2
-		../gamemachine/include
-		../gamemachineui/include
-		../gamemachinemedia/include
-		../gamemachineqt/include
+		../../3rdparty/glm-0.9.9-a2
+		../../gamemachine/include
+		../../gamemachineui/include
+		../../gamemachinemedia/include
+		../../gamemachineqt/include
 		./
 		./src
 	)
@@ -70,12 +70,14 @@ add_executable(${PROJECT_NAME}
 		${SOURCES}
 	)
 gm_gamemachine_project(${PROJECT_NAME} TRUE)
+gm_folder_with_name(${PROJECT_NAME} gamemachinedemo)
 
 if(MSVC)
 	set (gamemachineexplorer_dll ${PROJECT_NAME}_dll)
 	add_executable(${gamemachineexplorer_dll}
 		${SOURCES}
 	)
+	gm_folder_with_name(${gamemachineexplorer_dll} gamemachinedemo)
 	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
 	set_target_properties(${gamemachineexplorer_dll} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
 	gm_gamemachine_project(${gamemachineexplorer_dll} FALSE)

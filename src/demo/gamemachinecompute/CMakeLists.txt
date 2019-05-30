@@ -4,10 +4,10 @@ project (gamemachinecompute C CXX)
 gm_begin_project()
 
 include_directories(
-		../3rdparty/glm-0.9.9-a2
-		../gamemachine/include
-		../gamemachineui/include
-		../gamemachinemedia/include
+		../../3rdparty/glm-0.9.9-a2
+		../../gamemachine/include
+		../../gamemachineui/include
+		../../gamemachinemedia/include
 		./
 	)
 
@@ -30,6 +30,7 @@ add_executable(${PROJECT_NAME}
 		${SOURCES}
 	)
 gm_gamemachine_project(${PROJECT_NAME} TRUE)
+gm_folder_with_name(${PROJECT_NAME} gamemachinedemo)
 if(WIN32)
 	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE") 
 endif(WIN32)

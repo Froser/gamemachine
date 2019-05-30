@@ -4,8 +4,8 @@ project (gamemachinedemo_window)
 gm_begin_project()
 
 include_directories(
-		../3rdparty/glm-0.9.9-a2
-		../gamemachine/include
+		../../3rdparty/glm-0.9.9-a2
+		../../gamemachine/include
 		./
 	)
 
@@ -30,6 +30,7 @@ add_definitions(-DUNICODE -D_UNICODE)
 add_executable(${PROJECT_NAME}
 		${SOURCES}
 	)
+gm_folder_with_name(${PROJECT_NAME} gamemachinedemo)
 
 if(MSVC)
 	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS" ) 
