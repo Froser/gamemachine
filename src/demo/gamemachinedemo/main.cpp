@@ -1,13 +1,7 @@
 ﻿#include <iostream>
-#if GM_WINDOWS
-#include <windows.h>
-#endif
-#include <fstream>
 #include <gamemachine.h>
 #include <gmm.h>
 #include "demonstration_world.h"
-#include <gmdx11.h>
-#include <gmgl.h>
 #include <wrapper.h>
 
 namespace
@@ -74,17 +68,6 @@ int main(int argc, char* argv[])
 	mainWindow->showWindow();
 	mainWindow->setHandler(new DemostrationEntrance(mainWindow));
 	GM.addWindow(mainWindow);
-
-	/*
-	gm::IWindow* mainWindow2 = nullptr;
-	windowDesc.windowName = "Window 2";
-	factory->createWindow(hInstance, mainWindow, &mainWindow2);
-	mainWindow2->create(windowDesc);
-	mainWindow2->centerWindow();
-	mainWindow2->showWindow();
-	mainWindow2->setHandler(new DemostrationEntrance(mainWindow2));
-	GM.addWindow(mainWindow2);
-	*/
 
 	GM.startGameMachine();
 	return 0;

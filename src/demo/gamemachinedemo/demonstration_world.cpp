@@ -39,7 +39,7 @@ extern gm::GMRenderEnvironment GetRenderEnv();
 
 namespace
 {
-	void loadDemostrations(DemonstrationWorld* world)
+	void loadDemonstrations(DemonstrationWorld* world)
 	{
 		world->addDemo(L"入门: 读取一个纹理。", new Demo_Texture(world));
 		world->addDemo(L"入门: 使用索引缓存读取一个纹理。", new Demo_Texture_Index(world));
@@ -749,7 +749,7 @@ void DemostrationEntrance::start()
 	gm::IInput* inputManager = d->mainWindow->getInputManager();
 	getWorld()->resetCameraAndLights();
 	inputManager->getIMState().activate(gm::GMKL_United_States);
-	loadDemostrations(d->world);
+	loadDemonstrations(d->world);
 }
 
 void DemostrationEntrance::event(gm::GameMachineHandlerEvent evt)
