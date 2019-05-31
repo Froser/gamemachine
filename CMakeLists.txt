@@ -2,9 +2,13 @@
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules" )
 
-macro(gm_folder foldername)
-	set_target_properties(${foldername} PROPERTIES FOLDER ${PROJECT_NAME})
+macro(gm_folder targetname)
+	set_target_properties(${targetname} PROPERTIES FOLDER ${PROJECT_NAME})
 endmacro(gm_folder)
+
+macro(gm_folder_with_name targetname foldername)
+	set_target_properties(${targetname} PROPERTIES FOLDER ${foldername})
+endmacro(gm_folder_with_name)
 
 macro(gm_source_group_by_dir source_files)
 	foreach(sgbd_file ${${source_files}})

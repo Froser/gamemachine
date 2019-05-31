@@ -141,6 +141,15 @@ void GMTextGameObject::setColor(const GMVec4& color)
 	}
 }
 
+
+GMVec4 GMTextGameObject::getColor()
+{
+	D(d);
+	GMVec4 color;
+	color.setFloat4(d->color);
+	return color;
+}
+
 void GMTextGameObject::setCenter(bool center) GM_NOEXCEPT
 {
 	D(d);
@@ -177,6 +186,17 @@ void GMTextGameObject::setLineSpacing(GMint32 lineSpacing) GM_NOEXCEPT
 	if (d->lineSpacing != lineSpacing)
 	{
 		d->lineSpacing = lineSpacing;
+		markDirty();
+	}
+}
+
+
+void GMTextGameObject::setFontSize(GMFontSizePt fontSize) GM_NOEXCEPT
+{
+	D(d);
+	if (d->fontSize != fontSize)
+	{
+		d->fontSize = fontSize;
 		markDirty();
 	}
 }
@@ -295,6 +315,7 @@ void GMTextGameObject::updateVertices(GMScene* scene)
 			typoEngine = d->typoEngine;
 			typoEngine->setFont(d->font);
 			typoEngine->setLineHeight(0);
+			typoEngine->setFontSize(d->fontSize);
 			iter = typoEngine->begin(d->text, options);
 		}
 		else
@@ -306,6 +327,7 @@ void GMTextGameObject::updateVertices(GMScene* scene)
 			options.useCache = true;
 			options.renderStart = d->textBuffer->getRenderStart();
 			options.renderEnd = d->textBuffer->getRenderEnd();
+			typoEngine->setFontSize(d->fontSize);
 			iter = typoEngine->begin(d->text, options);
 		}
 

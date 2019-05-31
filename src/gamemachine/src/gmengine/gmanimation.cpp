@@ -12,6 +12,20 @@ GMAnimation::~GMAnimation()
 	}
 }
 
+void GMAnimation::clearObjects()
+{
+	D(d);
+	pause();
+	d->targetObjects.clear();
+}
+
+void GMAnimation::clearFrames()
+{
+	D(d);
+	pause();
+	d->keyframes.clear();
+}
+
 void GMAnimation::addKeyFrame(AUTORELEASE GMAnimationKeyframe* kf)
 {
 	D(d);
@@ -25,6 +39,7 @@ void GMAnimation::play()
 	if (!d->isPlaying)
 	{
 		d->isPlaying = true;
+		d->finished = false;
 	}
 }
 
@@ -72,6 +87,7 @@ void GMAnimation::update(GMDuration dt)
 		if (d->keyframesIter == d->keyframes.cend())
 		{
 			// 最后一帧关键帧也播放完了
+			d->finished = true;
 			// 考虑是否重播
 			if (d->playLoop)
 			{
@@ -80,6 +96,15 @@ void GMAnimation::update(GMDuration dt)
 			}
 			else
 			{
+				// 更新最后一帧防止错过
+				if (!d->keyframes.empty())
+				{
+					for (auto object : d->targetObjects)
+					{
+						auto last = *d->keyframes.rbegin();
+						last->update(object, d->timeline);
+					}
+				}
 				pause();
 			}
 			return;
@@ -97,9 +122,9 @@ void GMAnimation::update(GMDuration dt)
 			d->lastKeyframe = currentKeyFrame;
 		}
 
-		for (auto gameObject : d->targetObjects)
+		for (auto object : d->targetObjects)
 		{
-			currentKeyFrame->update(gameObject, d->timeline);
+			currentKeyFrame->update(object, d->timeline);
 		}
 	}
 }

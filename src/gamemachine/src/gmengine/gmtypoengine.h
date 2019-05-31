@@ -58,7 +58,6 @@ public:
 
 struct GMTypoOptions
 {
-	GMFontSizePt defaultFontSize = 12;
 	GMint32 lineSpacing = 0;
 	GMRect typoArea = { 0, 0, -1, -1 }; // 排版框，排版引擎将在此框内排版
 	bool center = false;
@@ -82,6 +81,7 @@ GM_INTERFACE(ITypoEngine)
 	virtual GMTypoIterator begin(const GMString& literature, const GMTypoOptions& options, GMsize_t start = 0) = 0;
 	virtual GMTypoIterator end() = 0;
 	virtual void setFont(GMFontHandle) = 0;
+	virtual void setFontSize(GMFontSizePt) = 0;
 	virtual void setLineHeight(GMint32) = 0;
 	virtual void createInstance(OUT ITypoEngine**) = 0;
 	virtual GMTypoResultInfo getResults() = 0;
@@ -130,7 +130,7 @@ protected:
 
 protected:
 	virtual void setColor(GMfloat rgb[3]);
-	virtual void setFontSize(GMint32 sz);
+	virtual void setFontSize(GMFontSizePt sz);
 
 private:
 	bool parsePair(const GMString& key, REF GMString& value);
@@ -173,6 +173,7 @@ public:
 	virtual GMTypoIterator begin(const GMString& literature, const GMTypoOptions& options, GMsize_t start) override;
 	virtual GMTypoIterator end() override;
 	virtual void setFont(GMFontHandle font) override;
+	virtual void setFontSize(GMFontSizePt pt) override;
 	virtual void setLineHeight(GMint32 lineHeight) override;
 	virtual void createInstance(OUT ITypoEngine**) override;
 	virtual GMTypoResultInfo getResults() override;
@@ -187,7 +188,6 @@ private:
 
 public:
 	void setColor(GMfloat rgb[3]);
-	void setFontSize(GMint32 pt);
 };
 
 GM_PRIVATE_OBJECT(GMTypoTextBuffer)

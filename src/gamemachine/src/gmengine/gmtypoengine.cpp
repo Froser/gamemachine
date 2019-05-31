@@ -158,7 +158,7 @@ void GMTypoStateMachine::setColor(GMfloat rgb[3])
 	d->typoEngine->setColor(rgb);
 }
 
-void GMTypoStateMachine::setFontSize(GMint32 sz)
+void GMTypoStateMachine::setFontSize(GMFontSizePt sz)
 {
 	D(d);
 	d->typoEngine->setFontSize(sz);
@@ -250,8 +250,6 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 			d->results.erase(d->results.begin() + start, d->results.end());
 		}
 	}
-
-	setFontSize(d->options.defaultFontSize);
 
 	const std::wstring& wstr = literature.toStdWString();
 
@@ -445,7 +443,7 @@ void GMTypoEngine::setColor(GMfloat rgb[3])
 	d->color[2] = rgb[2];
 }
 
-void GMTypoEngine::setFontSize(GMint32 pt)
+void GMTypoEngine::setFontSize(GMFontSizePt pt)
 {
 	D(d);
 	d->fontSize = pt;

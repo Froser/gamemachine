@@ -1,8 +1,7 @@
 ﻿#include <iostream>
 #include <gamemachine.h>
-#include <gmm.h>
-#include "demonstration_world.h"
 #include <wrapper.h>
+#include "handler.h"
 
 namespace
 {
@@ -66,19 +65,8 @@ int main(int argc, char* argv[])
 	mainWindow->create(windowDesc);
 	mainWindow->centerWindow();
 	mainWindow->showWindow();
-	mainWindow->setHandler(new DemostrationEntrance(mainWindow));
+	mainWindow->setHandler(new Handler(mainWindow));
 	GM.addWindow(mainWindow);
-
-	/*
-	gm::IWindow* mainWindow2 = nullptr;
-	windowDesc.windowName = "Window 2";
-	factory->createWindow(hInstance, mainWindow, &mainWindow2);
-	mainWindow2->create(windowDesc);
-	mainWindow2->centerWindow();
-	mainWindow2->showWindow();
-	mainWindow2->setHandler(new DemostrationEntrance(mainWindow2));
-	GM.addWindow(mainWindow2);
-	*/
 
 	GM.startGameMachine();
 	return 0;

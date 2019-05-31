@@ -94,6 +94,7 @@ GM_PRIVATE_OBJECT(GMTextGameObject)
 	GMScene* scene = nullptr;
 	GMTextColorType colorType = GMTextColorType::ByScript;
 	GMFloat4 color = GMFloat4(1, 1, 1, 1);
+	GMint32 fontSize = 16;
 	Vector<GMVertex> vericesCache;
 	GMTypoTextBuffer* textBuffer = nullptr;
 	GMTextDrawMode drawMode = GMTextDrawMode::Immediate;
@@ -112,10 +113,12 @@ public:
 	void setText(const GMString& text);
 	void setColorType(GMTextColorType type) GM_NOEXCEPT;
 	void setColor(const GMVec4& color);
+	GMVec4 getColor();
 	void setCenter(bool center) GM_NOEXCEPT;
 	void setFont(GMFontHandle font) GM_NOEXCEPT;
 	void setNewline(bool newline) GM_NOEXCEPT;
 	void setLineSpacing(GMint32 lineSpacing) GM_NOEXCEPT;
+	void setFontSize(GMFontSizePt fontSize) GM_NOEXCEPT;
 
 	//! 设置文本缓存。
 	/*!

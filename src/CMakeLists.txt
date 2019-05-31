@@ -16,6 +16,7 @@ add_subdirectory(gamemachinemedia gamemachinemedia)
 
 if (GM_BUILD_DEMO)
 	add_subdirectory(./demo/gamemachinedemo gamemachinedemo)
+	add_subdirectory(./demo/premiere premiere)
 	add_subdirectory(./demo/gamemachinesimple gamemachinesimple)
 	add_subdirectory(./demo/gamemachinerunner gamemachinerunner)
 	add_subdirectory(./demo/gamemachineluademo gamemachineluademo)

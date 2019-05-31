@@ -49,6 +49,7 @@ GM_PRIVATE_OBJECT(GMAnimation)
 {
 	bool playLoop = false;
 	bool isPlaying = false;
+	bool finished = false;
 	GMDuration timeline = 0;
 	Set<GMAnimationKeyframe*, GMAnimationKeyframeLess> keyframes;
 	Set<GMAnimationKeyframe*, GMAnimationKeyframeLess>::const_iterator keyframesIter;
@@ -92,7 +93,15 @@ public:
 		return d->isPlaying;
 	}
 
+	inline bool isFinished() GM_NOEXCEPT
+	{
+		D(d);
+		return d->finished;
+	}
+
 public:
+	void clearObjects();
+	void clearFrames();
 	void addKeyFrame(AUTORELEASE GMAnimationKeyframe* kf);
 	void play();
 	void pause();
