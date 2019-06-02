@@ -15,7 +15,7 @@ class GM_EXPORT GMAnimationKeyframe : public GMObject
 	GM_DECLARE_PROPERTY(Time, time);
 
 public:
-	GMAnimationKeyframe() = default;
+	GMAnimationKeyframe(GMfloat timePoint);
 
 	virtual void reset(GMObject* object) = 0;
 	virtual void beginFrame(GMObject* object, GMfloat timeStart) = 0;

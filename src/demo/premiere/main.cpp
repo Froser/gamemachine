@@ -54,6 +54,7 @@ int main(int argc, char* argv[])
 
 	gm::GMWindowDesc windowDesc;
 	windowDesc.instance = hInstance;
+	windowDesc.windowName = L"GameMachine Primiere";
 
 #if GM_WINDOWS
 	windowDesc.dwStyle = WS_OVERLAPPEDWINDOW | WS_SIZEBOX;

@@ -129,18 +129,23 @@ void GMAnimation::update(GMDuration dt)
 	}
 }
 
+GMAnimationKeyframe::GMAnimationKeyframe(GMfloat timePoint)
+{
+	setTime(timePoint);
+}
+
 GMGameObjectKeyframe::GMGameObjectKeyframe(
 	const GMVec4& translation,
 	const GMVec4& scaling,
 	const GMQuat& rotation,
 	GMfloat timePoint
 )
+	: GMAnimationKeyframe(timePoint)
 {
 	D(d);
 	setTranslation(translation);
 	setScaling(scaling);
 	setRotation(rotation);
-	setTime(timePoint);
 }
 
 void GMGameObjectKeyframe::reset(GMObject* object)

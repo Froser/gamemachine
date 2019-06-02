@@ -687,16 +687,16 @@ void DemonstrationWorld::waitForExit()
 void DemonstrationWorld::mainThreadInvoke(std::function<void()> function)
 {
 	D(d);
-	d->funcStack.push(function);
+	d->funcQueue.push(function);
 }
 
 void DemonstrationWorld::invokeThreadFunctions()
 {
 	D(d);
-	if (!d->funcStack.empty())
+	if (!d->funcQueue.empty())
 	{
-		std::function<void()> func = d->funcStack.top();
-		d->funcStack.pop();
+		std::function<void()> func = d->funcQueue.top();
+		d->funcQueue.pop();
 		func();
 	}
 }

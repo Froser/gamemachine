@@ -65,12 +65,22 @@ bool GMGameWorld::removeObject(GMGameObject* obj)
 {
 	D(d);
 	auto& objs = d->gameObjects;
-	auto objIter = objs.find(GMOwnedPtr<GMGameObject>(obj));
-	if (objIter == objs.end())
+	const GMOwnedPtr<GMGameObject>* eraseTarget = nullptr;
+	for (auto& o : objs)
+	{
+		if (o.get() == obj)
+		{
+			eraseTarget = &o;
+			break;
+		}
+	}
+
+	if (!eraseTarget)
 		return false;
-	GMGameObject* eraseTarget = (*objIter).get();
+
+	removeFromRenderList(obj);
 	obj->onRemovingObjectFromWorld();
-	objs.erase(objIter);
+	objs.erase(*eraseTarget);
 	return true;
 }
 
@@ -123,6 +133,31 @@ void GMGameWorld::addToRenderList(GMGameObject* object)
 		else
 			d->renderList.forward.push_front(object);
 	}
+}
+
+bool GMGameWorld::removeFromRenderList(GMGameObject* object)
+{
+	D(d);
+	bool flag = false;
+	{
+		auto iter = std::find(d->renderList.forward.begin(), d->renderList.forward.end(), object);
+		if (iter != d->renderList.forward.end())
+		{
+			d->renderList.forward.erase(iter);
+			flag = true;
+		}
+	}
+
+	{
+		auto iter = std::find(d->renderList.deferred.begin(), d->renderList.deferred.end(), object);
+		if (iter != d->renderList.deferred.end())
+		{
+			d->renderList.deferred.erase(iter);
+			flag = true;
+		}
+	}
+
+	return flag;
 }
 
 void GMGameWorld::setPhysicsWorld(AUTORELEASE GMPhysicsWorld* w)

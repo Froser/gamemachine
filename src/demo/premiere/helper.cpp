@@ -14,11 +14,11 @@ GMRect Helper::getMiddleRectOfWindow(const GMRect& rc, IWindow* window)
 }
 
 FontColorAnimationKeyframe::FontColorAnimationKeyframe(GMTextGameObject* textObject, GMVec4 color, GMfloat timePoint)
-	: m_textObject(textObject)
+	: GMAnimationKeyframe(timePoint)
+	, m_textObject(textObject)
 	, m_timeStart(0)
 	, m_targetColor(color)
 {
-	setTime(timePoint);
 	m_defaultColor = textObject->getColor();
 
 	m_colorMap[textObject] = m_defaultColor;

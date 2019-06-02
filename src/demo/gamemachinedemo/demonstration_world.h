@@ -102,7 +102,7 @@ GM_PRIVATE_OBJECT(DemonstrationWorld)
 	gm::GMGameObject* logoObj = nullptr;
 	gm::GMAnimation logoAnimation;
 	gm::GMFuture<void> logoLoadedFuture;
-	Stack<std::function<void()>> funcStack;
+	Stack<std::function<void()>> funcQueue;
 };
 
 class DemonstrationWorld : public gm::GMGameWorld

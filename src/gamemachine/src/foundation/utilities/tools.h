@@ -27,7 +27,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMClock)
 	GMint64 lastCycle;
 };
 
-class GMClock
+class GM_EXPORT GMClock
 {
 	GM_DECLARE_PRIVATE_NGO(GMClock)
 

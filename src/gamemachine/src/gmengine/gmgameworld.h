@@ -61,6 +61,7 @@ public:
 	void updateGameWorld(GMDuration dt);
 	void clearRenderList();
 	void addToRenderList(GMGameObject* object);
+	bool removeFromRenderList(GMGameObject* object);
 	inline GMAssets& getAssets() { D(d); return d->assets; }
 
 protected:
