@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<timeline>
+    <assets>
+        <cubemap
+            id="tex_deception"
+            left="deception/deception_pass_lf.tga"
+            right="deception/deception_pass_rt.tga"
+            up="deception/deception_pass_up.tga"
+            down="deception/deception_pass_dn.tga"
+            front="deception/deception_pass_ft.tga"
+            back="deception/deception_pass_bk.tga"
+        />
+    </assets>
+    <objects>
+        <light id="global" type="point" position=".7 .7 -.7" ambient=".8 .8 .8" diffuse=".7 .7 .7" /> 
+        <cubemap id="obj_deception" asset="tex_deception" />
+    </objects>
+    <actions>
+        <action type="camera" view="perspective" fovy="75" near=".1f" far="3200" />
+        <action type="camera" direction="0 1 0" position="0 0 0" />
+        <action type="addLight" id="global"/>
+        <action type="addObject" id="obj_deception" />
+    </actions>
+</timeline>

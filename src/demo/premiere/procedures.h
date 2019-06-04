@@ -33,6 +33,7 @@ private:
 	GMOwnedPtr<IAudioSource> m_bgmSrc;
 	Timeline m_timeline;
 	bool m_assetsLoaded;
+	bool m_timelineStarted;
 };
 
 class Procedures

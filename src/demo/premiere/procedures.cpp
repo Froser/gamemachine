@@ -37,6 +37,8 @@ ProceduresPrivate::ProceduresPrivate(Procedures& p)
 	: m_procedures(p)
 	, m_title(nullptr)
 	, m_assetsLoaded(false)
+	, m_timeline(p.m_handler->getWindow()->getContext(), p.m_handler->getWorld())
+	, m_timelineStarted(false)
 {
 	m_audioPlayer = gmm::GMMFactory::getAudioPlayer();
 	m_audioReader = gmm::GMMFactory::getAudioReader();
@@ -56,6 +58,25 @@ void ProceduresPrivate::finalize()
 
 void ProceduresPrivate::showLogo(GMDuration dt)
 {
+	static std::once_flag s_flag;
+	std::call_once(s_flag, [this]() {
+		async(GMAsync::async(GMAsync::Async, [this]() {
+
+			GMBuffer buffer;
+			GM.getGamePackageManager()->readFile(GMPackageIndex::Scripts, "timeline.xml", &buffer);
+			GM_ASSERT(buffer.getSize() > 0);
+			if (buffer.getSize() > 0)
+			{
+				buffer.convertToStringBuffer();
+				m_timeline.parse(GMString(reinterpret_cast<char*>(buffer.getData())));
+				invokeInMainThread([this]() {
+					m_timeline.play();
+					m_assetsLoaded = true;
+				});
+			}
+		}));
+	});
+
 	if (!m_title)
 	{
 		IWindow* window = m_procedures.m_handler->getWindow();
@@ -141,21 +162,9 @@ void ProceduresPrivate::showLogo(GMDuration dt)
 
 void ProceduresPrivate::loadingScene(GMDuration dt)
 {
+	// 如果资源没有读取完成，将会卡在这里
 	m_titleAnimation.update(dt);
 	m_procedures.m_handler->getWorld()->renderScene();
-
-	static std::once_flag s_flag;
-	std::call_once(s_flag, [this]() {
-		async(GMAsync::async(GMAsync::Async, [this]() {
-			GMThread::sleep(3000); //TEST
-			m_timeline.parse(""); //TODO
-			m_timeline.loadAssets();
-			invokeInMainThread([this]() {
-				m_timeline.play();
-				m_assetsLoaded = true;
-			});
-		}));
-	});
 
 	if (m_assetsLoaded)
 	{
@@ -165,16 +174,16 @@ void ProceduresPrivate::loadingScene(GMDuration dt)
 
 void ProceduresPrivate::play(GMDuration dt)
 {
-	if (m_titleAnimation.isFinished())
+	if (m_titleAnimation.isFinished() && !m_timelineStarted)
 	{
 		m_titleAnimation.clearFrames();
 		m_titleAnimation.addKeyFrame(new FontColorAnimationKeyframe(m_title, GMVec4(0, 0, 0, 0), 1));
 		m_titleAnimation.reset();
 		m_titleAnimation.play();
+		m_timelineStarted = true;
 	}
 
 	// 按照脚本播放动画
-	// TODO
 	m_timeline.update(dt);
 
 	m_titleAnimation.update(dt);

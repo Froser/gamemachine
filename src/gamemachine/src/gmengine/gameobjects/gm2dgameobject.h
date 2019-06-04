@@ -94,7 +94,7 @@ GM_PRIVATE_OBJECT(GMTextGameObject)
 	GMScene* scene = nullptr;
 	GMTextColorType colorType = GMTextColorType::ByScript;
 	GMFloat4 color = GMFloat4(1, 1, 1, 1);
-	GMint32 fontSize = 16;
+	GMint32 fontSize = 12;
 	Vector<GMVertex> vericesCache;
 	GMTypoTextBuffer* textBuffer = nullptr;
 	GMTextDrawMode drawMode = GMTextDrawMode::Immediate;

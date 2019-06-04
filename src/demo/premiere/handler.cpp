@@ -70,8 +70,8 @@ void Handler::init(const IRenderContext* context)
 	}
 
 	context->getEngine()->setShaderLoadCallback(this);
-	m_procedures.reset(new Procedures(this));
 	m_world.reset(new GMGameWorld(context));
+	m_procedures.reset(new Procedures(this));
 }
 
 void Handler::start()
