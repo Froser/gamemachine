@@ -974,7 +974,7 @@ inline GMQuat RotationTo(const GMVec3& src, const GMVec3& dest, const GMVec3& fa
 		{
 			// Generate an axis
 			GMVec3 axis = Cross(GMVec3(1, 0, 0), src);
-			if (axis.length() == 0) // pick another if colinear
+			if (Length(axis) == 0) // pick another if colinear
 				axis = Cross(GMVec3(0, 1, 0), src);
 			axis = Normalize(axis);
 			q = Rotate(Radian(PI), axis);

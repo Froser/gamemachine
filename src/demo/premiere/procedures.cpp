@@ -81,6 +81,7 @@ void ProceduresPrivate::showLogo(GMDuration dt)
 	{
 		IWindow* window = m_procedures.m_handler->getWindow();
 		m_title = new GMTextGameObject(window->getRenderRect());
+		m_title->getShader().setBlendFactorDest(GMS_BlendFunc::OneMinusDestColor);
 		m_title->setColorType(GMTextColorType::Plain);
 		m_title->setFontSize(32);
 		m_title->setColor(GMVec4(0, 0, 0, 1));
@@ -93,7 +94,7 @@ void ProceduresPrivate::showLogo(GMDuration dt)
 		m_titleAnimation.setTargetObjects(m_title);
 		m_titleAnimation.addKeyFrame(new FontColorAnimationKeyframe(m_title, GMVec4(1, 1, 1, 1), 1));
 		m_titleAnimation.addKeyFrame(new FontColorAnimationKeyframe(m_title, GMVec4(1, 1, 1, 1), 2));
-		m_titleAnimation.addKeyFrame(new FontColorAnimationKeyframe(m_title, GMVec4(0, 0, 0, 0), 3));
+		m_titleAnimation.addKeyFrame(new FontColorAnimationKeyframe(m_title, GMVec4(1, 1, 1, 0), 3));
 		m_titleAnimation.reset();
 		m_titleAnimation.play();
 
@@ -108,6 +109,7 @@ void ProceduresPrivate::showLogo(GMDuration dt)
 		m_procedures.m_handler->getWorld()->removeObject(m_title);
 
 		m_title = new GMTextGameObject(window->getRenderRect());
+		m_title->getShader().setBlendFactorDest(GMS_BlendFunc::OneMinusDestColor);
 		m_title->setColorType(GMTextColorType::Plain);
 		m_title->setFontSize(32);
 		m_title->setColor(GMVec4(0, 0, 0, 1));
@@ -177,7 +179,7 @@ void ProceduresPrivate::play(GMDuration dt)
 	if (m_titleAnimation.isFinished() && !m_timelineStarted)
 	{
 		m_titleAnimation.clearFrames();
-		m_titleAnimation.addKeyFrame(new FontColorAnimationKeyframe(m_title, GMVec4(0, 0, 0, 0), 1));
+		m_titleAnimation.addKeyFrame(new FontColorAnimationKeyframe(m_title, GMVec4(1, 1, 1, 0), 2));
 		m_titleAnimation.reset();
 		m_titleAnimation.play();
 		m_timelineStarted = true;
@@ -186,7 +188,18 @@ void ProceduresPrivate::play(GMDuration dt)
 	// 按照脚本播放动画
 	m_timeline.update(dt);
 
-	m_titleAnimation.update(dt);
+	if (!m_titleAnimation.isFinished())
+	{
+		m_titleAnimation.update(dt);
+	}
+	else
+	{
+		static std::once_flag s_flag;
+		std::call_once(s_flag, [this]() {
+			bool b = m_procedures.m_handler->getWorld()->removeObject(m_title);
+			GM_ASSERT(b);
+		});
+	}
 	m_procedures.m_handler->getWorld()->renderScene();
 }
 

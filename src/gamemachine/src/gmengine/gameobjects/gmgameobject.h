@@ -76,7 +76,6 @@ public:
 	void setAsset(GMSceneAsset asset);
 	GMScene* getScene();
 	const GMScene* getScene() const;
-	GMModel* getModel();
 	void setWorld(GMGameWorld* world);
 	GMGameWorld* getWorld();
 	void setPhysicsObject(AUTORELEASE GMPhysicsObject* phyObj);
@@ -84,6 +83,7 @@ public:
 	void setCullComputeShaderProgram(IComputeShaderProgram* shaderProgram);
 
 public:
+	virtual GMModel* getModel();
 	virtual void onAppendingObjectToWorld();
 	virtual void onRemovingObjectFromWorld() {}
 	virtual void draw();

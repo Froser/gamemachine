@@ -5,13 +5,28 @@
 #include <gmgameobject.h>
 #include <gmlight.h>
 
+#define NoComponent 0
+#define PositionComponent 0x01
+#define DirectionComponent 0x02
+
 using namespace tinyxml2;
+
+enum Animation
+{
+	Camera,
+	GameObject,
+	EndOfAnimation,
+};
 
 Timeline::Timeline(const IRenderContext* context, GMGameWorld* world)
 	: m_context(context)
 	, m_world(world)
+	, m_timeline(0)
+	, m_playing(false)
+	, m_finished(false)
 {
 	GM_ASSERT(m_context && m_world);
+	m_animations.resize(EndOfAnimation);
 }
 
 bool Timeline::parse(const GMString& timelineContent)
@@ -33,23 +48,39 @@ bool Timeline::parse(const GMString& timelineContent)
 
 void Timeline::update(GMDuration dt)
 {
+	if (m_playing)
+	{
+		if (m_timeline == 0)
+			runImmediateActions();
+		else
+			runActions();
 
+		m_timeline += dt;
+	}
+
+	for (auto& animation : m_animations)
+	{
+		animation.update(dt);
+	}
 }
 
 void Timeline::play()
 {
-	for (const auto& action : m_actions)
+	m_currentAction = m_actions.begin();
+	m_playing = true;
+	for (auto& animation : m_animations)
 	{
-		if (action.runType == Action::Immediate)
-		{
-			action.action();
-		}
+		animation.play();
 	}
 }
 
 void Timeline::pause()
 {
-
+	m_playing = false;
+	for (auto& animation : m_animations)
+	{
+		animation.pause();
+	}
 }
 
 void Timeline::parseElements(tinyxml2::XMLElement* e)
@@ -192,12 +223,15 @@ void Timeline::parseObjects(tinyxml2::XMLElement* e)
 		}
 		else if (name == L"cubemap")
 		{
+			GMGameObject* obj = nullptr;
 			GMString asset = e->Attribute("asset");
 			auto assetIter = m_assets.find(asset);
 			if (assetIter != m_assets.end())
-				m_objects[id] = new GMCubeMapGameObject(assetIter->second);
+				obj = m_objects[id] = new GMCubeMapGameObject(assetIter->second);
 			else
 				gm_warning(gm_dbg_wrap("Cannot find asset: {0}"), asset);
+
+			parseTransform(obj, e);
 		}
 
 		e = e->NextSiblingElement();
@@ -212,15 +246,10 @@ void Timeline::parseActions(tinyxml2::XMLElement* e)
 		GMString name = e->Name();
 		if (name == L"action")
 		{
-			Action action = { Action::Immediate, 0 };
+			Action action = { Action::Immediate };
 			GMString time = e->Attribute("time");
 			if (!time.isEmpty())
-			{
 				action.runType = Action::Deferred;
-				action.timePoint = GMString::parseInt(time);
-				if (action.timePoint == 0)
-					action.runType = Action::Immediate;
-			}
 
 			GMString type = e->Attribute("type");
 			if (type == "camera")
@@ -261,9 +290,10 @@ void Timeline::parseActions(tinyxml2::XMLElement* e)
 
 					action.action = [fovy, aspect, n, f, this]() {
 						auto& camera = m_context->getEngine()->getCamera();
-						camera.setPerspective(Radian(75.f), 1.333f, .1f, 3200);
+						camera.setPerspective(fovy, aspect, n, f);
 					};
-					m_actions.insert(action);
+
+					bindAction(action);
 				}
 				else if (!view.isEmpty())
 				{
@@ -300,7 +330,8 @@ void Timeline::parseActions(tinyxml2::XMLElement* e)
 						GMCameraLookAt lookAt(direction, position);
 						camera.lookAt(lookAt);
 					};
-					m_actions.insert(action);
+					
+					bindAction(action);
 				}
 			}
 			else if (type == L"addObject")
@@ -314,7 +345,8 @@ void Timeline::parseActions(tinyxml2::XMLElement* e)
 						m_world->addObjectAndInit(targetObject);
 						m_world->addToRenderList(targetObject);
 					};
-					m_actions.insert(action);
+
+					bindAction(action);
 				}
 				else
 				{
@@ -331,11 +363,71 @@ void Timeline::parseActions(tinyxml2::XMLElement* e)
 					action.action = [this, targetLight]() {
 						m_context->getEngine()->addLight(targetLight);
 					};
-					m_actions.insert(action);
+					
+					bindAction(action);
 				}
 				else
 				{
 					gm_warning(gm_dbg_wrap("Cannot find light: {0}"), id);
+				}
+			}
+			else if (type == L"lerp")
+			{
+				if (!time.isEmpty())
+				{
+					GMint32 component = NoComponent;
+
+					GMfloat t = GMString::parseFloat(time);
+					action.timePoint = t;
+
+					GMString id = e->Attribute("id");
+					if (id == L"$camera")
+					{
+						GMVec3 pos, dir;
+						GMString str = e->Attribute("position");
+						if (!str.isEmpty())
+						{
+							GMScanner scanner(str);
+							GMfloat x, y, z;
+							scanner.nextFloat(x);
+							scanner.nextFloat(y);
+							scanner.nextFloat(z);
+							pos = GMVec3(x, y, z);
+							component |= PositionComponent;
+						}
+
+						str = e->Attribute("direction");
+						if (!str.isEmpty())
+						{
+							GMScanner scanner(str);
+							GMfloat x, y, z;
+							scanner.nextFloat(x);
+							scanner.nextFloat(y);
+							scanner.nextFloat(z);
+							dir = Normalize(GMVec3(x, y, z));
+							component |= DirectionComponent;
+						}
+
+						if (component != NoComponent)
+						{
+							action.runType = Action::Immediate; // lerp动作的添加是立即的
+							action.action = [this, component, pos, dir, t]() {
+								GMAnimation& animation = m_animations[Camera];
+								GMCamera& camera = m_context->getEngine()->getCamera();
+								const GMCameraLookAt& lookAt = camera.getLookAt();
+								animation.setTargetObjects(&camera);
+
+								GMVec3 posCandidate = (component & PositionComponent) ? pos : lookAt.position;
+								GMVec3 dirCandidate = (component & DirectionComponent) ? dir : lookAt.lookDirection;
+								animation.addKeyFrame(new GMCameraKeyframe(posCandidate, dirCandidate, t));
+							};
+							bindAction(action);
+						}
+					}
+				}
+				else
+				{
+					gm_warning(gm_dbg_wrap("type 'lerp' must combine with attribute 'time'."));
 				}
 			}
 			else
@@ -349,5 +441,99 @@ void Timeline::parseActions(tinyxml2::XMLElement* e)
 		}
 
 		e = e->NextSiblingElement();
+	}
+}
+
+void Timeline::parseTransform(GMGameObject* o, tinyxml2::XMLElement* e)
+{
+	GM_ASSERT(o);
+	GMString str = e->Attribute("scale");
+	if (!str.isEmpty())
+	{
+		GMfloat x, y, z;
+		GMScanner scanner(str);
+		scanner.nextFloat(x);
+		scanner.nextFloat(y);
+		scanner.nextFloat(z);
+		o->setScaling(Scale(GMVec3(x, y, z)));
+	}
+
+	str = e->Attribute("translate");
+	if (!str.isEmpty())
+	{
+		GMfloat x, y, z;
+		GMScanner scanner(str);
+		scanner.nextFloat(x);
+		scanner.nextFloat(y);
+		scanner.nextFloat(z);
+		o->setTranslation(Translate(GMVec3(x, y, z)));
+	}
+
+	str = e->Attribute("rotate");
+	if (!str.isEmpty())
+	{
+		GMfloat x, y, z, degree;
+		GMScanner scanner(str);
+		scanner.nextFloat(x);
+		scanner.nextFloat(y);
+		scanner.nextFloat(z);
+		scanner.nextFloat(degree);
+		GMVec3 axis(x, y, z);
+		if (!FuzzyCompare(Length(axis), 0.f))
+			o->setRotation(Rotate(Radian(degree), axis));
+		else
+			gm_warning(gm_dbg_wrap("Wrong rotation axis"));
+	}
+}
+
+void Timeline::bindAction(const Action& a)
+{
+	m_actions.insert(a);
+}
+
+void Timeline::runImmediateActions()
+{
+	for (const auto& action : m_actions)
+	{
+		if (action.runType == Action::Immediate)
+		{
+			action.action();
+		}
+	}
+}
+
+void Timeline::runActions()
+{
+	while (m_currentAction != m_actions.end())
+	{
+		if (m_currentAction->runType == Action::Deferred)
+		{
+			auto next = m_currentAction;
+			++next;
+			if (next == m_actions.end())
+			{
+				// 当前为最后一帧
+				if (m_timeline >= m_currentAction->timePoint)
+					m_currentAction->action();
+				else
+					break;
+			}
+			else
+			{
+				// 当前不是最后一帧
+				if (m_currentAction->timePoint <= m_timeline && m_timeline <= next->timePoint)
+					m_currentAction->action();
+				else if (m_currentAction->timePoint > m_timeline)
+					break;
+			}
+		}
+
+		++m_currentAction;
+	}
+	
+	if (m_currentAction == m_actions.end())
+	{
+		m_finished = true;
+		m_playing = false;
 	}
 }

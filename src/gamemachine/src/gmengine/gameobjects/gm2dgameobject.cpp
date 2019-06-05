@@ -66,6 +66,12 @@ void GM2DGameObjectBase::setGeometry(const GMRect& geometry)
 	}
 }
 
+
+GMShader& GM2DGameObjectBase::getShader()
+{
+	return getModel()->getShader();
+}
+
 void GM2DGameObjectBase::initShader(GMShader& shader)
 {
 	GMGlyphManager* glyphManager = getContext()->getEngine()->getGlyphManager();
@@ -225,6 +231,16 @@ void GMTextGameObject::setDrawMode(GMTextDrawMode mode) GM_NOEXCEPT
 	}
 }
 
+GMModel* GMTextGameObject::getModel()
+{
+	D(d);
+	D_BASE(db, GMGameObject);
+	if (db->asset.isEmpty())
+		createModel();
+
+	return GMGameObject::getModel();
+}
+
 void GMTextGameObject::onAppendingObjectToWorld()
 {
 	D(d);
@@ -266,11 +282,7 @@ GMScene* GMTextGameObject::createScene()
 {
 	D(d);
 	D_BASE(db, GMGameObject);
-	GMModel* model = new GMModel();
-	db->asset = GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, model));
-	model->setType(GMModelType::Text);
-	model->setUsageHint(GMUsageHint::DynamicDraw);
-	model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
+	GMModel* model = db->asset.isEmpty() ? createModel() : getModel();
 	initShader(model->getShader());
 
 	GMPart* part = new GMPart(model);
@@ -418,6 +430,19 @@ void GMTextGameObject::updateVertices(GMScene* scene)
 	memcpy_s(ptr, sz, vertices.data(), sz);
 	proxy->endUpdateBuffer();
 	vertices.clear();
+}
+
+
+GMModel* GMTextGameObject::createModel()
+{
+	D_BASE(db, GMGameObject);
+	GM_ASSERT(db->asset.isEmpty());
+	GMModel* model = new GMModel();
+	db->asset = GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, model));
+	model->setType(GMModelType::Text);
+	model->setUsageHint(GMUsageHint::DynamicDraw);
+	model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
+	return model;
 }
 
 void GMSprite2DGameObject::draw()

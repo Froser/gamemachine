@@ -13,12 +13,17 @@
     </assets>
     <objects>
         <light id="global" type="point" position=".7 .7 -.7" ambient=".8 .8 .8" diffuse=".7 .7 .7" /> 
-        <cubemap id="obj_deception" asset="tex_deception" />
+        <cubemap id="obj_deception" asset="tex_deception" scale="1500 1500 1500" translate="0 0 0" rotate="0 1 0 0"/>
     </objects>
     <actions>
-        <action type="camera" view="perspective" fovy="75" near=".1f" far="3200" />
-        <action type="camera" direction="0 1 0" position="0 0 0" />
+        <action type="camera" view="perspective" fovy="60" near=".1f" far="3200" />
+        <action type="camera" direction="0 .2 1" position="0 0 0" />
         <action type="addLight" id="global"/>
         <action type="addObject" id="obj_deception" />
+
+        <action type="lerp" id="$camera" position="0 0 0" direction="0 .2 1" time="1"/>
+        <action type="lerp" id="$camera" position="0 0 0" direction="-1 .2 0" time="6"/>
+        <action type="lerp" id="$camera" position="0 0 0" direction="0 .2 -1" time="11"/>
+        <action type="lerp" id="$camera" position="0 0 0" direction="1 .2 0" time="16"/>
     </actions>
 </timeline>

@@ -145,5 +145,35 @@ public:
 	virtual void endFrame(GMObject* object) override;
 	virtual void update(GMObject* object, GMfloat time) override;
 };
+
+GM_PRIVATE_OBJECT(GMCameraKeyframe)
+{
+	Map<GMCamera*, GMVec3, std::less<GMCamera*>, AlignedAllocator<Pair<GMGameObject*, GMVec3>> > positionMap;
+	Map<GMCamera*, GMVec3, std::less<GMCamera*>, AlignedAllocator<Pair<GMGameObject*, GMVec3>> > lookAtDirectionMap;
+	GMVec3 position;
+	GMVec3 lookAtDirection;
+	GMfloat timeStart = 0;
+};
+
+class GM_EXPORT GMCameraKeyframe : public GMAnimationKeyframe
+{
+	GM_DECLARE_PRIVATE(GMCameraKeyframe)
+	GM_DECLARE_PROPERTY(Position, position)
+	GM_DECLARE_PROPERTY(LookAtDirection, lookAtDirection)
+
+public:
+	GMCameraKeyframe(
+		const GMVec3& position,
+		const GMVec3& lookAtDirection,
+		GMfloat timePoint
+	);
+
+public:
+	virtual void reset(GMObject* object) override;
+	virtual void beginFrame(GMObject* object, GMfloat timeStart) override;
+	virtual void endFrame(GMObject* object) override;
+	virtual void update(GMObject* object, GMfloat time) override;
+};
+
 END_NS
 #endif

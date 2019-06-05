@@ -29,6 +29,7 @@ public:
 
 public:
 	void setGeometry(const GMRect& geometry);
+	GMShader& getShader();
 
 public:
 	inline const GMRect& getGeometry()
@@ -138,6 +139,7 @@ public:
 	void setDrawMode(GMTextDrawMode mode) GM_NOEXCEPT;
 
 public:
+	virtual GMModel* getModel() override;
 	virtual void onAppendingObjectToWorld() override;
 	virtual void draw() override;
 
@@ -151,6 +153,7 @@ public:
 private:
 	void update();
 	GMScene* createScene();
+	GMModel* createModel();
 	void updateVertices(GMScene* scene);
 };
 
