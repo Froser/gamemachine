@@ -491,7 +491,7 @@ struct GMScannerPrivate
 	bool valid;
 };
 
-class GMScanner
+class GM_EXPORT GMScanner
 {
 	DECLARE_STRING_PRIVATE(GMScanner)
 

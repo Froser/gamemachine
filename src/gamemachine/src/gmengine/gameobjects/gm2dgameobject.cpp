@@ -282,7 +282,7 @@ GMScene* GMTextGameObject::createScene()
 {
 	D(d);
 	D_BASE(db, GMGameObject);
-	GMModel* model = db->asset.isEmpty() ? createModel() : getModel();
+	GMModel* model = createModel();
 	initShader(model->getShader());
 
 	GMPart* part = new GMPart(model);
@@ -436,7 +436,6 @@ void GMTextGameObject::updateVertices(GMScene* scene)
 GMModel* GMTextGameObject::createModel()
 {
 	D_BASE(db, GMGameObject);
-	GM_ASSERT(db->asset.isEmpty());
 	GMModel* model = new GMModel();
 	db->asset = GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, model));
 	model->setType(GMModelType::Text);

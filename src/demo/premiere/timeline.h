@@ -2,7 +2,7 @@
 #define __TIMELINE_H__
 
 #include <gamemachine.h>
-#include <tinyxml2.h>
+#include <gmxml.h>
 #include <gmanimation.h>
 
 using namespace gm;
@@ -38,13 +38,13 @@ public:
 	void pause();
 
 private:
-	void parseElements(tinyxml2::XMLElement*);
-	void parseAssets(tinyxml2::XMLElement*);
-	void parseObjects(tinyxml2::XMLElement*);
-	void parseActions(tinyxml2::XMLElement*);
+	void parseElements(GMXMLElement*);
+	void parseAssets(GMXMLElement*);
+	void parseObjects(GMXMLElement*);
+	void parseActions(GMXMLElement*);
 
 private:
-	void parseTransform(GMGameObject*, tinyxml2::XMLElement*);
+	void parseTransform(GMGameObject*, GMXMLElement*);
 
 	void bindAction(const Action& a);
 	void runImmediateActions();

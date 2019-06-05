@@ -9,8 +9,6 @@
 #define PositionComponent 0x01
 #define DirectionComponent 0x02
 
-using namespace tinyxml2;
-
 enum Animation
 {
 	Camera,
@@ -31,9 +29,9 @@ Timeline::Timeline(const IRenderContext* context, GMGameWorld* world)
 
 bool Timeline::parse(const GMString& timelineContent)
 {
-	tinyxml2::XMLDocument doc;
+	GMXMLDocument doc;
 	std::string content = timelineContent.toStdString();
-	if (XML_SUCCESS == doc.Parse(content.c_str()))
+	if (GMXMLError::XML_SUCCESS == doc.Parse(content.c_str()))
 	{
 		auto root = doc.RootElement();
 		if (GMString::stringEquals(root->Name(), "timeline"))
@@ -83,7 +81,7 @@ void Timeline::pause()
 	}
 }
 
-void Timeline::parseElements(tinyxml2::XMLElement* e)
+void Timeline::parseElements(GMXMLElement* e)
 {
 	while (e)
 	{
@@ -105,7 +103,7 @@ void Timeline::parseElements(tinyxml2::XMLElement* e)
 	}
 }
 
-void Timeline::parseAssets(tinyxml2::XMLElement* e)
+void Timeline::parseAssets(GMXMLElement* e)
 {
 	auto package = GM.getGamePackageManager();
 	while (e)
@@ -157,7 +155,7 @@ void Timeline::parseAssets(tinyxml2::XMLElement* e)
 	}
 }
 
-void Timeline::parseObjects(tinyxml2::XMLElement* e)
+void Timeline::parseObjects(GMXMLElement* e)
 {
 	while (e)
 	{
@@ -238,7 +236,7 @@ void Timeline::parseObjects(tinyxml2::XMLElement* e)
 	}
 }
 
-void Timeline::parseActions(tinyxml2::XMLElement* e)
+void Timeline::parseActions(GMXMLElement* e)
 {
 	GM_ASSERT(m_world);
 	while (e)
@@ -444,7 +442,7 @@ void Timeline::parseActions(tinyxml2::XMLElement* e)
 	}
 }
 
-void Timeline::parseTransform(GMGameObject* o, tinyxml2::XMLElement* e)
+void Timeline::parseTransform(GMGameObject* o, GMXMLElement* e)
 {
 	GM_ASSERT(o);
 	GMString str = e->Attribute("scale");
