@@ -26,7 +26,7 @@ void Demo_Async::init()
 	world->addObject("text", literature);
 
 	d->future = gm::GMAsync::async(gm::GMAsync::Async, [this, d, context, literature]() {
-		context->getWindow()->setMultithreadRenderingFlag(gm::GMMultithreadRenderingFlag::StartRenderOnMultiThread);
+		GM_CHILD_THREAD_RENDER(context->getWindow());
 		gm::GMGamePackage& pk = *GM.getGamePackageManager();
 		gm::GMModelLoadSettings loadSettings(
 			"dragon/dragon.obj",
@@ -46,7 +46,6 @@ void Demo_Async::init()
 			literature->getModel()->getShader().setVisible(false);
 			setDefaultLights();
 		});
-		context->getWindow()->setMultithreadRenderingFlag(gm::GMMultithreadRenderingFlag::EndRenderOnMultiThread);
 	});
 
 	createDefaultWidget();

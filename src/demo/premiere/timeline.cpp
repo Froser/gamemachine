@@ -4,10 +4,12 @@
 #include <gmimage.h>
 #include <gmgameobject.h>
 #include <gmlight.h>
+#include <gmmodelreader.h>
 
 #define NoComponent 0
 #define PositionComponent 0x01
 #define DirectionComponent 0x02
+#define FocusAtComponent 0x04
 
 enum Animation
 {
@@ -110,7 +112,7 @@ void Timeline::parseAssets(GMXMLElement* e)
 	{
 		GMString id = e->Attribute("id");
 		GMString name = e->Name();
-		if (name ==  L"cubemap")
+		if (name == L"cubemap")
 		{
 			GMBuffer l, r, u, d, f, b;
 			package->readFile(GMPackageIndex::Textures, e->Attribute("left"), &l);
@@ -148,6 +150,22 @@ void Timeline::parseAssets(GMXMLElement* e)
 			else
 			{
 				gm_warning(gm_dbg_wrap("Load asset failed. Id: {0}"), id);
+			}
+		}
+		else if (name == L"object")
+		{
+			GMModelLoadSettings loadSettings(
+				"dragon/dragon.obj",
+				m_context
+			);
+			GMSceneAsset asset;
+			if (GMModelReader::load(loadSettings, asset))
+			{
+				m_assets[id] = asset;
+			}
+			else
+			{
+				gm_warning(gm_dbg_wrap("Load asset failed: {0}"), loadSettings.filename);
 			}
 		}
 
@@ -231,6 +249,18 @@ void Timeline::parseObjects(GMXMLElement* e)
 
 			parseTransform(obj, e);
 		}
+		else if (name == L"object")
+		{
+			GMGameObject* obj = nullptr;
+			GMString asset = e->Attribute("asset");
+			auto assetIter = m_assets.find(asset);
+			if (assetIter != m_assets.end())
+				obj = m_objects[id] = new GMGameObject(assetIter->second);
+			else
+				gm_warning(gm_dbg_wrap("Cannot find asset: {0}"), asset);
+
+			parseTransform(obj, e);
+		}
 
 		e = e->NextSiblingElement();
 	}
@@ -299,38 +329,67 @@ void Timeline::parseActions(GMXMLElement* e)
 				}
 
 				// 设置位置
-				GMString dirStr, posStr;
-				GMVec3 direction, position;
+				GMString dirStr, posStr, focusStr;
+				GMVec3 direction = Zero<GMVec3>(), position = Zero<GMVec3>(), focus = Zero<GMVec3>();
 				dirStr = e->Attribute("direction");
 				posStr = e->Attribute("position");
-				if (!dirStr.isEmpty() && !posStr.isEmpty())
+				focusStr = e->Attribute("focus");
+				if (!posStr.isEmpty())
 				{
-					{
-						GMfloat x = 0, y = 0, z = 0;
-						GMScanner scanner(dirStr);
-						scanner.nextFloat(x);
-						scanner.nextFloat(y);
-						scanner.nextFloat(z);
-						direction = GMVec3(x, y, z);
-					}
+					GMfloat x = 0, y = 0, z = 0;
+					GMScanner scanner(posStr);
+					scanner.nextFloat(x);
+					scanner.nextFloat(y);
+					scanner.nextFloat(z);
+					position = GMVec3(x, y, z);
 
-					{
-						GMfloat x = 0, y = 0, z = 0;
-						GMScanner scanner(posStr);
-						scanner.nextFloat(x);
-						scanner.nextFloat(y);
-						scanner.nextFloat(z);
-						position = GMVec3(x, y, z);
-					}
+				}
 
+				if (!dirStr.isEmpty())
+				{
+					GMfloat x = 0, y = 0, z = 0;
+					GMScanner scanner(dirStr);
+					scanner.nextFloat(x);
+					scanner.nextFloat(y);
+					scanner.nextFloat(z);
+					direction = GMVec3(x, y, z);
+				}
+
+				if (!focusStr.isEmpty())
+				{
+					GMfloat x = 0, y = 0, z = 0;
+					GMScanner scanner(focusStr);
+					scanner.nextFloat(x);
+					scanner.nextFloat(y);
+					scanner.nextFloat(z);
+					focus = GMVec3(x, y, z);
+				}
+
+				if (!dirStr.isEmpty() && !focusStr.isEmpty())
+				{
+					gm_warning(gm_dbg_wrap("You cannot specify both 'direction' and 'focus'. 'direction' won't work."));
+				}
+
+				if (!focusStr.isEmpty())
+				{
+					// focus
+					action.action = [this, focus, position]() {
+						auto& camera = m_context->getEngine()->getCamera();
+						GMCameraLookAt lookAt = GMCameraLookAt::makeLookAt(position, focus);
+						camera.lookAt(lookAt);
+					};
+				}
+				else if (!dirStr.isEmpty())
+				{
+					// direction
 					action.action = [this, direction, position]() {
 						auto& camera = m_context->getEngine()->getCamera();
 						GMCameraLookAt lookAt(direction, position);
 						camera.lookAt(lookAt);
 					};
-					
-					bindAction(action);
 				}
+
+				bindAction(action);
 			}
 			else if (type == L"addObject")
 			{
@@ -381,7 +440,7 @@ void Timeline::parseActions(GMXMLElement* e)
 					GMString id = e->Attribute("id");
 					if (id == L"$camera")
 					{
-						GMVec3 pos, dir;
+						GMVec3 pos, dir, focus;
 						GMString str = e->Attribute("position");
 						if (!str.isEmpty())
 						{
@@ -406,10 +465,27 @@ void Timeline::parseActions(GMXMLElement* e)
 							component |= DirectionComponent;
 						}
 
+						str = e->Attribute("focus");
+						if (!str.isEmpty())
+						{
+							GMScanner scanner(str);
+							GMfloat x, y, z;
+							scanner.nextFloat(x);
+							scanner.nextFloat(y);
+							scanner.nextFloat(z);
+							focus = Normalize(GMVec3(x, y, z));
+							component |= FocusAtComponent;
+						}
+
+						if ((component & DirectionComponent) && (component & FocusAtComponent))
+						{
+							gm_warning(gm_dbg_wrap("You cannot specify both 'direction' and 'focus'. 'direction' won't work."));
+						}
+
 						if (component != NoComponent)
 						{
 							action.runType = Action::Immediate; // lerp动作的添加是立即的
-							action.action = [this, component, pos, dir, t]() {
+							action.action = [this, component, pos, dir, focus, t]() {
 								GMAnimation& animation = m_animations[Camera];
 								GMCamera& camera = m_context->getEngine()->getCamera();
 								const GMCameraLookAt& lookAt = camera.getLookAt();
@@ -417,7 +493,11 @@ void Timeline::parseActions(GMXMLElement* e)
 
 								GMVec3 posCandidate = (component & PositionComponent) ? pos : lookAt.position;
 								GMVec3 dirCandidate = (component & DirectionComponent) ? dir : lookAt.lookDirection;
-								animation.addKeyFrame(new GMCameraKeyframe(posCandidate, dirCandidate, t));
+								GMVec3 focusCandidate = (component & FocusAtComponent) ? focus : lookAt.position + lookAt.lookDirection;
+								if (component & DirectionComponent)
+									animation.addKeyFrame(new GMCameraKeyframe(GMCameraKeyframe::ByPositionAndDirection, posCandidate, dirCandidate, t));
+								else // 默认是按照focusAt调整视觉
+									animation.addKeyFrame(new GMCameraKeyframe(GMCameraKeyframe::ByPositionAndFocusAt, posCandidate, focusCandidate, t));
 							};
 							bindAction(action);
 						}

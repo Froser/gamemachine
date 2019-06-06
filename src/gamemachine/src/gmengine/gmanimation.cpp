@@ -216,6 +216,8 @@ void GMGameObjectKeyframe::update(GMObject* object, GMfloat time)
 	D(d);
 	GMGameObject* gameObj = gm_cast<GMGameObject*>(object);
 	GMfloat percentage = (time - d->timeStart) / (getTime() - d->timeStart);
+	if (percentage > 1.f)
+		percentage = 1.f;
 	gameObj->beginUpdateTransform();
 	gameObj->setTranslation(Translate(Lerp(d->translationMap[gameObj], getTranslation(), percentage)));
 	gameObj->setScaling(Scale(Lerp(d->scalingMap[gameObj], getScaling(), percentage)));
@@ -224,12 +226,25 @@ void GMGameObjectKeyframe::update(GMObject* object, GMfloat time)
 }
 
 //////////////////////////////////////////////////////////////////////////
-GMCameraKeyframe::GMCameraKeyframe(const GMVec3& position, const GMVec3& lookAtDirection, GMfloat timePoint)
+GMCameraKeyframe::ByPositionAndDirectionTag GMCameraKeyframe::ByPositionAndDirection;
+GMCameraKeyframe::ByPositionAndFocusAtTag GMCameraKeyframe::ByPositionAndFocusAt;
+
+GMCameraKeyframe::GMCameraKeyframe(ByPositionAndDirectionTag, const GMVec3& position, const GMVec3& lookAtDirection, GMfloat timePoint)
 	: GMAnimationKeyframe(timePoint)
 {
 	D(d);
 	setPosition(position);
 	setLookAtDirection(lookAtDirection);
+	d->directionLerp = true;
+}
+
+GMCameraKeyframe::GMCameraKeyframe(ByPositionAndFocusAtTag, const GMVec3& position, const GMVec3& focusAt, GMfloat timePoint)
+	: GMAnimationKeyframe(timePoint)
+{
+	D(d);
+	setPosition(position);
+	setFocusAt(focusAt);
+	d->directionLerp = false;
 }
 
 void GMCameraKeyframe::reset(GMObject* object)
@@ -248,6 +263,7 @@ void GMCameraKeyframe::beginFrame(GMObject* object, GMfloat timeStart)
 	const GMCameraLookAt& lookAt = camera->getLookAt();
 	d->positionMap[camera] = lookAt.position;
 	d->lookAtDirectionMap[camera] = lookAt.lookDirection;
+	d->focusMap[camera] = lookAt.position + lookAt.lookDirection;
 }
 
 void GMCameraKeyframe::endFrame(GMObject* object)
@@ -256,8 +272,15 @@ void GMCameraKeyframe::endFrame(GMObject* object)
 	// 去掉误差，把对象放到正确的位置
 	GMCamera* camera = gm_cast<GMCamera*>(object);
 	GMCameraLookAt lookAt;
-	lookAt.position = getPosition();
-	lookAt.lookDirection = getLookAtDirection();
+	if (d->directionLerp)
+	{
+		lookAt.position = getPosition();
+		lookAt.lookDirection = getLookAtDirection();
+	}
+	else
+	{
+		lookAt = GMCameraLookAt::makeLookAt(getPosition(), getFocusAt());
+	}
 	camera->lookAt(lookAt);
 }
 
@@ -266,9 +289,18 @@ void GMCameraKeyframe::update(GMObject* object, GMfloat time)
 	D(d);
 	GMCamera* camera = gm_cast<GMCamera*>(object);
 	GMfloat percentage = (time - d->timeStart) / (getTime() - d->timeStart);
+	if (percentage > 1.f)
+		percentage = 1.f;
 	GMCameraLookAt lookAt = camera->getLookAt();
-	lookAt.position = Lerp(d->positionMap[camera], getPosition(), percentage);
-	lookAt.lookDirection = Normalize(SlerpVector(d->lookAtDirectionMap[camera], getLookAtDirection(), percentage));
+	if (d->directionLerp)
+	{
+		lookAt.position = Lerp(d->positionMap[camera], getPosition(), percentage);
+		lookAt.lookDirection = SlerpVector(d->lookAtDirectionMap[camera], getLookAtDirection(), percentage);
+	}
+	else
+	{
+		lookAt = GMCameraLookAt::makeLookAt(Lerp(d->positionMap[camera], getPosition(), percentage), Lerp(d->focusMap[camera], getFocusAt(), percentage));
+	}
 
 	camera->lookAt(lookAt);
 }

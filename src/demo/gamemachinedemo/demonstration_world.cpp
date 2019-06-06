@@ -582,7 +582,7 @@ void DemonstrationWorld::initObjects()
 {
 	D(d);
 	d->logoLoadedFuture = gm::GMAsync::async(gm::GMAsync::Async, [this, d]() {
-		getContext()->getWindow()->setMultithreadRenderingFlag(gm::GMMultithreadRenderingFlag::StartRenderOnMultiThread);
+		GM_CHILD_THREAD_RENDER(getContext()->getWindow());
 		gm::GMGamePackage& pk = *GM.getGamePackageManager();
 		gm::GMModelLoadSettings loadSettings(
 			"dragon/dragon.obj",
@@ -629,7 +629,6 @@ void DemonstrationWorld::initObjects()
 			this->addToRenderList(d->logoObj);
 			this->resetCameraAndLights();
 		});
-		getContext()->getWindow()->setMultithreadRenderingFlag(gm::GMMultithreadRenderingFlag::EndRenderOnMultiThread);
 	});
 }
 

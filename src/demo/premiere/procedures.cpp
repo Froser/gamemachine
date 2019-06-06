@@ -182,7 +182,7 @@ void ProceduresPrivate::play(GMDuration dt)
 	if (m_titleAnimation.isFinished() && !m_timelineStarted)
 	{
 		m_titleAnimation.clearFrames();
-		m_titleAnimation.addKeyFrame(new FontColorAnimationKeyframe(m_title, GMVec4(1, 1, 1, 0), 2));
+		m_titleAnimation.addKeyFrame(new FontColorAnimationKeyframe(m_title, GMVec4(1, 1, 1, 0), 1));
 		m_titleAnimation.reset();
 		m_titleAnimation.play();
 		m_timelineStarted = true;

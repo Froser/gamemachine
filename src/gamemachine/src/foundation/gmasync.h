@@ -76,7 +76,7 @@ private:
 	IWindow* m_window;
 };
 
-#define GM_CHILD_THREAD_RENDER(window) GMMultithreadRenderHelper __mtrh_placeholder__(window);
+#define GM_CHILD_THREAD_RENDER(window) gm::GMMultithreadRenderHelper __mtrh_placeholder__(window);
 
 END_NS
 #endif
