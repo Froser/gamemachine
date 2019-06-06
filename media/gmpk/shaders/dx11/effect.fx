@@ -1008,7 +1008,7 @@ VS_OUTPUT VS_Text(VS_INPUT input)
 float4 PS_Text(PS_INPUT input) : SV_TARGET
 {
     float4 alpha = GM_AmbientTexture.Sample(GM_AmbientSampler, input.Texcoord);
-    return float4(input.Color.r, input.Color.g, input.Color.b, alpha.r);
+    return float4(input.Color.r, input.Color.g, input.Color.b, alpha.r * input.Color.a);
 }
 
 //--------------------------------------------------------------------------------------

@@ -66,28 +66,17 @@ public:
 GM_STATIC_ASSERT(GMAsync::Async == static_cast<GMint32>(std::launch::async), "LaunchPolicy must be same with std::luanch");
 GM_STATIC_ASSERT(GMAsync::Deferred == static_cast<GMint32>(std::launch::deferred), "LaunchPolicy must be same with std::luanch");
 
-// 同步
-class GMAsyncResult
+class GMMultithreadRenderHelper
 {
 public:
-	virtual void* state();
-	virtual bool isComplete();
-	virtual void wait();
-
-public:
-	void setFuture(GMFuture<void> future);
-	void setComplete() GM_NOEXCEPT
-	{
-		complete = true;
-	}
+	GMMultithreadRenderHelper(IWindow* window);
+	~GMMultithreadRenderHelper();
 
 private:
-	GMBuffer buffer;
-	GMFuture<void> future;
-	bool complete = false;
+	IWindow* m_window;
 };
 
-using GMAsyncCallback = std::function<void(GMAsyncResult*)>;
+#define GM_CHILD_THREAD_RENDER(window) GMMultithreadRenderHelper __mtrh_placeholder__(window);
 
 END_NS
 #endif

@@ -61,7 +61,7 @@ void ProceduresPrivate::showLogo(GMDuration dt)
 	static std::once_flag s_flag;
 	std::call_once(s_flag, [this]() {
 		async(GMAsync::async(GMAsync::Async, [this]() {
-
+			GM_CHILD_THREAD_RENDER(m_procedures.m_handler->getWindow());
 			GMBuffer buffer;
 			GM.getGamePackageManager()->readFile(GMPackageIndex::Scripts, "timeline.xml", &buffer);
 			GM_ASSERT(buffer.getSize() > 0);
@@ -81,10 +81,11 @@ void ProceduresPrivate::showLogo(GMDuration dt)
 	{
 		IWindow* window = m_procedures.m_handler->getWindow();
 		m_title = new GMTextGameObject(window->getRenderRect());
-		m_title->getShader().setBlendFactorDest(GMS_BlendFunc::OneMinusDestColor);
+		m_title->getShader().setBlendFactorSource(GMS_BlendFunc::SourceAlpha);
+		m_title->getShader().setBlendFactorDest(GMS_BlendFunc::OneMinusSourceAlpha);
 		m_title->setColorType(GMTextColorType::Plain);
 		m_title->setFontSize(32);
-		m_title->setColor(GMVec4(0, 0, 0, 1));
+		m_title->setColor(GMVec4(1, 1, 1, 0));
 		m_title->setText("GameMachine Presents");
 		GMRect rc = { 0, 0, 512, 32 };
 		rc = Helper::getMiddleRectOfWindow(rc, window);
@@ -109,10 +110,11 @@ void ProceduresPrivate::showLogo(GMDuration dt)
 		m_procedures.m_handler->getWorld()->removeObject(m_title);
 
 		m_title = new GMTextGameObject(window->getRenderRect());
-		m_title->getShader().setBlendFactorDest(GMS_BlendFunc::OneMinusDestColor);
+		m_title->getShader().setBlendFactorSource(GMS_BlendFunc::SourceAlpha);
+		m_title->getShader().setBlendFactorDest(GMS_BlendFunc::OneMinusSourceAlpha);
 		m_title->setColorType(GMTextColorType::Plain);
 		m_title->setFontSize(32);
-		m_title->setColor(GMVec4(0, 0, 0, 1));
+		m_title->setColor(GMVec4(1, 1, 1, 0));
 		m_title->setText("Producer: Froser");
 		GMRect rc = { 0, 0, 400, 32 };
 		rc = Helper::getMiddleRectOfWindow(rc, window);
@@ -130,6 +132,7 @@ void ProceduresPrivate::showLogo(GMDuration dt)
 		static std::once_flag s_flag;
 		std::call_once(s_flag, [this]() {
 			async(GMAsync::async(GMAsync::Async, [this]() {
+				GM_CHILD_THREAD_RENDER(m_procedures.m_handler->getWindow());
 				GMBuffer bgBuffer;
 				GMString fn;
 				GM.getGamePackageManager()->readFile(GMPackageIndex::Audio, L"Thomas Greenberg - Curly Wurly.mp3", &bgBuffer, &fn);

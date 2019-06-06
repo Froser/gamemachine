@@ -378,7 +378,7 @@ void GMTextGameObject::updateVertices(GMScene* scene)
 					{ 0 },
 					{ 0 },
 					{ 0 },
-					{ pResultColor[0], pResultColor[1], pResultColor[2] }
+					{ pResultColor[0], pResultColor[1], pResultColor[2], pResultColor[3] }
 				};
 				GMVertex V1 = {
 					{ coord.x + X(typoResult.x), coord.y  - Y(typoResult.y + lineHeight - (glyph.bearingY - glyph.height)), Z },
@@ -387,7 +387,7 @@ void GMTextGameObject::updateVertices(GMScene* scene)
 					{ 0 },
 					{ 0 },
 					{ 0 },
-					{ pResultColor[0], pResultColor[1], pResultColor[2] }
+					{ pResultColor[0], pResultColor[1], pResultColor[2], pResultColor[3] }
 				};
 				GMVertex V2 = {
 					{ coord.x + X(typoResult.x + typoResult.width), coord.y - Y(typoResult.y + lineHeight - glyph.bearingY), Z },
@@ -396,7 +396,7 @@ void GMTextGameObject::updateVertices(GMScene* scene)
 					{ 0 },
 					{ 0 },
 					{ 0 },
-					{ pResultColor[0], pResultColor[1], pResultColor[2] }
+					{ pResultColor[0], pResultColor[1], pResultColor[2], pResultColor[3] }
 				};
 				GMVertex V3 = {
 					{ coord.x + X(typoResult.x + typoResult.width), coord.y - Y(typoResult.y + lineHeight - (glyph.bearingY - glyph.height)), Z },
@@ -405,7 +405,7 @@ void GMTextGameObject::updateVertices(GMScene* scene)
 					{ 0 },
 					{ 0 },
 					{ 0 },
-					{ pResultColor[0], pResultColor[1], pResultColor[2] }
+					{ pResultColor[0], pResultColor[1], pResultColor[2], pResultColor[3] }
 				};
 
 				vertices.push_back(V0);

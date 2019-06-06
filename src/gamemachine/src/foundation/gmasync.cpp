@@ -1,23 +1,13 @@
 ﻿#include "stdafx.h"
 #include "gmasync.h"
 
-void* GMAsyncResult::state()
+GMMultithreadRenderHelper::GMMultithreadRenderHelper(IWindow* window)
+	: m_window(window)
 {
-	return &buffer;
+	m_window->setMultithreadRenderingFlag(GMMultithreadRenderingFlag::StartRenderOnMultiThread);
 }
 
-bool GMAsyncResult::isComplete()
+GMMultithreadRenderHelper::~GMMultithreadRenderHelper()
 {
-	return complete;
-}
-
-void GMAsyncResult::wait()
-{
-	if (future.valid())
-		future.wait();
-}
-
-void GMAsyncResult::setFuture(GMFuture<void> future)
-{
-	this->future = std::move(future);
+	m_window->setMultithreadRenderingFlag(GMMultithreadRenderingFlag::EndRenderOnMultiThread);
 }

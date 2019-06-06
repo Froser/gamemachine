@@ -9,5 +9,5 @@ void GM_Text(void)
         _frag_color = vec4(0, 0, 0, 0);
     }
 
-    _frag_color = vec4(_color.rgb, _frag_color.r);
+    _frag_color = vec4(_color.rgb, _frag_color.r * _color.a);
 }

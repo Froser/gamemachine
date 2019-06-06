@@ -44,9 +44,7 @@ void Demo_CustomGeometryShader::init()
 	quad->getShader().getMaterial().setSpecular(GMVec3(0));
 
 	gm::GMTextureAsset tex;
-	gm::GMAsyncResult* result = nullptr;
 	tex = gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "gamemachine.png");
-	gm::GM_delete(result);
 
 	gm::GMToolUtil::addTextureToShader(quad->getShader(), tex, gm::GMTextureType::Diffuse);
 	getDemoWorldReference()->getAssets().addAsset(tex);
