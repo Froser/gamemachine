@@ -76,7 +76,7 @@ public:
 			const GMWindowStates& windowStates = m_context->getWindow()->getWindowStates();
 			GMShadowSourceDesc desc;
 			desc.position = GMVec4(-3.f, 3.f, -3.f, 1);
-			desc.type = GMShadowSourceDesc::DirectShadow;
+			desc.type = GMShadowSourceDesc::CSMShadow;
 			desc.camera = m_context->getEngine()->getCamera();
 			desc.biasMax = desc.biasMin = 0.0005f;
 			desc.width = windowStates.renderRect.width * 2;						// 为了防止锯齿，我们构造个窗口2倍大小的深度缓存

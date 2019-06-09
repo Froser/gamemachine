@@ -1577,6 +1577,7 @@ technique11 GMTech_3D_Shadow
     pass P0
     {
         SetVertexShader(CompileShader(vs_5_0,VS_Shadow()));
+        SetPixelShader(NULL);
         SetGeometryShader(NULL);
         SetRasterizerState(GM_RasterizerState);
         SetDepthStencilState(GM_DepthStencilState, 1);

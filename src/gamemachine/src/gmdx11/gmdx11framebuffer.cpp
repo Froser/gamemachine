@@ -431,7 +431,11 @@ void GMDx11ShadowFramebuffers::use()
 	D(d);
 	db->deviceContext->RSSetViewports(1, &d->viewports[d->currentViewport]);
 	if (d->currentViewport == 0)
+	{
+		static ID3D11ShaderResourceView* s_emptyView[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT] = { NULL };
+		db->deviceContext->PSSetShaderResources(0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, s_emptyView);
 		db->deviceContext->OMSetRenderTargets(gm_sizet_to<UINT>(db->renderTargetViews.size()), db->renderTargetViews.data(), db->depthStencilView);
+	}
 }
 
 void GMDx11ShadowFramebuffers::setShadowSource(const GMShadowSourceDesc& shadowSource)

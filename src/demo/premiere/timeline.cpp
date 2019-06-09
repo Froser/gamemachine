@@ -5,6 +5,8 @@
 #include <gmgameobject.h>
 #include <gmlight.h>
 #include <gmmodelreader.h>
+#include <gmutilities.h>
+#include <gmgraphicengine.h>
 
 #define NoComponent 0
 #define PositionComponent 0x01
@@ -42,6 +44,10 @@ bool Timeline::parse(const GMString& timelineContent)
 			parseElements(firstElement);
 			return true;
 		}
+	}
+	else
+	{
+		gm_warning(gm_dbg_wrap("Parse timeline file error: {0}, {1}, {2}"), GMString(doc.ErrorLineNum()), GMString(doc.ErrorName()), GMString(doc.ErrorStr()));
 	}
 	return false;
 }
@@ -152,10 +158,24 @@ void Timeline::parseAssets(GMXMLElement* e)
 				gm_warning(gm_dbg_wrap("Load asset failed. Id: {0}"), id);
 			}
 		}
+		else if (name == L"texture")
+		{
+			GMString file = e->Attribute("file");
+			GMTextureAsset asset = GMToolUtil::createTexture(m_context, file);
+			if (asset.isEmpty())
+			{
+				gm_warning(gm_dbg_wrap("Load asset failed. Id: {0}"), id);
+			}
+			else
+			{
+				m_assets[id] = asset;
+			}
+		}
 		else if (name == L"object")
 		{
+			GMString file = e->Attribute("file");
 			GMModelLoadSettings loadSettings(
-				"dragon/dragon.obj",
+				file,
 				m_context
 			);
 			GMSceneAsset asset;
@@ -240,28 +260,55 @@ void Timeline::parseObjects(GMXMLElement* e)
 		else if (name == L"cubemap")
 		{
 			GMGameObject* obj = nullptr;
-			GMString asset = e->Attribute("asset");
-			auto assetIter = m_assets.find(asset);
-			if (assetIter != m_assets.end())
-				obj = m_objects[id] = new GMCubeMapGameObject(assetIter->second);
+			GMString assetName = e->Attribute("asset");
+			GMAsset asset = findAsset(assetName);
+			if (!asset.isEmpty())
+				obj = m_objects[id] = new GMCubeMapGameObject(asset);
 			else
-				gm_warning(gm_dbg_wrap("Cannot find asset: {0}"), asset);
+				gm_warning(gm_dbg_wrap("Cannot find asset: {0}"), assetName);
 
 			parseTransform(obj, e);
 		}
 		else if (name == L"object")
 		{
 			GMGameObject* obj = nullptr;
-			GMString asset = e->Attribute("asset");
-			auto assetIter = m_assets.find(asset);
-			if (assetIter != m_assets.end())
-				obj = m_objects[id] = new GMGameObject(assetIter->second);
+			GMString assetName = e->Attribute("asset");
+			GMAsset asset = findAsset(assetName);
+			if (!asset.isEmpty())
+				obj = m_objects[id] = new GMGameObject(asset);
 			else
-				gm_warning(gm_dbg_wrap("Cannot find asset: {0}"), asset);
+				gm_warning(gm_dbg_wrap("Cannot find asset: {0}"), assetName);
 
+			parseTextures(obj, e);
+			parseMaterial(obj, e);
 			parseTransform(obj, e);
 		}
+		else if (name == L"quad")
+		{
+			GMfloat x = 0, y = 0, z = 0;
+			GMfloat width = 1, height = 1;
+			x = GMString::parseFloat(e->Attribute("x"));
+			y = GMString::parseFloat(e->Attribute("y"));
+			z = GMString::parseFloat(e->Attribute("z"));
+			width = GMString::parseFloat(e->Attribute("width"));
+			height = GMString::parseFloat(e->Attribute("height"));
 
+			GMVec2 he(width / 2.f, height / 2.f);
+			GMSceneAsset scene;
+			GMPrimitiveCreator::createQuadrangle(he, z, scene);
+
+			if (!scene.isEmpty())
+			{
+				GMGameObject* obj = m_objects[id] = new GMGameObject(scene);
+				parseTextures(obj, e);
+				parseMaterial(obj, e);
+				parseTransform(obj, e);
+			}
+			else
+			{
+				gm_warning(gm_dbg_wrap("Create quadrangle error. Id: {0}"), id);
+			}
+		}
 		e = e->NextSiblingElement();
 	}
 }
@@ -393,8 +440,8 @@ void Timeline::parseActions(GMXMLElement* e)
 			}
 			else if (type == L"addObject")
 			{
-				GMString id = e->Attribute("id");
-				auto objectIter = m_objects.find(id);
+				GMString object = e->Attribute("object");
+				auto objectIter = m_objects.find(object);
 				if (objectIter != m_objects.end())
 				{
 					GMGameObject* targetObject = objectIter->second;
@@ -407,13 +454,13 @@ void Timeline::parseActions(GMXMLElement* e)
 				}
 				else
 				{
-					gm_warning(gm_dbg_wrap("Cannot find object: {0}"), id);
+					gm_warning(gm_dbg_wrap("Cannot find object: {0}"), object);
 				}
 			}
 			else if (type == L"addLight")
 			{
-				GMString id = e->Attribute("id");
-				auto lightIter = m_lights.find(id);
+				GMString object = e->Attribute("object");
+				auto lightIter = m_lights.find(object);
 				if (lightIter != m_lights.end())
 				{
 					ILight* targetLight = lightIter->second;
@@ -425,7 +472,7 @@ void Timeline::parseActions(GMXMLElement* e)
 				}
 				else
 				{
-					gm_warning(gm_dbg_wrap("Cannot find light: {0}"), id);
+					gm_warning(gm_dbg_wrap("Cannot find light: {0}"), object);
 				}
 			}
 			else if (type == L"lerp")
@@ -437,8 +484,8 @@ void Timeline::parseActions(GMXMLElement* e)
 					GMfloat t = GMString::parseFloat(time);
 					action.timePoint = t;
 
-					GMString id = e->Attribute("id");
-					if (id == L"$camera")
+					GMString object = e->Attribute("object");
+					if (object == L"$camera")
 					{
 						GMVec3 pos, dir, focus;
 						GMString str = e->Attribute("position");
@@ -508,6 +555,126 @@ void Timeline::parseActions(GMXMLElement* e)
 					gm_warning(gm_dbg_wrap("type 'lerp' must combine with attribute 'time'."));
 				}
 			}
+			else if (type == L"shadow")
+			{
+				GMString camera = e->Attribute("camera");
+				if (camera != L"$camera" && !camera.isEmpty())
+					gm_warning(gm_dbg_wrap("You must set 'camera' attribute as '$camera'."));
+
+				GMint32 component = NoComponent;
+				GMfloat posX = 0, posY = 0, posZ = 0;
+				GMString posStr = e->Attribute("position");
+				{
+					GMScanner scanner(posStr);
+					scanner.nextFloat(posX);
+					scanner.nextFloat(posY);
+					scanner.nextFloat(posZ);
+				}
+
+				GMString directionStr = e->Attribute("direction");
+				GMString focusStr = e->Attribute("focus");
+				GMfloat focusX = 0, focusY = 0, focusZ = 0;
+				GMfloat dirX = 0, dirY = 0, dirZ = 0;
+				if (!focusStr.isEmpty())
+				{
+					GMScanner scanner(focusStr);
+					scanner.nextFloat(focusX);
+					scanner.nextFloat(focusY);
+					scanner.nextFloat(focusZ);
+					component |= FocusAtComponent;
+				}
+
+				if (!directionStr.isEmpty())
+				{
+					GMScanner scanner(directionStr);
+					scanner.nextFloat(dirX);
+					scanner.nextFloat(dirY);
+					scanner.nextFloat(dirZ);
+					component |= DirectionComponent;
+				}
+
+				if ((component & DirectionComponent) && (component & FocusAtComponent))
+				{
+					gm_warning(gm_dbg_wrap("You cannot specify both 'direction' and 'focus'. 'direction' won't work."));
+				}
+
+				GMRect rc = m_context->getWindow()->getRenderRect();
+				GMfloat width = rc.width, height = rc.height;
+				{
+					GMString str = e->Attribute("width");
+					if (!str.isEmpty())
+						width = GMString::parseFloat(str);
+				}
+				{
+					GMString str = e->Attribute("height");
+					if (!str.isEmpty())
+						height = GMString::parseFloat(str);
+				}
+
+				GMfloat cascades = 1;
+				{
+					GMString str = e->Attribute("cascades");
+					if (!str.isEmpty())
+						cascades = GMString::parseFloat(str);
+				}
+
+				Vector<GMfloat> partitions;
+				if (cascades > 1)
+				{
+					partitions.resize(cascades);
+					GMString str = e->Attribute("partitions");
+					if (!str.isEmpty())
+					{
+						GMScanner scanner(str);
+						for (GMint32 i = 0; i < cascades; ++i)
+						{
+							GMfloat p = 0;
+							scanner.nextFloat(p);
+							partitions[i] = p;
+						}
+					}
+					else
+					{
+						GMfloat p = 1.f / cascades;
+						for (GMint32 i = 0; i < cascades - 1; ++i)
+						{
+							partitions[i] = (i + 1) * p;
+						}
+						partitions[cascades - 1] = 1.f;
+					}
+				}
+
+				action.action = [this, component, posX, posY, posZ, focusX, focusY, focusZ, dirX, dirY, dirZ, cascades, width, height, partitions = std::move(partitions)]() {
+					GMShadowSourceDesc desc;
+					desc.type = GMShadowSourceDesc::CSMShadow;
+					desc.camera = m_context->getEngine()->getCamera();
+					desc.position = GMVec4(posX, posY, posZ, 1);
+					if (component & FocusAtComponent)
+					{
+						desc.camera.lookAt(GMCameraLookAt::makeLookAt(desc.position, GMVec3(focusX, focusY, focusZ)));
+					}
+					else if (component & DirectionComponent)
+					{
+						desc.camera.lookAt(GMCameraLookAt(desc.position, GMVec3(dirX, dirY, dirZ)));
+					}
+
+					if (cascades > 1)
+					{
+						for (GMint32 i = 0; i < cascades; ++i)
+						{
+							desc.cascadePartitions[i] = partitions[i];
+						}
+					}
+
+					desc.width = width;
+					desc.height = height;
+					desc.cascades = cascades;
+					desc.biasMax = desc.biasMin = 0.005f;
+					m_context->getEngine()->setShadowSource(desc);
+				};
+				bindAction(action);
+
+			}
 			else
 			{
 				gm_warning(gm_dbg_wrap("action type cannot be recognized: {0}"), type);
@@ -522,9 +689,20 @@ void Timeline::parseActions(GMXMLElement* e)
 	}
 }
 
+GMAsset Timeline::findAsset(const GMString& assetName)
+{
+	auto assetIter = m_assets.find(assetName);
+	if (assetIter != m_assets.end())
+		return assetIter->second;
+
+	return GMAsset::invalidAsset();
+}
+
 void Timeline::parseTransform(GMGameObject* o, GMXMLElement* e)
 {
-	GM_ASSERT(o);
+	if (!o)
+		return;
+
 	GMString str = e->Attribute("scale");
 	if (!str.isEmpty())
 	{
@@ -561,6 +739,131 @@ void Timeline::parseTransform(GMGameObject* o, GMXMLElement* e)
 			o->setRotation(Rotate(Radian(degree), axis));
 		else
 			gm_warning(gm_dbg_wrap("Wrong rotation axis"));
+	}
+}
+
+void Timeline::parseTextures(GMGameObject* o, GMXMLElement* e)
+{
+	if (!o)
+		return;
+
+	GMString id = e->Attribute("id");
+	GMModel* model = o->getModel();
+	GMShader& shader = model->getShader();
+
+	{
+		GMString tex = e->Attribute("ambient");
+		if (!tex.isEmpty())
+		{
+			GMAsset asset = findAsset(tex);
+			if (!asset.isEmpty() && asset.isTexture())
+				GMToolUtil::addTextureToShader(shader, asset, GMTextureType::Ambient);
+			else
+				gm_warning(gm_dbg_wrap("Cannot find texture asset: {0}"), tex);
+		}
+	}
+
+	{
+		GMString tex = e->Attribute("diffuse");
+		if (!tex.isEmpty())
+		{
+			GMAsset asset = findAsset(tex);
+			if (!asset.isEmpty() && asset.isTexture())
+				GMToolUtil::addTextureToShader(shader, asset, GMTextureType::Diffuse);
+			else
+				gm_warning(gm_dbg_wrap("Cannot find texture asset: {0}"), tex);
+		}
+	}
+
+	{
+		GMString tex = e->Attribute("specular");
+		if (!tex.isEmpty())
+		{
+			GMAsset asset = findAsset(tex);
+			if (!asset.isEmpty() && asset.isTexture())
+				GMToolUtil::addTextureToShader(shader, asset, GMTextureType::Specular);
+			else
+				gm_warning(gm_dbg_wrap("Cannot find texture asset: {0}"), tex);
+		}
+	}
+
+	{
+		GMString tex = e->Attribute("normal");
+		if (!tex.isEmpty())
+		{
+			GMAsset asset = findAsset(tex);
+			if (!asset.isEmpty() && asset.isTexture())
+				GMToolUtil::addTextureToShader(shader, asset, GMTextureType::NormalMap);
+			else
+				gm_warning(gm_dbg_wrap("Cannot find texture asset: {0}"), tex);
+		}
+	}
+
+	{
+		GMString tex = e->Attribute("albedo");
+		if (!tex.isEmpty())
+		{
+			GMAsset asset = findAsset(tex);
+			if (!asset.isEmpty() && asset.isTexture())
+				GMToolUtil::addTextureToShader(shader, asset, GMTextureType::Albedo);
+			else
+				gm_warning(gm_dbg_wrap("Cannot find texture asset: {0}"), tex);
+		}
+	}
+	//TODO AO, etc
+}
+
+void Timeline::parseMaterial(GMGameObject* o, GMXMLElement* e)
+{
+	if (!o)
+		return;
+
+	GMModel* model = o->getModel();
+	GMShader& shader = model->getShader();
+	GMfloat x = 0, y = 0, z = 0;
+
+	{
+		GMString str = e->Attribute("ka");
+		if (!str.isEmpty())
+		{
+			GMScanner scanner(str);
+			scanner.nextFloat(x);
+			scanner.nextFloat(y);
+			scanner.nextFloat(z);
+			shader.getMaterial().setAmbient(GMVec3(x, y, z));
+		}
+	}
+
+	{
+		GMString str = e->Attribute("kd");
+		if (!str.isEmpty())
+		{
+			GMScanner scanner(str);
+			scanner.nextFloat(x);
+			scanner.nextFloat(y);
+			scanner.nextFloat(z);
+			shader.getMaterial().setDiffuse(GMVec3(x, y, z));
+		}
+	}
+
+	{
+		GMString str = e->Attribute("ks");
+		if (!str.isEmpty())
+		{
+			GMScanner scanner(str);
+			scanner.nextFloat(x);
+			scanner.nextFloat(y);
+			scanner.nextFloat(z);
+			shader.getMaterial().setSpecular(GMVec3(x, y, z));
+		}
+	}
+
+	{
+		GMString str = e->Attribute("shininess");
+		if (!str.isEmpty())
+		{
+			shader.getMaterial().setShininess(GMString::parseFloat(str));
+		}
 	}
 }
 

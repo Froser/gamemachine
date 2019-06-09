@@ -44,7 +44,10 @@ private:
 	void parseActions(GMXMLElement*);
 
 private:
+	GMAsset findAsset(const GMString& assetName);
 	void parseTransform(GMGameObject*, GMXMLElement*);
+	void parseTextures(GMGameObject*, GMXMLElement*);
+	void parseMaterial(GMGameObject*, GMXMLElement*);
 
 	void bindAction(const Action& a);
 	void runImmediateActions();

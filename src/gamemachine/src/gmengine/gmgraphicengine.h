@@ -180,8 +180,7 @@ struct GM_EXPORT GMShadowSourceDesc
 	enum Type
 	{
 		NoShadow,
-		DirectShadow,
-		CascadedShadow,
+		CSMShadow,
 	};
 
 	Type type;

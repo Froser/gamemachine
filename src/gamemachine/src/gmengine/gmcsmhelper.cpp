@@ -148,9 +148,6 @@ void GMCSMHelper::setOrthoCamera(ICSMFramebuffers* csm, const GMCamera& viewerCa
 	GMVec4 cornerPoints[8];
 	createFrustumPointsFromCascadeInterval(viewerCamera, frustumIntervalBegin, frustumIntervalEnd, cornerPoints);
 
-	//GMVec4 cornerPoints2[8];
-	//createFrustumPointsFromCascadeInterval2(viewerCamera, frustumIntervalBegin, frustumIntervalEnd, cornerPoints);
-
 	// 找到平行投影的最大点和最小点
 	GMVec4 tempShadowCameraFrustumCornerPoint;
 

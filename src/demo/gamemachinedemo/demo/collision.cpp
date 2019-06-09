@@ -175,7 +175,7 @@ void Demo_Collision::setDefaultLights()
 		{
 			gm::GMShadowSourceDesc desc;
 			desc.position = GMVec4(-3.f, 3.f, -3.f, 1);
-			desc.type = gm::GMShadowSourceDesc::DirectShadow;
+			desc.type = gm::GMShadowSourceDesc::CSMShadow;
 			desc.camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
 			desc.biasMax = desc.biasMin = 0.0005f;
 			desc.width = windowStates.renderRect.width * 2;

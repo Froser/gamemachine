@@ -239,7 +239,7 @@ void Demo_CSM::setDefaultLights()
 			const gm::GMWindowStates& windowStates = getDemonstrationWorld()->getContext()->getWindow()->getWindowStates();
 			gm::GMShadowSourceDesc desc;
 			desc.position = GMVec4(-3.f, 3.f, -3.f, 1);
-			desc.type = gm::GMShadowSourceDesc::DirectShadow;
+			desc.type = gm::GMShadowSourceDesc::CSMShadow;
 
 			gm::GMCamera shadowCamera;
 			shadowCamera.setPerspective(PI / 4, 1.f, 1, 1000);

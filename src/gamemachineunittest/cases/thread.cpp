@@ -6,32 +6,6 @@
 #define LOOP_NUM 3
 volatile static gm::GMint32 g_testCode = 0;
 
-namespace gm
-{
-	static GMint32 __i;
-
-	void beginDoSomething(GMAsyncCallback callback, OUT GMAsyncResult** ar, std::ostream& out = std::cout)
-	{
-		auto f = [callback, &out](GMAsyncResult* r) {
-			// 这里做一个非常长时间的工作
-			for (__i = 0; __i < LOOP_NUM; ++__i)
-			{
-				out << "工作线程正在处理：" << __i << std::endl;
-				std::this_thread::sleep_for(std::chrono::seconds(3));
-			}
-
-			r->setComplete();
-			callback(r);
-		};
-
-		GMAsyncResult* asyncResult = new GMAsyncResult();
-		GMFuture<void> future = GMAsync::async(GMAsync::Async, f, asyncResult);
-		asyncResult->setFuture(std::move(future));
-		GM_ASSERT(ar);
-		(*ar) = asyncResult;
-	}
-}
-
 class TestThread_Join : public gm::GMThread
 {
 public:
@@ -142,21 +116,6 @@ void cases::Thread::addToUnitTest(UnitTest& ut)
 				suc = false;
 		}
 		return suc;
-	});
-
-	ut.addTestCase("Async", []() {
-		bool finished = false;
-		gm::GMAsyncCallback cb = [&finished](gm::GMAsyncResult* ar) {
-			std::cout << "工作线程已经完成。" << std::endl;
-			finished = ar->isComplete();
-		};
-		gm::GMAsyncResult* ar = nullptr;
-		beginDoSomething(cb, &ar);
-		std::cout << "正在等待工作线程结束..." << std::endl;
-		ar->wait();
-		std::cout << "等待线程已经结束" << std::endl;
-		gm::GM_delete(ar);
-		return gm::__i == LOOP_NUM && finished;
 	});
 
 	ut.addTestCase("GMEvent", []() {
