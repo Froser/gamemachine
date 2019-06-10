@@ -35,7 +35,7 @@
             ka=".4 .4 .4"
             kd=".5 .5 .5"
             ks=".1 .1 .1"
-            translate="0 -20 0"
+            translate="0 -15 0"
         />
     </objects>
     <actions>

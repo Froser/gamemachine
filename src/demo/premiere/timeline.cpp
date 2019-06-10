@@ -1047,16 +1047,14 @@ CurveType Timeline::parseCurve(GMXMLElement* e, GMInterpolationFunctors& f)
 		GMString controlStr = e->Attribute("control");
 		if (!controlStr.isEmpty())
 		{
-			GMfloat cpx0, cpy0, cpz0, cpx1, cpy1, cpz1;
+			GMfloat cpx0, cpy0, cpx1, cpy1;
 			GMScanner scanner(controlStr);
 			scanner.nextFloat(cpx0);
 			scanner.nextFloat(cpy0);
-			scanner.nextFloat(cpz0);
 			scanner.nextFloat(cpx1);
 			scanner.nextFloat(cpy1);
-			scanner.nextFloat(cpz1);
 			f = GMInterpolationFunctors::getDefaultInterpolationFunctors();
-			f.vec3Functor = GMSharedPtr<IInterpolationVec3>(new GMCubicBezierFunctor<GMVec3>(GMVec3(cpx0, cpy0, cpz0), GMVec3(cpx1, cpy1, cpz1)));
+			f.vec3Functor = GMSharedPtr<IInterpolationVec3>(new GMCubicBezierFunctor<GMVec3>(GMVec2(cpx0, cpy0), GMVec2(cpx1, cpy1)));
 			return CurveType::CubicBezier;
 		}
 		else

@@ -60,7 +60,7 @@ struct GMLerpFunctor : ProperInterpolationInterface<T>
 template <typename T>
 struct GMCubicBezierFunctor : ProperInterpolationInterface<T>
 {
-	GMCubicBezierFunctor(T cp0, T cp1)
+	GMCubicBezierFunctor(GMVec2 cp0, GMVec2 cp1)
 		: m_cp0(cp0)
 		, m_cp1(cp1)
 	{
@@ -68,14 +68,16 @@ struct GMCubicBezierFunctor : ProperInterpolationInterface<T>
 
 	T interpolate(T p0, T p1, GMfloat percentage)
 	{
-		return p0 * Pow(1 - percentage, 3) +
-			3 * m_cp0 * percentage * Pow(1 - percentage, 2) +
-			3 * m_cp1 * percentage * percentage * (1 - percentage) +
-			p1 * Pow(percentage, 3);
+		// 构造一个从0~1的贝塞尔曲线，根据percentage来获取变换的进度
+		GMfloat progress = (
+			m_cp0 * 3 * percentage * Pow(1 - percentage, 2) +
+			m_cp1 * 3 * percentage * percentage * (1 - percentage) +
+			GMVec2(1, 1) * Pow(percentage, 3)).getY();
+		return p0 + (p1 - p0) * progress;
 	}
 
 private:
-	T m_cp0, m_cp1;
+	GMVec2 m_cp0, m_cp1;
 };
 
 GM_PRIVATE_OBJECT(GMAnimationKeyframe)

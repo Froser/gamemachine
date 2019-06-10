@@ -462,6 +462,10 @@ inline GMVec4 operator-(const GMVec4& V);
 
 inline GMVec2 operator+(const GMVec2& V1, const GMVec2& V2);
 
+inline GMVec2 operator*(const GMVec2& V1, gm::GMfloat S);
+
+inline GMVec2 operator/(const GMVec2& V1, gm::GMfloat S);
+
 inline GMVec2 operator-(const GMVec2& V1, const GMVec2& V2);
 
 inline GMVec3 operator+(const GMVec3& V1, const GMVec3& V2);
