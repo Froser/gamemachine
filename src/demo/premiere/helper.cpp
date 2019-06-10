@@ -24,24 +24,24 @@ FontColorAnimationKeyframe::FontColorAnimationKeyframe(GMTextGameObject* textObj
 	m_colorMap[textObject] = m_defaultColor;
 }
 
-void FontColorAnimationKeyframe::reset(GMObject* object)
+void FontColorAnimationKeyframe::reset(IDestroyObject* object)
 {
 	GMTextGameObject* textObject = gm_cast<GMTextGameObject*>(object);
 	textObject->setColor(m_defaultColor);
 }
 
-void FontColorAnimationKeyframe::beginFrame(GMObject* object, GMfloat timeStart)
+void FontColorAnimationKeyframe::beginFrame(IDestroyObject* object, GMfloat timeStart)
 {
 	m_timeStart = timeStart;
 	GMTextGameObject* textObject = gm_cast<GMTextGameObject*>(object);
 	m_colorMap[textObject] = textObject->getColor();
 }
 
-void FontColorAnimationKeyframe::endFrame(GMObject* object)
+void FontColorAnimationKeyframe::endFrame(IDestroyObject* object)
 {
 }
 
-void FontColorAnimationKeyframe::update(GMObject* object, GMfloat time)
+void FontColorAnimationKeyframe::update(IDestroyObject* object, GMfloat time)
 {
 	GMTextGameObject* textObject = gm_cast<GMTextGameObject*>(object);
 	GMfloat percentage = (time - m_timeStart) / (getTime() - m_timeStart);

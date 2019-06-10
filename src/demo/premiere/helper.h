@@ -19,10 +19,10 @@ public:
 	FontColorAnimationKeyframe(GMTextGameObject* textObject, GMVec4 color, GMfloat timePoint);
 
 public:
-	virtual void reset(GMObject* object) override;
-	virtual void beginFrame(GMObject* object, GMfloat timeStart) override;
-	virtual void endFrame(GMObject* object) override;
-	virtual void update(GMObject* object, GMfloat time) override;
+	virtual void reset(IDestroyObject* object) override;
+	virtual void beginFrame(IDestroyObject* object, GMfloat timeStart) override;
+	virtual void endFrame(IDestroyObject* object) override;
+	virtual void update(IDestroyObject* object, GMfloat time) override;
 
 private:
 	GMTextGameObject* m_textObject;

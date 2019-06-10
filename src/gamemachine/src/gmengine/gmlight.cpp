@@ -66,3 +66,59 @@ bool GMLight::setLightAttribute(GMLightAttribute attr, GMfloat value)
 	}
 	return true;
 }
+
+
+bool GMLight::getLightAttribute(GMLightAttribute attr, REF GMfloat& value)
+{
+	D(d);
+	switch (attr)
+	{
+	case SpecularIntensity:
+		value = d->specularIntensity;
+		break;
+	case AttenuationConstant:
+		value = d->attenuation.constant;
+		break;
+	case AttenuationLinear:
+		value = d->attenuation.linear;
+		break;
+	case AttenuationExp:
+		value = d->attenuation.exp;
+		break;
+	default:
+		return false;
+	}
+	return true;
+}
+
+bool GMLight::getLightAttribute3(GMLightAttribute attr, OUT GMfloat value[3])
+{
+	D(d);
+	constexpr GMsize_t sz = 3 * sizeof(GMfloat);
+	switch (attr)
+	{
+	case Position:
+	{
+		memcpy_s(value, sz, d->position, sz);
+		break;
+	}
+	case Color:
+	{
+		memcpy_s(value, sz, d->color, sz);
+		break;
+	}
+	case AmbientIntensity:
+	{
+		memcpy_s(value, sz, d->ambientIntensity, sz);
+		break;
+	}
+	case DiffuseIntensity:
+	{
+		memcpy_s(value, sz, d->diffuseIntensity, sz);
+		break;
+	}
+	default:
+		return false;
+	}
+	return true;
+}

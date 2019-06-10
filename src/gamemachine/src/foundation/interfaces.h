@@ -529,6 +529,8 @@ GM_INTERFACE(ILight)
 
 	virtual bool setLightAttribute3(GMLightAttribute, GMfloat[3]) = 0;
 	virtual bool setLightAttribute(GMLightAttribute, GMfloat) = 0;
+	virtual bool getLightAttribute3(GMLightAttribute, OUT GMfloat[3]) = 0;
+	virtual bool getLightAttribute(GMLightAttribute, REF GMfloat&) = 0;
 	virtual void activateLight(GMuint32 index, ITechnique* technique) = 0;
 };
 

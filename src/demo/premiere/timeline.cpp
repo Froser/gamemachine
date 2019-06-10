@@ -8,14 +8,35 @@
 #include <gmutilities.h>
 #include <gmgraphicengine.h>
 
-#define NoComponent 0
+#define NoCameraComponent 0
 #define PositionComponent 0x01
 #define DirectionComponent 0x02
 #define FocusAtComponent 0x04
 
+namespace
+{
+	template <AssetType Type, typename Container>
+	bool getAssetAndType(const Container& container, const GMString& objectName, REF AssetType& result, OUT void** out)
+	{
+		result = AssetType::NotFound;
+
+		decltype(container.end()) iter;
+		if ((iter = container.find(objectName)) != container.end())
+		{
+			result = Type;
+			if (out)
+				(*out) = iter->second;
+			return true;
+		}
+
+		return false;
+	}
+}
+
 enum Animation
 {
 	Camera,
+	Light,
 	GameObject,
 	EndOfAnimation,
 };
@@ -227,8 +248,8 @@ void Timeline::parseObjects(GMXMLElement* e)
 				scanner.nextFloat(x);
 				scanner.nextFloat(y);
 				scanner.nextFloat(z);
-				GMfloat lightPos[] = { x, y, z };
-				light->setLightAttribute3(GMLight::Position, lightPos);
+				GMfloat value[] = { x, y, z };
+				light->setLightAttribute3(GMLight::Position, value);
 			}
 
 			GMString ambientStr = e->Attribute("ambient");
@@ -239,8 +260,8 @@ void Timeline::parseObjects(GMXMLElement* e)
 				scanner.nextFloat(x);
 				scanner.nextFloat(y);
 				scanner.nextFloat(z);
-				GMfloat lightPos[] = { x, y, z };
-				light->setLightAttribute3(GMLight::AmbientIntensity, lightPos);
+				GMfloat value[] = { x, y, z };
+				light->setLightAttribute3(GMLight::AmbientIntensity, value);
 			}
 
 			GMString diffuseStr = e->Attribute("diffuse");
@@ -251,8 +272,18 @@ void Timeline::parseObjects(GMXMLElement* e)
 				scanner.nextFloat(x);
 				scanner.nextFloat(y);
 				scanner.nextFloat(z);
-				GMfloat lightPos[] = { x, y, z };
-				light->setLightAttribute3(GMLight::DiffuseIntensity, lightPos);
+				GMfloat value[] = { x, y, z };
+				light->setLightAttribute3(GMLight::DiffuseIntensity, value);
+			}
+
+			GMString specularStr = e->Attribute("specular");
+			if (!specularStr.isEmpty())
+			{
+				GMfloat specular = 0;
+				GMScanner scanner(specularStr);
+				scanner.nextFloat(specular);
+				bool bSuc = light->setLightAttribute(GMLight::SpecularIntensity, specular);
+				GM_ASSERT(bSuc);
 			}
 
 			m_lights[id] = light;
@@ -310,6 +341,124 @@ void Timeline::parseObjects(GMXMLElement* e)
 			}
 		}
 		e = e->NextSiblingElement();
+	}
+}
+
+void Timeline::interpolateCamera(GMXMLElement* e, Action& action)
+{
+	GMint32 component = NoCameraComponent;
+	GMVec3 pos, dir, focus;
+	GMString str = e->Attribute("position");
+	if (!str.isEmpty())
+	{
+		GMScanner scanner(str);
+		GMfloat x, y, z;
+		scanner.nextFloat(x);
+		scanner.nextFloat(y);
+		scanner.nextFloat(z);
+		pos = GMVec3(x, y, z);
+		component |= PositionComponent;
+	}
+
+	str = e->Attribute("direction");
+	if (!str.isEmpty())
+	{
+		GMScanner scanner(str);
+		GMfloat x, y, z;
+		scanner.nextFloat(x);
+		scanner.nextFloat(y);
+		scanner.nextFloat(z);
+		dir = Normalize(GMVec3(x, y, z));
+		component |= DirectionComponent;
+	}
+
+	str = e->Attribute("focus");
+	if (!str.isEmpty())
+	{
+		GMScanner scanner(str);
+		GMfloat x, y, z;
+		scanner.nextFloat(x);
+		scanner.nextFloat(y);
+		scanner.nextFloat(z);
+		focus = Normalize(GMVec3(x, y, z));
+		component |= FocusAtComponent;
+	}
+
+	if ((component & DirectionComponent) && (component & FocusAtComponent))
+	{
+		gm_warning(gm_dbg_wrap("You cannot specify both 'direction' and 'focus'. 'direction' won't work."));
+	}
+
+	if (component != NoCameraComponent)
+	{
+		GMfloat t = action.timePoint;
+		action.runType = Action::Immediate; // 插值动作的添加是立即的
+		action.action = [this, component, pos, dir, focus, t]() {
+			GMAnimation& animation = m_animations[Camera];
+			GMCamera& camera = m_context->getEngine()->getCamera();
+			const GMCameraLookAt& lookAt = camera.getLookAt();
+			animation.setTargetObjects(&camera);
+
+			GMVec3 posCandidate = (component & PositionComponent) ? pos : lookAt.position;
+			GMVec3 dirCandidate = (component & DirectionComponent) ? dir : lookAt.lookDirection;
+			GMVec3 focusCandidate = (component & FocusAtComponent) ? focus : lookAt.position + lookAt.lookDirection;
+			if (component & DirectionComponent)
+				animation.addKeyFrame(new GMCameraKeyframe(GMCameraKeyframeComponent::LookAtDirection, posCandidate, dirCandidate, t));
+			else // 默认是按照focusAt调整视觉
+				animation.addKeyFrame(new GMCameraKeyframe(GMCameraKeyframeComponent::FocusAt, posCandidate, focusCandidate, t));
+		};
+		bindAction(action);
+	}
+}
+
+void Timeline::interpolateLight(GMXMLElement* e, Action& action, ILight* light)
+{
+	GMint32 component = GMLightKeyframeComponent::NoComponent;
+	GMVec3 ambient, diffuse;
+	GMfloat specular = 0;
+
+	GMString ambientStr = e->Attribute("ambient");
+	if (!ambientStr.isEmpty())
+	{
+		GMScanner scanner(ambientStr);
+		GMfloat x, y, z;
+		scanner.nextFloat(x);
+		scanner.nextFloat(y);
+		scanner.nextFloat(z);
+		ambient = GMVec3(x, y, z);
+		component |= GMLightKeyframeComponent::Ambient;
+	}
+
+	GMString diffuseStr = e->Attribute("diffuse");
+	if (!diffuseStr.isEmpty())
+	{
+		GMScanner scanner(diffuseStr);
+		GMfloat x, y, z;
+		scanner.nextFloat(x);
+		scanner.nextFloat(y);
+		scanner.nextFloat(z);
+		diffuse = GMVec3(x, y, z);
+		component |= GMLightKeyframeComponent::Diffuse;
+	}
+
+	GMString specularStr = e->Attribute("specular");
+	if (!specularStr.isEmpty())
+	{
+		GMScanner scanner(specularStr);
+		scanner.nextFloat(specular);
+		component |= GMLightKeyframeComponent::Specular;
+	}
+
+	if (component != GMLightKeyframeComponent::NoComponent)
+	{
+		GMfloat t = action.timePoint;
+		action.runType = Action::Immediate; // 插值动作的添加是立即的
+		action.action = [this, light, component, ambient, diffuse, specular, t]() {
+			GMAnimation& animation = m_animations[Light];
+			animation.setTargetObjects(light);
+			animation.addKeyFrame(new GMLightKeyframe(m_context, component, ambient, diffuse, specular, t));
+		};
+		bindAction(action);
 	}
 }
 
@@ -475,79 +624,29 @@ void Timeline::parseActions(GMXMLElement* e)
 					gm_warning(gm_dbg_wrap("Cannot find light: {0}"), object);
 				}
 			}
-			else if (type == L"lerp")
+			else if (type == L"lerp") // 或者是其它插值变换
 			{
 				if (!time.isEmpty())
 				{
-					GMint32 component = NoComponent;
-
 					GMfloat t = GMString::parseFloat(time);
 					action.timePoint = t;
 
 					GMString object = e->Attribute("object");
-					if (object == L"$camera")
+
+					void* targetObject = nullptr;
+					AssetType type = getAssetType(object, &targetObject);
+
+					if (type == AssetType::Camera)
 					{
-						GMVec3 pos, dir, focus;
-						GMString str = e->Attribute("position");
-						if (!str.isEmpty())
-						{
-							GMScanner scanner(str);
-							GMfloat x, y, z;
-							scanner.nextFloat(x);
-							scanner.nextFloat(y);
-							scanner.nextFloat(z);
-							pos = GMVec3(x, y, z);
-							component |= PositionComponent;
-						}
-
-						str = e->Attribute("direction");
-						if (!str.isEmpty())
-						{
-							GMScanner scanner(str);
-							GMfloat x, y, z;
-							scanner.nextFloat(x);
-							scanner.nextFloat(y);
-							scanner.nextFloat(z);
-							dir = Normalize(GMVec3(x, y, z));
-							component |= DirectionComponent;
-						}
-
-						str = e->Attribute("focus");
-						if (!str.isEmpty())
-						{
-							GMScanner scanner(str);
-							GMfloat x, y, z;
-							scanner.nextFloat(x);
-							scanner.nextFloat(y);
-							scanner.nextFloat(z);
-							focus = Normalize(GMVec3(x, y, z));
-							component |= FocusAtComponent;
-						}
-
-						if ((component & DirectionComponent) && (component & FocusAtComponent))
-						{
-							gm_warning(gm_dbg_wrap("You cannot specify both 'direction' and 'focus'. 'direction' won't work."));
-						}
-
-						if (component != NoComponent)
-						{
-							action.runType = Action::Immediate; // lerp动作的添加是立即的
-							action.action = [this, component, pos, dir, focus, t]() {
-								GMAnimation& animation = m_animations[Camera];
-								GMCamera& camera = m_context->getEngine()->getCamera();
-								const GMCameraLookAt& lookAt = camera.getLookAt();
-								animation.setTargetObjects(&camera);
-
-								GMVec3 posCandidate = (component & PositionComponent) ? pos : lookAt.position;
-								GMVec3 dirCandidate = (component & DirectionComponent) ? dir : lookAt.lookDirection;
-								GMVec3 focusCandidate = (component & FocusAtComponent) ? focus : lookAt.position + lookAt.lookDirection;
-								if (component & DirectionComponent)
-									animation.addKeyFrame(new GMCameraKeyframe(GMCameraKeyframe::ByPositionAndDirection, posCandidate, dirCandidate, t));
-								else // 默认是按照focusAt调整视觉
-									animation.addKeyFrame(new GMCameraKeyframe(GMCameraKeyframe::ByPositionAndFocusAt, posCandidate, focusCandidate, t));
-							};
-							bindAction(action);
-						}
+						interpolateCamera(e, action);
+					}
+					else if (type == AssetType::Light)
+					{
+						interpolateLight(e, action, static_cast<ILight*>(targetObject));
+					}
+					else
+					{
+						gm_warning(gm_dbg_wrap("Cannot find object: {0}"), object);
 					}
 				}
 				else
@@ -561,7 +660,7 @@ void Timeline::parseActions(GMXMLElement* e)
 				if (camera != L"$camera" && !camera.isEmpty())
 					gm_warning(gm_dbg_wrap("You must set 'camera' attribute as '$camera'."));
 
-				GMint32 component = NoComponent;
+				GMint32 component = NoCameraComponent;
 				GMfloat posX = 0, posY = 0, posZ = 0;
 				GMString posStr = e->Attribute("position");
 				{
@@ -917,4 +1016,26 @@ void Timeline::runActions()
 		m_finished = true;
 		m_playing = false;
 	}
+}
+
+AssetType Timeline::getAssetType(const GMString& objectName, OUT void** out)
+{
+	AssetType result = AssetType::NotFound;
+	if (objectName == "$camera")
+	{
+		result = AssetType::Camera;
+		if (out)
+			*out = &m_context->getEngine()->getCamera();
+	}
+	else
+	{
+		do 
+		{
+			if (getAssetAndType<AssetType::GameObject>(m_objects, objectName, result, out))
+				break;
+			if (getAssetAndType<AssetType::Light>(m_lights, objectName, result, out))
+				break;
+		} while (false);
+	}
+	return result;
 }

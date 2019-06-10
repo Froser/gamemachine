@@ -3,6 +3,9 @@
 #include "foundation/gamemachine.h"
 #include "gameobjects/gmgameobject.h"
 #include <gmcamera.h>
+#include <gmlight.h>
+
+#define RUN_AND_CHECK(expr) { bool b = expr; GM_ASSERT(b); }
 
 namespace
 {
@@ -175,7 +178,7 @@ GMGameObjectKeyframe::GMGameObjectKeyframe(
 	setRotation(rotation);
 }
 
-void GMGameObjectKeyframe::reset(GMObject* object)
+void GMGameObjectKeyframe::reset(IDestroyObject* object)
 {
 	D(d);
 	GMGameObject* gameObj = gm_cast<GMGameObject*>(object);
@@ -184,7 +187,7 @@ void GMGameObjectKeyframe::reset(GMObject* object)
 	gameObj->setRotation(d->rotationMap[gameObj]);
 }
 
-void GMGameObjectKeyframe::beginFrame(GMObject* object, GMfloat timeStart)
+void GMGameObjectKeyframe::beginFrame(IDestroyObject* object, GMfloat timeStart)
 {
 	D(d);
 	d->timeStart = timeStart;
@@ -199,7 +202,7 @@ void GMGameObjectKeyframe::beginFrame(GMObject* object, GMfloat timeStart)
 	d->rotationMap[gameObj] = gameObj->getRotation();
 }
 
-void GMGameObjectKeyframe::endFrame(GMObject* object)
+void GMGameObjectKeyframe::endFrame(IDestroyObject* object)
 {
 	D(d);
 	// 去掉误差，把对象放到正确的位置
@@ -211,7 +214,7 @@ void GMGameObjectKeyframe::endFrame(GMObject* object)
 	gameObj->endUpdateTransform();
 }
 
-void GMGameObjectKeyframe::update(GMObject* object, GMfloat time)
+void GMGameObjectKeyframe::update(IDestroyObject* object, GMfloat time)
 {
 	D(d);
 	GMGameObject* gameObj = gm_cast<GMGameObject*>(object);
@@ -226,28 +229,21 @@ void GMGameObjectKeyframe::update(GMObject* object, GMfloat time)
 }
 
 //////////////////////////////////////////////////////////////////////////
-GMCameraKeyframe::ByPositionAndDirectionTag GMCameraKeyframe::ByPositionAndDirection;
-GMCameraKeyframe::ByPositionAndFocusAtTag GMCameraKeyframe::ByPositionAndFocusAt;
-
-GMCameraKeyframe::GMCameraKeyframe(ByPositionAndDirectionTag, const GMVec3& position, const GMVec3& lookAtDirection, GMfloat timePoint)
+GMCameraKeyframe::GMCameraKeyframe(GMCameraKeyframeComponent component, const GMVec3& position, const GMVec3& lookAtDirectionOrFocusAt, GMfloat timePoint)
 	: GMAnimationKeyframe(timePoint)
 {
 	D(d);
 	setPosition(position);
-	setLookAtDirection(lookAtDirection);
-	d->directionLerp = true;
+	if (component == GMCameraKeyframeComponent::LookAtDirection)
+		setLookAtDirection(lookAtDirectionOrFocusAt);
+	else if (component == GMCameraKeyframeComponent::FocusAt)
+		setFocusAt(lookAtDirectionOrFocusAt);
+	else
+		gm_warning(gm_dbg_wrap("Wrong component type. This keyframe won't work or work abnormally."));
+	d->component = component;
 }
 
-GMCameraKeyframe::GMCameraKeyframe(ByPositionAndFocusAtTag, const GMVec3& position, const GMVec3& focusAt, GMfloat timePoint)
-	: GMAnimationKeyframe(timePoint)
-{
-	D(d);
-	setPosition(position);
-	setFocusAt(focusAt);
-	d->directionLerp = false;
-}
-
-void GMCameraKeyframe::reset(GMObject* object)
+void GMCameraKeyframe::reset(IDestroyObject* object)
 {
 	D(d);
 	GMCamera* camera = gm_cast<GMCamera*>(object);
@@ -255,7 +251,7 @@ void GMCameraKeyframe::reset(GMObject* object)
 	camera->lookAt(lookAt);
 }
 
-void GMCameraKeyframe::beginFrame(GMObject* object, GMfloat timeStart)
+void GMCameraKeyframe::beginFrame(IDestroyObject* object, GMfloat timeStart)
 {
 	D(d);
 	d->timeStart = timeStart;
@@ -266,13 +262,12 @@ void GMCameraKeyframe::beginFrame(GMObject* object, GMfloat timeStart)
 	d->focusMap[camera] = lookAt.position + lookAt.lookDirection;
 }
 
-void GMCameraKeyframe::endFrame(GMObject* object)
+void GMCameraKeyframe::endFrame(IDestroyObject* object)
 {
 	D(d);
-	// 去掉误差，把对象放到正确的位置
 	GMCamera* camera = gm_cast<GMCamera*>(object);
 	GMCameraLookAt lookAt;
-	if (d->directionLerp)
+	if (d->component == GMCameraKeyframeComponent::LookAtDirection)
 	{
 		lookAt.position = getPosition();
 		lookAt.lookDirection = getLookAtDirection();
@@ -284,7 +279,7 @@ void GMCameraKeyframe::endFrame(GMObject* object)
 	camera->lookAt(lookAt);
 }
 
-void GMCameraKeyframe::update(GMObject* object, GMfloat time)
+void GMCameraKeyframe::update(IDestroyObject* object, GMfloat time)
 {
 	D(d);
 	GMCamera* camera = gm_cast<GMCamera*>(object);
@@ -292,7 +287,7 @@ void GMCameraKeyframe::update(GMObject* object, GMfloat time)
 	if (percentage > 1.f)
 		percentage = 1.f;
 	GMCameraLookAt lookAt = camera->getLookAt();
-	if (d->directionLerp)
+	if (d->component == GMCameraKeyframeComponent::LookAtDirection)
 	{
 		lookAt.position = Lerp(d->positionMap[camera], getPosition(), percentage);
 		lookAt.lookDirection = SlerpVector(d->lookAtDirectionMap[camera], getLookAtDirection(), percentage);
@@ -303,4 +298,86 @@ void GMCameraKeyframe::update(GMObject* object, GMfloat time)
 	}
 
 	camera->lookAt(lookAt);
+}
+
+//////////////////////////////////////////////////////////////////////////
+GMLightKeyframe::GMLightKeyframe(const IRenderContext* context, GMint32 component, const GMVec3& ambient, const GMVec3& diffuse, GMfloat specular, GMfloat timePoint)
+	: GMAnimationKeyframe(timePoint)
+{
+	D(d);
+	setAmbient(ambient);
+	setDiffuse(diffuse);
+	setSpecular(specular);
+	d->component = component;
+	d->context = context;
+}
+
+void GMLightKeyframe::reset(IDestroyObject* object)
+{
+	D(d);
+	ILight* light = gm_cast<ILight*>(object);
+	RUN_AND_CHECK(light->setLightAttribute3(GMLight::AmbientIntensity, ValuePointer(d->ambientMap[light])));
+	RUN_AND_CHECK(light->setLightAttribute3(GMLight::DiffuseIntensity, ValuePointer(d->diffuseMap[light])));
+	RUN_AND_CHECK(light->setLightAttribute(GMLight::SpecularIntensity, d->specularMap[light]));
+}
+
+void GMLightKeyframe::beginFrame(IDestroyObject* object, GMfloat timeStart)
+{
+	D(d);
+	d->timeStart = timeStart;
+	ILight* light = gm_cast<ILight*>(object);
+	if (d->component & GMLightKeyframeComponent::Ambient)
+		RUN_AND_CHECK(light->getLightAttribute3(GMLight::AmbientIntensity, ValuePointer(d->ambientMap[light])));
+	if (d->component & GMLightKeyframeComponent::Diffuse)
+		RUN_AND_CHECK(light->getLightAttribute3(GMLight::DiffuseIntensity, ValuePointer(d->diffuseMap[light])));
+	if (d->component & GMLightKeyframeComponent::Specular)
+		RUN_AND_CHECK(light->getLightAttribute(GMLight::SpecularIntensity, d->specularMap[light]));
+}
+
+void GMLightKeyframe::endFrame(IDestroyObject* object)
+{
+	D(d);
+	ILight* light = gm_cast<ILight*>(object);
+	RUN_AND_CHECK(light->setLightAttribute3(GMLight::AmbientIntensity, ValuePointer(d->ambient)));
+	RUN_AND_CHECK(light->setLightAttribute3(GMLight::DiffuseIntensity, ValuePointer(d->diffuse)));
+	RUN_AND_CHECK(light->setLightAttribute(GMLight::SpecularIntensity, d->specular));
+}
+
+void GMLightKeyframe::update(IDestroyObject* object, GMfloat time)
+{
+	D(d);
+	ILight* light = gm_cast<ILight*>(object);
+	GMfloat percentage = (time - d->timeStart) / (getTime() - d->timeStart);
+	if (percentage > 1.f)
+		percentage = 1.f;
+
+	if (d->component & GMLightKeyframeComponent::Ambient)
+	{
+		GMVec3 currentIntensity;
+		RUN_AND_CHECK(light->getLightAttribute3(GMLight::AmbientIntensity, ValuePointer(currentIntensity)));
+		GMVec3 intensity = Lerp(currentIntensity, getAmbient(), percentage);
+		RUN_AND_CHECK(light->setLightAttribute3(GMLight::AmbientIntensity, ValuePointer(intensity)));
+	}
+
+	if (d->component & GMLightKeyframeComponent::Diffuse)
+	{
+		GMVec3 currentIntensity;
+		RUN_AND_CHECK(light->getLightAttribute3(GMLight::DiffuseIntensity, ValuePointer(currentIntensity)));
+		GMVec3 intensity = Lerp(currentIntensity, getDiffuse(), percentage);
+		RUN_AND_CHECK(light->setLightAttribute3(GMLight::DiffuseIntensity, ValuePointer(intensity)));
+	}
+
+	if (d->component & GMLightKeyframeComponent::Specular)
+	{
+		GMfloat currentIntensity;
+		RUN_AND_CHECK(light->getLightAttribute(GMLight::SpecularIntensity, currentIntensity));
+		GMfloat intensity = Lerp(currentIntensity, getSpecular(), percentage);
+		RUN_AND_CHECK(light->setLightAttribute(GMLight::SpecularIntensity, intensity));
+	}
+
+	if (d->component != GMLightKeyframeComponent::NoComponent)
+	{
+		GM_ASSERT(d->context);
+		d->context->getEngine()->update(GMUpdateDataType::LightChanged);
+	}
 }

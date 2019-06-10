@@ -17,9 +17,9 @@ class GM_EXPORT GMAnimationKeyframe : public GMObject
 public:
 	GMAnimationKeyframe(GMfloat timePoint);
 
-	virtual void reset(GMObject* object) = 0;
-	virtual void beginFrame(GMObject* object, GMfloat timeStart) = 0;
-	virtual void endFrame(GMObject* object) = 0;
+	virtual void reset(IDestroyObject* object) = 0;
+	virtual void beginFrame(IDestroyObject* object, GMfloat timeStart) = 0;
+	virtual void endFrame(IDestroyObject* object) = 0;
 
 	//! 关键帧处理方法，用于改变GMObject对象的状态。
 	/*!
@@ -27,7 +27,7 @@ public:
 	  \param object 希望执行动画的对象。
 	  \param time 当前动画执行的时间。从前一帧结束开始算起。
 	*/
-	virtual void update(GMObject* object, GMfloat time) = 0;
+	virtual void update(IDestroyObject* object, GMfloat time) = 0;
 
 public:
 	bool operator <(const GMAnimationKeyframe& rhs) const
@@ -53,7 +53,7 @@ GM_PRIVATE_OBJECT(GMAnimation)
 	GMDuration timeline = 0;
 	Set<GMAnimationKeyframe*, GMAnimationKeyframeLess> keyframes;
 	Set<GMAnimationKeyframe*, GMAnimationKeyframeLess>::const_iterator keyframesIter;
-	Set<GMObject*> targetObjects;
+	Set<IDestroyObject*> targetObjects;
 	GMAnimationKeyframe* lastKeyframe = nullptr;
 };
 
@@ -140,10 +140,17 @@ public:
 	);
 
 public:
-	virtual void reset(GMObject* object) override;
-	virtual void beginFrame(GMObject* object, GMfloat timeStart) override;
-	virtual void endFrame(GMObject* object) override;
-	virtual void update(GMObject* object, GMfloat time) override;
+	virtual void reset(IDestroyObject* object) override;
+	virtual void beginFrame(IDestroyObject* object, GMfloat timeStart) override;
+	virtual void endFrame(IDestroyObject* object) override;
+	virtual void update(IDestroyObject* object, GMfloat time) override;
+};
+
+enum class GMCameraKeyframeComponent
+{
+	NoComponent,
+	FocusAt,
+	LookAtDirection,
 };
 
 GM_PRIVATE_OBJECT(GMCameraKeyframe)
@@ -151,47 +158,81 @@ GM_PRIVATE_OBJECT(GMCameraKeyframe)
 	Map<GMCamera*, GMVec3, std::less<GMCamera*>, AlignedAllocator<Pair<GMGameObject*, GMVec3>> > positionMap;
 	Map<GMCamera*, GMVec3, std::less<GMCamera*>, AlignedAllocator<Pair<GMGameObject*, GMVec3>> > lookAtDirectionMap;
 	Map<GMCamera*, GMVec3, std::less<GMCamera*>, AlignedAllocator<Pair<GMGameObject*, GMVec3>> > focusMap;
+	GMCameraKeyframeComponent component = GMCameraKeyframeComponent::NoComponent;
 	GMVec3 position;
 	GMVec3 lookAtDirection;
 	GMVec3 focusAt;
 	GMfloat timeStart = 0;
-	bool directionLerp = true;
 };
 
 class GM_EXPORT GMCameraKeyframe : public GMAnimationKeyframe
 {
-	GM_DECLARE_PRIVATE(GMCameraKeyframe)
+	GM_DECLARE_PRIVATE_AND_BASE(GMCameraKeyframe, GMAnimationKeyframe)
 	GM_DECLARE_PROPERTY(Position, position)
 	GM_DECLARE_PROPERTY(LookAtDirection, lookAtDirection)
 	GM_DECLARE_PROPERTY(FocusAt, focusAt)
 
-	struct ByPositionAndDirectionTag {};
-	struct ByPositionAndFocusAtTag {};
-
 public:
 	GMCameraKeyframe(
-		ByPositionAndDirectionTag,
+		GMCameraKeyframeComponent component,
 		const GMVec3& position,
-		const GMVec3& lookAtDirection,
-		GMfloat timePoint
-	);
-
-	GMCameraKeyframe(
-		ByPositionAndFocusAtTag,
-		const GMVec3& position,
-		const GMVec3& focusAt,
+		const GMVec3& lookAtDirectionOrFocusAt,
 		GMfloat timePoint
 	);
 
 public:
-	virtual void reset(GMObject* object) override;
-	virtual void beginFrame(GMObject* object, GMfloat timeStart) override;
-	virtual void endFrame(GMObject* object) override;
-	virtual void update(GMObject* object, GMfloat time) override;
+	virtual void reset(IDestroyObject* object) override;
+	virtual void beginFrame(IDestroyObject* object, GMfloat timeStart) override;
+	virtual void endFrame(IDestroyObject* object) override;
+	virtual void update(IDestroyObject* object, GMfloat time) override;
+};
+
+struct GMLightKeyframeComponent
+{
+	enum
+	{
+		NoComponent = 0x00,
+		Ambient = 0x01,
+		Diffuse = 0x02,
+		Specular = 0x04,
+	};
+};
+
+GM_PRIVATE_OBJECT(GMLightKeyframe)
+{
+	Map<ILight*, GMVec3, std::less<ILight*>, AlignedAllocator<Pair<GMGameObject*, GMVec3>> > ambientMap;
+	Map<ILight*, GMVec3, std::less<ILight*>, AlignedAllocator<Pair<GMGameObject*, GMVec3>> > diffuseMap;
+	Map<ILight*, GMfloat, std::less<ILight*>> specularMap;
+	GMint32 component = GMLightKeyframeComponent::NoComponent;
+	GMVec3 ambient;
+	GMVec3 diffuse;
+	GMfloat specular;
+	GMfloat timeStart = 0;
+	const IRenderContext* context = nullptr;
+};
+
+class GM_EXPORT GMLightKeyframe : public GMAnimationKeyframe
+{
+	GM_DECLARE_PRIVATE_AND_BASE(GMLightKeyframe, GMAnimationKeyframe)
+	GM_DECLARE_PROPERTY(Ambient, ambient)
+	GM_DECLARE_PROPERTY(Diffuse, diffuse)
+	GM_DECLARE_PROPERTY(Specular, specular)
 
 public:
-	static ByPositionAndDirectionTag ByPositionAndDirection;
-	static ByPositionAndFocusAtTag ByPositionAndFocusAt;
+	GMLightKeyframe(
+		const IRenderContext* context,
+		GMint32 component,
+		const GMVec3& ambient,
+		const GMVec3& diffuse,
+		GMfloat specular,
+		GMfloat timePoint
+	);
+
+public:
+	virtual void reset(IDestroyObject* object) override;
+	virtual void beginFrame(IDestroyObject* object, GMfloat timeStart) override;
+	virtual void endFrame(IDestroyObject* object) override;
+	virtual void update(IDestroyObject* object, GMfloat time) override;
 };
 
 END_NS

@@ -52,6 +52,8 @@ public:
 public:
 	virtual bool setLightAttribute3(GMLightAttribute attr, GMfloat value[3]) override;
 	virtual bool setLightAttribute(GMLightAttribute, GMfloat) override;
+	virtual bool getLightAttribute3(GMLightAttribute, OUT GMfloat[3]) override;
+	virtual bool getLightAttribute(GMLightAttribute, REF GMfloat&) override;
 };
 
 END_NS

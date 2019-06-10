@@ -20,6 +20,14 @@ struct Action
 	std::function<void()> action;
 };
 
+enum class AssetType
+{
+	NotFound,
+	Camera,
+	GameObject,
+	Light,
+};
+
 inline bool operator<(const Action& lhs, const Action& rhs) GM_NOEXCEPT
 {
 	return lhs.timePoint < rhs.timePoint;
@@ -44,6 +52,10 @@ private:
 	void parseActions(GMXMLElement*);
 
 private:
+	void interpolateCamera(GMXMLElement*, Action&);
+	void interpolateLight(GMXMLElement*, Action&, ILight*);
+
+private:
 	GMAsset findAsset(const GMString& assetName);
 	void parseTransform(GMGameObject*, GMXMLElement*);
 	void parseTextures(GMGameObject*, GMXMLElement*);
@@ -52,6 +64,8 @@ private:
 	void bindAction(const Action& a);
 	void runImmediateActions();
 	void runActions();
+
+	AssetType getAssetType(const GMString& objectName, OUT void** out);
 
 private:
 	const IRenderContext* m_context;
