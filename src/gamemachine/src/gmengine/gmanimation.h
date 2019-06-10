@@ -3,9 +3,85 @@
 #include <gmcommon.h>
 BEGIN_NS
 
+struct IInterpolationFloat { virtual GMfloat interpolate(GMfloat, GMfloat, GMfloat) = 0; };
+struct IInterpolationVec3 { virtual GMVec3 interpolate(GMVec3, GMVec3, GMfloat) = 0; };
+struct IInterpolationVec4 { virtual GMVec4 interpolate(GMVec4, GMVec4, GMfloat) = 0; };
+struct IInterpolationQuat { virtual GMQuat interpolate(GMQuat, GMQuat, GMfloat) = 0; };
+
+template <typename T>
+struct ProperInterpolationInterface_;
+
+template <>
+struct ProperInterpolationInterface_<GMfloat>
+{
+	typedef IInterpolationFloat Type;
+};
+
+template <>
+struct ProperInterpolationInterface_<GMVec3>
+{
+	typedef IInterpolationVec3 Type;
+};
+
+template <>
+struct ProperInterpolationInterface_<GMVec4>
+{
+	typedef IInterpolationVec4 Type;
+};
+
+template <>
+struct ProperInterpolationInterface_<GMQuat>
+{
+	typedef IInterpolationQuat Type;
+};
+
+template <typename T>
+using ProperInterpolationInterface = typename ProperInterpolationInterface_<T>::Type;
+
+struct GMInterpolationFunctors
+{
+	GMSharedPtr<IInterpolationFloat> floatFunctor;
+	GMSharedPtr<IInterpolationVec3> vec3Functor;
+	GMSharedPtr<IInterpolationVec4> vec4Functor;
+	GMSharedPtr<IInterpolationQuat> quatFunctor;
+
+	static GMInterpolationFunctors getDefaultInterpolationFunctors();
+};
+
+template <typename T>
+struct GMLerpFunctor : ProperInterpolationInterface<T>
+{
+	T interpolate(T p0, T p1, GMfloat percentage)
+	{
+		return Lerp(p0, p1, percentage);
+	}
+};
+
+template <typename T>
+struct GMCubicBezierFunctor : ProperInterpolationInterface<T>
+{
+	GMCubicBezierFunctor(T cp0, T cp1)
+		: m_cp0(cp0)
+		, m_cp1(cp1)
+	{
+	}
+
+	T interpolate(T p0, T p1, GMfloat percentage)
+	{
+		return p0 * Pow(1 - percentage, 3) +
+			3 * m_cp0 * percentage * Pow(1 - percentage, 2) +
+			3 * m_cp1 * percentage * percentage * (1 - percentage) +
+			p1 * Pow(percentage, 3);
+	}
+
+private:
+	T m_cp0, m_cp1;
+};
+
 GM_PRIVATE_OBJECT(GMAnimationKeyframe)
 {
 	GMfloat time;
+	GMInterpolationFunctors functors;
 };
 
 //! 动画的关键帧。
@@ -13,6 +89,7 @@ class GM_EXPORT GMAnimationKeyframe : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMAnimationKeyframe)
 	GM_DECLARE_PROPERTY(Time, time);
+	GM_DECLARE_PROPERTY(Functors, functors);
 
 public:
 	GMAnimationKeyframe(GMfloat timePoint);

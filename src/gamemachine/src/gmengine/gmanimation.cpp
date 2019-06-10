@@ -30,6 +30,17 @@ namespace
 	}
 }
 
+GMInterpolationFunctors GMInterpolationFunctors::getDefaultInterpolationFunctors()
+{
+	static GMInterpolationFunctors s_default = {
+		GMSharedPtr<IInterpolationFloat>(new GMLerpFunctor<GMfloat>()),
+		GMSharedPtr<IInterpolationVec3>(new GMLerpFunctor<GMVec3>()),
+		GMSharedPtr<IInterpolationVec4>(new GMLerpFunctor<GMVec4>()),
+		GMSharedPtr<IInterpolationQuat>(new GMLerpFunctor<GMQuat>()),
+	};
+	return s_default;
+}
+
 GMAnimation::~GMAnimation()
 {
 	D(d);
@@ -162,6 +173,7 @@ void GMAnimation::update(GMDuration dt)
 GMAnimationKeyframe::GMAnimationKeyframe(GMfloat timePoint)
 {
 	setTime(timePoint);
+	setFunctors(GMInterpolationFunctors::getDefaultInterpolationFunctors());
 }
 
 GMGameObjectKeyframe::GMGameObjectKeyframe(
@@ -222,9 +234,11 @@ void GMGameObjectKeyframe::update(IDestroyObject* object, GMfloat time)
 	if (percentage > 1.f)
 		percentage = 1.f;
 	gameObj->beginUpdateTransform();
-	gameObj->setTranslation(Translate(Lerp(d->translationMap[gameObj], getTranslation(), percentage)));
-	gameObj->setScaling(Scale(Lerp(d->scalingMap[gameObj], getScaling(), percentage)));
-	gameObj->setRotation(Lerp(d->rotationMap[gameObj], getRotation(), percentage));
+
+	const auto& functor = getFunctors();
+	gameObj->setTranslation(Translate(functor.vec4Functor->interpolate(d->translationMap[gameObj], getTranslation(), percentage)));
+	gameObj->setScaling(Scale(functor.vec3Functor->interpolate(d->scalingMap[gameObj], getScaling(), percentage)));
+	gameObj->setRotation(functor.quatFunctor->interpolate(d->rotationMap[gameObj], getRotation(), percentage));
 	gameObj->endUpdateTransform();
 }
 
@@ -286,15 +300,17 @@ void GMCameraKeyframe::update(IDestroyObject* object, GMfloat time)
 	GMfloat percentage = (time - d->timeStart) / (getTime() - d->timeStart);
 	if (percentage > 1.f)
 		percentage = 1.f;
+
 	GMCameraLookAt lookAt = camera->getLookAt();
+	const auto& functor = getFunctors();
 	if (d->component == GMCameraKeyframeComponent::LookAtDirection)
 	{
-		lookAt.position = Lerp(d->positionMap[camera], getPosition(), percentage);
+		lookAt.position = functor.vec3Functor->interpolate(d->positionMap[camera], getPosition(), percentage);
 		lookAt.lookDirection = SlerpVector(d->lookAtDirectionMap[camera], getLookAtDirection(), percentage);
 	}
 	else
 	{
-		lookAt = GMCameraLookAt::makeLookAt(Lerp(d->positionMap[camera], getPosition(), percentage), Lerp(d->focusMap[camera], getFocusAt(), percentage));
+		lookAt = GMCameraLookAt::makeLookAt(functor.vec3Functor->interpolate(d->positionMap[camera], getPosition(), percentage), functor.vec3Functor->interpolate(d->focusMap[camera], getFocusAt(), percentage));
 	}
 
 	camera->lookAt(lookAt);
@@ -351,11 +367,12 @@ void GMLightKeyframe::update(IDestroyObject* object, GMfloat time)
 	if (percentage > 1.f)
 		percentage = 1.f;
 
+	const auto& functor = getFunctors();
 	if (d->component & GMLightKeyframeComponent::Ambient)
 	{
 		GMVec3 currentIntensity;
 		RUN_AND_CHECK(light->getLightAttribute3(GMLight::AmbientIntensity, ValuePointer(currentIntensity)));
-		GMVec3 intensity = Lerp(currentIntensity, getAmbient(), percentage);
+		GMVec3 intensity = functor.vec3Functor->interpolate(currentIntensity, getAmbient(), percentage);
 		RUN_AND_CHECK(light->setLightAttribute3(GMLight::AmbientIntensity, ValuePointer(intensity)));
 	}
 
@@ -363,7 +380,7 @@ void GMLightKeyframe::update(IDestroyObject* object, GMfloat time)
 	{
 		GMVec3 currentIntensity;
 		RUN_AND_CHECK(light->getLightAttribute3(GMLight::DiffuseIntensity, ValuePointer(currentIntensity)));
-		GMVec3 intensity = Lerp(currentIntensity, getDiffuse(), percentage);
+		GMVec3 intensity = functor.vec3Functor->interpolate(currentIntensity, getDiffuse(), percentage);
 		RUN_AND_CHECK(light->setLightAttribute3(GMLight::DiffuseIntensity, ValuePointer(intensity)));
 	}
 
@@ -371,7 +388,7 @@ void GMLightKeyframe::update(IDestroyObject* object, GMfloat time)
 	{
 		GMfloat currentIntensity;
 		RUN_AND_CHECK(light->getLightAttribute(GMLight::SpecularIntensity, currentIntensity));
-		GMfloat intensity = Lerp(currentIntensity, getSpecular(), percentage);
+		GMfloat intensity = functor.floatFunctor->interpolate(currentIntensity, getSpecular(), percentage);
 		RUN_AND_CHECK(light->setLightAttribute(GMLight::SpecularIntensity, intensity));
 	}
 

@@ -13,30 +13,29 @@
         <texture id="mud_d" file="mud/albedo.jpg" />
         <texture id="mud_n" file="mud/normal.jpg" />
         <buffer id="mud_terrain" file="textures/mud/terrain.png" />
-        <object id="model_dragon" file="cat/cat.obj" />
+        <object id="model_dragon" file="dragon/dragon.obj" />
     </assets>
     <objects>
         <light id="global" type="point" position="20 20 -20" ambient=".8 .8 .8" diffuse=".7 .7 .7" /> 
-        <cubemap id="obj_sky" asset="tex_sky" scale="1500 1500 1500" translate="0 10 0" rotate="0 1 0 0"/>
+        <cubemap id="obj_sky" asset="tex_sky" scale="1500 1500 1500" translate="0 10 0" />
         <object id="obj_dragon" asset="model_dragon" scale="1.2 1.2 1.2" ks=".5 .5 .5" />
         <terrain
             id="obj_ground"
-            x="-500"
-            y="-500"
-            z="0"
+            terrainX="-500"
+            terrainZ="-500"
             width="1000"
             height="1000"
-            scale="20"
+            heightScaling="50"
             slice="100 100"
             textureSize="100 100"
             terrain="mud_terrain"
             ambient="mud_d"
             diffuse="mud_d"
             normal="mud_n"
-            rotate="1 0 0 90"
             ka=".4 .4 .4"
             kd=".5 .5 .5"
             ks=".1 .1 .1"
+            translate="0 -20 0"
         />
     </objects>
     <actions>
@@ -50,8 +49,9 @@
         <action type="lerp" object="$camera" position="30 30 0" time="3"/>
         <action type="lerp" object="$camera" position="0 30 30" time="6"/>
         <action type="lerp" object="global" ambient=".8 .8 .8" diffuse=".7 .7 .7" time="6"/>
-        <!--<action type="lerp" object="global" ambient="0 0 0" diffuse="0 0 0" specular="0" time="12"/>-->
         <action type="lerp" object="$camera" position="-40 10 0" time="12"/>
+        <action type="lerp" object="$camera" position="0 40 -30" time="14"/>
+        <action type="cubic-bezier" control="1 0 1 1 1 1" object="global" ambient="0 0 0" diffuse="0 0 0" specular="0" time="14"/>-->
         <!--
         <action type="lerp" object="$camera" position="0 0 0" direction="-1 .2 0" time="6"/>
         <action type="lerp" object="$camera" position="0 0 0" direction="0 .2 -1" time="11"/>

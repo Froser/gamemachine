@@ -21,6 +21,12 @@ struct Action
 	std::function<void()> action;
 };
 
+enum class CurveType
+{
+	NoCurve,
+	CubicBezier,
+};
+
 enum class AssetType
 {
 	NotFound,
@@ -63,6 +69,7 @@ private:
 	void parseTransform(GMGameObject*, GMXMLElement*);
 	void parseTextures(GMGameObject*, GMXMLElement*);
 	void parseMaterial(GMGameObject*, GMXMLElement*);
+	CurveType parseCurve(GMXMLElement*, GMInterpolationFunctors&);
 
 	void bindAction(const Action& a);
 	void runImmediateActions();

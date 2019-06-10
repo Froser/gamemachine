@@ -338,18 +338,17 @@ void Timeline::parseObjects(GMXMLElement* e)
 		}
 		else if (name == L"terrain")
 		{
-			GMfloat x = 0, y = 0, z = 0;
-			GMfloat width = 1, height = 1, scale = 10.f;
+			GMfloat terrainX = 0, terrainZ = 0;
+			GMfloat width = 1, height = 1, heightScaling = 10.f;
 
 			GMint32 sliceX = 10, sliceY = 10;
 			GMfloat texLen = 10, texHeight = 10;
 
-			x = GMString::parseFloat(e->Attribute("x"));
-			y = GMString::parseFloat(e->Attribute("y"));
-			z = GMString::parseFloat(e->Attribute("z"));
+			terrainX = GMString::parseFloat(e->Attribute("terrainX"));
+			terrainZ = GMString::parseFloat(e->Attribute("terrainZ"));
 			width = GMString::parseFloat(e->Attribute("width"));
 			height = GMString::parseFloat(e->Attribute("height"));
-			scale = GMString::parseFloat(e->Attribute("scale"));
+			heightScaling = GMString::parseFloat(e->Attribute("heightScaling"));
 
 			GMString sliceStr = e->Attribute("slice");
 			if (!sliceStr.isEmpty())
@@ -378,11 +377,11 @@ void Timeline::parseObjects(GMXMLElement* e)
 					imgMap->getData().channels,
 					imgMap->getWidth(),
 					imgMap->getHeight(),
-					x,
-					y,
+					terrainX,
+					terrainZ,
 					width,
 					height,
-					scale,
+					heightScaling,
 					(GMsize_t)sliceX,
 					(GMsize_t)sliceY,
 					texLen,
@@ -455,19 +454,26 @@ void Timeline::interpolateCamera(GMXMLElement* e, Action& action)
 	{
 		GMfloat t = action.timePoint;
 		action.runType = Action::Immediate; // 插值动作的添加是立即的
-		action.action = [this, component, pos, dir, focus, t]() {
+		
+		GMInterpolationFunctors f;
+		CurveType curve = parseCurve(e, f);
+		action.action = [this, component, pos, dir, focus, t, curve, f]() {
 			GMAnimation& animation = m_animations[Camera];
 			GMCamera& camera = m_context->getEngine()->getCamera();
 			const GMCameraLookAt& lookAt = camera.getLookAt();
 			animation.setTargetObjects(&camera);
-
+			
 			GMVec3 posCandidate = (component & PositionComponent) ? pos : lookAt.position;
 			GMVec3 dirCandidate = (component & DirectionComponent) ? dir : lookAt.lookDirection;
 			GMVec3 focusCandidate = (component & FocusAtComponent) ? focus : lookAt.position + lookAt.lookDirection;
+			GMCameraKeyframe* keyframe = nullptr;
 			if (component & DirectionComponent)
-				animation.addKeyFrame(new GMCameraKeyframe(GMCameraKeyframeComponent::LookAtDirection, posCandidate, dirCandidate, t));
+				keyframe = new GMCameraKeyframe(GMCameraKeyframeComponent::LookAtDirection, posCandidate, dirCandidate, t);
 			else // 默认是按照focusAt调整视觉
-				animation.addKeyFrame(new GMCameraKeyframe(GMCameraKeyframeComponent::FocusAt, posCandidate, focusCandidate, t));
+				keyframe = new GMCameraKeyframe(GMCameraKeyframeComponent::FocusAt, posCandidate, focusCandidate, t);
+			animation.addKeyFrame(keyframe);
+			if (curve != CurveType::NoCurve)
+				keyframe->setFunctors(f);
 		};
 		bindAction(action);
 	}
@@ -515,10 +521,15 @@ void Timeline::interpolateLight(GMXMLElement* e, Action& action, ILight* light)
 	{
 		GMfloat t = action.timePoint;
 		action.runType = Action::Immediate; // 插值动作的添加是立即的
-		action.action = [this, light, component, ambient, diffuse, specular, t]() {
+		GMInterpolationFunctors f;
+		CurveType curve = parseCurve(e, f);
+		action.action = [this, light, component, ambient, diffuse, specular, t, curve, f]() {
 			GMAnimation& animation = m_animations[Light];
 			animation.setTargetObjects(light);
-			animation.addKeyFrame(new GMLightKeyframe(m_context, component, ambient, diffuse, specular, t));
+			GMAnimationKeyframe* keyframe = new GMLightKeyframe(m_context, component, ambient, diffuse, specular, t);
+			if (curve != CurveType::NoCurve)
+				keyframe->setFunctors(f);
+			animation.addKeyFrame(keyframe);
 		};
 		bindAction(action);
 	}
@@ -601,7 +612,7 @@ void Timeline::parseActions(GMXMLElement* e)
 					gm_warning(gm_dbg_wrap("Cannot find light: {0}"), object);
 				}
 			}
-			else if (type == L"lerp") // 或者是其它插值变换
+			else if (type == L"lerp" || type == "cubic-bezier") // 或者是其它插值变换
 			{
 				if (!time.isEmpty())
 				{
@@ -611,13 +622,13 @@ void Timeline::parseActions(GMXMLElement* e)
 					GMString object = e->Attribute("object");
 
 					void* targetObject = nullptr;
-					AssetType type = getAssetType(object, &targetObject);
+					AssetType assetType = getAssetType(object, &targetObject);
 
-					if (type == AssetType::Camera)
+					if (assetType == AssetType::Camera)
 					{
 						interpolateCamera(e, action);
 					}
-					else if (type == AssetType::Light)
+					else if (assetType == AssetType::Light)
 					{
 						interpolateLight(e, action, static_cast<ILight*>(targetObject));
 					}
@@ -1026,6 +1037,34 @@ void Timeline::parseMaterial(GMGameObject* o, GMXMLElement* e)
 			shader.getMaterial().setShininess(GMString::parseFloat(str));
 		}
 	}
+}
+
+CurveType Timeline::parseCurve(GMXMLElement* e, GMInterpolationFunctors& f)
+{
+	GMString type = e->Attribute("type");
+	if (type == L"cubic-bezier")
+	{
+		GMString controlStr = e->Attribute("control");
+		if (!controlStr.isEmpty())
+		{
+			GMfloat cpx0, cpy0, cpz0, cpx1, cpy1, cpz1;
+			GMScanner scanner(controlStr);
+			scanner.nextFloat(cpx0);
+			scanner.nextFloat(cpy0);
+			scanner.nextFloat(cpz0);
+			scanner.nextFloat(cpx1);
+			scanner.nextFloat(cpy1);
+			scanner.nextFloat(cpz1);
+			f = GMInterpolationFunctors::getDefaultInterpolationFunctors();
+			f.vec3Functor = GMSharedPtr<IInterpolationVec3>(new GMCubicBezierFunctor<GMVec3>(GMVec3(cpx0, cpy0, cpz0), GMVec3(cpx1, cpy1, cpz1)));
+			return CurveType::CubicBezier;
+		}
+		else
+		{
+			gm_warning(gm_dbg_wrap("Cubic bezier missing control points. Object for {0}"), GMString(e->Attribute("object")));
+		}
+	}
+	return CurveType::NoCurve;
 }
 
 void Timeline::bindAction(const Action& a)
