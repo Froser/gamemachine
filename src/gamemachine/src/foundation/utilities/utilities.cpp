@@ -422,6 +422,9 @@ void GMPrimitiveCreator::createTerrain(
 
 			if (desc.data)
 			{
+				if (y_image >= desc.dataHeight)
+					y_image = desc.dataHeight - 1.f; // 防止越界
+
 				GMsize_t idx = (x_image + y_image * desc.dataWidth) * desc.dataStride;
 				y = desc.heightScaling * desc.data[idx] / 0xFF;
 			}
