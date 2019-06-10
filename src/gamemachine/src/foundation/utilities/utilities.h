@@ -27,7 +27,7 @@ struct GMTerrainDescription
 	GMfloat terrainX; //!< 地形在x轴的起始位置。
 	GMfloat terrainZ; //!< 地形在z轴的起始位置。
 	GMfloat terrainLength; //!< 地形在x轴的长度。
-	GMfloat terrainWidth; //!< 地形在y轴的长度。
+	GMfloat terrainWidth; //!< 地形在z轴的长度。
 	GMfloat heightScaling; //!< 地形高度的缩放比例。
 	GMsize_t sliceM; //!< 地形在x轴的分块数。
 	GMsize_t sliceN; //!< 地形在z轴的分块数。

@@ -7,6 +7,7 @@
 
 using namespace gm;
 
+struct CameraParams;
 struct Action
 {
 	enum RunType
@@ -50,6 +51,7 @@ private:
 	void parseAssets(GMXMLElement*);
 	void parseObjects(GMXMLElement*);
 	void parseActions(GMXMLElement*);
+	GMint32 parseCameraAction(GMXMLElement*, REF CameraParams& cp, REF GMCameraLookAt& lookAt);
 
 private:
 	void interpolateCamera(GMXMLElement*, Action&);
@@ -57,6 +59,7 @@ private:
 
 private:
 	GMAsset findAsset(const GMString& assetName);
+	GMBuffer findBuffer(const GMString& bufferName);
 	void parseTransform(GMGameObject*, GMXMLElement*);
 	void parseTextures(GMGameObject*, GMXMLElement*);
 	void parseMaterial(GMGameObject*, GMXMLElement*);
@@ -70,6 +73,7 @@ private:
 private:
 	const IRenderContext* m_context;
 	GMGameWorld* m_world;
+	HashMap<GMString, GMBuffer, GMStringHashFunctor> m_buffers;
 	HashMap<GMString, GMAsset, GMStringHashFunctor> m_assets;
 	HashMap<GMString, GMGameObject*, GMStringHashFunctor> m_objects;
 	HashMap<GMString, ILight*, GMStringHashFunctor> m_lights;

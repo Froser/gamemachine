@@ -1,39 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <timeline>
     <assets>
-        <!--
         <cubemap
-            id="tex_deception"
-            left="deception/deception_pass_lf.tga"
-            right="deception/deception_pass_rt.tga"
-            up="deception/deception_pass_up.tga"
-            down="deception/deception_pass_dn.tga"
-            front="deception/deception_pass_ft.tga"
-            back="deception/deception_pass_bk.tga"
-        /> -->
+            id="tex_sky"
+            left="sky/sky_left.jpg"
+            right="sky/sky_right.jpg"
+            up="sky/sky_up.jpg"
+            down="sky/sky_down.jpg"
+            front="sky/sky_front.jpg"
+            back="sky/sky_back.jpg"
+        />
         <texture id="mud_d" file="mud/albedo.jpg" />
         <texture id="mud_n" file="mud/normal.jpg" />
-        <object id="model_dragon" file="dragon/dragon.obj" />
+        <buffer id="mud_terrain" file="textures/mud/terrain.png" />
+        <object id="model_dragon" file="cat/cat.obj" />
     </assets>
     <objects>
-        <light id="global" type="point" position="10 10 -10" ambient=".8 .8 .8" diffuse=".7 .7 .7" /> 
-        <!--<cubemap id="obj_deception" asset="tex_deception" scale="1500 1500 1500" translate="0 10 0" rotate="0 1 0 0"/>-->
+        <light id="global" type="point" position="20 20 -20" ambient=".8 .8 .8" diffuse=".7 .7 .7" /> 
+        <cubemap id="obj_sky" asset="tex_sky" scale="1500 1500 1500" translate="0 10 0" rotate="0 1 0 0"/>
         <object id="obj_dragon" asset="model_dragon" scale="1.2 1.2 1.2" ks=".5 .5 .5" />
-        <quad id="obj_ground" x="-100" y="-100" z="0" width="200" height="200" ambient="mud_d" diffuse="mud_d" normal="mud_n" rotate="1 0 0 90" ka=".4 .4 .4" kd=".5 .5 .5" ks=".1 .1 .1" />
+        <terrain
+            id="obj_ground"
+            x="-500"
+            y="-500"
+            z="0"
+            width="1000"
+            height="1000"
+            scale="20"
+            slice="100 100"
+            textureSize="100 100"
+            terrain="mud_terrain"
+            ambient="mud_d"
+            diffuse="mud_d"
+            normal="mud_n"
+            rotate="1 0 0 90"
+            ka=".4 .4 .4"
+            kd=".5 .5 .5"
+            ks=".1 .1 .1"
+        />
     </objects>
     <actions>
         <action type="camera" view="perspective" fovy="60" near=".1f" far="3200" />
         <action type="camera" focus="0 0 0" position="0 30 -30" />
-        <action type="shadow" cascades="3" partitions=".2 .3 1" position="50 50 -50" focus="0 0 0" camera="$camera" width="4096" height="3072"/>
+        <action type="shadow" cascades="1" position="30 30 -30" focus="0 0 0" width="1024" height="768" view="perspective" fovy="45" near=".1f" far="1600" bias="0.000125"/>
         <action type="addLight" object="global"/>
-        <action type="addObject" object="obj_deception" />
+        <action type="addObject" object="obj_sky" />
         <action type="addObject" object="obj_ground" />
         <action type="addObject" object="obj_dragon" />
         <action type="lerp" object="$camera" position="30 30 0" time="3"/>
         <action type="lerp" object="$camera" position="0 30 30" time="6"/>
-        <action type="lerp" object="$camera" position="-30 30 0" time="9"/>
-        <action type="lerp" object="$camera" position="0 30 -30" time="12"/>
-        <action type="lerp" object="$camera" position="60 60 0" time="13"/>
+        <action type="lerp" object="global" ambient=".8 .8 .8" diffuse=".7 .7 .7" time="6"/>
+        <!--<action type="lerp" object="global" ambient="0 0 0" diffuse="0 0 0" specular="0" time="12"/>-->
+        <action type="lerp" object="$camera" position="-40 10 0" time="12"/>
         <!--
         <action type="lerp" object="$camera" position="0 0 0" direction="-1 .2 0" time="6"/>
         <action type="lerp" object="$camera" position="0 0 0" direction="0 .2 -1" time="11"/>

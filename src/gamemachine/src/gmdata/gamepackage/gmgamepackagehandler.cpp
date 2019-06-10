@@ -83,7 +83,7 @@ GMString GMDefaultGamePackageHandler::pathRoot(GMPackageIndex index)
 	switch (index)
 	{
 	case GMPackageIndex::Root:
-		return packagePath();
+		return packagePath() + L"/";
 	case GMPackageIndex::Maps:
 		return packagePath() + L"/maps/";
 	case GMPackageIndex::Shaders:

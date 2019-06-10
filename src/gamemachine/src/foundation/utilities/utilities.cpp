@@ -421,9 +421,14 @@ void GMPrimitiveCreator::createTerrain(
 			x_image = x_distance * desc.dataWidth / desc.terrainLength;
 
 			if (desc.data)
-				y = desc.heightScaling * desc.data[(x_image + y_image * desc.dataWidth) * desc.dataStride] / 0xFF;
+			{
+				GMsize_t idx = (x_image + y_image * desc.dataWidth) * desc.dataStride;
+				y = desc.heightScaling * desc.data[idx] / 0xFF;
+			}
 			else
+			{
 				y = 0;
+			}
 
 			u = (x_distance) / desc.textureLength;
 			v = (z - z_start) / desc.textureHeight;

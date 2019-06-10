@@ -13,6 +13,14 @@
 #define DirectionComponent 0x02
 #define FocusAtComponent 0x04
 
+#define PerspectiveComponent 0x01
+#define CameraLookAtComponent 0x02
+
+struct CameraParams
+{
+	GMfloat fovy, aspect, n, f;
+};
+
 namespace
 {
 	template <AssetType Type, typename Container>
@@ -209,6 +217,20 @@ void Timeline::parseAssets(GMXMLElement* e)
 				gm_warning(gm_dbg_wrap("Load asset failed: {0}"), loadSettings.filename);
 			}
 		}
+		else if (name == L"buffer")
+		{
+			GMString file = e->Attribute("file");
+			GMBuffer buffer;
+			package->readFile(GMPackageIndex::Root, file, &buffer);
+			if (buffer.getSize() > 0)
+			{
+				m_buffers[id] = buffer;
+			}
+			else
+			{
+				gm_warning(gm_dbg_wrap("Cannot get file: {0}"), file);
+			}
+		}
 
 		e = e->NextSiblingElement();
 	}
@@ -314,22 +336,62 @@ void Timeline::parseObjects(GMXMLElement* e)
 			parseMaterial(obj, e);
 			parseTransform(obj, e);
 		}
-		else if (name == L"quad")
+		else if (name == L"terrain")
 		{
 			GMfloat x = 0, y = 0, z = 0;
-			GMfloat width = 1, height = 1;
+			GMfloat width = 1, height = 1, scale = 10.f;
+
+			GMint32 sliceX = 10, sliceY = 10;
+			GMfloat texLen = 10, texHeight = 10;
+
 			x = GMString::parseFloat(e->Attribute("x"));
 			y = GMString::parseFloat(e->Attribute("y"));
 			z = GMString::parseFloat(e->Attribute("z"));
 			width = GMString::parseFloat(e->Attribute("width"));
 			height = GMString::parseFloat(e->Attribute("height"));
+			scale = GMString::parseFloat(e->Attribute("scale"));
 
-			GMVec2 he(width / 2.f, height / 2.f);
-			GMSceneAsset scene;
-			GMPrimitiveCreator::createQuadrangle(he, z, scene);
-
-			if (!scene.isEmpty())
+			GMString sliceStr = e->Attribute("slice");
+			if (!sliceStr.isEmpty())
 			{
+				GMScanner scanner(sliceStr);
+				scanner.nextInt(sliceX);
+				scanner.nextInt(sliceY);
+			}
+
+			GMString texSizeStr = e->Attribute("textureSize");
+			if (!texSizeStr.isEmpty())
+			{
+				GMScanner scanner(texSizeStr);
+				scanner.nextFloat(texLen);
+				scanner.nextFloat(texHeight);
+			}
+
+			GMString terrainName = e->Attribute("terrain");
+			GMBuffer terrainBuffer = findBuffer(terrainName);
+			GMImage* imgMap = nullptr;
+			GMSceneAsset scene;
+			if (GMImageReader::load(terrainBuffer.getData(), terrainBuffer.getSize(), &imgMap))
+			{
+				GMTerrainDescription desc = {
+					imgMap->getData().mip[0].data,
+					imgMap->getData().channels,
+					imgMap->getWidth(),
+					imgMap->getHeight(),
+					x,
+					y,
+					width,
+					height,
+					scale,
+					(GMsize_t)sliceX,
+					(GMsize_t)sliceY,
+					texLen,
+					texHeight,
+					false
+				};
+
+				GMPrimitiveCreator::createTerrain(desc, scene);
+				imgMap->destroy();
 				GMGameObject* obj = m_objects[id] = new GMGameObject(scene);
 				parseTextures(obj, e);
 				parseMaterial(obj, e);
@@ -337,7 +399,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 			}
 			else
 			{
-				gm_warning(gm_dbg_wrap("Create quadrangle error. Id: {0}"), id);
+				gm_warning(gm_dbg_wrap("Create terrain error. Id: {0}"), id);
 			}
 		}
 		e = e->NextSiblingElement();
@@ -478,109 +540,24 @@ void Timeline::parseActions(GMXMLElement* e)
 			GMString type = e->Attribute("type");
 			if (type == "camera")
 			{
-				GMString view = e->Attribute("view");
-				if (view == L"perspective")
+				CameraParams p;
+				GMCameraLookAt lookAt;
+				GMint32 component = parseCameraAction(e, p, lookAt);
+				
+				if (component & PerspectiveComponent)
 				{
-					GMString fovyStr, aspectStr, nStr, fStr;
-					GMfloat fovy, aspect, n, f;
-					fovyStr = e->Attribute("fovy");
-					if (fovyStr.isEmpty())
-						fovy = Radian(75.f);
-					else
-						fovy = Radian(GMString::parseFloat(fovyStr));
-
-					aspectStr = e->Attribute("aspect");
-					if (aspectStr.isEmpty())
-					{
-						GMRect rc = m_context->getWindow()->getRenderRect();
-						aspect = static_cast<GMfloat>(rc.width) / rc.height;
-					}
-					else
-					{
-						aspect = 1.33f;
-					}
-
-					nStr = e->Attribute("near");
-					if (nStr.isEmpty())
-						n = .1f;
-					else
-						n = GMString::parseFloat(nStr);
-
-					fStr = e->Attribute("far");
-					if (fStr.isEmpty())
-						f = 3200;
-					else
-						f = GMString::parseFloat(fStr);
-
-					action.action = [fovy, aspect, n, f, this]() {
+					action.action = [p, this]() {
 						auto& camera = m_context->getEngine()->getCamera();
-						camera.setPerspective(fovy, aspect, n, f);
-					};
-
-					bindAction(action);
-				}
-				else if (!view.isEmpty())
-				{
-					gm_warning(gm_dbg_wrap("Camera view only supports 'perspective'"));
-				}
-
-				// 设置位置
-				GMString dirStr, posStr, focusStr;
-				GMVec3 direction = Zero<GMVec3>(), position = Zero<GMVec3>(), focus = Zero<GMVec3>();
-				dirStr = e->Attribute("direction");
-				posStr = e->Attribute("position");
-				focusStr = e->Attribute("focus");
-				if (!posStr.isEmpty())
-				{
-					GMfloat x = 0, y = 0, z = 0;
-					GMScanner scanner(posStr);
-					scanner.nextFloat(x);
-					scanner.nextFloat(y);
-					scanner.nextFloat(z);
-					position = GMVec3(x, y, z);
-
-				}
-
-				if (!dirStr.isEmpty())
-				{
-					GMfloat x = 0, y = 0, z = 0;
-					GMScanner scanner(dirStr);
-					scanner.nextFloat(x);
-					scanner.nextFloat(y);
-					scanner.nextFloat(z);
-					direction = GMVec3(x, y, z);
-				}
-
-				if (!focusStr.isEmpty())
-				{
-					GMfloat x = 0, y = 0, z = 0;
-					GMScanner scanner(focusStr);
-					scanner.nextFloat(x);
-					scanner.nextFloat(y);
-					scanner.nextFloat(z);
-					focus = GMVec3(x, y, z);
-				}
-
-				if (!dirStr.isEmpty() && !focusStr.isEmpty())
-				{
-					gm_warning(gm_dbg_wrap("You cannot specify both 'direction' and 'focus'. 'direction' won't work."));
-				}
-
-				if (!focusStr.isEmpty())
-				{
-					// focus
-					action.action = [this, focus, position]() {
-						auto& camera = m_context->getEngine()->getCamera();
-						GMCameraLookAt lookAt = GMCameraLookAt::makeLookAt(position, focus);
-						camera.lookAt(lookAt);
+						camera.setPerspective(p.fovy, p.aspect, p.n, p.f);
 					};
 				}
-				else if (!dirStr.isEmpty())
+				if (component & CameraLookAtComponent)
 				{
-					// direction
-					action.action = [this, direction, position]() {
+					action.action = [p, action, lookAt, this]() {
+						if (action.action)
+							action.action();
+
 						auto& camera = m_context->getEngine()->getCamera();
-						GMCameraLookAt lookAt(direction, position);
 						camera.lookAt(lookAt);
 					};
 				}
@@ -656,47 +633,6 @@ void Timeline::parseActions(GMXMLElement* e)
 			}
 			else if (type == L"shadow")
 			{
-				GMString camera = e->Attribute("camera");
-				if (camera != L"$camera" && !camera.isEmpty())
-					gm_warning(gm_dbg_wrap("You must set 'camera' attribute as '$camera'."));
-
-				GMint32 component = NoCameraComponent;
-				GMfloat posX = 0, posY = 0, posZ = 0;
-				GMString posStr = e->Attribute("position");
-				{
-					GMScanner scanner(posStr);
-					scanner.nextFloat(posX);
-					scanner.nextFloat(posY);
-					scanner.nextFloat(posZ);
-				}
-
-				GMString directionStr = e->Attribute("direction");
-				GMString focusStr = e->Attribute("focus");
-				GMfloat focusX = 0, focusY = 0, focusZ = 0;
-				GMfloat dirX = 0, dirY = 0, dirZ = 0;
-				if (!focusStr.isEmpty())
-				{
-					GMScanner scanner(focusStr);
-					scanner.nextFloat(focusX);
-					scanner.nextFloat(focusY);
-					scanner.nextFloat(focusZ);
-					component |= FocusAtComponent;
-				}
-
-				if (!directionStr.isEmpty())
-				{
-					GMScanner scanner(directionStr);
-					scanner.nextFloat(dirX);
-					scanner.nextFloat(dirY);
-					scanner.nextFloat(dirZ);
-					component |= DirectionComponent;
-				}
-
-				if ((component & DirectionComponent) && (component & FocusAtComponent))
-				{
-					gm_warning(gm_dbg_wrap("You cannot specify both 'direction' and 'focus'. 'direction' won't work."));
-				}
-
 				GMRect rc = m_context->getWindow()->getRenderRect();
 				GMfloat width = rc.width, height = rc.height;
 				{
@@ -715,6 +651,13 @@ void Timeline::parseActions(GMXMLElement* e)
 					GMString str = e->Attribute("cascades");
 					if (!str.isEmpty())
 						cascades = GMString::parseFloat(str);
+				}
+
+				GMfloat bias = .005f;
+				{
+					GMString str = e->Attribute("bias");
+					if (!str.isEmpty())
+						bias = GMString::parseFloat(str);
 				}
 
 				Vector<GMfloat> partitions;
@@ -743,20 +686,21 @@ void Timeline::parseActions(GMXMLElement* e)
 					}
 				}
 
-				action.action = [this, component, posX, posY, posZ, focusX, focusY, focusZ, dirX, dirY, dirZ, cascades, width, height, partitions = std::move(partitions)]() {
+				CameraParams cp;
+				GMCameraLookAt lookAt;
+				GMint32 component = parseCameraAction(e, cp, lookAt);
+
+				action.action = [this, component, cascades, width, height, bias, partitions = std::move(partitions), cp, lookAt]() {
 					GMShadowSourceDesc desc;
 					desc.type = GMShadowSourceDesc::CSMShadow;
-					desc.camera = m_context->getEngine()->getCamera();
-					desc.position = GMVec4(posX, posY, posZ, 1);
-					if (component & FocusAtComponent)
-					{
-						desc.camera.lookAt(GMCameraLookAt::makeLookAt(desc.position, GMVec3(focusX, focusY, focusZ)));
-					}
-					else if (component & DirectionComponent)
-					{
-						desc.camera.lookAt(GMCameraLookAt(desc.position, GMVec3(dirX, dirY, dirZ)));
-					}
+					GMCamera camera;
+					if (component & PerspectiveComponent)
+						camera.setPerspective(cp.fovy, cp.aspect, cp.n, cp.f);
+					if (component & CameraLookAtComponent)
+						camera.lookAt(lookAt);
 
+					desc.position = GMVec4(lookAt.position, 1);
+					desc.camera = camera;
 					if (cascades > 1)
 					{
 						for (GMint32 i = 0; i < cascades; ++i)
@@ -768,7 +712,7 @@ void Timeline::parseActions(GMXMLElement* e)
 					desc.width = width;
 					desc.height = height;
 					desc.cascades = cascades;
-					desc.biasMax = desc.biasMin = 0.005f;
+					desc.biasMax = desc.biasMin = bias;
 					m_context->getEngine()->setShadowSource(desc);
 				};
 				bindAction(action);
@@ -788,6 +732,107 @@ void Timeline::parseActions(GMXMLElement* e)
 	}
 }
 
+GMint32 Timeline::parseCameraAction(GMXMLElement* e, CameraParams& cp, GMCameraLookAt& lookAt)
+{
+	GMint32 component = NoCameraComponent;
+	GMString view = e->Attribute("view");
+	if (view == L"perspective")
+	{
+		GMString fovyStr, aspectStr, nStr, fStr;
+		GMfloat fovy, aspect, n, f;
+		fovyStr = e->Attribute("fovy");
+		if (fovyStr.isEmpty())
+			fovy = Radian(75.f);
+		else
+			fovy = Radian(GMString::parseFloat(fovyStr));
+
+		aspectStr = e->Attribute("aspect");
+		if (aspectStr.isEmpty())
+		{
+			GMRect rc = m_context->getWindow()->getRenderRect();
+			aspect = static_cast<GMfloat>(rc.width) / rc.height;
+		}
+		else
+		{
+			aspect = 1.33f;
+		}
+
+		nStr = e->Attribute("near");
+		if (nStr.isEmpty())
+			n = .1f;
+		else
+			n = GMString::parseFloat(nStr);
+
+		fStr = e->Attribute("far");
+		if (fStr.isEmpty())
+			f = 3200;
+		else
+			f = GMString::parseFloat(fStr);
+
+		cp = { fovy, aspect, n, f };
+		component |= PerspectiveComponent;
+	}
+	else if (!view.isEmpty())
+	{
+		gm_warning(gm_dbg_wrap("Camera view only supports 'perspective'"));
+	}
+
+	// 设置位置
+	GMString dirStr, posStr, focusStr;
+	GMVec3 direction = Zero<GMVec3>(), position = Zero<GMVec3>(), focus = Zero<GMVec3>();
+	dirStr = e->Attribute("direction");
+	posStr = e->Attribute("position");
+	focusStr = e->Attribute("focus");
+	if (!posStr.isEmpty())
+	{
+		GMfloat x = 0, y = 0, z = 0;
+		GMScanner scanner(posStr);
+		scanner.nextFloat(x);
+		scanner.nextFloat(y);
+		scanner.nextFloat(z);
+		position = GMVec3(x, y, z);
+	}
+
+	if (!dirStr.isEmpty())
+	{
+		GMfloat x = 0, y = 0, z = 0;
+		GMScanner scanner(dirStr);
+		scanner.nextFloat(x);
+		scanner.nextFloat(y);
+		scanner.nextFloat(z);
+		direction = GMVec3(x, y, z);
+	}
+
+	if (!focusStr.isEmpty())
+	{
+		GMfloat x = 0, y = 0, z = 0;
+		GMScanner scanner(focusStr);
+		scanner.nextFloat(x);
+		scanner.nextFloat(y);
+		scanner.nextFloat(z);
+		focus = GMVec3(x, y, z);
+	}
+
+	if (!dirStr.isEmpty() && !focusStr.isEmpty())
+	{
+		gm_warning(gm_dbg_wrap("You cannot specify both 'direction' and 'focus'. 'direction' won't work."));
+	}
+
+	if (!focusStr.isEmpty())
+	{
+		// focus
+		lookAt = GMCameraLookAt::makeLookAt(position, focus);
+		component |= CameraLookAtComponent;
+	}
+	else if (!dirStr.isEmpty())
+	{
+		// direction
+		lookAt = GMCameraLookAt(direction, position);
+		component |= CameraLookAtComponent;
+	}
+	return component;
+}
+
 GMAsset Timeline::findAsset(const GMString& assetName)
 {
 	auto assetIter = m_assets.find(assetName);
@@ -795,6 +840,16 @@ GMAsset Timeline::findAsset(const GMString& assetName)
 		return assetIter->second;
 
 	return GMAsset::invalidAsset();
+}
+
+GMBuffer Timeline::findBuffer(const GMString& bufferName)
+{
+	auto bufferIter = m_buffers.find(bufferName);
+	if (bufferIter != m_buffers.end())
+		return bufferIter->second;
+
+	static GMBuffer s_empty;
+	return s_empty;
 }
 
 void Timeline::parseTransform(GMGameObject* o, GMXMLElement* e)
@@ -848,6 +903,9 @@ void Timeline::parseTextures(GMGameObject* o, GMXMLElement* e)
 
 	GMString id = e->Attribute("id");
 	GMModel* model = o->getModel();
+	if (!model)
+		return;
+
 	GMShader& shader = model->getShader();
 
 	{
@@ -909,6 +967,7 @@ void Timeline::parseTextures(GMGameObject* o, GMXMLElement* e)
 				gm_warning(gm_dbg_wrap("Cannot find texture asset: {0}"), tex);
 		}
 	}
+
 	//TODO AO, etc
 }
 
@@ -918,6 +977,9 @@ void Timeline::parseMaterial(GMGameObject* o, GMXMLElement* e)
 		return;
 
 	GMModel* model = o->getModel();
+	if (!model)
+		return;
+
 	GMShader& shader = model->getShader();
 	GMfloat x = 0, y = 0, z = 0;
 

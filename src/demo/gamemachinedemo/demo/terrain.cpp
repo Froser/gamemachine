@@ -38,6 +38,7 @@ void Demo_Terrain::init()
 	};
 
 	gm::GMPrimitiveCreator::createTerrain(desc, d->terrainScene);
+	imgMap->destroy();
 	gm::GMModel* terrainModel = d->terrainScene.getScene()->getModels()[0].getModel();
 	gm::GMTextureAsset texture = gm::GMToolUtil::createTexture(db->parentDemonstrationWorld->getContext(), L"grass.jpg");
 	gm::GMToolUtil::addTextureToShader(terrainModel->getShader(), texture, gm::GMTextureType::Ambient);
