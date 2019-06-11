@@ -53,6 +53,11 @@ GM_PRIVATE_OBJECT(GMGameObject)
 
 	struct
 	{
+		bool visible = true;
+	} attributes;
+
+	struct
+	{
 		ITechnique* currentTechnique = nullptr;
 	} drawContext;
 };
@@ -120,6 +125,12 @@ public:
 	void setCullOption(GMGameObjectCullOption option, GMCamera* camera = nullptr);
 	GMAnimationType getAnimationType() const;
 
+	inline bool getVisible() const GM_NOEXCEPT
+	{
+		D(d);
+		return d->attributes.visible;
+	}
+
 	inline const GMMat4& getTransform() const GM_NOEXCEPT
 	{
 		D(d);
@@ -152,6 +163,12 @@ public:
 	{
 		D(d);
 		d->context = context;
+	}
+
+	inline void setVisible(bool visible) const GM_NOEXCEPT
+	{
+		D(d);
+		d->attributes.visible = visible;
 	}
 
 private:

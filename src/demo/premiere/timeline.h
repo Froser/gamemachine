@@ -69,6 +69,7 @@ private:
 	void parseTransform(GMGameObject*, GMXMLElement*);
 	void parseTextures(GMGameObject*, GMXMLElement*);
 	void parseMaterial(GMGameObject*, GMXMLElement*);
+	void parseAttributes(GMGameObject*, GMXMLElement*, Action&);
 	CurveType parseCurve(GMXMLElement*, GMInterpolationFunctors&);
 
 	void bindAction(const Action& a);
@@ -84,7 +85,8 @@ private:
 	HashMap<GMString, GMAsset, GMStringHashFunctor> m_assets;
 	HashMap<GMString, GMGameObject*, GMStringHashFunctor> m_objects;
 	HashMap<GMString, ILight*, GMStringHashFunctor> m_lights;
-	std::multiset<Action> m_actions;
+	std::multiset<Action> m_immediateActions;
+	std::multiset<Action> m_deferredActions;
 	std::multiset<Action>::iterator m_currentAction;
 	Vector<GMAnimation> m_animations;
 	bool m_playing;

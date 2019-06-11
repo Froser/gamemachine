@@ -39,6 +39,18 @@ namespace
 
 		return false;
 	}
+
+	bool toBool(const GMString& str)
+	{
+		if (str == L"true")
+			return true;
+
+		if (str == L"false")
+			return false;
+
+		gm_warning(gm_dbg_wrap("Unrecognized boolean string '{0}', treat as false."), str);
+		return false;
+	}
 }
 
 enum Animation
@@ -101,7 +113,7 @@ void Timeline::update(GMDuration dt)
 
 void Timeline::play()
 {
-	m_currentAction = m_actions.begin();
+	m_currentAction = m_deferredActions.begin();
 	m_playing = true;
 	for (auto& animation : m_animations)
 	{
@@ -727,7 +739,16 @@ void Timeline::parseActions(GMXMLElement* e)
 					m_context->getEngine()->setShadowSource(desc);
 				};
 				bindAction(action);
-
+			}
+			else if (type == L"attribute")
+			{
+				GMString object = e->Attribute("object");
+				void* targetObject = nullptr;
+				AssetType assetType = getAssetType(object, &targetObject);
+				if (assetType == AssetType::GameObject)
+					parseAttributes(static_cast<GMGameObject*>(targetObject), e, action);
+				action.timePoint = GMString::parseFloat(time);
+				bindAction(action);
 			}
 			else
 			{
@@ -1039,6 +1060,18 @@ void Timeline::parseMaterial(GMGameObject* o, GMXMLElement* e)
 	}
 }
 
+void Timeline::parseAttributes(GMGameObject* obj, GMXMLElement* e, Action& action)
+{
+	GM_ASSERT(obj);
+	{
+		GMString value = e->Attribute("visible");
+		bool visible = toBool(value);
+		action.action = [obj, visible]() {
+			obj->setVisible(visible);
+		};
+	}
+}
+
 CurveType Timeline::parseCurve(GMXMLElement* e, GMInterpolationFunctors& f)
 {
 	GMString type = e->Attribute("type");
@@ -1067,12 +1100,15 @@ CurveType Timeline::parseCurve(GMXMLElement* e, GMInterpolationFunctors& f)
 
 void Timeline::bindAction(const Action& a)
 {
-	m_actions.insert(a);
+	if (a.runType == Action::Immediate)
+		m_immediateActions.insert(a);
+	else
+		m_deferredActions.insert(a);
 }
 
 void Timeline::runImmediateActions()
 {
-	for (const auto& action : m_actions)
+	for (const auto& action : m_immediateActions)
 	{
 		if (action.runType == Action::Immediate)
 		{
@@ -1083,34 +1119,32 @@ void Timeline::runImmediateActions()
 
 void Timeline::runActions()
 {
-	while (m_currentAction != m_actions.end())
+	while (m_currentAction != m_deferredActions.end())
 	{
-		if (m_currentAction->runType == Action::Deferred)
+		GM_ASSERT(m_currentAction->runType == Action::Deferred);
+		auto next = m_currentAction;
+		++next;
+		if (next == m_deferredActions.end())
 		{
-			auto next = m_currentAction;
-			++next;
-			if (next == m_actions.end())
-			{
-				// 当前为最后一帧
-				if (m_timeline >= m_currentAction->timePoint)
-					m_currentAction->action();
-				else
-					break;
-			}
+			// 当前为最后一帧
+			if (m_timeline >= m_currentAction->timePoint)
+				m_currentAction->action();
 			else
-			{
-				// 当前不是最后一帧
-				if (m_currentAction->timePoint <= m_timeline && m_timeline <= next->timePoint)
-					m_currentAction->action();
-				else if (m_currentAction->timePoint > m_timeline)
-					break;
-			}
+				break;
+		}
+		else
+		{
+			// 当前不是最后一帧
+			if (m_currentAction->timePoint <= m_timeline && m_timeline <= next->timePoint)
+				m_currentAction->action();
+			else if (m_currentAction->timePoint > m_timeline)
+				break;
 		}
 
 		++m_currentAction;
 	}
 	
-	if (m_currentAction == m_actions.end())
+	if (m_currentAction == m_deferredActions.end())
 	{
 		m_finished = true;
 		m_playing = false;

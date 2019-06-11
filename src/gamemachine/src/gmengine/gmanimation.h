@@ -46,6 +46,7 @@ struct GMInterpolationFunctors
 	GMSharedPtr<IInterpolationQuat> quatFunctor;
 
 	static GMInterpolationFunctors getDefaultInterpolationFunctors();
+	static void binarySearch(const AlignedVector<GMVec2>& points, GMfloat x, GMVec2& resultA, GMVec2& resultB);
 };
 
 template <typename T>
@@ -60,24 +61,53 @@ struct GMLerpFunctor : ProperInterpolationInterface<T>
 template <typename T>
 struct GMCubicBezierFunctor : ProperInterpolationInterface<T>
 {
-	GMCubicBezierFunctor(GMVec2 cp0, GMVec2 cp1)
-		: m_cp0(cp0)
-		, m_cp1(cp1)
+	GMCubicBezierFunctor(GMVec2 cp0, GMVec2 cp1, GMint32 slice = 20)
 	{
+		GM_ASSERT(0 <= cp0.getX() && cp0.getX() <= 1);
+		GM_ASSERT(0 <= cp1.getX() && cp1.getX() <= 1);
+
+		// 构造一个从0~1的贝塞尔曲线，根据percentage来获取变换的进度
+		auto tFunc = [cp0, cp1](GMfloat t)
+		{
+			return (
+				cp0 * 3 * t * Pow(1 - t, 2) +
+				cp1 * 3 * t * t * (1 - t) +
+				GMVec2(1, 1) * Pow(t, 3));
+		};
+
+		GMfloat dt = 1.f / slice;
+		m_interpolations.resize(slice + 1);
+		for (GMfloat i = 0; i < slice; ++i)
+		{
+			GMfloat t = dt * i;
+			m_interpolations[i] = tFunc(t);
+		}
+		m_interpolations[slice] = GMVec2(1, 1);
 	}
 
 	T interpolate(T p0, T p1, GMfloat percentage)
 	{
-		// 构造一个从0~1的贝塞尔曲线，根据percentage来获取变换的进度
-		GMfloat progress = (
-			m_cp0 * 3 * percentage * Pow(1 - percentage, 2) +
-			m_cp1 * 3 * percentage * percentage * (1 - percentage) +
-			GMVec2(1, 1) * Pow(percentage, 3)).getY();
-		return p0 + (p1 - p0) * progress;
+		// 根据二分法查找percentage所在的曲线的最近的两个点，并进行插值
+		GMVec2 a, b;
+		GMfloat t = 0;
+		GMInterpolationFunctors::binarySearch(m_interpolations, percentage, a, b);
+		GM_ASSERT(b.getX() >= a.getX());
+		if (a == b)
+		{
+			// 如果给定的点恰好就是容器中的采样点
+			t = a.getY();
+		}
+		else
+		{
+			// 两点之间进行插值
+			GMfloat d = (percentage - a.getX()) / (b.getX() - a.getX());
+			t = Lerp(a, b, d).getY();
+		}
+		return Lerp(p0, p1, t);
 	}
 
 private:
-	GMVec2 m_cp0, m_cp1;
+	AlignedVector<GMVec2> m_interpolations;
 };
 
 GM_PRIVATE_OBJECT(GMAnimationKeyframe)

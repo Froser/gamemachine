@@ -41,6 +41,35 @@ GMInterpolationFunctors GMInterpolationFunctors::getDefaultInterpolationFunctors
 	return s_default;
 }
 
+void GMInterpolationFunctors::binarySearch(const AlignedVector<GMVec2>& points, GMfloat x, GMVec2& resultA, GMVec2& resultB)
+{
+	// 从一个有序的顶点序列中找到某个x值相邻的2个点
+	GMsize_t boundL = 0, boundR = points.size() - 1;
+	while (boundL <= boundR)
+	{
+		GMsize_t mid = (boundR + boundL) / 2;
+		const GMVec2& p = points[mid];
+		if (FuzzyCompare(p.getX(), x))
+		{
+			// 刚好找到这个点
+			resultA = resultB = p;
+			return;
+		}
+		else if (p.getX() < x)
+		{
+			boundL = mid + 1;
+		}
+		else if (p.getX() > x)
+		{
+			boundR = mid - 1;
+		}
+	}
+	
+	GM_ASSERT(boundR == boundL - 1);
+	resultA = points[boundR];
+	resultB = points[boundL];
+}
+
 GMAnimation::~GMAnimation()
 {
 	D(d);

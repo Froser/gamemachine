@@ -393,8 +393,12 @@ void GMGameObject::setDefaultCullShaderCode(const GMString& code)
 void GMGameObject::drawModel(const IRenderContext* context, GMModel* model)
 {
 	D(d);
+	if (!d->attributes.visible)
+		return;
+
 	if (!model->getShader().getVisible() || model->getShader().isCulled())
 		return;
+
 	IGraphicEngine* engine = context->getEngine();
 	ITechnique* technique = engine->getTechnique(model->getType());
 	if (technique != d->drawContext.currentTechnique)
