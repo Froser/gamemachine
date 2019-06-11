@@ -624,7 +624,7 @@ void Timeline::parseActions(GMXMLElement* e)
 					gm_warning(gm_dbg_wrap("Cannot find light: {0}"), object);
 				}
 			}
-			else if (type == L"lerp" || type == "cubic-bezier") // 或者是其它插值变换
+			else if (type == L"animate") // 或者是其它插值变换
 			{
 				if (!time.isEmpty())
 				{
@@ -651,7 +651,7 @@ void Timeline::parseActions(GMXMLElement* e)
 				}
 				else
 				{
-					gm_warning(gm_dbg_wrap("type 'lerp' must combine with attribute 'time'."));
+					gm_warning(gm_dbg_wrap("type 'animate' must combine with attribute 'time'."));
 				}
 			}
 			else if (type == L"shadow")
@@ -747,6 +747,24 @@ void Timeline::parseActions(GMXMLElement* e)
 				AssetType assetType = getAssetType(object, &targetObject);
 				if (assetType == AssetType::GameObject)
 					parseAttributes(static_cast<GMGameObject*>(targetObject), e, action);
+				else if (assetType == AssetType::NotFound)
+					gm_warning(gm_dbg_wrap("Object '{0}' not found."), object);
+				else
+					gm_warning(gm_dbg_wrap("Object '{0}' doesn't support 'attribute' type."), object);
+				action.timePoint = GMString::parseFloat(time);
+				bindAction(action);
+			}
+			else if (type == L"removeObject")
+			{
+				GMString object = e->Attribute("object");
+				void* targetObject = nullptr;
+				AssetType assetType = getAssetType(object, &targetObject);
+				if (assetType == AssetType::Light)
+					removeObject(static_cast<ILight*>(targetObject), e, action);
+				else if (assetType == AssetType::NotFound)
+					gm_warning(gm_dbg_wrap("Object '{0}' not found."), object);
+				else
+					gm_warning(gm_dbg_wrap("Object '{0}' doesn't support 'removeObject' type."), object);
 				action.timePoint = GMString::parseFloat(time);
 				bindAction(action);
 			}
@@ -1072,10 +1090,20 @@ void Timeline::parseAttributes(GMGameObject* obj, GMXMLElement* e, Action& actio
 	}
 }
 
+void Timeline::removeObject(ILight* light, GMXMLElement* e, Action& action)
+{
+	GMString object = e->Attribute("object");
+	action.action = [this, light, object]() {
+		IGraphicEngine* engine = m_context->getEngine();
+		if (!engine->removeLight(light))
+			gm_warning(gm_dbg_wrap("Cannot remove light: {0}."), object);
+	};
+}
+
 CurveType Timeline::parseCurve(GMXMLElement* e, GMInterpolationFunctors& f)
 {
-	GMString type = e->Attribute("type");
-	if (type == L"cubic-bezier")
+	GMString function = e->Attribute("function");
+	if (function == L"cubic-bezier")
 	{
 		GMString controlStr = e->Attribute("control");
 		if (!controlStr.isEmpty())

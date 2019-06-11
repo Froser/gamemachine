@@ -666,6 +666,20 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	*/
 	virtual ILight* getLight(GMLightIndex index) = 0;
 
+	//! 移除一个光源。
+	/*!
+	  根据索引移除一个光源。如果索引非法，返回false。
+	  \return 是否移除成功。
+	*/
+	virtual bool removeLight(GMLightIndex index) = 0;
+
+	//! 移除一个光源。
+	/*!
+	  移除一个指定光源。如果指定光源不在添加的光源中，返回false。
+	  \return 是否移除成功。
+	*/
+	virtual bool removeLight(ILight* light) = 0;
+
 	//! 移除所有光源。
 	/*!
 	  移除引擎中的所有光源。

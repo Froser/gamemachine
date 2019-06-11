@@ -612,6 +612,27 @@ ILight* GMGraphicEngine::getLight(GMLightIndex index)
 	return d->lights[index - 1];
 }
 
+bool GMGraphicEngine::removeLight(ILight* light)
+{
+	D(d);
+	auto iter = std::find(d->lights.begin(), d->lights.end(), light);
+	if (iter == d->lights.end())
+		return false;
+
+	d->lights.erase(iter);
+	return true;
+}
+
+bool GMGraphicEngine::removeLight(GMLightIndex index)
+{
+	D(d);
+	if (d->lights.size() >= index)
+		return false;
+
+	d->lights.erase(d->lights.begin() + index);
+	return true;
+}
+
 void GMGraphicEngine::removeLights()
 {
 	deleteLights();

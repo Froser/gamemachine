@@ -46,17 +46,15 @@
         <action type="addObject" object="obj_sky" />
         <action type="addObject" object="obj_ground" />
         <action type="addObject" object="obj_dragon" />
-        <action type="lerp" object="$camera" position="30 30 0" time="3"/>
-        <action type="lerp" object="$camera" position="0 30 30" time="6"/>
-        <action type="lerp" object="global" ambient=".8 .8 .8" diffuse=".7 .7 .7" time="6"/>
-        <action type="lerp" object="$camera" position="-40 10 0" time="12"/>
-        <action type="lerp" object="$camera" position="0 40 -30" time="14"/>
-        <action type="cubic-bezier" control="1 0 1 0" object="global" ambient="0 0 0" diffuse="0 0 0" specular="0" time="14"/>
-        <action type="attribute" object="obj_sky" visible="false" time="14"/>
+        <action type="animate" function="lerp" object="$camera" position="30 30 0" time="3"/>
+        <action type="animate" function="lerp" object="$camera" position="0 30 30" time="6"/>
+        <action type="animate" function="lerp" object="$camera" position="-40 10 0" time="12"/>
+        <action type="animate" function="lerp" object="global" ambient=".8 .8 .8" diffuse=".7 .7 .7" time="12"/>
+        <action type="animate" function="lerp" object="$camera" position="0 40 -30" time="14"/>
+        <action type="animate" function="cubic-bezier" control="1 0 1 0" object="global" ambient="0 0 0" diffuse="0 0 0" specular="0" time="14"/>
+        <action type="removeObject" object="global" time="14" />
         <!--
-        <action type="lerp" object="$camera" position="0 0 0" direction="-1 .2 0" time="6"/>
-        <action type="lerp" object="$camera" position="0 0 0" direction="0 .2 -1" time="11"/>
-        <action type="lerp" object="$camera" position="0 0 0" direction="1 .2 0" time="16"/>
+        <action type="attribute" object="obj_sky" visible="false" time="14"/>
     -->
     </actions>
 </timeline>

@@ -70,6 +70,7 @@ private:
 	void parseTextures(GMGameObject*, GMXMLElement*);
 	void parseMaterial(GMGameObject*, GMXMLElement*);
 	void parseAttributes(GMGameObject*, GMXMLElement*, Action&);
+	void removeObject(ILight*, GMXMLElement*, Action&);
 	CurveType parseCurve(GMXMLElement*, GMInterpolationFunctors&);
 
 	void bindAction(const Action& a);

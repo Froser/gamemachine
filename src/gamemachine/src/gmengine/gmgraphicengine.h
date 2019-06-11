@@ -265,6 +265,8 @@ public:
 	virtual void draw(const List<GMGameObject*>& forwardRenderingObjects, const List<GMGameObject*>& deferredRenderingObjects) override;
 	virtual GMLightIndex addLight(AUTORELEASE ILight* light) override;
 	virtual ILight* getLight(GMLightIndex index) override;
+	virtual bool removeLight(GMLightIndex index) override;
+	virtual bool removeLight(ILight* light) override;
 	virtual void removeLights() override;
 	virtual void setStencilOptions(const GMStencilOptions& options) override;
 	virtual const GMStencilOptions& getStencilOptions() override;
