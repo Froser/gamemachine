@@ -60,8 +60,8 @@ private:
 	GMint32 parseCameraAction(GMXMLElement*, REF CameraParams& cp, REF GMCameraLookAt& lookAt);
 
 private:
-	void interpolateCamera(GMXMLElement*, Action&);
-	void interpolateLight(GMXMLElement*, Action&, ILight*);
+	void interpolateCamera(GMXMLElement*, Action&, GMfloat);
+	void interpolateLight(GMXMLElement*, Action&, ILight*, GMfloat);
 
 private:
 	GMAsset findAsset(const GMString& assetName);

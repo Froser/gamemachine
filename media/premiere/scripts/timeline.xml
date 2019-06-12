@@ -13,10 +13,12 @@
         <texture id="mud_d" file="mud/albedo.jpg" />
         <texture id="mud_n" file="mud/normal.jpg" />
         <buffer id="mud_terrain" file="textures/mud/terrain.png" />
-        <object id="model_dragon" file="dragon/dragon.obj" />
+        <object id="model_dragon" file="cat/cat.obj" />
+        <object id="model_logo" file="logo/logo.obj" />
     </assets>
     <objects>
         <light id="global" type="point" position="20 20 -20" ambient=".8 .8 .8" diffuse=".7 .7 .7" /> 
+        <light id="spotlight" type="point" position="20 20 -20" ambient=".8 .8 .8" diffuse=".7 .7 .7" /> 
         <cubemap id="obj_sky" asset="tex_sky" scale="1500 1500 1500" translate="0 10 0" />
         <object id="obj_dragon" asset="model_dragon" scale="1.2 1.2 1.2" ks=".5 .5 .5" />
         <terrain
@@ -53,6 +55,7 @@
         <action type="animate" function="lerp" object="$camera" position="0 40 -30" time="14"/>
         <action type="animate" function="cubic-bezier" control="1 0 1 0" object="global" ambient="0 0 0" diffuse="0 0 0" specular="0" time="14"/>
         <action type="removeObject" object="global" time="14" />
+        <action type="addLight" object="spotlight" time="14"/>
         <!--
         <action type="attribute" object="obj_sky" visible="false" time="14"/>
     -->

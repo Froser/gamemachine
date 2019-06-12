@@ -417,7 +417,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 	}
 }
 
-void Timeline::interpolateCamera(GMXMLElement* e, Action& action)
+void Timeline::interpolateCamera(GMXMLElement* e, Action& action, GMfloat timePoint)
 {
 	GMint32 component = NoCameraComponent;
 	GMVec3 pos, dir, focus;
@@ -464,12 +464,9 @@ void Timeline::interpolateCamera(GMXMLElement* e, Action& action)
 
 	if (component != NoCameraComponent)
 	{
-		GMfloat t = action.timePoint;
-		action.runType = Action::Immediate; // 插值动作的添加是立即的
-		
 		GMInterpolationFunctors f;
 		CurveType curve = parseCurve(e, f);
-		action.action = [this, component, pos, dir, focus, t, curve, f]() {
+		action.action = [this, component, pos, dir, focus, timePoint, curve, f]() {
 			GMAnimation& animation = m_animations[Camera];
 			GMCamera& camera = m_context->getEngine()->getCamera();
 			const GMCameraLookAt& lookAt = camera.getLookAt();
@@ -480,9 +477,9 @@ void Timeline::interpolateCamera(GMXMLElement* e, Action& action)
 			GMVec3 focusCandidate = (component & FocusAtComponent) ? focus : lookAt.position + lookAt.lookDirection;
 			GMCameraKeyframe* keyframe = nullptr;
 			if (component & DirectionComponent)
-				keyframe = new GMCameraKeyframe(GMCameraKeyframeComponent::LookAtDirection, posCandidate, dirCandidate, t);
+				keyframe = new GMCameraKeyframe(GMCameraKeyframeComponent::LookAtDirection, posCandidate, dirCandidate, timePoint);
 			else // 默认是按照focusAt调整视觉
-				keyframe = new GMCameraKeyframe(GMCameraKeyframeComponent::FocusAt, posCandidate, focusCandidate, t);
+				keyframe = new GMCameraKeyframe(GMCameraKeyframeComponent::FocusAt, posCandidate, focusCandidate, timePoint);
 			animation.addKeyFrame(keyframe);
 			if (curve != CurveType::NoCurve)
 				keyframe->setFunctors(f);
@@ -491,7 +488,7 @@ void Timeline::interpolateCamera(GMXMLElement* e, Action& action)
 	}
 }
 
-void Timeline::interpolateLight(GMXMLElement* e, Action& action, ILight* light)
+void Timeline::interpolateLight(GMXMLElement* e, Action& action, ILight* light, GMfloat timePoint)
 {
 	GMint32 component = GMLightKeyframeComponent::NoComponent;
 	GMVec3 ambient, diffuse;
@@ -531,14 +528,12 @@ void Timeline::interpolateLight(GMXMLElement* e, Action& action, ILight* light)
 
 	if (component != GMLightKeyframeComponent::NoComponent)
 	{
-		GMfloat t = action.timePoint;
-		action.runType = Action::Immediate; // 插值动作的添加是立即的
 		GMInterpolationFunctors f;
 		CurveType curve = parseCurve(e, f);
-		action.action = [this, light, component, ambient, diffuse, specular, t, curve, f]() {
+		action.action = [this, light, component, ambient, diffuse, specular, timePoint, curve, f]() {
 			GMAnimation& animation = m_animations[Light];
 			animation.setTargetObjects(light);
-			GMAnimationKeyframe* keyframe = new GMLightKeyframe(m_context, component, ambient, diffuse, specular, t);
+			GMAnimationKeyframe* keyframe = new GMLightKeyframe(m_context, component, ambient, diffuse, specular, timePoint);
 			if (curve != CurveType::NoCurve)
 				keyframe->setFunctors(f);
 			animation.addKeyFrame(keyframe);
@@ -558,7 +553,10 @@ void Timeline::parseActions(GMXMLElement* e)
 			Action action = { Action::Immediate };
 			GMString time = e->Attribute("time");
 			if (!time.isEmpty())
+			{
 				action.runType = Action::Deferred;
+				action.timePoint = GMString::parseFloat(time);
+			}
 
 			GMString type = e->Attribute("type");
 			if (type == "camera")
@@ -628,9 +626,9 @@ void Timeline::parseActions(GMXMLElement* e)
 			{
 				if (!time.isEmpty())
 				{
-					GMfloat t = GMString::parseFloat(time);
-					action.timePoint = t;
-
+					GMfloat t = action.timePoint;
+					action.timePoint = 0;
+					action.runType = Action::Immediate; // 插值动作的添加是立即的
 					GMString object = e->Attribute("object");
 
 					void* targetObject = nullptr;
@@ -638,11 +636,11 @@ void Timeline::parseActions(GMXMLElement* e)
 
 					if (assetType == AssetType::Camera)
 					{
-						interpolateCamera(e, action);
+						interpolateCamera(e, action, t);
 					}
 					else if (assetType == AssetType::Light)
 					{
-						interpolateLight(e, action, static_cast<ILight*>(targetObject));
+						interpolateLight(e, action, static_cast<ILight*>(targetObject), t);
 					}
 					else
 					{
