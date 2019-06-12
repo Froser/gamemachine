@@ -15,6 +15,9 @@ namespace
 		GMfloat percentage
 	)
 	{
+		if (x == y)
+			return x;
+
 		// get cosine of angle between vectors (-1 -> 1)
 		GMfloat CosAlpha = Dot(x, y);
 		// get angle (0 -> pi)
@@ -346,13 +349,24 @@ void GMCameraKeyframe::update(IDestroyObject* object, GMfloat time)
 }
 
 //////////////////////////////////////////////////////////////////////////
-GMLightKeyframe::GMLightKeyframe(const IRenderContext* context, GMint32 component, const GMVec3& ambient, const GMVec3& diffuse, GMfloat specular, GMfloat timePoint)
+GMLightKeyframe::GMLightKeyframe(
+	const IRenderContext* context,
+	GMint32 component,
+	const GMVec3& ambient,
+	const GMVec3& diffuse,
+	GMfloat specular,
+	const GMVec3& position,
+	GMfloat cutOff,
+	GMfloat timePoint
+)
 	: GMAnimationKeyframe(timePoint)
 {
 	D(d);
 	setAmbient(ambient);
 	setDiffuse(diffuse);
 	setSpecular(specular);
+	setPosition(position);
+	setCutOff(cutOff);
 	d->component = component;
 	d->context = context;
 }
@@ -364,6 +378,8 @@ void GMLightKeyframe::reset(IDestroyObject* object)
 	RUN_AND_CHECK(light->setLightAttribute3(GMLight::AmbientIntensity, ValuePointer(d->ambientMap[light])));
 	RUN_AND_CHECK(light->setLightAttribute3(GMLight::DiffuseIntensity, ValuePointer(d->diffuseMap[light])));
 	RUN_AND_CHECK(light->setLightAttribute(GMLight::SpecularIntensity, d->specularMap[light]));
+	RUN_AND_CHECK(light->setLightAttribute(GMLight::CutOff, d->cutOffMap[light]));
+	RUN_AND_CHECK(light->setLightAttribute3(GMLight::Position, ValuePointer(d->positionMap[light])));
 }
 
 void GMLightKeyframe::beginFrame(IDestroyObject* object, GMfloat timeStart)
@@ -377,6 +393,10 @@ void GMLightKeyframe::beginFrame(IDestroyObject* object, GMfloat timeStart)
 		RUN_AND_CHECK(light->getLightAttribute3(GMLight::DiffuseIntensity, ValuePointer(d->diffuseMap[light])));
 	if (d->component & GMLightKeyframeComponent::Specular)
 		RUN_AND_CHECK(light->getLightAttribute(GMLight::SpecularIntensity, d->specularMap[light]));
+	if (d->component & GMLightKeyframeComponent::Position)
+		RUN_AND_CHECK(light->getLightAttribute3(GMLight::Position, ValuePointer(d->positionMap[light])));
+	if (d->component & GMLightKeyframeComponent::CutOff)
+		light->getLightAttribute(GMLight::CutOff, d->cutOffMap[light]);
 }
 
 void GMLightKeyframe::endFrame(IDestroyObject* object)
@@ -386,6 +406,8 @@ void GMLightKeyframe::endFrame(IDestroyObject* object)
 	RUN_AND_CHECK(light->setLightAttribute3(GMLight::AmbientIntensity, ValuePointer(d->ambient)));
 	RUN_AND_CHECK(light->setLightAttribute3(GMLight::DiffuseIntensity, ValuePointer(d->diffuse)));
 	RUN_AND_CHECK(light->setLightAttribute(GMLight::SpecularIntensity, d->specular));
+	RUN_AND_CHECK(light->setLightAttribute3(GMLight::Position, ValuePointer(d->position)));
+	light->setLightAttribute(GMLight::CutOff, d->cutOff);
 }
 
 void GMLightKeyframe::update(IDestroyObject* object, GMfloat time)
@@ -399,26 +421,32 @@ void GMLightKeyframe::update(IDestroyObject* object, GMfloat time)
 	const auto& functor = getFunctors();
 	if (d->component & GMLightKeyframeComponent::Ambient)
 	{
-		GMVec3 currentIntensity;
-		RUN_AND_CHECK(light->getLightAttribute3(GMLight::AmbientIntensity, ValuePointer(currentIntensity)));
-		GMVec3 intensity = functor.vec3Functor->interpolate(currentIntensity, getAmbient(), percentage);
+		GMVec3 intensity = functor.vec3Functor->interpolate(d->ambientMap[light], getAmbient(), percentage);
 		RUN_AND_CHECK(light->setLightAttribute3(GMLight::AmbientIntensity, ValuePointer(intensity)));
 	}
 
 	if (d->component & GMLightKeyframeComponent::Diffuse)
 	{
-		GMVec3 currentIntensity;
-		RUN_AND_CHECK(light->getLightAttribute3(GMLight::DiffuseIntensity, ValuePointer(currentIntensity)));
-		GMVec3 intensity = functor.vec3Functor->interpolate(currentIntensity, getDiffuse(), percentage);
+		GMVec3 intensity = functor.vec3Functor->interpolate(d->diffuseMap[light], getDiffuse(), percentage);
 		RUN_AND_CHECK(light->setLightAttribute3(GMLight::DiffuseIntensity, ValuePointer(intensity)));
 	}
 
 	if (d->component & GMLightKeyframeComponent::Specular)
 	{
-		GMfloat currentIntensity;
-		RUN_AND_CHECK(light->getLightAttribute(GMLight::SpecularIntensity, currentIntensity));
-		GMfloat intensity = functor.floatFunctor->interpolate(currentIntensity, getSpecular(), percentage);
+		GMfloat intensity = functor.floatFunctor->interpolate(d->specularMap[light], getSpecular(), percentage);
 		RUN_AND_CHECK(light->setLightAttribute(GMLight::SpecularIntensity, intensity));
+	}
+
+	if (d->component & GMLightKeyframeComponent::CutOff)
+	{
+		GMfloat cutOff = functor.floatFunctor->interpolate(d->cutOffMap[light], getCutOff(), percentage);
+		RUN_AND_CHECK(light->setLightAttribute(GMLight::CutOff, cutOff));
+	}
+
+	if (d->component & GMLightKeyframeComponent::Position)
+	{
+		GMVec3 position = functor.vec3Functor->interpolate(d->positionMap[light], getPosition(), percentage);
+		RUN_AND_CHECK(light->setLightAttribute3(GMLight::Position, ValuePointer(position)));
 	}
 
 	if (d->component != GMLightKeyframeComponent::NoComponent)

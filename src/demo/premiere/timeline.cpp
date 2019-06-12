@@ -320,6 +320,16 @@ void Timeline::parseObjects(GMXMLElement* e)
 				GM_ASSERT(bSuc);
 			}
 
+			GMString cutOffStr = e->Attribute("cutoff");
+			if (!cutOffStr.isEmpty())
+			{
+				GMfloat cutOff = 0;
+				GMScanner scanner(cutOffStr);
+				scanner.nextFloat(cutOff);
+				bool bSuc = light->setLightAttribute(GMLight::CutOff, cutOff);
+				GM_ASSERT(bSuc);
+			}
+
 			m_lights[id] = light;
 		}
 		else if (name == L"cubemap")
@@ -459,7 +469,11 @@ void Timeline::interpolateCamera(GMXMLElement* e, Action& action, GMfloat timePo
 
 	if ((component & DirectionComponent) && (component & FocusAtComponent))
 	{
-		gm_warning(gm_dbg_wrap("You cannot specify both 'direction' and 'focus'. 'direction' won't work."));
+		gm_warning(gm_dbg_wrap("You cannot specify both 'direction' and 'focus'. In this camera action, 'direction' won't work."));
+	}
+	if (!(component & DirectionComponent) && !(component & FocusAtComponent))
+	{
+		gm_warning(gm_dbg_wrap("You must specify at least 'direction' or 'focus'. In this camera action, 'direction' won't work."));
 	}
 
 	if (component != NoCameraComponent)
@@ -491,8 +505,8 @@ void Timeline::interpolateCamera(GMXMLElement* e, Action& action, GMfloat timePo
 void Timeline::interpolateLight(GMXMLElement* e, Action& action, ILight* light, GMfloat timePoint)
 {
 	GMint32 component = GMLightKeyframeComponent::NoComponent;
-	GMVec3 ambient, diffuse;
-	GMfloat specular = 0;
+	GMVec3 position, ambient, diffuse;
+	GMfloat specular = 0, cutOff = 10.f;
 
 	GMString ambientStr = e->Attribute("ambient");
 	if (!ambientStr.isEmpty())
@@ -526,14 +540,34 @@ void Timeline::interpolateLight(GMXMLElement* e, Action& action, ILight* light, 
 		component |= GMLightKeyframeComponent::Specular;
 	}
 
+	GMString cutOffStr = e->Attribute("cutoff");
+	if (!cutOffStr.isEmpty())
+	{
+		GMScanner scanner(specularStr);
+		scanner.nextFloat(cutOff);
+		component |= GMLightKeyframeComponent::CutOff;
+	}
+
+	GMString posStr = e->Attribute("position");
+	if (!posStr.isEmpty())
+	{
+		GMScanner scanner(posStr);
+		GMfloat x, y, z;
+		scanner.nextFloat(x);
+		scanner.nextFloat(y);
+		scanner.nextFloat(z);
+		position = GMVec3(x, y, z);
+		component |= GMLightKeyframeComponent::Position;
+	}
+
 	if (component != GMLightKeyframeComponent::NoComponent)
 	{
 		GMInterpolationFunctors f;
 		CurveType curve = parseCurve(e, f);
-		action.action = [this, light, component, ambient, diffuse, specular, timePoint, curve, f]() {
+		action.action = [this, light, component, ambient, diffuse, specular, position, cutOff, timePoint, curve, f]() {
 			GMAnimation& animation = m_animations[Light];
 			animation.setTargetObjects(light);
-			GMAnimationKeyframe* keyframe = new GMLightKeyframe(m_context, component, ambient, diffuse, specular, timePoint);
+			GMAnimationKeyframe* keyframe = new GMLightKeyframe(m_context, component, ambient, diffuse, specular, position, cutOff, timePoint);
 			if (curve != CurveType::NoCurve)
 				keyframe->setFunctors(f);
 			animation.addKeyFrame(keyframe);
@@ -588,39 +622,16 @@ void Timeline::parseActions(GMXMLElement* e)
 			else if (type == L"addObject")
 			{
 				GMString object = e->Attribute("object");
-				auto objectIter = m_objects.find(object);
-				if (objectIter != m_objects.end())
-				{
-					GMGameObject* targetObject = objectIter->second;
-					action.action = [this, targetObject]() {
-						m_world->addObjectAndInit(targetObject);
-						m_world->addToRenderList(targetObject);
-					};
-
-					bindAction(action);
-				}
+				void* targetObject = nullptr;
+				AssetType assetType = getAssetType(object, &targetObject);
+				if (assetType == AssetType::GameObject)
+					addObject(static_cast<GMGameObject*>(targetObject), e, action);
+				else if (assetType == AssetType::Light)
+					addObject(static_cast<ILight*>(targetObject), e, action);
 				else
-				{
 					gm_warning(gm_dbg_wrap("Cannot find object: {0}"), object);
-				}
-			}
-			else if (type == L"addLight")
-			{
-				GMString object = e->Attribute("object");
-				auto lightIter = m_lights.find(object);
-				if (lightIter != m_lights.end())
-				{
-					ILight* targetLight = lightIter->second;
-					action.action = [this, targetLight]() {
-						m_context->getEngine()->addLight(targetLight);
-					};
-					
-					bindAction(action);
-				}
-				else
-				{
-					gm_warning(gm_dbg_wrap("Cannot find light: {0}"), object);
-				}
+
+				bindAction(action);
 			}
 			else if (type == L"animate") // 或者是其它插值变换
 			{
@@ -1088,6 +1099,23 @@ void Timeline::parseAttributes(GMGameObject* obj, GMXMLElement* e, Action& actio
 	}
 }
 
+void Timeline::addObject(GMGameObject* object, GMXMLElement*, Action& action)
+{
+	action.action = [this, object]() {
+		m_world->addObjectAndInit(object);
+		m_world->addToRenderList(object);
+	};
+}
+
+void Timeline::addObject(ILight* light, GMXMLElement*, Action& action)
+{
+	action.action = [this, light]() {
+		m_context->getEngine()->addLight(light);
+	};
+
+	bindAction(action);
+}
+
 void Timeline::removeObject(ILight* light, GMXMLElement* e, Action& action)
 {
 	GMString object = e->Attribute("object");
@@ -1161,9 +1189,9 @@ void Timeline::runActions()
 		else
 		{
 			// 当前不是最后一帧
-			if (m_currentAction->timePoint <= m_timeline && m_timeline <= next->timePoint)
+			if (m_currentAction->timePoint <= m_timeline)
 				m_currentAction->action();
-			else if (m_currentAction->timePoint > m_timeline)
+			else
 				break;
 		}
 

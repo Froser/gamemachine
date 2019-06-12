@@ -14,13 +14,14 @@
         <texture id="mud_n" file="mud/normal.jpg" />
         <buffer id="mud_terrain" file="textures/mud/terrain.png" />
         <object id="model_dragon" file="cat/cat.obj" />
-        <object id="model_logo" file="logo/logo.obj" />
+        <object id="model_logo" file="logo/logo.fbx" />
     </assets>
     <objects>
-        <light id="global" type="point" position="20 20 -20" ambient=".8 .8 .8" diffuse=".7 .7 .7" /> 
-        <light id="spotlight" type="point" position="20 20 -20" ambient=".8 .8 .8" diffuse=".7 .7 .7" /> 
+        <light id="spotlight" type="spotlight" position="-15 10 -5" direction="0 0 1" ambient="4 4 4" diffuse="4 4 4" cutoff="55"/>
+        <light id="global" type="point" position="20 20 -20" ambient="0 0 0" diffuse="0 0 0" />
         <cubemap id="obj_sky" asset="tex_sky" scale="1500 1500 1500" translate="0 10 0" />
         <object id="obj_dragon" asset="model_dragon" scale="1.2 1.2 1.2" ks=".5 .5 .5" />
+        <object id="obj_logo" asset="model_logo" scale="5 5 5" />
         <terrain
             id="obj_ground"
             terrainX="-500"
@@ -42,12 +43,20 @@
     </objects>
     <actions>
         <action type="camera" view="perspective" fovy="60" near=".1f" far="3200" />
-        <action type="camera" focus="0 0 0" position="0 30 -30" />
+        <action type="camera" direction="0 0 1" position="0 0 -30" />
+        <action type="addObject" object="spotlight"/>
+        <action type="addObject" object="obj_logo" />
+        <action type="animate" function="lerp" object="spotlight" position="60 10 -5" time="10" />
+        <action type="animate" function="cubic-bezier" control=".9 .3 .9 .7" object="$camera" direction="0.1 0 1" position="0 0 30" time="15"/>
+<!--
+        <action type="removeObject" object="spotlight" time="15" />
+        <action type="addObject" object="global" time="15" />
+        <action type="animate" function="cubic-bezier" control="1 0 1 0" object="global" position="20 20 -20" ambient=".8 .8 .8" diffuse=".7 .7 .7" time="20"/>
+        <!--<action type="addObject" object="obj_ground" />-->
+        <!--<action type="addObject" object="obj_dragon" />
         <action type="shadow" cascades="1" position="30 30 -30" focus="0 0 0" width="1024" height="768" view="perspective" fovy="45" near=".1f" far="1600" bias="0.000125"/>
-        <action type="addLight" object="global"/>
-        <action type="addObject" object="obj_sky" />
-        <action type="addObject" object="obj_ground" />
-        <action type="addObject" object="obj_dragon" />
+        <action type="camera" focus="0 0 0" position="0 30 -30" />
+        <action type="addObject" object="obj_logo" />
         <action type="animate" function="lerp" object="$camera" position="30 30 0" time="3"/>
         <action type="animate" function="lerp" object="$camera" position="0 30 30" time="6"/>
         <action type="animate" function="lerp" object="$camera" position="-40 10 0" time="12"/>
@@ -55,7 +64,8 @@
         <action type="animate" function="lerp" object="$camera" position="0 40 -30" time="14"/>
         <action type="animate" function="cubic-bezier" control="1 0 1 0" object="global" ambient="0 0 0" diffuse="0 0 0" specular="0" time="14"/>
         <action type="removeObject" object="global" time="14" />
-        <action type="addLight" object="spotlight" time="14"/>
+        <action type="addObject" object="spotlight" time="14"/>
+    -->
         <!--
         <action type="attribute" object="obj_sky" visible="false" time="14"/>
     -->

@@ -304,6 +304,8 @@ struct GMLightKeyframeComponent
 		Ambient = 0x01,
 		Diffuse = 0x02,
 		Specular = 0x04,
+		CutOff = 0x08,
+		Position = 0x10,
 	};
 };
 
@@ -311,11 +313,15 @@ GM_PRIVATE_OBJECT(GMLightKeyframe)
 {
 	Map<ILight*, GMVec3, std::less<ILight*>, AlignedAllocator<Pair<GMGameObject*, GMVec3>> > ambientMap;
 	Map<ILight*, GMVec3, std::less<ILight*>, AlignedAllocator<Pair<GMGameObject*, GMVec3>> > diffuseMap;
+	Map<ILight*, GMVec3, std::less<ILight*>, AlignedAllocator<Pair<GMGameObject*, GMVec3>> > positionMap;
 	Map<ILight*, GMfloat, std::less<ILight*>> specularMap;
+	Map<ILight*, GMfloat, std::less<ILight*>> cutOffMap;
 	GMint32 component = GMLightKeyframeComponent::NoComponent;
 	GMVec3 ambient;
 	GMVec3 diffuse;
 	GMfloat specular;
+	GMVec3 position;
+	GMfloat cutOff;
 	GMfloat timeStart = 0;
 	const IRenderContext* context = nullptr;
 };
@@ -326,6 +332,8 @@ class GM_EXPORT GMLightKeyframe : public GMAnimationKeyframe
 	GM_DECLARE_PROPERTY(Ambient, ambient)
 	GM_DECLARE_PROPERTY(Diffuse, diffuse)
 	GM_DECLARE_PROPERTY(Specular, specular)
+	GM_DECLARE_PROPERTY(CutOff, cutOff)
+	GM_DECLARE_PROPERTY(Position, position)
 
 public:
 	GMLightKeyframe(
@@ -334,6 +342,8 @@ public:
 		const GMVec3& ambient,
 		const GMVec3& diffuse,
 		GMfloat specular,
+		const GMVec3& position,
+		GMfloat cutOff,
 		GMfloat timePoint
 	);
 
