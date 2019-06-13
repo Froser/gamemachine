@@ -105,9 +105,12 @@ void Timeline::update(GMDuration dt)
 		m_timeline += dt;
 	}
 
-	for (auto& animation : m_animations)
+	for (auto& animationList : m_animations)
 	{
-		animation.update(dt);
+		for (auto& animation : animationList)
+		{
+			animation.second.update(dt);
+		}
 	}
 }
 
@@ -115,18 +118,24 @@ void Timeline::play()
 {
 	m_currentAction = m_deferredActions.begin();
 	m_playing = true;
-	for (auto& animation : m_animations)
+	for (auto& animationList : m_animations)
 	{
-		animation.play();
+		for (auto& animation : animationList)
+		{
+			animation.second.play();
+		}
 	}
 }
 
 void Timeline::pause()
 {
 	m_playing = false;
-	for (auto& animation : m_animations)
+	for (auto& animationList : m_animations)
 	{
-		animation.pause();
+		for (auto& animation : animationList)
+		{
+			animation.second.pause();
+		}
 	}
 }
 
@@ -481,8 +490,8 @@ void Timeline::interpolateCamera(GMXMLElement* e, Action& action, GMfloat timePo
 		GMInterpolationFunctors f;
 		CurveType curve = parseCurve(e, f);
 		action.action = [this, component, pos, dir, focus, timePoint, curve, f]() {
-			GMAnimation& animation = m_animations[Camera];
 			GMCamera& camera = m_context->getEngine()->getCamera();
+			GMAnimation& animation = m_animations[Camera][&camera];
 			const GMCameraLookAt& lookAt = camera.getLookAt();
 			animation.setTargetObjects(&camera);
 			
@@ -494,9 +503,10 @@ void Timeline::interpolateCamera(GMXMLElement* e, Action& action, GMfloat timePo
 				keyframe = new GMCameraKeyframe(GMCameraKeyframeComponent::LookAtDirection, posCandidate, dirCandidate, timePoint);
 			else // 默认是按照focusAt调整视觉
 				keyframe = new GMCameraKeyframe(GMCameraKeyframeComponent::FocusAt, posCandidate, focusCandidate, timePoint);
-			animation.addKeyFrame(keyframe);
 			if (curve != CurveType::NoCurve)
 				keyframe->setFunctors(f);
+			animation.addKeyFrame(keyframe);
+			animation.play();
 		};
 		bindAction(action);
 	}
@@ -565,12 +575,13 @@ void Timeline::interpolateLight(GMXMLElement* e, Action& action, ILight* light, 
 		GMInterpolationFunctors f;
 		CurveType curve = parseCurve(e, f);
 		action.action = [this, light, component, ambient, diffuse, specular, position, cutOff, timePoint, curve, f]() {
-			GMAnimation& animation = m_animations[Light];
+			GMAnimation& animation = m_animations[Light][light];
 			animation.setTargetObjects(light);
 			GMAnimationKeyframe* keyframe = new GMLightKeyframe(m_context, component, ambient, diffuse, specular, position, cutOff, timePoint);
 			if (curve != CurveType::NoCurve)
 				keyframe->setFunctors(f);
 			animation.addKeyFrame(keyframe);
+			animation.play();
 		};
 		bindAction(action);
 	}
@@ -1112,8 +1123,6 @@ void Timeline::addObject(ILight* light, GMXMLElement*, Action& action)
 	action.action = [this, light]() {
 		m_context->getEngine()->addLight(light);
 	};
-
-	bindAction(action);
 }
 
 void Timeline::removeObject(ILight* light, GMXMLElement* e, Action& action)

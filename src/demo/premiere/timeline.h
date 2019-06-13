@@ -91,7 +91,7 @@ private:
 	std::multiset<Action> m_immediateActions;
 	std::multiset<Action> m_deferredActions;
 	std::multiset<Action>::iterator m_currentAction;
-	Vector<GMAnimation> m_animations;
+	Vector<Map<IDestroyObject*, GMAnimation>> m_animations;
 	bool m_playing;
 	bool m_finished;
 	GMDuration m_timeline;

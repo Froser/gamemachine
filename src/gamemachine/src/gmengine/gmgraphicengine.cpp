@@ -599,8 +599,11 @@ void GMGraphicEngine::createModelDataProxy(const IRenderContext* context, GMMode
 GMLightIndex GMGraphicEngine::addLight(AUTORELEASE ILight* light)
 {
 	D(d);
-	d->lights.push_back(light);
-	update(GMUpdateDataType::LightChanged);
+	if (std::find(d->lights.begin(), d->lights.end(), light) == d->lights.end())
+	{
+		d->lights.push_back(light);
+		update(GMUpdateDataType::LightChanged);
+	}
 	return d->lights.size();
 }
 
