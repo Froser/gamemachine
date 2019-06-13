@@ -32,6 +32,9 @@ GMGameWorld::GMGameWorld(const IRenderContext* context)
 void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
 {
 	D(d);
+	if (obj->getWorld() == this)
+		return; //inited
+
 	GMOwnedPtr<GMMutex, GMMutexRelease> mutexGuard(&d->addObjectMutex);
 	mutexGuard->lock();
 

@@ -61,12 +61,73 @@ enum Animation
 	EndOfAnimation,
 };
 
+AnimationContainer::AnimationContainer()
+	: m_animationCount(0)
+	, m_currentAnimationIndex(0)
+{
+	newAnimation();
+}
+
+void AnimationContainer::newAnimation()
+{
+	++m_animationCount;
+	m_animations.resize(m_animationCount);
+	m_animationTimePoints.resize(m_animationCount);
+}
+
+void AnimationContainer::nextAnimation()
+{
+	m_animations[m_currentAnimationIndex].reset();
+
+	++m_currentAnimationIndex;
+	if (m_currentAnimationIndex == m_animationCount)
+		newAnimation();
+}
+
+void AnimationContainer::playAnimation()
+{
+	m_animations[m_currentAnimationIndex].play();
+}
+
+void AnimationContainer::pauseAnimation()
+{
+	m_animations[m_currentAnimationIndex].pause();
+}
+
+void AnimationContainer::updateAnimation(GMfloat dt)
+{
+	m_animations[m_currentAnimationIndex].update(dt);
+}
+
+GMAnimation& AnimationContainer::currentAnimation()
+{
+	return m_animations[m_currentAnimationIndex];
+}
+
+void AnimationContainer::setCurrentAnimationTimePoint(GMfloat timePoint)
+{
+	m_animationTimePoints[m_currentAnimationIndex] = timePoint;
+}
+
+GMfloat AnimationContainer::getCurrentAnimationTimePoint()
+{
+	return m_animationTimePoints[m_currentAnimationIndex];
+}
+
+GMfloat AnimationContainer::getTimePointFromStart(GMfloat timePoint)
+{
+	GMfloat result = timePoint - getCurrentAnimationTimePoint();
+	GM_ASSERT(result >= 0);
+	return result;
+}
+
 Timeline::Timeline(const IRenderContext* context, GMGameWorld* world)
 	: m_context(context)
 	, m_world(world)
 	, m_timeline(0)
 	, m_playing(false)
 	, m_finished(false)
+	, m_lastTime(0)
 {
 	GM_ASSERT(m_context && m_world);
 	m_animations.resize(EndOfAnimation);
@@ -109,7 +170,7 @@ void Timeline::update(GMDuration dt)
 	{
 		for (auto& animation : animationList)
 		{
-			animation.second.update(dt);
+			animation.second.updateAnimation(dt);
 		}
 	}
 }
@@ -118,13 +179,6 @@ void Timeline::play()
 {
 	m_currentAction = m_deferredActions.begin();
 	m_playing = true;
-	for (auto& animationList : m_animations)
-	{
-		for (auto& animation : animationList)
-		{
-			animation.second.play();
-		}
-	}
 }
 
 void Timeline::pause()
@@ -134,7 +188,7 @@ void Timeline::pause()
 	{
 		for (auto& animation : animationList)
 		{
-			animation.second.pause();
+			animation.second.pauseAnimation();
 		}
 	}
 }
@@ -491,7 +545,10 @@ void Timeline::interpolateCamera(GMXMLElement* e, Action& action, GMfloat timePo
 		CurveType curve = parseCurve(e, f);
 		action.action = [this, component, pos, dir, focus, timePoint, curve, f]() {
 			GMCamera& camera = m_context->getEngine()->getCamera();
-			GMAnimation& animation = m_animations[Camera][&camera];
+			AnimationContainer& animationContainer = m_animations[Camera][&camera];
+			GMfloat t = animationContainer.getTimePointFromStart(timePoint);
+
+			GMAnimation& animation = animationContainer.currentAnimation();
 			const GMCameraLookAt& lookAt = camera.getLookAt();
 			animation.setTargetObjects(&camera);
 			
@@ -500,13 +557,12 @@ void Timeline::interpolateCamera(GMXMLElement* e, Action& action, GMfloat timePo
 			GMVec3 focusCandidate = (component & FocusAtComponent) ? focus : lookAt.position + lookAt.lookDirection;
 			GMCameraKeyframe* keyframe = nullptr;
 			if (component & DirectionComponent)
-				keyframe = new GMCameraKeyframe(GMCameraKeyframeComponent::LookAtDirection, posCandidate, dirCandidate, timePoint);
+				keyframe = new GMCameraKeyframe(GMCameraKeyframeComponent::LookAtDirection, posCandidate, dirCandidate, t);
 			else // 默认是按照focusAt调整视觉
-				keyframe = new GMCameraKeyframe(GMCameraKeyframeComponent::FocusAt, posCandidate, focusCandidate, timePoint);
+				keyframe = new GMCameraKeyframe(GMCameraKeyframeComponent::FocusAt, posCandidate, focusCandidate, t);
 			if (curve != CurveType::NoCurve)
 				keyframe->setFunctors(f);
 			animation.addKeyFrame(keyframe);
-			animation.play();
 		};
 		bindAction(action);
 	}
@@ -575,16 +631,33 @@ void Timeline::interpolateLight(GMXMLElement* e, Action& action, ILight* light, 
 		GMInterpolationFunctors f;
 		CurveType curve = parseCurve(e, f);
 		action.action = [this, light, component, ambient, diffuse, specular, position, cutOff, timePoint, curve, f]() {
-			GMAnimation& animation = m_animations[Light][light];
+			AnimationContainer& animationContainer = m_animations[Light][light];
+			GMAnimation& animation = animationContainer.currentAnimation();
+			GMfloat t = animationContainer.getTimePointFromStart(timePoint);
+
 			animation.setTargetObjects(light);
-			GMAnimationKeyframe* keyframe = new GMLightKeyframe(m_context, component, ambient, diffuse, specular, position, cutOff, timePoint);
+			GMAnimationKeyframe* keyframe = new GMLightKeyframe(m_context, component, ambient, diffuse, specular, position, cutOff, t);
 			if (curve != CurveType::NoCurve)
 				keyframe->setFunctors(f);
 			animation.addKeyFrame(keyframe);
-			animation.play();
 		};
 		bindAction(action);
 	}
+}
+
+AnimationContainer& Timeline::getAnimationFromObject(AssetType at, void* o)
+{
+	if (at == AssetType::NotFound)
+		throw std::logic_error("Asset not found");
+
+	if (at == AssetType::Light)
+		return m_animations[Light][static_cast<ILight*>(o)];
+	if (at == AssetType::GameObject)
+		return m_animations[GameObject][static_cast<GMGameObject*>(o)];
+	if (at == AssetType::Camera)
+		return m_animations[Camera][static_cast<GMCamera*>(o)];
+
+	throw std::logic_error("Asset wrong type.");
 }
 
 void Timeline::parseActions(GMXMLElement* e)
@@ -600,8 +673,32 @@ void Timeline::parseActions(GMXMLElement* e)
 			if (!time.isEmpty())
 			{
 				action.runType = Action::Deferred;
-				action.timePoint = GMString::parseFloat(time);
+				if (time[0] == '+')
+				{
+					// 相对时间
+					GMString t = time.substr(1, time.length() - 1);
+					if (!t.isEmpty())
+					{
+						action.timePoint = m_lastTime + GMString::parseFloat(t);
+						if (action.timePoint > m_lastTime)
+							m_lastTime = action.timePoint;
+					}
+					else
+					{
+						action.runType = Action::Immediate;
+						gm_warning(gm_dbg_wrap("Wrong action time: {0}"), time);
+					}
+				}
+				else
+				{
+					action.timePoint = GMString::parseFloat(time);
+					if (action.timePoint > m_lastTime)
+						m_lastTime = action.timePoint;
+				}
 			}
+
+			if (action.timePoint == 0)
+				action.runType = Action::Immediate;
 
 			GMString type = e->Attribute("type");
 			if (type == "camera")
@@ -646,32 +743,52 @@ void Timeline::parseActions(GMXMLElement* e)
 			}
 			else if (type == L"animate") // 或者是其它插值变换
 			{
-				if (!time.isEmpty())
+				GMString actionStr = e->Attribute("action");
+				GMString object = e->Attribute("object");
+				void* targetObject = nullptr;
+				AssetType assetType = getAssetType(object, &targetObject);
+
+				if (assetType == AssetType::NotFound)
+					gm_warning(gm_dbg_wrap("Cannot find object: {0}"), object);
+
+				if (actionStr == L"play")
+				{
+					if (targetObject)
+					{
+						AnimationContainer& animationContainer = getAnimationFromObject(assetType, targetObject);
+						animationContainer.setCurrentAnimationTimePoint(action.timePoint);
+						action.action = [&animationContainer]() {
+							animationContainer.playAnimation();
+						};
+						bindAction(action);
+					}
+				}
+				else if (actionStr == L"stop")
+				{
+					if (targetObject)
+					{
+						AnimationContainer& animationContainer = getAnimationFromObject(assetType, targetObject);
+						action.action = [&animationContainer]() {
+							animationContainer.nextAnimation();
+						};
+						bindAction(action);
+					}
+
+				}
+				else if (!time.isEmpty())
 				{
 					GMfloat t = action.timePoint;
 					action.timePoint = 0;
 					action.runType = Action::Immediate; // 插值动作的添加是立即的
-					GMString object = e->Attribute("object");
-
-					void* targetObject = nullptr;
-					AssetType assetType = getAssetType(object, &targetObject);
 
 					if (assetType == AssetType::Camera)
-					{
 						interpolateCamera(e, action, t);
-					}
 					else if (assetType == AssetType::Light)
-					{
 						interpolateLight(e, action, static_cast<ILight*>(targetObject), t);
-					}
-					else
-					{
-						gm_warning(gm_dbg_wrap("Cannot find object: {0}"), object);
-					}
 				}
 				else
 				{
-					gm_warning(gm_dbg_wrap("type 'animate' must combine with attribute 'time'."));
+					gm_warning(gm_dbg_wrap("type 'animate' must combine with attribute 'time' or 'action'."));
 				}
 			}
 			else if (type == L"shadow")
@@ -771,7 +888,6 @@ void Timeline::parseActions(GMXMLElement* e)
 					gm_warning(gm_dbg_wrap("Object '{0}' not found."), object);
 				else
 					gm_warning(gm_dbg_wrap("Object '{0}' doesn't support 'attribute' type."), object);
-				action.timePoint = GMString::parseFloat(time);
 				bindAction(action);
 			}
 			else if (type == L"removeObject")
@@ -781,11 +897,12 @@ void Timeline::parseActions(GMXMLElement* e)
 				AssetType assetType = getAssetType(object, &targetObject);
 				if (assetType == AssetType::Light)
 					removeObject(static_cast<ILight*>(targetObject), e, action);
+				else if (assetType == AssetType::GameObject)
+					removeObject(static_cast<GMGameObject*>(targetObject), e, action);
 				else if (assetType == AssetType::NotFound)
 					gm_warning(gm_dbg_wrap("Object '{0}' not found."), object);
 				else
 					gm_warning(gm_dbg_wrap("Object '{0}' doesn't support 'removeObject' type."), object);
-				action.timePoint = GMString::parseFloat(time);
 				bindAction(action);
 			}
 			else
@@ -1135,6 +1252,17 @@ void Timeline::removeObject(ILight* light, GMXMLElement* e, Action& action)
 	};
 }
 
+void Timeline::removeObject(GMGameObject* obj, GMXMLElement* e, Action& action)
+{
+	GMString objName = e->Attribute("object");
+	action.action = [this, obj, objName]() {
+		if (!m_world->removeFromRenderList(obj))
+		{
+			gm_warning(gm_dbg_wrap("Cannot find object '{0}' from render list."), objName);
+		}
+	};
+}
+
 CurveType Timeline::parseCurve(GMXMLElement* e, GMInterpolationFunctors& f)
 {
 	GMString function = e->Attribute("function");
@@ -1191,17 +1319,27 @@ void Timeline::runActions()
 		{
 			// 当前为最后一帧
 			if (m_timeline >= m_currentAction->timePoint)
-				m_currentAction->action();
+			{
+				if (m_currentAction->action)
+					m_currentAction->action();
+			}
 			else
+			{
 				break;
+			}
 		}
 		else
 		{
 			// 当前不是最后一帧
 			if (m_currentAction->timePoint <= m_timeline)
-				m_currentAction->action();
+			{
+				if (m_currentAction->action)
+					m_currentAction->action();
+			}
 			else
+			{
 				break;
+			}
 		}
 
 		++m_currentAction;

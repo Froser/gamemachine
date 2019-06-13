@@ -378,8 +378,8 @@ void GMLightKeyframe::reset(IDestroyObject* object)
 	RUN_AND_CHECK(light->setLightAttribute3(GMLight::AmbientIntensity, ValuePointer(d->ambientMap[light])));
 	RUN_AND_CHECK(light->setLightAttribute3(GMLight::DiffuseIntensity, ValuePointer(d->diffuseMap[light])));
 	RUN_AND_CHECK(light->setLightAttribute(GMLight::SpecularIntensity, d->specularMap[light]));
-	RUN_AND_CHECK(light->setLightAttribute(GMLight::CutOff, d->cutOffMap[light]));
 	RUN_AND_CHECK(light->setLightAttribute3(GMLight::Position, ValuePointer(d->positionMap[light])));
+	light->setLightAttribute(GMLight::CutOff, d->cutOffMap[light]);
 }
 
 void GMLightKeyframe::beginFrame(IDestroyObject* object, GMfloat timeStart)

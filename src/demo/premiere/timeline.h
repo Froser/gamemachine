@@ -40,6 +40,30 @@ inline bool operator<(const Action& lhs, const Action& rhs) GM_NOEXCEPT
 	return lhs.timePoint < rhs.timePoint;
 }
 
+class AnimationContainer
+{
+public:
+	AnimationContainer();
+
+public:
+	void newAnimation();
+	void nextAnimation();
+	void playAnimation();
+	void pauseAnimation();
+	void updateAnimation(GMfloat dt);
+	GMAnimation& currentAnimation();
+
+	void setCurrentAnimationTimePoint(GMfloat timePoint);
+	GMfloat getCurrentAnimationTimePoint();
+	GMfloat getTimePointFromStart(GMfloat timePoint);
+
+private:
+	GMsize_t m_animationCount;
+	GMsize_t m_currentAnimationIndex;
+	Vector<GMAnimation> m_animations;
+	Vector<GMfloat> m_animationTimePoints;
+};
+
 class Timeline
 {
 public:
@@ -62,6 +86,7 @@ private:
 private:
 	void interpolateCamera(GMXMLElement*, Action&, GMfloat);
 	void interpolateLight(GMXMLElement*, Action&, ILight*, GMfloat);
+	AnimationContainer& getAnimationFromObject(AssetType, void*);
 
 private:
 	GMAsset findAsset(const GMString& assetName);
@@ -73,6 +98,7 @@ private:
 	void addObject(GMGameObject*, GMXMLElement*, Action&);
 	void addObject(ILight*, GMXMLElement*, Action&);
 	void removeObject(ILight*, GMXMLElement*, Action&);
+	void removeObject(GMGameObject*, GMXMLElement*, Action&);
 	CurveType parseCurve(GMXMLElement*, GMInterpolationFunctors&);
 
 	void bindAction(const Action& a);
@@ -91,10 +117,11 @@ private:
 	std::multiset<Action> m_immediateActions;
 	std::multiset<Action> m_deferredActions;
 	std::multiset<Action>::iterator m_currentAction;
-	Vector<Map<IDestroyObject*, GMAnimation>> m_animations;
+	Vector<Map<IDestroyObject*, AnimationContainer>> m_animations;
 	bool m_playing;
 	bool m_finished;
 	GMDuration m_timeline;
+	GMDuration m_lastTime;
 };
 
 #endif
