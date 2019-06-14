@@ -42,6 +42,13 @@ distribution.
 #endif
 #include <stdint.h>
 
+// GameMachine Exports
+#if GM_DLL
+#   define TINYXML2_EXPORT
+#elif GM_USE_DLL
+#   define TINYXML2_IMPORT
+#endif
+
 /*
    TODO: intern strings instead of allocation.
 */

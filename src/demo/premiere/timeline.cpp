@@ -1152,6 +1152,7 @@ void Timeline::parseMaterial(GMGameObject* o, GMXMLElement* e)
 		return;
 
 	GMShader& shader = model->getShader();
+
 	GMfloat x = 0, y = 0, z = 0;
 
 	{
@@ -1287,7 +1288,8 @@ void Timeline::runImmediateActions()
 	{
 		if (action.runType == Action::Immediate)
 		{
-			action.action();
+			if (action.action)
+				action.action();
 		}
 	}
 }

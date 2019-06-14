@@ -13,7 +13,7 @@
         <texture id="mud_d" file="mud/albedo.jpg" />
         <texture id="mud_n" file="mud/normal.jpg" />
         <buffer id="mud_terrain" file="textures/mud/terrain.png" />
-        <object id="model_dragon" file="cat/cat.obj" />
+        <object id="model_dragon" file="dragon/dragon.obj" />
         <object id="model_logo" file="logo/logo.fbx" />
     </assets>
     <objects>

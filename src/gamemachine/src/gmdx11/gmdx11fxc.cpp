@@ -182,10 +182,11 @@ bool GMDx11FXC::compile(GMDx11FXCDescription& desc, ID3DBlob** ppCode, ID3DBlob*
 	}
 
 	gm_info(gm_dbg_wrap("Compiling HLSL code..."));
+	std::string strCodePath = desc.codePath.toStdString();
 	if (SUCCEEDED(D3DCompile(
 		bufCode.getData(),
 		bufCode.getSize(),
-		NULL,
+		strCodePath.c_str(),
 		NULL,
 		0,
 		"",

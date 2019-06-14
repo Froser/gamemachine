@@ -47,6 +47,7 @@ IShaderProgram* GMDx11Helper::loadEffectShader(
 	// 如果没有prefetch，则查找是否有前一次生成的prefetch文件
 	GMDx11FXCDescription desc;
 	desc.code = code;
+	desc.codePath = filepath;
 #if GM_DEBUG
 	desc.debug = true;
 #endif

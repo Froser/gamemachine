@@ -2,12 +2,6 @@
 #define __GMXML_H__
 #include <gmcommon.h>
 
-#if GM_DLL
-#	define TINYXML2_EXPORT
-#elif GM_USE_DLL
-#	define TINYXML2_IMPORT
-#endif
-
 #include "tinyxml2/tinyxml2.h"
 
 BEGIN_NS

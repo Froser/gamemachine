@@ -38,7 +38,7 @@ struct ProperInterpolationInterface_<GMQuat>
 template <typename T>
 using ProperInterpolationInterface = typename ProperInterpolationInterface_<T>::Type;
 
-struct GMInterpolationFunctors
+struct GM_EXPORT GMInterpolationFunctors
 {
 	GMSharedPtr<IInterpolationFloat> floatFunctor;
 	GMSharedPtr<IInterpolationVec3> vec3Functor;
