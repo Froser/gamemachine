@@ -46,22 +46,20 @@ public:
 	AnimationContainer();
 
 public:
-	void newAnimation();
-	void nextAnimation();
 	void playAnimation();
 	void pauseAnimation();
 	void updateAnimation(GMfloat dt);
-	GMAnimation& currentAnimation();
-
-	void setCurrentAnimationTimePoint(GMfloat timePoint);
-	GMfloat getCurrentAnimationTimePoint();
-	GMfloat getTimePointFromStart(GMfloat timePoint);
+	GMAnimation& currentEditingAnimation();
+	void nextEditAnimation();
+	void nextPlayingAnimation();
 
 private:
-	GMsize_t m_animationCount;
-	GMsize_t m_currentAnimationIndex;
+	void newAnimation();
+
+private:
 	Vector<GMAnimation> m_animations;
-	Vector<GMfloat> m_animationTimePoints;
+	GMint32 m_playingAnimationIndex;
+	GMint32 m_editingAnimationIndex;
 };
 
 class Timeline
