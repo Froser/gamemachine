@@ -23,6 +23,7 @@ enum class GMImageFormat
 	RGB,
 	RGBA,
 	BGRA,
+	ARGB,
 	RED,
 };
 

@@ -9,6 +9,7 @@
 #include <../code/StringUtils.h>
 #include "foundation/gamemachine.h"
 #include "foundation/utilities/utilities.h"
+#include "gmdata/imagereader/gmimagereader.h"
 
 class GamePackageIOSystem : public Assimp::MemoryIOSystem
 {
@@ -104,7 +105,29 @@ namespace
 			valueRef = GMVec3(v.r, v.g, v.b);
 	}
 
-	void materialTextureGet(GMModelReader_Assimp* imp, aiMaterial* material, aiTextureType tt, GMModel* model, GMTextureType targetTt)
+	void processTexture(GMModelReader_Assimp* imp, aiTexture* texture, GMModel* model, GMTextureType targetTt)
+	{
+		if (texture->mHeight == 0)
+		{
+			// From compressed
+			GMShader& shader = model->getShader();
+			GMImage* image = nullptr;
+			GMImageReader::load((const GMbyte*)texture->pcData, texture->mWidth, &image);
+			if (image)
+			{
+				GMTextureAsset texture;
+				GM.getFactory()->createTexture(imp->getSettings().context, image, texture);
+				GMToolUtil::addTextureToShader(shader, texture, targetTt);
+			}
+		}
+		else
+		{
+			// Not support
+			GM_ASSERT(false);
+		}
+	}
+
+	void materialTextureGet(GMModelReader_Assimp* imp, const aiScene* scene, aiMaterial* material, aiTextureType tt, GMModel* model, GMTextureType targetTt)
 	{
 		GMShader& shader = model->getShader();
 		aiString p;
@@ -112,25 +135,44 @@ namespace
 		if (aiRet == aiReturn_SUCCESS)
 		{
 			GMString name = p.C_Str();
-			GMTextureAsset tex = imp->getTextureMap()[name];
-			if (tex.isEmpty())
+			if (name.startsWith(L"*")) // *表示一个嵌入文件
 			{
-				GMString imgPath = GM.getGamePackageManager()->pathOf(GMPackageIndex::Models, imp->getSettings().directory + name);
-				GMToolUtil::createTextureFromFullPath(imp->getSettings().context, imgPath, tex);
+				bool ok = false;
+				GMint32 index = GMString::parseFloat(p.C_Str() + 1, &ok);
+				if (ok)
+				{
+					if (index >= gm_sizet_to_int(scene->mNumTextures))
+					{
+						gm_warning(gm_dbg_wrap("Texture {0} is out of range."), name);
+					}
+					else
+					{
+						processTexture(imp, scene->mTextures[index], model, targetTt);
+					}
+				}
+				else
+				{
+					gm_warning(gm_dbg_wrap("Cannot load embedded texture file of {0}."), name);
+				}
 			}
-			if (!tex.isEmpty())
+			else
 			{
-				imp->getTextureMap()[name] = tex;
-				GMToolUtil::addTextureToShader(shader, tex, targetTt);
+				GMTextureAsset tex = imp->getTextureMap()[name];
+				if (tex.isEmpty())
+				{
+					GMString imgPath = GM.getGamePackageManager()->pathOf(GMPackageIndex::Models, imp->getSettings().directory + name);
+					GMToolUtil::createTextureFromFullPath(imp->getSettings().context, imgPath, tex);
+				}
+				if (!tex.isEmpty())
+				{
+					imp->getTextureMap()[name] = tex;
+					GMToolUtil::addTextureToShader(shader, tex, targetTt);
+				}
 			}
 		}
 	}
 
-	void processTexture(GMModelReader_Assimp* imp, aiTexture* texture, GMModel* model)
-	{
-	}
-
-	void processMaterial(GMModelReader_Assimp* imp, aiMaterial* material, GMModel* model)
+	void processMaterial(GMModelReader_Assimp* imp, const aiScene* scene, aiMaterial* material, GMModel* model)
 	{
 		GMShader& shader = model->getShader();
 		GMMaterial& mtl = shader.getMaterial();
@@ -139,10 +181,10 @@ namespace
 		materialGet(material, AI_MATKEY_COLOR_SPECULAR, mtl.getSpecular());
 		materialGet(material, AI_MATKEY_SHININESS, mtl.getShininess());
 		// materialGet(material, AI_MATKEY_COLOR_REFLECTIVE, mtl.getRefractivity());
-		materialTextureGet(imp, material, aiTextureType_AMBIENT, model, GMTextureType::Ambient);
-		materialTextureGet(imp, material, aiTextureType_DIFFUSE, model, GMTextureType::Diffuse);
-		materialTextureGet(imp, material, aiTextureType_SPECULAR, model, GMTextureType::Specular);
-		materialTextureGet(imp, material, aiTextureType_NORMALS, model, GMTextureType::NormalMap);
+		materialTextureGet(imp, scene, material, aiTextureType_AMBIENT, model, GMTextureType::Ambient);
+		materialTextureGet(imp, scene, material, aiTextureType_DIFFUSE, model, GMTextureType::Diffuse);
+		materialTextureGet(imp, scene, material, aiTextureType_SPECULAR, model, GMTextureType::Specular);
+		materialTextureGet(imp, scene, material, aiTextureType_NORMALS, model, GMTextureType::NormalMap);
 	}
 
 	GMVertex* getMutableVertex(GMModel* model, GMsize_t index)
@@ -337,13 +379,7 @@ namespace
 		if (scene->mMaterials)
 		{
 			aiMaterial* material = scene->mMaterials[part->mMaterialIndex];
-			processMaterial(imp, material, model);
-		}
-
-		if (scene->mTextures)
-		{
-			aiTexture* texture = scene->mTextures[part->mMaterialIndex];
-			processTexture(imp, texture, model);
+			processMaterial(imp, scene, material, model);
 		}
 	}
 
@@ -362,6 +398,17 @@ namespace
 			{
 				s->setAnimationType(GMAnimationType::SkeletalAnimation);
 				processBones(imp, part, model);
+
+
+				std::vector<std::vector<aiVertexWeight> > weightsPerVertex(part->mNumVertices);
+				for (unsigned int a = 0; a < part->mNumBones; a++) {
+					const aiBone* bone = part->mBones[a];
+					for (unsigned int b = 0; b < bone->mNumWeights; b++)
+						weightsPerVertex[bone->mWeights[b].mVertexId].push_back(aiVertexWeight(a, bone->mWeights[b].mWeight));
+				}
+
+				int ii = 0;
+				ii++;
 			}
 
 			s->addModelAsset(GMAsset(GMAssetType::Model, model));
