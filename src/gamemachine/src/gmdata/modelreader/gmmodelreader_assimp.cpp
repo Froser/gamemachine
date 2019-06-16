@@ -64,6 +64,8 @@ private:
 
 namespace
 {
+	typedef Vector<aiVertexWeight> aiVertexWeights;
+
 	// aiMatrix4x4转换函数
 	GMMat4 fromAiMatrix(const aiMatrix4x4& mat)
 	{
@@ -251,16 +253,6 @@ namespace
 			{
 				boneIndex = index = boneMapping[boneName];
 			}
-
-			// 接下来，记录所有的weight
-
-			for (GMsize_t j = 0; j < mesh->mBones[i]->mNumWeights; ++j)
-			{
-				auto& weight = mesh->mBones[i]->mWeights[j];
-				GMsize_t vertexId = weight.mVertexId;
-				// 将每个顶点与Bones和Weight绑定
-				addVertexBoneAndWeight(model, vertexId, boneIndex, weight.mWeight);
-			}
 		}
 	}
 
@@ -330,8 +322,9 @@ namespace
 		s->setAnimations(animations);
 	}
 
-	void processMesh(GMModelReader_Assimp* imp, aiMesh* part, const aiScene* scene, GMModel* model)
+	void processMesh(GMModelReader_Assimp* imp, const aiScene* scene, GMuint32 meshId, GMModel* model, const Vector<aiVertexWeights>& weightsPerVertex)
 	{
+		aiMesh* part = scene->mMeshes[meshId];
 		model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
 		if (part->HasFaces())
 			model->setDrawMode(GMModelDrawMode::Index);
@@ -360,6 +353,26 @@ namespace
 				{ 0, 0, 0, 0 },
 				{ 0, 0, 0, 0 }
 			};
+
+
+			// bones
+			if (!weightsPerVertex.empty())
+			{
+				// has bones
+				GMuint32 boneIndices[4] = { 0, 0, 0, 0 };
+				GMfloat boneWeights[4] = { 0, 0, 0, 0 };
+				GM_ASSERT(weightsPerVertex[meshId].size() <= 4);
+				for (GMsize_t a = 0; a < weightsPerVertex[meshId].size(); a++)
+				{
+					boneIndices[a] = weightsPerVertex[meshId][a].mVertexId;
+					boneWeights[a] = weightsPerVertex[meshId][a].mWeight;
+				}
+				GM_STATIC_ASSERT(sizeof(v.boneIds) == sizeof(boneIndices), "Wrong type size");
+				GM_STATIC_ASSERT(sizeof(v.weights) == sizeof(boneWeights), "Wrong type size");
+				memcpy_s(&v.boneIds, sizeof(v.boneIds), boneIndices, sizeof(boneIndices));
+				memcpy_s(&v.weights, sizeof(v.weights), boneWeights, sizeof(boneWeights));
+			}
+
 			p->vertex(v);
 		}
 
@@ -390,25 +403,20 @@ namespace
 			aiMesh* part = scene->mMeshes[i];
 			GMModel* model = new GMModel();
 
-			// part
-			processMesh(imp, part, scene, model);
+			Vector<aiVertexWeights> weightsPerVertex(part->mNumVertices);
 
-			// bones
+			for (GMuint32 a = 0; a < part->mNumBones; a++) {
+				const aiBone* bone = part->mBones[a];
+				for (GMuint32 b = 0; b < bone->mNumWeights; b++)
+					weightsPerVertex[bone->mWeights[b].mVertexId].push_back(aiVertexWeight(a, bone->mWeights[b].mWeight));
+			}
+
+			processMesh(imp, scene, i, model, weightsPerVertex);
+
 			if (part->HasBones())
 			{
 				s->setAnimationType(GMAnimationType::SkeletalAnimation);
 				processBones(imp, part, model);
-
-
-				std::vector<std::vector<aiVertexWeight> > weightsPerVertex(part->mNumVertices);
-				for (unsigned int a = 0; a < part->mNumBones; a++) {
-					const aiBone* bone = part->mBones[a];
-					for (unsigned int b = 0; b < bone->mNumWeights; b++)
-						weightsPerVertex[bone->mWeights[b].mVertexId].push_back(aiVertexWeight(a, bone->mWeights[b].mWeight));
-				}
-
-				int ii = 0;
-				ii++;
 			}
 
 			s->addModelAsset(GMAsset(GMAssetType::Model, model));
