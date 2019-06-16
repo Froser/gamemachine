@@ -574,6 +574,9 @@ void GMToolUtil::createTextureFromFullPath(const IRenderContext* context, const 
 	GMBuffer buf;
 	GM.getGamePackageManager()->readFileFromPath(filename, &buf);
 	GMImageReader::load(buf.getData(), buf.getSize(), &img);
+	if (!img)
+		return;
+
 	GM_ASSERT(img);
 
 	GM.getFactory()->createTexture(context, img, texture);

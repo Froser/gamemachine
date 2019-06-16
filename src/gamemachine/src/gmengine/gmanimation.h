@@ -61,7 +61,7 @@ struct GMLerpFunctor : ProperInterpolationInterface<T>
 template <typename T>
 struct GMCubicBezierFunctor : ProperInterpolationInterface<T>
 {
-	GMCubicBezierFunctor(GMVec2 cp0, GMVec2 cp1, GMint32 slice = 20)
+	GMCubicBezierFunctor(GMVec2 cp0, GMVec2 cp1, GMint32 slice = 60)
 	{
 		GM_ASSERT(0 <= cp0.getX() && cp0.getX() <= 1);
 		GM_ASSERT(0 <= cp1.getX() && cp1.getX() <= 1);

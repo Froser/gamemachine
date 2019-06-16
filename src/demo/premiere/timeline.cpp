@@ -7,6 +7,7 @@
 #include <gmmodelreader.h>
 #include <gmutilities.h>
 #include <gmgraphicengine.h>
+#include <gmm.h>
 
 #define NoCameraComponent 0
 #define PositionComponent 0x01
@@ -113,9 +114,26 @@ Timeline::Timeline(const IRenderContext* context, GMGameWorld* world)
 	, m_playing(false)
 	, m_finished(false)
 	, m_lastTime(0)
+	, m_audioPlayer(gmm::GMMFactory::getAudioPlayer())
+	, m_audioReader(gmm::GMMFactory::getAudioReader())
 {
 	GM_ASSERT(m_context && m_world);
 	m_animations.resize(EndOfAnimation);
+}
+
+Timeline::~Timeline()
+{
+	for (auto source : m_audioSources)
+	{
+		if (source.second)
+			source.second->destroy();
+	}
+
+	for (auto source : m_audioFiles)
+	{
+		if (source.second)
+			source.second->destroy();
+	}
 }
 
 bool Timeline::parse(const GMString& timelineContent)
@@ -289,6 +307,22 @@ void Timeline::parseAssets(GMXMLElement* e)
 			else
 			{
 				gm_warning(gm_dbg_wrap("Cannot get file: {0}"), file);
+			}
+		}
+		else if (name == L"audio")
+		{
+			GMString file = e->Attribute("file");
+			GMBuffer buffer;
+			package->readFile(GMPackageIndex::Audio, file, &buffer);
+			IAudioFile* f = nullptr;
+			m_audioReader->load(buffer, &f);
+			if (!f)
+			{
+				gm_warning(gm_dbg_wrap("Cannot read audio file {0}."), file);
+			}
+			else
+			{
+				m_audioFiles[id] = f;
 			}
 		}
 
@@ -469,6 +503,32 @@ void Timeline::parseObjects(GMXMLElement* e)
 			else
 			{
 				gm_warning(gm_dbg_wrap("Create terrain error. Id: {0}"), id);
+			}
+		}
+		else if (name == L"source")
+		{
+			GMString assetName = e->Attribute("asset");
+			auto asset = m_audioFiles[assetName];
+			if (asset)
+			{
+				auto exists = m_audioSources.find(id);
+				if (exists == m_audioSources.end())
+				{
+					IAudioSource* s = nullptr;
+					m_audioPlayer->createPlayerSource(asset, &s);
+					if (s)
+						m_audioSources[id] = s;
+					else
+						gm_warning(gm_dbg_wrap("Create source failed: {0}"), id);
+				}
+				else
+				{
+					gm_warning(gm_dbg_wrap("Source id {0} is already existed."), id);
+				}
+			}
+			else
+			{
+				gm_warning(gm_dbg_wrap("Cannot find asset for source: {0}"), assetName);
 			}
 		}
 		e = e->NextSiblingElement();
@@ -888,6 +948,20 @@ void Timeline::parseActions(GMXMLElement* e)
 				else
 					gm_warning(gm_dbg_wrap("Object '{0}' doesn't support 'removeObject' type."), object);
 				bindAction(action);
+			}
+			else if (type == L"play")
+			{
+				GMString object = e->Attribute("object");
+				void* targetObject = nullptr;
+				AssetType assetType = getAssetType(object, &targetObject);
+				if (assetType == AssetType::AudioSource)
+				{
+					playAudio(static_cast<IAudioSource*>(targetObject));
+				}
+				else
+				{
+					gm_warning(gm_dbg_wrap("Cannot find source: {0}"), object);
+				}
 			}
 			else
 			{
@@ -1355,7 +1429,14 @@ AssetType Timeline::getAssetType(const GMString& objectName, OUT void** out)
 				break;
 			if (getAssetAndType<AssetType::Light>(m_lights, objectName, result, out))
 				break;
+			if (getAssetAndType<AssetType::AudioSource>(m_audioSources, objectName, result, out))
+				break;
 		} while (false);
 	}
 	return result;
+}
+
+void Timeline::playAudio(IAudioSource* source)
+{
+	source->play(false);
 }

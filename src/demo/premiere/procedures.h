@@ -28,9 +28,6 @@ private:
 	Stack<std::function<void()>> m_funcQueue;
 	List<GMFuture<void>> m_managedFutures;
 	GMAnimation m_titleAnimation;
-	IAudioReader* m_audioReader;
-	IAudioPlayer* m_audioPlayer;
-	GMOwnedPtr<IAudioSource> m_bgmSrc;
 	Timeline m_timeline;
 	bool m_assetsLoaded;
 	bool m_timelineStarted;

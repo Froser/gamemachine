@@ -634,6 +634,9 @@ bool GMImageReader_TGA::load(const GMbyte* data, size_t size, OUT GMImage** imag
 
 bool GMImageReader_TGA::test(const GMbyte* data)
 {
+	if (!data)
+		return false;
+
 	return
 		data[3] == 0 ||
 		data[3] == 1 ||

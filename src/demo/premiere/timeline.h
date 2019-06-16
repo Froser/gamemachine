@@ -33,6 +33,7 @@ enum class AssetType
 	Camera,
 	GameObject,
 	Light,
+	AudioSource,
 };
 
 inline bool operator<(const Action& lhs, const Action& rhs) GM_NOEXCEPT
@@ -66,6 +67,7 @@ class Timeline
 {
 public:
 	Timeline(const IRenderContext* context, GMGameWorld* world);
+	~Timeline();
 
 public:
 	// 解析一个Timeline文件
@@ -104,6 +106,7 @@ private:
 	void runActions();
 
 	AssetType getAssetType(const GMString& objectName, OUT void** out);
+	void playAudio(IAudioSource* source);
 
 private:
 	const IRenderContext* m_context;
@@ -112,6 +115,8 @@ private:
 	HashMap<GMString, GMAsset, GMStringHashFunctor> m_assets;
 	HashMap<GMString, GMGameObject*, GMStringHashFunctor> m_objects;
 	HashMap<GMString, ILight*, GMStringHashFunctor> m_lights;
+	HashMap<GMString, IAudioFile*, GMStringHashFunctor> m_audioFiles;
+	HashMap<GMString, IAudioSource*, GMStringHashFunctor> m_audioSources;
 	std::multiset<Action> m_immediateActions;
 	std::multiset<Action> m_deferredActions;
 	std::multiset<Action>::iterator m_currentAction;
@@ -120,6 +125,8 @@ private:
 	bool m_finished;
 	GMDuration m_timeline;
 	GMDuration m_lastTime;
+	IAudioReader* m_audioReader;
+	IAudioPlayer* m_audioPlayer;
 };
 
 #endif

@@ -2,7 +2,6 @@
 #include "procedures.h"
 #include "handler.h"
 #include "helper.h"
-#include <gmm.h>
 
 Procedures::Procedures(Handler* handler)
 	: m_handler(handler)
@@ -40,15 +39,10 @@ ProceduresPrivate::ProceduresPrivate(Procedures& p)
 	, m_timeline(p.m_handler->getWindow()->getContext(), p.m_handler->getWorld())
 	, m_timelineStarted(false)
 {
-	m_audioPlayer = gmm::GMMFactory::getAudioPlayer();
-	m_audioReader = gmm::GMMFactory::getAudioReader();
 }
 
 void ProceduresPrivate::finalize()
 {
-	if (m_bgmSrc)
-		m_bgmSrc->stop();
-
 	for (auto& f : m_managedFutures)
 	{
 		if (f.valid())
@@ -128,37 +122,6 @@ void ProceduresPrivate::showLogo(GMDuration dt)
 
 		m_procedures.m_handler->getWorld()->addObjectAndInit(m_title);
 		m_procedures.m_handler->getWorld()->addToRenderList(m_title);
-
-		static std::once_flag s_flag;
-		std::call_once(s_flag, [this]() {
-			async(GMAsync::async(GMAsync::Async, [this]() {
-				GM_CHILD_THREAD_RENDER(m_procedures.m_handler->getWindow());
-				GMBuffer bgBuffer;
-				GMString fn;
-				GM.getGamePackageManager()->readFile(GMPackageIndex::Audio, L"Thomas Greenberg - Curly Wurly.mp3", &bgBuffer, &fn);
-				if (bgBuffer.getSize() > 0)
-				{
-					IAudioFile* musicFile;
-					if (m_audioReader->load(bgBuffer, &musicFile))
-					{
-						IAudioSource* musicSrc;
-						m_audioPlayer->createPlayerSource(musicFile, &musicSrc);
-						m_bgmSrc.reset(musicSrc);
-						invokeInMainThread([this]() {
-							m_bgmSrc->play(false);
-						});
-					}
-					else
-					{
-						gm_warning(gm_dbg_wrap("BGM load failed: {0}"), fn);
-					}
-				}
-				else
-				{
-					gm_warning(gm_dbg_wrap("BGM not found: {0}"), fn);
-				}
-			}));
-		});
 		m_procedures.m_procedure = Procedures::LoadingScene;
 	}
 
