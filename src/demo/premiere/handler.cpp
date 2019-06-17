@@ -96,6 +96,12 @@ void Handler::event(GameMachineHandlerEvent evt)
 		m_procedures->run(GM.getRunningStates().lastFrameElpased);
 		break;
 	}
+	case GameMachineHandlerEvent::Update:
+	{
+		GMfloat dt = GM.getRunningStates().lastFrameElpased;
+		m_procedures->update(dt);
+		break;
+	}
 	case GameMachineHandlerEvent::Terminate:
 		m_procedures->finalize();
 		break;

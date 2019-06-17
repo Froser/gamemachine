@@ -13,8 +13,9 @@
         <texture id="mud_d" file="mud/albedo.jpg" />
         <texture id="mud_n" file="mud/normal.jpg" />
         <buffer id="mud_terrain" file="textures/mud/terrain.png" />
-        <object id="model_dragon" file="deathstroke/deathstroke.fbx" />
+        <object id="model_dragon" file="dragon/dragon.obj" />
         <object id="model_logo" file="logo/logo.fbx" />
+        <object id="model_deathstroke" file="deathstroke/deathstroke.fbx" />
     </assets>
     <objects>
         <light id="light_spotlight" type="spotlight" position="-30 12 -5" direction="0 0 1" ambient="4 4 4" diffuse="4 4 4" cutoff="55"/>
@@ -40,10 +41,12 @@
             ks=".1 .1 .1"
             translate="0 -15 0"
         />
+        <object id="obj_deathstroke" asset="model_deathstroke" scale="4 4 4" rotate="0 1 0 180"/>
     </objects>
     <actions>
         <action type="camera" view="perspective" fovy="60" near=".1f" far="3200" />
         <action type="camera" direction="0 0 1" position="0 0 -30" />
+
         <action type="addObject" object="light_spotlight"/>
         <action type="addObject" object="obj_logo" />
         
@@ -80,6 +83,14 @@
         <action type="animate" action="stop" object="light_global" time="+1"/>
 
         <action type="removeObject" object="light_global" time="+0" />
+        <action type="removeObject" object="obj_ground" time="+0" />
+        <action type="removeObject" object="obj_dragon" time="+0" />
         <action type="attribute" object="obj_sky" visible="false" time="+0"/>
+
+        <action type="addObject" object="light_global" time="+0" />
+        <action type="animate" action="play" object="light_global" time="+0"/>
+        <action type="animate" function="linear" object="light_global" ambient="1 1 1" diffuse=".7 .7 .7" endtime="3"/>
+        <action type="animate" action="stop" object="light_global" time="+3"/>
+        <action type="addObject" object="obj_deathstroke" time="+0"/>
     </actions>
 </timeline>

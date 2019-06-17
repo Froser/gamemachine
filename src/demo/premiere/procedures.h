@@ -51,6 +51,7 @@ public:
 
 public:
 	void run(GMDuration dt);
+	void update(GMDuration dt);
 	void finalize();
 
 private:

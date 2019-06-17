@@ -27,6 +27,18 @@ void Procedures::run(GMDuration dt)
 	}
 }
 
+void Procedures::update(GMDuration dt)
+{
+	switch (m_procedure)
+	{
+	case Play:
+	{
+		m_handler->getWorld()->updateGameWorld(dt);
+		break;
+	}
+	}
+}
+
 void Procedures::finalize()
 {
 	m_p.finalize();
@@ -109,7 +121,7 @@ void ProceduresPrivate::showLogo(GMDuration dt)
 		m_title->setColorType(GMTextColorType::Plain);
 		m_title->setFontSize(32);
 		m_title->setColor(GMVec4(1, 1, 1, 0));
-		m_title->setText("Producer: Froser");
+		m_title->setText("Produced by Froser");
 		GMRect rc = { 0, 0, 400, 32 };
 		rc = Helper::getMiddleRectOfWindow(rc, window);
 		rc.y -= 40;
