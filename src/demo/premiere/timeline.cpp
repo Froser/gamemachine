@@ -728,17 +728,11 @@ void Timeline::interpolateLight(GMXMLElement* e, ILight* light, GMfloat timePoin
 	}
 }
 
-void Timeline::interpolateObject(GMXMLElement* e, GMGameObject* obj, GMfloat)
+void Timeline::interpolateObject(GMXMLElement* e, GMGameObject* obj, GMfloat timePoint)
 {
-	/*
-	GMFloat4 translation4;
-	GetTranslationFromMatrix(obj->getTranslation(), translation4);
-
-	GMFloat4 scale4;
-	GetScalingFromMatrix(obj->getTranslation(), translation4);
-
-	GMVec4 translate, scale;
-	translate.setFloat4(translation4);
+	GMint32 component = GMGameObjectKeyframeComponent::NoComponent;
+	GMVec4 translation, scaling;
+	GMQuat rotation;
 
 	GMString str = e->Attribute("translate");
 	if (!str.isEmpty())
@@ -748,16 +742,51 @@ void Timeline::interpolateObject(GMXMLElement* e, GMGameObject* obj, GMfloat)
 		scanner.nextFloat(x);
 		scanner.nextFloat(y);
 		scanner.nextFloat(z);
-		translate = GMVec4(x, y, z, 1);
+		component |= GMGameObjectKeyframeComponent::Translate;
+		translation = GMVec4(x, y, z, 1);
 	}
 
-	GMInterpolationFunctors f;
-	CurveType curve = parseCurve(e, f);
-	AnimationContainer& animationContainer = m_animations[GameObject][obj];
-	GMAnimation& animation = animationContainer.currentEditingAnimation();
-	animation.setTargetObjects(obj);
-	GMAnimationKeyframe* keyframe = new GMGameObjectKeyframe();
-	*/
+	str = e->Attribute("scale");
+	if (!str.isEmpty())
+	{
+		GMScanner scanner(str);
+		GMfloat x, y, z;
+		scanner.nextFloat(x);
+		scanner.nextFloat(y);
+		scanner.nextFloat(z);
+		component |= GMGameObjectKeyframeComponent::Scale;
+		scaling = GMVec4(x, y, z, 1);
+	}
+
+	str = e->Attribute("rotate");
+	if (!str.isEmpty())
+	{
+		GMfloat x, y, z, degree;
+		GMScanner scanner(str);
+		scanner.nextFloat(x);
+		scanner.nextFloat(y);
+		scanner.nextFloat(z);
+		scanner.nextFloat(degree);
+		component |= GMGameObjectKeyframeComponent::Rotate;
+		GMVec3 axis(x, y, z);
+		if (!FuzzyCompare(Length(axis), 0.f))
+			rotation = Rotate(Radian(degree), axis);
+		else
+			gm_warning(gm_dbg_wrap("Wrong rotation axis"));
+	}
+
+	if (component != GMGameObjectKeyframeComponent::NoComponent)
+	{
+		GMInterpolationFunctors f;
+		CurveType curve = parseCurve(e, f);
+		AnimationContainer& animationContainer = m_animations[GameObject][obj];
+		GMAnimation& animation = animationContainer.currentEditingAnimation();
+		animation.setTargetObjects(obj);
+		GMAnimationKeyframe* keyframe = new GMGameObjectKeyframe(component, translation, scaling, rotation, timePoint);
+		if (curve != CurveType::NoCurve)
+			keyframe->setFunctors(f);
+		animation.addKeyFrame(keyframe);
+	}
 }
 
 AnimationContainer& Timeline::getAnimationFromObject(AssetType at, void* o)
@@ -915,7 +944,7 @@ void Timeline::parseActions(GMXMLElement* e)
 					}
 					else
 					{
-						gm_warning(gm_dbg_wrap("Attribute 'endtime' must be specified in animation interpolation."));
+						gm_warning(gm_dbg_wrap("Attribute 'endtime' must be specified in animation interpolation. Object: '{0}'"), object);
 					}
 				}
 			}

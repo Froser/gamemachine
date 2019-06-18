@@ -388,6 +388,13 @@ void GMString::stringCat(GMwchar* dest, GMsize_t cchDest, const GMwchar* source)
 
 GMfloat GMString::parseFloat(const GMString& i, bool* ok)
 {
+	if (i.isEmpty())
+	{
+		if (ok)
+			*ok = false;
+		return 0.f;
+	}
+
 	try
 	{
 		GMfloat v = std::stof(i.toStdWString());
@@ -429,6 +436,13 @@ GMint32 GMString::parseInt(const GMString& i, bool* ok)
 
 GMlong GMString::parseLong(const GMString& i, bool* ok)
 {
+	if (i.isEmpty())
+	{
+		if (ok)
+			*ok = false;
+		return 0;
+	}
+
 	try
 	{
 		GMlong v = std::stol(i.toStdWString());

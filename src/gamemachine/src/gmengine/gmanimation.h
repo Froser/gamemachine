@@ -222,6 +222,17 @@ private:
 };
 
 // Animations
+struct GMGameObjectKeyframeComponent
+{
+	enum
+	{
+		NoComponent = 0x00,
+		Translate = 0x01,
+		Scale = 0x02,
+		Rotate = 0x04,
+	};
+};
+
 GM_PRIVATE_OBJECT(GMGameObjectKeyframe)
 {
 	Map<GMGameObject*, GMVec4, std::less<GMGameObject*>, AlignedAllocator<Pair<GMGameObject*, GMVec4>> > translationMap;
@@ -231,6 +242,7 @@ GM_PRIVATE_OBJECT(GMGameObjectKeyframe)
 	GMVec4 scaling;
 	GMQuat rotation;
 	GMfloat timeStart = 0;
+	GMint32 component = GMGameObjectKeyframeComponent::NoComponent;
 };
 
 class GM_EXPORT GMGameObjectKeyframe : public GMAnimationKeyframe
@@ -242,6 +254,7 @@ class GM_EXPORT GMGameObjectKeyframe : public GMAnimationKeyframe
 
 public:
 	GMGameObjectKeyframe(
+		GMint32 component,
 		const GMVec4& translation,
 		const GMVec4& scaling,
 		const GMQuat& rotation,

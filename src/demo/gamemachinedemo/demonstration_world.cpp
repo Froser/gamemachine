@@ -598,25 +598,24 @@ void DemonstrationWorld::initObjects()
 
 			// 创建动画
 			GMFloat4 t4, s4;
-			GetTranslationFromMatrix(d->logoObj->getTranslation(), t4);
-			GetScalingFromMatrix(d->logoObj->getScaling(), s4);
 			GMVec4 t, s;
-			t.setFloat4(t4);
-			s.setFloat4(s4);
 			d->logoAnimation.setTargetObjects(d->logoObj);
 			d->logoAnimation.addKeyFrame(new gm::GMGameObjectKeyframe(
+				gm::GMGameObjectKeyframeComponent::Rotate,
 				t,
 				s,
 				(Rotate(PI * 2 / 3, (GMVec3(0, 1, 0)))),
 				1.5f
 			));
 			d->logoAnimation.addKeyFrame(new gm::GMGameObjectKeyframe(
+				gm::GMGameObjectKeyframeComponent::Rotate,
 				t,
 				s,
 				(Rotate(PI * 4 / 3, (GMVec3(0, 1, 0)))),
 				3.f
 			));
 			d->logoAnimation.addKeyFrame(new gm::GMGameObjectKeyframe(
+				gm::GMGameObjectKeyframeComponent::Rotate,
 				t,
 				s,
 				(Rotate(PI * 2, (GMVec3(0, 1, 0)))),

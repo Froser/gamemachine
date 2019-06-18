@@ -35,27 +35,25 @@ void Demo_NormalMap::init()
 	asDemoGameWorld(getDemoWorldReference())->addObject("texture", d->gameObject);
 
 	// 为这个对象创建动画
-	GMFloat4 t4, s4;
-	GetTranslationFromMatrix(d->gameObject->getTranslation(), t4);
-	GetScalingFromMatrix(d->gameObject->getScaling(), s4);
 	GMVec4 t, s;
-	t.setFloat4(t4);
-	s.setFloat4(s4);
 
 	d->animation.setTargetObjects(d->gameObject);
 	d->animation.addKeyFrame(new gm::GMGameObjectKeyframe(
+		gm::GMGameObjectKeyframeComponent::Rotate,
 		t,
 		s,
 		(Rotate(PI * 2 / 3 , (GMVec3(0, 0, 1)))),
 		1.5f
 	));
 	d->animation.addKeyFrame(new gm::GMGameObjectKeyframe(
+		gm::GMGameObjectKeyframeComponent::Rotate,
 		t,
 		s,
 		(Rotate(PI * 4 / 3, (GMVec3(0, 0, 1)))),
 		3.f
 	));
 	d->animation.addKeyFrame(new gm::GMGameObjectKeyframe(
+		gm::GMGameObjectKeyframeComponent::Rotate,
 		t,
 		s,
 		(Rotate(PI * 2, (GMVec3(0, 0, 1)))),

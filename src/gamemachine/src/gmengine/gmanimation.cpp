@@ -212,6 +212,7 @@ GMAnimationKeyframe::GMAnimationKeyframe(GMfloat timePoint)
 }
 
 GMGameObjectKeyframe::GMGameObjectKeyframe(
+	GMint32 component,
 	const GMVec4& translation,
 	const GMVec4& scaling,
 	const GMQuat& rotation,
@@ -220,6 +221,7 @@ GMGameObjectKeyframe::GMGameObjectKeyframe(
 	: GMAnimationKeyframe(timePoint)
 {
 	D(d);
+	d->component = component;
 	setTranslation(translation);
 	setScaling(scaling);
 	setRotation(rotation);
@@ -254,11 +256,17 @@ void GMGameObjectKeyframe::endFrame(IDestroyObject* object)
 	D(d);
 	// 去掉误差，把对象放到正确的位置
 	GMGameObject* gameObj = gm_cast<GMGameObject*>(object);
-	gameObj->beginUpdateTransform();
-	gameObj->setTranslation(Translate(getTranslation()));
-	gameObj->setScaling(Scale(getScaling()));
-	gameObj->setRotation(getRotation());
-	gameObj->endUpdateTransform();
+	if (d->component != GMGameObjectKeyframeComponent::NoComponent)
+	{
+		gameObj->beginUpdateTransform();
+		if (d->component & GMGameObjectKeyframeComponent::Translate)
+			gameObj->setTranslation(Translate(getTranslation()));
+		if (d->component & GMGameObjectKeyframeComponent::Scale)
+			gameObj->setScaling(Scale(getScaling()));
+		if (d->component & GMGameObjectKeyframeComponent::Rotate)
+			gameObj->setRotation(getRotation());
+		gameObj->endUpdateTransform();
+	}
 }
 
 void GMGameObjectKeyframe::update(IDestroyObject* object, GMfloat time)
@@ -268,13 +276,23 @@ void GMGameObjectKeyframe::update(IDestroyObject* object, GMfloat time)
 	GMfloat percentage = (time - d->timeStart) / (getTime() - d->timeStart);
 	if (percentage > 1.f)
 		percentage = 1.f;
-	gameObj->beginUpdateTransform();
 
-	const auto& functor = getFunctors();
-	gameObj->setTranslation(Translate(functor.vec4Functor->interpolate(d->translationMap[gameObj], getTranslation(), percentage)));
-	gameObj->setScaling(Scale(functor.vec3Functor->interpolate(d->scalingMap[gameObj], getScaling(), percentage)));
-	gameObj->setRotation(functor.quatFunctor->interpolate(d->rotationMap[gameObj], getRotation(), percentage));
-	gameObj->endUpdateTransform();
+	if (d->component != GMGameObjectKeyframeComponent::NoComponent)
+	{
+		gameObj->beginUpdateTransform();
+
+		const auto& functor = getFunctors();
+		if (d->component & GMGameObjectKeyframeComponent::Translate)
+			gameObj->setTranslation(Translate(functor.vec4Functor->interpolate(d->translationMap[gameObj], getTranslation(), percentage)));
+
+		if (d->component & GMGameObjectKeyframeComponent::Scale)
+			gameObj->setScaling(Scale(functor.vec3Functor->interpolate(d->scalingMap[gameObj], getScaling(), percentage)));
+
+		if (d->component & GMGameObjectKeyframeComponent::Rotate)
+			gameObj->setRotation(functor.quatFunctor->interpolate(d->rotationMap[gameObj], getRotation(), percentage));
+
+		gameObj->endUpdateTransform();
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
