@@ -110,10 +110,10 @@ protected:
 	void prepareLights();
 	void prepareShadow(const GMShadowSourceDesc* shadowSourceDesc, GMGLShadowFramebuffers* shadowFramebuffers, bool hasShadow);
 	GMIlluminationModel prepareIlluminationModel(GMModel* model);
-
-private:
 	void updateBoneTransforms(IShaderProgram* shaderProgram, GMModel* model);
 	void updateNodeTransforms(IShaderProgram* shaderProgram, GMModel* model);
+
+private:
 	void startDraw(GMModel* model);
 };
 

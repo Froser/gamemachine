@@ -822,11 +822,17 @@ VS_OUTPUT VS_3D( VS_INPUT input )
         boneTransform += GM_Bones[input.BoneIDs[2]] * input.Weights[2];
         boneTransform += GM_Bones[input.BoneIDs[3]] * input.Weights[3];
         output.Position = mul(output.Position, boneTransform);
+        output.Normal = mul(input.Normal, GM_ToFloat3x3(boneTransform));
     }
     else if (GM_UseAnimation == GM_AffineAnimation)
     {
         // 将仿射变换的值放到第1个Bones矩阵中
         output.Position = mul(output.Position, GM_Bones[0]);
+        output.Normal = mul(GM_ToFloat4(input.Normal.xyz), GM_Bones[0]);
+    }
+    else
+    {
+        output.Normal = input.Normal;
     }
 
     output.Position = mul(output.Position, GM_WorldMatrix);
@@ -835,7 +841,6 @@ VS_OUTPUT VS_3D( VS_INPUT input )
     output.Position = mul(output.Position, GM_ViewMatrix);
     output.Position = mul(output.Position, GM_ProjectionMatrix);
 
-    output.Normal = input.Normal;
     output.Texcoord = input.Texcoord;
     output.Tangent = input.Tangent;
     output.Bitangent = input.Bitangent;
@@ -1258,18 +1263,28 @@ VS_OUTPUT VS_Shadow( VS_INPUT input )
 {
     VS_OUTPUT output;
     output.Position = GM_ToFloat4(input.Position);
+
+    if (GM_UseAnimation == GM_SkeletalAnimation)
+    {
+        matrix boneTransform = GM_Bones[input.BoneIDs[0]] * input.Weights[0];
+        boneTransform += GM_Bones[input.BoneIDs[1]] * input.Weights[1];
+        boneTransform += GM_Bones[input.BoneIDs[2]] * input.Weights[2];
+        boneTransform += GM_Bones[input.BoneIDs[3]] * input.Weights[3];
+        output.Position = mul(output.Position, boneTransform);
+    }
+    else if (GM_UseAnimation == GM_AffineAnimation)
+    {
+        // 将仿射变换的值放到第1个Bones矩阵中
+        output.Position = mul(output.Position, GM_Bones[0]);
+    }
+    else
+    {
+    }
+    
     output.Position = mul(output.Position, GM_WorldMatrix);
     output.WorldPos = output.Position;
-    
     output.Position = mul(output.Position, GM_ShadowInfo.ShadowMatrix[GM_ShadowInfo.CurrentCascadeLevel]);
 
-    output.Normal = input.Normal;
-    output.Texcoord = input.Texcoord;
-    output.Tangent = input.Tangent;
-    output.Bitangent = input.Bitangent;
-    output.Lightmap = input.Lightmap;
-    output.Color = input.Color;
-    output.Z = output.Position.z;
     return output;
 }
 

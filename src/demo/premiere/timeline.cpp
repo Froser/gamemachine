@@ -907,11 +907,11 @@ void Timeline::parseActions(GMXMLElement* e)
 						action.runType = Action::Immediate; // 插值动作的添加是立即的
 
 						if (assetType == AssetType::Camera)
-							interpolateCamera(e, action, endTime);
+							interpolateCamera(e, endTime);
 						else if (assetType == AssetType::Light)
-							interpolateLight(e, action, static_cast<ILight*>(targetObject), endTime);
+							interpolateLight(e, static_cast<ILight*>(targetObject), endTime);
 						else if (assetType == AssetType::GameObject)
-							interpolateObject(e, action, static_cast<GMGameObject*>(targetObject), endTime);
+							interpolateObject(e, static_cast<GMGameObject*>(targetObject), endTime);
 					}
 					else
 					{

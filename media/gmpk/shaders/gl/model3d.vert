@@ -9,7 +9,6 @@ void model3d_calcCoords()
         boneTransform += GM_Bones[boneIDs[2]] * weights[2];
         boneTransform += GM_Bones[boneIDs[3]] * weights[3];
         position = boneTransform * position;
-        normal = boneTransform * vec4(normal.xyz, 0);
     }
     else if (GM_UseAnimation == GM_AffineAnimation)
     {

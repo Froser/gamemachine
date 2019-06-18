@@ -1408,6 +1408,16 @@ void GMDx11Technique_3D_Shadow::beginModel(GMModel* model, const GMGameObject* p
 		shaderProgram->setMatrix4(VI(InverseTransposeModelMatrix), Identity<GMMat4>());
 	}
 
+	// 骨骼动画
+	GMAnimationType at = parent->getAnimationType();
+	shaderProgram->setInt(VI(UseAnimation), static_cast<GMint32>(at));
+	if (parent && parent->getAnimationType() != GMAnimationType::NoAnimation)
+	{
+		if (at == GMAnimationType::SkeletalAnimation)
+			updateBoneTransforms(shaderProgram, model);
+		else
+			updateNodeTransforms(shaderProgram, model);
+	}
 	prepareShadow(true);
 }
 
