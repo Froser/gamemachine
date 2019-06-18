@@ -3,10 +3,10 @@
 #include <gmcommon.h>
 BEGIN_NS
 
-struct IInterpolationFloat { virtual GMfloat interpolate(GMfloat, GMfloat, GMfloat) = 0; };
-struct IInterpolationVec3 { virtual GMVec3 interpolate(GMVec3, GMVec3, GMfloat) = 0; };
-struct IInterpolationVec4 { virtual GMVec4 interpolate(GMVec4, GMVec4, GMfloat) = 0; };
-struct IInterpolationQuat { virtual GMQuat interpolate(GMQuat, GMQuat, GMfloat) = 0; };
+struct IInterpolationFloat { virtual GMfloat interpolate(const GMfloat&, const GMfloat&, GMfloat) = 0; };
+struct IInterpolationVec3 { virtual GMVec3 interpolate(const GMVec3&, const GMVec3&, GMfloat) = 0; };
+struct IInterpolationVec4 { virtual GMVec4 interpolate(const GMVec4&, const GMVec4&, GMfloat) = 0; };
+struct IInterpolationQuat { virtual GMQuat interpolate(const GMQuat&, const GMQuat&, GMfloat) = 0; };
 
 template <typename T>
 struct ProperInterpolationInterface_;
@@ -52,7 +52,7 @@ struct GM_EXPORT GMInterpolationFunctors
 template <typename T>
 struct GMLerpFunctor : ProperInterpolationInterface<T>
 {
-	T interpolate(T p0, T p1, GMfloat percentage)
+	T interpolate(const T& p0, const T& p1, GMfloat percentage)
 	{
 		return Lerp(p0, p1, percentage);
 	}
@@ -61,7 +61,7 @@ struct GMLerpFunctor : ProperInterpolationInterface<T>
 template <typename T>
 struct GMCubicBezierFunctor : ProperInterpolationInterface<T>
 {
-	GMCubicBezierFunctor(GMVec2 cp0, GMVec2 cp1, GMint32 slice = 60)
+	GMCubicBezierFunctor(const GMVec2& cp0, const GMVec2& cp1, GMint32 slice = 60)
 	{
 		GM_ASSERT(0 <= cp0.getX() && cp0.getX() <= 1);
 		GM_ASSERT(0 <= cp1.getX() && cp1.getX() <= 1);
@@ -85,7 +85,7 @@ struct GMCubicBezierFunctor : ProperInterpolationInterface<T>
 		m_interpolations[slice] = GMVec2(1, 1);
 	}
 
-	T interpolate(T p0, T p1, GMfloat percentage)
+	T interpolate(const T& p0, const T& p1, GMfloat percentage)
 	{
 		// 根据二分法查找percentage所在的曲线的最近的两个点，并进行插值
 		GMVec2 a, b;

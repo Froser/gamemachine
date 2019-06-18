@@ -16,7 +16,7 @@ GM_ALIGNED_16(class) FontColorAnimationKeyframe : public GMAnimationKeyframe
 	GM_DECLARE_ALIGNED_ALLOCATOR()
 
 public:
-	FontColorAnimationKeyframe(GMTextGameObject* textObject, GMVec4 color, GMfloat timePoint);
+	FontColorAnimationKeyframe(GMTextGameObject* textObject, const GMVec4& color, GMfloat timePoint);
 
 public:
 	virtual void reset(IDestroyObject* object) override;

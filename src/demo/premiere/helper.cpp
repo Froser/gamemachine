@@ -13,7 +13,7 @@ GMRect Helper::getMiddleRectOfWindow(const GMRect& rc, IWindow* window)
 	return result;
 }
 
-FontColorAnimationKeyframe::FontColorAnimationKeyframe(GMTextGameObject* textObject, GMVec4 color, GMfloat timePoint)
+FontColorAnimationKeyframe::FontColorAnimationKeyframe(GMTextGameObject* textObject, const GMVec4& color, GMfloat timePoint)
 	: GMAnimationKeyframe(timePoint)
 	, m_textObject(textObject)
 	, m_timeStart(0)

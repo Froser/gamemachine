@@ -96,14 +96,14 @@ GMAnimation& AnimationContainer::currentEditingAnimation()
 void AnimationContainer::nextEditAnimation()
 {
 	++m_editingAnimationIndex;
-	if (m_animations.size() >= m_editingAnimationIndex)
+	if (gm_sizet_to_int(m_animations.size()) >= m_editingAnimationIndex)
 		newAnimation();
 }
 
 void AnimationContainer::nextPlayingAnimation()
 {
 	++m_playingAnimationIndex;
-	if (m_animations.size() >= m_playingAnimationIndex)
+	if (gm_sizet_to_int(m_animations.size()) >= m_playingAnimationIndex)
 		newAnimation();
 }
 
