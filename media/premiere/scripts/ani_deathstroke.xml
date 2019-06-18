@@ -1,26 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <timeline>
     <objects>
-        <light id="light_deathstroke" type="point" position="20 20 -20" direction="1 1 -1" ambient="0 0 0" diffuse="0 0 0" />
+        <light id="light_deathstroke" type="point" position="50 50 -100" focus="0 0 0" ambient="0 0 0" diffuse="0 0 0" />
+
+        <terrain
+            id="obj_metalplate"
+            terrainX="-500"
+            terrainZ="-500"
+            width="1000"
+            height="1000"
+            heightScaling="50"
+            slice="100 100"
+            textureSize="100 100"
+            ambient="tex_metalplate_diffuse"
+            diffuse="tex_metalplate_diffuse"
+            normal="tex_metalplate_normal"
+            ka=".4 .4 .4"
+            kd=".5 .5 .5"
+            ks=".2 .2 .2"
+            translate="0 0 0"
+        />
     </objects>
     <actions>
+        <action type="shadow" cascades="1" position="50 50 -100" focus="0 0 0" width="1024" height="768" view="perspective" fovy="45" near=".1f" far="1600" bias="0.00000825" time="+0"/>
         <action type="camera" direction="0 0 1" position="0 30 0" time="+0"/>
         <action type="addObject" object="obj_metalplate" time="+0"/>
         <action type="addObject" object="light_deathstroke" time="+0" />
         <action type="addObject" object="obj_deathstroke" time="+0"/>
 
         <action type="animate" action="play" object="light_deathstroke" time="+0"/>
-        <action type="animate" function="linear" object="light_deathstroke" ambient="1 1 1" diffuse="2 2 2" specular="1.5 1.5 1.5" endtime="6"/>
+        <action type="animate" function="linear" object="light_deathstroke" ambient="1 1 1" diffuse="3 3 3" specular="2 2 2" endtime="6"/>
         <action type="animate" action="stop" object="light_deathstroke" time="+6"/>
 
         <action type="animate" action="play" object="$camera" time="-6"/>
-        <action type="animate" function="cubic-bezier" control="0 .75 .75 1" object="$camera" direction="0 0 1" position="0 20 -35" endtime="16"/>
+        <action type="animate" function="cubic-bezier" control="0 .75 .75 1" object="$camera" direction="0 0 1" position="0 20 -100" endtime="16"/>
         <action type="animate" action="stop" object="$camera" time="+10"/>
 
-<!--
-        <action type="animate" action="play" object="obj_deathstroke" time="-10"/>
-        <action type="animate" action="lerp" object="obj_deathstroke" translate="0 0 30" />
-        <action type="animate" action="stop" object="obj_deathstroke" time="0"/>
-    -->
+        <action type="animate" action="play" object="obj_deathstroke" time="-16"/>
+        <action type="animate" action="lerp" object="obj_deathstroke" translate="0 0 -115" endtime="16" />
+        <action type="animate" action="stop" object="obj_deathstroke" time="+0"/>
+
+        <action type="animate" action="play" object="light_deathstroke" time="-6"/>
+        <action type="animate" function="linear" object="light_deathstroke" ambient="0 0 0" diffuse="0 0 0" specular="0" endtime="3"/>
+        <action type="animate" action="stop" object="light_deathstroke" time="-3"/>
+        <action type="removeObject" object="light_deathstroke" time="+0" />
     </actions>
 </timeline>

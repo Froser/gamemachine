@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <timeline>
     <assets>
+        <audio id="audio_bgm" file="Thomas Greenberg - Curly Wurly.mp3" />
         <cubemap
             id="tex_sky"
             left="sky/sky_left.jpg"
@@ -30,8 +31,6 @@
         <object id="model_deathstroke" file="deathstroke/deathstroke.fbx" />
     </assets>
     <objects>
-        <light id="light_spotlight" type="spotlight" position="-30 12 -5" direction="0 0 1" ambient="4 4 4" diffuse="4 4 4" cutoff="55"/>
-        <light id="light_global" type="point" position="20 20 -20" ambient="0 0 0" diffuse="0 0 0" />
         <cubemap id="obj_sky" asset="tex_sky" scale="1500 1500 1500" translate="0 10 0" />
         <object id="obj_dragon" asset="model_dragon" scale="1.2 1.2 1.2" ks=".5 .5 .5" />
         <object id="obj_logo" asset="model_logo" scale="5 5 5" />
@@ -53,34 +52,16 @@
             ks=".1 .1 .1"
             translate="0 -15 0"
         />
-        <terrain
-            id="obj_metalplate"
-            terrainX="-500"
-            terrainZ="-500"
-            width="1000"
-            height="1000"
-            heightScaling="50"
-            slice="100 100"
-            textureSize="100 100"
-            ambient="tex_metalplate_diffuse"
-            diffuse="tex_metalplate_diffuse"
-            normal="tex_metalplate_normal"
-            ka=".4 .4 .4"
-            kd=".5 .5 .5"
-            ks=".1 .1 .1"
-            translate="0 -15 0"
-        />
         <object id="obj_deathstroke" asset="model_deathstroke" scale="8 8 8" rotate="0 1 0 180"/>
+        <source id="src_bgm" asset="audio_bgm"/>
     </objects>
     <actions>
+        <action type="play" object="src_bgm" />
         <action type="camera" view="perspective" fovy="60" near=".1f" far="3200" />
         <action type="camera" direction="0 0 1" position="0 0 -30" />
 
-<!--
         <include file="ani_logo.xml" />
         <include file="ani_dragon.xml" />
--->
-
         <include file="ani_deathstroke.xml" />
 
 

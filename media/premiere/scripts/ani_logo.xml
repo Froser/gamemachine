@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <timeline>
+    <objects>
+        <light id="light_logo_spotlight" type="spotlight" position="-30 12 -5" direction="0 0 1" ambient="4 4 4" diffuse="4 4 4" cutoff="55"/>
+    </objects>
     <actions>
-        <action type="addObject" object="light_spotlight"/>
+        <action type="addObject" object="light_logo_spotlight"/>
         <action type="addObject" object="obj_logo" />
         
-        <action type="animate" action="play" object="light_spotlight" time="+0"/>
-        <action type="animate" function="linear" object="light_spotlight" position="30 12 -5" endtime="8" />
-        <action type="animate" action="stop" object="light_spotlight" time="+8" />
+        <action type="animate" action="play" object="light_logo_spotlight" time="+0"/>
+        <action type="animate" function="linear" object="light_logo_spotlight" position="30 12 -5" endtime="8" />
+        <action type="animate" action="stop" object="light_logo_spotlight" time="+8" />
 
         <action type="animate" action="play" object="$camera" time="-8" />
         <action type="animate" function="cubic-bezier" control=".9 .3 .9 .7" object="$camera" direction="0.1 0 1" position="0 0 5" endtime="8"/>
         <action type="animate" action="stop" object="$camera" time="+0"/>
+        <action type="removeObject" object="light_logo_spotlight" time="+0" />
     </actions>
 </timeline>
