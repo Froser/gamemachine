@@ -44,6 +44,24 @@ extern "C"
 		src->bytes_in_buffer = nbytes;
 		src->next_input_byte = (JOCTET*)buffer;
 	}
+
+	const char* getTempDirectoryName()
+	{
+#if GM_WINDOWS
+		static char s_tempPath[MAX_PATH + 1] = { 0 };
+		if (!s_tempPath[0])
+			GetTempPathA(MAX_PATH, s_tempPath);
+		return s_tempPath;
+#else
+		return nullptr;
+#endif
+	}
+}
+
+GMImageReader_JPG::GMImageReader_JPG()
+{
+	// 设置回调
+	jpeg_set_temp_directory_name_ptr(getTempDirectoryName);
 }
 
 bool GMImageReader_JPG::load(const GMbyte* data, GMsize_t size, OUT GMImage** image)

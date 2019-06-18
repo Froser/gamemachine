@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<timeline>
+    <actions>
+        <action type="removeObject" object="light_spotlight" time="+0" />
+        <action type="removeObject" object="obj_logo" time="+0" />
+        <action type="addObject" object="light_global" time="+0" />
+        <action type="addObject" object="obj_mud" time="+0"/>
+        <action type="addObject" object="obj_dragon" time="+0"/>
+        <action type="addObject" object="obj_sky" time="+0"/>
+        <action type="shadow" cascades="1" position="30 30 -30" focus="0 0 0" width="1024" height="768" view="perspective" fovy="45" near=".1f" far="1600" bias="0.000125" time="+0"/>
+        <action type="camera" focus="0 0 0" position="0 30 -30" time="+0"/>
+
+        <action type="animate" action="play" object="light_global" time="+0"/>
+        <action type="animate" function="linear" object="light_global" ambient="1 1 1" diffuse=".7 .7 .7" endtime="3"/>
+        <action type="animate" action="stop" object="light_global" time="+3"/>
+
+        <action type="animate" action="play" object="$camera" time="-3"/>
+        <action type="animate" function="cubic-bezier" control=".6 0 .4 1" object="$camera" focus="0 0 0" position="30 30 0" endtime="3"/>
+        <action type="animate" function="cubic-bezier" control=".6 0 .4 1" object="$camera" focus="0 0 0" position="0 30 30" endtime="6"/>
+        <action type="animate" function="cubic-bezier" control=".6 0 .4 1" object="$camera" focus="0 0 0" position="-40 10 0" endtime="9"/>
+        <action type="animate" function="cubic-bezier" control=".6 0 .4 1" object="$camera" focus="0 0 0" position="0 40 -30" endtime="11"/>
+        <action type="animate" action="stop" object="$camera" time="+8"/>
+
+        <action type="animate" action="play" object="light_global" time="-4"/>
+        <action type="animate" function="linear" object="light_global" ambient="0 0 0" diffuse="0 0 0" specular="0" endtime="5"/>
+        <action type="animate" action="stop" object="light_global" time="+1"/>
+
+        <action type="removeObject" object="light_global" time="+0" />
+        <action type="removeObject" object="obj_mud" time="+0" />
+        <action type="removeObject" object="obj_dragon" time="+0" />
+        <action type="attribute" object="obj_sky" visible="false" time="+0"/>
+    </actions>
+</timeline>

@@ -41,6 +41,11 @@ inline bool operator<(const Action& lhs, const Action& rhs) GM_NOEXCEPT
 	return lhs.timePoint < rhs.timePoint;
 }
 
+struct PBR
+{
+	GMTextureAsset albedo, metallicRoughnessAO, normal;
+};
+
 class AnimationContainer
 {
 public:
@@ -81,15 +86,18 @@ private:
 	void parseAssets(GMXMLElement*);
 	void parseObjects(GMXMLElement*);
 	void parseActions(GMXMLElement*);
+	void parseInclude(GMXMLElement*);
 	GMint32 parseCameraAction(GMXMLElement*, REF CameraParams& cp, REF GMCameraLookAt& lookAt);
 
 private:
-	void interpolateCamera(GMXMLElement*, Action&, GMfloat);
-	void interpolateLight(GMXMLElement*, Action&, ILight*, GMfloat);
+	void interpolateCamera(GMXMLElement*, GMfloat);
+	void interpolateLight(GMXMLElement*, ILight*, GMfloat);
+	void interpolateObject(GMXMLElement*, GMGameObject*, GMfloat);
 	AnimationContainer& getAnimationFromObject(AssetType, void*);
 
 private:
 	GMAsset findAsset(const GMString& assetName);
+	const PBR* findPBR(const GMString& assetName);
 	GMBuffer findBuffer(const GMString& bufferName);
 	void parseTransform(GMGameObject*, GMXMLElement*);
 	void parseTextures(GMGameObject*, GMXMLElement*);
@@ -113,6 +121,7 @@ private:
 	GMGameWorld* m_world;
 	HashMap<GMString, GMBuffer, GMStringHashFunctor> m_buffers;
 	HashMap<GMString, GMAsset, GMStringHashFunctor> m_assets;
+	HashMap<GMString, PBR, GMStringHashFunctor> m_pbrs;
 	HashMap<GMString, GMGameObject*, GMStringHashFunctor> m_objects;
 	HashMap<GMString, ILight*, GMStringHashFunctor> m_lights;
 	HashMap<GMString, IAudioFile*, GMStringHashFunctor> m_audioFiles;

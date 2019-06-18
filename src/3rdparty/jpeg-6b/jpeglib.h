@@ -1093,4 +1093,7 @@ struct jpeg_color_quantizer { long dummy; };
 #include "jerror.h"		/* fetch error codes too */
 #endif
 
+typedef const char* (*jpeg_get_temp_directory_name)();
+EXTERN(void) jpeg_set_temp_directory_name_ptr(jpeg_get_temp_directory_name);
+
 #endif /* JPEGLIB_H */

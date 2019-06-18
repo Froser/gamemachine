@@ -10,10 +10,22 @@
             front="sky/sky_front.jpg"
             back="sky/sky_back.jpg"
         />
-        <texture id="mud_d" file="mud/albedo.jpg" />
-        <texture id="mud_n" file="mud/normal.jpg" />
+        <texture id="tex_mud_diffuse" file="mud/albedo.jpg" />
+        <texture id="tex_mud_normal" file="mud/normal.jpg" />
+        <texture id="tex_metalplate_diffuse" file="metalplate/Metal_Plate_basecolor.jpg" />
+        <texture id="tex_metalplate_normal" file="metalplate/Metal_Plate_normal.jpg" />
+
+        <!--<pbr
+            id="pbr_metal_plate"
+            albedo="metalplate/Metal_Plate_basecolor.jpg"
+            metallic="metalplate/Metal_Plate_metallic.jpg"
+            roughness="metalplate/Metal_Plate_roughness.jpg"
+            ao="metalplate/Metal_Plate_ambientOcclusion.jpg"
+            normal="metalplate/Metal_Plate_normal.jpg"
+        />-->
+
         <buffer id="mud_terrain" file="textures/mud/terrain.png" />
-        <object id="model_dragon" file="dragon/dragon.obj" />
+        <object id="model_dragon" file="cat/cat.obj" />
         <object id="model_logo" file="logo/logo.fbx" />
         <object id="model_deathstroke" file="deathstroke/deathstroke.fbx" />
     </assets>
@@ -24,7 +36,7 @@
         <object id="obj_dragon" asset="model_dragon" scale="1.2 1.2 1.2" ks=".5 .5 .5" />
         <object id="obj_logo" asset="model_logo" scale="5 5 5" />
         <terrain
-            id="obj_ground"
+            id="obj_mud"
             terrainX="-500"
             terrainZ="-500"
             width="1000"
@@ -33,64 +45,44 @@
             slice="100 100"
             textureSize="100 100"
             terrain="mud_terrain"
-            ambient="mud_d"
-            diffuse="mud_d"
-            normal="mud_n"
+            ambient="tex_mud_diffuse"
+            diffuse="tex_mud_diffuse"
+            normal="tex_mud_normal"
             ka=".4 .4 .4"
             kd=".5 .5 .5"
             ks=".1 .1 .1"
             translate="0 -15 0"
         />
-        <object id="obj_deathstroke" asset="model_deathstroke" scale="4 4 4" rotate="0 1 0 180"/>
+        <terrain
+            id="obj_metalplate"
+            terrainX="-500"
+            terrainZ="-500"
+            width="1000"
+            height="1000"
+            heightScaling="50"
+            slice="100 100"
+            textureSize="100 100"
+            ambient="tex_metalplate_diffuse"
+            diffuse="tex_metalplate_diffuse"
+            normal="tex_metalplate_normal"
+            ka=".4 .4 .4"
+            kd=".5 .5 .5"
+            ks=".1 .1 .1"
+            translate="0 -15 0"
+        />
+        <object id="obj_deathstroke" asset="model_deathstroke" scale="8 8 8" rotate="0 1 0 180"/>
     </objects>
     <actions>
         <action type="camera" view="perspective" fovy="60" near=".1f" far="3200" />
         <action type="camera" direction="0 0 1" position="0 0 -30" />
 
-        <action type="addObject" object="light_spotlight"/>
-        <action type="addObject" object="obj_logo" />
-        
-        <action type="animate" action="play" object="light_spotlight" />
-        <action type="animate" function="linear" object="light_spotlight" position="30 12 -5" endtime="8" />
-        <action type="animate" action="stop" object="light_spotlight" time="+8" />
+<!--
+        <include file="ani_logo.xml" />
+        <include file="ani_dragon.xml" />
+-->
 
-        <action type="animate" action="play" object="$camera" />
-        <action type="animate" function="cubic-bezier" control=".9 .3 .9 .7" object="$camera" direction="0.1 0 1" position="0 0 5" endtime="8"/>
-        <action type="animate" action="stop" object="$camera" time="8"/>
+        <include file="ani_deathstroke.xml" />
 
-        <action type="removeObject" object="light_spotlight" time="+0" />
-        <action type="removeObject" object="obj_logo" time="+0" />
-        <action type="addObject" object="light_global" time="+0" />
-        <action type="addObject" object="obj_ground" time="+0"/>
-        <action type="addObject" object="obj_dragon" time="+0"/>
-        <action type="addObject" object="obj_sky" time="+0"/>
-        <action type="shadow" cascades="1" position="30 30 -30" focus="0 0 0" width="1024" height="768" view="perspective" fovy="45" near=".1f" far="1600" bias="0.000125" time="+0"/>
-        <action type="camera" focus="0 0 0" position="0 30 -30" time="+0"/>
 
-        <action type="animate" action="play" object="light_global" time="+0"/>
-        <action type="animate" function="linear" object="light_global" ambient="1 1 1" diffuse=".7 .7 .7" endtime="3"/>
-        <action type="animate" action="stop" object="light_global" time="+3"/>
-
-        <action type="animate" action="play" object="$camera" time="-3"/>
-        <action type="animate" function="cubic-bezier" control=".6 0 .4 1" object="$camera" focus="0 0 0" position="30 30 0" endtime="3"/>
-        <action type="animate" function="cubic-bezier" control=".6 0 .4 1" object="$camera" focus="0 0 0" position="0 30 30" endtime="6"/>
-        <action type="animate" function="cubic-bezier" control=".6 0 .4 1" object="$camera" focus="0 0 0" position="-40 10 0" endtime="9"/>
-        <action type="animate" function="cubic-bezier" control=".6 0 .4 1" object="$camera" focus="0 0 0" position="0 40 -30" endtime="11"/>
-        <action type="animate" action="stop" object="$camera" time="+8"/>
-
-        <action type="animate" action="play" object="light_global" time="-4"/>
-        <action type="animate" function="linear" object="light_global" ambient="0 0 0" diffuse="0 0 0" specular="0" endtime="5"/>
-        <action type="animate" action="stop" object="light_global" time="+1"/>
-
-        <action type="removeObject" object="light_global" time="+0" />
-        <action type="removeObject" object="obj_ground" time="+0" />
-        <action type="removeObject" object="obj_dragon" time="+0" />
-        <action type="attribute" object="obj_sky" visible="false" time="+0"/>
-
-        <action type="addObject" object="light_global" time="+0" />
-        <action type="animate" action="play" object="light_global" time="+0"/>
-        <action type="animate" function="linear" object="light_global" ambient="1 1 1" diffuse=".7 .7 .7" endtime="3"/>
-        <action type="animate" action="stop" object="light_global" time="+3"/>
-        <action type="addObject" object="obj_deathstroke" time="+0"/>
     </actions>
 </timeline>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<timeline>
+    <objects>
+        <light id="light_deathstroke" type="point" position="20 20 -20" direction="1 1 -1" ambient="0 0 0" diffuse="0 0 0" />
+    </objects>
+    <actions>
+        <action type="camera" direction="0 0 1" position="0 30 0" time="+0"/>
+        <action type="addObject" object="obj_metalplate" time="+0"/>
+        <action type="addObject" object="light_deathstroke" time="+0" />
+        <action type="addObject" object="obj_deathstroke" time="+0"/>
+
+        <action type="animate" action="play" object="light_deathstroke" time="+0"/>
+        <action type="animate" function="linear" object="light_deathstroke" ambient="1 1 1" diffuse="2 2 2" specular="1.5 1.5 1.5" endtime="6"/>
+        <action type="animate" action="stop" object="light_deathstroke" time="+6"/>
+
+        <action type="animate" action="play" object="$camera" time="-6"/>
+        <action type="animate" function="cubic-bezier" control="0 .75 .75 1" object="$camera" direction="0 0 1" position="0 20 -35" endtime="16"/>
+        <action type="animate" action="stop" object="$camera" time="+10"/>
+
+<!--
+        <action type="animate" action="play" object="obj_deathstroke" time="-10"/>
+        <action type="animate" action="lerp" object="obj_deathstroke" translate="0 0 30" />
+        <action type="animate" action="stop" object="obj_deathstroke" time="0"/>
+    -->
+    </actions>
+</timeline>

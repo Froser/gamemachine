@@ -278,6 +278,34 @@ void Timeline::parseAssets(GMXMLElement* e)
 				m_assets[id] = asset;
 			}
 		}
+		else if (name == L"pbr")
+		{
+			GMString albedo = e->Attribute("albedo");
+			GMString metallic = e->Attribute("metallic");
+			GMString roughness = e->Attribute("roughness");
+			GMString ao = e->Attribute("ao");
+			GMString normal = e->Attribute("normal");
+			PBR pbr;
+			bool b = GMToolUtil::createPBRTextures(
+				m_context,
+				albedo,
+				metallic,
+				roughness,
+				ao,
+				normal,
+				pbr.albedo,
+				pbr.metallicRoughnessAO,
+				pbr.normal
+			);
+			if (!b)
+			{
+				gm_warning(gm_dbg_wrap("Create PBR texture failed: {0}"), id);
+			}
+			else
+			{
+				m_pbrs[id] = pbr;
+			}
+		}
 		else if (name == L"object")
 		{
 			GMString file = e->Attribute("file");
@@ -495,15 +523,33 @@ void Timeline::parseObjects(GMXMLElement* e)
 
 				GMPrimitiveCreator::createTerrain(desc, scene);
 				imgMap->destroy();
-				GMGameObject* obj = m_objects[id] = new GMGameObject(scene);
-				parseTextures(obj, e);
-				parseMaterial(obj, e);
-				parseTransform(obj, e);
 			}
 			else
 			{
-				gm_warning(gm_dbg_wrap("Create terrain error. Id: {0}"), id);
+				GMTerrainDescription desc = {
+					nullptr,
+					0,
+					0,
+					0,
+					terrainX,
+					terrainZ,
+					width,
+					height,
+					heightScaling,
+					(GMsize_t)sliceX,
+					(GMsize_t)sliceY,
+					texLen,
+					texHeight,
+					false
+				};
+
+				GMPrimitiveCreator::createTerrain(desc, scene);
 			}
+
+			GMGameObject* obj = m_objects[id] = new GMGameObject(scene);
+			parseTextures(obj, e);
+			parseMaterial(obj, e);
+			parseTransform(obj, e);
 		}
 		else if (name == L"source")
 		{
@@ -535,7 +581,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 	}
 }
 
-void Timeline::interpolateCamera(GMXMLElement* e, Action& action, GMfloat timePoint)
+void Timeline::interpolateCamera(GMXMLElement* e, GMfloat timePoint)
 {
 	GMint32 component = NoCameraComponent;
 	GMVec3 pos, dir, focus;
@@ -609,7 +655,7 @@ void Timeline::interpolateCamera(GMXMLElement* e, Action& action, GMfloat timePo
 	}
 }
 
-void Timeline::interpolateLight(GMXMLElement* e, Action& action, ILight* light, GMfloat timePoint)
+void Timeline::interpolateLight(GMXMLElement* e, ILight* light, GMfloat timePoint)
 {
 	GMint32 component = GMLightKeyframeComponent::NoComponent;
 	GMVec3 position, ambient, diffuse;
@@ -682,6 +728,38 @@ void Timeline::interpolateLight(GMXMLElement* e, Action& action, ILight* light, 
 	}
 }
 
+void Timeline::interpolateObject(GMXMLElement* e, GMGameObject* obj, GMfloat)
+{
+	/*
+	GMFloat4 translation4;
+	GetTranslationFromMatrix(obj->getTranslation(), translation4);
+
+	GMFloat4 scale4;
+	GetScalingFromMatrix(obj->getTranslation(), translation4);
+
+	GMVec4 translate, scale;
+	translate.setFloat4(translation4);
+
+	GMString str = e->Attribute("translate");
+	if (!str.isEmpty())
+	{
+		GMScanner scanner(str);
+		GMfloat x, y, z;
+		scanner.nextFloat(x);
+		scanner.nextFloat(y);
+		scanner.nextFloat(z);
+		translate = GMVec4(x, y, z, 1);
+	}
+
+	GMInterpolationFunctors f;
+	CurveType curve = parseCurve(e, f);
+	AnimationContainer& animationContainer = m_animations[GameObject][obj];
+	GMAnimation& animation = animationContainer.currentEditingAnimation();
+	animation.setTargetObjects(obj);
+	GMAnimationKeyframe* keyframe = new GMGameObjectKeyframe();
+	*/
+}
+
 AnimationContainer& Timeline::getAnimationFromObject(AssetType at, void* o)
 {
 	if (at == AssetType::NotFound)
@@ -703,7 +781,11 @@ void Timeline::parseActions(GMXMLElement* e)
 	while (e)
 	{
 		GMString name = e->Name();
-		if (name == L"action")
+		if (name == L"include")
+		{
+			parseInclude(e);
+		}
+		else if (name == L"action")
 		{
 			Action action = { Action::Immediate };
 			GMString time = e->Attribute("time");
@@ -828,6 +910,8 @@ void Timeline::parseActions(GMXMLElement* e)
 							interpolateCamera(e, action, endTime);
 						else if (assetType == AssetType::Light)
 							interpolateLight(e, action, static_cast<ILight*>(targetObject), endTime);
+						else if (assetType == AssetType::GameObject)
+							interpolateObject(e, action, static_cast<GMGameObject*>(targetObject), endTime);
 					}
 					else
 					{
@@ -977,6 +1061,30 @@ void Timeline::parseActions(GMXMLElement* e)
 	}
 }
 
+void Timeline::parseInclude(GMXMLElement* e)
+{
+	GMString filename = e->Attribute("file");
+	if (filename.isEmpty())
+	{
+		gm_warning(gm_dbg_wrap("Include file name cannot be empty."));
+	}
+	else
+	{
+		GMBuffer buffer;
+		GM.getGamePackageManager()->readFile(GMPackageIndex::Scripts, filename, &buffer);
+		if (buffer.getSize() > 0)
+		{
+			buffer.convertToStringBuffer();
+			GMString content((const char*)buffer.getData());
+			parse(content);
+		}
+		else
+		{
+			gm_warning(gm_dbg_wrap("File is empty with filename: {0}"), filename);
+		}
+	}
+}
+
 GMint32 Timeline::parseCameraAction(GMXMLElement* e, CameraParams& cp, GMCameraLookAt& lookAt)
 {
 	GMint32 component = NoCameraComponent;
@@ -1085,6 +1193,15 @@ GMAsset Timeline::findAsset(const GMString& assetName)
 		return assetIter->second;
 
 	return GMAsset::invalidAsset();
+}
+
+const PBR* Timeline::findPBR(const GMString& assetName)
+{
+	auto pbrIter = m_pbrs.find(assetName);
+	if (pbrIter != m_pbrs.end())
+		return &pbrIter->second;
+
+	return nullptr;
 }
 
 GMBuffer Timeline::findBuffer(const GMString& bufferName)
@@ -1202,18 +1319,23 @@ void Timeline::parseTextures(GMGameObject* o, GMXMLElement* e)
 	}
 
 	{
-		GMString tex = e->Attribute("albedo");
-		if (!tex.isEmpty())
+		GMString pbrStr = e->Attribute("pbr");
+		if (!pbrStr.isEmpty())
 		{
-			GMAsset asset = findAsset(tex);
-			if (!asset.isEmpty() && asset.isTexture())
-				GMToolUtil::addTextureToShader(shader, asset, GMTextureType::Albedo);
+			const PBR* pbr = findPBR(pbrStr);
+			if (pbr)
+			{
+				shader.setIlluminationModel(gm::GMIlluminationModel::CookTorranceBRDF);
+				gm::GMToolUtil::addTextureToShader(shader, pbr->albedo, gm::GMTextureType::Albedo);
+				gm::GMToolUtil::addTextureToShader(shader, pbr->normal, gm::GMTextureType::NormalMap);
+				gm::GMToolUtil::addTextureToShader(shader, pbr->metallicRoughnessAO, gm::GMTextureType::MetallicRoughnessAO);
+			}
 			else
-				gm_warning(gm_dbg_wrap("Cannot find texture asset: {0}"), tex);
+			{
+				gm_warning(gm_dbg_wrap("Cannot find pbr assets: {0}"), pbrStr);
+			}
 		}
 	}
-
-	//TODO AO, etc
 }
 
 void Timeline::parseMaterial(GMGameObject* o, GMXMLElement* e)

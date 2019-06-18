@@ -122,11 +122,26 @@ select_file_name (char * fname)
 #define TEMP_FILE_NAME  "%sJPG%dXXXXXX"
 #endif
 
+jpeg_get_temp_directory_name jpeg_get_temp_directory_name_ptr;
+GLOBAL(void) jpeg_set_temp_directory_name_ptr(jpeg_get_temp_directory_name ptr)
+{
+	jpeg_get_temp_directory_name_ptr = ptr;
+}
+
 LOCAL(void)
 select_file_name (char * fname)
 {
   next_file_num++;		/* advance counter */
-  sprintf(fname, TEMP_FILE_NAME, TEMP_DIRECTORY, next_file_num);
+  if (jpeg_get_temp_directory_name_ptr) {
+    char* c = jpeg_get_temp_directory_name_ptr();
+    if (c)
+      sprintf(fname, TEMP_FILE_NAME, c, next_file_num);
+    else
+      sprintf(fname, TEMP_FILE_NAME, TEMP_DIRECTORY, next_file_num);
+  }
+  else {
+    sprintf(fname, TEMP_FILE_NAME, TEMP_DIRECTORY, next_file_num);
+  }
   mktemp(fname);		/* make sure file name is unique */
   /* mktemp replaces the trailing XXXXXX with a unique string of characters */
 }
