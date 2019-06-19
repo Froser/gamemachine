@@ -597,7 +597,6 @@ void DemonstrationWorld::initObjects()
 			d->logoObj->setTranslation(Translate(GMVec3(0, -.2f, 0)));
 
 			// 创建动画
-			GMFloat4 t4, s4;
 			GMVec4 t, s;
 			d->logoAnimation.setTargetObjects(d->logoObj);
 			d->logoAnimation.addKeyFrame(new gm::GMGameObjectKeyframe(

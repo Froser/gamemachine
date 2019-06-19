@@ -22,7 +22,7 @@
         />
     </objects>
     <actions>
-        <action type="shadow" cascades="1" position="50 50 -100" focus="0 0 0" width="1024" height="768" view="perspective" fovy="45" near=".1f" far="1600" bias="0.00000825" time="+0"/>
+        <action type="shadow" cascades="1" position="75 100 -150" focus="0 0 -50" width="1024" height="768" view="perspective" fovy="45" near=".1f" far="1600" bias="0.00000825" time="+0"/>
         <action type="camera" direction="0 0 1" position="0 30 0" time="+0"/>
         <action type="addObject" object="obj_metalplate" time="+0"/>
         <action type="addObject" object="light_deathstroke" time="+0" />

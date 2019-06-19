@@ -337,8 +337,20 @@ void GMParticleSystem::createCocos2DParticleSystem(
 		GM.getGamePackageManager()->readFile(GMPackageIndex::Particle, filename, &buf);
 		buf.convertToStringBuffer();
 
+		createCocos2DParticleSystem(buf, modelType, particleSystem, descriptionCallback);
+	}
+}
+
+void GMParticleSystem::createCocos2DParticleSystem(
+	const GMBuffer& buffer,
+	GMParticleModelType modelType,
+	OUT GMParticleSystem** particleSystem,
+	std::function<void(GMParticleDescription&)> descriptionCallback /*= std::function<void(GMParticleDescription&)>() */)
+{
+	if (particleSystem)
+	{
 		*particleSystem = new GMParticleSystem();
-		GMParticleDescription description = GMParticleSystem::createParticleDescriptionFromCocos2DPlist(gm::GMString((const char*)buf.getData()), modelType);
+		GMParticleDescription description = GMParticleSystem::createParticleDescriptionFromCocos2DPlist(gm::GMString((const char*)buffer.getData()), modelType);
 		if (descriptionCallback)
 			descriptionCallback(description);
 

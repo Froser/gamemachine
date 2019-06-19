@@ -6,6 +6,7 @@
 #include <gmenums.h>
 #include "gameobjects/gmgameobject.h"
 #include <gmassets.h>
+#include <gmparticle.h>
 
 BEGIN_NS
 
@@ -36,6 +37,7 @@ GM_PRIVATE_OBJECT(GMGameWorld)
 	GMRenderList renderList;
 	GMMutex renderListMutex;
 	GMMutex addObjectMutex;
+	GMOwnedPtr<GMParticleSystemManager> particleSystem;
 };
 
 class GM_EXPORT GMGameWorld : public GMObject
@@ -62,6 +64,7 @@ public:
 	void clearRenderList();
 	void addToRenderList(GMGameObject* object);
 	bool removeFromRenderList(GMGameObject* object);
+	inline GMParticleSystemManager* getParticleSystemManager() { D(d); return d->particleSystem.get(); }
 	inline GMAssets& getAssets() { D(d); return d->assets; }
 
 protected:

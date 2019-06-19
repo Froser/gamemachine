@@ -29,6 +29,8 @@
         <object id="model_dragon" file="cat/cat.obj" />
         <object id="model_logo" file="logo/logo.fbx" />
         <object id="model_deathstroke" file="deathstroke/deathstroke.fbx" />
+
+        <particles id="particle_firework" file="ExplodingRing.plist" />
     </assets>
     <objects>
         <cubemap id="obj_sky" asset="tex_sky" scale="1500 1500 1500" translate="0 10 0" />
@@ -54,16 +56,20 @@
         />
         <object id="obj_deathstroke" asset="model_deathstroke" scale="8 8 8" rotate="0 1 0 180"/>
         <source id="src_bgm" asset="audio_bgm"/>
+
+        <particles id="obj_firework" asset="particle_firework" type="cocos2d"/>
     </objects>
     <actions>
         <action type="play" object="src_bgm" />
         <action type="camera" view="perspective" fovy="60" near=".1f" far="3200" />
         <action type="camera" direction="0 0 1" position="0 0 -30" />
 
+<!--
         <include file="ani_logo.xml" />
         <include file="ani_dragon.xml" />
+    -->
         <include file="ani_deathstroke.xml" />
 
-
+        <action type="addObject" object="obj_firework" time="+0"/>
     </actions>
 </timeline>

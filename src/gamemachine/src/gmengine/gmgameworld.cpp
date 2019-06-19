@@ -27,6 +27,7 @@ GMGameWorld::GMGameWorld(const IRenderContext* context)
 {
 	D(d);
 	d->context = context;
+	d->particleSystem.reset(new GMParticleSystemManager(context));
 }
 
 void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
@@ -62,6 +63,8 @@ void GMGameWorld::renderScene()
 	{
 		engine->draw(d->renderList.forward, d->renderList.deferred);
 	}
+
+	d->particleSystem->render();
 }
 
 bool GMGameWorld::removeObject(GMGameObject* obj)
@@ -98,6 +101,7 @@ void GMGameWorld::updateGameWorld(GMDuration dt)
 	D(d);
 	auto phyw = getPhysicsWorld();
 	updateGameObjects(dt, phyw, d->gameObjects);
+	d->particleSystem->update(dt);
 }
 
 void GMGameWorld::clearRenderList()

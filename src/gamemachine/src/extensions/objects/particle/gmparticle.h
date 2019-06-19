@@ -414,6 +414,13 @@ public:
 		OUT GMParticleSystem** particleSystem,
 		std::function<void(GMParticleDescription&)> descriptionCallback = std::function<void(GMParticleDescription&)>()
 	);
+
+	static void createCocos2DParticleSystem(
+		const GMBuffer& buffer,
+		GMParticleModelType modelType,
+		OUT GMParticleSystem** particleSystem,
+		std::function<void(GMParticleDescription&)> descriptionCallback = std::function<void(GMParticleDescription&)>()
+	);
 };
 
 GM_PRIVATE_OBJECT(GMParticlePool)

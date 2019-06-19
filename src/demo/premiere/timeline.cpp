@@ -7,6 +7,7 @@
 #include <gmmodelreader.h>
 #include <gmutilities.h>
 #include <gmgraphicengine.h>
+#include <gmparticle.h>
 #include <gmm.h>
 
 #define NoCameraComponent 0
@@ -17,6 +18,22 @@
 #define PerspectiveComponent 0x01
 #define CameraLookAtComponent 0x02
 
+template <typename T>
+struct AssetCast_
+{
+	typedef GMOwnedPtr<T>* Type;
+};
+
+template <typename T> auto asset_cast(void* obj)
+{
+	return static_cast<typename AssetCast_<T>::Type>(obj);
+}
+
+template <> auto asset_cast<GMCamera>(void* obj)
+{
+	return static_cast<GMCamera*>(obj);
+}
+
 struct CameraParams
 {
 	GMfloat fovy, aspect, n, f;
@@ -25,7 +42,7 @@ struct CameraParams
 namespace
 {
 	template <AssetType Type, typename Container>
-	bool getAssetAndType(const Container& container, const GMString& objectName, REF AssetType& result, OUT void** out)
+	bool getAssetAndType(Container& container, const GMString& objectName, REF AssetType& result, OUT void** out)
 	{
 		result = AssetType::NotFound;
 
@@ -34,7 +51,7 @@ namespace
 		{
 			result = Type;
 			if (out)
-				(*out) = iter->second;
+				(*out) = &(iter->second);
 			return true;
 		}
 
@@ -123,17 +140,6 @@ Timeline::Timeline(const IRenderContext* context, GMGameWorld* world)
 
 Timeline::~Timeline()
 {
-	for (auto source : m_audioSources)
-	{
-		if (source.second)
-			source.second->destroy();
-	}
-
-	for (auto source : m_audioFiles)
-	{
-		if (source.second)
-			source.second->destroy();
-	}
 }
 
 bool Timeline::parse(const GMString& timelineContent)
@@ -350,8 +356,12 @@ void Timeline::parseAssets(GMXMLElement* e)
 			}
 			else
 			{
-				m_audioFiles[id] = f;
+				m_audioFiles[id] = GMOwnedPtr<IAudioFile>(f);
 			}
+		}
+		else if (name == L"particles")
+		{
+			parseParticlesAsset(e);
 		}
 
 		e = e->NextSiblingElement();
@@ -440,7 +450,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 				GM_ASSERT(bSuc);
 			}
 
-			m_lights[id] = light;
+			m_lights[id] = GMOwnedPtr<ILight>(light);
 		}
 		else if (name == L"cubemap")
 		{
@@ -448,9 +458,14 @@ void Timeline::parseObjects(GMXMLElement* e)
 			GMString assetName = e->Attribute("asset");
 			GMAsset asset = findAsset(assetName);
 			if (!asset.isEmpty())
-				obj = m_objects[id] = new GMCubeMapGameObject(asset);
+			{
+				obj = new GMCubeMapGameObject(asset);
+				m_objects[id] = GMOwnedPtr<GMGameObject>(obj);
+			}
 			else
+			{
 				gm_warning(gm_dbg_wrap("Cannot find asset: {0}"), assetName);
+			}
 
 			parseTransform(obj, e);
 		}
@@ -460,7 +475,10 @@ void Timeline::parseObjects(GMXMLElement* e)
 			GMString assetName = e->Attribute("asset");
 			GMAsset asset = findAsset(assetName);
 			if (!asset.isEmpty())
-				obj = m_objects[id] = new GMGameObject(asset);
+			{
+				obj = new GMGameObject(asset);
+				m_objects[id] = GMOwnedPtr<GMGameObject>(obj);
+			}
 			else
 				gm_warning(gm_dbg_wrap("Cannot find asset: {0}"), assetName);
 
@@ -546,7 +564,8 @@ void Timeline::parseObjects(GMXMLElement* e)
 				GMPrimitiveCreator::createTerrain(desc, scene);
 			}
 
-			GMGameObject* obj = m_objects[id] = new GMGameObject(scene);
+			GMGameObject* obj = new GMGameObject(scene);
+			m_objects[id] = GMOwnedPtr<GMGameObject>(obj);
 			parseTextures(obj, e);
 			parseMaterial(obj, e);
 			parseTransform(obj, e);
@@ -554,7 +573,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 		else if (name == L"source")
 		{
 			GMString assetName = e->Attribute("asset");
-			auto asset = m_audioFiles[assetName];
+			auto asset = m_audioFiles[assetName].get();
 			if (asset)
 			{
 				auto exists = m_audioSources.find(id);
@@ -563,7 +582,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 					IAudioSource* s = nullptr;
 					m_audioPlayer->createPlayerSource(asset, &s);
 					if (s)
-						m_audioSources[id] = s;
+						m_audioSources[id] = GMOwnedPtr<IAudioSource>(s);
 					else
 						gm_warning(gm_dbg_wrap("Create source failed: {0}"), id);
 				}
@@ -576,6 +595,10 @@ void Timeline::parseObjects(GMXMLElement* e)
 			{
 				gm_warning(gm_dbg_wrap("Cannot find asset for source: {0}"), assetName);
 			}
+		}
+		else if (name == L"particles")
+		{
+			parseParticlesObject(e);
 		}
 		e = e->NextSiblingElement();
 	}
@@ -795,11 +818,11 @@ AnimationContainer& Timeline::getAnimationFromObject(AssetType at, void* o)
 		throw std::logic_error("Asset not found");
 
 	if (at == AssetType::Light)
-		return m_animations[Light][static_cast<ILight*>(o)];
+		return m_animations[Light][asset_cast<ILight>(o)->get()];
 	if (at == AssetType::GameObject)
-		return m_animations[GameObject][static_cast<GMGameObject*>(o)];
+		return m_animations[GameObject][asset_cast<GMGameObject>(o)->get()];
 	if (at == AssetType::Camera)
-		return m_animations[Camera][static_cast<GMCamera*>(o)];
+		return m_animations[Camera][asset_cast<GMCamera>(o)];
 
 	throw std::logic_error("Asset wrong type.");
 }
@@ -879,10 +902,13 @@ void Timeline::parseActions(GMXMLElement* e)
 				GMString object = e->Attribute("object");
 				void* targetObject = nullptr;
 				AssetType assetType = getAssetType(object, &targetObject);
+
 				if (assetType == AssetType::GameObject)
-					addObject(static_cast<GMGameObject*>(targetObject), e, action);
+					addObject(asset_cast<GMGameObject>(targetObject), e, action);
 				else if (assetType == AssetType::Light)
-					addObject(static_cast<ILight*>(targetObject), e, action);
+					addObject(asset_cast<ILight>(targetObject), e, action);
+				else if (assetType == AssetType::Particles)
+					addObject(asset_cast<GMParticleSystem>(targetObject), e, action);
 				else
 					gm_warning(gm_dbg_wrap("Cannot find object: {0}"), object);
 
@@ -938,9 +964,9 @@ void Timeline::parseActions(GMXMLElement* e)
 						if (assetType == AssetType::Camera)
 							interpolateCamera(e, endTime);
 						else if (assetType == AssetType::Light)
-							interpolateLight(e, static_cast<ILight*>(targetObject), endTime);
+							interpolateLight(e, asset_cast<ILight>(targetObject)->get(), endTime);
 						else if (assetType == AssetType::GameObject)
-							interpolateObject(e, static_cast<GMGameObject*>(targetObject), endTime);
+							interpolateObject(e, asset_cast<GMGameObject>(targetObject)->get(), endTime);
 					}
 					else
 					{
@@ -1040,7 +1066,7 @@ void Timeline::parseActions(GMXMLElement* e)
 				void* targetObject = nullptr;
 				AssetType assetType = getAssetType(object, &targetObject);
 				if (assetType == AssetType::GameObject)
-					parseAttributes(static_cast<GMGameObject*>(targetObject), e, action);
+					parseAttributes(asset_cast<GMGameObject>(targetObject)->get(), e, action);
 				else if (assetType == AssetType::NotFound)
 					gm_warning(gm_dbg_wrap("Object '{0}' not found."), object);
 				else
@@ -1053,9 +1079,9 @@ void Timeline::parseActions(GMXMLElement* e)
 				void* targetObject = nullptr;
 				AssetType assetType = getAssetType(object, &targetObject);
 				if (assetType == AssetType::Light)
-					removeObject(static_cast<ILight*>(targetObject), e, action);
+					removeObject(asset_cast<ILight>(targetObject)->get(), e, action);
 				else if (assetType == AssetType::GameObject)
-					removeObject(static_cast<GMGameObject*>(targetObject), e, action);
+					removeObject(asset_cast<GMGameObject>(targetObject)->get(), e, action);
 				else if (assetType == AssetType::NotFound)
 					gm_warning(gm_dbg_wrap("Object '{0}' not found."), object);
 				else
@@ -1069,7 +1095,7 @@ void Timeline::parseActions(GMXMLElement* e)
 				AssetType assetType = getAssetType(object, &targetObject);
 				if (assetType == AssetType::AudioSource)
 				{
-					playAudio(static_cast<IAudioSource*>(targetObject));
+					playAudio(asset_cast<IAudioSource>(targetObject)->get());
 				}
 				else
 				{
@@ -1213,6 +1239,54 @@ GMint32 Timeline::parseCameraAction(GMXMLElement* e, CameraParams& cp, GMCameraL
 		component |= CameraLookAtComponent;
 	}
 	return component;
+}
+
+void Timeline::parseParticlesAsset(GMXMLElement* e)
+{
+	GMString id = e->Attribute("id");
+	GMString filename = e->Attribute("file");
+	if (!id.isEmpty())
+	{
+		GMBuffer& buf = m_buffers[id];
+		GM.getGamePackageManager()->readFile(GMPackageIndex::Particle, filename, &buf);
+		buf.convertToStringBuffer();
+	}
+	else
+	{
+		gm_warning(gm_dbg_wrap("ID is empty while parsing particles asset."));
+	}
+}
+
+void Timeline::parseParticlesObject(GMXMLElement* e)
+{
+	GMString id = e->Attribute("id");
+	GMString assetName = e->Attribute("asset");
+	const auto& buf = m_buffers[assetName];
+	if (buf.getSize() > 0)
+	{
+		GMString type = e->Attribute("type");
+		if (type == L"cocos2d")
+		{
+			GMParticleSystem* ps = nullptr;
+			GMParticleSystem::createCocos2DParticleSystem(buf, GMParticleModelType::Particle3D, &ps);
+			if (ps)
+			{
+				m_particleSystems[id] = GMOwnedPtr<GMParticleSystem>(ps);
+			}
+			else
+			{
+				gm_warning(gm_dbg_wrap("Create particle system failed for id '{1}'."), id);
+			}
+		}
+		else
+		{
+			gm_warning(gm_dbg_wrap("Unrecognized type {0} for id '{1}'."), type, id);
+		}
+	}
+	else
+	{
+		gm_warning(gm_dbg_wrap("Cannot find particles for source: {0}"), assetName);
+	}
 }
 
 GMAsset Timeline::findAsset(const GMString& assetName)
@@ -1437,18 +1511,26 @@ void Timeline::parseAttributes(GMGameObject* obj, GMXMLElement* e, Action& actio
 	}
 }
 
-void Timeline::addObject(GMGameObject* object, GMXMLElement*, Action& action)
+void Timeline::addObject(GMOwnedPtr<GMGameObject>* object, GMXMLElement*, Action& action)
 {
 	action.action = [this, object]() {
-		m_world->addObjectAndInit(object);
-		m_world->addToRenderList(object);
+		GMGameObject* obj = object->release();
+		m_world->addObjectAndInit(obj);
+		m_world->addToRenderList(obj);
 	};
 }
 
-void Timeline::addObject(ILight* light, GMXMLElement*, Action& action)
+void Timeline::addObject(GMOwnedPtr<ILight>* light, GMXMLElement*, Action& action)
 {
 	action.action = [this, light]() {
-		m_context->getEngine()->addLight(light);
+		m_context->getEngine()->addLight(light->release());
+	};
+}
+
+void Timeline::addObject(GMOwnedPtr<GMParticleSystem>* particles, GMXMLElement* e, Action& action)
+{
+	action.action = [this, particles]() {
+		m_world->getParticleSystemManager()->addParticleSystem(particles->release());
 	};
 }
 
@@ -1581,6 +1663,8 @@ AssetType Timeline::getAssetType(const GMString& objectName, OUT void** out)
 			if (getAssetAndType<AssetType::Light>(m_lights, objectName, result, out))
 				break;
 			if (getAssetAndType<AssetType::AudioSource>(m_audioSources, objectName, result, out))
+				break;
+			if (getAssetAndType<AssetType::Particles>(m_particleSystems, objectName, result, out))
 				break;
 		} while (false);
 	}

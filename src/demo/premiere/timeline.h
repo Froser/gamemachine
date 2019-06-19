@@ -34,6 +34,7 @@ enum class AssetType
 	GameObject,
 	Light,
 	AudioSource,
+	Particles,
 };
 
 inline bool operator<(const Action& lhs, const Action& rhs) GM_NOEXCEPT
@@ -88,6 +89,8 @@ private:
 	void parseActions(GMXMLElement*);
 	void parseInclude(GMXMLElement*);
 	GMint32 parseCameraAction(GMXMLElement*, REF CameraParams& cp, REF GMCameraLookAt& lookAt);
+	void parseParticlesAsset(GMXMLElement*);
+	void parseParticlesObject(GMXMLElement*);
 
 private:
 	void interpolateCamera(GMXMLElement*, GMfloat);
@@ -103,8 +106,9 @@ private:
 	void parseTextures(GMGameObject*, GMXMLElement*);
 	void parseMaterial(GMGameObject*, GMXMLElement*);
 	void parseAttributes(GMGameObject*, GMXMLElement*, Action&);
-	void addObject(GMGameObject*, GMXMLElement*, Action&);
-	void addObject(ILight*, GMXMLElement*, Action&);
+	void addObject(GMOwnedPtr<GMGameObject>*, GMXMLElement*, Action&);
+	void addObject(GMOwnedPtr<ILight>*, GMXMLElement*, Action&);
+	void addObject(GMOwnedPtr<GMParticleSystem>*, GMXMLElement*, Action&);
 	void removeObject(ILight*, GMXMLElement*, Action&);
 	void removeObject(GMGameObject*, GMXMLElement*, Action&);
 	CurveType parseCurve(GMXMLElement*, GMInterpolationFunctors&);
@@ -122,10 +126,11 @@ private:
 	HashMap<GMString, GMBuffer, GMStringHashFunctor> m_buffers;
 	HashMap<GMString, GMAsset, GMStringHashFunctor> m_assets;
 	HashMap<GMString, PBR, GMStringHashFunctor> m_pbrs;
-	HashMap<GMString, GMGameObject*, GMStringHashFunctor> m_objects;
-	HashMap<GMString, ILight*, GMStringHashFunctor> m_lights;
-	HashMap<GMString, IAudioFile*, GMStringHashFunctor> m_audioFiles;
-	HashMap<GMString, IAudioSource*, GMStringHashFunctor> m_audioSources;
+	HashMap<GMString, GMOwnedPtr<GMGameObject>, GMStringHashFunctor> m_objects;
+	HashMap<GMString, GMOwnedPtr<ILight>, GMStringHashFunctor> m_lights;
+	HashMap<GMString, GMOwnedPtr<IAudioFile>, GMStringHashFunctor> m_audioFiles;
+	HashMap<GMString, GMOwnedPtr<IAudioSource>, GMStringHashFunctor> m_audioSources;
+	HashMap<GMString, GMOwnedPtr<GMParticleSystem>, GMStringHashFunctor> m_particleSystems;
 	std::multiset<Action> m_immediateActions;
 	std::multiset<Action> m_deferredActions;
 	std::multiset<Action>::iterator m_currentAction;
