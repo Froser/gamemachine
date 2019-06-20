@@ -142,8 +142,11 @@ bool GMImageReader_BMP::load(const GMbyte* byte, GMsize_t size, OUT GMImage** im
 	}
 }
 
-bool GMImageReader_BMP::test(const GMbyte* byte)
+bool GMImageReader_BMP::test(const GMbyte* byte, GMsize_t size)
 {
+	if (size < sizeof(BitmapHeader))
+		return false;
+
 	const BitmapHeader* header = reinterpret_cast<const BitmapHeader*>(byte);
 	return header && header->bfType == 19778;
 }

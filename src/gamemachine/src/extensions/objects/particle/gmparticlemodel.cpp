@@ -216,25 +216,32 @@ void GMParticleModel::GPUUpdate(IComputeShaderProgram* shaderProgram, const IRen
 	}
 
 	GMComputeBufferHandle futureResult = prepareBuffers(shaderProgram, context, dataPtr, GMParticleModel::None);
-	shaderProgram->dispatch(sz, 1, 1);
-
-	// 从futureResult获取结果，并拷贝到dataPtr
-	bool canReadFromGPU = shaderProgram->canRead(futureResult);
-	if (!canReadFromGPU)
+	if (futureResult)
 	{
-		if (d->resultBuffer_CPU)
-			shaderProgram->release(d->resultBuffer_CPU);
-		shaderProgram->createReadOnlyBufferFrom(futureResult, &d->resultBuffer_CPU);
+		shaderProgram->dispatch(sz, 1, 1);
+
+		// 从futureResult获取结果，并拷贝到dataPtr
+		bool canReadFromGPU = shaderProgram->canRead(futureResult);
+		if (!canReadFromGPU)
+		{
+			if (d->resultBuffer_CPU)
+				shaderProgram->release(d->resultBuffer_CPU);
+			shaderProgram->createReadOnlyBufferFrom(futureResult, &d->resultBuffer_CPU);
+		}
+
+		GMComputeBufferHandle resultHandle = canReadFromGPU ? futureResult : d->resultBuffer_CPU;
+		if (!canReadFromGPU)
+			shaderProgram->copyBuffer(resultHandle, futureResult);
+
+		void* resultPtr = shaderProgram->mapBuffer(resultHandle);
+		const GMsize_t verticesSize = sizeof(GMVertex) * 6 * sz; // 一个粒子6个顶点
+		memcpy_s(dataPtr, verticesSize, resultPtr, verticesSize);
+		shaderProgram->unmapBuffer(resultHandle);
 	}
-
-	GMComputeBufferHandle resultHandle = canReadFromGPU ? futureResult : d->resultBuffer_CPU;
-	if (!canReadFromGPU)
-		shaderProgram->copyBuffer(resultHandle, futureResult);
-
-	void* resultPtr = shaderProgram->mapBuffer(resultHandle);
-	const GMsize_t verticesSize = sizeof(GMVertex) * 6 * sz; // 一个粒子6个顶点
-	memcpy_s(dataPtr, verticesSize, resultPtr, verticesSize);
-	shaderProgram->unmapBuffer(resultHandle);
+	else
+	{
+		// Buffer not ready.
+	}
 }
 
 GMComputeBufferHandle GMParticleModel::prepareBuffers(IComputeShaderProgram* shaderProgram, const IRenderContext* context, void* dataPtr, BufferFlags flags)
@@ -247,6 +254,9 @@ GMComputeBufferHandle GMParticleModel::prepareBuffers(IComputeShaderProgram* sha
 
 	D(d);
 	auto& particles = d->system->getEmitter()->getParticles();
+	if (particles.empty())
+		return 0;
+
 	if (!d->constantBuffer || d->particleSizeChanged)
 	{
 		disposeGPUHandles();

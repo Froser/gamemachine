@@ -48,6 +48,8 @@ struct ImageMipData
 	GMbyte* data = nullptr;
 };
 
+typedef void(*GMImageDataDeleter)(void*);
+
 GM_PRIVATE_OBJECT(GMImage)
 {
 	GMImageTarget target = GMImageTarget::Invalid;
@@ -60,6 +62,7 @@ GM_PRIVATE_OBJECT(GMImage)
 	ImageMipData mip[MAX_MIP_CNT];
 	GMsize_t size = 0;
 	GMuint32 channels = GM_IMAGE_DEFAULT_CHANNELS;
+	GMImageDataDeleter deleter = nullptr;
 };
 
 //! 表示一张或一系列图片。

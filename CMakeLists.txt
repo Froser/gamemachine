@@ -108,6 +108,8 @@ macro(gm_link_libraries libraryName ACCESS)
 	target_link_libraries(${libraryName} ${ACCESS} libmad)
 	target_link_libraries(${libraryName} ${ACCESS} OpenAL)
 	target_link_libraries(${libraryName} ${ACCESS} cryptopp-static)
+	target_link_libraries(${libraryName} ${ACCESS} tiff)
+	target_link_libraries(${libraryName} ${ACCESS} tiffxx)
 endmacro(gm_link_libraries)
 
 macro(gm_link_x11 libraryName ACCESS)

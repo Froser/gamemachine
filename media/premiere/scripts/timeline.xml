@@ -67,8 +67,8 @@
 <!--
         <include file="ani_logo.xml" />
         <include file="ani_dragon.xml" />
-    -->
         <include file="ani_deathstroke.xml" />
+    -->
 
         <action type="addObject" object="obj_firework" time="+0"/>
     </actions>

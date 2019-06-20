@@ -10,6 +10,7 @@ add_subdirectory(./3rdparty/openal-soft-1.19.1 openal)
 add_subdirectory(./3rdparty/bullet3-2.87 bullet3)
 add_subdirectory(./3rdparty/assimp-3.3.1 assimp-3.3.1)
 add_subdirectory(./3rdparty/cryptopp-8.2.0 cryptocpp-8.2.0)
+add_subdirectory(./3rdparty/libtiff tiff)
 
 add_subdirectory(gamemachine gamemachine)
 add_subdirectory(gamemachinemedia gamemachinemedia)

@@ -17,7 +17,10 @@ void GMImage::dispose()
 	D(d);
 	if (d->mip[0].data)
 	{
-		delete[] reinterpret_cast<GMbyte *>(d->mip[0].data);
+		if (!d->deleter)
+			delete[] reinterpret_cast<GMbyte *>(d->mip[0].data);
+		else
+			d->deleter(d->mip[0].data);
 		d->mip[0].data = nullptr;
 	}
 }

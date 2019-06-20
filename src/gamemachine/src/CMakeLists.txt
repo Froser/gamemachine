@@ -14,6 +14,7 @@ include_directories(
 		../../3rdparty/bullet3-2.87/src
 		../../3rdparty/assimp-3.3.1/include
 		../../3rdparty/cryptocpp-8.2.0
+		../../3rdparty/libtiff
 	)
 
 set(SOURCES
@@ -37,6 +38,8 @@ set(SOURCES
 		gmdata/imagereader/gmimagereader_png.cpp
 		gmdata/imagereader/gmimagereader_tga.h
 		gmdata/imagereader/gmimagereader_tga.cpp
+		gmdata/imagereader/gmimagereader_tiff.h
+		gmdata/imagereader/gmimagereader_tiff.cpp
 		gmdata/modelreader/gmmodelreader.h
 		gmdata/modelreader/gmmodelreader.cpp
 		gmdata/modelreader/gmmodelreader_assimp.h
@@ -404,6 +407,6 @@ if(NOT GM_USE_DX11)
 		gm_use_gamemachine_dll(${gm_wrapper_name})
 		gm_end_project(${gm_wrapper_name})
 	endif(GM_BUILD_WRAPPER)
-endif(GM_USE_DX11)
+endif(NOT GM_USE_DX11)
 
 endif(MSVC)

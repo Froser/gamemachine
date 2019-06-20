@@ -7,7 +7,7 @@ BEGIN_NS
 class GMImageReader_TGA : public IImageReader
 {
 	virtual bool load(const GMbyte* data, GMsize_t size, OUT GMImage** image) override;
-	virtual bool test(const GMbyte* data) override;
+	virtual bool test(const GMbyte* data, GMsize_t size) override;
 };
 
 END_NS

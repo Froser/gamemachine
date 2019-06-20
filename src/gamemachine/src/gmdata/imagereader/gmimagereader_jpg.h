@@ -10,7 +10,7 @@ public:
 	GMImageReader_JPG();
 
 	virtual bool load(const GMbyte* data, GMsize_t size, OUT GMImage** image) override;
-	virtual bool test(const GMbyte* data) override;
+	virtual bool test(const GMbyte* data, GMsize_t size) override;
 };
 
 END_NS

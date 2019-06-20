@@ -9,7 +9,7 @@ struct IImageReader
 {
 	virtual ~IImageReader() {};
 	virtual bool load(const GMbyte* data, GMsize_t size, OUT GMImage** image) = 0;
-	virtual bool test(const GMbyte* data) = 0;
+	virtual bool test(const GMbyte* data, GMsize_t size) = 0;
 };
 
 class GM_EXPORT GMImageReader
@@ -23,6 +23,7 @@ public:
 		ImageType_JPG = ImageType_Begin,
 		ImageType_PNG,
 		ImageType_BMP,
+		ImageType_TIFF,
 		ImageType_TGA, // TGA头无magic number，放在最后解析
 		ImageType_End,
 	};
@@ -38,7 +39,7 @@ public:
 	static IImageReader* getReader(ImageType type);
 
 private:
-	static ImageType test(const GMbyte* data);
+	static ImageType test(const GMbyte* data, GMsize_t size);
 };
 
 END_NS

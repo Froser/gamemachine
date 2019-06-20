@@ -18,7 +18,7 @@ class GMImageReader_PNG : public IImageReader
 {
 public:
 	virtual bool load(const GMbyte* data, GMsize_t size, OUT GMImage** img) override;
-	virtual bool test(const GMbyte* data) override;
+	virtual bool test(const GMbyte* data, GMsize_t size) override;
 
 private:
 	void writeDataToImage(PngData& png, GMImage* img, GMsize_t size);

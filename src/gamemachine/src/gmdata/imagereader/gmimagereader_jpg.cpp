@@ -174,8 +174,11 @@ bool GMImageReader_JPG::load(const GMbyte* data, GMsize_t size, OUT GMImage** im
 	return true;
 }
 
-bool GMImageReader_JPG::test(const GMbyte* data)
+bool GMImageReader_JPG::test(const GMbyte* data, GMsize_t size)
 {
+	if (size < sizeof(short))
+		return false;
+
 	const short* p = reinterpret_cast<const short*>(data);
 	return p && *p == (short) 0xd8ff;
 }

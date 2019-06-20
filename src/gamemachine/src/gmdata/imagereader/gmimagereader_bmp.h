@@ -11,7 +11,7 @@ class GMImageReader_BMP : public IImageReader
 {
 public:
 	virtual bool load(const GMbyte* byte, GMsize_t size, OUT GMImage** img) override;
-	virtual bool test(const GMbyte* byte) override;
+	virtual bool test(const GMbyte* byte, GMsize_t size) override;
 
 private:
 	void writeDataToImage(BitmapFile& bitmap, GMImage* img, GMuint32 size);
