@@ -532,20 +532,20 @@ void GMParticleEffect::update(GMParticleEmitter* emitter, const IRenderContext* 
 	}
 }
 
-GMParticleSystemManager::GMParticleSystemManager(const IRenderContext* context, GMsize_t particleCountHint)
+GMParticleSystemManager_Cocos2D::GMParticleSystemManager_Cocos2D(const IRenderContext* context, GMsize_t particleCountHint)
 {
 	D(d);
 	d->context = context;
 }
 
-void GMParticleSystemManager::addParticleSystem(AUTORELEASE GMParticleSystem* ps)
+void GMParticleSystemManager_Cocos2D::addParticleSystem(AUTORELEASE GMParticleSystem* ps)
 {
 	D(d);
 	ps->setParticleSystemManager(this);
 	d->particleSystems.push_back(GMOwnedPtr<GMParticleSystem>(ps));
 }
 
-void GMParticleSystemManager::render()
+void GMParticleSystemManager_Cocos2D::render()
 {
 	D(d);
 	for (decltype(auto) ps : d->particleSystems)
@@ -554,7 +554,7 @@ void GMParticleSystemManager::render()
 	}
 }
 
-void GMParticleSystemManager::update(GMDuration dt)
+void GMParticleSystemManager_Cocos2D::update(GMDuration dt)
 {
 	D(d);
 	// 涉及到粒子池的分配，不能并行

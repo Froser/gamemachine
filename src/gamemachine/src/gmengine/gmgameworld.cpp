@@ -27,7 +27,7 @@ GMGameWorld::GMGameWorld(const IRenderContext* context)
 {
 	D(d);
 	d->context = context;
-	d->particleSystem.reset(new GMParticleSystemManager(context));
+	d->particleSystemMgr.reset(new GMParticleSystemManager_Cocos2D(context));
 }
 
 void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
@@ -64,7 +64,7 @@ void GMGameWorld::renderScene()
 		engine->draw(d->renderList.forward, d->renderList.deferred);
 	}
 
-	d->particleSystem->render();
+	d->particleSystemMgr->render();
 }
 
 bool GMGameWorld::removeObject(GMGameObject* obj)
@@ -96,12 +96,18 @@ const IRenderContext* GMGameWorld::getContext()
 	return d->context;
 }
 
+void GMGameWorld::setParticleSystemManager(AUTORELEASE IParticleSystemManager* particleSystemMgrManager)
+{
+	D(d);
+	d->particleSystemMgr.reset(particleSystemMgrManager);
+}
+
 void GMGameWorld::updateGameWorld(GMDuration dt)
 {
 	D(d);
 	auto phyw = getPhysicsWorld();
 	updateGameObjects(dt, phyw, d->gameObjects);
-	d->particleSystem->update(dt);
+	d->particleSystemMgr->update(dt);
 }
 
 void GMGameWorld::clearRenderList()

@@ -5,9 +5,16 @@
 BEGIN_NS
 
 class GMParticleSystem;
-class GMParticleSystemManager;
+class GMParticleSystemManager_Cocos2D;
 class GMParticleEmitter;
 class GMParticle;
+
+GM_INTERFACE(IParticleSystemManager)
+{
+	virtual void addParticleSystem(AUTORELEASE GMParticleSystem* ps) = 0;
+	virtual void render() = 0;
+	virtual void update(GMDuration dt) = 0;
+};
 
 GM_INTERFACE(IParticleModel)
 {
@@ -347,7 +354,7 @@ protected:
 GM_PRIVATE_OBJECT(GMParticleSystem)
 {
 	GMOwnedPtr<GMParticleEmitter> emitter;
-	GMParticleSystemManager* manager = nullptr;
+	GMParticleSystemManager_Cocos2D* manager = nullptr;
 	GMTextureAsset texture;
 	GMBuffer textureBuffer;
 	GMOwnedPtr<IParticleModel> particleModel;
@@ -356,7 +363,7 @@ GM_PRIVATE_OBJECT(GMParticleSystem)
 class GM_EXPORT GMParticleSystem : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMParticleSystem)
-	GM_FRIEND_CLASS(GMParticleSystemManager)
+	GM_FRIEND_CLASS(GMParticleSystemManager_Cocos2D)
 	GM_DECLARE_PROPERTY(Texture, texture)
 
 public:
@@ -377,7 +384,7 @@ public:
 		return d->emitter.get();
 	}
 
-	inline GMParticleSystemManager* getParticleSystemManager() GM_NOEXCEPT
+	inline GMParticleSystemManager_Cocos2D* getParticleSystemManager() GM_NOEXCEPT
 	{
 		D(d);
 		return d->manager;
@@ -399,7 +406,7 @@ private:
 	void updateData(const IRenderContext* context, void* dataPtr);
 
 private:
-	inline void setParticleSystemManager(GMParticleSystemManager* manager) GM_NOEXCEPT
+	inline void setParticleSystemManager(GMParticleSystemManager_Cocos2D* manager) GM_NOEXCEPT
 	{
 		D(d);
 		d->manager = manager;
@@ -431,23 +438,23 @@ GM_PRIVATE_OBJECT(GMParticlePool)
 	GMsize_t capacity = 0;
 };
 
-GM_PRIVATE_OBJECT(GMParticleSystemManager)
+GM_PRIVATE_OBJECT(GMParticleSystemManager_Cocos2D)
 {
 	const IRenderContext* context;
 	Vector<GMOwnedPtr<GMParticleSystem>> particleSystems;
 };
 
-class GM_EXPORT GMParticleSystemManager : public GMObject
+class GM_EXPORT GMParticleSystemManager_Cocos2D : public GMObject, public IParticleSystemManager
 {
-	GM_DECLARE_PRIVATE(GMParticleSystemManager)
+	GM_DECLARE_PRIVATE(GMParticleSystemManager_Cocos2D)
 
 public:
-	GMParticleSystemManager(const IRenderContext* context, GMsize_t particleCountHint = 128);
+	GMParticleSystemManager_Cocos2D(const IRenderContext* context, GMsize_t particleCountHint = 128);
 
 public:
-	void addParticleSystem(AUTORELEASE GMParticleSystem* ps);
-	void render();
-	void update(GMDuration dt);
+	virtual void addParticleSystem(AUTORELEASE GMParticleSystem* ps);
+	virtual void render();
+	virtual void update(GMDuration dt);
 };
 
 END_NS

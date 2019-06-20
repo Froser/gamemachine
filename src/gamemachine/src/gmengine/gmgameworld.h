@@ -37,7 +37,7 @@ GM_PRIVATE_OBJECT(GMGameWorld)
 	GMRenderList renderList;
 	GMMutex renderListMutex;
 	GMMutex addObjectMutex;
-	GMOwnedPtr<GMParticleSystemManager> particleSystem;
+	GMOwnedPtr<IParticleSystemManager> particleSystemMgr;
 };
 
 class GM_EXPORT GMGameWorld : public GMObject
@@ -57,6 +57,7 @@ public:
 	virtual void renderScene();
 	virtual bool removeObject(GMGameObject* obj);
 	virtual const IRenderContext* getContext();
+	virtual void setParticleSystemManager(AUTORELEASE IParticleSystemManager* particleSystemManager);
 
 public:
 	void addObjectAndInit(AUTORELEASE GMGameObject* obj);
@@ -64,7 +65,7 @@ public:
 	void clearRenderList();
 	void addToRenderList(GMGameObject* object);
 	bool removeFromRenderList(GMGameObject* object);
-	inline GMParticleSystemManager* getParticleSystemManager() { D(d); return d->particleSystem.get(); }
+	inline IParticleSystemManager* getParticleSystemManager() { D(d); return d->particleSystemMgr.get(); }
 	inline GMAssets& getAssets() { D(d); return d->assets; }
 
 protected:
