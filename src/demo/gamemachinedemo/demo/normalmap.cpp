@@ -131,12 +131,12 @@ void Demo_NormalMap::event(gm::GameMachineHandlerEvent evt)
 		break;
 	case gm::GameMachineHandlerEvent::Update:
 	{
-		getDemoWorldReference()->updateGameWorld(GM.getRunningStates().lastFrameElpased);
+		getDemoWorldReference()->updateGameWorld(GM.getRunningStates().lastFrameElapsed);
 		break;
 	}
 	case gm::GameMachineHandlerEvent::Render:
 	{
-		d->animation.update(GM.getRunningStates().lastFrameElpased);
+		d->animation.update(GM.getRunningStates().lastFrameElapsed);
 		getDemoWorldReference()->renderScene();
 		break;
 	}

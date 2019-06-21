@@ -34,7 +34,7 @@ namespace
 	protected:
 		virtual bool registerMeta() override
 		{
-			GM_META(lastFrameElpased);
+			GM_META(lastFrameElapsed);
 			GM_META(elapsedTime);
 			GM_META(fps);
 			GM_META(crashDown);

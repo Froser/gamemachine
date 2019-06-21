@@ -240,7 +240,7 @@ void GMParticleModel::GPUUpdate(IComputeShaderProgram* shaderProgram, const IRen
 	}
 	else
 	{
-		// Buffer not ready.
+		// Buffer is empty
 	}
 }
 

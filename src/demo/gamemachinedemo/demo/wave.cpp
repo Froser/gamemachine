@@ -257,7 +257,7 @@ void Demo_Wave::event(gm::GameMachineHandlerEvent evt)
 	}
 	case gm::GameMachineHandlerEvent::Update:
 		if (d->wave)
-			d->wave->update(GM.getRunningStates().lastFrameElpased);
+			d->wave->update(GM.getRunningStates().lastFrameElapsed);
 		if (d->handwareAccelerationLabel)
 			d->handwareAccelerationLabel->setText(d->wave->getHandwareAcceleration() == gm::GMWaveGameObjectHardwareAcceleration::CPU ? L"渲染方式：CPU" : L"渲染方式：GPU");
 		break;

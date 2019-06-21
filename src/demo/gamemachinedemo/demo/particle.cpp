@@ -11,7 +11,7 @@ void Demo_Particle2D::init()
 	Base::init();
 
 	// 创建对象
-	d->particleSystemManager.reset(new gm::GMParticleSystemManager(getDemoWorldReference()->getContext(), 128));
+	d->particleSystemManager.reset(new gm::GMParticleSystemManager_Cocos2D(getDemoWorldReference()->getContext()));
 
 	gm::GMControlButton* button = nullptr;
 	gm::GMWidget* widget = createDefaultWidget();
@@ -63,7 +63,7 @@ void Demo_Particle2D::event(gm::GameMachineHandlerEvent evt)
 	switch (evt)
 	{
 	case gm::GameMachineHandlerEvent::Update:
-		d->particleSystemManager->update(GM.getRunningStates().lastFrameElpased);
+		d->particleSystemManager->update(GM.getRunningStates().lastFrameElapsed);
 		break;
 	case gm::GameMachineHandlerEvent::Render:
 		d->particleSystemManager->render();
@@ -89,7 +89,7 @@ void Demo_ParticleBillboard::init()
 	Base::init();
 
 	// 创建对象
-	d->particleSystemManager.reset(new gm::GMParticleSystemManager(getDemoWorldReference()->getContext(), 128));
+	d->particleSystemManager.reset(new gm::GMParticleSystemManager_Cocos2D(getDemoWorldReference()->getContext()));
 
 	gm::GMControlButton* button = nullptr;
 	gm::GMWidget* widget = createDefaultWidget();
@@ -138,7 +138,7 @@ void Demo_ParticleBillboard::event(gm::GameMachineHandlerEvent evt)
 	switch (evt)
 	{
 	case gm::GameMachineHandlerEvent::Update:
-		d->particleSystemManager->update(GM.getRunningStates().lastFrameElpased);
+		d->particleSystemManager->update(GM.getRunningStates().lastFrameElapsed);
 		break;
 	case gm::GameMachineHandlerEvent::Render:
 		d->particleSystemManager->render();

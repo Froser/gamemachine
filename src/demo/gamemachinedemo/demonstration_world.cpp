@@ -774,7 +774,7 @@ void DemostrationEntrance::event(gm::GameMachineHandlerEvent evt)
 			getWorld()->switchDemo();
 			break;
 		case gm::GameMachineHandlerEvent::Update:
-			getWorld()->getLogoAnimation().update(GM.getRunningStates().lastFrameElpased);
+			getWorld()->getLogoAnimation().update(GM.getRunningStates().lastFrameElapsed);
 			break;
 		case gm::GameMachineHandlerEvent::Render:
 			getWorld()->renderScene();

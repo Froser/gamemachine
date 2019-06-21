@@ -169,7 +169,20 @@ bool GameMachine::renderFrame(IWindow* window)
 	// 本帧结束
 	endHandlerEvents(window);
 
-	d->states.lastFrameElpased = frameCounter.elapsedFromStart();
+#if GM_DEBUG
+	// Debug模式下超过一定时间，认为是在调试
+	constexpr GMfloat DEBUG_ELAPSED = 10;
+	GMfloat lastFrameElapsed = frameCounter.elapsedFromStart();
+	if (lastFrameElapsed > DEBUG_ELAPSED)
+	{
+		lastFrameElapsed = 1.f / 60;
+		gm_info(gm_dbg_wrap("Detecting GameMachine triggered the break point. Skip one frame."));
+	}
+	d->states.lastFrameElapsed = lastFrameElapsed;
+#else
+	d->states.lastFrameElapsed = frameCounter.elapsedFromStart();
+#endif
+
 	return true;
 }
 

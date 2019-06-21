@@ -145,7 +145,7 @@ void Demo_Quake3_BSP::event(gm::GameMachineHandlerEvent evt)
 	{
 	case gm::GameMachineHandlerEvent::Update:
 	{
-		d->world->updateGameWorld(GM.getRunningStates().lastFrameElpased);
+		d->world->updateGameWorld(GM.getRunningStates().lastFrameElapsed);
 		// 更新Camera
 		getDemonstrationWorld()->getContext()->getEngine()->setCamera(d->sprite->getCamera());
 		break;

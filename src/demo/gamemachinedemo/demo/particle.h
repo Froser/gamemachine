@@ -10,7 +10,7 @@
 GM_PRIVATE_OBJECT(Demo_Particle2D)
 {
 	gm::GMFilterMode::Mode mode = gm::GMFilterMode::None;
-	gm::GMOwnedPtr<gm::GMParticleSystemManager> particleSystemManager;
+	gm::GMOwnedPtr<gm::IParticleSystemManager> particleSystemManager;
 };
 
 class Demo_Particle2D : public DemoHandler
@@ -35,7 +35,7 @@ protected:
 GM_PRIVATE_OBJECT(Demo_ParticleBillboard)
 {
 	gm::GMFilterMode::Mode mode = gm::GMFilterMode::None;
-	gm::GMOwnedPtr<gm::GMParticleSystemManager> particleSystemManager;
+	gm::GMOwnedPtr<gm::IParticleSystemManager> particleSystemManager;
 	gm::GMCameraUtility cameraUtility;
 	bool activated = false;
 };

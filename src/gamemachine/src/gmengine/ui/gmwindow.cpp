@@ -118,7 +118,7 @@ void GMWindow::msgProc(const GMMessage& message)
 			d->input->update();
 
 		d->windowStates.renderRect = getRenderRect();
-		GMDuration elapsed = GM.getRunningStates().lastFrameElpased;
+		GMDuration elapsed = GM.getRunningStates().lastFrameElapsed;
 		for (auto widget : d->widgets)
 		{
 			widget->render(elapsed);

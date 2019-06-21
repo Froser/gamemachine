@@ -119,7 +119,7 @@ void Demo_Collision::event(gm::GameMachineHandlerEvent evt)
 		break;
 	case gm::GameMachineHandlerEvent::Update:
 	{
-		getDemoWorldReference()->getPhysicsWorld()->update(GM.getRunningStates().lastFrameElpased, nullptr);
+		getDemoWorldReference()->getPhysicsWorld()->update(GM.getRunningStates().lastFrameElapsed, nullptr);
 		break;
 	}
 	case gm::GameMachineHandlerEvent::Render:

@@ -279,7 +279,7 @@ void Demo_Sponza::event(gm::GameMachineHandlerEvent evt)
 	}
 	case gm::GameMachineHandlerEvent::Update:
 	{
-		gm::GMfloat dt = GM.getRunningStates().lastFrameElpased;
+		gm::GMfloat dt = GM.getRunningStates().lastFrameElapsed;
 		getDemoWorldReference()->updateGameWorld(dt);
 		getDemonstrationWorld()->getContext()->getEngine()->setCamera(d->sprite->getCamera());
 		break;

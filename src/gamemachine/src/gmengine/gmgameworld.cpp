@@ -62,8 +62,8 @@ void GMGameWorld::renderScene()
 	{
 		engine->draw(d->renderList.forward, d->renderList.deferred);
 	}
-
-	d->particleSystemMgr->render();
+	if (d->particleSystemMgr)
+		d->particleSystemMgr->render();
 }
 
 bool GMGameWorld::removeObject(GMGameObject* obj)

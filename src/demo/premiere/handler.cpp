@@ -93,12 +93,12 @@ void Handler::event(GameMachineHandlerEvent evt)
 	{
 		IGraphicEngine* engine = getWorld()->getContext()->getEngine();
 		engine->getDefaultFramebuffers()->clear();
-		m_procedures->run(GM.getRunningStates().lastFrameElpased);
+		m_procedures->run(GM.getRunningStates().lastFrameElapsed);
 		break;
 	}
 	case GameMachineHandlerEvent::Update:
 	{
-		GMfloat dt = GM.getRunningStates().lastFrameElpased;
+		GMfloat dt = GM.getRunningStates().lastFrameElapsed;
 		m_procedures->update(dt);
 		break;
 	}

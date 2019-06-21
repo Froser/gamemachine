@@ -408,25 +408,39 @@ void GMParticleEmitter::addParticle()
 void GMParticleEmitter::emitParticles(GMDuration dt)
 {
 	D(d);
-	GMfloat dtEmit = 1.f / d->emitRate;
-	if (d->particles.size() < static_cast<GMsize_t>(d->particleCount))
+	// 如果emitRate为0，则要调用emitOnce手动触发
+	if (!isinf(d->emitRate))
 	{
-		d->emitCounter += dt;
-	}
+		GMfloat dtEmit = 1.f / d->emitRate;
+		if (d->particles.size() < static_cast<GMsize_t>(d->particleCount))
+		{
+			d->emitCounter += dt;
+		}
 
-	while (d->particles.size() < static_cast<GMsize_t>(d->particleCount) && d->emitCounter > 0)
+		while (d->particles.size() < static_cast<GMsize_t>(d->particleCount) && d->emitCounter > 0)
+		{
+			// 发射待发射的粒子
+			addParticle();
+			d->emitCounter -= dtEmit;
+		}
+
+		d->elapsed += dt;
+		// 如果duration是个负数，表示永远发射
+		if (d->duration >= 0 && d->duration < d->elapsed)
+		{
+			d->elapsed = 0;
+			stopEmit();
+		}
+	}
+}
+
+void GMParticleEmitter::emitOnce()
+{
+	D(d);
+	while (d->particles.size() < static_cast<GMsize_t>(d->particleCount))
 	{
 		// 发射待发射的粒子
 		addParticle();
-		d->emitCounter -= dtEmit;
-	}
-
-	d->elapsed += dt;
-	// 如果duration是个负数，表示永远发射
-	if (d->duration >= 0 && d->duration < d->elapsed)
-	{
-		d->elapsed = 0;
-		stopEmit();
 	}
 }
 

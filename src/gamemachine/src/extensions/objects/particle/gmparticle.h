@@ -268,6 +268,7 @@ public:
 	void setParticleEffect(GMParticleEffect* effect);
 	void addParticle();
 	void emitParticles(GMDuration dt);
+	void emitOnce();
 	void update(const IRenderContext* context, GMDuration dt);
 	void startEmit();
 	void stopEmit();

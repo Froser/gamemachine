@@ -7,6 +7,70 @@
 
 using namespace gm;
 
+template <typename T>
+class AutoReleasePtr
+{
+public:
+	AutoReleasePtr()
+		: m_ptr(nullptr)
+		, m_released(false)
+	{
+
+	}
+
+	AutoReleasePtr(T* ptr)
+		: m_ptr(ptr)
+		, m_released(false)
+	{
+
+	}
+
+	AutoReleasePtr(AutoReleasePtr&& rhs)
+	{
+		*this = std::move(rhs);
+	}
+
+	~AutoReleasePtr()
+	{
+		if (!m_released && m_ptr)
+			GM_delete(m_ptr);
+	}
+
+	AutoReleasePtr& operator=(AutoReleasePtr&& rhs)
+	{
+		using namespace std;
+		swap(m_released, rhs.m_released);
+		swap(m_ptr, rhs.m_ptr);
+		return *this;
+	}
+
+	T* release()
+	{
+		if (!m_released)
+			m_released = true;
+		return m_ptr;
+	}
+
+	T* get() GM_NOEXCEPT
+	{
+		return m_ptr;
+	}
+
+	T* operator->() GM_NOEXCEPT
+	{
+		return get();
+	}
+
+	bool operator!() GM_NOEXCEPT
+	{
+		return !!get();
+	}
+
+private:
+	bool m_released;
+	T* m_ptr;
+};
+
 struct CameraParams;
 struct Action
 {
@@ -106,9 +170,9 @@ private:
 	void parseTextures(GMGameObject*, GMXMLElement*);
 	void parseMaterial(GMGameObject*, GMXMLElement*);
 	void parseAttributes(GMGameObject*, GMXMLElement*, Action&);
-	void addObject(GMOwnedPtr<GMGameObject>*, GMXMLElement*, Action&);
-	void addObject(GMOwnedPtr<ILight>*, GMXMLElement*, Action&);
-	void addObject(GMOwnedPtr<GMParticleSystem>*, GMXMLElement*, Action&);
+	void addObject(AutoReleasePtr<GMGameObject>*, GMXMLElement*, Action&);
+	void addObject(AutoReleasePtr<ILight>*, GMXMLElement*, Action&);
+	void addObject(AutoReleasePtr<GMParticleSystem>*, GMXMLElement*, Action&);
 	void removeObject(ILight*, GMXMLElement*, Action&);
 	void removeObject(GMGameObject*, GMXMLElement*, Action&);
 	CurveType parseCurve(GMXMLElement*, GMInterpolationFunctors&);
@@ -126,11 +190,11 @@ private:
 	HashMap<GMString, GMBuffer, GMStringHashFunctor> m_buffers;
 	HashMap<GMString, GMAsset, GMStringHashFunctor> m_assets;
 	HashMap<GMString, PBR, GMStringHashFunctor> m_pbrs;
-	HashMap<GMString, GMOwnedPtr<GMGameObject>, GMStringHashFunctor> m_objects;
-	HashMap<GMString, GMOwnedPtr<ILight>, GMStringHashFunctor> m_lights;
-	HashMap<GMString, GMOwnedPtr<IAudioFile>, GMStringHashFunctor> m_audioFiles;
-	HashMap<GMString, GMOwnedPtr<IAudioSource>, GMStringHashFunctor> m_audioSources;
-	HashMap<GMString, GMOwnedPtr<GMParticleSystem>, GMStringHashFunctor> m_particleSystems;
+	HashMap<GMString, AutoReleasePtr<GMGameObject>, GMStringHashFunctor> m_objects;
+	HashMap<GMString, AutoReleasePtr<ILight>, GMStringHashFunctor> m_lights;
+	HashMap<GMString, AutoReleasePtr<IAudioFile>, GMStringHashFunctor> m_audioFiles;
+	HashMap<GMString, AutoReleasePtr<IAudioSource>, GMStringHashFunctor> m_audioSources;
+	HashMap<GMString, AutoReleasePtr<GMParticleSystem>, GMStringHashFunctor> m_particleSystems;
 	std::multiset<Action> m_immediateActions;
 	std::multiset<Action> m_deferredActions;
 	std::multiset<Action>::iterator m_currentAction;

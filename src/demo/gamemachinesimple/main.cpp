@@ -197,7 +197,7 @@ public:
 			m_world->renderScene();
 			break;
 		case GameMachineHandlerEvent::Update:
-			m_world->getPhysicsWorld()->update(GM.getRunningStates().lastFrameElpased, nullptr);
+			m_world->getPhysicsWorld()->update(GM.getRunningStates().lastFrameElapsed, nullptr);
 			break;
 		}
 	}

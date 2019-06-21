@@ -70,6 +70,8 @@
         <include file="ani_deathstroke.xml" />
     -->
 
+        <action type="camera" view="ortho" left="0" right="1024" top="0" bottom="768" near=".1f" far="3200" time="+0"/>
         <action type="addObject" object="obj_firework" time="+0"/>
+        <action type="emit" object="obj_firework" time="+0" />
     </actions>
 </timeline>

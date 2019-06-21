@@ -275,7 +275,7 @@ void Demo_CSM::event(gm::GameMachineHandlerEvent evt)
 	case gm::GameMachineHandlerEvent::FrameEnd:
 		break;
 	case gm::GameMachineHandlerEvent::Update:
-		getDemoWorldReference()->updateGameWorld(GM.getRunningStates().lastFrameElpased);
+		getDemoWorldReference()->updateGameWorld(GM.getRunningStates().lastFrameElapsed);
 		updateCamera();
 		break;
 	case gm::GameMachineHandlerEvent::Render:

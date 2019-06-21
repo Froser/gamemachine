@@ -17,11 +17,12 @@
 
 #define PerspectiveComponent 0x01
 #define CameraLookAtComponent 0x02
+#define OrthoComponent 0x04
 
 template <typename T>
 struct AssetCast_
 {
-	typedef GMOwnedPtr<T>* Type;
+	typedef AutoReleasePtr<T>* Type;
 };
 
 template <typename T> auto asset_cast(void* obj)
@@ -36,7 +37,19 @@ template <> auto asset_cast<GMCamera>(void* obj)
 
 struct CameraParams
 {
-	GMfloat fovy, aspect, n, f;
+	union
+	{
+		struct
+		{
+			GMfloat left, right, top, bottom;
+		};
+
+		struct
+		{
+			GMfloat fovy, aspect;
+		};
+	};
+	GMfloat n, f;
 };
 
 namespace
@@ -136,6 +149,7 @@ Timeline::Timeline(const IRenderContext* context, GMGameWorld* world)
 {
 	GM_ASSERT(m_context && m_world);
 	m_animations.resize(EndOfAnimation);
+	m_world->setParticleSystemManager(new GMParticleSystemManager_Cocos2D(m_context));
 }
 
 Timeline::~Timeline()
@@ -356,7 +370,7 @@ void Timeline::parseAssets(GMXMLElement* e)
 			}
 			else
 			{
-				m_audioFiles[id] = GMOwnedPtr<IAudioFile>(f);
+				m_audioFiles[id] = AutoReleasePtr<IAudioFile>(f);
 			}
 		}
 		else if (name == L"particles")
@@ -450,7 +464,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 				GM_ASSERT(bSuc);
 			}
 
-			m_lights[id] = GMOwnedPtr<ILight>(light);
+			m_lights[id] = AutoReleasePtr<ILight>(light);
 		}
 		else if (name == L"cubemap")
 		{
@@ -460,7 +474,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 			if (!asset.isEmpty())
 			{
 				obj = new GMCubeMapGameObject(asset);
-				m_objects[id] = GMOwnedPtr<GMGameObject>(obj);
+				m_objects[id] = AutoReleasePtr<GMGameObject>(obj);
 			}
 			else
 			{
@@ -477,7 +491,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 			if (!asset.isEmpty())
 			{
 				obj = new GMGameObject(asset);
-				m_objects[id] = GMOwnedPtr<GMGameObject>(obj);
+				m_objects[id] = AutoReleasePtr<GMGameObject>(obj);
 			}
 			else
 				gm_warning(gm_dbg_wrap("Cannot find asset: {0}"), assetName);
@@ -565,7 +579,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 			}
 
 			GMGameObject* obj = new GMGameObject(scene);
-			m_objects[id] = GMOwnedPtr<GMGameObject>(obj);
+			m_objects[id] = AutoReleasePtr<GMGameObject>(obj);
 			parseTextures(obj, e);
 			parseMaterial(obj, e);
 			parseTransform(obj, e);
@@ -582,7 +596,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 					IAudioSource* s = nullptr;
 					m_audioPlayer->createPlayerSource(asset, &s);
 					if (s)
-						m_audioSources[id] = GMOwnedPtr<IAudioSource>(s);
+						m_audioSources[id] = AutoReleasePtr<IAudioSource>(s);
 					else
 						gm_warning(gm_dbg_wrap("Create source failed: {0}"), id);
 				}
@@ -884,6 +898,13 @@ void Timeline::parseActions(GMXMLElement* e)
 						camera.setPerspective(p.fovy, p.aspect, p.n, p.f);
 					};
 				}
+				else if (component & OrthoComponent)
+				{
+					action.action = [p, this]() {
+						auto& camera = m_context->getEngine()->getCamera();
+						camera.setOrtho(p.left, p.right, p.bottom, p.top, p.n, p.f);
+					};
+				}
 				if (component & CameraLookAtComponent)
 				{
 					action.action = [p, action, lookAt, this]() {
@@ -1039,6 +1060,8 @@ void Timeline::parseActions(GMXMLElement* e)
 					GMCamera camera;
 					if (component & PerspectiveComponent)
 						camera.setPerspective(cp.fovy, cp.aspect, cp.n, cp.f);
+					else if (component & OrthoComponent)
+						camera.setOrtho(cp.left, cp.right, cp.bottom, cp.top, cp.n, cp.f);
 					if (component & CameraLookAtComponent)
 						camera.lookAt(lookAt);
 
@@ -1100,6 +1123,27 @@ void Timeline::parseActions(GMXMLElement* e)
 				else
 				{
 					gm_warning(gm_dbg_wrap("Cannot find source: {0}"), object);
+				}
+			}
+			else if (type == L"emit")
+			{
+				GMString object = e->Attribute("object");
+				void* targetObject = nullptr;
+				AssetType assetType = getAssetType(object, &targetObject);
+				if (assetType == AssetType::Particles)
+				{
+					auto particleSystemPtr = asset_cast<GMParticleSystem>(targetObject);
+					GM_ASSERT(particleSystemPtr);
+					GMParticleSystem* particleSystem = particleSystemPtr->get();
+					action.action = [particleSystem](){
+						particleSystem->getEmitter()->startEmit();
+						particleSystem->getEmitter()->emitOnce();
+					};
+					bindAction(action);
+				}
+				else
+				{
+					gm_warning(gm_dbg_wrap("object '{0}' is not a particle system object."), object);
 				}
 			}
 			else
@@ -1177,12 +1221,33 @@ GMint32 Timeline::parseCameraAction(GMXMLElement* e, CameraParams& cp, GMCameraL
 		else
 			f = GMString::parseFloat(fStr);
 
-		cp = { fovy, aspect, n, f };
+		cp.fovy = fovy;
+		cp.aspect = aspect;
+		cp.n = n;
+		cp.f = f;
 		component |= PerspectiveComponent;
+	}
+	else if (view == "ortho")
+	{
+		GMfloat left = 0, right = 0, top = 0, bottom = 0;
+		GMfloat n = 0, f = 0;
+		left = GMString::parseInt(e->Attribute("left"));
+		right = GMString::parseInt(e->Attribute("right"));
+		top = GMString::parseInt(e->Attribute("top"));
+		bottom = GMString::parseInt(e->Attribute("bottom"));
+		n = GMString::parseInt(e->Attribute("near"));
+		f = GMString::parseInt(e->Attribute("far"));
+		cp.left = left;
+		cp.right = right;
+		cp.top = top;
+		cp.bottom = bottom;
+		cp.n = n;
+		cp.f = f;
+		component |= OrthoComponent;
 	}
 	else if (!view.isEmpty())
 	{
-		gm_warning(gm_dbg_wrap("Camera view only supports 'perspective'"));
+		gm_warning(gm_dbg_wrap("Camera view only supports 'perspective' and 'ortho'"));
 	}
 
 	// 设置位置
@@ -1271,7 +1336,8 @@ void Timeline::parseParticlesObject(GMXMLElement* e)
 			GMParticleSystem::createCocos2DParticleSystem(buf, GMParticleModelType::Particle3D, &ps);
 			if (ps)
 			{
-				m_particleSystems[id] = GMOwnedPtr<GMParticleSystem>(ps);
+				ps->getEmitter()->stopEmit();
+				m_particleSystems[id] = AutoReleasePtr<GMParticleSystem>(ps);
 			}
 			else
 			{
@@ -1511,7 +1577,7 @@ void Timeline::parseAttributes(GMGameObject* obj, GMXMLElement* e, Action& actio
 	}
 }
 
-void Timeline::addObject(GMOwnedPtr<GMGameObject>* object, GMXMLElement*, Action& action)
+void Timeline::addObject(AutoReleasePtr<GMGameObject>* object, GMXMLElement*, Action& action)
 {
 	action.action = [this, object]() {
 		GMGameObject* obj = object->release();
@@ -1520,14 +1586,14 @@ void Timeline::addObject(GMOwnedPtr<GMGameObject>* object, GMXMLElement*, Action
 	};
 }
 
-void Timeline::addObject(GMOwnedPtr<ILight>* light, GMXMLElement*, Action& action)
+void Timeline::addObject(AutoReleasePtr<ILight>* light, GMXMLElement*, Action& action)
 {
 	action.action = [this, light]() {
 		m_context->getEngine()->addLight(light->release());
 	};
 }
 
-void Timeline::addObject(GMOwnedPtr<GMParticleSystem>* particles, GMXMLElement* e, Action& action)
+void Timeline::addObject(AutoReleasePtr<GMParticleSystem>* particles, GMXMLElement* e, Action& action)
 {
 	action.action = [this, particles]() {
 		m_world->getParticleSystemManager()->addParticleSystem(particles->release());
