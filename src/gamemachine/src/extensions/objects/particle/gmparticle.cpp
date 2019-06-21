@@ -532,7 +532,7 @@ void GMParticleEffect::update(GMParticleEmitter* emitter, const IRenderContext* 
 	}
 }
 
-GMParticleSystemManager_Cocos2D::GMParticleSystemManager_Cocos2D(const IRenderContext* context, GMsize_t particleCountHint)
+GMParticleSystemManager_Cocos2D::GMParticleSystemManager_Cocos2D(const IRenderContext* context)
 {
 	D(d);
 	d->context = context;

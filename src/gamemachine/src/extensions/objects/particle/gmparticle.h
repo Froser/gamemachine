@@ -449,7 +449,7 @@ class GM_EXPORT GMParticleSystemManager_Cocos2D : public GMObject, public IParti
 	GM_DECLARE_PRIVATE(GMParticleSystemManager_Cocos2D)
 
 public:
-	GMParticleSystemManager_Cocos2D(const IRenderContext* context, GMsize_t particleCountHint = 128);
+	GMParticleSystemManager_Cocos2D(const IRenderContext* context);
 
 public:
 	virtual void addParticleSystem(AUTORELEASE GMParticleSystem* ps);

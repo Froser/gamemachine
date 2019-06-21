@@ -27,7 +27,6 @@ GMGameWorld::GMGameWorld(const IRenderContext* context)
 {
 	D(d);
 	d->context = context;
-	d->particleSystemMgr.reset(new GMParticleSystemManager_Cocos2D(context));
 }
 
 void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
@@ -107,7 +106,8 @@ void GMGameWorld::updateGameWorld(GMDuration dt)
 	D(d);
 	auto phyw = getPhysicsWorld();
 	updateGameObjects(dt, phyw, d->gameObjects);
-	d->particleSystemMgr->update(dt);
+	if (d->particleSystemMgr)
+		d->particleSystemMgr->update(dt);
 }
 
 void GMGameWorld::clearRenderList()
