@@ -15,6 +15,8 @@ namespace
 	}
 
 	static GMString s_code;
+
+	enum { VerticesPerParticle = 6 };
 }
 
 GMParticleModel::GMParticleModel(GMParticleSystem* system)
@@ -180,28 +182,38 @@ void GMParticleModel::update6Vertices(
 	};
 }
 
-void GMParticleModel::updateData(const IRenderContext* context, void* dataPtr)
+void GMParticleModel::updateData(void* dataPtr)
 {
 	D(d);
 	if (d->GPUValid)
 	{
+		const IRenderContext* context = d->system->getContext();
+		GM_ASSERT(context);
 		IComputeShaderProgram* prog = GMComputeShaderManager::instance().getComputeShaderProgram(context, GMCS_PARTICLE_DATA_TRANSFER, L".", getCode(), L"main");
 		if (!prog)
 		{
 			d->GPUValid = false;
-			CPUUpdate(context, dataPtr);
+			CPUUpdate(dataPtr);
 			return;
 		}
 
-		GPUUpdate(prog, context, dataPtr);
+		GPUUpdate(prog, dataPtr);
 	}
 	else
 	{
-		CPUUpdate(context, dataPtr);
+		CPUUpdate(dataPtr);
 	}
+
+	// 无效粒子以0填充
+	GMsize_t particleMaxCount = d->system->getEmitter()->getParticleCount();
+	GMsize_t particleRemainingCount = d->system->getEmitter()->getParticles().size();
+	GMsize_t totalSize = sizeof(GMVertex) * VerticesPerParticle * particleMaxCount;
+	GMsize_t unavailableOffset = sizeof(GMVertex) * VerticesPerParticle * particleRemainingCount;
+	if (unavailableOffset < totalSize)
+		GM_ZeroMemory((GMbyte*)dataPtr + unavailableOffset, totalSize - unavailableOffset);
 }
 
-void GMParticleModel::GPUUpdate(IComputeShaderProgram* shaderProgram, const IRenderContext* context, void* dataPtr)
+void GMParticleModel::GPUUpdate(IComputeShaderProgram* shaderProgram, void* dataPtr)
 {
 	D(d);
 	const GMuint32 sz = gm_sizet_to_uint(d->system->getEmitter()->getParticles().size());
@@ -215,7 +227,7 @@ void GMParticleModel::GPUUpdate(IComputeShaderProgram* shaderProgram, const IRen
 		d->particleSizeChanged = false;
 	}
 
-	GMComputeBufferHandle futureResult = prepareBuffers(shaderProgram, context, dataPtr, GMParticleModel::None);
+	GMComputeBufferHandle futureResult = prepareBuffers(shaderProgram, dataPtr, GMParticleModel::None);
 	if (futureResult)
 	{
 		shaderProgram->dispatch(sz, 1, 1);
@@ -244,7 +256,7 @@ void GMParticleModel::GPUUpdate(IComputeShaderProgram* shaderProgram, const IRen
 	}
 }
 
-GMComputeBufferHandle GMParticleModel::prepareBuffers(IComputeShaderProgram* shaderProgram, const IRenderContext* context, void* dataPtr, BufferFlags flags)
+GMComputeBufferHandle GMParticleModel::prepareBuffers(IComputeShaderProgram* shaderProgram, void* dataPtr, BufferFlags flags)
 {
 	struct Constant
 	{
@@ -268,6 +280,8 @@ GMComputeBufferHandle GMParticleModel::prepareBuffers(IComputeShaderProgram* sha
 	}
 
 	const static GMVec3 s_normal(0, 0, -1.f);
+	const IRenderContext* context = d->system->getContext();
+	GM_ASSERT(context);
 	GMVec3 lookDir = context->getEngine()->getCamera().getLookAt().lookDirection;
 	GMQuat rot = RotationTo(s_normal, -lookDir, Zero<GMVec3>());
 	Constant c = { QuatToMatrix(rot), flags & IgnorePosZ };
@@ -283,6 +297,36 @@ GMComputeBufferHandle GMParticleModel::prepareBuffers(IComputeShaderProgram* sha
 	return d->resultBuffer;
 }
 
+
+void GMParticleModel::initObjects(const IRenderContext* context)
+{
+	D(d);
+	if (!d->particleObject)
+	{
+		d->particleObject.reset(createGameObject(context));
+
+		if (d->system->getTexture().isEmpty())
+		{
+			// 获取并设置纹理
+			GMImage* image = nullptr;
+			auto& buffer = d->system->getTextureBuffer();
+			if (buffer.getData())
+			{
+				GMImageReader::load(buffer.getData(), buffer.getSize(), &image);
+				if (image)
+				{
+					GMTextureAsset texture;
+					GM.getFactory()->createTexture(context, image, texture);
+					GM_delete(image);
+					GM_ASSERT(d->particleObject->getModel());
+					d->particleObject->getModel()->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(texture);
+					d->system->setTexture(texture);
+				}
+			}
+		}
+	}
+
+}
 
 void GMParticleModel::disposeGPUHandles()
 {
@@ -315,38 +359,13 @@ void GMParticleModel::setDefaultCode(const GMString& code)
 void GMParticleModel::render(const IRenderContext* context)
 {
 	D(d);
-	if (!d->particleObject)
-	{
-		d->particleObject.reset(createGameObject(context));
-
-		if (d->system->getTexture().isEmpty())
-		{
-			// 获取并设置纹理
-			GMImage* image = nullptr;
-			auto& buffer = d->system->getTextureBuffer();
-			if (buffer.getData())
-			{
-				GMImageReader::load(buffer.getData(), buffer.getSize(), &image);
-				if (image)
-				{
-					GMTextureAsset texture;
-					GM.getFactory()->createTexture(context, image, texture);
-					GM_delete(image);
-					GM_ASSERT(d->particleObject->getModel());
-					d->particleObject->getModel()->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(texture);
-					d->system->setTexture(texture);
-				}
-			}
-		}
-	}
-
 	if (d->particleObject)
 	{
 		// 开始更新粒子数据
 		auto dataProxy = d->particleModel->getModelDataProxy();
 		dataProxy->beginUpdateBuffer();
 		void* dataPtr = dataProxy->getBuffer();
-		updateData(context, dataPtr);
+		updateData(dataPtr);
 		dataProxy->endUpdateBuffer();
 	}
 
@@ -354,14 +373,15 @@ void GMParticleModel::render(const IRenderContext* context)
 	d->particleObject->draw();
 }
 
-void GMParticleModel_2D::CPUUpdate(const IRenderContext* context, void* dataPtr)
+void GMParticleModel_2D::CPUUpdate(void* dataPtr)
 {
 	D(d);
+	const IRenderContext* context = d->system->getContext();
+	GM_ASSERT(context);
 	auto& particles = d->system->getEmitter()->getParticles();
 	const auto& lookDirection = context->getEngine()->getCamera().getLookAt().lookDirection;
 
 	// 一个粒子有6个顶点，2个三角形，放入并行计算
-	enum { VerticesPerParticle = 6 };
 	GMAsync::blockedAsync(
 		GMAsync::Async,
 		GM.getRunningStates().systemInfo.numberOfProcessors,
@@ -393,9 +413,11 @@ GMString GMParticleModel_2D::getCode()
 	return s_code;
 }
 
-void GMParticleModel_3D::CPUUpdate(const IRenderContext* context, void* dataPtr)
+void GMParticleModel_3D::CPUUpdate(void* dataPtr)
 {
 	D(d);
+	const IRenderContext* context = d->system->getContext();
+	GM_ASSERT(context);
 	auto& particles = d->system->getEmitter()->getParticles();
 	const auto& lookDirection = context->getEngine()->getCamera().getLookAt().lookDirection;
 
@@ -437,5 +459,5 @@ GMString GMParticleModel_3D::getCode()
 
 GMComputeBufferHandle GMParticleModel_3D::prepareBuffers(IComputeShaderProgram* shaderProgram, const IRenderContext* context, void* dataPtr, BufferFlags)
 {
-	return GMParticleModel::prepareBuffers(shaderProgram, context, dataPtr, GMParticleModel::None);
+	return GMParticleModel::prepareBuffers(shaderProgram, dataPtr, GMParticleModel::None);
 }

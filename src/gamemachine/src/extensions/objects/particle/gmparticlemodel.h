@@ -56,15 +56,16 @@ protected:
 	);
 
 protected:
-	virtual void updateData(const IRenderContext* context, void* dataPtr);
-	virtual void CPUUpdate(const IRenderContext* context, void* dataPtr) = 0;
-	virtual void GPUUpdate(IComputeShaderProgram*, const IRenderContext* context, void* dataPtr);
+	virtual void updateData(void* dataPtr);
+	virtual void CPUUpdate(void* dataPtr) = 0;
+	virtual void GPUUpdate(IComputeShaderProgram*, void* dataPtr);
 	virtual GMString getCode() = 0;
 
 protected:
-	virtual GMComputeBufferHandle prepareBuffers(IComputeShaderProgram*, const IRenderContext* context, void* dataPtr, BufferFlags = IgnorePosZ);
+	virtual GMComputeBufferHandle prepareBuffers(IComputeShaderProgram*, void* dataPtr, BufferFlags = IgnorePosZ);
 
 private:
+	void initObjects(const IRenderContext* context);
 	void disposeGPUHandles();
 
 public:
@@ -77,7 +78,7 @@ public:
 	using GMParticleModel::GMParticleModel;
 
 protected:
-	virtual void CPUUpdate(const IRenderContext* context, void* dataPtr) override;
+	virtual void CPUUpdate(void* dataPtr) override;
 	virtual GMString getCode() override;
 };
 
@@ -87,7 +88,7 @@ public:
 	using GMParticleModel::GMParticleModel;
 
 protected:
-	virtual void CPUUpdate(const IRenderContext* context, void* dataPtr) override;
+	virtual void CPUUpdate(void* dataPtr) override;
 	virtual GMString getCode() override;
 
 protected:

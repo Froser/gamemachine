@@ -181,7 +181,7 @@ public:
 	}
 };
 
-GMParticleSystem::GMParticleSystem()
+GMParticleSystem::GMParticleSystem(const IRenderContext* context)
 {
 	D(d);
 	d->emitter.reset(new GMParticleEmitter(this));
@@ -196,17 +196,24 @@ void GMParticleSystem::setDescription(const GMParticleDescription& desc)
 	setParticleModel(createParticleModel(desc));
 }
 
-void GMParticleSystem::update(const IRenderContext* context, GMDuration dt)
+void GMParticleSystem::update(GMDuration dt)
 {
 	D(d);
-	d->emitter->update(context, dt);
+	d->emitter->update(dt);
 }
 
-void GMParticleSystem::render(const IRenderContext* context)
+void GMParticleSystem::render()
 {
 	D(d);
 	GM_ASSERT(d->particleModel);
-	d->particleModel->render(context);
+	d->particleModel->render();
+}
+
+
+const IRenderContext* gm::GMParticleSystem::getContext()
+{
+	D(d);
+	return d->context;
 }
 
 IParticleModel* GMParticleSystem::createParticleModel(const GMParticleDescription& desc)
@@ -325,6 +332,7 @@ GMParticleDescription GMParticleSystem::createParticleDescriptionFromCocos2DPlis
 }
 
 void GMParticleSystem::createCocos2DParticleSystem(
+	const IRenderContext* context,
 	const GMString& filename,
 	GMParticleModelType modelType,
 	OUT GMParticleSystem** particleSystem,
@@ -337,11 +345,12 @@ void GMParticleSystem::createCocos2DParticleSystem(
 		GM.getGamePackageManager()->readFile(GMPackageIndex::Particle, filename, &buf);
 		buf.convertToStringBuffer();
 
-		createCocos2DParticleSystem(buf, modelType, particleSystem, descriptionCallback);
+		createCocos2DParticleSystem(context, buf, modelType, particleSystem, descriptionCallback);
 	}
 }
 
 void GMParticleSystem::createCocos2DParticleSystem(
+	const IRenderContext* context,
 	const GMBuffer& buffer,
 	GMParticleModelType modelType,
 	OUT GMParticleSystem** particleSystem,
@@ -349,7 +358,7 @@ void GMParticleSystem::createCocos2DParticleSystem(
 {
 	if (particleSystem)
 	{
-		*particleSystem = new GMParticleSystem();
+		*particleSystem = new GMParticleSystem(context);
 		GMParticleDescription description = GMParticleSystem::createParticleDescriptionFromCocos2DPlist(gm::GMString((const char*)buffer.getData()), modelType);
 		if (descriptionCallback)
 			descriptionCallback(description);
@@ -450,13 +459,13 @@ void GMParticleEmitter::setParticleEffect(GMParticleEffect* effect)
 	d->effect.reset(effect);
 }
 
-void GMParticleEmitter::update(const IRenderContext* context, GMDuration dt)
+void GMParticleEmitter::update(GMDuration dt)
 {
 	D(d);
 	if (d->canEmit)
 	{
 		emitParticles(dt);
-		d->effect->update(this, context, dt);
+		d->effect->update(this, dt);
 	}
 }
 
@@ -531,13 +540,13 @@ void GMParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle* part
 }
 
 
-void GMParticleEffect::update(GMParticleEmitter* emitter, const IRenderContext* context, GMDuration dt)
+void GMParticleEffect::update(GMParticleEmitter* emitter, GMDuration dt)
 {
 	D(d);
 	IComputeShaderProgram* computeShader = nullptr;
 	if (d->GPUValid)
 	{
-		if (!GPUUpdate(emitter, context, dt))
+		if (!GPUUpdate(emitter, dt))
 			d->GPUValid = false;
 	}
 	else

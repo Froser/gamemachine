@@ -269,7 +269,7 @@ public:
 	void addParticle();
 	void emitParticles(GMDuration dt);
 	void emitOnce();
-	void update(const IRenderContext* context, GMDuration dt);
+	void update(GMDuration dt);
 	void startEmit();
 	void stopEmit();
 
@@ -345,15 +345,16 @@ public:
 
 public:
 	virtual void initParticle(GMParticleEmitter* emitter, GMParticle* particle);
-	virtual void update(GMParticleEmitter* emitter, const IRenderContext* context, GMDuration dt);
+	virtual void update(GMParticleEmitter* emitter, GMDuration dt);
 
 protected:
 	virtual void CPUUpdate(GMParticleEmitter* emitter, GMDuration dt) = 0;
-	virtual bool GPUUpdate(GMParticleEmitter* emitter, const IRenderContext* context, GMDuration dt) = 0;
+	virtual bool GPUUpdate(GMParticleEmitter* emitter, GMDuration dt) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMParticleSystem)
 {
+	const IRenderContext* context = nullptr;
 	GMOwnedPtr<GMParticleEmitter> emitter;
 	GMParticleSystemManager_Cocos2D* manager = nullptr;
 	GMTextureAsset texture;
@@ -368,12 +369,13 @@ class GM_EXPORT GMParticleSystem : public GMObject
 	GM_DECLARE_PROPERTY(Texture, texture)
 
 public:
-	GMParticleSystem();
+	GMParticleSystem(const IRenderContext* context);
 
 public:
 	void setDescription(const GMParticleDescription& desc);
-	void update(const IRenderContext* context, GMDuration dt);
-	void render(const IRenderContext* context);
+	void update(GMDuration dt);
+	void render();
+	const IRenderContext* getContext();
 
 public:
 	virtual IParticleModel* createParticleModel(const GMParticleDescription& desc);
@@ -404,7 +406,7 @@ public:
 	}
 
 private:
-	void updateData(const IRenderContext* context, void* dataPtr);
+	void updateData(void* dataPtr);
 
 private:
 	inline void setParticleSystemManager(GMParticleSystemManager_Cocos2D* manager) GM_NOEXCEPT
@@ -417,6 +419,7 @@ public:
 	static GMParticleDescription createParticleDescriptionFromCocos2DPlist(const GMString& content, GMParticleModelType modelType);
 
 	static void createCocos2DParticleSystem(
+		const IRenderContext* context,
 		const GMString& filename,
 		GMParticleModelType modelType,
 		OUT GMParticleSystem** particleSystem,
@@ -424,6 +427,7 @@ public:
 	);
 
 	static void createCocos2DParticleSystem(
+		const IRenderContext* context,
 		const GMBuffer& buffer,
 		GMParticleModelType modelType,
 		OUT GMParticleSystem** particleSystem,

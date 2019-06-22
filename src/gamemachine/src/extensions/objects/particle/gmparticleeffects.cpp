@@ -35,9 +35,10 @@ GMParticleEffectImplBase::~GMParticleEffectImplBase()
 	}
 }
 
-bool GMParticleEffectImplBase::GPUUpdate(GMParticleEmitter* emitter, const IRenderContext* context, GMDuration dt)
+bool GMParticleEffectImplBase::GPUUpdate(GMParticleEmitter* emitter, GMDuration dt)
 {
 	D(d);
+	const IRenderContext* context = emitter->getParticleSystem()->getContext();
 	if (!d->context)
 	{
 		d->context = context;

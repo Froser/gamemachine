@@ -23,7 +23,7 @@ public:
 	~GMParticleEffectImplBase();
 
 protected:
-	virtual bool GPUUpdate(GMParticleEmitter* emitter, const IRenderContext* context, GMDuration dt);
+	virtual bool GPUUpdate(GMParticleEmitter* emitter, GMDuration dt);
 
 protected:
 	virtual GMString getCode() = 0;

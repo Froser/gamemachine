@@ -1333,7 +1333,7 @@ void Timeline::parseParticlesObject(GMXMLElement* e)
 		if (type == L"cocos2d")
 		{
 			GMParticleSystem* ps = nullptr;
-			GMParticleSystem::createCocos2DParticleSystem(buf, GMParticleModelType::Particle3D, &ps);
+			GMParticleSystem::createCocos2DParticleSystem(m_context, buf, GMParticleModelType::Particle3D, &ps);
 			if (ps)
 			{
 				ps->getEmitter()->stopEmit();
