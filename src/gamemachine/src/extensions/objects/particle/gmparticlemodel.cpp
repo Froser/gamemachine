@@ -23,6 +23,7 @@ GMParticleModel::GMParticleModel(GMParticleSystem* system)
 {
 	D(d);
 	d->system = system;
+	initObjects();
 }
 
 GMParticleModel::~GMParticleModel()
@@ -298,11 +299,12 @@ GMComputeBufferHandle GMParticleModel::prepareBuffers(IComputeShaderProgram* sha
 }
 
 
-void GMParticleModel::initObjects(const IRenderContext* context)
+void GMParticleModel::initObjects()
 {
 	D(d);
 	if (!d->particleObject)
 	{
+		const IRenderContext* context = d->system->getContext();
 		d->particleObject.reset(createGameObject(context));
 
 		if (d->system->getTexture().isEmpty())
@@ -356,7 +358,7 @@ void GMParticleModel::setDefaultCode(const GMString& code)
 	s_code = code;
 }
 
-void GMParticleModel::render(const IRenderContext* context)
+void GMParticleModel::render()
 {
 	D(d);
 	if (d->particleObject)

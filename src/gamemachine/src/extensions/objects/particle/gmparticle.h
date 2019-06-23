@@ -18,7 +18,7 @@ GM_INTERFACE(IParticleSystemManager)
 
 GM_INTERFACE(IParticleModel)
 {
-	virtual void render(const IRenderContext* context) = 0;
+	virtual void render() = 0;
 };
 
 enum class GMParticleModelType

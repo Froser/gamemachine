@@ -184,6 +184,7 @@ public:
 GMParticleSystem::GMParticleSystem(const IRenderContext* context)
 {
 	D(d);
+	d->context = context;
 	d->emitter.reset(new GMParticleEmitter(this));
 }
 
@@ -573,7 +574,7 @@ void GMParticleSystemManager_Cocos2D::render()
 	D(d);
 	for (decltype(auto) ps : d->particleSystems)
 	{
-		ps->render(d->context);
+		ps->render();
 	}
 }
 
@@ -583,6 +584,6 @@ void GMParticleSystemManager_Cocos2D::update(GMDuration dt)
 	// 涉及到粒子池的分配，不能并行
 	for (decltype(auto) system : d->particleSystems)
 	{
-		system->update(d->context, dt);
+		system->update(dt);
 	}
 }

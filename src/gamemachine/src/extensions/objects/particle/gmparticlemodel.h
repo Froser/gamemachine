@@ -38,7 +38,7 @@ public:
 	~GMParticleModel();
 
 public:
-	virtual void render(const IRenderContext* context) override;
+	virtual void render() override;
 
 protected:
 	GMGameObject* createGameObject(
@@ -65,7 +65,7 @@ protected:
 	virtual GMComputeBufferHandle prepareBuffers(IComputeShaderProgram*, void* dataPtr, BufferFlags = IgnorePosZ);
 
 private:
-	void initObjects(const IRenderContext* context);
+	void initObjects();
 	void disposeGPUHandles();
 
 public:
