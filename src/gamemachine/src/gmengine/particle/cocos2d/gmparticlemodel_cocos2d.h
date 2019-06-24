@@ -41,6 +41,9 @@ public:
 public:
 	void render();
 
+public:
+	virtual void init();
+
 protected:
 	GMGameObject* createGameObject(
 		const IRenderContext* context
@@ -63,11 +66,12 @@ protected:
 	virtual GMString getCode() = 0;
 
 protected:
-	virtual GMComputeBufferHandle prepareBuffers(IComputeShaderProgram*, void* dataPtr, BufferFlags = IgnorePosZ);
+	virtual GMComputeBufferHandle prepareBuffers(IComputeShaderProgram*, BufferFlags = IgnorePosZ);
 
 private:
 	void initObjects();
 	void disposeGPUHandles();
+	void createBuffers(IComputeShaderProgram* shaderProgram);
 
 public:
 	static void setDefaultCode(const GMString& code);
@@ -93,7 +97,7 @@ protected:
 	virtual GMString getCode() override;
 
 protected:
-	virtual GMComputeBufferHandle prepareBuffers(IComputeShaderProgram*, const IRenderContext* context, void* dataPtr, BufferFlags);
+	virtual GMComputeBufferHandle prepareBuffers(IComputeShaderProgram*, const IRenderContext* context, BufferFlags);
 };
 
 END_NS

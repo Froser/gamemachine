@@ -210,7 +210,11 @@ void GMParticleSystem_Cocos2D::setDescription(const GMParticleDescription_Cocos2
 	GM_ASSERT(d->emitter);
 	d->emitter->setDescription(&desc);
 	d->textureBuffer = desc.getTextureImageData();
-	setParticleModel(createParticleModel(desc));
+
+	GMParticleModel_Cocos2D* particleModel = createParticleModel(desc);
+	GM_ASSERT(particleModel);
+	particleModel->init();
+	setParticleModel(particleModel);
 }
 
 void GMParticleSystem_Cocos2D::update(GMDuration dt)
@@ -230,6 +234,13 @@ void GMParticleSystem_Cocos2D::setParticleSystemManager(IParticleSystemManager* 
 {
 	D(d);
 	d->manager = manager;
+}
+
+
+GMParticleEmitter_Cocos2D* GMParticleSystem_Cocos2D::getEmitter()
+{
+	D(d);
+	return d->emitter.get();
 }
 
 void GMParticleSystem_Cocos2D::setParticleModel(AUTORELEASE GMParticleModel_Cocos2D* particleModel)
@@ -423,14 +434,14 @@ void GMParticleEmitter_Cocos2D::setDescription(GMParticleDescription desc)
 	GMParticleEffect_Cocos2D* eff = nullptr;
 	if (cocos2DDesc->getEmitterType() == GMParticleEmitterType::Gravity)
 	{
-		eff = new GMGravityParticleEffect_Cocos2D();
+		eff = new GMGravityParticleEffect_Cocos2D(this);
 	}
 	else
 	{
 		GM_ASSERT(cocos2DDesc->getEmitterType() == GMParticleEmitterType::Radius);
-		eff = new GMRadialParticleEffect_Cocos2D();
+		eff = new GMRadialParticleEffect_Cocos2D(this);
 	}
-
+	eff->init();
 	eff->setParticleDescription(cocos2DDesc);
 	setParticleEffect(eff);
 }
@@ -441,7 +452,7 @@ void GMParticleEmitter_Cocos2D::addParticle()
 	if (d->particles.size() < static_cast<GMsize_t>(getParticleCount()))
 	{
 		GMParticle_Cocos2D particle;
-		d->effect->initParticle(this, &particle);
+		d->effect->initParticle(&particle);
 		d->particles.push_back(particle);
 	}
 }
@@ -497,7 +508,7 @@ void GMParticleEmitter_Cocos2D::update(GMDuration dt)
 	if (d->canEmit)
 	{
 		emitParticles(dt);
-		d->effect->update(this, dt);
+		d->effect->update(dt);
 	}
 }
 
@@ -541,13 +552,24 @@ void GMParticleEffect_Cocos2D::setParticleDescription(GMParticleDescription desc
 	setRadiusMode(cocos2dDescription->getRadiusMode());
 }
 
-void GMParticleEffect_Cocos2D::initParticle(GMParticleEmitter_Cocos2D* emitter, GMParticle_Cocos2D* particle)
+
+GMParticleEffect_Cocos2D::GMParticleEffect_Cocos2D(GMParticleEmitter_Cocos2D* emitter)
+{
+	D(d);
+	d->emitter = emitter;
+}
+
+void GMParticleEffect_Cocos2D::init()
+{
+}
+
+void GMParticleEffect_Cocos2D::initParticle(GMParticle_Cocos2D* particle)
 {
 	D(d);
 	GMVec3 randomPos(GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f));
-	particle->setPosition(emitter->getEmitPosition() + emitter->getEmitPositionV() * randomPos);
+	particle->setPosition(d->emitter->getEmitPosition() + d->emitter->getEmitPositionV() * randomPos);
 
-	particle->setStartPosition(emitter->getEmitPosition());
+	particle->setStartPosition(d->emitter->getEmitPosition());
 	particle->setChangePosition(particle->getPosition());
 	particle->setRemainingLife(Max(.1f, getLife() + getLifeV() * GMRandomMt19937::random_real(-1.f, 1.f)));
 
@@ -574,17 +596,17 @@ void GMParticleEffect_Cocos2D::initParticle(GMParticleEmitter_Cocos2D* emitter, 
 }
 
 
-void GMParticleEffect_Cocos2D::update(GMParticleEmitter_Cocos2D* emitter, GMDuration dt)
+void GMParticleEffect_Cocos2D::update(GMDuration dt)
 {
 	D(d);
 	IComputeShaderProgram* computeShader = nullptr;
 	if (d->GPUValid)
 	{
-		if (!GPUUpdate(emitter, dt))
+		if (!GPUUpdate(dt))
 			d->GPUValid = false;
 	}
 	else
 	{
-		CPUUpdate(emitter, dt);
+		CPUUpdate(dt);
 	}
 }

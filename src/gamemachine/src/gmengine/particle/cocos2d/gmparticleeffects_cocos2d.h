@@ -7,7 +7,6 @@ BEGIN_NS
 
 GM_PRIVATE_OBJECT_UNALIGNED(GMParticleEffect_Cocos2DImplBase)
 {
-	const IRenderContext* context = nullptr;
 	GMComputeBufferHandle particles = 0;
 	GMComputeSRVHandle particlesSRV = 0;
 	GMComputeBufferHandle particlesResult = 0;
@@ -21,10 +20,14 @@ class GM_EXPORT GMParticleEffect_Cocos2DImplBase : public GMParticleEffect_Cocos
 	GM_DECLARE_PRIVATE_NGO(GMParticleEffect_Cocos2DImplBase)
 
 public:
+	using GMParticleEffect_Cocos2D::GMParticleEffect_Cocos2D;
 	~GMParticleEffect_Cocos2DImplBase();
 
+public:
+	virtual void init() override;
+
 protected:
-	virtual bool GPUUpdate(GMParticleEmitter_Cocos2D* emitter, GMDuration dt);
+	virtual bool GPUUpdate(GMDuration dt) override;
 
 protected:
 	virtual GMString getCode() = 0;
@@ -35,12 +38,13 @@ protected:
 class GM_EXPORT GMGravityParticleEffect_Cocos2D : public GMParticleEffect_Cocos2DImplBase
 {
 	typedef GMParticleEffect_Cocos2DImplBase Base;
+	using Base::Base;
 
 public:
-	virtual void initParticle(GMParticleEmitter_Cocos2D* emitter, GMParticle_Cocos2D* particle) override;
+	virtual void initParticle(GMParticle_Cocos2D* particle) override;
 
 protected:
-	virtual void CPUUpdate(GMParticleEmitter_Cocos2D* emitter, GMDuration dt);
+	virtual void CPUUpdate(GMDuration dt) override;
 
 protected:
 	virtual GMString getCode() override;
@@ -54,12 +58,13 @@ public:
 class GM_EXPORT GMRadialParticleEffect_Cocos2D : public GMParticleEffect_Cocos2DImplBase
 {
 	typedef GMParticleEffect_Cocos2DImplBase Base;
+	using Base::Base;
 
 public:
-	virtual void initParticle(GMParticleEmitter_Cocos2D* emitter, GMParticle_Cocos2D* particle) override;
+	virtual void initParticle(GMParticle_Cocos2D* particle) override;
 
 protected:
-	virtual void CPUUpdate(GMParticleEmitter_Cocos2D* emitter, GMDuration dt);
+	virtual void CPUUpdate(GMDuration dt) override;
 	virtual GMString getCode() override;
 	virtual GMString getEntry() override;
 	IComputeShaderProgram* getComputeShaderProgram(const IRenderContext* context) override;

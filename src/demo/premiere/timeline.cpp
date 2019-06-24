@@ -149,7 +149,7 @@ Timeline::Timeline(const IRenderContext* context, GMGameWorld* world)
 {
 	GM_ASSERT(m_context && m_world);
 	m_animations.resize(EndOfAnimation);
-	m_world->setParticleSystemManager(new GMParticleSystemManager_Cocos2D(m_context));
+	m_world->setParticleSystemManager(new GMParticleSystemManager(m_context));
 }
 
 Timeline::~Timeline()
@@ -929,7 +929,7 @@ void Timeline::parseActions(GMXMLElement* e)
 				else if (assetType == AssetType::Light)
 					addObject(asset_cast<ILight>(targetObject), e, action);
 				else if (assetType == AssetType::Particles)
-					addObject(asset_cast<GMParticleSystem>(targetObject), e, action);
+					addObject(asset_cast<IParticleSystem>(targetObject), e, action);
 				else
 					gm_warning(gm_dbg_wrap("Cannot find object: {0}"), object);
 
@@ -1132,12 +1132,12 @@ void Timeline::parseActions(GMXMLElement* e)
 				AssetType assetType = getAssetType(object, &targetObject);
 				if (assetType == AssetType::Particles)
 				{
-					auto particleSystemPtr = asset_cast<GMParticleSystem>(targetObject);
+					auto particleSystemPtr = asset_cast<IParticleSystem>(targetObject);
 					GM_ASSERT(particleSystemPtr);
-					GMParticleSystem* particleSystem = particleSystemPtr->get();
+					IParticleSystem* particleSystem = particleSystemPtr->get();
 					action.action = [particleSystem](){
-						particleSystem->getEmitter()->startEmit();
 						particleSystem->getEmitter()->emitOnce();
+						particleSystem->getEmitter()->startEmit();
 					};
 					bindAction(action);
 				}
@@ -1332,12 +1332,14 @@ void Timeline::parseParticlesObject(GMXMLElement* e)
 		GMString type = e->Attribute("type");
 		if (type == L"cocos2d")
 		{
-			GMParticleSystem* ps = nullptr;
-			GMParticleSystem::createCocos2DParticleSystem(m_context, buf, GMParticleModelType::Particle3D, &ps);
+			IParticleSystem* ps = nullptr;
+			GMParticleSystem_Cocos2D* cocos2DPs = nullptr;
+			GMParticleSystem_Cocos2D::createCocos2DParticleSystem(m_context, buf, GMParticleModelType::Particle3D, &cocos2DPs);
+			ps = cocos2DPs;
 			if (ps)
 			{
 				ps->getEmitter()->stopEmit();
-				m_particleSystems[id] = AutoReleasePtr<GMParticleSystem>(ps);
+				m_particleSystems[id] = AutoReleasePtr<IParticleSystem>(ps);
 			}
 			else
 			{
@@ -1593,7 +1595,7 @@ void Timeline::addObject(AutoReleasePtr<ILight>* light, GMXMLElement*, Action& a
 	};
 }
 
-void Timeline::addObject(AutoReleasePtr<GMParticleSystem>* particles, GMXMLElement* e, Action& action)
+void Timeline::addObject(AutoReleasePtr<IParticleSystem>* particles, GMXMLElement* e, Action& action)
 {
 	action.action = [this, particles]() {
 		m_world->getParticleSystemManager()->addParticleSystem(particles->release());

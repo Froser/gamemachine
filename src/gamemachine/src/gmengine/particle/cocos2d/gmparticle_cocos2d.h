@@ -215,6 +215,7 @@ public:
 
 GM_PRIVATE_OBJECT(GMParticleEffect_Cocos2D)
 {
+	GMParticleEmitter_Cocos2D* emitter = nullptr;
 	GMParticleMotionMode motionMode = GMParticleMotionMode::Free;
 	GMParticleGravityMode gravityMode;
 	GMParticleRadiusMode radiusMode;
@@ -258,18 +259,20 @@ class GM_EXPORT GMParticleEffect_Cocos2D : public GMObject
 		GM_DECLARE_PROPERTY(RadiusMode, radiusMode)
 
 public:
+	GMParticleEffect_Cocos2D(GMParticleEmitter_Cocos2D* emitter);
 	~GMParticleEffect_Cocos2D() = default;
 
 public:
-	virtual void initParticle(GMParticleEmitter_Cocos2D* emitter, GMParticle_Cocos2D* particle);
+	virtual void init();
+	virtual void initParticle(GMParticle_Cocos2D* particle);
 
 public:
 	void setParticleDescription(GMParticleDescription desc);
-	void update(GMParticleEmitter_Cocos2D* emitter, GMDuration dt);
+	void update(GMDuration dt);
 
 protected:
-	virtual void CPUUpdate(GMParticleEmitter_Cocos2D* emitter, GMDuration dt) = 0;
-	virtual bool GPUUpdate(GMParticleEmitter_Cocos2D* emitter, GMDuration dt) = 0;
+	virtual void CPUUpdate(GMDuration dt) = 0;
+	virtual bool GPUUpdate(GMDuration dt) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMParticleEmitter_Cocos2D)
@@ -368,14 +371,9 @@ public:
 	virtual void render() override;
 	virtual const IRenderContext* getContext() override;
 	virtual void setParticleSystemManager(IParticleSystemManager* manager);
+	virtual GMParticleEmitter_Cocos2D* getEmitter() override;
 
 public:
-	inline GMParticleEmitter_Cocos2D* getEmitter() GM_NOEXCEPT
-	{
-		D(d);
-		return d->emitter.get();
-	}
-
 	inline IParticleSystemManager* getParticleSystemManager() GM_NOEXCEPT
 	{
 		D(d);

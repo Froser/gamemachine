@@ -5,6 +5,12 @@
 #include "foundation/gmasync.h"
 #include <gmengine/gmcomputeshadermanager.h>
 
+struct Constant
+{
+	GMMat4 billboardRotation;
+	int ignoreZ;
+};
+
 namespace
 {
 	bool normalFuzzyEquals(const GMVec3& normal1, const GMVec3& normal2, GMfloat epsilon = .01f)
@@ -24,7 +30,6 @@ GMParticleModel_Cocos2D::GMParticleModel_Cocos2D(GMParticleSystem_Cocos2D* syste
 {
 	D(d);
 	d->system = system;
-	initObjects();
 }
 
 GMParticleModel_Cocos2D::~GMParticleModel_Cocos2D()
@@ -229,7 +234,7 @@ void GMParticleModel_Cocos2D::GPUUpdate(IComputeShaderProgram* shaderProgram, vo
 		d->particleSizeChanged = false;
 	}
 
-	GMComputeBufferHandle futureResult = prepareBuffers(shaderProgram, dataPtr, GMParticleModel_Cocos2D::None);
+	GMComputeBufferHandle futureResult = prepareBuffers(shaderProgram, GMParticleModel_Cocos2D::None);
 	if (futureResult)
 	{
 		shaderProgram->dispatch(sz, 1, 1);
@@ -258,14 +263,8 @@ void GMParticleModel_Cocos2D::GPUUpdate(IComputeShaderProgram* shaderProgram, vo
 	}
 }
 
-GMComputeBufferHandle GMParticleModel_Cocos2D::prepareBuffers(IComputeShaderProgram* shaderProgram, void* dataPtr, BufferFlags flags)
+GMComputeBufferHandle GMParticleModel_Cocos2D::prepareBuffers(IComputeShaderProgram* shaderProgram, BufferFlags flags)
 {
-	struct Constant
-	{
-		GMMat4 billboardRotation;
-		int ignoreZ;
-	};
-
 	D(d);
 	auto& particles = d->system->getEmitter()->getParticles();
 	if (particles.empty())
@@ -274,11 +273,7 @@ GMComputeBufferHandle GMParticleModel_Cocos2D::prepareBuffers(IComputeShaderProg
 	if (!d->constantBuffer || d->particleSizeChanged)
 	{
 		disposeGPUHandles();
-		shaderProgram->createBuffer(sizeof(Constant), 1, nullptr, GMComputeBufferType::Constant, &d->constantBuffer);
-		shaderProgram->createBuffer(sizeof(particles[0]), gm_sizet_to_uint(particles.size()), nullptr, GMComputeBufferType::Structured, &d->particleBuffer);
-		shaderProgram->createBufferShaderResourceView(d->particleBuffer, &d->particleView);
-		shaderProgram->createBuffer(sizeof(GMVertex), gm_sizet_to_uint(particles.size()) * 6, nullptr, GMComputeBufferType::UnorderedStructured, &d->resultBuffer);
-		shaderProgram->createBufferUnorderedAccessView(d->resultBuffer, &d->resultView);
+		createBuffers(shaderProgram);
 	}
 
 	const static GMVec3 s_normal(0, 0, -1.f);
@@ -354,6 +349,18 @@ void GMParticleModel_Cocos2D::disposeGPUHandles()
 }
 
 
+void GMParticleModel_Cocos2D::createBuffers(IComputeShaderProgram* shaderProgram)
+{
+	D(d);
+	auto& particles = d->system->getEmitter()->getParticles();
+	GMsize_t particleCount = d->system->getEmitter()->getParticleCount();
+	shaderProgram->createBuffer(sizeof(Constant), 1, nullptr, GMComputeBufferType::Constant, &d->constantBuffer);
+	shaderProgram->createBuffer(sizeof(particles[0]), gm_sizet_to_uint(particles.size()), nullptr, GMComputeBufferType::Structured, &d->particleBuffer);
+	shaderProgram->createBufferShaderResourceView(d->particleBuffer, &d->particleView);
+	shaderProgram->createBuffer(sizeof(GMVertex), gm_sizet_to_uint(particles.size()) * 6, nullptr, GMComputeBufferType::UnorderedStructured, &d->resultBuffer);
+	shaderProgram->createBufferUnorderedAccessView(d->resultBuffer, &d->resultView);
+}
+
 void GMParticleModel_Cocos2D::setDefaultCode(const GMString& code)
 {
 	s_code = code;
@@ -374,6 +381,12 @@ void GMParticleModel_Cocos2D::render()
 
 	GM_ASSERT(d->particleObject);
 	d->particleObject->draw();
+}
+
+
+void GMParticleModel_Cocos2D::init()
+{
+	initObjects();
 }
 
 void GMParticleModel_2D::CPUUpdate(void* dataPtr)
@@ -460,7 +473,7 @@ GMString GMParticleModel_3D::getCode()
 	return s_code;
 }
 
-GMComputeBufferHandle GMParticleModel_3D::prepareBuffers(IComputeShaderProgram* shaderProgram, const IRenderContext* context, void* dataPtr, BufferFlags)
+GMComputeBufferHandle GMParticleModel_3D::prepareBuffers(IComputeShaderProgram* shaderProgram, const IRenderContext* context, BufferFlags)
 {
-	return GMParticleModel_Cocos2D::prepareBuffers(shaderProgram, dataPtr, GMParticleModel_Cocos2D::None);
+	return GMParticleModel_Cocos2D::prepareBuffers(shaderProgram, GMParticleModel_Cocos2D::None);
 }

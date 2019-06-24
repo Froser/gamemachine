@@ -172,7 +172,7 @@ private:
 	void parseAttributes(GMGameObject*, GMXMLElement*, Action&);
 	void addObject(AutoReleasePtr<GMGameObject>*, GMXMLElement*, Action&);
 	void addObject(AutoReleasePtr<ILight>*, GMXMLElement*, Action&);
-	void addObject(AutoReleasePtr<GMParticleSystem>*, GMXMLElement*, Action&);
+	void addObject(AutoReleasePtr<IParticleSystem>*, GMXMLElement*, Action&);
 	void removeObject(ILight*, GMXMLElement*, Action&);
 	void removeObject(GMGameObject*, GMXMLElement*, Action&);
 	CurveType parseCurve(GMXMLElement*, GMInterpolationFunctors&);
@@ -194,7 +194,7 @@ private:
 	HashMap<GMString, AutoReleasePtr<ILight>, GMStringHashFunctor> m_lights;
 	HashMap<GMString, AutoReleasePtr<IAudioFile>, GMStringHashFunctor> m_audioFiles;
 	HashMap<GMString, AutoReleasePtr<IAudioSource>, GMStringHashFunctor> m_audioSources;
-	HashMap<GMString, AutoReleasePtr<GMParticleSystem>, GMStringHashFunctor> m_particleSystems;
+	HashMap<GMString, AutoReleasePtr<IParticleSystem>, GMStringHashFunctor> m_particleSystems;
 	std::multiset<Action> m_immediateActions;
 	std::multiset<Action> m_deferredActions;
 	std::multiset<Action>::iterator m_currentAction;

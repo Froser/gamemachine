@@ -7,6 +7,7 @@ BEGIN_NS
 typedef const void *GMParticleDescription;
 
 struct IParticleSystem;
+struct IParticleEmitter;
 GM_INTERFACE(IParticleSystemManager)
 {
 	virtual void addParticleSystem(AUTORELEASE IParticleSystem* ps) = 0;
@@ -20,6 +21,7 @@ GM_INTERFACE(IParticleSystem)
 	virtual void render() = 0;
 	virtual const IRenderContext* getContext() = 0;
 	virtual void setParticleSystemManager(IParticleSystemManager* manager) = 0;
+	virtual IParticleEmitter* getEmitter() = 0;
 };
 
 GM_INTERFACE(IParticleEmitter)
