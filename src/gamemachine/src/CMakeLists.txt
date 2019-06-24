@@ -90,6 +90,14 @@ set(SOURCES
 		gmengine/gmshaderhelper.cpp
 		gmengine/gmcomputeshadermanager.h
 		gmengine/gmcomputeshadermanager.cpp
+		gmengine/particle/gmparticle.h
+		gmengine/particle/gmparticle.cpp
+		gmengine/particle/cocos2d/gmparticle_cocos2d.h
+		gmengine/particle/cocos2d/gmparticle_cocos2d.cpp
+		gmengine/particle/cocos2d/gmparticleeffects_cocos2d.h
+		gmengine/particle/cocos2d/gmparticleeffects_cocos2d.cpp
+		gmengine/particle/cocos2d/gmparticlemodel_cocos2d.h
+		gmengine/particle/cocos2d/gmparticlemodel_cocos2d.cpp
 		gmengine/gameobjects/gmgameobject.h
 		gmengine/gameobjects/gmgameobject.cpp
 		gmengine/gameobjects/gmspritegameobject.h
@@ -258,15 +266,6 @@ set(SOURCES
 
 		extensions/objects/gmwavegameobject.h
 		extensions/objects/gmwavegameobject.cpp
-		
-		extensions/objects/particle/gmparticle.h
-		extensions/objects/particle/gmparticle.cpp
-		extensions/objects/particle/cocos2d/gmparticle_cocos2d.h
-		extensions/objects/particle/cocos2d/gmparticle_cocos2d.cpp
-		extensions/objects/particle/cocos2d/gmparticleeffects_cocos2d.h
-		extensions/objects/particle/cocos2d/gmparticleeffects_cocos2d.cpp
-		extensions/objects/particle/cocos2d/gmparticlemodel_cocos2d.h
-		extensions/objects/particle/cocos2d/gmparticlemodel_cocos2d.cpp
 	)
 
 set(WIN32_SOURCES

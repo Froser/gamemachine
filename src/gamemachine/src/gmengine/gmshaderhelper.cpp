@@ -8,8 +8,8 @@
 
 #include <gmglhelper.h>
 #include <extensions/objects/gmwavegameobject.h>
-#include <extensions/objects/particle/cocos2d/gmparticlemodel_cocos2d.h>
-#include <extensions/objects/particle/cocos2d/gmparticleeffects_cocos2d.h>
+#include <gmengine/particle/cocos2d/gmparticlemodel_cocos2d.h>
+#include <gmengine/particle/cocos2d/gmparticleeffects_cocos2d.h>
 #include "wrapper/dx11wrapper.h"
 
 namespace

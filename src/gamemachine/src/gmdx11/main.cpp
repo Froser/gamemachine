@@ -4,8 +4,8 @@
 #include "gmdx11helper.h"
 #include "gmengine/gameobjects/gmgameobject.h"
 #include "foundation/gamemachine.h"
-#include "extensions/objects/particle/cocos2d/gmparticleeffects_cocos2d.h"
-#include "extensions/objects/particle/cocos2d/gmparticlemodel_cocos2d.h"
+#include "gmengine/particle/cocos2d/gmparticleeffects_cocos2d.h"
+#include "gmengine/particle/cocos2d/gmparticlemodel_cocos2d.h"
 
 namespace
 {
