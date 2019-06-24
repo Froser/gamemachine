@@ -181,6 +181,19 @@ bool GMDx11FXC::compile(GMDx11FXCDescription& desc, ID3DBlob** ppCode, ID3DBlob*
 		gm_warning(gm_dbg_wrap("Unrecognized optimization level. Use default."));
 	}
 
+	const char* profile = nullptr;
+	switch (desc.profile)
+	{
+	case GMDx11FXCProfile::CS_5_0:
+		profile = "cs_5_0";
+		break;
+	case GMDx11FXCProfile::FX_5_0:
+	default:
+		profile = "fx_5_0";
+		break;
+	}
+	GM_ASSERT(profile);
+
 	gm_info(gm_dbg_wrap("Compiling HLSL code..."));
 	std::string strCodePath = desc.codePath.toStdString();
 	if (SUCCEEDED(D3DCompile(
@@ -190,7 +203,7 @@ bool GMDx11FXC::compile(GMDx11FXCDescription& desc, ID3DBlob** ppCode, ID3DBlob*
 		NULL,
 		0,
 		"",
-		"fx_5_0",
+		profile,
 		flags1,
 		0,
 		ppCode,

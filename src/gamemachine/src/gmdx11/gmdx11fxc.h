@@ -7,6 +7,12 @@ BEGIN_NS
 #error This file is only used in Windows.
 #endif
 
+enum class GMDx11FXCProfile
+{
+	FX_5_0,
+	CS_5_0,
+};
+
 struct GMDx11FXCDescription
 {
 	GMString fxcOutputDir;
@@ -15,6 +21,7 @@ struct GMDx11FXCDescription
 	GMint32 optimizationLevel = 1; // from 0-3
 	bool treatWarningsAsErrors = true;
 	bool debug = false;
+	GMDx11FXCProfile profile = GMDx11FXCProfile::FX_5_0;
 };
 
 class GMDx11FXC
