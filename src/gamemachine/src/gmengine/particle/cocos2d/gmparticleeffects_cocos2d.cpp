@@ -11,13 +11,17 @@ namespace
 	static GMString s_gravityEntry;
 	static GMString s_radialCode;
 	static GMString s_radialEntry;
+
+	const GMParticleDescription_Cocos2D* toCocos2DDesc(GMParticleDescription desc)
+	{
+		return static_cast<const GMParticleDescription_Cocos2D*>(desc);
+	}
 }
 
-GMParticleEffect_Cocos2DImplBase::~GMParticleEffect_Cocos2DImplBase()
+GMParticleEffect_Cocos2D::~GMParticleEffect_Cocos2D()
 {
 	D(d);
-	D_BASE(db, GMParticleEffect_Cocos2D);
-	if (const IRenderContext* context = db->emitter->getParticleSystem()->getContext();)
+	if (const IRenderContext* context = d->emitter->getParticleSystem()->getContext())
 	{
 		auto handles = {
 			d->particles,
@@ -36,22 +40,72 @@ GMParticleEffect_Cocos2DImplBase::~GMParticleEffect_Cocos2DImplBase()
 	}
 }
 
-
-void GMParticleEffect_Cocos2DImplBase::init()
+GMParticleEffect_Cocos2D::GMParticleEffect_Cocos2D(GMParticleEmitter_Cocos2D* emitter)
 {
-	D_BASE(d, GMParticleEffect_Cocos2D);
-	GMParticleEffect_Cocos2D::init();
+	D(d);
+	d->emitter = emitter;
+}
 
+void GMParticleEffect_Cocos2D::init()
+{
+	D(d);
 	const IRenderContext* context = d->emitter->getParticleSystem()->getContext();
 	getComputeShaderProgram(context);
 }
 
-bool GMParticleEffect_Cocos2DImplBase::GPUUpdate(GMDuration dt)
+void GMParticleEffect_Cocos2D::initParticle(GMParticle_Cocos2D* particle)
 {
 	D(d);
-	D_BASE(db, GMParticleEffect_Cocos2D);
+	GMVec3 randomPos(GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f));
+	particle->setPosition(d->emitter->getEmitPosition() + d->emitter->getEmitPositionV() * randomPos);
+
+	particle->setStartPosition(d->emitter->getEmitPosition());
+	particle->setChangePosition(particle->getPosition());
+	particle->setRemainingLife(Max(.1f, getLife() + getLifeV() * GMRandomMt19937::random_real(-1.f, 1.f)));
+
+	GMVec4 randomBeginColor(GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f));
+	GMVec4 randomEndColor(GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f));
+
+	GMVec4 beginColor, endColor;
+	beginColor = Clamp(getBeginColor() + getBeginColorV() * randomBeginColor, 0, 1);
+	endColor = Clamp(getEndColor() + getEndColorV() * randomEndColor, 0, 1);
+
+	GMfloat remainingLifeRev = 1.f / (particle->getRemainingLife());
+	particle->setColor(beginColor);
+	particle->setDeltaColor((endColor - beginColor) * remainingLifeRev);
+
+	GMfloat beginSize = Max(0, getBeginSize() + getBeginSizeV() * GMRandomMt19937::random_real(-1.f, 1.f));
+	GMfloat endSize = Max(0, getEndSize() + getEndSize() * GMRandomMt19937::random_real(-1.f, 1.f));
+	particle->setSize(beginSize);
+	particle->setDeltaSize((endSize - beginSize) / particle->getRemainingLife());
+
+	GMfloat beginSpin = Radian(Max(0, getBeginSpin() + getBeginSpinV() * GMRandomMt19937::random_real(-1.f, 1.f)));
+	GMfloat endSpin = Radian(Max(0, getEndSpin() + getEndSpin() * GMRandomMt19937::random_real(-1.f, 1.f)));
+	particle->setRotation(beginSpin);
+	particle->setDeltaRotation((endSpin - beginSpin) * remainingLifeRev);
+}
+
+
+void GMParticleEffect_Cocos2D::update(GMDuration dt)
+{
+	D(d);
+	IComputeShaderProgram* computeShader = nullptr;
+	if (d->GPUValid)
+	{
+		if (!GPUUpdate(dt))
+			d->GPUValid = false;
+	}
+	else
+	{
+		CPUUpdate(dt);
+	}
+}
+
+bool GMParticleEffect_Cocos2D::GPUUpdate(GMDuration dt)
+{
+	D(d);
 	// 获取计算着色器
-	const IRenderContext* context = db->emitter->getParticleSystem()->getContext();
+	const IRenderContext* context = d->emitter->getParticleSystem()->getContext();
 	IComputeShaderProgram* shaderProgram = getComputeShaderProgram(context);
 	if (!shaderProgram)
 		return false;
@@ -65,7 +119,7 @@ bool GMParticleEffect_Cocos2DImplBase::GPUUpdate(GMDuration dt)
 		GMint32 mode;
 	};
 
-	auto& particles = db->emitter->getParticles();
+	auto& particles = d->emitter->getParticles();
 	if (particles.empty())
 		return true;
 
@@ -105,7 +159,7 @@ bool GMParticleEffect_Cocos2DImplBase::GPUUpdate(GMDuration dt)
 	shaderProgram->bindShaderResourceView(1, &progParticlesSRV);
 
 	// 传入时间等变量
-	ConstantBuffer c = { db->emitter->getEmitPosition(), getGravityMode().getGravity(), db->emitter->getRotationAxis(), dt, static_cast<GMint32>(getMotionMode()) };
+	ConstantBuffer c = { d->emitter->getEmitPosition(), getGravityMode().getGravity(), d->emitter->getRotationAxis(), dt, static_cast<GMint32>(getMotionMode()) };
 	if (!constant)
 		shaderProgram->createBuffer(sizeof(ConstantBuffer), 1, &c, GMComputeBufferType::Constant, &constant);
 	shaderProgram->setBuffer(constant, GMComputeBufferType::Constant, &c, sizeof(ConstantBuffer));
@@ -155,7 +209,7 @@ bool GMParticleEffect_Cocos2DImplBase::GPUUpdate(GMDuration dt)
 
 void GMGravityParticleEffect_Cocos2D::initParticle(GMParticle_Cocos2D* particle)
 {
-	D_BASE(d, GMParticleEffect_Cocos2D);
+	D(d);
 	GMParticleEffect_Cocos2D::initParticle(particle);
 
 	GMfloat particleSpeed = d->emitter->getEmitSpeed() + d->emitter->getEmitSpeedV() * GMRandomMt19937::random_real(-1.f, 1.f);
@@ -234,6 +288,33 @@ GMString GMGravityParticleEffect_Cocos2D::getCode()
 GMString GMGravityParticleEffect_Cocos2D::getEntry()
 {
 	return s_gravityEntry;
+}
+
+void GMParticleEffect_Cocos2D::setParticleDescription(GMParticleDescription desc)
+{
+	const GMParticleDescription_Cocos2D* cocos2dDescription = toCocos2DDesc(desc);
+
+	setLife(cocos2dDescription->getLife());
+	setLifeV(cocos2dDescription->getLifeV());
+
+	setBeginColor(cocos2dDescription->getBeginColor());
+	setBeginColorV(cocos2dDescription->getBeginColorV());
+	setEndColor(cocos2dDescription->getEndColor());
+	setEndColorV(cocos2dDescription->getEndColorV());
+
+	setBeginSize(cocos2dDescription->getBeginSize());
+	setBeginSizeV(cocos2dDescription->getBeginSizeV());
+	setEndSize(cocos2dDescription->getEndSize());
+	setEndSizeV(cocos2dDescription->getEndSizeV());
+
+	setBeginSpin(cocos2dDescription->getBeginSpin());
+	setBeginSpinV(cocos2dDescription->getBeginSpinV());
+	setEndSpin(cocos2dDescription->getEndSpin());
+	setEndSpinV(cocos2dDescription->getEndSpinV());
+
+	setMotionMode(cocos2dDescription->getMotionMode());
+	setGravityMode(cocos2dDescription->getGravityMode());
+	setRadiusMode(cocos2dDescription->getRadiusMode());
 }
 
 IComputeShaderProgram* GMGravityParticleEffect_Cocos2D::getComputeShaderProgram(const IRenderContext* context)

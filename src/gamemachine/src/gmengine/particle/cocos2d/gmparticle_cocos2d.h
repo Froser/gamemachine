@@ -8,6 +8,7 @@ BEGIN_NS
 
 class GMParticleSystem_Cocos2D;
 class GMParticleEmitter_Cocos2D;
+class GMParticleEffect_Cocos2D;
 
 enum class GMParticleModelType
 {
@@ -213,68 +214,6 @@ public:
 	GMParticle_Cocos2D() = default;
 };
 
-GM_PRIVATE_OBJECT(GMParticleEffect_Cocos2D)
-{
-	GMParticleEmitter_Cocos2D* emitter = nullptr;
-	GMParticleMotionMode motionMode = GMParticleMotionMode::Free;
-	GMParticleGravityMode gravityMode;
-	GMParticleRadiusMode radiusMode;
-	GMfloat life = 0;
-	GMfloat lifeV = 0;
-	GMVec4 beginColor = 0;
-	GMVec4 beginColorV = 0;
-	GMVec4 endColor = 0;
-	GMVec4 endColorV = 0;
-	GMfloat beginSize = 0;
-	GMfloat beginSizeV = 0;
-	GMfloat endSize = 0;
-	GMfloat endSizeV = 0;
-	GMfloat beginSpin = 0;
-	GMfloat beginSpinV = 0;
-	GMfloat endSpin = 0;
-	GMfloat endSpinV = 0;
-	Map<const IRenderContext*, IComputeShaderProgram*> shaderPrograms;
-	bool GPUValid = true;
-};
-
-class GM_EXPORT GMParticleEffect_Cocos2D : public GMObject
-{
-	GM_DECLARE_PRIVATE(GMParticleEffect_Cocos2D)
-		GM_DECLARE_PROPERTY(Life, life)
-		GM_DECLARE_PROPERTY(LifeV, lifeV)
-		GM_DECLARE_PROPERTY(BeginColor, beginColor)
-		GM_DECLARE_PROPERTY(BeginColorV, beginColorV)
-		GM_DECLARE_PROPERTY(EndColor, endColor)
-		GM_DECLARE_PROPERTY(EndColorV, endColorV)
-		GM_DECLARE_PROPERTY(BeginSize, beginSize)
-		GM_DECLARE_PROPERTY(BeginSizeV, beginSizeV)
-		GM_DECLARE_PROPERTY(EndSize, endSize)
-		GM_DECLARE_PROPERTY(EndSizeV, endSizeV)
-		GM_DECLARE_PROPERTY(BeginSpin, beginSpin)
-		GM_DECLARE_PROPERTY(BeginSpinV, beginSpinV)
-		GM_DECLARE_PROPERTY(EndSpin, endSpin)
-		GM_DECLARE_PROPERTY(EndSpinV, endSpinV)
-		GM_DECLARE_PROPERTY(MotionMode, motionMode)
-		GM_DECLARE_PROPERTY(GravityMode, gravityMode)
-		GM_DECLARE_PROPERTY(RadiusMode, radiusMode)
-
-public:
-	GMParticleEffect_Cocos2D(GMParticleEmitter_Cocos2D* emitter);
-	~GMParticleEffect_Cocos2D() = default;
-
-public:
-	virtual void init();
-	virtual void initParticle(GMParticle_Cocos2D* particle);
-
-public:
-	void setParticleDescription(GMParticleDescription desc);
-	void update(GMDuration dt);
-
-protected:
-	virtual void CPUUpdate(GMDuration dt) = 0;
-	virtual bool GPUUpdate(GMDuration dt) = 0;
-};
-
 GM_PRIVATE_OBJECT(GMParticleEmitter_Cocos2D)
 {
 	GMVec3 emitPosition = Zero<GMVec3>();
@@ -287,7 +226,7 @@ GM_PRIVATE_OBJECT(GMParticleEmitter_Cocos2D)
 	GMDuration emitRate = 0;
 	GMDuration duration = 0;
 	GMVec3 rotationAxis = GMVec3(0, 0, 1);
-	GMOwnedPtr<GMParticleEffect_Cocos2D> effect;
+	AUTORELEASE GMParticleEffect_Cocos2D* effect = nullptr;
 	Vector<GMParticle_Cocos2D> particles;
 	bool canEmit = true;
 	GMParticleSystem_Cocos2D* system = nullptr;
@@ -311,6 +250,7 @@ class GMParticleEmitter_Cocos2D : public GMObject, public IParticleEmitter
 
 public:
 	GMParticleEmitter_Cocos2D(GMParticleSystem_Cocos2D* system);
+	~GMParticleEmitter_Cocos2D();
 
 public:
 	virtual void emitParticles(GMDuration dt) override;
@@ -333,7 +273,7 @@ public:
 	inline GMParticleEffect_Cocos2D* getEffect() GM_NOEXCEPT
 	{
 		D(d);
-		return d->effect.get();
+		return d->effect;
 	}
 
 	inline Vector<GMParticle_Cocos2D>& getParticles() GM_NOEXCEPT

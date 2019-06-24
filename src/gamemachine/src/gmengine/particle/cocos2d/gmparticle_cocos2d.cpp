@@ -414,6 +414,14 @@ GMParticleEmitter_Cocos2D::GMParticleEmitter_Cocos2D(GMParticleSystem_Cocos2D* s
 	d->system = system;
 }
 
+
+GMParticleEmitter_Cocos2D::~GMParticleEmitter_Cocos2D()
+{
+	D(d);
+	if (d->effect)
+		d->effect->destroy();
+}
+
 void GMParticleEmitter_Cocos2D::setDescription(GMParticleDescription desc)
 {
 	const GMParticleDescription_Cocos2D* cocos2DDesc = toCocos2DDesc(desc);
@@ -499,7 +507,9 @@ void GMParticleEmitter_Cocos2D::emitOnce()
 void GMParticleEmitter_Cocos2D::setParticleEffect(GMParticleEffect_Cocos2D* effect)
 {
 	D(d);
-	d->effect.reset(effect);
+	if (d->effect && d->effect != effect)
+		d->effect->destroy();
+	d->effect = effect;
 }
 
 void GMParticleEmitter_Cocos2D::update(GMDuration dt)
@@ -523,90 +533,4 @@ void GMParticleEmitter_Cocos2D::stopEmit()
 	D(d);
 	d->canEmit = false;
 	d->particles.clear();
-}
-
-void GMParticleEffect_Cocos2D::setParticleDescription(GMParticleDescription desc)
-{
-	const GMParticleDescription_Cocos2D* cocos2dDescription = toCocos2DDesc(desc);
-
-	setLife(cocos2dDescription->getLife());
-	setLifeV(cocos2dDescription->getLifeV());
-
-	setBeginColor(cocos2dDescription->getBeginColor());
-	setBeginColorV(cocos2dDescription->getBeginColorV());
-	setEndColor(cocos2dDescription->getEndColor());
-	setEndColorV(cocos2dDescription->getEndColorV());
-
-	setBeginSize(cocos2dDescription->getBeginSize());
-	setBeginSizeV(cocos2dDescription->getBeginSizeV());
-	setEndSize(cocos2dDescription->getEndSize());
-	setEndSizeV(cocos2dDescription->getEndSizeV());
-
-	setBeginSpin(cocos2dDescription->getBeginSpin());
-	setBeginSpinV(cocos2dDescription->getBeginSpinV());
-	setEndSpin(cocos2dDescription->getEndSpin());
-	setEndSpinV(cocos2dDescription->getEndSpinV());
-
-	setMotionMode(cocos2dDescription->getMotionMode());
-	setGravityMode(cocos2dDescription->getGravityMode());
-	setRadiusMode(cocos2dDescription->getRadiusMode());
-}
-
-
-GMParticleEffect_Cocos2D::GMParticleEffect_Cocos2D(GMParticleEmitter_Cocos2D* emitter)
-{
-	D(d);
-	d->emitter = emitter;
-}
-
-void GMParticleEffect_Cocos2D::init()
-{
-}
-
-void GMParticleEffect_Cocos2D::initParticle(GMParticle_Cocos2D* particle)
-{
-	D(d);
-	GMVec3 randomPos(GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f));
-	particle->setPosition(d->emitter->getEmitPosition() + d->emitter->getEmitPositionV() * randomPos);
-
-	particle->setStartPosition(d->emitter->getEmitPosition());
-	particle->setChangePosition(particle->getPosition());
-	particle->setRemainingLife(Max(.1f, getLife() + getLifeV() * GMRandomMt19937::random_real(-1.f, 1.f)));
-
-	GMVec4 randomBeginColor(GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f));
-	GMVec4 randomEndColor(GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f), GMRandomMt19937::random_real(-1.f, 1.f));
-
-	GMVec4 beginColor, endColor;
-	beginColor = Clamp(getBeginColor() + getBeginColorV() * randomBeginColor, 0, 1);
-	endColor = Clamp(getEndColor() + getEndColorV() * randomEndColor, 0, 1);
-
-	GMfloat remainingLifeRev = 1.f / (particle->getRemainingLife());
-	particle->setColor(beginColor);
-	particle->setDeltaColor((endColor - beginColor) * remainingLifeRev);
-
-	GMfloat beginSize = Max(0, getBeginSize() + getBeginSizeV() * GMRandomMt19937::random_real(-1.f, 1.f));
-	GMfloat endSize = Max(0, getEndSize() + getEndSize() * GMRandomMt19937::random_real(-1.f, 1.f));
-	particle->setSize(beginSize);
-	particle->setDeltaSize((endSize - beginSize) / particle->getRemainingLife());
-
-	GMfloat beginSpin = Radian(Max(0, getBeginSpin() + getBeginSpinV() * GMRandomMt19937::random_real(-1.f, 1.f)));
-	GMfloat endSpin = Radian(Max(0, getEndSpin() + getEndSpin() * GMRandomMt19937::random_real(-1.f, 1.f)));
-	particle->setRotation(beginSpin);
-	particle->setDeltaRotation((endSpin - beginSpin) * remainingLifeRev);
-}
-
-
-void GMParticleEffect_Cocos2D::update(GMDuration dt)
-{
-	D(d);
-	IComputeShaderProgram* computeShader = nullptr;
-	if (d->GPUValid)
-	{
-		if (!GPUUpdate(dt))
-			d->GPUValid = false;
-	}
-	else
-	{
-		CPUUpdate(dt);
-	}
 }
