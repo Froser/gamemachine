@@ -261,10 +261,12 @@ set(SOURCES
 		
 		extensions/objects/particle/gmparticle.h
 		extensions/objects/particle/gmparticle.cpp
-		extensions/objects/particle/gmparticleeffects.h
-		extensions/objects/particle/gmparticleeffects.cpp
-		extensions/objects/particle/gmparticlemodel.h
-		extensions/objects/particle/gmparticlemodel.cpp
+		extensions/objects/particle/cocos2d/gmparticle_cocos2d.h
+		extensions/objects/particle/cocos2d/gmparticle_cocos2d.cpp
+		extensions/objects/particle/cocos2d/gmparticleeffects_cocos2d.h
+		extensions/objects/particle/cocos2d/gmparticleeffects_cocos2d.cpp
+		extensions/objects/particle/cocos2d/gmparticlemodel_cocos2d.h
+		extensions/objects/particle/cocos2d/gmparticlemodel_cocos2d.cpp
 	)
 
 set(WIN32_SOURCES

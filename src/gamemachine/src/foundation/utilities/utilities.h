@@ -10,7 +10,6 @@ BEGIN_NS
 class GMModel;
 class GMShader;
 class GMGameObject;
-class GMParticleSystem;
 
 GM_INTERFACE(IPrimitiveCreatorShaderCallback)
 {

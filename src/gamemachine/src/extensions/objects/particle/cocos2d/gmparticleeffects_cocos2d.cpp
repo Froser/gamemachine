@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "gmparticleeffects.h"
+#include "gmparticleeffects_cocos2d.h"
 #include "foundation/gmasync.h"
 #include "foundation/gamemachine.h"
 #include <gmengine/gmcomputeshadermanager.h>
@@ -13,7 +13,7 @@ namespace
 	static GMString s_radialEntry;
 }
 
-GMParticleEffectImplBase::~GMParticleEffectImplBase()
+GMParticleEffect_Cocos2DImplBase::~GMParticleEffect_Cocos2DImplBase()
 {
 	D(d);
 	if (d->context)
@@ -35,7 +35,7 @@ GMParticleEffectImplBase::~GMParticleEffectImplBase()
 	}
 }
 
-bool GMParticleEffectImplBase::GPUUpdate(GMParticleEmitter* emitter, GMDuration dt)
+bool GMParticleEffect_Cocos2DImplBase::GPUUpdate(IParticleEmitter* emitter, GMDuration dt)
 {
 	D(d);
 	const IRenderContext* context = emitter->getParticleSystem()->getContext();
@@ -151,9 +151,9 @@ bool GMParticleEffectImplBase::GPUUpdate(GMParticleEmitter* emitter, GMDuration 
 	return true;
 }
 
-void GMGravityParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle* particle)
+void GMGravityParticleEffect::initParticle(IParticleEmitter* emitter, GMParticle* particle)
 {
-	GMParticleEffect::initParticle(emitter, particle);
+	GMParticleEffect_Cocos2D::initParticle(emitter, particle);
 
 	GMfloat particleSpeed = emitter->getEmitSpeed() + emitter->getEmitSpeedV() * GMRandomMt19937::random_real(-1.f, 1.f);
 	GMfloat angle = emitter->getEmitAngle() + emitter->getEmitAngleV() * GMRandomMt19937::random_real(-1.f, 1.f);
@@ -164,7 +164,7 @@ void GMGravityParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticl
 	particle->getGravityModeData().radialAcceleration = getGravityMode().getRadialAcceleration() + getGravityMode().getRadialAccelerationV() * GMRandomMt19937::random_real(-1.f, 1.f);
 }
 
-void GMGravityParticleEffect::CPUUpdate(GMParticleEmitter* emitter, GMDuration dt)
+void GMGravityParticleEffect::CPUUpdate(GMParticleEmitter_Cocos2D* emitter, GMDuration dt)
 {
 	D(d);
 	auto& particles = emitter->getParticles();
@@ -248,9 +248,9 @@ void GMGravityParticleEffect::setDefaultCodeAndEntry(const GMString& code, const
 	s_gravityEntry = entry;
 }
 
-void GMRadialParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle* particle)
+void GMRadialParticleEffect::initParticle(IParticleEmitter* emitter, GMParticle* particle)
 {
-	GMParticleEffect::initParticle(emitter, particle);
+	GMParticleEffect_Cocos2D::initParticle(emitter, particle);
 
 	GMfloat beginRadius = getRadiusMode().getBeginRadius() + getRadiusMode().getBeginRadiusV() * GMRandomMt19937::random_real(-1.f, 1.f);
 	GMfloat endRadius = getRadiusMode().getEndRadius() + getRadiusMode().getEndRadiusV() * GMRandomMt19937::random_real(-1.f, 1.f);
@@ -262,7 +262,7 @@ void GMRadialParticleEffect::initParticle(GMParticleEmitter* emitter, GMParticle
 	particle->getRadiusModeData().degressPerSecond = Radian(getRadiusMode().getSpinPerSecond() + getRadiusMode().getSpinPerSecondV() * GMRandomMt19937::random_real(-1.f, 1.f));
 }
 
-void GMRadialParticleEffect::CPUUpdate(GMParticleEmitter* emitter, GMDuration dt)
+void GMRadialParticleEffect::CPUUpdate(GMParticleEmitter_Cocos2D* emitter, GMDuration dt)
 {
 	auto& particles = emitter->getParticles();
 	for (auto iter = particles.begin(); iter != particles.end();)

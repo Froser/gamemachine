@@ -9,7 +9,7 @@ GM_PRIVATE_OBJECT(GMParticleModel)
 {
 	GMOwnedPtr<GMGameObject> particleObject;
 	GMModel* particleModel = nullptr;
-	GMParticleSystem* system = nullptr;
+	IParticleSystem* system = nullptr;
 	bool GPUValid = true;
 	GMComputeBufferHandle constantBuffer = 0;
 	GMComputeBufferHandle particleBuffer = 0;
@@ -34,7 +34,7 @@ public:
 	};
 
 public:
-	GMParticleModel(GMParticleSystem* system);
+	GMParticleModel(IParticleSystem* system);
 	~GMParticleModel();
 
 public:
