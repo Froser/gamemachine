@@ -35,7 +35,7 @@ GMParticleEffect_Cocos2DImplBase::~GMParticleEffect_Cocos2DImplBase()
 	}
 }
 
-bool GMParticleEffect_Cocos2DImplBase::GPUUpdate(IParticleEmitter* emitter, GMDuration dt)
+bool GMParticleEffect_Cocos2DImplBase::GPUUpdate(GMParticleEmitter_Cocos2D* emitter, GMDuration dt)
 {
 	D(d);
 	const IRenderContext* context = emitter->getParticleSystem()->getContext();
@@ -129,12 +129,12 @@ bool GMParticleEffect_Cocos2DImplBase::GPUUpdate(IParticleEmitter* emitter, GMDu
 		GMComputeBufferHandle resultHandle = canReadFromGPU ? progParticlesResult : particleCpuResult;
 		if (!canReadFromGPU)
 			shaderProgram->copyBuffer(resultHandle, progParticlesResult);
-		typedef GM_PRIVATE_NAME(GMParticle) ParticleData;
+		typedef GM_PRIVATE_NAME(GMParticle_Cocos2D) ParticleData;
 		const ParticleData* resultPtr = static_cast<ParticleData*>(shaderProgram->mapBuffer(resultHandle));
 		memcpy_s(particles.data(), sizeof(ParticleData) * particles.size(), resultPtr, sizeof(*particles[0].data()) * particles.size());
 
 		// 将存活的粒子放入临时容器，最后交换
-		Vector<GMParticle> tmp;
+		Vector<GMParticle_Cocos2D> tmp;
 		tmp.reserve(particles.size());
 		for (GMsize_t i = 0; i < particles.size(); ++i)
 		{
@@ -151,7 +151,7 @@ bool GMParticleEffect_Cocos2DImplBase::GPUUpdate(IParticleEmitter* emitter, GMDu
 	return true;
 }
 
-void GMGravityParticleEffect::initParticle(IParticleEmitter* emitter, GMParticle* particle)
+void GMGravityParticleEffect_Cocos2D::initParticle(GMParticleEmitter_Cocos2D* emitter, GMParticle_Cocos2D* particle)
 {
 	GMParticleEffect_Cocos2D::initParticle(emitter, particle);
 
@@ -164,13 +164,13 @@ void GMGravityParticleEffect::initParticle(IParticleEmitter* emitter, GMParticle
 	particle->getGravityModeData().radialAcceleration = getGravityMode().getRadialAcceleration() + getGravityMode().getRadialAccelerationV() * GMRandomMt19937::random_real(-1.f, 1.f);
 }
 
-void GMGravityParticleEffect::CPUUpdate(GMParticleEmitter_Cocos2D* emitter, GMDuration dt)
+void GMGravityParticleEffect_Cocos2D::CPUUpdate(GMParticleEmitter_Cocos2D* emitter, GMDuration dt)
 {
 	D(d);
 	auto& particles = emitter->getParticles();
 	for (auto iter = particles.begin(); iter != particles.end();)
 	{
-		GMParticle& particle = *iter;
+		GMParticle_Cocos2D& particle = *iter;
 		particle.setRemainingLife(particle.getRemainingLife() - dt);
 		if (particle.getRemainingLife() > 0)
 		{
@@ -223,17 +223,17 @@ void GMGravityParticleEffect::CPUUpdate(GMParticleEmitter_Cocos2D* emitter, GMDu
 	}
 }
 
-GMString GMGravityParticleEffect::getCode()
+GMString GMGravityParticleEffect_Cocos2D::getCode()
 {
 	return s_gravityCode;
 }
 
-GMString GMGravityParticleEffect::getEntry()
+GMString GMGravityParticleEffect_Cocos2D::getEntry()
 {
 	return s_gravityEntry;
 }
 
-IComputeShaderProgram* GMGravityParticleEffect::getComputeShaderProgram(const IRenderContext* context)
+IComputeShaderProgram* GMGravityParticleEffect_Cocos2D::getComputeShaderProgram(const IRenderContext* context)
 {
 	D(d);
 	if (getCode().isEmpty())
@@ -242,13 +242,13 @@ IComputeShaderProgram* GMGravityParticleEffect::getComputeShaderProgram(const IR
 	return GMComputeShaderManager::instance().getComputeShaderProgram(context, GMCS_PARTICLE_GRAVITY, L".", getCode(), getEntry());
 }
 
-void GMGravityParticleEffect::setDefaultCodeAndEntry(const GMString& code, const GMString& entry)
+void GMGravityParticleEffect_Cocos2D::setDefaultCodeAndEntry(const GMString& code, const GMString& entry)
 {
 	s_gravityCode = code;
 	s_gravityEntry = entry;
 }
 
-void GMRadialParticleEffect::initParticle(IParticleEmitter* emitter, GMParticle* particle)
+void GMRadialParticleEffect_Cocos2D::initParticle(GMParticleEmitter_Cocos2D* emitter, GMParticle_Cocos2D* particle)
 {
 	GMParticleEffect_Cocos2D::initParticle(emitter, particle);
 
@@ -262,12 +262,12 @@ void GMRadialParticleEffect::initParticle(IParticleEmitter* emitter, GMParticle*
 	particle->getRadiusModeData().degressPerSecond = Radian(getRadiusMode().getSpinPerSecond() + getRadiusMode().getSpinPerSecondV() * GMRandomMt19937::random_real(-1.f, 1.f));
 }
 
-void GMRadialParticleEffect::CPUUpdate(GMParticleEmitter_Cocos2D* emitter, GMDuration dt)
+void GMRadialParticleEffect_Cocos2D::CPUUpdate(GMParticleEmitter_Cocos2D* emitter, GMDuration dt)
 {
 	auto& particles = emitter->getParticles();
 	for (auto iter = particles.begin(); iter != particles.end();)
 	{
-		GMParticle& particle = *iter;
+		GMParticle_Cocos2D& particle = *iter;
 		particle.setRemainingLife(particle.getRemainingLife() - dt);
 		if (particle.getRemainingLife() > 0)
 		{
@@ -302,17 +302,17 @@ void GMRadialParticleEffect::CPUUpdate(GMParticleEmitter_Cocos2D* emitter, GMDur
 	}
 }
 
-GMString GMRadialParticleEffect::getCode()
+GMString GMRadialParticleEffect_Cocos2D::getCode()
 {
 	return s_radialCode;
 }
 
-GMString GMRadialParticleEffect::getEntry()
+GMString GMRadialParticleEffect_Cocos2D::getEntry()
 {
 	return s_radialEntry;
 }
 
-IComputeShaderProgram* GMRadialParticleEffect::getComputeShaderProgram(const IRenderContext* context)
+IComputeShaderProgram* GMRadialParticleEffect_Cocos2D::getComputeShaderProgram(const IRenderContext* context)
 {
 	D(d);
 	if (getCode().isEmpty())
@@ -321,7 +321,7 @@ IComputeShaderProgram* GMRadialParticleEffect::getComputeShaderProgram(const IRe
 	return GMComputeShaderManager::instance().getComputeShaderProgram(context, GMCS_PARTICLE_RADIAL, L".", getCode(), getEntry());
 }
 
-void GMRadialParticleEffect::setDefaultCodeAndEntry(const GMString& code, const GMString& entry)
+void GMRadialParticleEffect_Cocos2D::setDefaultCodeAndEntry(const GMString& code, const GMString& entry)
 {
 	s_radialCode = code;
 	s_radialEntry = entry;

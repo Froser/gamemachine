@@ -5,8 +5,8 @@
 BEGIN_NS
 
 typedef const void *GMParticleDescription;
-typedef void* GMParticle;
 
+struct IParticleSystem;
 GM_INTERFACE(IParticleSystemManager)
 {
 	virtual void addParticleSystem(AUTORELEASE IParticleSystem* ps) = 0;
@@ -14,37 +14,40 @@ GM_INTERFACE(IParticleSystemManager)
 	virtual void update(GMDuration dt) = 0;
 };
 
-GM_INTERFACE(IParticleModel)
-{
-	virtual void render() = 0;
-};
-
 GM_INTERFACE(IParticleSystem)
 {
 	virtual void update(GMDuration dt) = 0;
 	virtual void render() = 0;
 	virtual const IRenderContext* getContext() = 0;
-	virtual IParticleModel* createParticleModel(GMParticleDescription desc) = 0;
+	virtual void setParticleSystemManager(IParticleSystemManager* manager) = 0;
 };
 
 GM_INTERFACE(IParticleEmitter)
 {
-	virtual void setDescription(GMParticleDescription desc) = 0;
-	virtual void setParticleEffect(IParticleEffect* effect) = 0;
-	virtual void addParticle() = 0;
 	virtual void emitParticles(GMDuration dt) = 0;
 	virtual void emitOnce() = 0;
 	virtual void update(GMDuration dt) = 0;
 	virtual void startEmit() = 0;
 	virtual void stopEmit() = 0;
-	virtual IParticleSystem* getParticleSystem() = 0;
 };
 
-GM_INTERFACE(IParticleEffect)
+GM_PRIVATE_OBJECT(GMParticleSystemManager)
 {
-	virtual void setParticleDescription(GMParticleDescription desc) = 0;
-	virtual void initParticle(IParticleEmitter* emitter, GMParticle particle) = 0;
-	virtual void update(IParticleEmitter* emitter, GMDuration dt) = 0;
+	const IRenderContext* context;
+	Vector<GMOwnedPtr<IParticleSystem>> particleSystems;
+};
+
+class GM_EXPORT GMParticleSystemManager : public GMObject, public IParticleSystemManager
+{
+	GM_DECLARE_PRIVATE(GMParticleSystemManager)
+
+public:
+	GMParticleSystemManager(const IRenderContext* context);
+
+public:
+	virtual void addParticleSystem(AUTORELEASE IParticleSystem* ps) override;
+	virtual void render() override;
+	virtual void update(GMDuration dt) override;
 };
 
 END_NS

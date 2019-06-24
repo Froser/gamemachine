@@ -8,8 +8,8 @@
 
 #include <gmglhelper.h>
 #include <extensions/objects/gmwavegameobject.h>
-#include <extensions/objects/particle/gmparticlemodel.h>
-#include <extensions/objects/particle/gmparticleeffects.h>
+#include <extensions/objects/particle/cocos2d/gmparticlemodel_cocos2d.h>
+#include <extensions/objects/particle/cocos2d/gmparticleeffects_cocos2d.h>
 #include "wrapper/dx11wrapper.h"
 
 namespace
@@ -58,9 +58,9 @@ void GMShaderHelper::loadExtensionShaders(const IRenderContext* context)
 	auto& env = GM.getRunningStates().renderEnvironment;
 	if (env == GMRenderEnvironment::OpenGL)
 	{
-		GMGravityParticleEffect::setDefaultCodeAndEntry(getFileContent(L"gl/compute/particle_gravity.glsl"), L"main");
-		GMRadialParticleEffect::setDefaultCodeAndEntry(getFileContent(L"gl/compute/particle_radial.glsl"), L"main");
-		GMParticleModel::setDefaultCode(getFileContent(L"gl/compute/particle_transfer.glsl"));
+		GMGravityParticleEffect_Cocos2D::setDefaultCodeAndEntry(getFileContent(L"gl/compute/particle_gravity_cocos2d.glsl"), L"main");
+		GMRadialParticleEffect_Cocos2D::setDefaultCodeAndEntry(getFileContent(L"gl/compute/particle_radial_cocos2d.glsl"), L"main");
+		GMParticleModel_Cocos2D::setDefaultCode(getFileContent(L"gl/compute/particle_transfer_cocos2d.glsl"));
 	}
 	else
 	{

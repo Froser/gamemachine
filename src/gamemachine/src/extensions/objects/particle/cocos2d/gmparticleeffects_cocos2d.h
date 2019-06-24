@@ -24,7 +24,7 @@ public:
 	~GMParticleEffect_Cocos2DImplBase();
 
 protected:
-	virtual bool GPUUpdate(IParticleEmitter* emitter, GMDuration dt);
+	virtual bool GPUUpdate(GMParticleEmitter_Cocos2D* emitter, GMDuration dt);
 
 protected:
 	virtual GMString getCode() = 0;
@@ -32,12 +32,12 @@ protected:
 	virtual IComputeShaderProgram* getComputeShaderProgram(const IRenderContext* context) { return nullptr; }
 };
 
-class GM_EXPORT GMGravityParticleEffect : public GMParticleEffect_Cocos2DImplBase
+class GM_EXPORT GMGravityParticleEffect_Cocos2D : public GMParticleEffect_Cocos2DImplBase
 {
 	typedef GMParticleEffect_Cocos2DImplBase Base;
 
 public:
-	virtual void initParticle(IParticleEmitter* emitter, GMParticle particle) override;
+	virtual void initParticle(GMParticleEmitter_Cocos2D* emitter, GMParticle_Cocos2D* particle) override;
 
 protected:
 	virtual void CPUUpdate(GMParticleEmitter_Cocos2D* emitter, GMDuration dt);
@@ -51,12 +51,12 @@ public:
 	static void setDefaultCodeAndEntry(const GMString& code, const GMString& entry);
 };
 
-class GM_EXPORT GMRadialParticleEffect : public GMParticleEffect_Cocos2DImplBase
+class GM_EXPORT GMRadialParticleEffect_Cocos2D : public GMParticleEffect_Cocos2DImplBase
 {
 	typedef GMParticleEffect_Cocos2DImplBase Base;
 
 public:
-	virtual void initParticle(IParticleEmitter* emitter, GMParticle particle) override;
+	virtual void initParticle(GMParticleEmitter_Cocos2D* emitter, GMParticle_Cocos2D* particle) override;
 
 protected:
 	virtual void CPUUpdate(GMParticleEmitter_Cocos2D* emitter, GMDuration dt);

@@ -1,15 +1,16 @@
-﻿#ifndef __GMPARTICLE_MODEL__
-#define __GMPARTICLE_MODEL__
+﻿#ifndef __GMPARTICLE_MODEL_COCOS2D__
+#define __GMPARTICLE_MODEL_COCOS2D__
 #include <gmcommon.h>
-#include "gmparticle.h"
+#include "../gmparticle.h"
 
 BEGIN_NS
 
-GM_PRIVATE_OBJECT(GMParticleModel)
+class GMParticleSystem_Cocos2D;
+GM_PRIVATE_OBJECT(GMParticleModel_Cocos2D)
 {
 	GMOwnedPtr<GMGameObject> particleObject;
 	GMModel* particleModel = nullptr;
-	IParticleSystem* system = nullptr;
+	GMParticleSystem_Cocos2D* system = nullptr;
 	bool GPUValid = true;
 	GMComputeBufferHandle constantBuffer = 0;
 	GMComputeBufferHandle particleBuffer = 0;
@@ -22,9 +23,9 @@ GM_PRIVATE_OBJECT(GMParticleModel)
 };
 
 //! 表示一个2D粒子，是一个四边形
-class GM_EXPORT GMParticleModel : public GMObject, public IParticleModel
+class GM_EXPORT GMParticleModel_Cocos2D : public GMObject
 {
-	GM_DECLARE_PRIVATE(GMParticleModel)
+	GM_DECLARE_PRIVATE(GMParticleModel_Cocos2D)
 
 public:
 	enum BufferFlags
@@ -34,11 +35,11 @@ public:
 	};
 
 public:
-	GMParticleModel(IParticleSystem* system);
-	~GMParticleModel();
+	GMParticleModel_Cocos2D(GMParticleSystem_Cocos2D* system);
+	~GMParticleModel_Cocos2D();
 
 public:
-	virtual void render() override;
+	void render();
 
 protected:
 	GMGameObject* createGameObject(
@@ -72,20 +73,20 @@ public:
 	static void setDefaultCode(const GMString& code);
 };
 
-class GMParticleModel_2D : public GMParticleModel
+class GMParticleModel_2D : public GMParticleModel_Cocos2D
 {
 public:
-	using GMParticleModel::GMParticleModel;
+	using GMParticleModel_Cocos2D::GMParticleModel_Cocos2D;
 
 protected:
 	virtual void CPUUpdate(void* dataPtr) override;
 	virtual GMString getCode() override;
 };
 
-class GMParticleModel_3D : public GMParticleModel
+class GMParticleModel_3D : public GMParticleModel_Cocos2D
 {
 public:
-	using GMParticleModel::GMParticleModel;
+	using GMParticleModel_Cocos2D::GMParticleModel_Cocos2D;
 
 protected:
 	virtual void CPUUpdate(void* dataPtr) override;

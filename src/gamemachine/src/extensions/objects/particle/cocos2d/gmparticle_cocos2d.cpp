@@ -196,13 +196,21 @@ GMParticleSystem_Cocos2D::GMParticleSystem_Cocos2D(const IRenderContext* context
 	d->emitter.reset(new GMParticleEmitter_Cocos2D(this));
 }
 
+
+GMParticleSystem_Cocos2D::~GMParticleSystem_Cocos2D()
+{
+	D(d);
+	if (d->particleModel)
+		d->particleModel->destroy();
+}
+
 void GMParticleSystem_Cocos2D::setDescription(const GMParticleDescription_Cocos2D& desc)
 {
 	D(d);
 	GM_ASSERT(d->emitter);
 	d->emitter->setDescription(&desc);
 	d->textureBuffer = desc.getTextureImageData();
-	setParticleModel(createParticleModel(&desc));
+	setParticleModel(createParticleModel(desc));
 }
 
 void GMParticleSystem_Cocos2D::update(GMDuration dt)
@@ -218,6 +226,19 @@ void GMParticleSystem_Cocos2D::render()
 	d->particleModel->render();
 }
 
+void GMParticleSystem_Cocos2D::setParticleSystemManager(IParticleSystemManager* manager)
+{
+	D(d);
+	d->manager = manager;
+}
+
+void GMParticleSystem_Cocos2D::setParticleModel(AUTORELEASE GMParticleModel_Cocos2D* particleModel)
+{
+	D(d);
+	if (d->particleModel && d->particleModel != particleModel)
+		d->particleModel->destroy();
+	d->particleModel = particleModel;
+}
 
 const IRenderContext* gm::GMParticleSystem_Cocos2D::getContext()
 {
@@ -225,11 +246,10 @@ const IRenderContext* gm::GMParticleSystem_Cocos2D::getContext()
 	return d->context;
 }
 
-IParticleModel* GMParticleSystem_Cocos2D::createParticleModel(GMParticleDescription desc)
+GMParticleModel_Cocos2D* GMParticleSystem_Cocos2D::createParticleModel(const GMParticleDescription_Cocos2D& desc)
 {
 	D(d);
-	const GMParticleDescription_Cocos2D* cocos2dDescription = toCocos2DDesc(desc);
-	switch (cocos2dDescription->getParticleModelType())
+	switch (desc.getParticleModelType())
 	{
 	case GMParticleModelType::Particle2D:
 		return new GMParticleModel_2D(this);
@@ -403,12 +423,12 @@ void GMParticleEmitter_Cocos2D::setDescription(GMParticleDescription desc)
 	GMParticleEffect_Cocos2D* eff = nullptr;
 	if (cocos2DDesc->getEmitterType() == GMParticleEmitterType::Gravity)
 	{
-		eff = new GMGravityParticleEffect();
+		eff = new GMGravityParticleEffect_Cocos2D();
 	}
 	else
 	{
 		GM_ASSERT(cocos2DDesc->getEmitterType() == GMParticleEmitterType::Radius);
-		eff = new GMRadialParticleEffect();
+		eff = new GMRadialParticleEffect_Cocos2D();
 	}
 
 	eff->setParticleDescription(cocos2DDesc);
@@ -465,7 +485,7 @@ void GMParticleEmitter_Cocos2D::emitOnce()
 	}
 }
 
-void GMParticleEmitter_Cocos2D::setParticleEffect(IParticleEffect* effect)
+void GMParticleEmitter_Cocos2D::setParticleEffect(GMParticleEffect_Cocos2D* effect)
 {
 	D(d);
 	d->effect.reset(effect);
@@ -492,12 +512,6 @@ void GMParticleEmitter_Cocos2D::stopEmit()
 	D(d);
 	d->canEmit = false;
 	d->particles.clear();
-}
-
-void IParticleSystem* GMParticleEmitter_Cocos2D::getParticleSystem()
-{
-	D(d);
-	return d->system;
 }
 
 void GMParticleEffect_Cocos2D::setParticleDescription(GMParticleDescription desc)
@@ -572,37 +586,5 @@ void GMParticleEffect_Cocos2D::update(GMParticleEmitter_Cocos2D* emitter, GMDura
 	else
 	{
 		CPUUpdate(emitter, dt);
-	}
-}
-
-GMParticleSystemManager_Cocos2D::GMParticleSystemManager_Cocos2D(const IRenderContext* context)
-{
-	D(d);
-	d->context = context;
-}
-
-void GMParticleSystemManager_Cocos2D::addParticleSystem(AUTORELEASE GMParticleSystem_Cocos2D* ps)
-{
-	D(d);
-	ps->setParticleSystemManager(this);
-	d->particleSystems.push_back(GMOwnedPtr<GMParticleSystem_Cocos2D>(ps));
-}
-
-void GMParticleSystemManager_Cocos2D::render()
-{
-	D(d);
-	for (decltype(auto) ps : d->particleSystems)
-	{
-		ps->render();
-	}
-}
-
-void GMParticleSystemManager_Cocos2D::update(GMDuration dt)
-{
-	D(d);
-	// 涉及到粒子池的分配，不能并行
-	for (decltype(auto) system : d->particleSystems)
-	{
-		system->update(dt);
 	}
 }

@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "foundation/gamemachine.h"
-#include "gmparticlemodel.h"
+#include "gmparticlemodel_cocos2d.h"
+#include "gmparticle_cocos2d.h"
 #include "foundation/gmasync.h"
 #include <gmengine/gmcomputeshadermanager.h>
 
@@ -19,19 +20,19 @@ namespace
 	enum { VerticesPerParticle = 6 };
 }
 
-GMParticleModel::GMParticleModel(GMParticleSystem* system)
+GMParticleModel_Cocos2D::GMParticleModel_Cocos2D(GMParticleSystem_Cocos2D* system)
 {
 	D(d);
 	d->system = system;
 	initObjects();
 }
 
-GMParticleModel::~GMParticleModel()
+GMParticleModel_Cocos2D::~GMParticleModel_Cocos2D()
 {
 	disposeGPUHandles();
 }
 
-GMGameObject* GMParticleModel::createGameObject(
+GMGameObject* GMParticleModel_Cocos2D::createGameObject(
 	const IRenderContext* context
 )
 {
@@ -68,7 +69,7 @@ GMGameObject* GMParticleModel::createGameObject(
 	return object;
 }
 
-void GMParticleModel::update6Vertices(
+void GMParticleModel_Cocos2D::update6Vertices(
 	GMVertex* vertex,
 	const GMVec3& centerPt,
 	const GMVec2& halfExtents,
@@ -183,7 +184,7 @@ void GMParticleModel::update6Vertices(
 	};
 }
 
-void GMParticleModel::updateData(void* dataPtr)
+void GMParticleModel_Cocos2D::updateData(void* dataPtr)
 {
 	D(d);
 	if (d->GPUValid)
@@ -214,7 +215,7 @@ void GMParticleModel::updateData(void* dataPtr)
 		GM_ZeroMemory((GMbyte*)dataPtr + unavailableOffset, totalSize - unavailableOffset);
 }
 
-void GMParticleModel::GPUUpdate(IComputeShaderProgram* shaderProgram, void* dataPtr)
+void GMParticleModel_Cocos2D::GPUUpdate(IComputeShaderProgram* shaderProgram, void* dataPtr)
 {
 	D(d);
 	const GMuint32 sz = gm_sizet_to_uint(d->system->getEmitter()->getParticles().size());
@@ -228,7 +229,7 @@ void GMParticleModel::GPUUpdate(IComputeShaderProgram* shaderProgram, void* data
 		d->particleSizeChanged = false;
 	}
 
-	GMComputeBufferHandle futureResult = prepareBuffers(shaderProgram, dataPtr, GMParticleModel::None);
+	GMComputeBufferHandle futureResult = prepareBuffers(shaderProgram, dataPtr, GMParticleModel_Cocos2D::None);
 	if (futureResult)
 	{
 		shaderProgram->dispatch(sz, 1, 1);
@@ -257,7 +258,7 @@ void GMParticleModel::GPUUpdate(IComputeShaderProgram* shaderProgram, void* data
 	}
 }
 
-GMComputeBufferHandle GMParticleModel::prepareBuffers(IComputeShaderProgram* shaderProgram, void* dataPtr, BufferFlags flags)
+GMComputeBufferHandle GMParticleModel_Cocos2D::prepareBuffers(IComputeShaderProgram* shaderProgram, void* dataPtr, BufferFlags flags)
 {
 	struct Constant
 	{
@@ -299,7 +300,7 @@ GMComputeBufferHandle GMParticleModel::prepareBuffers(IComputeShaderProgram* sha
 }
 
 
-void GMParticleModel::initObjects()
+void GMParticleModel_Cocos2D::initObjects()
 {
 	D(d);
 	if (!d->particleObject)
@@ -330,7 +331,7 @@ void GMParticleModel::initObjects()
 
 }
 
-void GMParticleModel::disposeGPUHandles()
+void GMParticleModel_Cocos2D::disposeGPUHandles()
 {
 	D(d);
 	GMComputeBufferHandle* handles[] = {
@@ -353,12 +354,12 @@ void GMParticleModel::disposeGPUHandles()
 }
 
 
-void GMParticleModel::setDefaultCode(const GMString& code)
+void GMParticleModel_Cocos2D::setDefaultCode(const GMString& code)
 {
 	s_code = code;
 }
 
-void GMParticleModel::render()
+void GMParticleModel_Cocos2D::render()
 {
 	D(d);
 	if (d->particleObject)
@@ -394,7 +395,7 @@ void GMParticleModel_2D::CPUUpdate(void* dataPtr)
 		GMVertex* dataOffset = reinterpret_cast<GMVertex*>(dataPtr) + (begin - particles.begin()) * VerticesPerParticle;
 		for (auto iter = begin; iter != end; ++iter)
 		{
-			GMParticle& particle = *iter;
+			GMParticle_Cocos2D& particle = *iter;
 			GMfloat he = particle.getSize() / 2.f;
 			update6Vertices(
 				dataOffset,
@@ -436,7 +437,7 @@ void GMParticleModel_3D::CPUUpdate(void* dataPtr)
 		GMVertex* dataOffset = reinterpret_cast<GMVertex*>(dataPtr) + (begin - particles.begin()) * VerticesPerParticle;
 		for (auto iter = begin; iter != end; ++iter)
 		{
-			GMParticle& particle = *iter;
+			GMParticle_Cocos2D& particle = *iter;
 			GMfloat he = particle.getSize() / 2.f;
 
 			update6Vertices(
@@ -461,5 +462,5 @@ GMString GMParticleModel_3D::getCode()
 
 GMComputeBufferHandle GMParticleModel_3D::prepareBuffers(IComputeShaderProgram* shaderProgram, const IRenderContext* context, void* dataPtr, BufferFlags)
 {
-	return GMParticleModel::prepareBuffers(shaderProgram, dataPtr, GMParticleModel::None);
+	return GMParticleModel_Cocos2D::prepareBuffers(shaderProgram, dataPtr, GMParticleModel_Cocos2D::None);
 }

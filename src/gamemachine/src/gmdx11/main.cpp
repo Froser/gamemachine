@@ -4,8 +4,8 @@
 #include "gmdx11helper.h"
 #include "gmengine/gameobjects/gmgameobject.h"
 #include "foundation/gamemachine.h"
-#include "extensions/objects/particle/gmparticleeffects.h"
-#include "extensions/objects/particle/gmparticlemodel.h"
+#include "extensions/objects/particle/cocos2d/gmparticleeffects_cocos2d.h"
+#include "extensions/objects/particle/cocos2d/gmparticlemodel_cocos2d.h"
 
 namespace
 {
@@ -32,9 +32,9 @@ void gmdx11_loadShader(const IRenderContext* context, const GMString& fileName)
 
 void gmdx11_loadExtensionShaders(const IRenderContext*)
 {
-	GMGravityParticleEffect::setDefaultCodeAndEntry(getFileContent(L"dx11/compute/particle.hlsl"), L"gravity_main");
-	GMRadialParticleEffect::setDefaultCodeAndEntry(getFileContent(L"dx11/compute/particle.hlsl"), L"radial_main");
-	GMParticleModel::setDefaultCode(getFileContent(L"dx11/compute/particle_transfer.hlsl"));
+	GMGravityParticleEffect_Cocos2D::setDefaultCodeAndEntry(getFileContent(L"dx11/compute/particle_cocos2d.hlsl"), L"gravity_main");
+	GMRadialParticleEffect_Cocos2D::setDefaultCodeAndEntry(getFileContent(L"dx11/compute/particle_cocos2d.hlsl"), L"radial_main");
+	GMParticleModel_Cocos2D::setDefaultCode(getFileContent(L"dx11/compute/particle_transfer_cocos2d.hlsl"));
 }
 
 void gmdx11_ext_renderWaveObjectShader(const GMWaveGameObject* waveObject, IShaderProgram* shaderProgram)

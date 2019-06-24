@@ -11,7 +11,7 @@ void Demo_Particle2D::init()
 	Base::init();
 
 	// 创建对象
-	d->particleSystemManager.reset(new gm::GMParticleSystemManager_Cocos2D(getDemoWorldReference()->getContext()));
+	d->particleSystemManager.reset(new gm::GMParticleSystemManager(getDemoWorldReference()->getContext()));
 
 	gm::GMControlButton* button = nullptr;
 	gm::GMWidget* widget = createDefaultWidget();
@@ -19,26 +19,26 @@ void Demo_Particle2D::init()
 	auto top = getClientAreaTop();
 	widget->setSize(widget->getSize().width, top + 40);
 
-	gm::GMParticleSystem* psFire = nullptr;
-	gm::GMParticleSystem::createCocos2DParticleSystem(getDemoWorldReference()->getContext(), "fire1.plist", gm::GMParticleModelType::Particle2D, &psFire, [](auto& description) {
+	gm::GMParticleSystem_Cocos2D* psFire = nullptr;
+	gm::GMParticleSystem_Cocos2D::createCocos2DParticleSystem(getDemoWorldReference()->getContext(), "fire1.plist", gm::GMParticleModelType::Particle2D, &psFire, [](auto& description) {
 		// 由于采用Ortho视图，坐标系和正常的3D视图相反，y正方向向下，因此我们需要将发射方向旋转180度
 		description.setEmitterEmitAngle(description.getEmitterEmitAngle() + 180);
 	});
 	psFire->getEmitter()->setEmitPosition(GMVec3(800, 600, 0));
 	psFire->getEmitter()->getEffect()->setMotionMode(gm::GMParticleMotionMode::Relative);
 
-	gm::GMParticleSystem* psRadius = nullptr;
-	gm::GMParticleSystem::createCocos2DParticleSystem(getDemoWorldReference()->getContext(), L"radius1.plist", gm::GMParticleModelType::Particle2D, &psRadius);
+	gm::GMParticleSystem_Cocos2D* psRadius = nullptr;
+	gm::GMParticleSystem_Cocos2D::createCocos2DParticleSystem(getDemoWorldReference()->getContext(), L"radius1.plist", gm::GMParticleModelType::Particle2D, &psRadius);
 	psRadius->getEmitter()->setEmitPosition(GMVec3(800, 300, 0));
 	psRadius->getEmitter()->getEffect()->setMotionMode(gm::GMParticleMotionMode::Relative);
 
-	gm::GMParticleSystem* psStar = nullptr;
-	gm::GMParticleSystem::createCocos2DParticleSystem(getDemoWorldReference()->getContext(), L"star.plist", gm::GMParticleModelType::Particle2D, &psStar);
+	gm::GMParticleSystem_Cocos2D* psStar = nullptr;
+	gm::GMParticleSystem_Cocos2D::createCocos2DParticleSystem(getDemoWorldReference()->getContext(), L"star.plist", gm::GMParticleModelType::Particle2D, &psStar);
 	psStar->getEmitter()->setEmitPosition(GMVec3(400, 600, 0));
 	psStar->getEmitter()->getEffect()->setMotionMode(gm::GMParticleMotionMode::Relative);
 
-	gm::GMParticleSystem* psLeaves = nullptr;
-	gm::GMParticleSystem::createCocos2DParticleSystem(getDemoWorldReference()->getContext(), L"fallenLeaves.plist", gm::GMParticleModelType::Particle2D, &psLeaves);
+	gm::GMParticleSystem_Cocos2D* psLeaves = nullptr;
+	gm::GMParticleSystem_Cocos2D::createCocos2DParticleSystem(getDemoWorldReference()->getContext(), L"fallenLeaves.plist", gm::GMParticleModelType::Particle2D, &psLeaves);
 	psLeaves->getEmitter()->setEmitPosition(GMVec3(600, 0, 0));
 	psLeaves->getEmitter()->getEffect()->setMotionMode(gm::GMParticleMotionMode::Relative);
 
@@ -89,7 +89,7 @@ void Demo_ParticleBillboard::init()
 	Base::init();
 
 	// 创建对象
-	d->particleSystemManager.reset(new gm::GMParticleSystemManager_Cocos2D(getDemoWorldReference()->getContext()));
+	d->particleSystemManager.reset(new gm::GMParticleSystemManager(getDemoWorldReference()->getContext()));
 
 	gm::GMControlButton* button = nullptr;
 	gm::GMWidget* widget = createDefaultWidget();
@@ -97,7 +97,7 @@ void Demo_ParticleBillboard::init()
 	auto top = getClientAreaTop();
 	widget->setSize(widget->getSize().width, top + 40);
 
-	gm::GMParticleSystem* psFire = nullptr;
+	gm::GMParticleSystem_Cocos2D* psFire = nullptr;
 
 	GMVec3 positions[] = {
 		GMVec3(860, 250, 500),
@@ -112,7 +112,7 @@ void Demo_ParticleBillboard::init()
 
 	for (auto position : positions)
 	{
-		gm::GMParticleSystem::createCocos2DParticleSystem(getDemoWorldReference()->getContext(), L"fire1.plist", gm::GMParticleModelType::Particle3D, &psFire);
+		gm::GMParticleSystem_Cocos2D::createCocos2DParticleSystem(getDemoWorldReference()->getContext(), L"fire1.plist", gm::GMParticleModelType::Particle3D, &psFire);
 		psFire->getEmitter()->setEmitPosition(position);
 		psFire->getEmitter()->getEffect()->setMotionMode(gm::GMParticleMotionMode::Free);
 		d->particleSystemManager->addParticleSystem(psFire);
