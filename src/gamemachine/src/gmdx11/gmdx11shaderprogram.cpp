@@ -2,6 +2,26 @@
 #include "gmdx11shaderprogram.h"
 #include <linearmath.h>
 #include "gmdx11graphic_engine.h"
+#include "gmdx11fxc.h"
+#include "foundation/gamemachine.h"
+#include "foundation/gmcryptographic.h"
+
+namespace
+{
+	GMString toMD5String(const GMBuffer& md5Data)
+	{
+		GMString r;
+		r.reserve(gm_sizet_to_int(md5Data.getSize() * 2));
+
+		const char* hex = "0123456789ABCDEF";
+		for (GMint32 i = 0; i < md5Data.getSize(); ++i)
+		{
+			r += hex[(GMbyte)md5Data.getData()[i] >> 4];
+			r += hex[(GMbyte)md5Data.getData()[i] & 0x0f];
+		}
+		return r;
+	}
+}
 
 GMDx11EffectShaderProgram::GMDx11EffectShaderProgram(GMComPtr<ID3DX11Effect> effect)
 {
@@ -200,32 +220,51 @@ void GMDx11ComputeShaderProgram::dispatch(GMint32 threadGroupCountX, GMint32 thr
 void GMDx11ComputeShaderProgram::load(const GMString& path, const GMString& source, const GMString& entryPoint)
 {
 	D(d);
-	GMComPtr<ID3D10Blob> errorMessage;
-	GMComPtr<ID3D10Blob> shaderBuffer;
-	UINT flag = D3DCOMPILE_ENABLE_STRICTNESS;
+	if (source.isEmpty())
+		return;
+
+	// 从源代码算出MD5值作为文件名
+	const std::wstring& srcBuffer = source.toStdWString();
+	GMBuffer bufIn = GMBuffer::createBufferView((GMbyte*)srcBuffer.data(), srcBuffer.size() * sizeof(srcBuffer[0]));
+	GMBuffer bufMd5;
+	GMCryptographic::hash(bufIn, GMCryptographic::MD5, bufMd5);
+	GMString gfxCandidate = toMD5String(bufMd5) + L".gfx";
+	ID3D11Device* device = d->engine->getDevice();
+
+	GMDx11FXCDescription desc;
+	desc.fxcOutputFilename = gfxCandidate;
+	desc.code = source;
+	desc.codePath = path;
+	desc.profile = GMDx11FXCProfile::CS_5_0;
+	desc.sourceMd5Hint = bufMd5;
+	desc.entryPoint = entryPoint;
 #if GM_DEBUG
-	flag |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+	desc.debug = true;
 #endif
 
-	std::string stdCode = source.toStdString();
-	std::string stdPath = path.toStdString();
-	std::string stdEntryPoint = entryPoint.toStdString();
-	HRESULT hr = D3DX11CompileFromMemory(
-		stdCode.c_str(),
-		stdCode.length(),
-		stdPath.c_str(),
-		NULL,
-		NULL,
-		stdEntryPoint.c_str(),
-		"cs_5_0",
-		flag,
-		0,
-		NULL,
-		&shaderBuffer,
-		&errorMessage,
-		NULL
-	);
-	if (FAILED(hr))
+	GMDx11FXC fxc;
+	if (!path.isEmpty())
+	{
+		GMBuffer gfxBuffer;
+		GM.getGamePackageManager()->readFile(GMPackageIndex::Prefetch, gfxCandidate, &gfxBuffer);
+
+		if (fxc.canLoad(desc, gfxBuffer) && fxc.load(std::move(gfxBuffer), device, &d->shader))
+			return;
+	}
+
+	// 如果没有prefetch，则查找是否有前一次生成的prefetch文件
+
+	if (fxc.tryLoadCache(desc, device, &d->shader))
+		return;
+
+	// 编译一次代码
+	GMComPtr<ID3D10Blob> shaderBuffer;
+	GMComPtr<ID3D10Blob> errorMessage;
+	if (fxc.compile(desc, &shaderBuffer, &errorMessage))
+	{
+		fxc.tryLoadCache(desc, device, &d->shader);
+	}
+	else
 	{
 		GMStringReader reader(source);
 		std::string report;
@@ -247,14 +286,9 @@ void GMDx11ComputeShaderProgram::load(const GMString& path, const GMString& sour
 		}
 		else
 		{
-			gm_error(gm_dbg_wrap("Cannot find shader file {0}"), stdPath);
+			gm_error(gm_dbg_wrap("Cannot find shader file {0}"), path);
 			GM_ASSERT(false);
 		}
-	}
-	else
-	{
-		ID3D11Device* device = d->engine->getDevice();
-		GM_DX_HR(device->CreateComputeShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), nullptr, &d->shader));
 	}
 }
 

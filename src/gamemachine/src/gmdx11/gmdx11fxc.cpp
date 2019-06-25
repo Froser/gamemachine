@@ -8,7 +8,6 @@
 #include <gmcom.h>
 #include <foundation/gmcryptographic.h>
 
-#define FXC_FILENAME L"main.gfx"
 #define TEMP_CODE_FILE "code.hlsl"
 #define LOG_FILE "log.txt"
 #define BUFSIZE 10 * 1024
@@ -121,9 +120,99 @@ namespace
 	{
 		buffer = GMBuffer::createBufferView((GMbyte*)code.c_str(), code.length());
 	}
+
+	bool readGMFXCFile(const GMDx11FXCDescription& desc, GMBuffer& buf)
+	{
+		GM_ASSERT(!desc.fxcOutputFilename.isEmpty());
+		if (desc.fxcOutputFilename.isEmpty())
+		{
+			gm_warning(gm_dbg_wrap("FXC output filename must be specified."));
+			return false;
+		}
+
+		GMString outputPath = desc.fxcOutputDir + L"\\" + desc.fxcOutputFilename;
+		HANDLE hFile = CreateFile(outputPath.c_str(), GENERIC_READ, NULL, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (hFile == INVALID_HANDLE_VALUE)
+			return false;
+
+		DWORD dwSize = GetFileSize(hFile, NULL);
+		buf.resize(dwSize);
+		ReadFile(hFile, buf.getData(), (DWORD)buf.getSize(), NULL, NULL);
+		CloseHandle(hFile);
+		return true;
+	}
+
+	bool fillDescription(GMDx11FXCDescription* desc)
+	{
+		GM_ASSERT(desc);
+		if (desc->fxcOutputDir.isEmpty())
+		{
+			TCHAR szTempPath[MAX_PATH];
+			GetModuleFileNameW(NULL, szTempPath, MAX_PATH);
+			PathRemoveFileSpec(szTempPath);
+			PathCombine(szTempPath, szTempPath, _T("prefetch"));
+			desc->fxcOutputDir = GMString(szTempPath);
+			if (!PathFileExists(szTempPath) && !CreateDirectory(szTempPath, NULL))
+				return false;
+		}
+
+		return true;
+	}
+
+	bool makeFingerprints(const GMDx11FXCDescription& desc, ID3DBlob* pCode)
+	{
+		TCHAR fxcOutput[MAX_PATH];
+		PathCombine(fxcOutput, desc.fxcOutputDir.c_str(), desc.fxcOutputFilename.toStdWString().c_str());
+
+		// 再次打开生成文件，创建带有GM标识头的fxc文件，在文件头加上GameMachine {版本号(int32)}{代码MD5}。
+		HANDLE hFile = CreateFile(fxcOutput, GENERIC_WRITE, NULL, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (hFile == INVALID_HANDLE_VALUE)
+			return false;
+
+		GMBuffer sourceCode;
+		sourceCodeToBufferW(desc.code, sourceCode);
+
+		GMBuffer md5 = desc.sourceMd5Hint;
+		if (md5.getSize() != 16)
+			GMCryptographic::hash(sourceCode, GMCryptographic::MD5, md5);
+
+		// 准备一块空间content，这段缓存就是最终文件的内容
+		GM_ASSERT(md5.getSize() == 16);
+		constexpr GMsize_t HEADER_LEN = GM_HEADER_LEN + sizeof(Version) + 16; //16表示16字节的MD5
+		GMBuffer header;
+		header.resize(HEADER_LEN);
+
+		// 写 "GameMachine"
+		GMsize_t uOffset = GM_HEADER_LEN;
+		memcpy_s(header.getData(), header.getSize(), GM_HEADER, uOffset);
+
+		// 写 版本号 Major Minor
+		Version version = {
+			GM_FXC_VERSION_MAJOR,
+			GM_FXC_VERSION_MINOR,
+		};
+		memcpy_s(header.getData() + uOffset, header.getSize() - uOffset, &version, sizeof(Version));
+		uOffset += sizeof(Version);
+
+		// 写MD5
+		memcpy_s(header.getData() + uOffset, header.getSize() - uOffset, md5.getData(), md5.getSize());
+		uOffset += md5.getSize();
+
+		// 获取编译好的二进制代码
+		SetFilePointer(hFile, 0, NULL, FILE_BEGIN);
+		if (!WriteFile(hFile, header.getData(), (DWORD)header.getSize(), NULL, NULL))
+			return false;
+
+		if (!WriteFile(hFile, pCode->GetBufferPointer(), pCode->GetBufferSize(), NULL, NULL))
+			return false;
+
+		SetEndOfFile(hFile);
+		CloseHandle(hFile);
+		return true;
+	}
 }
 
-bool GMDx11FXC::canLoad(const GMString& code, const GMBuffer& fxcBuffer)
+bool GMDx11FXC::canLoad(const GMDx11FXCDescription& desc, const GMBuffer& fxcBuffer)
 {
 	if (!fxcBuffer.getData())
 		return false;
@@ -138,11 +227,14 @@ bool GMDx11FXC::canLoad(const GMString& code, const GMBuffer& fxcBuffer)
 		return false;
 	}
 
-	GMBuffer sourceCode;
-	sourceCodeToBufferW(code, sourceCode);
-	GMBuffer md5;
-	GMCryptographic::hash(sourceCode, GMCryptographic::MD5, md5);
-	GM_ASSERT(md5.getSize() == 16);
+	GMBuffer md5 = desc.sourceMd5Hint;
+	if (md5.getSize() != 16)
+	{
+		GMBuffer sourceCode;
+		sourceCodeToBufferW(desc.code, sourceCode);
+		GMCryptographic::hash(sourceCode, GMCryptographic::MD5, md5);
+		GM_ASSERT(md5.getSize() == 16);
+	}
 
 	if (memcmp(fileFingerprints, md5.getData(), md5.getSize()) != 0)
 	{
@@ -196,13 +288,14 @@ bool GMDx11FXC::compile(GMDx11FXCDescription& desc, ID3DBlob** ppCode, ID3DBlob*
 
 	gm_info(gm_dbg_wrap("Compiling HLSL code..."));
 	std::string strCodePath = desc.codePath.toStdString();
+	std::string entryPoint = desc.entryPoint.toStdString();
 	if (SUCCEEDED(D3DCompile(
 		bufCode.getData(),
 		bufCode.getSize(),
 		strCodePath.c_str(),
 		NULL,
 		0,
-		"",
+		entryPoint.c_str(),
 		profile,
 		flags1,
 		0,
@@ -240,90 +333,44 @@ bool GMDx11FXC::load(const GMBuffer& shaderBuffer, ID3D11Device* pDevice, ID3DX1
 	return false;
 }
 
+bool GMDx11FXC::load(const GMBuffer& shaderBuffer, ID3D11Device* pDevice, ID3D11ComputeShader** ppComputeShader)
+{
+	Version version;
+	GMbyte fingerprints[16];
+	GMsize_t uOffset = 0;
+	getFileHeaders(shaderBuffer, version, fingerprints, uOffset);
+	if (version.major == 1 && version.minor == 0)
+	{
+		const GMBuffer gfxView = GMBuffer::createBufferView(shaderBuffer, uOffset);
+		GMComPtr<ID3DBlob> shaderBufferBlob;
+		GMBlob::createBlob(gfxView, &shaderBufferBlob);
+		return SUCCEEDED(pDevice->CreateComputeShader(shaderBufferBlob->GetBufferPointer(), shaderBufferBlob->GetBufferSize(), nullptr, ppComputeShader));
+	}
+
+	gm_warning(gm_dbg_wrap("The version {0}.{1} is not supported."), GMString(version.major), GMString(version.minor));
+	return false;
+}
+
 bool GMDx11FXC::tryLoadCache(GMDx11FXCDescription& desc, ID3D11Device* pDevice, ID3DX11Effect** ppEffect)
 {
 	if (!fillDescription(&desc))
 		return false;
 
-	GMString outputPath = desc.fxcOutputDir + L"\\" FXC_FILENAME;
-	HANDLE hFile = CreateFile(outputPath.c_str(), GENERIC_READ, NULL, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (hFile == INVALID_HANDLE_VALUE)
+	GMBuffer buf;
+	if (!readGMFXCFile(desc, buf))
+		return false;
+
+	return (canLoad(desc, buf) && load(buf, pDevice, ppEffect));
+}
+
+bool GMDx11FXC::tryLoadCache(IN OUT GMDx11FXCDescription& desc, ID3D11Device* pDevice, ID3D11ComputeShader** ppComputeShader)
+{
+	if (!fillDescription(&desc))
 		return false;
 
 	GMBuffer buf;
-	DWORD dwSize = GetFileSize(hFile, NULL);
-	buf.resize(dwSize);
-	ReadFile(hFile, buf.getData(), (DWORD) buf.getSize(), NULL, NULL);
-	CloseHandle(hFile);
-
-	return (canLoad(desc.code, buf) && load(buf, pDevice, ppEffect));
-}
-
-bool GMDx11FXC::fillDescription(GMDx11FXCDescription* desc)
-{
-	GM_ASSERT(desc);
-	if (desc->fxcOutputDir.isEmpty())
-	{
-		TCHAR szTempPath[MAX_PATH];
-		GetModuleFileNameW(NULL, szTempPath, MAX_PATH);
-		PathRemoveFileSpec(szTempPath);
-		PathCombine(szTempPath, szTempPath, _T("prefetch"));
-		desc->fxcOutputDir = GMString(szTempPath);
-		if (!PathFileExists(szTempPath) && !CreateDirectory(szTempPath, NULL))
-			return false;
-	}
-
-	return true;
-}
-
-bool GMDx11FXC::makeFingerprints(const GMDx11FXCDescription& desc, ID3DBlob* pCode)
-{
-	TCHAR fxcOutput[MAX_PATH];
-	PathCombine(fxcOutput, desc.fxcOutputDir.c_str(), _T("main.gfx"));
-
-	// 再次打开生成文件，创建带有GM标识头的fxc文件，在文件头加上GameMachine {版本号(int32)}{代码MD5}。
-	HANDLE hFile = CreateFile(fxcOutput, GENERIC_WRITE, NULL, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (hFile == INVALID_HANDLE_VALUE)
+	if (!readGMFXCFile(desc, buf))
 		return false;
 
-	GMBuffer sourceCode;
-	sourceCodeToBufferW(desc.code, sourceCode);
-
-	GMBuffer md5;
-	GMCryptographic::hash(sourceCode, GMCryptographic::MD5, md5);
-
-	// 准备一块空间content，这段缓存就是最终文件的内容
-	GM_ASSERT(md5.getSize() == 16);
-	constexpr GMsize_t HEADER_LEN = GM_HEADER_LEN + sizeof(Version) + 16; //16表示16字节的MD5
-	GMBuffer header;
-	header.resize(HEADER_LEN);
-
-	// 写 "GameMachine"
-	GMsize_t uOffset = GM_HEADER_LEN;
-	memcpy_s(header.getData(), header.getSize(), GM_HEADER, uOffset);
-
-	// 写 版本号 Major Minor
-	Version version = {
-		GM_FXC_VERSION_MAJOR,
-		GM_FXC_VERSION_MINOR,
-	};
-	memcpy_s(header.getData() + uOffset, header.getSize() - uOffset, &version, sizeof(Version));
-	uOffset += sizeof(Version);
-
-	// 写MD5
-	memcpy_s(header.getData() + uOffset, header.getSize() - uOffset, md5.getData(), md5.getSize());
-	uOffset += md5.getSize();
-
-	// 获取编译好的二进制代码
-	SetFilePointer(hFile, 0, NULL, FILE_BEGIN);
-	if (!WriteFile(hFile, header.getData(), (DWORD) header.getSize(), NULL, NULL))
-		return false;
-
-	if (!WriteFile(hFile, pCode->GetBufferPointer(), pCode->GetBufferSize(), NULL, NULL))
-		return false;
-
-	SetEndOfFile(hFile);
-	CloseHandle(hFile);
-	return true;
+	return (canLoad(desc, buf) && load(buf, pDevice, ppComputeShader));
 }
-

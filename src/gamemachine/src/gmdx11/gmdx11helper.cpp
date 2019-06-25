@@ -33,6 +33,14 @@ IShaderProgram* GMDx11Helper::loadEffectShader(
 	if (!b || !device)
 		return nullptr;
 
+	GMDx11FXCDescription desc;
+	desc.fxcOutputFilename = "main.gfx";
+	desc.code = code;
+	desc.codePath = filepath;
+#if GM_DEBUG
+	desc.debug = true;
+#endif
+
 	// 先检查prefetch下是否有预编译的fx文件
 	GMDx11FXC fxc;
 	if (!gfxCandidate.isEmpty())
@@ -40,18 +48,11 @@ IShaderProgram* GMDx11Helper::loadEffectShader(
 		GMBuffer gfxBuffer;
 		GM.getGamePackageManager()->readFile(GMPackageIndex::Prefetch, gfxCandidate, &gfxBuffer);
 
-		if (fxc.canLoad(code, gfxBuffer) && fxc.load(std::move(gfxBuffer), device, &effect))
+		if (fxc.canLoad(desc, gfxBuffer) && fxc.load(std::move(gfxBuffer), device, &effect))
 			return newShaderProgram(engine, effect);
 	}
 
 	// 如果没有prefetch，则查找是否有前一次生成的prefetch文件
-	GMDx11FXCDescription desc;
-	desc.code = code;
-	desc.codePath = filepath;
-#if GM_DEBUG
-	desc.debug = true;
-#endif
-
 	if (fxc.tryLoadCache(desc, device, &effect))
 		return newShaderProgram(engine, effect);
 

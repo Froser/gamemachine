@@ -16,25 +16,26 @@ enum class GMDx11FXCProfile
 struct GMDx11FXCDescription
 {
 	GMString fxcOutputDir;
+	GMString fxcOutputFilename;
 	GMString code;
 	GMString codePath;
+	GMString entryPoint;
 	GMint32 optimizationLevel = 1; // from 0-3
 	bool treatWarningsAsErrors = true;
 	bool debug = false;
 	GMDx11FXCProfile profile = GMDx11FXCProfile::FX_5_0;
+	GMBuffer sourceMd5Hint;
 };
 
 class GMDx11FXC
 {
 public:
-	bool canLoad(const GMString& code, const GMBuffer& fxcBuffer);
+	bool canLoad(const GMDx11FXCDescription& desc, const GMBuffer& fxcBuffer);
 	bool load(const GMBuffer& shaderBuffer, ID3D11Device* pDevice, ID3DX11Effect** ppEffect);
+	bool load(const GMBuffer& shaderBuffer, ID3D11Device* pDevice, ID3D11ComputeShader** ppComputeShader);
 	bool tryLoadCache(IN OUT GMDx11FXCDescription& desc, ID3D11Device* pDevice, ID3DX11Effect** ppEffect);
+	bool tryLoadCache(IN OUT GMDx11FXCDescription& desc, ID3D11Device* pDevice, ID3D11ComputeShader** ppComputeShader);
 	bool compile(IN OUT GMDx11FXCDescription&, ID3DBlob** ppCode, ID3DBlob** ppErrorMessages);
-
-private:
-	bool fillDescription(GMDx11FXCDescription*);
-	bool makeFingerprints(const GMDx11FXCDescription& desc, ID3DBlob* pCode);
 };
 
 END_NS

@@ -67,20 +67,7 @@ RWStructuredBuffer<particle_t> particles : register(u0);
 void gravity_main(uint3 DTid : SV_DispatchThreadID)
 {
     uint gid = DTid.x;
-    /*
-    particles[gid].color = float4(1, 2, 3, 4);
-    particles[gid].deltaColor = float4(5, 6, 7, 8);
-    particles[gid].position = float4(9, 10, 11, 0);
-    particles[gid].startPosition = float4(12, 13, 14, 0);
-    particles[gid].changePosition = float4(15, 16, 17, 0);
-    particles[gid].velocity = float4(18, 19, 20, 0);
-    particles[gid].size = 21;
-    particles[gid].currentSize = 22;
-    particles[gid].deltaSize = 23;
-    particles[gid].rotation = 24;
-    particles[gid].deltaRotation = 25;
-    particles[gid].remainingLife = 26;
-    */
+
     particles[gid] = particlesIn[gid];
     particles[gid].remainingLife -= dt;
     if (particles[gid].remainingLife > 0)
@@ -100,7 +87,7 @@ void gravity_main(uint3 DTid : SV_DispatchThreadID)
         tangential.xyz = float3(-tangential.y, tangential.x, tangential.z);
         tangential *= particles[gid].gravityModeData.tangentialAcceleration;
 
-        offset = (radial + tangential + gravity) * dt;
+        offset = (radial + tangential + gravity.xyz) * dt;
 
         particles[gid].gravityModeData.initialVelocity.xyz += offset;
         particles[gid].changePosition.xyz += particles[gid].gravityModeData.initialVelocity.xyz * dt;
@@ -119,20 +106,7 @@ void gravity_main(uint3 DTid : SV_DispatchThreadID)
 void radial_main(uint3 DTid : SV_DispatchThreadID)
 {
     uint gid = DTid.x;
-    /*
-    particles[gid].color = float4(1, 2, 3, 4);
-    particles[gid].deltaColor = float4(5, 6, 7, 8);
-    particles[gid].position = float4(9, 10, 11, 0);
-    particles[gid].startPosition = float4(12, 13, 14, 0);
-    particles[gid].changePosition = float4(15, 16, 17, 0);
-    particles[gid].velocity = float4(18, 19, 20, 0);
-    particles[gid].size = 21;
-    particles[gid].currentSize = 22;
-    particles[gid].deltaSize = 23;
-    particles[gid].rotation = 24;
-    particles[gid].deltaRotation = 25;
-    particles[gid].remainingLife = 26;
-    */
+
     particles[gid] = particlesIn[gid];
     particles[gid].remainingLife -= dt;
     if (particles[gid].remainingLife > 0)

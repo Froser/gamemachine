@@ -64,20 +64,7 @@ layout(local_size_x = 1, local_size_y = 1) in;
 void main(void)
 {
     uint gid = gl_GlobalInvocationID.x;
-    /*
-    particles[gid].color = vec4(1, 2, 3, 4);
-    particles[gid].deltaColor = vec4(5, 6, 7, 8);
-    particles[gid].position = vec3(9, 10, 11);
-    particles[gid].startPosition = vec3(12, 13, 14);
-    particles[gid].changePosition = vec3(15, 16, 17);
-    particles[gid].velocity = vec3(18, 19, 20);
-    particles[gid].size = 21;
-    particles[gid].currentSize = 22;
-    particles[gid].deltaSize = 23;
-    particles[gid].rotation = 24;
-    particles[gid].deltaRotation = 25;
-    particles[gid].remainingLife = 26;
-    */
+    
     particles[gid] = particlesIn[gid];
     particles[gid].remainingLife -= dt;
     if (particles[gid].remainingLife > 0)
