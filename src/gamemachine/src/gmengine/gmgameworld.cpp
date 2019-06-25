@@ -51,8 +51,10 @@ void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
 void GMGameWorld::renderScene()
 {
 	D(d);
-	static List<GMGameObject*> s_emptyList;
+	static GMGameObjectContainer s_emptyList;
 	IGraphicEngine* engine = d->context->getEngine();
+	if (d->particleSystemMgr)
+		d->particleSystemMgr->render();
 	if (getRenderPreference() == GMRenderPreference::PreferForwardRendering)
 	{
 		engine->draw(d->renderList.deferred, s_emptyList);
@@ -62,8 +64,6 @@ void GMGameWorld::renderScene()
 	{
 		engine->draw(d->renderList.forward, d->renderList.deferred);
 	}
-	if (d->particleSystemMgr)
-		d->particleSystemMgr->render();
 }
 
 bool GMGameWorld::removeObject(GMGameObject* obj)
@@ -137,14 +137,14 @@ void GMGameWorld::addToRenderList(GMGameObject* object)
 
 	if (object->canDeferredRendering())
 	{
-		d->renderList.deferred.push_back(object);
+		addToContainerByPriority(d->renderList.deferred, object);
 	}
 	else
 	{
 		if (needBlend(object))
-			d->renderList.forward.push_back(object);
+			addToContainerByPriority(d->renderList.forward, object);
 		else
-			d->renderList.forward.push_front(object);
+			addToContainerByPriority(d->renderList.forward, object, GMGameObjectRenderPriority::High);
 	}
 }
 
@@ -178,4 +178,20 @@ void GMGameWorld::setPhysicsWorld(AUTORELEASE GMPhysicsWorld* w)
 	D(d);
 	GM_ASSERT(!d->physicsWorld);
 	d->physicsWorld.reset(w);
+}
+
+void GMGameWorld::addToContainerByPriority(GMGameObjectContainer& c, GMGameObject* o, GMGameObjectRenderPriority hint)
+{
+	if (hint == GMGameObjectRenderPriority::High)
+	{
+		c.push_front(o);
+	}
+	else
+	{
+		GMGameObjectRenderPriority priority = o->getRenderPriority();
+		if (priority == GMGameObjectRenderPriority::High)
+			c.push_front(o);
+		else
+			c.push_back(o);
+	}
 }

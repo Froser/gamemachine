@@ -78,7 +78,7 @@ IFramebuffers* GMGLGBuffer::createGeometryFramebuffers()
 	return framebuffers;
 }
 
-void GMGLGBuffer::geometryPass(const List<GMGameObject*>& objects)
+void GMGLGBuffer::geometryPass(const GMGameObjectContainer& objects)
 {
 	D(d);
 	IFramebuffers* activeFramebuffers = nullptr;

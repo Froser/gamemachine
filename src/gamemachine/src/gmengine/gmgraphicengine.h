@@ -262,7 +262,7 @@ public:
 	virtual void init() override;
 	virtual IGBuffer* getGBuffer() override;
 	virtual IFramebuffers* getFilterFramebuffers() override;
-	virtual void draw(const List<GMGameObject*>& forwardRenderingObjects, const List<GMGameObject*>& deferredRenderingObjects) override;
+	virtual void draw(const GMGameObjectContainer& forwardRenderingObjects, const GMGameObjectContainer& deferredRenderingObjects) override;
 	virtual GMLightIndex addLight(AUTORELEASE ILight* light) override;
 	virtual ILight* getLight(GMLightIndex index) override;
 	virtual bool removeLight(GMLightIndex index) override;
@@ -295,7 +295,7 @@ protected:
 	virtual void createShadowFramebuffers(OUT IFramebuffers** framebuffers);
 	virtual void resetCSM();
 	virtual void createFilterFramebuffer();
-	virtual void generateShadowBuffer(const List<GMGameObject*>& forwardRenderingObjects, const List<GMGameObject*>& deferredRenderingObjects);
+	virtual void generateShadowBuffer(const GMGameObjectContainer& forwardRenderingObjects, const GMGameObjectContainer& deferredRenderingObjects);
 	virtual bool needUseFilterFramebuffer();
 	virtual void bindFilterFramebufferAndClear();
 	virtual void unbindFilterFramebufferAndDraw();
@@ -303,7 +303,7 @@ protected:
 public:
 	const GMFilterMode::Mode getCurrentFilterMode();
 
-	void draw(const List<GMGameObject*>& objects);
+	void draw(const GMGameObjectContainer& objects);
 	IFramebuffers* getShadowMapFramebuffers();
 
 	bool needGammaCorrection();

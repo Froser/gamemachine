@@ -37,7 +37,7 @@ GMDx11GBuffer::GMDx11GBuffer(const IRenderContext* context)
 {
 }
 
-void GMDx11GBuffer::geometryPass(const List<GMGameObject*>& objects)
+void GMDx11GBuffer::geometryPass(const GMGameObjectContainer& objects)
 {
 	D(d);
 	setGeometryPassingState(GMGeometryPassingState::PassingGeometry);

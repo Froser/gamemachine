@@ -16,9 +16,16 @@ enum class GMGameObjectCullOption
 	AABB,
 };
 
+enum class GMGameObjectRenderPriority
+{
+	High,
+	Normal,
+};
+
 GM_PRIVATE_OBJECT(GMGameObject)
 {
 	GMuint32 id = 0;
+	GMGameObjectRenderPriority renderPriority = GMGameObjectRenderPriority::Normal; //!< 渲染优先级。优先级最高的对象将会在GMGameWorld中被优先渲染。
 	GMOwnedPtr<GMPhysicsObject> physics;
 	GMGameWorld* world = nullptr;
 	const IRenderContext* context = nullptr;
@@ -65,6 +72,7 @@ GM_PRIVATE_OBJECT(GMGameObject)
 class GM_EXPORT GMGameObject : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMGameObject)
+	GM_DECLARE_PROPERTY(RenderPriority, renderPriority)
 
 public:
 	enum

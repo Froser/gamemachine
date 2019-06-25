@@ -12,7 +12,7 @@ public:
 	GMDx11GBuffer(const IRenderContext* context);
 
 public:
-	virtual void geometryPass(const List<GMGameObject*>& objects) override;
+	virtual void geometryPass(const GMGameObjectContainer& objects) override;
 	virtual void lightPass() override;
 
 	void useGeometryTextures(ID3DX11Effect* effect);

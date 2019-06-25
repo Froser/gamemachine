@@ -56,8 +56,6 @@
         />
         <object id="obj_deathstroke" asset="model_deathstroke" scale="8 8 8" rotate="0 1 0 180"/>
         <source id="src_bgm" asset="audio_bgm"/>
-
-        <particles id="obj_firework" asset="particle_firework" type="cocos2d"/>
     </objects>
     <actions>
         <action type="play" object="src_bgm" />
@@ -67,11 +65,8 @@
 <!--
         <include file="ani_logo.xml" />
         <include file="ani_dragon.xml" />
-        <include file="ani_deathstroke.xml" />
-    -->
 
-        <action type="camera" view="ortho" left="0" right="1024" top="0" bottom="768" near=".1f" far="3200" time="+0"/>
-        <action type="addObject" object="obj_firework" time="+0"/>
-        <action type="emit" object="obj_firework" time="+0" />
+    -->
+        <include file="ani_deathstroke.xml" />
     </actions>
 </timeline>

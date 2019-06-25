@@ -69,6 +69,7 @@ typedef GMAsset GMModelAsset;
 typedef GMAsset GMSceneAsset;
 typedef GMAsset GMPhysicsShapeAsset;
 typedef GMAsset GMTextureAsset;
+typedef List<GMGameObject*> GMGameObjectContainer;
 
 enum class GameMachineHandlerEvent
 {
@@ -504,7 +505,7 @@ enum class GMGeometryPassingState
 GM_INTERFACE(IGBuffer)
 {
 	virtual void init() = 0;
-	virtual void geometryPass(const List<GMGameObject*>& objects) = 0;
+	virtual void geometryPass(const GMGameObjectContainer& objects) = 0;
 	virtual void lightPass() = 0;
 	virtual IFramebuffers* getGeometryFramebuffers() = 0;
 	virtual void setGeometryPassingState(GMGeometryPassingState) = 0;
@@ -641,7 +642,7 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	  \param forwardRenderingObjects 正向渲染对象列表。
 	  \param deferredRenderingObjects 延迟渲染对象列表。
 	*/
-	virtual void draw(const List<GMGameObject*>& forwardRenderingObjects, const List<GMGameObject*>& deferredRenderingObjects) = 0;
+	virtual void draw(const GMGameObjectContainer& forwardRenderingObjects, const GMGameObjectContainer& deferredRenderingObjects) = 0;
 
 	//! 更新绘制数据。
 	/*!

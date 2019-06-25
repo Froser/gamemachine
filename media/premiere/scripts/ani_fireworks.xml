@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<timeline>
+    <objects>
+        <particles id="obj_firework" asset="particle_firework" type="cocos2d" translate="100 300 1000"/>
+        <particles id="obj_firework2" asset="particle_firework" type="cocos2d" translate="-200 200 600"/>
+        <particles id="obj_firework3" asset="particle_firework" type="cocos2d" translate="-100 100 400"/>
+        <particles id="obj_firework4" asset="particle_firework" type="cocos2d" translate="300 200 500"/>
+        <particles id="obj_firework5" asset="particle_firework" type="cocos2d" translate="0 50 100"/>
+    </objects>
+    <actions>
+        <checkpoint type="save"/>
+        <action type="addObject" object="obj_firework" time="+1"/>
+        <action type="addObject" object="obj_firework2" time="+0"/>
+        <action type="addObject" object="obj_firework3" time="+0"/>
+        <action type="addObject" object="obj_firework4" time="+0"/>
+        <action type="addObject" object="obj_firework5" time="+0"/>
+        <action type="emit" object="obj_firework" time="+0" />
+        <action type="emit" object="obj_firework2" time="+0.5" />
+        <action type="emit" object="obj_firework3" time="+1" />
+        <action type="emit" object="obj_firework4" time="+0.5" />
+        <action type="emit" object="obj_firework" time="+1" />
+        <action type="emit" object="obj_firework3" time="+1" />
+        <action type="emit" object="obj_firework2" time="+0.7" />
+        <action type="emit" object="obj_firework" time="+1" />
+        <action type="emit" object="obj_firework4" time="+0.5" />
+        <action type="emit" object="obj_firework2" time="+0.7" />
+        <action type="emit" object="obj_firework3" time="+0" />
+        <action type="emit" object="obj_firework4" time="+0.2" />
+        <action type="emit" object="obj_firework5" time="+2" />
+        <checkpoint type="load"/>
+    </actions>
+</timeline>

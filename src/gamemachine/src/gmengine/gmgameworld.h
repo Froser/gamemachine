@@ -23,8 +23,8 @@ enum class GMRenderPreference
 
 struct GMRenderList
 {
-	List<GMGameObject*> forward;
-	List<GMGameObject*> deferred;
+	GMGameObjectContainer forward;
+	GMGameObjectContainer deferred;
 };
 
 GM_PRIVATE_OBJECT(GMGameWorld)
@@ -81,6 +81,7 @@ private:
 	// GMPhysicsWorld
 private:
 	void setPhysicsWorld(AUTORELEASE GMPhysicsWorld* w);
+	void addToContainerByPriority(GMGameObjectContainer&, GMGameObject*, GMGameObjectRenderPriority = GMGameObjectRenderPriority::Normal);
 };
 
 END_NS

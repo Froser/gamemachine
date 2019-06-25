@@ -13,7 +13,7 @@ protected:
 	virtual IFramebuffers* createGeometryFramebuffers() override;
 
 public:
-	virtual void geometryPass(const List<GMGameObject*>& objects) override;
+	virtual void geometryPass(const GMGameObjectContainer& objects) override;
 	virtual void lightPass() override;
 
 public:

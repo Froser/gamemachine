@@ -174,7 +174,7 @@ IFramebuffers* GMGraphicEngine::getFilterFramebuffers()
 	return d->filterFramebuffers;
 }
 
-void GMGraphicEngine::draw(const List<GMGameObject*>& forwardRenderingObjects, const List<GMGameObject*>& deferredRenderingObjects)
+void GMGraphicEngine::draw(const GMGameObjectContainer& forwardRenderingObjects, const GMGameObjectContainer& deferredRenderingObjects)
 {
 	GM_PROFILE("draw");
 	D(d);
@@ -227,7 +227,7 @@ void GMGraphicEngine::draw(const List<GMGameObject*>& forwardRenderingObjects, c
 	}
 }
 
-void GMGraphicEngine::draw(const List<GMGameObject*>& objects)
+void GMGraphicEngine::draw(const GMGameObjectContainer& objects)
 {
 	D(d);
 	for (auto object : objects)
@@ -388,7 +388,7 @@ void GMGraphicEngine::createFilterFramebuffer()
 	}
 }
 
-void GMGraphicEngine::generateShadowBuffer(const List<GMGameObject*>& forwardRenderingObjects, const List<GMGameObject*>& deferredRenderingObjects)
+void GMGraphicEngine::generateShadowBuffer(const GMGameObjectContainer& forwardRenderingObjects, const GMGameObjectContainer& deferredRenderingObjects)
 {
 	D(d);
 	d->isDrawingShadow = true;
