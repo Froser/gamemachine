@@ -23,24 +23,27 @@
     </objects>
     <actions>
         <include file="ani_fireworks.xml" />
-        
+
         <action type="shadow" cascades="1" position="75 100 -150" focus="0 0 -50" width="1024" height="768" view="perspective" fovy="45" near=".1f" far="1600" bias="0.00000825" time="+0"/>
         <action type="camera" direction="0 0 1" position="0 30 0" time="+0"/>
         <action type="addObject" object="obj_metalplate" time="+0"/>
         <action type="addObject" object="light_deathstroke" time="+0" />
         <action type="addObject" object="obj_deathstroke" time="+0"/>
 
+        <checkpoint type="save"/>
         <action type="animate" action="play" object="light_deathstroke" time="+0"/>
         <action type="animate" function="linear" object="light_deathstroke" ambient="1 1 1" diffuse="3 3 3" specular="2 2 2" endtime="6"/>
         <action type="animate" action="stop" object="light_deathstroke" time="+6"/>
+        <checkpoint type="load"/>
 
-        <action type="animate" action="play" object="$camera" time="-6"/>
+        <action type="animate" action="play" object="$camera" time="+0"/>
         <action type="animate" function="cubic-bezier" control="0 .75 .75 1" object="$camera" direction="0 0 1" position="0 20 -100" endtime="16"/>
-        <action type="animate" action="stop" object="$camera" time="+10"/>
+        <action type="animate" action="stop" object="$camera" time="+16"/>
+        <checkpoint type="load"/>
 
-        <action type="animate" action="play" object="obj_deathstroke" time="-16"/>
+        <action type="animate" action="play" object="obj_deathstroke" time="+0"/>
         <action type="animate" action="lerp" object="obj_deathstroke" translate="0 0 -115" endtime="16" />
-        <action type="animate" action="stop" object="obj_deathstroke" time="+0"/>
+        <action type="animate" action="stop" object="obj_deathstroke" time="+16"/>
 
         <action type="animate" action="play" object="light_deathstroke" time="-6"/>
         <action type="animate" function="linear" object="light_deathstroke" ambient="0 0 0" diffuse="0 0 0" specular="0" endtime="3"/>

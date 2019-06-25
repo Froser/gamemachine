@@ -62,11 +62,8 @@
         <action type="camera" view="perspective" fovy="60" near=".1f" far="3200" />
         <action type="camera" direction="0 0 1" position="0 0 -30" />
 
-<!--
-        <include file="ani_logo.xml" />
+        <!--<include file="ani_logo.xml" />-->
         <include file="ani_dragon.xml" />
-
-    -->
         <include file="ani_deathstroke.xml" />
     </actions>
 </timeline>
