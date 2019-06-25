@@ -4,6 +4,32 @@
 #include "foundation/gamemachine.h"
 #include <gmdxincludes.h>
 
+bool GMFrustum::operator==(const GMFrustum& rhs)
+{
+	D(d);
+	D_OF(d_rhs, &rhs);
+	bool sameType = d->type == d_rhs->type;
+	if (!sameType)
+		return false;
+
+	bool nf = getNear() == rhs.getNear() && getFar() == rhs.getFar();
+	if (!nf)
+		return false;
+
+	if (d->type == GMFrustumType::Perspective)
+		return d->parameters.fovy == d_rhs->parameters.fovy && d->parameters.aspect == d_rhs->parameters.aspect;
+	
+	return d->parameters.left == d_rhs->parameters.left &&
+		d->parameters.right == d_rhs->parameters.right &&
+		d->parameters.top == d_rhs->parameters.top &&
+		d->parameters.bottom == d_rhs->parameters.bottom;
+}
+
+bool GMFrustum::operator!=(const GMFrustum& rhs)
+{
+	return !(*this == rhs);
+}
+
 void GMFrustum::setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f)
 {
 	D(d);
@@ -135,6 +161,18 @@ GMCamera::GMCamera()
 	d->frustum.setPerspective(Radian(75.f), 1.333f, .1f, 3200);
 	d->lookAt.position = GMVec3(0);
 	d->lookAt.lookDirection = GMVec3(0, 0, 1);
+}
+
+bool GMCamera::operator==(const GMCamera& rhs)
+{
+	D(d);
+	D_OF(d_rhs, &rhs);
+	return d->frustum == d_rhs->frustum && d->lookAt == d_rhs->lookAt;
+}
+
+bool GMCamera::operator!=(const GMCamera& rhs)
+{
+	return !(*this == rhs);
 }
 
 void GMCamera::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f)

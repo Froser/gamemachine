@@ -400,29 +400,28 @@ void GMGraphicEngine::generateShadowBuffer(const GMGameObjectContainer& forwardR
 	}
 	else
 	{
-		if (d->shadow.cascades != d->lastShadow.cascades ||
-			d->shadow.width != d->lastShadow.width ||
-			d->shadow.height != d->lastShadow.height)
+		if (d->shadow.width != d->lastShadow.width || d->shadow.height != d->lastShadow.height)
 		{
 			d->shadowDepthFramebuffers->destroy();
 			createShadowFramebuffers(&d->shadowDepthFramebuffers);
+		}
+
+		if (d->shadow.cascades != d->lastShadow.cascades)
+		{
 			resetCSM();
 		}
-		else if (d->shadow.camera.getFrustum().getParameters() != d->lastShadow.camera.getFrustum().getParameters() ||
-			d->shadow.camera.getFrustum().getNear() != d->lastShadow.camera.getFrustum().getNear() ||
-			d->shadow.camera.getFrustum().getFar() != d->lastShadow.camera.getFrustum().getFar()
-			)
+
+		if (d->shadow.camera != d->lastShadow.camera)
 		{
 			ICSMFramebuffers* csm = getCSMFramebuffers(); // csm和d->shadowDepthFramebuffers其实是同一个对象
 			for (GMCascadeLevel i = 0; i < d->shadow.cascades; ++i)
 			{
 				// 创建每一个cascade的viewport
 				csm->setEachCascadeEndClip(i);
-				resetCSM();
 			}
+			resetCSM();
 		}
 	}
-
 
 	GM_ASSERT(d->shadowDepthFramebuffers);
 	d->shadowDepthFramebuffers->clear(GMFramebuffersClearType::Depth);
@@ -517,9 +516,8 @@ IGBuffer* GMGraphicEngine::createGBuffer()
 void GMGraphicEngine::setShadowSource(const GMShadowSourceDesc& desc)
 {
 	D(d);
-	GMint64 ver = d->shadow.version;
 	d->shadow = desc;
-	d->shadow.version = ++ver;
+	++d->shadow.version;
 }
 
 GMCamera& GMGraphicEngine::getCamera()

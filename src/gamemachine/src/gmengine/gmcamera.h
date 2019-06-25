@@ -28,6 +28,16 @@ GM_ALIGNED_STRUCT(GMCameraLookAt)
 	GMVec3 position = Zero<GMVec3>(); //!< 摄像机位置
 	GMVec3 up = GMVec3(0, 1, 0);
 
+	bool operator == (const GMCameraLookAt& rhs)
+	{
+		return this->lookDirection == rhs.lookDirection && this->position == rhs.position && this->up == rhs.up;
+	}
+
+	bool operator != (const GMCameraLookAt& rhs)
+	{
+		return !(*this == rhs);
+	}
+
 	static GMCameraLookAt makeLookAt(const GMVec3& _position, const GMVec3& _focusAt, const GMVec3& _up = GMVec3(0, 1, 0))
 	{
 		return GMCameraLookAt(_focusAt - _position, _position, _up);
@@ -89,6 +99,10 @@ class GMFrustum
 	friend class GMCamera;
 
 	GMFrustum() = default;
+
+	bool operator== (const GMFrustum&);
+	bool operator!= (const GMFrustum&);
+
 	void setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f);
 	void setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f);
 
@@ -144,6 +158,9 @@ public:
 	GMCamera();
 
 public:
+	bool operator==(const GMCamera& rhs);
+	bool operator!=(const GMCamera& rhs);
+
 	void setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f);
 	void setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f);
 	void updateViewMatrix();
