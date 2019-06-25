@@ -453,14 +453,14 @@ option(mdi "support for Microsoft Document Imaging" ON)
 set(MDI_SUPPORT ${mdi})
 
 # ZLIB
-option(zlib "use zlib (required for Deflate compression)" ON)
-if (zlib)
-  find_package(ZLIB)
-endif()
-set(ZLIB_SUPPORT 0)
-if(ZLIB_FOUND)
+# option(zlib "use zlib (required for Deflate compression)" ON)
+# if (zlib)
+#   find_package(ZLIB)
+# endif()
+# set(ZLIB_SUPPORT 0)
+# if(ZLIB_FOUND)
   set(ZLIB_SUPPORT 1)
-endif()
+# endif()
 set(ZIP_SUPPORT ${ZLIB_SUPPORT})
 # Option for Pixar log-format algorithm
 

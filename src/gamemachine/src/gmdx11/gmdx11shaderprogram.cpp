@@ -14,7 +14,7 @@ namespace
 		r.reserve(gm_sizet_to_int(md5Data.getSize() * 2));
 
 		const char* hex = "0123456789ABCDEF";
-		for (GMint32 i = 0; i < md5Data.getSize(); ++i)
+		for (GMsize_t i = 0; i < md5Data.getSize(); ++i)
 		{
 			r += hex[(GMbyte)md5Data.getData()[i] >> 4];
 			r += hex[(GMbyte)md5Data.getData()[i] & 0x0f];

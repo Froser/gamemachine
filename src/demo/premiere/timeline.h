@@ -133,6 +133,22 @@ private:
 	GMint32 m_editingAnimationIndex;
 };
 
+template <typename T>
+struct AlignCache : AlignedVector<T>
+{
+	GMsize_t put(const T& value)
+	{
+		push_back(value);
+		return size() - 1;
+	}
+
+	GMsize_t put(T&& value)
+	{
+		push_back(std::move(value));
+		return size() - 1;
+	}
+};
+
 class Timeline
 {
 public:
@@ -200,6 +216,7 @@ private:
 	std::multiset<Action> m_deferredActions;
 	std::multiset<Action>::iterator m_currentAction;
 	Vector<Map<IDestroyObject*, AnimationContainer>> m_animations;
+	AlignCache<GMCameraLookAt> m_cameraLookAtCache;
 	bool m_playing;
 	bool m_finished;
 	GMDuration m_timeline;

@@ -28,7 +28,7 @@
         <buffer id="mud_terrain" file="textures/mud/terrain.png" />
         <object id="model_dragon" file="dragon/dragon.obj" />
         <object id="model_logo" file="logo/logo.fbx" />
-        <object id="model_deathstroke" file="deathstroke/deathstroke.fbx" />
+        <object id="model_deathstroke" file="deathstroke/Deathstroke.fbx" />
 
         <particles id="particle_firework" file="ExplodingRing.plist" />
     </assets>

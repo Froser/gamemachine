@@ -891,6 +891,7 @@ void Timeline::parseActions(GMXMLElement* e)
 				CameraParams p;
 				GMCameraLookAt lookAt;
 				GMint32 component = parseCameraAction(e, p, lookAt);
+				GMsize_t lookAtIndex = m_cameraLookAtCache.put(lookAt);
 				
 				if (component & PerspectiveComponent)
 				{
@@ -908,12 +909,12 @@ void Timeline::parseActions(GMXMLElement* e)
 				}
 				if (component & CameraLookAtComponent)
 				{
-					action.action = [p, action, lookAt, this]() {
+					action.action = [p, action, lookAtIndex, this]() {
 						if (action.action)
 							action.action();
 
 						auto& camera = m_context->getEngine()->getCamera();
-						camera.lookAt(lookAt);
+						camera.lookAt(m_cameraLookAtCache[lookAtIndex]);
 					};
 				}
 
@@ -1054,8 +1055,10 @@ void Timeline::parseActions(GMXMLElement* e)
 				CameraParams cp;
 				GMCameraLookAt lookAt;
 				GMint32 component = parseCameraAction(e, cp, lookAt);
+				GMsize_t lookAtIndex = m_cameraLookAtCache.put(lookAt);
 
-				action.action = [this, component, cascades, width, height, bias, partitions = std::move(partitions), cp, lookAt]() {
+				action.action = [this, component, cascades, width, height, bias, partitions = std::move(partitions), cp, lookAtIndex]() {
+					const GMCameraLookAt& lookAt = m_cameraLookAtCache[lookAtIndex];
 					GMShadowSourceDesc desc;
 					desc.type = GMShadowSourceDesc::CSMShadow;
 					GMCamera camera;
