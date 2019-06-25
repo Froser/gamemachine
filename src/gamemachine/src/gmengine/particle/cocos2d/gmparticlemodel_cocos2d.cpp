@@ -253,7 +253,7 @@ void GMParticleModel_Cocos2D::GPUUpdate(IComputeShaderProgram* shaderProgram, vo
 			shaderProgram->copyBuffer(resultHandle, futureResult);
 
 		void* resultPtr = shaderProgram->mapBuffer(resultHandle);
-		const GMsize_t verticesSize = sizeof(GMVertex) * 6 * sz; // 一个粒子6个顶点
+		const GMsize_t verticesSize = sizeof(GMVertex) * VerticesPerParticle * sz; // 一个粒子6个顶点
 		memcpy_s(dataPtr, verticesSize, resultPtr, verticesSize);
 		shaderProgram->unmapBuffer(resultHandle);
 	}

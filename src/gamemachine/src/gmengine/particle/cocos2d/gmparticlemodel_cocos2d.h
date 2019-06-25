@@ -45,9 +45,7 @@ public:
 	virtual void init();
 
 protected:
-	GMGameObject* createGameObject(
-		const IRenderContext* context
-	);
+	virtual GMGameObject* createGameObject(const IRenderContext* context);
 
 	void update6Vertices(
 		GMVertex* vertex,

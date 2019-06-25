@@ -144,6 +144,7 @@ Timeline::Timeline(const IRenderContext* context, GMGameWorld* world)
 	, m_playing(false)
 	, m_finished(false)
 	, m_lastTime(0)
+	, m_checkpointTime(0)
 	, m_audioPlayer(gmm::GMMFactory::getAudioPlayer())
 	, m_audioReader(gmm::GMMFactory::getAudioReader())
 {
@@ -1151,6 +1152,22 @@ void Timeline::parseActions(GMXMLElement* e)
 				gm_warning(gm_dbg_wrap("action type cannot be recognized: {0}"), type);
 			}
 		}
+		else if (name == L"checkpoint")
+		{
+			GMString type = e->Attribute("type");
+			if (type == "save")
+			{
+				m_checkpointTime = m_lastTime;
+			}
+			else if (type == "load")
+			{
+				m_lastTime = m_checkpointTime;
+			}
+			else
+			{
+				gm_warning(gm_dbg_wrap("checkpoint type cannot be recognized: {0}"), type);
+			}
+		}
 		else
 		{
 			gm_warning(gm_dbg_wrap("tag name cannot be recognized: {0}"), e->Name());
@@ -1345,6 +1362,8 @@ void Timeline::parseParticlesObject(GMXMLElement* e)
 			{
 				gm_warning(gm_dbg_wrap("Create particle system failed for id '{1}'."), id);
 			}
+
+			parseCocos2DParticleAttributes(ps, e);
 		}
 		else
 		{
@@ -1354,6 +1373,21 @@ void Timeline::parseParticlesObject(GMXMLElement* e)
 	else
 	{
 		gm_warning(gm_dbg_wrap("Cannot find particles for source: {0}"), assetName);
+	}
+}
+
+void Timeline::parseCocos2DParticleAttributes(IParticleSystem* ps, GMXMLElement* e)
+{
+	GMParticleEmitter_Cocos2D* emitter = gm_cast<GMParticleEmitter_Cocos2D*>(ps->getEmitter());
+	GMString translateStr = e->Attribute("translate");
+	if (!translateStr.isEmpty())
+	{
+		GMfloat x = 0, y = 0, z = 0;
+		GMScanner scanner(translateStr);
+		scanner.nextFloat(x);
+		scanner.nextFloat(y);
+		scanner.nextFloat(z);
+		emitter->setEmitPosition(GMVec3(x, y, z));
 	}
 }
 

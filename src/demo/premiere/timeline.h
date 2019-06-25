@@ -155,6 +155,7 @@ private:
 	GMint32 parseCameraAction(GMXMLElement*, REF CameraParams& cp, REF GMCameraLookAt& lookAt);
 	void parseParticlesAsset(GMXMLElement*);
 	void parseParticlesObject(GMXMLElement*);
+	void parseCocos2DParticleAttributes(IParticleSystem*, GMXMLElement*);
 
 private:
 	void interpolateCamera(GMXMLElement*, GMfloat);
@@ -203,6 +204,7 @@ private:
 	bool m_finished;
 	GMDuration m_timeline;
 	GMDuration m_lastTime;
+	GMDuration m_checkpointTime;
 	IAudioReader* m_audioReader;
 	IAudioPlayer* m_audioPlayer;
 };
