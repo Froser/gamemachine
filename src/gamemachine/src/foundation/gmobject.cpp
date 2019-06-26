@@ -2,6 +2,7 @@
 #include "gmobject.h"
 #include "interfaces.h"
 #include <utility>
+#include "gmthread.h"
 
 template <typename ContainerType>
 static size_t removeIf(ContainerType& container, std::function<bool(typename ContainerType::iterator)> pred)
@@ -19,6 +20,12 @@ static size_t removeIf(ContainerType& container, std::function<bool(typename Con
 		}
 	}
 	return cnt;
+}
+
+GMObject::GMObject()
+{
+	D(d);
+	d->tid = GMThread::getCurrentThreadId();
 }
 
 GMObject::~GMObject()

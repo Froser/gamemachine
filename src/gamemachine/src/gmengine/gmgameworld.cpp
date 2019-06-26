@@ -44,7 +44,11 @@ void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
 	d->gameObjects.insert(GMOwnedPtr<GMGameObject>(obj));
 
 	obj->foreachModel([d, this](GMModel* m) {
-		getContext()->getEngine()->createModelDataProxy(d->context, m);
+		const IRenderContext* context = getContext();
+		if (context->getEngine()->isCurrentMainThread())
+			context->getEngine()->createModelDataProxy(d->context, m);
+		else
+			GM.invokeInMainThread([context, d, m]() {context->getEngine()->createModelDataProxy(d->context, m); });
 	});
 }
 

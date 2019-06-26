@@ -79,6 +79,10 @@
 #include <limits>
 #include "assert.h"
 
+#if GM_UNIX
+#include <pthread.h>
+#endif
+
 template <typename T1, typename T2>
 using Pair = std::pair<T1, T2>;
 
@@ -264,6 +268,17 @@ typedef LRESULT GMLResult;
 typedef GMint32 GMWParam;
 typedef GMlong GMLParam;
 typedef GMlong GMLResult;
+#endif
+
+// 线程
+#if GM_WINDOWS
+typedef void* GMThreadHandle;
+typedef GMlong GMThreadId;
+#elif GM_UNIX
+// USE pthread
+typedef pthread_t GMThreadHandle;
+typedef pthread_t GMThreadId;
+typedef pthread_attr_t GMThreadAttr;
 #endif
 
 // 类型大小静态断言，如果在某些环境下失败，应该同步typedef使得其编译通过

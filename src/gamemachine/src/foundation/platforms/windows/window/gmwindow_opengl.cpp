@@ -303,7 +303,8 @@ void GMWindow_OpenGL::setMultithreadRenderingFlag(GMMultithreadRenderingFlag fla
 		HGLRC hRC = d->hRCShareManager->getAvailable();
 		if (hRC)
 		{
-			wglMakeCurrent(d->hDC, hRC);
+			if (!wglMakeCurrent(d->hDC, hRC))
+				gm_error(gm_dbg_wrap("wglMakeCurrent returned false. Make current failed."));
 		}
 		else
 		{

@@ -102,6 +102,8 @@ struct GMGameMachineDesc
 	GMGameMachineRunningMode runningMode = GMGameMachineRunningMode::GameMode;
 };
 
+typedef std::function<void()> GMCallable;
+
 GM_PRIVATE_OBJECT_UNALIGNED(GameMachine)
 {
 	GMClock clock;
@@ -115,6 +117,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GameMachine)
 	GMMessage lastMessage;
 	Queue<GMMessage> messageQueue;
 	Vector<IDestroyObject*> managerQueue;
+	Queue<GMCallable> callableQueue;
 	GMGameMachineRunningStates states;
 	GMGameMachineRunningMode runningMode;
 	GMConfigs configs;
@@ -276,6 +279,13 @@ public:
 	//! 马上处理一个GameMachine消息。
 	bool sendMessage(const GMMessage& msg);
 
+	//! 将一个对象推入GameMachine可调用对象列表，它将在下一次GameMachine主线程循环的时候被调用。
+	/*!
+	  用户需要自己确保下一次调用可调用对象时，它是否还存在，需要自己确认函数中的生命周期管理是否正确。
+	  \param callable 待调用的可调用对象。
+	*/
+	void invokeInMainThread(GMCallable callable);
+
 	//! 退出程序。
 	void exit();
 
@@ -292,7 +302,7 @@ private:
 	void runEventLoop();
 	template <typename T, typename U> void registerManager(T* newObject, OUT U** manager);
 	bool handleMessage(const GMMessage& msg);
-	void updateGameMachineRunningStates();
+	void updateGameMachine();
 	void setRenderEnvironment(GMRenderEnvironment renv);
 	bool checkCrashDown();
 	void beginHandlerEvents(IWindow* window);
@@ -300,6 +310,7 @@ private:
 	void eachHandler(std::function<void(IWindow*, IGameHandler*)> action);
 	void beforeStartGameMachine();
 	void initHandlers();
+	void invokeCallables();
 };
 
 END_NS

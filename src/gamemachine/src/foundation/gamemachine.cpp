@@ -48,7 +48,7 @@ GameMachine& GameMachine::instance()
 GameMachine::GameMachine()
 {
 	GMDebugger::instance();
-	updateGameMachineRunningStates();
+	updateGameMachine();
 }
 
 void GameMachine::init(
@@ -68,7 +68,7 @@ void GameMachine::init(
 	{
 		d->clock.begin();
 		handleMessages();
-		updateGameMachineRunningStates();
+		updateGameMachine();
 
 		eachHandler([=](auto window, auto handler) {
 			if (handler)
@@ -164,7 +164,7 @@ bool GameMachine::renderFrame(IWindow* window)
 	d->clock.update();
 
 	// 更新状态
-	updateGameMachineRunningStates();
+	updateGameMachine();
 
 	// 本帧结束
 	endHandlerEvents(window);
@@ -189,6 +189,12 @@ bool GameMachine::renderFrame(IWindow* window)
 bool GameMachine::sendMessage(const GMMessage& msg)
 {
 	return handleMessage(msg);
+}
+
+void GameMachine::invokeInMainThread(GMCallable callable)
+{
+	D(d);
+	d->callableQueue.push(callable);
 }
 
 void GameMachine::exit()
@@ -364,11 +370,12 @@ void GameMachine::finalize()
 	}
 }
 
-void GameMachine::updateGameMachineRunningStates()
+void GameMachine::updateGameMachine()
 {
 	D(d);
 	d->states.elapsedTime = d->clock.getTime();
 	d->states.fps = d->clock.getFps();
+	invokeCallables();
 }
 
 void GameMachine::eachHandler(std::function<void(IWindow*, IGameHandler*)> action)
@@ -383,7 +390,7 @@ void GameMachine::eachHandler(std::function<void(IWindow*, IGameHandler*)> actio
 void GameMachine::beforeStartGameMachine()
 {
 	D(d);
-	updateGameMachineRunningStates();
+	updateGameMachine();
 	handleMessages();
 	initHandlers();
 	d->gamemachinestarted = true;
@@ -410,5 +417,17 @@ void GameMachine::initHandlers()
 	{
 		if (!d->gamemachinestarted)
 			finalize();
+	}
+}
+
+void GameMachine::invokeCallables()
+{
+	D(d);
+	GMOwnedPtr<GMMutex, GMMutexRelease> mutex;
+	while (!d->callableQueue.empty())
+	{
+		GMCallable callable = d->callableQueue.front();
+		callable();
+		d->callableQueue.pop();
 	}
 }

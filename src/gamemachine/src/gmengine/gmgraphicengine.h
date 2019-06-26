@@ -287,6 +287,7 @@ public:
 	virtual GMPrimitiveManager* getPrimitiveManager() override;
 	virtual bool msgProc(const GMMessage& e) override;
 	virtual void createModelDataProxy(const IRenderContext* context, GMModel* model, bool transfer = true) override;
+	virtual bool isCurrentMainThread() override;
 
 public:
 	virtual ICSMFramebuffers* getCSMFramebuffers();

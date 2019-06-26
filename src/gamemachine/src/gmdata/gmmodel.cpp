@@ -95,7 +95,10 @@ void GMModelDataProxy::prepareParentModel()
 	GMModel* parent = d->model->getParentModel();
 	if (parent)
 	{
-		d->context->getEngine()->createModelDataProxy(d->context, parent, true);
+		if (!parent->getModelDataProxy())
+			d->context->getEngine()->createModelDataProxy(d->context, parent, true);
+		parent->getModelDataProxy()->prepareParentModel();
+
 		// 参考 GMModel::GMModel(GMModelAsset parentAsset)
 		d->model->setModelBuffer(parent->getModelBuffer());
 		d->model->setPrimitiveTopologyMode(parent->getPrimitiveTopologyMode());

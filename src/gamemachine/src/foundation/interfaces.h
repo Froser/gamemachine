@@ -771,6 +771,13 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	\param transfer 是否马上传递顶点信息到GPU。传递后，对象的顶点信息将在内存中被释放。
 	*/
 	virtual void createModelDataProxy(const IRenderContext* context, GMModel* model, bool transfer = true) = 0;
+
+	//! 判断当前线程是否为主线程。
+	/*!
+	  请确保IGraphicEngine对象是在主线程创建，否则此函数将无法正确判断。
+	  \return 是否当前线程为主线程。
+	*/
+	virtual bool isCurrentMainThread() = 0;
 };
 
 GM_INTERFACE(ITechnique)

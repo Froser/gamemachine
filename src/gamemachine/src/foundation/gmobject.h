@@ -296,6 +296,7 @@ GM_PRIVATE_OBJECT(GMObject)
 	bool metaRegistered = false;
 	GMMeta meta;
 	GMSlots objSlots;
+	GMThreadId tid = 0;
 	GMConnectionTargets connectionTargets;
 };
 
@@ -321,7 +322,7 @@ public:
 	/*!
 	  构造一个GMObject实例。
 	*/
-	GMObject() = default;
+	GMObject();
 
 	//! GMObject析构函数函数。
 	/*!
@@ -373,12 +374,32 @@ public:
 
 	//! 交换GMObject私有数据
 	/*!
-	GMObject允许交换其私有数据。<BR>
-	\param another 交换私有数据的目标对象，将目标对象的私有数据交换到此对象。
+	  GMObject允许交换其私有数据。<BR>
+	  \param another 交换私有数据的目标对象，将目标对象的私有数据交换到此对象。
 	*/
 	void swapData(GMObject&& another) GM_NOEXCEPT
 	{
 		m_data.swap(another.m_data);
+	}
+
+	//! 获取对象创建时的线程ID。
+	/*!
+	  return 对象创建时的线程ID。
+	*/
+	GMThreadId getThreadId() GM_NOEXCEPT
+	{
+		D(d);
+		return d->tid;
+	}
+
+	//! 将一个对象移交到另外一个线程。
+	/*!
+	  \param tid 将要移交到的线程。
+	*/
+	void moveToThread(GMThreadId tid) GM_NOEXCEPT
+	{
+		D(d);
+		d->tid = tid;
 	}
 
 private:

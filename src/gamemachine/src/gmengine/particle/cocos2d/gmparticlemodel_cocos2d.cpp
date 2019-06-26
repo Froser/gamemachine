@@ -68,7 +68,10 @@ GMGameObject* GMParticleModel_Cocos2D::createGameObject(
 		part->vertex(GMVertex());
 	}
 
-	context->getEngine()->createModelDataProxy(context, d->particleModel);
+	if (context->getEngine()->isCurrentMainThread())
+		context->getEngine()->createModelDataProxy(context, d->particleModel);
+	else
+		GM.invokeInMainThread([context, d]() { context->getEngine()->createModelDataProxy(context, d->particleModel); });
 	object->setContext(context);
 	object->setAsset(gm::GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, d->particleModel)));
 	return object;
@@ -294,7 +297,6 @@ GMComputeBufferHandle GMParticleModel_Cocos2D::prepareBuffers(IComputeShaderProg
 	return d->resultBuffer;
 }
 
-
 void GMParticleModel_Cocos2D::initObjects()
 {
 	D(d);
@@ -369,6 +371,12 @@ void GMParticleModel_Cocos2D::setDefaultCode(const GMString& code)
 void GMParticleModel_Cocos2D::render()
 {
 	D(d);
+	//const IRenderContext* context = d->system->getContext();
+	//if (!context->getEngine()->isCurrentMainThread())
+	//{
+		//return;
+	//}
+
 	if (d->particleObject)
 	{
 		// 开始更新粒子数据
@@ -386,6 +394,7 @@ void GMParticleModel_Cocos2D::render()
 
 void GMParticleModel_Cocos2D::init()
 {
+	D(d);
 	initObjects();
 }
 

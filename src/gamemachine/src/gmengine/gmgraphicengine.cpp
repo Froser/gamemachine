@@ -594,6 +594,12 @@ void GMGraphicEngine::createModelDataProxy(const IRenderContext* context, GMMode
 	}
 }
 
+bool GMGraphicEngine::isCurrentMainThread()
+{
+	D(d);
+	return GMThread::getCurrentThreadId() == d->mtid;
+}
+
 GMLightIndex GMGraphicEngine::addLight(AUTORELEASE ILight* light)
 {
 	D(d);

@@ -41,6 +41,8 @@ void GMGLModelDataProxy::transfer()
 	GMsize_t verticeCount = 0;
 
 	GLuint vao;
+
+	GMGLBeginGetErrorsAndCheck();
 	glGenVertexArrays(1, &vao);
 	bufferData.arrayId = vao;
 	glBindVertexArray(vao);
@@ -86,6 +88,7 @@ void GMGLModelDataProxy::transfer()
 	}
 
 	glBindVertexArray(0);
+	GMGLEndGetErrorsAndCheck();
 
 	for (auto& part : model->getParts())
 	{
@@ -119,7 +122,9 @@ void GMGLModelDataProxy::beginUpdateBuffer(GMModelBufferType type)
 	GMModel* model = getModel();
 	GM_ASSERT(model);
 	d->lastType = type;
+	GMGLBeginGetErrorsAndCheck();
 	glBindVertexArray(model->getModelBuffer()->getMeshBuffer().arrayId);
+	GMGLEndGetErrorsAndCheck();
 
 	if (type == GMModelBufferType::VertexBuffer)
 		glBindBuffer(GL_ARRAY_BUFFER, model->getModelBuffer()->getMeshBuffer().vertexBufferId);
