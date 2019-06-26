@@ -300,9 +300,11 @@ GMComputeBufferHandle GMParticleModel_Cocos2D::prepareBuffers(IComputeShaderProg
 void GMParticleModel_Cocos2D::initObjects()
 {
 	D(d);
+	const IRenderContext* context = d->system->getContext();
+	GM_ASSERT(context);
+
 	if (!d->particleObject)
 	{
-		const IRenderContext* context = d->system->getContext();
 		d->particleObject.reset(createGameObject(context));
 
 		if (d->system->getTexture().isEmpty())
@@ -326,6 +328,8 @@ void GMParticleModel_Cocos2D::initObjects()
 		}
 	}
 
+	// 提前获取着色器。它可能是在另外的线程中，所以可以提速
+	GMComputeShaderManager::instance().getComputeShaderProgram(context, GMCS_PARTICLE_DATA_TRANSFER, L".", getCode(), L"main");
 }
 
 void GMParticleModel_Cocos2D::disposeGPUHandles()
@@ -371,12 +375,6 @@ void GMParticleModel_Cocos2D::setDefaultCode(const GMString& code)
 void GMParticleModel_Cocos2D::render()
 {
 	D(d);
-	//const IRenderContext* context = d->system->getContext();
-	//if (!context->getEngine()->isCurrentMainThread())
-	//{
-		//return;
-	//}
-
 	if (d->particleObject)
 	{
 		// 开始更新粒子数据
