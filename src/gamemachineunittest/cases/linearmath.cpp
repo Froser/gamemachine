@@ -197,6 +197,20 @@ void cases::LinearMath::addToUnitTest(UnitTest& ut)
 		return VECTOR3_EQUALS(V, 12, 6, 2);
 	});
 
+	ut.addTestCase("GMVec2 * float", []() {
+		GMVec2 v1(4, 3);
+		gm::GMfloat m = 3;
+		GMVec2 V = v1 * m;
+		return VECTOR2_EQUALS(V, 12, 9);
+	});
+
+	ut.addTestCase("GMVec2 / float", []() {
+		GMVec2 v1(8, 4);
+		gm::GMfloat m = 2;
+		GMVec2 V = v1 / m;
+		return VECTOR2_EQUALS(V, 4, 2);
+	});
+
 	ut.addTestCase("GMVec3 * float", []() {
 		GMVec3 v1(4, 3, 2);
 		gm::GMfloat m = 3;

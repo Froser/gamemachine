@@ -333,7 +333,7 @@ inline GMVec2 operator*(const GMVec2& V1, gm::GMfloat S)
 #if GM_USE_DX_MATH
 	V.v_ = DirectX::operator*(V1.v_, S);
 #else
-	V.v_ = V1.v_ / S;
+	V.v_ = V1.v_ * S;
 #endif
 	return V;
 }
