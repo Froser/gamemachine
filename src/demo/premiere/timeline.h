@@ -4,6 +4,7 @@
 #include <gamemachine.h>
 #include <gmxml.h>
 #include <gmanimation.h>
+#include <extensions/objects/gmwavegameobject.h>
 
 using namespace gm;
 
@@ -187,6 +188,8 @@ private:
 	void parseTextures(GMGameObject*, GMXMLElement*);
 	void parseMaterial(GMGameObject*, GMXMLElement*);
 	void parseAttributes(GMGameObject*, GMXMLElement*, Action&);
+	void parseWaveObjectAttributes(GMWaveGameObjectDescription&, GMXMLElement*);
+	void parseWaveAttributes(GMWaveDescription&, GMXMLElement*);
 	void addObject(AutoReleasePtr<GMGameObject>*, GMXMLElement*, Action&);
 	void addObject(AutoReleasePtr<ILight>*, GMXMLElement*, Action&);
 	void addObject(AutoReleasePtr<IParticleSystem>*, GMXMLElement*, Action&);

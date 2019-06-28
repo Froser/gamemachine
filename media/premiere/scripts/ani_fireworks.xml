@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <timeline>
+    <assets>
+        <particles id="particle_firework" file="ExplodingRing.plist" />
+    </assets>
     <objects>
         <particles id="obj_firework" asset="particle_firework" type="cocos2d" translate="100 300 1000"/>
         <particles id="obj_firework2" asset="particle_firework" type="cocos2d" translate="-200 200 600"/>

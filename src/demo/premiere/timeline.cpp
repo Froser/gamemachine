@@ -495,10 +495,33 @@ void Timeline::parseObjects(GMXMLElement* e)
 				m_objects[id] = AutoReleasePtr<GMGameObject>(obj);
 			}
 			else
+			{
 				gm_warning(gm_dbg_wrap("Cannot find asset: {0}"), assetName);
+			}
 
 			parseTextures(obj, e);
 			parseMaterial(obj, e);
+			parseTransform(obj, e);
+		}
+		else if (name == L"wave")
+		{
+			GMWaveGameObjectDescription objDesc;
+			parseWaveObjectAttributes(objDesc, e);
+
+			Vector<GMWaveDescription> wds;
+			GMXMLElement* waveDescriptionPtr = e->FirstChildElement("attribute");
+			while (waveDescriptionPtr)
+			{
+				GMWaveDescription desc;
+				parseWaveAttributes(desc, waveDescriptionPtr);
+				wds.push_back(std::move(desc));
+				waveDescriptionPtr = waveDescriptionPtr->NextSiblingElement("attribute");
+			}
+
+			GMWaveGameObject* obj = GMWaveGameObject::create(objDesc);
+			obj->setWaveDescriptions(std::move(wds));
+			m_objects[id] = AutoReleasePtr<GMGameObject>(obj);
+			parseTextures(obj, e);
 			parseTransform(obj, e);
 		}
 		else if (name == L"terrain")
@@ -1614,6 +1637,101 @@ void Timeline::parseAttributes(GMGameObject* obj, GMXMLElement* e, Action& actio
 			obj->setVisible(visible);
 		};
 	}
+}
+
+void Timeline::parseWaveObjectAttributes(GMWaveGameObjectDescription& desc, GMXMLElement* e)
+{
+	GMfloat terrainX = 0, terrainZ = 0;
+	GMfloat terrainLength = 1, terrainWidth = 1, heightScaling = 10.f;
+
+	GMint32 sliceX = 10, sliceY = 10;
+	GMfloat texLen = 10, texHeight = 10;
+
+	GMfloat texScaleLen = 2, texScaleHeight = 2;
+
+	terrainX = GMString::parseFloat(e->Attribute("terrainX"));
+	terrainZ = GMString::parseFloat(e->Attribute("terrainZ"));
+	terrainLength = GMString::parseFloat(e->Attribute("length"));
+	terrainWidth = GMString::parseFloat(e->Attribute("width"));
+	heightScaling = GMString::parseFloat(e->Attribute("heightScaling"));
+
+	GMString sliceStr = e->Attribute("slice");
+	if (!sliceStr.isEmpty())
+	{
+		GMScanner scanner(sliceStr);
+		scanner.nextInt(sliceX);
+		scanner.nextInt(sliceY);
+	}
+
+	GMString texSizeStr = e->Attribute("textureSize");
+	if (!texSizeStr.isEmpty())
+	{
+		GMScanner scanner(texSizeStr);
+		scanner.nextFloat(texLen);
+		scanner.nextFloat(texHeight);
+	}
+
+	GMString texScaling = e->Attribute("textureScaling");
+	if (!texScaling.isEmpty())
+	{
+		GMScanner scanner(texScaling);
+		scanner.nextFloat(texScaleLen);
+		scanner.nextFloat(texScaleHeight);
+	}
+
+	desc.terrainX = terrainX;
+	desc.terrainZ = terrainZ;
+	desc.terrainLength = terrainLength;
+	desc.terrainWidth = terrainWidth;
+	desc.heightScaling = heightScaling;
+	desc.sliceM = sliceX;
+	desc.sliceN = sliceY;
+	desc.textureLength = texLen;
+	desc.textureHeight = texHeight;
+	desc.textureScaleLength = texScaleLen;
+	desc.textureScaleHeight = texScaleHeight;
+}
+
+void Timeline::parseWaveAttributes(GMWaveDescription& desc, GMXMLElement* e)
+{
+	GMfloat steepness = 0;
+	GMfloat amplitude = 1;
+	GMfloat direction[3];
+	GMfloat speed = 2;
+	GMfloat waveLength = 1;
+
+	GMString steepnessStr = e->Attribute("steepness");
+	if (!steepnessStr.isEmpty())
+		steepness = GMString::parseFloat(steepnessStr);
+
+	GMString amplitudeStr = e->Attribute("amplitude");
+	if (!amplitudeStr.isEmpty())
+		amplitude = GMString::parseFloat(amplitudeStr);
+
+	GMString directionStr = e->Attribute("direction");
+	if (!directionStr.isEmpty())
+	{
+		GMScanner scanner(directionStr);
+		scanner.nextFloat(direction[0]);
+		scanner.nextFloat(direction[1]);
+		scanner.nextFloat(direction[2]);
+	}
+
+	GMString speedStr = e->Attribute("speed");
+	if (!speedStr.isEmpty())
+		speed = GMString::parseFloat(speedStr);
+
+	GMString waveLengthStr = e->Attribute("waveLength");
+	if (!waveLengthStr.isEmpty())
+		waveLength = GMString::parseFloat(waveLengthStr);
+
+	desc.steepness = steepness;
+	desc.amplitude = amplitude;
+	desc.direction[0] = direction[0];
+	desc.direction[1] = direction[1];
+	desc.direction[2] = direction[2];
+	desc.speed = speed;
+	desc.waveLength = waveLength;
 }
 
 void Timeline::addObject(AutoReleasePtr<GMGameObject>* object, GMXMLElement*, Action& action)

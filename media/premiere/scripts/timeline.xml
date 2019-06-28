@@ -26,11 +26,13 @@
         />-->
 
         <buffer id="mud_terrain" file="textures/mud/terrain.png" />
-        <object id="model_dragon" file="dragon/dragon.obj" />
+        <object id="model_dragon" file="cat/cat.obj" />
         <object id="model_logo" file="logo/logo.fbx" />
         <object id="model_deathstroke" file="deathstroke/Deathstroke.fbx" />
 
-        <particles id="particle_firework" file="ExplodingRing.plist" />
+        <texture id="tex_water_diffuse" file="water/water.tga" />
+        <texture id="tex_water_normal" file="water/water-normal.tga" />
+
     </assets>
     <objects>
         <cubemap id="obj_sky" asset="tex_sky" scale="1500 1500 1500" translate="0 10 0" />
@@ -56,14 +58,29 @@
         />
         <object id="obj_deathstroke" asset="model_deathstroke" scale="8 8 8" rotate="0 1 0 180"/>
         <source id="src_bgm" asset="audio_bgm"/>
+        <wave 
+            ambient="tex_water_diffuse" diffuse="tex_water_diffuse" normal="tex_water_normal"
+            terrainX="-256"
+            terrainZ="-256"
+            length="512"
+            width="512"
+            heightScaling="80"
+            slice="50"
+            textureSize="100 100"
+            textureScaling="2 2" 
+            >
+            <attribute steepness="0" amplitude="1.25" direction="1 0 1" speed="2" waveLength="3" />
+            <attribute steepness="0.03" amplitude=".5" direction="-1 0 1" speed="3" waveLength="1.5" />
+        </wave>
     </objects>
     <actions>
         <action type="play" object="src_bgm" />
         <action type="camera" view="perspective" fovy="60" near=".1f" far="3200" />
         <action type="camera" direction="0 0 1" position="0 0 -30" />
 
+<!--
         <include file="ani_logo.xml" />
-        <include file="ani_dragon.xml" />
+        <include file="ani_dragon.xml" />-->
         <include file="ani_deathstroke.xml" />
     </actions>
 </timeline>
