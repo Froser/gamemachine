@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<timeline>
+    <objects>
+        <light id="light_wave_global" type="point" position="200 200 -200" ambient="0 0 0" diffuse="0 0 0" />
+
+        <wave 
+            id="obj_wave"
+            ambient="tex_water_diffuse" diffuse="tex_water_diffuse" normal="tex_water_normal"
+            ambientTranslateSpeed="0.025 0.05" diffuseTranslateSpeed="0.025 0.05" normalTranslateSpeed="0.025 0.05"
+            ka=".4 .4 .4" ks=".6 .6 .6" kd=".6 .6 .6"
+            terrainX="-256"
+            terrainZ="-256"
+            length="512"
+            width="512"
+            heightScaling="180"
+            slice="50"
+            textureSize="100 100"
+            textureScaling="2 2" 
+            >
+            <attribute steepness="0" amplitude="1.25" direction="1 0 1" speed="2" waveLength="3" />
+            <attribute steepness="0.03" amplitude=".5" direction="-1 0 1" speed="3" waveLength="1.5" />
+        </wave>
+    </objects>
+    <actions>
+        <action type="camera" focus="0 0 0" position="150 20 -150" time="+0"/>
+        <action type="camera" view="perspective" fovy="60" near=".1f" far="3200" time="+0"/>
+        <action type="addObject" object="light_wave_global" time="+0"/>
+        <action type="addObject" object="obj_wave" time="+0"/>
+        <action type="play" object="obj_wave" time="+0"/>
+        <action type="removeShadow" time="+0"/>
+
+        <checkpoint type="save"/>
+        <action type="animate" action="play" object="light_wave_global" time="+0"/>
+        <action type="animate" function="linear" object="light_wave_global" ambient="1 1 1" diffuse=".5 .5 .5" endtime=".5"/>
+        <action type="animate" action="stop" object="light_wave_global" time="+.5"/>
+        <checkpoint type="load"/>
+
+    </actions>
+</timeline>

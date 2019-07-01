@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <timeline>
+    <assets>
+        <object id="model_deathstroke" file="deathstroke/Deathstroke.fbx" />
+    </assets>
     <objects>
         <light id="light_deathstroke" type="point" position="50 50 -100" focus="0 0 0" ambient="0 0 0" diffuse="0 0 0" />
 
@@ -20,11 +23,14 @@
             ks=".2 .2 .2"
             translate="0 0 0"
         />
+
+        <shadow id="shadow_deathstroke" cascades="1" position="75 100 -150" focus="0 0 -50" width="1024" height="768" view="perspective" fovy="45" near=".1f" far="1600" bias="0.00000825"/>
+        <object id="obj_deathstroke" asset="model_deathstroke" scale="8 8 8" rotate="0 1 0 180"/>
     </objects>
     <actions>
         <include file="ani_fireworks.xml" />
 
-        <action type="shadow" cascades="1" position="75 100 -150" focus="0 0 -50" width="1024" height="768" view="perspective" fovy="45" near=".1f" far="1600" bias="0.00000825" time="+0"/>
+        <action type="addObject" object="shadow_deathstroke" time="+0"/>
         <action type="camera" direction="0 0 1" position="0 30 0" time="+0"/>
         <action type="addObject" object="obj_metalplate" time="+0"/>
         <action type="addObject" object="light_deathstroke" time="+0" />

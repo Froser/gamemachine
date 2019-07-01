@@ -35,6 +35,11 @@ template <> auto asset_cast<GMCamera>(void* obj)
 	return static_cast<GMCamera*>(obj);
 }
 
+template <> auto asset_cast<GMShadowSourceDesc>(void* obj)
+{
+	return static_cast<GMShadowSourceDesc*>(obj);
+}
+
 struct CameraParams
 {
 	union
@@ -522,6 +527,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 			obj->setWaveDescriptions(std::move(wds));
 			m_objects[id] = AutoReleasePtr<GMGameObject>(obj);
 			parseTextures(obj, e);
+			parseMaterial(obj, e);
 			parseTransform(obj, e);
 		}
 		else if (name == L"terrain")
@@ -607,6 +613,90 @@ void Timeline::parseObjects(GMXMLElement* e)
 			parseTextures(obj, e);
 			parseMaterial(obj, e);
 			parseTransform(obj, e);
+		}
+		else if (name == L"shadow")
+		{
+			GMRect rc = m_context->getWindow()->getRenderRect();
+			GMfloat width = rc.width, height = rc.height;
+			{
+				GMString str = e->Attribute("width");
+				if (!str.isEmpty())
+					width = GMString::parseFloat(str);
+			}
+			{
+				GMString str = e->Attribute("height");
+				if (!str.isEmpty())
+					height = GMString::parseFloat(str);
+			}
+
+			GMfloat cascades = 1;
+			{
+				GMString str = e->Attribute("cascades");
+				if (!str.isEmpty())
+					cascades = GMString::parseFloat(str);
+			}
+
+			GMfloat bias = .005f;
+			{
+				GMString str = e->Attribute("bias");
+				if (!str.isEmpty())
+					bias = GMString::parseFloat(str);
+			}
+
+			Vector<GMfloat> partitions;
+			if (cascades > 1)
+			{
+				partitions.resize(cascades);
+				GMString str = e->Attribute("partitions");
+				if (!str.isEmpty())
+				{
+					GMScanner scanner(str);
+					for (GMint32 i = 0; i < cascades; ++i)
+					{
+						GMfloat p = 0;
+						scanner.nextFloat(p);
+						partitions[i] = p;
+					}
+				}
+				else
+				{
+					GMfloat p = 1.f / cascades;
+					for (GMint32 i = 0; i < cascades - 1; ++i)
+					{
+						partitions[i] = (i + 1) * p;
+					}
+					partitions[cascades - 1] = 1.f;
+				}
+			}
+
+			CameraParams cp;
+			GMCameraLookAt lookAt;
+			GMint32 component = parseCameraAction(e, cp, lookAt);
+			GMShadowSourceDesc desc;
+			desc.type = GMShadowSourceDesc::CSMShadow;
+			GMCamera camera;
+			if (component & PerspectiveComponent)
+				camera.setPerspective(cp.fovy, cp.aspect, cp.n, cp.f);
+			else if (component & OrthoComponent)
+				camera.setOrtho(cp.left, cp.right, cp.bottom, cp.top, cp.n, cp.f);
+			if (component & CameraLookAtComponent)
+				camera.lookAt(lookAt);
+
+			desc.position = GMVec4(lookAt.position, 1);
+			desc.camera = camera;
+			if (cascades > 1)
+			{
+				for (GMint32 i = 0; i < cascades; ++i)
+				{
+					desc.cascadePartitions[i] = partitions[i];
+				}
+			}
+
+			desc.width = width;
+			desc.height = height;
+			desc.cascades = cascades;
+			desc.biasMax = desc.biasMin = bias;
+			m_shadows[id] = desc;
 		}
 		else if (name == L"source")
 		{
@@ -955,6 +1045,8 @@ void Timeline::parseActions(GMXMLElement* e)
 					addObject(asset_cast<ILight>(targetObject), e, action);
 				else if (assetType == AssetType::Particles)
 					addObject(asset_cast<IParticleSystem>(targetObject), e, action);
+				else if (assetType == AssetType::Shadow)
+					addObject(asset_cast<GMShadowSourceDesc>(targetObject), e, action);
 				else
 					gm_warning(gm_dbg_wrap("Cannot find object: {0}"), object);
 
@@ -1020,96 +1112,6 @@ void Timeline::parseActions(GMXMLElement* e)
 					}
 				}
 			}
-			else if (type == L"shadow")
-			{
-				GMRect rc = m_context->getWindow()->getRenderRect();
-				GMfloat width = rc.width, height = rc.height;
-				{
-					GMString str = e->Attribute("width");
-					if (!str.isEmpty())
-						width = GMString::parseFloat(str);
-				}
-				{
-					GMString str = e->Attribute("height");
-					if (!str.isEmpty())
-						height = GMString::parseFloat(str);
-				}
-
-				GMfloat cascades = 1;
-				{
-					GMString str = e->Attribute("cascades");
-					if (!str.isEmpty())
-						cascades = GMString::parseFloat(str);
-				}
-
-				GMfloat bias = .005f;
-				{
-					GMString str = e->Attribute("bias");
-					if (!str.isEmpty())
-						bias = GMString::parseFloat(str);
-				}
-
-				Vector<GMfloat> partitions;
-				if (cascades > 1)
-				{
-					partitions.resize(cascades);
-					GMString str = e->Attribute("partitions");
-					if (!str.isEmpty())
-					{
-						GMScanner scanner(str);
-						for (GMint32 i = 0; i < cascades; ++i)
-						{
-							GMfloat p = 0;
-							scanner.nextFloat(p);
-							partitions[i] = p;
-						}
-					}
-					else
-					{
-						GMfloat p = 1.f / cascades;
-						for (GMint32 i = 0; i < cascades - 1; ++i)
-						{
-							partitions[i] = (i + 1) * p;
-						}
-						partitions[cascades - 1] = 1.f;
-					}
-				}
-
-				CameraParams cp;
-				GMCameraLookAt lookAt;
-				GMint32 component = parseCameraAction(e, cp, lookAt);
-				GMsize_t lookAtIndex = m_cameraLookAtCache.put(lookAt);
-
-				action.action = [this, component, cascades, width, height, bias, partitions = std::move(partitions), cp, lookAtIndex]() {
-					const GMCameraLookAt& lookAt = m_cameraLookAtCache[lookAtIndex];
-					GMShadowSourceDesc desc;
-					desc.type = GMShadowSourceDesc::CSMShadow;
-					GMCamera camera;
-					if (component & PerspectiveComponent)
-						camera.setPerspective(cp.fovy, cp.aspect, cp.n, cp.f);
-					else if (component & OrthoComponent)
-						camera.setOrtho(cp.left, cp.right, cp.bottom, cp.top, cp.n, cp.f);
-					if (component & CameraLookAtComponent)
-						camera.lookAt(lookAt);
-
-					desc.position = GMVec4(lookAt.position, 1);
-					desc.camera = camera;
-					if (cascades > 1)
-					{
-						for (GMint32 i = 0; i < cascades; ++i)
-						{
-							desc.cascadePartitions[i] = partitions[i];
-						}
-					}
-
-					desc.width = width;
-					desc.height = height;
-					desc.cascades = cascades;
-					desc.biasMax = desc.biasMin = bias;
-					m_context->getEngine()->setShadowSource(desc);
-				};
-				bindAction(action);
-			}
 			else if (type == L"attribute")
 			{
 				GMString object = e->Attribute("object");
@@ -1138,6 +1140,15 @@ void Timeline::parseActions(GMXMLElement* e)
 					gm_warning(gm_dbg_wrap("Object '{0}' doesn't support 'removeObject' type."), object);
 				bindAction(action);
 			}
+			else if (type == L"removeShadow")
+			{
+				action.action = [this]() {
+					GMShadowSourceDesc desc;
+					desc.type = GMShadowSourceDesc::NoShadow;
+					m_context->getEngine()->setShadowSource(desc);
+				};
+				bindAction(action);
+			}
 			else if (type == L"play")
 			{
 				GMString object = e->Attribute("object");
@@ -1146,6 +1157,10 @@ void Timeline::parseActions(GMXMLElement* e)
 				if (assetType == AssetType::AudioSource)
 				{
 					playAudio(asset_cast<IAudioSource>(targetObject)->get());
+				}
+				else if (assetType == AssetType::GameObject)
+				{
+					play(asset_cast<GMGameObject>(targetObject)->get());
 				}
 				else
 				{
@@ -1567,6 +1582,11 @@ void Timeline::parseTextures(GMGameObject* o, GMXMLElement* e)
 			}
 		}
 	}
+
+	parseTextureTransform(shader, e, "ambientTranslateSpeed", GMTextureType::Ambient, GMS_TextureTransformType::Scroll);
+	parseTextureTransform(shader, e, "diffuseTranslateSpeed", GMTextureType::Diffuse, GMS_TextureTransformType::Scroll);
+	parseTextureTransform(shader, e, "normalTranslateSpeed", GMTextureType::NormalMap, GMS_TextureTransformType::Scroll);
+	parseTextureTransform(shader, e, "specularTranslateSpeed", GMTextureType::Specular, GMS_TextureTransformType::Scroll);
 }
 
 void Timeline::parseMaterial(GMGameObject* o, GMXMLElement* e)
@@ -1624,6 +1644,20 @@ void Timeline::parseMaterial(GMGameObject* o, GMXMLElement* e)
 		{
 			shader.getMaterial().setShininess(GMString::parseFloat(str));
 		}
+	}
+}
+
+void Timeline::parseTextureTransform(GMShader& shader, GMXMLElement* e, const char* type, GMTextureType textureType, GMS_TextureTransformType transformType)
+{
+	GMString val = e->Attribute(type);
+	if (!val.isEmpty())
+	{
+		GMScanner scanner(val);
+		GMS_TextureTransform tt;
+		tt.type = transformType;
+		scanner.nextFloat(tt.p1);
+		scanner.nextFloat(tt.p2);
+		shader.getTextureList().getTextureSampler(textureType).setTextureTransform(0, tt);
 	}
 }
 
@@ -1754,6 +1788,13 @@ void Timeline::addObject(AutoReleasePtr<IParticleSystem>* particles, GMXMLElemen
 {
 	action.action = [this, particles]() {
 		m_world->getParticleSystemManager()->addParticleSystem(particles->release());
+	};
+}
+
+void Timeline::addObject(GMShadowSourceDesc* s, GMXMLElement*, Action& action)
+{
+	action.action = [this, s]() {
+		m_context->getEngine()->setShadowSource(*s);
 	};
 }
 
@@ -1889,6 +1930,8 @@ AssetType Timeline::getAssetType(const GMString& objectName, OUT void** out)
 				break;
 			if (getAssetAndType<AssetType::Particles>(m_particleSystems, objectName, result, out))
 				break;
+			if (getAssetAndType<AssetType::Shadow>(m_shadows, objectName, result, out))
+				break;
 		} while (false);
 	}
 	return result;
@@ -1897,4 +1940,12 @@ AssetType Timeline::getAssetType(const GMString& objectName, OUT void** out)
 void Timeline::playAudio(IAudioSource* source)
 {
 	source->play(false);
+}
+
+void Timeline::play(GMGameObject* obj)
+{
+	if (GMWaveGameObject* wave = dynamic_cast<GMWaveGameObject*>(obj))
+	{
+		wave->play();
+	}
 }

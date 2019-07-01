@@ -100,6 +100,7 @@ enum class AssetType
 	Light,
 	AudioSource,
 	Particles,
+	Shadow,
 };
 
 inline bool operator<(const Action& lhs, const Action& rhs) GM_NOEXCEPT
@@ -187,12 +188,14 @@ private:
 	void parseTransform(GMGameObject*, GMXMLElement*);
 	void parseTextures(GMGameObject*, GMXMLElement*);
 	void parseMaterial(GMGameObject*, GMXMLElement*);
+	void parseTextureTransform(GMShader&, GMXMLElement*, const char* type, GMTextureType textureType, GMS_TextureTransformType transformType);
 	void parseAttributes(GMGameObject*, GMXMLElement*, Action&);
 	void parseWaveObjectAttributes(GMWaveGameObjectDescription&, GMXMLElement*);
 	void parseWaveAttributes(GMWaveDescription&, GMXMLElement*);
 	void addObject(AutoReleasePtr<GMGameObject>*, GMXMLElement*, Action&);
 	void addObject(AutoReleasePtr<ILight>*, GMXMLElement*, Action&);
 	void addObject(AutoReleasePtr<IParticleSystem>*, GMXMLElement*, Action&);
+	void addObject(GMShadowSourceDesc*, GMXMLElement*, Action&);
 	void removeObject(ILight*, GMXMLElement*, Action&);
 	void removeObject(GMGameObject*, GMXMLElement*, Action&);
 	CurveType parseCurve(GMXMLElement*, GMInterpolationFunctors&);
@@ -203,6 +206,7 @@ private:
 
 	AssetType getAssetType(const GMString& objectName, OUT void** out);
 	void playAudio(IAudioSource* source);
+	void play(GMGameObject*);
 
 private:
 	const IRenderContext* m_context;
@@ -215,6 +219,7 @@ private:
 	HashMap<GMString, AutoReleasePtr<IAudioFile>, GMStringHashFunctor> m_audioFiles;
 	HashMap<GMString, AutoReleasePtr<IAudioSource>, GMStringHashFunctor> m_audioSources;
 	HashMap<GMString, AutoReleasePtr<IParticleSystem>, GMStringHashFunctor> m_particleSystems;
+	HashMap<GMString, GMShadowSourceDesc, GMStringHashFunctor> m_shadows;
 	std::multiset<Action> m_immediateActions;
 	std::multiset<Action> m_deferredActions;
 	std::multiset<Action>::iterator m_currentAction;
