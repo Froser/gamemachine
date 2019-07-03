@@ -1,0 +1,15 @@
+# Blender MTL File: 'rocks-low-poly.blend'
+# Material Count: 1
+
+newmtl rock-texture
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd rock_diffuse_texture2.png
+map_Ks rock_specullar.png
+map_Ns rock_specullar.png
+map_Kn normal_map_rock.png

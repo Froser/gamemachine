@@ -508,6 +508,26 @@ void Timeline::parseObjects(GMXMLElement* e)
 			parseMaterial(obj, e);
 			parseTransform(obj, e);
 		}
+		else if (name == L"quad")
+		{
+			GMString lengthStr = e->Attribute("length");
+			GMString widthStr = e->Attribute("width");
+			GMfloat length = 0, width = 0;
+			length = GMString::parseFloat(lengthStr);
+			width = GMString::parseFloat(widthStr);
+			
+			GMSceneAsset scene;
+			GMPrimitiveCreator::createQuadrangle(GMVec2(length / 2, width / 2), 0, scene);
+
+			GMGameObject* obj = new GMGameObject(scene);
+			GM_ASSERT(obj->getModel());
+			obj->getModel()->getShader().setCull(GMS_Cull::None);
+			m_objects[id] = AutoReleasePtr<GMGameObject>(obj);
+
+			parseTextures(obj, e);
+			parseMaterial(obj, e);
+			parseTransform(obj, e);
+		}
 		else if (name == L"wave")
 		{
 			GMWaveGameObjectDescription objDesc;

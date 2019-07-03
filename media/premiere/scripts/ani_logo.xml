@@ -15,5 +15,6 @@
         <action type="animate" function="cubic-bezier" control=".9 .3 .9 .7" object="$camera" direction="0.1 0 1" position="0 0 5" endtime="8"/>
         <action type="animate" action="stop" object="$camera" time="+0"/>
         <action type="removeObject" object="light_logo_spotlight" time="+0" />
+        <action type="removeObject" object="obj_logo" time="+0" />
     </actions>
 </timeline>

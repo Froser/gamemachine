@@ -5,7 +5,6 @@
         <shadow id="shadow_dragon" cascades="1" position="30 30 -30" focus="0 0 0" width="1024" height="768" view="perspective" fovy="45" near=".1f" far="1600" bias="0.000125" time="+0"/>
     </objects>
     <actions>
-        <action type="removeObject" object="obj_logo" time="+0" />
         <action type="addObject" object="light_dragon_global" time="+0" />
         <action type="addObject" object="obj_mud" time="+0"/>
         <action type="addObject" object="obj_dragon" time="+0"/>

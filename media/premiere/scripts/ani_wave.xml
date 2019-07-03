@@ -1,39 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <timeline>
+    <assets>
+        <texture id="tex_intelredclouds" file="sky/intelredclouds.jpg" />
+        <object id="model_rock01" file="rock/rock01.obj" />
+        <object id="model_rock02" file="rock/rock02.obj" />
+    </assets>
     <objects>
         <light id="light_wave_global" type="point" position="200 200 -200" ambient="0 0 0" diffuse="0 0 0" />
+
+        <terrain
+            id="obj_coast"
+            terrainX="-500"
+            terrainZ="-500"
+            width="1500"
+            height="1500"
+            heightScaling="300"
+            slice="100 100"
+            textureSize="100 100"
+            terrain="coast_terrain"
+            ambient="tex_mud_diffuse"
+            diffuse="tex_mud_diffuse"
+            normal="tex_mud_normal"
+            ka=".4 .4 .4"
+            kd=".5 .5 .5"
+            ks=".1 .1 .1"
+            translate="0 -45 0"
+        />
 
         <wave 
             id="obj_wave"
             ambient="tex_water_diffuse" diffuse="tex_water_diffuse" normal="tex_water_normal"
-            ambientTranslateSpeed="0.025 0.05" diffuseTranslateSpeed="0.025 0.05" normalTranslateSpeed="0.025 0.05"
+            ambientTranslateSpeed=".2 .1" diffuseTranslateSpeed=".2 .1" normalTranslateSpeed=".2 .1"
             ka=".4 .4 .4" ks=".6 .6 .6" kd=".6 .6 .6"
             terrainX="-256"
             terrainZ="-256"
             length="512"
             width="512"
-            heightScaling="180"
+            heightScaling="80"
             slice="50"
             textureSize="100 100"
-            textureScaling="2 2" 
+            textureScaling="2 2"
+            translate="0 15 0"
             >
-            <attribute steepness="0" amplitude="1.25" direction="1 0 1" speed="2" waveLength="3" />
-            <attribute steepness="0.03" amplitude=".5" direction="-1 0 1" speed="3" waveLength="1.5" />
+            <attribute steepness="0" amplitude="1.15" direction="1 0 1" speed="2" waveLength="3" />
+            <attribute steepness="0.03" amplitude=".8" direction="-1 0 1" speed="3" waveLength="1.5" />
         </wave>
+        <quad id="obj_wavesky"
+            length="10000" width="10000"
+            translate="0 800 0" rotate="1 0 0 90"
+            ka="1 1 1" ambient="tex_intelredclouds" ambientTranslateSpeed=".05 .05"
+        />
+        <object id="obj_rock01" asset="model_rock01" scale="16 16 16" translate="45 5 125"/>
+        <object id="obj_rock02" asset="model_rock02" scale="22 22 22" translate="105 0 80"/>
     </objects>
     <actions>
-        <action type="camera" focus="0 0 0" position="150 20 -150" time="+0"/>
-        <action type="camera" view="perspective" fovy="60" near=".1f" far="3200" time="+0"/>
+        <action type="camera" direction="0 0 1" position="0 25 -200" time="+0"/>
+        <action type="camera" view="perspective" fovy="60" near=".1f" far="32000" time="+0"/>
         <action type="addObject" object="light_wave_global" time="+0"/>
         <action type="addObject" object="obj_wave" time="+0"/>
+        <action type="addObject" object="obj_coast" time="+0"/>
+        <action type="addObject" object="obj_wavesky" time="+0"/>
+        <action type="addObject" object="obj_rock01" time="+0"/>
+        <action type="addObject" object="obj_rock02" time="+0"/>
         <action type="play" object="obj_wave" time="+0"/>
-        <action type="removeShadow" time="+0"/>
 
         <checkpoint type="save"/>
         <action type="animate" action="play" object="light_wave_global" time="+0"/>
-        <action type="animate" function="linear" object="light_wave_global" ambient="1 1 1" diffuse=".5 .5 .5" endtime=".5"/>
-        <action type="animate" action="stop" object="light_wave_global" time="+.5"/>
+        <action type="animate" function="linear" object="light_wave_global" ambient="1 1 1" diffuse=".5 .5 .5" endtime="1"/>
+        <action type="animate" action="stop" object="light_wave_global" time="+1"/>
         <checkpoint type="load"/>
+
+        <action type="animate" action="play" object="$camera" time="+0"/>
+        <action type="animate" function="cubic-bezier" control=".55 0 .3 1"  object="$camera" position="0 25 25" direction="0 .2 1" endtime="10" />
+        <action type="animate" action="stop" object="$camera" time="+10"/>
 
     </actions>
 </timeline>

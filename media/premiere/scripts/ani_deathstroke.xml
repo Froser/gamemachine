@@ -54,6 +54,10 @@
         <action type="animate" action="play" object="light_deathstroke" time="-6"/>
         <action type="animate" function="linear" object="light_deathstroke" ambient="0 0 0" diffuse="0 0 0" specular="0" endtime="3"/>
         <action type="animate" action="stop" object="light_deathstroke" time="-3"/>
+        
         <action type="removeObject" object="light_deathstroke" time="+0" />
+        <action type="removeObject" object="obj_deathstroke" time="+0" />
+        <action type="removeObject" object="obj_metalplate" time="+0" />
+        <action type="removeShadow" time="+0"/>
     </actions>
 </timeline>
