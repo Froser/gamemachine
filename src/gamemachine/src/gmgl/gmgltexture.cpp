@@ -123,12 +123,14 @@ void GMGLTexture::init()
 	switch (d->target)
 	{
 	case GL_TEXTURE_2D:
+	{
 		glTexStorage2D(d->target,
 			imgData.mipLevels,
 			d->internalFormat,
 			imgData.mip[0].width,
 			imgData.mip[0].height);
-		for (level = 0; level < imgData.mipLevels; ++level)
+		GMint32 maxLevel = imgData.mipLevels == 0 ? 1 : imgData.mipLevels;
+		for (level = 0; level <= maxLevel; ++level)
 		{
 			glTexSubImage2D(GL_TEXTURE_2D,
 				level,
@@ -137,9 +139,14 @@ void GMGLTexture::init()
 				d->format, d->dataType,
 				imgData.mip[level].data);
 		}
+		if (imgData.generateMipmap)
+			glGenerateMipmap(GL_TEXTURE_2D);
 		break;
+	}
 	case GL_TEXTURE_CUBE_MAP:
-		for (level = 0; level < imgData.mipLevels; ++level)
+	{
+		GMint32 maxLevel = imgData.mipLevels == 0 ? 1 : imgData.mipLevels;
+		for (level = 0; level <= maxLevel; ++level)
 		{
 			GMbyte* ptr = (GMbyte *)imgData.mip[level].data;
 			for (int face = 0; face < 6; face++)
@@ -154,6 +161,7 @@ void GMGLTexture::init()
 			}
 		}
 		break;
+	}
 	default:
 		break;
 	}
@@ -170,6 +178,7 @@ void GMGLTexture::bindSampler(GMTextureSampler* sampler)
 	if (!d->texParamsSet)
 	{
 		glBindTexture(d->target, d->id);
+
 		// Apply params
 		glTexParameteri(d->target, GL_TEXTURE_MIN_FILTER,
 			sampler->getMinFilter() == GMS_TextureFilter::Linear ? GL_LINEAR :
@@ -180,13 +189,10 @@ void GMGLTexture::bindSampler(GMTextureSampler* sampler)
 			sampler->getMinFilter() == GMS_TextureFilter::NearestMipmapNearest ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR
 		);
 
+		GM_ASSERT(sampler->getMagFilter() == GMS_TextureFilter::Linear || sampler->getMagFilter() == GMS_TextureFilter::Nearest);
 		glTexParameteri(d->target, GL_TEXTURE_MAG_FILTER,
 			sampler->getMagFilter() == GMS_TextureFilter::Linear ? GL_LINEAR :
-			sampler->getMagFilter() == GMS_TextureFilter::Nearest ? GL_NEAREST :
-			sampler->getMagFilter() == GMS_TextureFilter::LinearMipmapLinear ? GL_LINEAR_MIPMAP_LINEAR :
-			sampler->getMagFilter() == GMS_TextureFilter::NearestMipmapNearest ? GL_NEAREST_MIPMAP_LINEAR :
-			sampler->getMagFilter() == GMS_TextureFilter::LinearMipmapNearest ? GL_LINEAR_MIPMAP_NEAREST :
-			sampler->getMagFilter() == GMS_TextureFilter::NearestMipmapNearest ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR
+			sampler->getMagFilter() == GMS_TextureFilter::Nearest ? GL_NEAREST : GL_NEAREST
 		);
 
 		glTexParameteri(d->target, GL_TEXTURE_WRAP_S,

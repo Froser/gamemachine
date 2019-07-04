@@ -6,6 +6,8 @@
 
 namespace
 {
+	GMMutex s_generateMipMutex;
+
 	inline DXGI_FORMAT toDxgiFormat(GMImageFormat format)
 	{
 		switch (format)
@@ -156,19 +158,28 @@ void GMDx11Texture::init()
 
 		texDesc.Width = d->image->getWidth();
 		texDesc.Height = d->image->getHeight();
-		texDesc.MipLevels = imageData.mipLevels;
+		texDesc.MipLevels = imageData.generateMipmap ? -1 : imageData.mipLevels;
 		texDesc.ArraySize = imageData.slices;
 		texDesc.Format = toDxgiFormat(imageData.format);
 		texDesc.SampleDesc.Count = 1;
 		texDesc.SampleDesc.Quality = 0;
 		texDesc.Usage = D3D11_USAGE_DEFAULT;
-		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		texDesc.CPUAccessFlags = 0;
-		texDesc.MiscFlags = 0;
+
+		if (imageData.generateMipmap)
+		{
+			texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+			texDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+		}
+		else
+		{
+			texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+			texDesc.MiscFlags = 0;
+		}
 
 		GMint32 index = 0;
 		GM_ASSERT(texDesc.ArraySize == 1);
-		for (GMuint32 j = 0; j < texDesc.MipLevels; ++j, ++index)
+		for (GMint32 j = 0; j < imageData.mipLevels; ++j, ++index)
 		{
 			GMuint32 pitch = d->image->getWidth(j);
 			resourceData[index].pSysMem = imageData.mip[j].data;
@@ -179,11 +190,31 @@ void GMDx11Texture::init()
 		d->resource = texture;
 
 		GM_ASSERT(d->resource);
+
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+		srvDesc.Format = texDesc.Format;
+		srvDesc.ViewDimension = D3D_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MipLevels = imageData.generateMipmap ? -1 : imageData.mipLevels;
+		srvDesc.Texture2D.MostDetailedMip = 0;
 		GM_DX_HR(d->device->CreateShaderResourceView(
 			d->resource,
-			NULL,
+			&srvDesc,
 			&d->shaderResourceView
 		));
+
+		if (imageData.generateMipmap)
+		{
+			if (d->context->getEngine()->isCurrentMainThread())
+			{
+				d->deviceContext->GenerateMips(d->shaderResourceView);
+			}
+			else
+			{
+				GM.invokeInMainThread([d]() {
+					d->deviceContext->GenerateMips(d->shaderResourceView);
+				});
+			}
+		}
 	}
 	else if (imageData.target == GMImageTarget::CubeMap)
 	{
@@ -216,13 +247,10 @@ void GMDx11Texture::init()
 		d->resource = texture;
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-		if (imageData.target == GMImageTarget::CubeMap)
-		{
-			srvDesc.Format = toDxgiFormat(imageData.format);
-			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
-			srvDesc.TextureCube.MipLevels = texDesc.MipLevels;
-			srvDesc.TextureCube.MostDetailedMip = 0;
-		}
+		srvDesc.Format = toDxgiFormat(imageData.format);
+		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+		srvDesc.TextureCube.MipLevels = imageData.mipLevels;
+		srvDesc.TextureCube.MostDetailedMip = 0;
 		GM_DX_HR(d->device->CreateShaderResourceView(
 			d->resource,
 			&srvDesc,

@@ -200,5 +200,7 @@ struct GMMutexRelease
 	void operator()(GMMutex* mutex) { mutex->unlock(); }
 };
 
+typedef GMOwnedPtr<GMMutex, GMMutexRelease> GMMutexLock;
+
 END_NS
 #endif

@@ -44,7 +44,7 @@ bool GMDefaultGamePackageHandler::readFileFromPath(const GMString& path, REF GMB
 
 GMString GMDefaultGamePackageHandler::pathOf(GMPackageIndex index, const GMString& fileName)
 {
-	GMOwnedPtr<GMMutex, GMMutexRelease> m(&m_mutex);
+	GMMutexLock m(&m_mutex);
 	m->lock();
 	resetPackageCandidate();
 	GMString result;
@@ -59,7 +59,7 @@ GMString GMDefaultGamePackageHandler::pathOf(GMPackageIndex index, const GMStrin
 
 bool GMDefaultGamePackageHandler::exists(GMPackageIndex index, const GMString& fileName)
 {
-	GMOwnedPtr<GMMutex, GMMutexRelease> m(&m_mutex);
+	GMMutexLock m(&m_mutex);
 	m->lock();
 	resetPackageCandidate();
 	GMString result;

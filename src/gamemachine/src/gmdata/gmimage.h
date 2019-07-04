@@ -63,6 +63,7 @@ GM_PRIVATE_OBJECT(GMImage)
 	GMsize_t size = 0;
 	GMuint32 channels = GM_IMAGE_DEFAULT_CHANNELS;
 	GMImageDataDeleter deleter = nullptr;
+	bool generateMipmap = true;
 };
 
 //! 表示一张或一系列图片。
@@ -86,6 +87,7 @@ public:
 public:
 	inline GMint32 getWidth(GMint32 mipLevel = 0) const { return getData().mip[mipLevel].width; }
 	inline GMint32 getHeight(GMint32 mipLevel = 0) const { return getData().mip[mipLevel].height; }
+	inline void setGenerateMipmap(bool b) { getData().generateMipmap = b; }
 };
 
 END_NS

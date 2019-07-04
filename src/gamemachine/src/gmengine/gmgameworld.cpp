@@ -35,7 +35,7 @@ void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
 	if (obj->getWorld() == this)
 		return; //inited
 
-	GMOwnedPtr<GMMutex, GMMutexRelease> mutexGuard(&d->addObjectMutex);
+	GMMutexLock mutexGuard(&d->addObjectMutex);
 	mutexGuard->lock();
 
 	obj->setWorld(this);
@@ -117,7 +117,7 @@ void GMGameWorld::updateGameWorld(GMDuration dt)
 void GMGameWorld::clearRenderList()
 {
 	D(d);
-	GMOwnedPtr<GMMutex, GMMutexRelease> mutexGuard(&d->renderListMutex);
+	GMMutexLock mutexGuard(&d->renderListMutex);
 	mutexGuard->lock();
 	d->renderList.deferred.clear();
 	d->renderList.forward.clear();
@@ -136,7 +136,7 @@ void GMGameWorld::updateGameObjects(GMDuration dt, GMPhysicsWorld* phyw, const S
 void GMGameWorld::addToRenderList(GMGameObject* object)
 {
 	D(d);
-	GMOwnedPtr<GMMutex, GMMutexRelease> mutexGuard(&d->renderListMutex);
+	GMMutexLock mutexGuard(&d->renderListMutex);
 	mutexGuard->lock();
 
 	if (object->canDeferredRendering())

@@ -423,7 +423,7 @@ void GameMachine::initHandlers()
 void GameMachine::invokeCallables()
 {
 	D(d);
-	GMOwnedPtr<GMMutex, GMMutexRelease> mutex;
+	GMMutexLock mutex;
 	while (!d->callableQueue.empty())
 	{
 		GMCallable callable = d->callableQueue.front();
