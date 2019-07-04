@@ -158,7 +158,7 @@ void GMDx11Texture::init()
 
 		texDesc.Width = d->image->getWidth();
 		texDesc.Height = d->image->getHeight();
-		texDesc.MipLevels = imageData.generateMipmap ? -1 : imageData.mipLevels;
+		texDesc.MipLevels = imageData.mipLevels;
 		texDesc.ArraySize = imageData.slices;
 		texDesc.Format = toDxgiFormat(imageData.format);
 		texDesc.SampleDesc.Count = 1;

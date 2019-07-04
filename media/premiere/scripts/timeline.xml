@@ -13,17 +13,10 @@
         />
         <texture id="tex_mud_diffuse" file="mud/albedo.jpg" />
         <texture id="tex_mud_normal" file="mud/normal.jpg" />
-        <texture id="tex_metalplate_diffuse" file="metalplate/Metal_Plate_basecolor.jpg" />
-        <texture id="tex_metalplate_normal" file="metalplate/Metal_Plate_normal.jpg" />
 
-        <!--<pbr
-            id="pbr_metal_plate"
-            albedo="metalplate/Metal_Plate_basecolor.jpg"
-            metallic="metalplate/Metal_Plate_metallic.jpg"
-            roughness="metalplate/Metal_Plate_roughness.jpg"
-            ao="metalplate/Metal_Plate_ambientOcclusion.jpg"
-            normal="metalplate/Metal_Plate_normal.jpg"
-        />-->
+        <texture id="tex_gravelroad_diffuse" file="gravelroad/Diffuse.jpg" />
+        <texture id="tex_gravelroad_normal" file="gravelroad/Normal.jpg" />
+        <texture id="tex_gravelroad_specular" file="gravelroad/Specular.jpg" />
 
         <buffer id="mud_terrain" file="textures/mud/terrain.png" />
         <buffer id="coast_terrain" file="textures/water/coast.jpg" />
@@ -64,8 +57,8 @@
         <action type="camera" direction="0 0 1" position="0 0 -30"  />
 
         <!--<include file="ani_logo.xml" />
-        <include file="ani_dragon.xml" />-->
-        <include file="ani_deathstroke.xml" />
+        <include file="ani_dragon.xml" />
+        <include file="ani_deathstroke.xml" />-->
         <include file="ani_wave.xml" />
     </actions>
 </timeline>

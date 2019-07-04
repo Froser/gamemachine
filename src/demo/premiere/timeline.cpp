@@ -1535,54 +1535,10 @@ void Timeline::parseTextures(GMGameObject* o, GMXMLElement* e)
 		return;
 
 	GMShader& shader = model->getShader();
-
-	{
-		GMString tex = e->Attribute("ambient");
-		if (!tex.isEmpty())
-		{
-			GMAsset asset = findAsset(tex);
-			if (!asset.isEmpty() && asset.isTexture())
-				GMToolUtil::addTextureToShader(shader, asset, GMTextureType::Ambient);
-			else
-				gm_warning(gm_dbg_wrap("Cannot find texture asset: {0}"), tex);
-		}
-	}
-
-	{
-		GMString tex = e->Attribute("diffuse");
-		if (!tex.isEmpty())
-		{
-			GMAsset asset = findAsset(tex);
-			if (!asset.isEmpty() && asset.isTexture())
-				GMToolUtil::addTextureToShader(shader, asset, GMTextureType::Diffuse);
-			else
-				gm_warning(gm_dbg_wrap("Cannot find texture asset: {0}"), tex);
-		}
-	}
-
-	{
-		GMString tex = e->Attribute("specular");
-		if (!tex.isEmpty())
-		{
-			GMAsset asset = findAsset(tex);
-			if (!asset.isEmpty() && asset.isTexture())
-				GMToolUtil::addTextureToShader(shader, asset, GMTextureType::Specular);
-			else
-				gm_warning(gm_dbg_wrap("Cannot find texture asset: {0}"), tex);
-		}
-	}
-
-	{
-		GMString tex = e->Attribute("normal");
-		if (!tex.isEmpty())
-		{
-			GMAsset asset = findAsset(tex);
-			if (!asset.isEmpty() && asset.isTexture())
-				GMToolUtil::addTextureToShader(shader, asset, GMTextureType::NormalMap);
-			else
-				gm_warning(gm_dbg_wrap("Cannot find texture asset: {0}"), tex);
-		}
-	}
+	parseTexture(shader, e, "ambient", GMTextureType::Ambient);
+	parseTexture(shader, e, "diffuse", GMTextureType::Diffuse);
+	parseTexture(shader, e, "normal", GMTextureType::NormalMap);
+	parseTexture(shader, e, "specular", GMTextureType::Specular);
 
 	{
 		GMString pbrStr = e->Attribute("pbr");
@@ -1664,6 +1620,19 @@ void Timeline::parseMaterial(GMGameObject* o, GMXMLElement* e)
 		{
 			shader.getMaterial().setShininess(GMString::parseFloat(str));
 		}
+	}
+}
+
+void Timeline::parseTexture(GMShader& shader, GMXMLElement* e, const char* type, GMTextureType textureType)
+{
+	GMString tex = e->Attribute(type);
+	if (!tex.isEmpty())
+	{
+		GMAsset asset = findAsset(tex);
+		if (!asset.isEmpty() && asset.isTexture())
+			GMToolUtil::addTextureToShader(shader, asset, textureType);
+		else
+			gm_warning(gm_dbg_wrap("Cannot find texture asset: {0}"), tex);
 	}
 }
 

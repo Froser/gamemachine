@@ -188,6 +188,7 @@ private:
 	void parseTransform(GMGameObject*, GMXMLElement*);
 	void parseTextures(GMGameObject*, GMXMLElement*);
 	void parseMaterial(GMGameObject*, GMXMLElement*);
+	void parseTexture(GMShader&, GMXMLElement*, const char* type, GMTextureType textureType);
 	void parseTextureTransform(GMShader&, GMXMLElement*, const char* type, GMTextureType textureType, GMS_TextureTransformType transformType);
 	void parseAttributes(GMGameObject*, GMXMLElement*, Action&);
 	void parseWaveObjectAttributes(GMWaveGameObjectDescription&, GMXMLElement*);

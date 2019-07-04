@@ -10,6 +10,6 @@ Ni 1.000000
 d 1.000000
 illum 1
 map_Kd rock_diffuse_texture.png
-map_Ks rock_specullar.png
-map_Ns rock_specullar.png
+map_Ks rock_specular.png
+map_Ns rock_specular.png
 map_Kn normal_map_rock.png

@@ -4,9 +4,10 @@
         <texture id="tex_intelredclouds" file="sky/intelredclouds.jpg" />
         <object id="model_rock01" file="rock/rock01.obj" />
         <object id="model_rock02" file="rock/rock02.obj" />
+        <object id="model_rock03" file="rock/rock03.obj" />
     </assets>
     <objects>
-        <light id="light_wave_global" type="point" position="200 200 -200" ambient="0 0 0" diffuse="0 0 0" />
+        <light id="light_wave_global" type="point" position="200 200 -200" ambient="0 0 0" diffuse="0 0 0" specular="0 0 0"/>
 
         <terrain
             id="obj_coast"
@@ -16,11 +17,12 @@
             height="1500"
             heightScaling="300"
             slice="100 100"
-            textureSize="100 100"
+            textureSize="200 200"
             terrain="coast_terrain"
             ambient="tex_mud_diffuse"
             diffuse="tex_mud_diffuse"
             normal="tex_mud_normal"
+            specular=""
             ka=".4 .4 .4"
             kd=".5 .5 .5"
             ks=".1 .1 .1"
@@ -52,6 +54,7 @@
         />
         <object id="obj_rock01" asset="model_rock01" scale="16 16 16" translate="45 5 125"/>
         <object id="obj_rock02" asset="model_rock02" scale="22 22 22" translate="105 0 80"/>
+        <object id="obj_rock03" asset="model_rock03" scale="40 40 40" translate="-35 -10 60"/>
     </objects>
     <actions>
         <action type="camera" direction="0 0 1" position="0 25 -200" time="+0"/>
@@ -62,16 +65,17 @@
         <action type="addObject" object="obj_wavesky" time="+0"/>
         <action type="addObject" object="obj_rock01" time="+0"/>
         <action type="addObject" object="obj_rock02" time="+0"/>
+        <action type="addObject" object="obj_rock03" time="+0"/>
         <action type="play" object="obj_wave" time="+0"/>
 
         <checkpoint type="save"/>
         <action type="animate" action="play" object="light_wave_global" time="+0"/>
-        <action type="animate" function="linear" object="light_wave_global" ambient="1 1 1" diffuse=".5 .5 .5" endtime="1"/>
+        <action type="animate" function="linear" object="light_wave_global" ambient="1 1 1" diffuse=".5 .5 .5" specular=".5 .5 .5" endtime="1"/>
         <action type="animate" action="stop" object="light_wave_global" time="+1"/>
         <checkpoint type="load"/>
 
         <action type="animate" action="play" object="$camera" time="+0"/>
-        <action type="animate" function="cubic-bezier" control=".55 0 .3 1"  object="$camera" position="0 25 25" direction="0 .2 1" endtime="10" />
+        <action type="animate" function="cubic-bezier" control=".55 0 .3 1" object="$camera" position="0 35 15" direction=".5 .2 1" endtime="10" />
         <action type="animate" action="stop" object="$camera" time="+10"/>
 
     </actions>
