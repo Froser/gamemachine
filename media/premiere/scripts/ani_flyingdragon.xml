@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<timeline>
+    <assets>
+    </assets>
+    <objects>
+        <light id="light_flyingdragon_global" type="point" position="200 200 -200" ambient="0 0 0" diffuse="0 0 0" specular="0 0 0"/>
+    </objects>
+    <actions>
+        <action type="camera" direction="0 0 1" position="0 25 -200" time="+0"/>
+        <action type="camera" view="perspective" fovy="60" near=".1f" far="32000" time="+0"/>
+        <action type="addObject" object="light_flyingdragon_global" time="+0"/>
+
+        <checkpoint type="save"/>
+        <action type="animate" action="play" object="light_flyingdragon_global" time="+0"/>
+        <action type="animate" function="linear" object="light_flyingdragon_global" ambient="1 1 1" diffuse=".5 .5 .5" specular=".5 .5 .5" endtime="1"/>
+        <action type="animate" action="stop" object="light_flyingdragon_global" time="+1"/>
+        <checkpoint type="load"/>
+    </actions>
+</timeline>

@@ -1224,6 +1224,29 @@ void Timeline::parseActions(GMXMLElement* e)
 			{
 				m_lastTime = m_checkpointTime;
 			}
+			else if (type == "time")
+			{
+				GMString timeStr = e->Attribute("time");
+				if (!timeStr.isEmpty())
+				{
+					GMfloat time = 0;
+					bool ok = false;
+					time = GMString::parseFloat(timeStr, &ok);
+					if (ok)
+					{
+						m_lastTime += time;
+						m_checkpointTime = m_lastTime;
+					}
+					else
+					{
+						gm_warning(gm_dbg_wrap("'time' is not a number: {0}"), timeStr);
+					}
+				}
+				else
+				{
+					gm_warning(gm_dbg_wrap("checkpoint 'time' type missing 'time' attribute."));
+				}
+			}
 			else
 			{
 				gm_warning(gm_dbg_wrap("checkpoint type cannot be recognized: {0}"), type);

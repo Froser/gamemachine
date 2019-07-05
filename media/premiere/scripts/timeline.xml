@@ -60,5 +60,6 @@
         <include file="ani_dragon.xml" />
         <include file="ani_deathstroke.xml" />-->
         <include file="ani_wave.xml" />
+        <include file="ani_flyingdragon.xml" />
     </actions>
 </timeline>

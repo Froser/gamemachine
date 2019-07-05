@@ -68,6 +68,7 @@
         <action type="addObject" object="obj_rock03" time="+0"/>
         <action type="play" object="obj_wave" time="+0"/>
 
+        <checkpoint type="time" time="+0.5"/>
         <checkpoint type="save"/>
         <action type="animate" action="play" object="light_wave_global" time="+0"/>
         <action type="animate" function="linear" object="light_wave_global" ambient="1 1 1" diffuse=".5 .5 .5" specular=".5 .5 .5" endtime="1"/>
@@ -78,5 +79,15 @@
         <action type="animate" function="cubic-bezier" control=".55 0 .3 1" object="$camera" position="0 35 15" direction=".5 .2 1" endtime="10" />
         <action type="animate" action="stop" object="$camera" time="+10"/>
 
+        <action type="animate" action="play" object="light_wave_global" time="-1"/>
+        <action type="animate" function="linear" object="light_wave_global" ambient="0 0 0" diffuse="0 0 0" specular="0 0 0" endtime="1"/>
+        <action type="animate" action="stop" object="light_wave_global" time="+0"/>
+        <action type="removeObject" object="light_wave_global" time="+0"/>
+        <action type="removeObject" object="obj_wave" time="+0"/>
+        <action type="removeObject" object="obj_coast" time="+0"/>
+        <action type="removeObject" object="obj_wavesky" time="+0"/>
+        <action type="removeObject" object="obj_rock01" time="+0"/>
+        <action type="removeObject" object="obj_rock02" time="+0"/>
+        <action type="removeObject" object="obj_rock03" time="+0"/>
     </actions>
 </timeline>
