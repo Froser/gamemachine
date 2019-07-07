@@ -1,19 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <timeline>
     <assets>
+        <object id="model_flyingdragon" file="flying-dragon/Dragon_Baked_Actions_fbx_7.4_binary.fbx" />
+        <cubemap
+            id="tex_yellowsky"
+            left="yellowsky/yellowcloud_lf.jpg"
+            right="yellowsky/yellowcloud_rt.jpg"
+            up="yellowsky/yellowcloud_up.jpg"
+            down="yellowsky/yellowcloud_dn.jpg"
+            front="yellowsky/yellowcloud_ft.jpg"
+            back="yellowsky/yellowcloud_bk.jpg"
+        />
+        <buffer id="moutain_terrain" file="textures/yellowsky/mountain.jpg" />
     </assets>
     <objects>
-        <light id="light_flyingdragon_global" type="point" position="200 200 -200" ambient="0 0 0" diffuse="0 0 0" specular="0 0 0"/>
+        <terrain
+            id="obj_dragonmountain"
+            terrainX="-1500"
+            terrainZ="-1500"
+            width="3000"
+            height="3000"
+            heightScaling="100"
+            slice="100 100"
+            textureSize="200 200"
+            terrain="moutain_terrain"
+            ambient="tex_mud_diffuse"
+            diffuse="tex_mud_diffuse"
+            normal="tex_mud_normal"
+            specular=""
+            ka=".04 .04 .04"
+            kd=".05 .05 .05"
+            ks=".01 .01 .01"
+            translate="0 0 0"
+        />
+        <light id="light_flyingdragon_global" type="point" position="500 300 -500" ambient="0 0 0" diffuse="0 0 0" specular="0 0 0"/>
+        <object id="obj_flyingdragon" asset="model_flyingdragon" scale=".05 .05 .05" translate="0 100 0"/>
+        <cubemap id="obj_yellowsky" asset="tex_yellowsky" scale="2200 2200 2200" translate="0 -400 0" />
+        <shadow id="shadow_flyingdragon" cascades="1" position="1000 600 -1000" focus="0 0 0" width="1024" height="768" view="perspective" fovy="45" near=".1f" far="1600" bias="0" time="+0"/>
     </objects>
     <actions>
-        <action type="camera" direction="0 0 1" position="0 25 -200" time="+0"/>
-        <action type="camera" view="perspective" fovy="60" near=".1f" far="32000" time="+0"/>
+        <action type="camera" focus="0 100 0" position="100 500 100" time="+0"/>
+        <action type="camera" view="perspective" fovy="60" near=".1f" far="5000" time="+0"/>
+        <action type="addObject" object="shadow_flyingdragon" time="+0"/>
         <action type="addObject" object="light_flyingdragon_global" time="+0"/>
+        <action type="addObject" object="obj_yellowsky" time="+0"/>
+        <action type="addObject" object="obj_dragonmountain" time="+0"/>
+        <action type="addObject" object="obj_flyingdragon" time="+0"/>
+        <action type="play" object="obj_flyingdragon" name="Armature|Idel_New" time="+0"/>
 
         <checkpoint type="save"/>
         <action type="animate" action="play" object="light_flyingdragon_global" time="+0"/>
-        <action type="animate" function="linear" object="light_flyingdragon_global" ambient="1 1 1" diffuse=".5 .5 .5" specular=".5 .5 .5" endtime="1"/>
+        <action type="animate" function="linear" object="light_flyingdragon_global" ambient="1 1 1" diffuse="12 12 12" specular="1 1 1" endtime="1"/>
         <action type="animate" action="stop" object="light_flyingdragon_global" time="+1"/>
         <checkpoint type="load"/>
+
+        <checkpoint type="save"/>
+        <action type="animate" action="play" object="$camera" time="+0"/>
+        <action type="animate" function="cubic-bezier" control="0 .75 .75 1" object="$camera" focus="0 200 0" position="50 150 300" endtime="10"/>
+        <action type="animate" action="stop" object="$camera" time="+10"/>
+
+        <checkpoint type="save"/>
+        <action type="play" object="obj_flyingdragon" name="Armature|Run_New" time="+0" />
+        <action type="animate" action="play" object="obj_flyingdragon" time="+0"/>
+        <action type="animate" function="cubic-bezier" control=".2 0 .6 .65" object="obj_flyingdragon" translate="0 100 500" endtime="3"/>
+        <action type="animate" action="stop" object="obj_flyingdragon" time="+3"/>
+        <checkpoint type="load"/>
+
+        <action type="animate" action="play" object="$camera" time="+0"/>
+        <action type="animate" function="cubic-bezier" control=".2 0 .6 .65" object="$camera" focus="0 200 500" position="250 150 300" endtime="3"/>
+        <action type="animate" action="stop" object="$camera" time="+3"/>
+
+        <checkpoint type="save"/>
+        <action type="play" object="obj_flyingdragon" name="Armature|Fly_New" time="+0" />
+        <action type="animate" action="play" object="obj_flyingdragon" time="+0"/>
+        <action type="animate" function="cubic-bezier" control="1 0 .88 .6" object="obj_flyingdragon" translate="0 100 500" endtime="3"/>
+        <action type="animate" action="stop" object="obj_flyingdragon" time="+3"/>
+        <checkpoint type="load"/>
+
+        <action type="animate" action="play" object="$camera" time="+0"/>
+        <action type="animate" function="cubic-bezier" control="1 0 .88 .6" object="$camera" focus="0 150 500" position="250 150 300" endtime="3"/>
+        <action type="animate" action="stop" object="$camera" time="+3"/>
+        <action type="removeShadow" time="+0"/>
     </actions>
 </timeline>

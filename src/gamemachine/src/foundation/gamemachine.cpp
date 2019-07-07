@@ -427,7 +427,8 @@ void GameMachine::invokeCallables()
 	while (!d->callableQueue.empty())
 	{
 		GMCallable callable = d->callableQueue.front();
-		callable();
+		if (callable)
+			callable();
 		d->callableQueue.pop();
 	}
 }

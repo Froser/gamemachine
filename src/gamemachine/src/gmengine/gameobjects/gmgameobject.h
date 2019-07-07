@@ -107,10 +107,12 @@ public:
 
 	// 动画控制
 public:
-	void play();
-	void pause();
-	bool isPlaying();
-	void reset(bool update);
+	virtual void play();
+	virtual void reset(bool update);
+	virtual void pause();
+	virtual bool isPlaying();
+
+public:
 	GMsize_t getAnimationCount();
 	void setAnimation(GMsize_t index);
 	Vector<GMString> getAnimationNames();

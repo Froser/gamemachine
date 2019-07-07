@@ -88,10 +88,14 @@ public:
 	static GMWaveGameObject* create(const GMWaveGameObjectDescription& desc);
 
 public:
+	virtual void play() override;
+	virtual void pause() override;
+	virtual void reset(bool update) override;
+	virtual void update(GMDuration dt) override;
+	virtual bool isPlaying() override;
+
+public:
 	void setWaveDescriptions(Vector<GMWaveDescription> desc);
-	void play();
-	void stop();
-	void update(GMDuration dt);
 
 public:
 	virtual void onRenderShader(GMModel* model, IShaderProgram* shaderProgram) const;

@@ -207,7 +207,7 @@ private:
 
 	AssetType getAssetType(const GMString& objectName, OUT void** out);
 	void playAudio(IAudioSource* source);
-	void play(GMGameObject*);
+	void play(GMGameObject*, const GMString&);
 
 private:
 	const IRenderContext* m_context;

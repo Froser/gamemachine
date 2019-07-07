@@ -2,15 +2,6 @@
 <timeline version="1.0">
     <assets>
         <audio id="audio_bgm" file="Thomas Greenberg - Curly Wurly.mp3" />
-        <cubemap
-            id="tex_sky"
-            left="sky/sky_left.jpg"
-            right="sky/sky_right.jpg"
-            up="sky/sky_up.jpg"
-            down="sky/sky_down.jpg"
-            front="sky/sky_front.jpg"
-            back="sky/sky_back.jpg"
-        />
         <texture id="tex_mud_diffuse" file="mud/albedo.jpg" />
         <texture id="tex_mud_normal" file="mud/normal.jpg" />
 
@@ -22,13 +13,8 @@
         <buffer id="coast_terrain" file="textures/water/coast.jpg" />
         <object id="model_dragon" file="cat/cat.obj" />
         <object id="model_logo" file="logo/logo.fbx" />
-
-        <texture id="tex_water_diffuse" file="water/water.tga" />
-        <texture id="tex_water_normal" file="water/water-normal.tga" />
-
     </assets>
     <objects>
-        <cubemap id="obj_sky" asset="tex_sky" scale="1500 1500 1500" translate="0 10 0" />
         <object id="obj_dragon" asset="model_dragon" scale="1.2 1.2 1.2" ks=".5 .5 .5" />
         <object id="obj_logo" asset="model_logo" scale="5 5 5" />
         <terrain
@@ -58,8 +44,8 @@
 
         <!--<include file="ani_logo.xml" />
         <include file="ani_dragon.xml" />
-        <include file="ani_deathstroke.xml" />-->
-        <include file="ani_wave.xml" />
+        <include file="ani_deathstroke.xml" />
+        <include file="ani_wave.xml" />-->
         <include file="ani_flyingdragon.xml" />
     </actions>
 </timeline>

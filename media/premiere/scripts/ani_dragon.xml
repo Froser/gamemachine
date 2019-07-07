@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <timeline>
+    <assets>
+        <cubemap
+            id="tex_sky"
+            left="sky/sky_left.jpg"
+            right="sky/sky_right.jpg"
+            up="sky/sky_up.jpg"
+            down="sky/sky_down.jpg"
+            front="sky/sky_front.jpg"
+            back="sky/sky_back.jpg"
+        />
+    </assets>
     <objects>
         <light id="light_dragon_global" type="point" position="20 20 -20" ambient="0 0 0" diffuse="0 0 0" />
         <shadow id="shadow_dragon" cascades="1" position="30 30 -30" focus="0 0 0" width="1024" height="768" view="perspective" fovy="45" near=".1f" far="1600" bias="0.000125" time="+0"/>
+        <cubemap id="obj_sky" asset="tex_sky" scale="1500 1500 1500" translate="0 10 0" />
     </objects>
     <actions>
         <action type="addObject" object="light_dragon_global" time="+0" />
@@ -33,5 +45,6 @@
         <action type="removeObject" object="obj_mud" time="+0" />
         <action type="removeObject" object="obj_dragon" time="+0" />
         <action type="attribute" object="obj_sky" visible="false" time="+0"/>
+        <action type="removeShadow" time="+0"/>
     </actions>
 </timeline>

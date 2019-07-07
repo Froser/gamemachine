@@ -92,7 +92,7 @@ void Demo_Wave::createMenu()
 
 	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		if (d->wave)
-			d->wave->stop();
+			d->wave->pause();
 	});
 
 	widget->addControl(button = gm::GMControlButton::createControl(

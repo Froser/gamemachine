@@ -333,13 +333,20 @@ void GMWaveGameObject::play()
 	}
 }
 
-void GMWaveGameObject::stop()
+void GMWaveGameObject::pause()
 {
 	D(d);
 	if (d->isPlaying)
-	{
 		d->isPlaying = false;
-	}
+}
+
+void GMWaveGameObject::reset(bool update)
+{
+	D(d);
+	d->duration = 0;
+	if (update)
+		this->update(0);
+	d->isPlaying = false;
 }
 
 void GMWaveGameObject::update(GMDuration dt)
@@ -364,6 +371,12 @@ void GMWaveGameObject::update(GMDuration dt)
 	{
 		d->waveModel->setType(GMModelType::Custom);
 	}
+}
+
+bool GMWaveGameObject::isPlaying()
+{
+	D(d);
+	return d->isPlaying;
 }
 
 void GMWaveGameObject::onRenderShader(GMModel* model, IShaderProgram* shaderProgram) const

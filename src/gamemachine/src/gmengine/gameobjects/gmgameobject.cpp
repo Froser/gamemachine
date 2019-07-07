@@ -204,7 +204,6 @@ const IRenderContext* GMGameObject::getContext()
 	return d->context;
 }
 
-
 void GMGameObject::play()
 {
 	D(d);

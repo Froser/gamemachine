@@ -162,6 +162,9 @@ namespace
 				GMTextureAsset tex = imp->getTextureMap()[name];
 				if (tex.isEmpty())
 				{
+					if (!name.startsWith("/") || !name.startsWith("\\"))
+						name = "/" + name;
+
 					GMString imgPath = GM.getGamePackageManager()->pathOf(GMPackageIndex::Models, imp->getSettings().directory + name);
 					GMToolUtil::createTextureFromFullPath(imp->getSettings().context, imgPath, tex);
 				}

@@ -5,6 +5,8 @@
         <object id="model_rock01" file="rock/rock01.obj" />
         <object id="model_rock02" file="rock/rock02.obj" />
         <object id="model_rock03" file="rock/rock03.obj" />
+        <texture id="tex_water_diffuse" file="water/water.tga" />
+        <texture id="tex_water_normal" file="water/water-normal.tga" />
     </assets>
     <objects>
         <light id="light_wave_global" type="point" position="200 200 -200" ambient="0 0 0" diffuse="0 0 0" specular="0 0 0"/>
