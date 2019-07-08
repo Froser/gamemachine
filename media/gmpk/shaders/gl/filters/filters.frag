@@ -29,6 +29,7 @@ struct GMScreenInfo
 uniform GMScreenInfo GM_ScreenInfo;
 uniform float GM_KernelDeltaX;
 uniform float GM_KernelDeltaY;
+uniform vec3 GM_BlendFactor;
 
 vec3 kernel(float kernels[9], sampler2D t, vec2 uv)
 {
@@ -100,6 +101,11 @@ vec3 GM_EdgeDetectFilter(sampler2D t, vec2 uv)
     return kernel(kernels, t, uv);
 }
 
+vec3 GM_BlendFilter(sampler2D t, vec2 uv)
+{
+    return texture(t, uv).rgb * GM_BlendFactor;
+}
+
 vec3 GM_DefaultFilter(sampler2D t, vec2 uv)
 {
     return texture(t, uv).rgb;
@@ -113,6 +119,7 @@ const int GM_FilterType_SharpenFilter = 2;
 const int GM_FilterType_BlurFilter = 3;
 const int GM_FilterType_GrayscaleFilter = 4;
 const int GM_FilterType_EdgeDetectFilter = 5;
+const int GM_FilterType_BlendFilter = 6;
 
 vec3 GM_InvokeFilter(sampler2D t, vec2 texcoords)
 {
@@ -131,6 +138,8 @@ vec3 GM_InvokeFilter(sampler2D t, vec2 texcoords)
             return GM_GrayscaleFilter(t, texcoords);
         case GM_FilterType_EdgeDetectFilter:
             return GM_EdgeDetectFilter(t, texcoords);
+        case GM_FilterType_BlendFilter:
+            return GM_BlendFilter(t, texcoords);
     }
     return vec3(0, 0, 0);
 }

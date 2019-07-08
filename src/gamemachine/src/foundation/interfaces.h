@@ -49,6 +49,7 @@ class GMCamera;
 class GMRenderTechniqueManager;
 class GMRenderTechniques;
 class GMPrimitiveManager;
+class GMConfigs;
 struct ILight;
 struct ISoundPlayer;
 struct IGamePackageHandler;
@@ -761,6 +762,8 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	virtual GMRenderTechniqueManager* getRenderTechniqueManager() = 0;
 
 	virtual GMPrimitiveManager* getPrimitiveManager() = 0;
+
+	virtual GMConfigs& getConfigs() = 0;
 
 	//! 初始化一个对象数据代理。
 	/*!

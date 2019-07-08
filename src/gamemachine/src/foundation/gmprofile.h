@@ -5,7 +5,7 @@
 #include <stack>
 BEGIN_NS
 
-#define GM_PROFILE(name) gm::GMProfile __profile(L ## name)
+#define GM_PROFILE(engine, name) gm::GMProfile __profile(engine, L ## name)
 #define GM_PROFILE_HANDLER(ptr) gm::GMProfile::setHandler(ptr)
 #define GM_PROFILE_CLEAR_HANDLER() gm::GMProfile::clearHandler()
 #define GM_PROFILE_RESET_TIMELINE() gm::GMProfile::resetTimeline()
@@ -45,9 +45,9 @@ public:
 	static GMProfileSessions::GMProfileSession& profileSession();
 
 public:
-	GMProfile();
-	GMProfile(const GMString& name);
-	GMProfile(const GMwchar* name);
+	GMProfile(IGraphicEngine* engine);
+	GMProfile(IGraphicEngine* engine, const GMString& name);
+	GMProfile(IGraphicEngine* engine, const GMwchar* name);
 	~GMProfile();
 
 public:

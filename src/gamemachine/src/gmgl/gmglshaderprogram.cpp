@@ -33,6 +33,7 @@ namespace
 			BlurFilter = 3,
 			GrayscaleFilter = 4,
 			EdgeDetectFilter = 5,
+			BlendFilter = 6,
 		};
 
 		GM_STATIC_ASSERT(Shadow == 8, "If shadow enum value is changed, you have to modify glsl.");

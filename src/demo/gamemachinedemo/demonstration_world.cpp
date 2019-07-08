@@ -94,8 +94,8 @@ DemoHandler::DemoHandler(DemonstrationWorld* parentDemonstrationWorld)
 {
 	D(d);
 	d->parentDemonstrationWorld = parentDemonstrationWorld;
-	d->renderConfig = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
-	d->debugConfig = GM.getConfigs().getConfig(gm::GMConfigs::Debug).asDebugConfig();
+	d->renderConfig = parentDemonstrationWorld->getContext()->getEngine()->getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+	d->debugConfig = parentDemonstrationWorld->getContext()->getEngine()->getConfigs().getConfig(gm::GMConfigs::Debug).asDebugConfig();
 	d->engine = parentDemonstrationWorld->getContext()->getEngine();
 }
 
@@ -144,7 +144,7 @@ void DemoHandler::onDeactivate()
 	noShadow.type = gm::GMShadowSourceDesc::NoShadow;
 	d->engine->setShadowSource(noShadow);
 
-	gm::GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+	gm::GMRenderConfig config = getDemonstrationWorld()->getContext()->getEngine()->getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
 	config.set(gm::GMRenderConfigs::HDR_Bool, false);
 	config.set(gm::GMRenderConfigs::ViewCascade_Bool, false);
 
@@ -735,8 +735,8 @@ void DemostrationEntrance::init(const gm::IRenderContext* context)
 	}
 
 	context->getEngine()->setShaderLoadCallback(this);
-	d->renderConfig = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
-	d->debugConfig = GM.getConfigs().getConfig(gm::GMConfigs::Debug).asDebugConfig();
+	d->renderConfig = context->getEngine()->getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+	d->debugConfig = context->getEngine()->getConfigs().getConfig(gm::GMConfigs::Debug).asDebugConfig();
 	d->world = new DemonstrationWorld(context, d->mainWindow);
 }
 

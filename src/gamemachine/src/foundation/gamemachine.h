@@ -113,14 +113,12 @@ GM_PRIVATE_OBJECT_UNALIGNED(GameMachine)
 	const IRenderContext* computeContext = nullptr;
 	IFactory* factory = nullptr;
 	GMGamePackage* gamePackageManager = nullptr;
-	GMConfigs* statesManager = nullptr;
 	GMMessage lastMessage;
 	Queue<GMMessage> messageQueue;
 	Vector<IDestroyObject*> managerQueue;
 	Queue<GMCallable> callableQueue;
 	GMGameMachineRunningStates states;
 	GMGameMachineRunningMode runningMode;
-	GMConfigs configs;
 };
 
 //! GameMachine类负责掌管整个进程的生命周期。
@@ -176,13 +174,6 @@ public:
 	  \return 程序当前运行状态。
 	*/
 	inline const GMGameMachineRunningStates& getRunningStates() const { D(d); return d->states; }
-
-	//! 获取程序当前的配置。
-	/*!
-	  通过设置程序配置，可以激活运行时的一些行为，如绘制调试信息、输出性能表等。程序所有的配置存在此对象中。用户可以获取此对象并且修改它。
-	  \return 程序当前配置。
-	*/
-	inline GMConfigs& getConfigs() { D(d); return d->configs; }
 
 	//! 发送一条GameMachine的消息。
 	/*!

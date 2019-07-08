@@ -106,7 +106,7 @@ void Demo_CSM::init()
 		// Visualize CSM
 		if (d->view == CameraView)
 		{
-			gm::GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+			gm::GMRenderConfig config = getDemonstrationWorld()->getContext()->getEngine()->getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
 			config.set(gm::GMRenderConfigs::ViewCascade_Bool, d->viewCSM = !config.get(gm::GMRenderConfigs::ViewCascade_Bool).toBool());
 		}
 	});
@@ -124,7 +124,7 @@ void Demo_CSM::init()
 	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->view = CameraView;
 
-		gm::GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+		gm::GMRenderConfig config = getDemonstrationWorld()->getContext()->getEngine()->getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
 		config.set(gm::GMRenderConfigs::ViewCascade_Bool, d->viewCSM);
 	});
 
@@ -141,7 +141,7 @@ void Demo_CSM::init()
 	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->view = ShadowCameraView;
 
-		gm::GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+		gm::GMRenderConfig config = getDemonstrationWorld()->getContext()->getEngine()->getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
 		config.set(gm::GMRenderConfigs::ViewCascade_Bool, false);
 	});
 

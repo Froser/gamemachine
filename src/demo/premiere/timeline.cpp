@@ -429,11 +429,11 @@ void Timeline::parseObjects(GMXMLElement* e)
 		{
 			GMString typeStr = e->Attribute("type");
 			GMLightType type = GMLightType::PointLight;
-			if (typeStr == "point")
+			if (typeStr == L"point")
 				type = GMLightType::PointLight;
-			else if (typeStr == "directional")
+			else if (typeStr == L"directional")
 				type = GMLightType::DirectionalLight;
-			else if (typeStr == "spotlight")
+			else if (typeStr == L"spotlight")
 				type = GMLightType::Spotlight;
 			else
 				gm_warning(gm_dbg_wrap("Wrong light type: {0}"), typeStr);
@@ -1047,7 +1047,7 @@ void Timeline::parseActions(GMXMLElement* e)
 				action.runType = Action::Immediate;
 
 			GMString type = e->Attribute("type");
-			if (type == "camera")
+			if (type == L"camera")
 			{
 				CameraParams p;
 				GMCameraLookAt lookAt;
@@ -1243,6 +1243,34 @@ void Timeline::parseActions(GMXMLElement* e)
 					gm_warning(gm_dbg_wrap("object '{0}' is not a particle system object."), object);
 				}
 			}
+			else if (type == L"filter")
+			{
+				GMString name = e->Attribute("name");
+				if (name == L"blend")
+				{
+					GMString valueStr = e->Attribute("value");
+					GMfloat r = 1, g = 1, b = 1;
+					Scanner scanner(valueStr, *this);
+					scanner.nextFloat(r);
+					scanner.nextFloat(g);
+					scanner.nextFloat(b);
+
+					action.action = [this, r, g, b]() {
+						auto renderContext = m_context->getEngine()->getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
+						renderContext.set(GMRenderConfigs::FilterMode, GMFilterMode::Blend);
+						renderContext.set(GMRenderConfigs::BlendFactor_Vec3, GMVec3(r, g, b));
+					};
+				}
+				bindAction(action);
+			}
+			else if (type == L"removeFilter")
+			{
+				action.action = [this]() {
+					auto renderContext = m_context->getEngine()->getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
+					renderContext.set(GMRenderConfigs::FilterMode, GMFilterMode::None);
+				};
+				bindAction(action);
+			}
 			else
 			{
 				gm_warning(gm_dbg_wrap("action type cannot be recognized: {0}"), type);
@@ -1251,15 +1279,15 @@ void Timeline::parseActions(GMXMLElement* e)
 		else if (name == L"checkpoint")
 		{
 			GMString type = e->Attribute("type");
-			if (type == "save")
+			if (type == L"save")
 			{
 				m_checkpointTime = m_lastTime;
 			}
-			else if (type == "load")
+			else if (type == L"load")
 			{
 				m_lastTime = m_checkpointTime;
 			}
-			else if (type == "time")
+			else if (type == L"time")
 			{
 				GMString timeStr = e->Attribute("time");
 				if (!timeStr.isEmpty())
@@ -1363,7 +1391,7 @@ GMint32 Timeline::parseCameraAction(GMXMLElement* e, CameraParams& cp, GMCameraL
 		cp.f = f;
 		component |= PerspectiveComponent;
 	}
-	else if (view == "ortho")
+	else if (view == L"ortho")
 	{
 		GMfloat left = 0, right = 0, top = 0, bottom = 0;
 		GMfloat n = 0, f = 0;
@@ -1960,7 +1988,7 @@ void Timeline::runActions()
 AssetType Timeline::getAssetType(const GMString& objectName, OUT void** out)
 {
 	AssetType result = AssetType::NotFound;
-	if (objectName == "$camera")
+	if (objectName == L"$camera")
 	{
 		result = AssetType::Camera;
 		if (out)

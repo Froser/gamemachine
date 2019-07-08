@@ -133,8 +133,8 @@ GMGraphicEngine::GMGraphicEngine(const IRenderContext* context)
 	D(d);
 	d->mtid = GMThread::getCurrentThreadId();
 	d->context = context;
-	d->renderConfig = GM.getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
-	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
+	d->renderConfig = d->configs.getConfig(GMConfigs::Render).asRenderConfig();
+	d->debugConfig = d->configs.getConfig(GMConfigs::Debug).asDebugConfig();
 	d->shadow.type = GMShadowSourceDesc::NoShadow;
 	d->renderTechniqueManager.reset(new GMRenderTechniqueManager(context));
 
@@ -178,7 +178,7 @@ IFramebuffers* GMGraphicEngine::getFilterFramebuffers()
 
 void GMGraphicEngine::draw(const GMGameObjectContainer& forwardRenderingObjects, const GMGameObjectContainer& deferredRenderingObjects)
 {
-	GM_PROFILE("draw");
+	GM_PROFILE(this, "draw");
 	D(d);
 	// 如果绘制阴影，先生成阴影缓存
 	if (d->shadow.type != GMShadowSourceDesc::NoShadow)
@@ -242,6 +242,12 @@ const GMFilterMode::Mode GMGraphicEngine::getCurrentFilterMode()
 {
 	D(d);
 	return d->renderConfig.get(GMRenderConfigs::FilterMode).toEnum<GMFilterMode::Mode>();
+}
+
+const GMVec3 GMGraphicEngine::getCurrentFilterBlendFactor()
+{
+	D(d);
+	return d->renderConfig.get(GMRenderConfigs::BlendFactor_Vec3).toVec3();
 }
 
 IFramebuffers* GMGraphicEngine::getShadowMapFramebuffers()
@@ -579,6 +585,12 @@ GMPrimitiveManager* GMGraphicEngine::getPrimitiveManager()
 bool GMGraphicEngine::msgProc(const GMMessage& e)
 {
 	return false;
+}
+
+GMConfigs& GMGraphicEngine::getConfigs()
+{
+	D(d);
+	return d->configs;
 }
 
 void GMGraphicEngine::createModelDataProxy(const IRenderContext* context, GMModel* model, bool transfer)

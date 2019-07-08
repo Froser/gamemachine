@@ -29,21 +29,21 @@ GMProfileSessions::GMProfileSession& GMProfile::profileSession()
 	return g_sessions.sessions[GMThread::getCurrentThreadId()];
 }
 
-GMProfile::GMProfile()
+GMProfile::GMProfile(IGraphicEngine* engine)
 {
 	D(d);
-	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
+	d->debugConfig = engine->getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
 }
 
-GMProfile::GMProfile(const GMString& name)
-	: GMProfile()
+GMProfile::GMProfile(IGraphicEngine* engine, const GMString& name)
+	: GMProfile(engine)
 {
 	D(d);
 	startRecord(name);
 }
 
-GMProfile::GMProfile(const GMwchar* name)
-	: GMProfile()
+GMProfile::GMProfile(IGraphicEngine* engine, const GMwchar* name)
+	: GMProfile(engine)
 {
 	D(d);
 	// 这里先判断，阻止赋值GMString

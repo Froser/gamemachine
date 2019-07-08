@@ -62,7 +62,6 @@ void GameMachine::init(
 	setRenderEnvironment(desc.renderEnvironment);
 	registerManager(desc.factory, &d->factory);
 	registerManager(new GMGamePackage(), &d->gamePackageManager);
-	registerManager(new GMConfigs(), &d->statesManager);
 
 	if (desc.runningMode != GMGameMachineRunningMode::ComputeOnly)
 	{
@@ -359,7 +358,6 @@ void GameMachine::finalize()
 
 	d->factory = nullptr;
 	d->gamePackageManager = nullptr;
-	d->statesManager = nullptr;
 
 	GM_ASSERT(d->runningMode != GMGameMachineRunningMode::ComputeOnly || d->computeContext);
 	GM_delete(d->computeContext);

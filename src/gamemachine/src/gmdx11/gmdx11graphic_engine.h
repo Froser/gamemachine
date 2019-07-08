@@ -116,12 +116,6 @@ public:
 		return d->renderConfig.get(GMRenderConfigs::FilterKernelOffset_Vec2).toVec2();
 	}
 
-	const GMVec3 getCurrentFilterBlendFactor()
-	{
-		D_BASE(d, Base);
-		return d->renderConfig.get(GMRenderConfigs::BlendFactor_Vec3).toVec3();
-	}
-
 private:
 	void initShaders(const IRenderContext* context);
 };

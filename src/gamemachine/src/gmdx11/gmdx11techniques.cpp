@@ -590,7 +590,7 @@ GMDx11Technique::GMDx11Technique(const IRenderContext* context)
 		GM_ASSERT(d->effect);
 
 		d->deviceContext = getEngine()->getDeviceContext();
-		d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
+		d->debugConfig = d->context->getEngine()->getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
 		getVarBank().init(d->effect);
 	}
 }
@@ -928,7 +928,7 @@ void GMDx11Technique::prepareShadow(bool isDrawingShadow)
 	ID3DX11EffectScalarVariable* viewCascade = bank.ViewCascade();
 
 	// 是否显示CSM范围
-	GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+	GMRenderConfig config = d->context->getEngine()->getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
 	bool vc = config.get(GMRenderConfigs::ViewCascade_Bool).toBool();
 	GM_DX_HR(viewCascade->SetBool(vc ? TRUE : FALSE));
 

@@ -1292,7 +1292,7 @@ VS_OUTPUT VS_Shadow( VS_INPUT input )
 // Filter
 //--------------------------------------------------------------------------------------
 int GM_KernelDeltaX = 0, GM_KernelDeltaY = 0;
-float3 GM_BlendFactor(1, 1, 1);
+float3 GM_BlendFactor = float3(1, 1, 1);
 typedef float GMKernel[9];
 interface IFilter
 {

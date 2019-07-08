@@ -242,6 +242,7 @@ GM_PRIVATE_OBJECT(GMGraphicEngine)
 	GMGlobalBlendStateDesc blendState;
 	GMOwnedPtr<GMRenderTechniqueManager> renderTechniqueManager;
 	GMOwnedPtr<GMPrimitiveManager> primitiveManager;
+	GMConfigs configs;
 
 	// Shadow
 	GMShadowSourceDesc shadow;
@@ -287,6 +288,7 @@ public:
 	virtual GMRenderTechniqueManager* getRenderTechniqueManager() override;
 	virtual GMPrimitiveManager* getPrimitiveManager() override;
 	virtual bool msgProc(const GMMessage& e) override;
+	virtual GMConfigs& getConfigs() override;
 	virtual void createModelDataProxy(const IRenderContext* context, GMModel* model, bool transfer = true) override;
 	virtual bool isCurrentMainThread() override;
 
@@ -304,6 +306,7 @@ protected:
 
 public:
 	const GMFilterMode::Mode getCurrentFilterMode();
+	const GMVec3 getCurrentFilterBlendFactor();
 
 	void draw(const GMGameObjectContainer& objects);
 	IFramebuffers* getShadowMapFramebuffers();

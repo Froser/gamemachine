@@ -174,8 +174,10 @@ void ProceduresPrivate::play(GMDuration dt)
 	{
 		static std::once_flag s_flag;
 		std::call_once(s_flag, [this]() {
-			bool b = m_procedures.m_handler->getWorld()->removeObject(m_title);
-			GM_ASSERT(b);
+			GM.invokeInMainThread([this]() {
+				bool b = m_procedures.m_handler->getWorld()->removeObject(m_title);
+				GM_ASSERT(b);
+			});
 		});
 	}
 	m_procedures.m_handler->getWorld()->renderScene();

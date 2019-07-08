@@ -108,7 +108,7 @@ void Demo_Phong_PBR::init()
 	));
 
 	connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
-		gm::GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+		gm::GMRenderConfig config = getDemonstrationWorld()->getContext()->getEngine()->getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
 		config.set(gm::GMRenderConfigs::HDR_Bool, !config.get(gm::GMRenderConfigs::HDR_Bool).toBool());
 	});
 

@@ -195,7 +195,7 @@ GMBSPGameWorld::GMBSPGameWorld(const IRenderContext* context)
 {
 	D(d);
 	d->physics = new GMBSPPhysicsWorld(this);
-	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
+	d->debugConfig = context->getEngine()->getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
 
 	d->bspRenderConfigWrapper = d->bspRenderConfig.as<GMBSPRenderConfig>();
 	d->bspRenderConfigWrapper.set(GMBSPRenderConfigs::CalculateFace_Bool, true);
@@ -226,7 +226,7 @@ GMGameObject* GMBSPGameWorld::getSky()
 
 void GMBSPGameWorld::renderScene()
 {
-	GM_PROFILE("renderScene");
+	GM_PROFILE(getContext()->getEngine(), "renderScene");
 	prepareAllToRenderList();
 	Base::renderScene();
 }
@@ -293,7 +293,7 @@ void GMBSPGameWorld::calculateVisibleFaces()
 {
 	static GMFrustumPlanes frustumPlanes;
 
-	GM_PROFILE("calculateVisibleFaces");
+	GM_PROFILE(getContext()->getEngine(), "calculateVisibleFaces");
 	D(d);
 	GMBSPRenderData& rd = d->render.renderData();
 
@@ -362,7 +362,7 @@ GMint32 GMBSPGameWorld::isClusterVisible(GMint32 cameraCluster, GMint32 testClus
 void GMBSPGameWorld::prepareAllToRenderList()
 {
 	D(d);
-	GM_PROFILE("drawAll");
+	GM_PROFILE(getContext()->getEngine(), "drawAll");
 	clearRenderList();
 	prepareSkyToRenderList();
 	if (!d->bspRenderConfigWrapper.get(GMBSPRenderConfigs::DrawSkyOnly_Bool).toBool())
@@ -382,7 +382,7 @@ void GMBSPGameWorld::prepareSkyToRenderList()
 
 void GMBSPGameWorld::prepareFacesToRenderList()
 {
-	GM_PROFILE("drawFaces");
+	GM_PROFILE(getContext()->getEngine(), "drawFaces");
 	::drawFacesToRenderList(this, renderData().polygonIndices, &GMBSPGameWorld::preparePolygonFaceToRenderList, MST_PLANAR);
 	::drawFacesToRenderList(this, renderData().meshFaceIndices, &GMBSPGameWorld::prepareMeshFaceToRenderList, MST_TRIANGLE_SOUP);
 	::drawFacesToRenderList(this, renderData().patchIndices, &GMBSPGameWorld::preparePatchToRenderList, MST_PATCH);

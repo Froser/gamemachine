@@ -363,7 +363,7 @@ namespace
 				GMuint32 boneIndices[4] = { 0, 0, 0, 0 };
 				GMfloat boneWeights[4] = { 0, 0, 0, 0 };
 				if (weightsPerVertex[i].size() > 4)
-					gm_warning(gm_dbg_wrap("Weights per vertex size is more than 4. We only use the first 4 weights."));
+					gm_warning(gm_dbg_wrap("Weights per vertex size are more than 4. We only use the first 4 weights."));
 
 				GMsize_t sz = weightsPerVertex[i].size();
 				if (sz > 4)

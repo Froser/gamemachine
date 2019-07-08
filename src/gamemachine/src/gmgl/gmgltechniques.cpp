@@ -192,7 +192,7 @@ GMGLTechnique::GMGLTechnique(const IRenderContext* context)
 	D(d);
 	d->context = context;
 	d->engine = gm_cast<GMGLGraphicEngine*>(d->context->getEngine());
-	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
+	d->debugConfig = context->getEngine()->getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
 
 	// 绑定着色器变化状态。着色器变化后，将isShadowDirty标记为true，准备为着色器更新阴影参数。
 	connect(*d->engine, GM_SIGNAL(GMGLGraphicEngine, shaderProgramChanged), [d](GMObject*, GMObject*) {
@@ -623,7 +623,7 @@ void GMGLTechnique::prepareShadow(const GMShadowSourceDesc* shadowSourceDesc, GM
 		}
 
 		// 是否显示CSM范围
-		GMRenderConfig config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+		GMRenderConfig config = d->context->getEngine()->getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
 		bool vc = config.get(GMRenderConfigs::ViewCascade_Bool).toBool();
 		shaderProgram->setInt(VI_N(ShadowInfo.ViewCascade, s_viewCascade), vc ? 1 : 0);
 
@@ -885,6 +885,7 @@ void GMGLTechnique_CubeMap::beforeDraw(GMModel* model)
 	D_BASE(db, Base);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+	prepareShaderAttributes(model);
 	prepareTextures(model);
 }
 
@@ -970,14 +971,19 @@ void GMGLTechnique_Filter::prepareTextures(GMModel* model)
 
 GMint32 GMGLTechnique_Filter::activateTexture(GMModel* model, GMTextureType type)
 {
-	D(d);
-	D_BASE(db, Base);
+	D(d_this);
+	D_BASE(d, Base);
 	GMint32 texId = getTextureID(type);
 	IShaderProgram* shaderProgram = getShaderProgram();
-	shaderProgram->setInt(getVariableIndex(shaderProgram, d->framebufferIndex, GMSHADER_FRAMEBUFFER), texId);
+	shaderProgram->setInt(getVariableIndex(shaderProgram, d_this->framebufferIndex, GMSHADER_FRAMEBUFFER), texId);
 
-	bool b = shaderProgram->setInterfaceInstance(GM_VariablesDesc.FilterAttributes.Filter, GM_VariablesDesc.FilterAttributes.Types[db->engine->getCurrentFilterMode()], GMShaderType::Pixel);
+	auto filterMode = d->engine->getCurrentFilterMode();
+	bool b = shaderProgram->setInterfaceInstance(GM_VariablesDesc.FilterAttributes.Filter, GM_VariablesDesc.FilterAttributes.Types[filterMode], GMShaderType::Pixel);
 	GM_ASSERT(b);
+
+	if (filterMode == GMFilterMode::Blend)
+		shaderProgram->setVec3(VI(FilterAttributes.BlendFactor), ValuePointer(d->engine->getCurrentFilterBlendFactor()));
+
 	return texId;
 }
 
