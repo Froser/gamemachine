@@ -1292,6 +1292,7 @@ VS_OUTPUT VS_Shadow( VS_INPUT input )
 // Filter
 //--------------------------------------------------------------------------------------
 int GM_KernelDeltaX = 0, GM_KernelDeltaY = 0;
+float3 GM_BlendFactor(1, 1, 1);
 typedef float GMKernel[9];
 interface IFilter
 {
@@ -1461,12 +1462,28 @@ class GMEdgeDetectFilter : IFilter
     }
 };
 
+class GMBlendFilter : IFilter
+{
+    float4 Sample(Texture2D tex, int3 coord)
+    {
+        float3 fragColor = tex.Load(coord).rgb * GM_BlendFactor;
+        return float4(fragColor.x, fragColor.y, fragColor.z, 1);
+    }
+
+    float4 SampleMSAA(Texture2DMS<float4> tex, int2 coord, int samplerId)
+    {
+        float3 fragColor = tex.Load(coord, samplerId).rgb * GM_BlendFactor;
+        return float4(fragColor.x, fragColor.y, fragColor.z, 1);
+    }
+};
+
 GMDefaultFilter GM_DefaultFilter;
 GMInversionFilter GM_InversionFilter;
 GMSharpenFilter GM_SharpenFilter;
 GMBlurFilter GM_BlurFilter;
 GMGrayscaleFilter GM_GrayscaleFilter;
 GMEdgeDetectFilter GM_EdgeDetectFilter;
+GMBlendFilter GM_BlendFilter;
 
 IFilter GM_Filter;
 Texture2D GM_FilterTexture;

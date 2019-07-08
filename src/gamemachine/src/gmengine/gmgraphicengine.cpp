@@ -42,6 +42,7 @@ static GMShaderVariablesDesc s_defaultShaderVariablesDesc =
 		"GM_Filter",
 		"GM_KernelDeltaX",
 		"GM_KernelDeltaY",
+		"GM_BlendFactor",
 		{
 			"GM_DefaultFilter",
 			"GM_InversionFilter",
@@ -49,6 +50,7 @@ static GMShaderVariablesDesc s_defaultShaderVariablesDesc =
 			"GM_BlurFilter",
 			"GM_GrayscaleFilter",
 			"GM_EdgeDetectFilter",
+			"GM_BlendFilter",
 		}
 	},
 

@@ -30,6 +30,7 @@ struct GMFilterMode
 		Blur,
 		Grayscale,
 		EdgeDetect,
+		Blend,
 		EndOfEnum,
 	};
 };
@@ -68,6 +69,7 @@ enum class GMRenderConfigs
 	HDR_Bool,
 	ToneMapping,
 	ViewCascade_Bool,
+	BlendFactor_Vec3,
 	Max,
 };
 

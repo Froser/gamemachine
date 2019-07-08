@@ -51,13 +51,14 @@ struct GMShaderVariablesMaterialDesc
 	T F0;
 };
 
-constexpr int GMFilterCount = 6;
+constexpr int GMFilterCount = 7;
 template <typename T>
 struct GMShaderVariablesFilterDesc
 {
 	T Filter;
 	T KernelDeltaX;
 	T KernelDeltaY;
+	T BlendFactor;
 	T Types[GMFilterCount];
 };
 

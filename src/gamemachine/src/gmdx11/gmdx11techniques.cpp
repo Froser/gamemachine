@@ -265,6 +265,9 @@ namespace
 #define EFFECT_VARIABLE_AS_SCALAR(funcName, name) \
 	EFFECT_VARIABLE_AS(funcName, name, ID3DX11EffectScalarVariable, AsScalar)
 
+#define EFFECT_VARIABLE_AS_VECTOR(funcName, name) \
+	EFFECT_VARIABLE_AS(funcName, name, ID3DX11EffectVectorVariable, AsVector)
+
 #define EFFECT_MEMBER_AS(funcName, effect, name, retType, to) \
 	private: retType* effect_var_##funcName = nullptr;														\
 	public: retType* funcName() {																			\
@@ -326,6 +329,7 @@ public:
 	// Filter
 	EFFECT_VARIABLE_AS_SCALAR(KernelDeltaX, GM_VariablesDesc.FilterAttributes.KernelDeltaX)
 	EFFECT_VARIABLE_AS_SCALAR(KernelDeltaY, GM_VariablesDesc.FilterAttributes.KernelDeltaY)
+	EFFECT_VARIABLE_AS_VECTOR(BlendFactor, GM_VariablesDesc.FilterAttributes.BlendFactor)
 
 	// Textures
 	EFFECT_VARIABLE(AmbientTexture, GM_VariablesDesc.AmbientTextureName);
@@ -1285,6 +1289,12 @@ void GMDx11Technique_Filter::beginModel(GMModel* model, const GMGameObject* pare
 	GM_DX_HR(kernelDeltaY->SetInt(delta[1]));
 
 	GMFilterMode::Mode filterMode = getEngine()->getCurrentFilterMode();
+	if (filterMode == GMFilterMode::Blend)
+	{
+		ID3DX11EffectVectorVariable* blendFactor = bank.BlendFactor();
+		GM_DX_HR(blendFactor->SetFloatVector(ValuePointer(getEngine()->getCurrentFilterBlendFactor())));
+	}
+
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
 	bool b = shaderProgram->setInterfaceInstance(GM_VariablesDesc.FilterAttributes.Filter.toStdString().c_str(), GM_VariablesDesc.FilterAttributes.Types[filterMode].toStdString().c_str(), GMShaderType::Effect);
 	GM_ASSERT(b);

@@ -50,6 +50,7 @@ void GMConfigs::init()
 	renderConfig.set(GMRenderConfigs::Gamma_Float, 2.2f);
 	renderConfig.set(GMRenderConfigs::HDR_Bool, false);
 	renderConfig.set(GMRenderConfigs::ToneMapping, GMToneMapping::Reinhard);
+	renderConfig.set(GMRenderConfigs::BlendFactor_Vec3, GMVec3(1, 1, 1));
 	renderConfig.set(GMRenderConfigs::ViewCascade_Bool, false);
 }
 
