@@ -151,8 +151,11 @@ struct AlignCache : AlignedVector<T>
 	}
 };
 
+class Scanner;
 class Timeline
 {
+	friend class Scanner;
+
 public:
 	Timeline(const IRenderContext* context, GMGameWorld* world);
 	~Timeline();
@@ -166,6 +169,7 @@ public:
 
 private:
 	void parseElements(GMXMLElement*);
+	void parseDefines(GMXMLElement*);
 	void parseAssets(GMXMLElement*);
 	void parseObjects(GMXMLElement*);
 	void parseActions(GMXMLElement*);
@@ -209,6 +213,10 @@ private:
 	void playAudio(IAudioSource* source);
 	void play(GMGameObject*, const GMString&);
 
+	void getValueFromDefines(GMString& id);
+	GMint32 parseInt(const GMString& str, bool* ok = nullptr);
+	GMfloat parseFloat(const GMString& str, bool* ok = nullptr);
+
 private:
 	const IRenderContext* m_context;
 	GMGameWorld* m_world;
@@ -221,6 +229,7 @@ private:
 	HashMap<GMString, AutoReleasePtr<IAudioSource>, GMStringHashFunctor> m_audioSources;
 	HashMap<GMString, AutoReleasePtr<IParticleSystem>, GMStringHashFunctor> m_particleSystems;
 	HashMap<GMString, GMShadowSourceDesc, GMStringHashFunctor> m_shadows;
+	HashMap<GMString, GMString, GMStringHashFunctor> m_defines;
 	std::multiset<Action> m_immediateActions;
 	std::multiset<Action> m_deferredActions;
 	std::multiset<Action>::iterator m_currentAction;
@@ -233,6 +242,23 @@ private:
 	GMDuration m_checkpointTime;
 	IAudioReader* m_audioReader;
 	IAudioPlayer* m_audioPlayer;
+};
+
+class Scanner
+{
+public:
+	explicit Scanner(const GMString& line, Timeline& timeline);
+
+public:
+	bool nextInt(REF GMint32& value);
+	bool nextFloat(REF GMfloat& value);
+
+private:
+	void getValueFromDefines(GMString& id);
+
+private:
+	Timeline& m_timeline;
+	GMScanner m_scanner;
 };
 
 #endif

@@ -24,7 +24,7 @@
             translate="0 0 0"
         />
 
-        <shadow id="shadow_deathstroke" cascades="1" position="75 100 -150" focus="0 0 -50" width="1024" height="768" view="perspective" fovy="45" near=".1f" far="1600" bias="0.00000825"/>
+        <shadow id="shadow_deathstroke" cascades="1" position="75 100 -150" focus="0 0 -50" width="$screen_width" height="$screen_height" view="perspective" fovy="45" near=".1f" far="1600" bias="0.00000825"/>
         <object id="obj_deathstroke" asset="model_deathstroke" scale="8 8 8" rotate="0 1 0 180"/>
     </objects>
     <actions>

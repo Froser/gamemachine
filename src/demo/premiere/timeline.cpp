@@ -210,6 +210,19 @@ void Timeline::play()
 	m_playing = true;
 }
 
+void Timeline::getValueFromDefines(GMString& id)
+{
+	if (id.startsWith("$"))
+	{
+		GMString key = id.substr(1, id.length() - 1);
+		auto replacementIter = m_defines.find(key);
+		if (replacementIter != m_defines.end())
+		{
+			id = replacementIter->second;
+		}
+	}
+}
+
 void Timeline::pause()
 {
 	m_playing = false;
@@ -227,7 +240,11 @@ void Timeline::parseElements(GMXMLElement* e)
 	while (e)
 	{
 		GMString name = e->Name();
-		if (name == L"assets")
+		if (name == L"defines")
+		{
+			parseDefines(e->FirstChildElement());
+		}
+		else if (name == L"assets")
 		{
 			parseAssets(e->FirstChildElement());
 		}
@@ -240,6 +257,17 @@ void Timeline::parseElements(GMXMLElement* e)
 			parseActions(e->FirstChildElement());
 		}
 
+		e = e->NextSiblingElement();
+	}
+}
+
+void Timeline::parseDefines(GMXMLElement* e)
+{
+	while (e)
+	{
+		auto result = m_defines.insert(std::make_pair(e->Name(), e->GetText()));
+		if (!result.second)
+			gm_warning(gm_dbg_wrap("The define name '{0}' has been already taken."), e->Name());
 		e = e->NextSiblingElement();
 	}
 }
@@ -417,7 +445,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 			GMString posStr = e->Attribute("position");
 			if (!posStr.isEmpty())
 			{
-				GMScanner scanner(posStr);
+				Scanner scanner(posStr, *this);
 				GMfloat x, y, z;
 				scanner.nextFloat(x);
 				scanner.nextFloat(y);
@@ -429,7 +457,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 			GMString ambientStr = e->Attribute("ambient");
 			if (!ambientStr.isEmpty())
 			{
-				GMScanner scanner(ambientStr);
+				Scanner scanner(ambientStr, *this);
 				GMfloat x, y, z;
 				scanner.nextFloat(x);
 				scanner.nextFloat(y);
@@ -441,7 +469,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 			GMString diffuseStr = e->Attribute("diffuse");
 			if (!diffuseStr.isEmpty())
 			{
-				GMScanner scanner(diffuseStr);
+				Scanner scanner(diffuseStr, *this);
 				GMfloat x, y, z;
 				scanner.nextFloat(x);
 				scanner.nextFloat(y);
@@ -454,7 +482,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 			if (!specularStr.isEmpty())
 			{
 				GMfloat specular = 0;
-				GMScanner scanner(specularStr);
+				Scanner scanner(specularStr, *this);
 				scanner.nextFloat(specular);
 				bool bSuc = light->setLightAttribute(GMLight::SpecularIntensity, specular);
 				GM_ASSERT(bSuc);
@@ -464,7 +492,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 			if (!cutOffStr.isEmpty())
 			{
 				GMfloat cutOff = 0;
-				GMScanner scanner(cutOffStr);
+				Scanner scanner(cutOffStr, *this);
 				scanner.nextFloat(cutOff);
 				bool bSuc = light->setLightAttribute(GMLight::CutOff, cutOff);
 				GM_ASSERT(bSuc);
@@ -513,8 +541,8 @@ void Timeline::parseObjects(GMXMLElement* e)
 			GMString lengthStr = e->Attribute("length");
 			GMString widthStr = e->Attribute("width");
 			GMfloat length = 0, width = 0;
-			length = GMString::parseFloat(lengthStr);
-			width = GMString::parseFloat(widthStr);
+			length = parseFloat(lengthStr);
+			width = parseFloat(widthStr);
 			
 			GMSceneAsset scene;
 			GMPrimitiveCreator::createQuadrangle(GMVec2(length / 2, width / 2), 0, scene);
@@ -558,16 +586,16 @@ void Timeline::parseObjects(GMXMLElement* e)
 			GMint32 sliceX = 10, sliceY = 10;
 			GMfloat texLen = 10, texHeight = 10;
 
-			terrainX = GMString::parseFloat(e->Attribute("terrainX"));
-			terrainZ = GMString::parseFloat(e->Attribute("terrainZ"));
-			width = GMString::parseFloat(e->Attribute("width"));
-			height = GMString::parseFloat(e->Attribute("height"));
-			heightScaling = GMString::parseFloat(e->Attribute("heightScaling"));
+			terrainX = parseFloat(e->Attribute("terrainX"));
+			terrainZ = parseFloat(e->Attribute("terrainZ"));
+			width = parseFloat(e->Attribute("width"));
+			height = parseFloat(e->Attribute("height"));
+			heightScaling = parseFloat(e->Attribute("heightScaling"));
 
 			GMString sliceStr = e->Attribute("slice");
 			if (!sliceStr.isEmpty())
 			{
-				GMScanner scanner(sliceStr);
+				Scanner scanner(sliceStr, *this);
 				scanner.nextInt(sliceX);
 				scanner.nextInt(sliceY);
 			}
@@ -575,7 +603,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 			GMString texSizeStr = e->Attribute("textureSize");
 			if (!texSizeStr.isEmpty())
 			{
-				GMScanner scanner(texSizeStr);
+				Scanner scanner(texSizeStr, *this);
 				scanner.nextFloat(texLen);
 				scanner.nextFloat(texHeight);
 			}
@@ -641,26 +669,26 @@ void Timeline::parseObjects(GMXMLElement* e)
 			{
 				GMString str = e->Attribute("width");
 				if (!str.isEmpty())
-					width = GMString::parseFloat(str);
+					width = parseFloat(str);
 			}
 			{
 				GMString str = e->Attribute("height");
 				if (!str.isEmpty())
-					height = GMString::parseFloat(str);
+					height = parseFloat(str);
 			}
 
 			GMfloat cascades = 1;
 			{
 				GMString str = e->Attribute("cascades");
 				if (!str.isEmpty())
-					cascades = GMString::parseFloat(str);
+					cascades = parseFloat(str);
 			}
 
 			GMfloat bias = .005f;
 			{
 				GMString str = e->Attribute("bias");
 				if (!str.isEmpty())
-					bias = GMString::parseFloat(str);
+					bias = parseFloat(str);
 			}
 
 			Vector<GMfloat> partitions;
@@ -670,7 +698,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 				GMString str = e->Attribute("partitions");
 				if (!str.isEmpty())
 				{
-					GMScanner scanner(str);
+					Scanner scanner(str, *this);
 					for (GMint32 i = 0; i < cascades; ++i)
 					{
 						GMfloat p = 0;
@@ -759,7 +787,7 @@ void Timeline::interpolateCamera(GMXMLElement* e, GMfloat timePoint)
 	GMString str = e->Attribute("position");
 	if (!str.isEmpty())
 	{
-		GMScanner scanner(str);
+		Scanner scanner(str, *this);
 		GMfloat x, y, z;
 		scanner.nextFloat(x);
 		scanner.nextFloat(y);
@@ -771,7 +799,7 @@ void Timeline::interpolateCamera(GMXMLElement* e, GMfloat timePoint)
 	str = e->Attribute("direction");
 	if (!str.isEmpty())
 	{
-		GMScanner scanner(str);
+		Scanner scanner(str, *this);
 		GMfloat x, y, z;
 		scanner.nextFloat(x);
 		scanner.nextFloat(y);
@@ -783,7 +811,7 @@ void Timeline::interpolateCamera(GMXMLElement* e, GMfloat timePoint)
 	str = e->Attribute("focus");
 	if (!str.isEmpty())
 	{
-		GMScanner scanner(str);
+		Scanner scanner(str, *this);
 		GMfloat x, y, z;
 		scanner.nextFloat(x);
 		scanner.nextFloat(y);
@@ -835,7 +863,7 @@ void Timeline::interpolateLight(GMXMLElement* e, ILight* light, GMfloat timePoin
 	GMString ambientStr = e->Attribute("ambient");
 	if (!ambientStr.isEmpty())
 	{
-		GMScanner scanner(ambientStr);
+		Scanner scanner(ambientStr, *this);
 		GMfloat x, y, z;
 		scanner.nextFloat(x);
 		scanner.nextFloat(y);
@@ -847,7 +875,7 @@ void Timeline::interpolateLight(GMXMLElement* e, ILight* light, GMfloat timePoin
 	GMString diffuseStr = e->Attribute("diffuse");
 	if (!diffuseStr.isEmpty())
 	{
-		GMScanner scanner(diffuseStr);
+		Scanner scanner(diffuseStr, *this);
 		GMfloat x, y, z;
 		scanner.nextFloat(x);
 		scanner.nextFloat(y);
@@ -859,7 +887,7 @@ void Timeline::interpolateLight(GMXMLElement* e, ILight* light, GMfloat timePoin
 	GMString specularStr = e->Attribute("specular");
 	if (!specularStr.isEmpty())
 	{
-		GMScanner scanner(specularStr);
+		Scanner scanner(specularStr, *this);
 		scanner.nextFloat(specular);
 		component |= GMLightKeyframeComponent::Specular;
 	}
@@ -867,7 +895,7 @@ void Timeline::interpolateLight(GMXMLElement* e, ILight* light, GMfloat timePoin
 	GMString cutOffStr = e->Attribute("cutoff");
 	if (!cutOffStr.isEmpty())
 	{
-		GMScanner scanner(specularStr);
+		Scanner scanner(specularStr, *this);
 		scanner.nextFloat(cutOff);
 		component |= GMLightKeyframeComponent::CutOff;
 	}
@@ -875,7 +903,7 @@ void Timeline::interpolateLight(GMXMLElement* e, ILight* light, GMfloat timePoin
 	GMString posStr = e->Attribute("position");
 	if (!posStr.isEmpty())
 	{
-		GMScanner scanner(posStr);
+		Scanner scanner(posStr, *this);
 		GMfloat x, y, z;
 		scanner.nextFloat(x);
 		scanner.nextFloat(y);
@@ -908,7 +936,7 @@ void Timeline::interpolateObject(GMXMLElement* e, GMGameObject* obj, GMfloat tim
 	GMString str = e->Attribute("translate");
 	if (!str.isEmpty())
 	{
-		GMScanner scanner(str);
+		Scanner scanner(str, *this);
 		GMfloat x, y, z;
 		scanner.nextFloat(x);
 		scanner.nextFloat(y);
@@ -920,7 +948,7 @@ void Timeline::interpolateObject(GMXMLElement* e, GMGameObject* obj, GMfloat tim
 	str = e->Attribute("scale");
 	if (!str.isEmpty())
 	{
-		GMScanner scanner(str);
+		Scanner scanner(str, *this);
 		GMfloat x, y, z;
 		scanner.nextFloat(x);
 		scanner.nextFloat(y);
@@ -933,7 +961,7 @@ void Timeline::interpolateObject(GMXMLElement* e, GMGameObject* obj, GMfloat tim
 	if (!str.isEmpty())
 	{
 		GMfloat x, y, z, degree;
-		GMScanner scanner(str);
+		Scanner scanner(str, *this);
 		scanner.nextFloat(x);
 		scanner.nextFloat(y);
 		scanner.nextFloat(z);
@@ -997,7 +1025,7 @@ void Timeline::parseActions(GMXMLElement* e)
 					// 相对时间
 					if (!time.isEmpty())
 					{
-						action.timePoint = m_lastTime + GMString::parseFloat(time);
+						action.timePoint = m_lastTime + parseFloat(time);
 						if (action.timePoint > m_lastTime)
 							m_lastTime = action.timePoint;
 					}
@@ -1009,7 +1037,7 @@ void Timeline::parseActions(GMXMLElement* e)
 				}
 				else
 				{
-					action.timePoint = GMString::parseFloat(time);
+					action.timePoint = parseFloat(time);
 					if (action.timePoint > m_lastTime)
 						m_lastTime = action.timePoint;
 				}
@@ -1113,7 +1141,7 @@ void Timeline::parseActions(GMXMLElement* e)
 					GMString endTimeStr = e->Attribute("endtime");
 					GMfloat endTime = 0;
 					bool ok = false;
-					endTime = GMString::parseFloat(endTimeStr, &ok);
+					endTime = parseFloat(endTimeStr, &ok);
 					if (ok)
 					{
 						action.timePoint = 0;
@@ -1238,7 +1266,7 @@ void Timeline::parseActions(GMXMLElement* e)
 				{
 					GMfloat time = 0;
 					bool ok = false;
-					time = GMString::parseFloat(timeStr, &ok);
+					time = parseFloat(timeStr, &ok);
 					if (ok)
 					{
 						m_lastTime += time;
@@ -1304,7 +1332,7 @@ GMint32 Timeline::parseCameraAction(GMXMLElement* e, CameraParams& cp, GMCameraL
 		if (fovyStr.isEmpty())
 			fovy = Radian(75.f);
 		else
-			fovy = Radian(GMString::parseFloat(fovyStr));
+			fovy = Radian(parseFloat(fovyStr));
 
 		aspectStr = e->Attribute("aspect");
 		if (aspectStr.isEmpty())
@@ -1321,13 +1349,13 @@ GMint32 Timeline::parseCameraAction(GMXMLElement* e, CameraParams& cp, GMCameraL
 		if (nStr.isEmpty())
 			n = .1f;
 		else
-			n = GMString::parseFloat(nStr);
+			n = parseFloat(nStr);
 
 		fStr = e->Attribute("far");
 		if (fStr.isEmpty())
 			f = 3200;
 		else
-			f = GMString::parseFloat(fStr);
+			f = parseFloat(fStr);
 
 		cp.fovy = fovy;
 		cp.aspect = aspect;
@@ -1339,12 +1367,12 @@ GMint32 Timeline::parseCameraAction(GMXMLElement* e, CameraParams& cp, GMCameraL
 	{
 		GMfloat left = 0, right = 0, top = 0, bottom = 0;
 		GMfloat n = 0, f = 0;
-		left = GMString::parseInt(e->Attribute("left"));
-		right = GMString::parseInt(e->Attribute("right"));
-		top = GMString::parseInt(e->Attribute("top"));
-		bottom = GMString::parseInt(e->Attribute("bottom"));
-		n = GMString::parseInt(e->Attribute("near"));
-		f = GMString::parseInt(e->Attribute("far"));
+		left = parseInt(e->Attribute("left"));
+		right = parseInt(e->Attribute("right"));
+		top = parseInt(e->Attribute("top"));
+		bottom = parseInt(e->Attribute("bottom"));
+		n = parseInt(e->Attribute("near"));
+		f = parseInt(e->Attribute("far"));
 		cp.left = left;
 		cp.right = right;
 		cp.top = top;
@@ -1367,7 +1395,7 @@ GMint32 Timeline::parseCameraAction(GMXMLElement* e, CameraParams& cp, GMCameraL
 	if (!posStr.isEmpty())
 	{
 		GMfloat x = 0, y = 0, z = 0;
-		GMScanner scanner(posStr);
+		Scanner scanner(posStr, *this);
 		scanner.nextFloat(x);
 		scanner.nextFloat(y);
 		scanner.nextFloat(z);
@@ -1377,7 +1405,7 @@ GMint32 Timeline::parseCameraAction(GMXMLElement* e, CameraParams& cp, GMCameraL
 	if (!dirStr.isEmpty())
 	{
 		GMfloat x = 0, y = 0, z = 0;
-		GMScanner scanner(dirStr);
+		Scanner scanner(dirStr, *this);
 		scanner.nextFloat(x);
 		scanner.nextFloat(y);
 		scanner.nextFloat(z);
@@ -1387,7 +1415,7 @@ GMint32 Timeline::parseCameraAction(GMXMLElement* e, CameraParams& cp, GMCameraL
 	if (!focusStr.isEmpty())
 	{
 		GMfloat x = 0, y = 0, z = 0;
-		GMScanner scanner(focusStr);
+		Scanner scanner(focusStr, *this);
 		scanner.nextFloat(x);
 		scanner.nextFloat(y);
 		scanner.nextFloat(z);
@@ -1474,7 +1502,7 @@ void Timeline::parseCocos2DParticleAttributes(IParticleSystem* ps, GMXMLElement*
 	if (!translateStr.isEmpty())
 	{
 		GMfloat x = 0, y = 0, z = 0;
-		GMScanner scanner(translateStr);
+		Scanner scanner(translateStr, *this);
 		scanner.nextFloat(x);
 		scanner.nextFloat(y);
 		scanner.nextFloat(z);
@@ -1519,7 +1547,7 @@ void Timeline::parseTransform(GMGameObject* o, GMXMLElement* e)
 	if (!str.isEmpty())
 	{
 		GMfloat x, y, z;
-		GMScanner scanner(str);
+		Scanner scanner(str, *this);
 		scanner.nextFloat(x);
 		scanner.nextFloat(y);
 		scanner.nextFloat(z);
@@ -1530,7 +1558,7 @@ void Timeline::parseTransform(GMGameObject* o, GMXMLElement* e)
 	if (!str.isEmpty())
 	{
 		GMfloat x, y, z;
-		GMScanner scanner(str);
+		Scanner scanner(str, *this);
 		scanner.nextFloat(x);
 		scanner.nextFloat(y);
 		scanner.nextFloat(z);
@@ -1541,7 +1569,7 @@ void Timeline::parseTransform(GMGameObject* o, GMXMLElement* e)
 	if (!str.isEmpty())
 	{
 		GMfloat x, y, z, degree;
-		GMScanner scanner(str);
+		Scanner scanner(str, *this);
 		scanner.nextFloat(x);
 		scanner.nextFloat(y);
 		scanner.nextFloat(z);
@@ -1610,7 +1638,7 @@ void Timeline::parseMaterial(GMGameObject* o, GMXMLElement* e)
 			GMString str = e->Attribute("ka");
 			if (!str.isEmpty())
 			{
-				GMScanner scanner(str);
+				Scanner scanner(str, *this);
 				scanner.nextFloat(x);
 				scanner.nextFloat(y);
 				scanner.nextFloat(z);
@@ -1622,7 +1650,7 @@ void Timeline::parseMaterial(GMGameObject* o, GMXMLElement* e)
 			GMString str = e->Attribute("kd");
 			if (!str.isEmpty())
 			{
-				GMScanner scanner(str);
+				Scanner scanner(str, *this);
 				scanner.nextFloat(x);
 				scanner.nextFloat(y);
 				scanner.nextFloat(z);
@@ -1634,7 +1662,7 @@ void Timeline::parseMaterial(GMGameObject* o, GMXMLElement* e)
 			GMString str = e->Attribute("ks");
 			if (!str.isEmpty())
 			{
-				GMScanner scanner(str);
+				Scanner scanner(str, *this);
 				scanner.nextFloat(x);
 				scanner.nextFloat(y);
 				scanner.nextFloat(z);
@@ -1646,7 +1674,7 @@ void Timeline::parseMaterial(GMGameObject* o, GMXMLElement* e)
 			GMString str = e->Attribute("shininess");
 			if (!str.isEmpty())
 			{
-				shader.getMaterial().setShininess(GMString::parseFloat(str));
+				shader.getMaterial().setShininess(parseFloat(str));
 			}
 		}
 	});
@@ -1670,7 +1698,7 @@ void Timeline::parseTextureTransform(GMShader& shader, GMXMLElement* e, const ch
 	GMString val = e->Attribute(type);
 	if (!val.isEmpty())
 	{
-		GMScanner scanner(val);
+		Scanner scanner(val, *this);
 		GMS_TextureTransform tt;
 		tt.type = transformType;
 		scanner.nextFloat(tt.p1);
@@ -1701,16 +1729,16 @@ void Timeline::parseWaveObjectAttributes(GMWaveGameObjectDescription& desc, GMXM
 
 	GMfloat texScaleLen = 2, texScaleHeight = 2;
 
-	terrainX = GMString::parseFloat(e->Attribute("terrainX"));
-	terrainZ = GMString::parseFloat(e->Attribute("terrainZ"));
-	terrainLength = GMString::parseFloat(e->Attribute("length"));
-	terrainWidth = GMString::parseFloat(e->Attribute("width"));
-	heightScaling = GMString::parseFloat(e->Attribute("heightScaling"));
+	terrainX = parseFloat(e->Attribute("terrainX"));
+	terrainZ = parseFloat(e->Attribute("terrainZ"));
+	terrainLength = parseFloat(e->Attribute("length"));
+	terrainWidth = parseFloat(e->Attribute("width"));
+	heightScaling = parseFloat(e->Attribute("heightScaling"));
 
 	GMString sliceStr = e->Attribute("slice");
 	if (!sliceStr.isEmpty())
 	{
-		GMScanner scanner(sliceStr);
+		Scanner scanner(sliceStr, *this);
 		scanner.nextInt(sliceX);
 		scanner.nextInt(sliceY);
 	}
@@ -1718,7 +1746,7 @@ void Timeline::parseWaveObjectAttributes(GMWaveGameObjectDescription& desc, GMXM
 	GMString texSizeStr = e->Attribute("textureSize");
 	if (!texSizeStr.isEmpty())
 	{
-		GMScanner scanner(texSizeStr);
+		Scanner scanner(texSizeStr, *this);
 		scanner.nextFloat(texLen);
 		scanner.nextFloat(texHeight);
 	}
@@ -1726,7 +1754,7 @@ void Timeline::parseWaveObjectAttributes(GMWaveGameObjectDescription& desc, GMXM
 	GMString texScaling = e->Attribute("textureScaling");
 	if (!texScaling.isEmpty())
 	{
-		GMScanner scanner(texScaling);
+		Scanner scanner(texScaling, *this);
 		scanner.nextFloat(texScaleLen);
 		scanner.nextFloat(texScaleHeight);
 	}
@@ -1754,16 +1782,16 @@ void Timeline::parseWaveAttributes(GMWaveDescription& desc, GMXMLElement* e)
 
 	GMString steepnessStr = e->Attribute("steepness");
 	if (!steepnessStr.isEmpty())
-		steepness = GMString::parseFloat(steepnessStr);
+		steepness = parseFloat(steepnessStr);
 
 	GMString amplitudeStr = e->Attribute("amplitude");
 	if (!amplitudeStr.isEmpty())
-		amplitude = GMString::parseFloat(amplitudeStr);
+		amplitude = parseFloat(amplitudeStr);
 
 	GMString directionStr = e->Attribute("direction");
 	if (!directionStr.isEmpty())
 	{
-		GMScanner scanner(directionStr);
+		Scanner scanner(directionStr, *this);
 		scanner.nextFloat(direction[0]);
 		scanner.nextFloat(direction[1]);
 		scanner.nextFloat(direction[2]);
@@ -1771,11 +1799,11 @@ void Timeline::parseWaveAttributes(GMWaveDescription& desc, GMXMLElement* e)
 
 	GMString speedStr = e->Attribute("speed");
 	if (!speedStr.isEmpty())
-		speed = GMString::parseFloat(speedStr);
+		speed = parseFloat(speedStr);
 
 	GMString waveLengthStr = e->Attribute("waveLength");
 	if (!waveLengthStr.isEmpty())
-		waveLength = GMString::parseFloat(waveLengthStr);
+		waveLength = parseFloat(waveLengthStr);
 
 	desc.steepness = steepness;
 	desc.amplitude = amplitude;
@@ -1846,7 +1874,7 @@ CurveType Timeline::parseCurve(GMXMLElement* e, GMInterpolationFunctors& f)
 		if (!controlStr.isEmpty())
 		{
 			GMfloat cpx0, cpy0, cpx1, cpy1;
-			GMScanner scanner(controlStr);
+			Scanner scanner(controlStr, *this);
 			scanner.nextFloat(cpx0);
 			scanner.nextFloat(cpy0);
 			scanner.nextFloat(cpx1);
@@ -1978,4 +2006,46 @@ void Timeline::play(GMGameObject* obj, const GMString& name)
 	}
 	obj->reset(true);
 	obj->play();
+}
+
+GMint32 Timeline::parseInt(const GMString& str, bool* ok)
+{
+	GMString temp = str;
+	getValueFromDefines(temp);
+	return GMString::parseInt(temp, ok);
+}
+
+GMfloat Timeline::parseFloat(const GMString& str, bool* ok)
+{
+	GMString temp = str;
+	getValueFromDefines(temp);
+	return GMString::parseFloat(temp, ok);
+}
+
+Scanner::Scanner(const GMString& line, Timeline& timeline)
+	: m_timeline(timeline)
+	, m_scanner(line)
+{
+}
+
+bool Scanner::nextInt(REF GMint32& value)
+{
+	GMString str;
+	m_scanner.next(str);
+	if (str.isEmpty())
+		return false;
+
+	value = m_timeline.parseFloat(str);
+	return true;
+}
+
+bool Scanner::nextFloat(REF GMfloat& value)
+{
+	GMString str;
+	m_scanner.next(str);
+	if (str.isEmpty())
+		return false;
+
+	value = m_timeline.parseFloat(str);
+	return true;
 }

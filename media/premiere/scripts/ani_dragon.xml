@@ -13,7 +13,7 @@
     </assets>
     <objects>
         <light id="light_dragon_global" type="point" position="20 20 -20" ambient="0 0 0" diffuse="0 0 0" />
-        <shadow id="shadow_dragon" cascades="1" position="30 30 -30" focus="0 0 0" width="1024" height="768" view="perspective" fovy="45" near=".1f" far="1600" bias="0.000125" time="+0"/>
+        <shadow id="shadow_dragon" cascades="1" position="30 30 -30" focus="0 0 0" width="$screen_width" height="$screen_height" view="perspective" fovy="45" near=".1f" far="1600" bias="0.000125" time="+0"/>
         <cubemap id="obj_sky" asset="tex_sky" scale="1500 1500 1500" translate="0 10 0" />
     </objects>
     <actions>

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <timeline version="1.0">
+    <defines>
+        <screen_width>1024</screen_width>
+        <screen_height>768</screen_height>
+    </defines>
     <assets>
         <audio id="audio_bgm" file="Thomas Greenberg - Curly Wurly.mp3" />
         <texture id="tex_mud_diffuse" file="mud/albedo.jpg" />
