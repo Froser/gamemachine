@@ -637,6 +637,12 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	*/
 	virtual IFramebuffers* getDefaultFramebuffers() = 0;
 
+	//! 开始绘制。
+	/*!
+	  在准备绘制一组对象时，调用此方法。
+	*/
+	virtual void begin() = 0;
+
 	//! 使用正向绘制对象。
 	/*!
 	  渲染引擎将先绘制延迟渲染对象，然后再绘制正向渲染对象。
@@ -644,6 +650,12 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	  \param deferredRenderingObjects 延迟渲染对象列表。
 	*/
 	virtual void draw(const GMGameObjectContainer& forwardRenderingObjects, const GMGameObjectContainer& deferredRenderingObjects) = 0;
+
+	//! 结束绘制。
+	/*!
+	  在结束绘制一组对象时，调用此方法。
+	*/
+	virtual void end() = 0;
 
 	//! 更新绘制数据。
 	/*!

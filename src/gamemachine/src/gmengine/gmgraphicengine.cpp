@@ -176,10 +176,29 @@ IFramebuffers* GMGraphicEngine::getFilterFramebuffers()
 	return d->filterFramebuffers;
 }
 
+void GMGraphicEngine::begin()
+{
+	D(d);
+	d->begun = true;
+
+	// 是否使用滤镜
+	bool useFilterFramebuffer = needUseFilterFramebuffer();
+	if (useFilterFramebuffer)
+	{
+		createFilterFramebuffer();
+		clearFilterFramebuffer();
+	}
+}
+
 void GMGraphicEngine::draw(const GMGameObjectContainer& forwardRenderingObjects, const GMGameObjectContainer& deferredRenderingObjects)
 {
 	GM_PROFILE(this, "draw");
 	D(d);
+	if (!d->begun)
+	{
+		gm_warning(gm_dbg_wrap("You should call IGraphicEngine::begin before call IGraphicEngine::draw."));
+	}
+
 	// 如果绘制阴影，先生成阴影缓存
 	if (d->shadow.type != GMShadowSourceDesc::NoShadow)
 	{
@@ -187,27 +206,20 @@ void GMGraphicEngine::draw(const GMGameObjectContainer& forwardRenderingObjects,
 		d->lastShadow = d->shadow;
 	}
 
-	// 是否使用滤镜
-	bool useFilterFramebuffer = needUseFilterFramebuffer();
-	if (useFilterFramebuffer)
-	{
-		createFilterFramebuffer();
-		getFilterFramebuffers()->clear();
-	}
-
 	// 绘制需要延迟渲染的对象
+	bool useFilterFramebuffer = needUseFilterFramebuffer();
 	if (!deferredRenderingObjects.empty())
 	{
 		IGBuffer* gBuffer = getGBuffer();
 		gBuffer->geometryPass(deferredRenderingObjects);
 
 		if (useFilterFramebuffer)
-			bindFilterFramebufferAndClear();
+			bindFilterFramebuffer();
 
 		gBuffer->lightPass();
 		if (useFilterFramebuffer)
 		{
-			unbindFilterFramebufferAndDraw();
+			unbindFilterFramebuffer();
 			gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(getFilterFramebuffers());
 		}
 		else
@@ -220,12 +232,12 @@ void GMGraphicEngine::draw(const GMGameObjectContainer& forwardRenderingObjects,
 	if (!forwardRenderingObjects.empty())
 	{
 		if (useFilterFramebuffer)
-			bindFilterFramebufferAndClear();
+			bindFilterFramebuffer();
 
 		draw(forwardRenderingObjects);
 
 		if (useFilterFramebuffer)
-			unbindFilterFramebufferAndDraw();
+			unbindFilterFramebuffer();
 	}
 }
 
@@ -236,6 +248,16 @@ void GMGraphicEngine::draw(const GMGameObjectContainer& objects)
 	{
 		object->draw();
 	}
+}
+
+void GMGraphicEngine::end()
+{
+	D(d);
+	d->begun = false;
+
+	bool useFilterFramebuffer = needUseFilterFramebuffer();
+	if (useFilterFramebuffer)
+		drawFilterFramebuffer();
 }
 
 const GMFilterMode::Mode GMGraphicEngine::getCurrentFilterMode()
@@ -454,19 +476,29 @@ bool GMGraphicEngine::needUseFilterFramebuffer()
 	return (filterMode != GMFilterMode::None || needHDR());
 }
 
-void GMGraphicEngine::bindFilterFramebufferAndClear()
+void GMGraphicEngine::bindFilterFramebuffer()
 {
 	IFramebuffers* filterFramebuffers = getFilterFramebuffers();
 	GM_ASSERT(filterFramebuffers);
 	filterFramebuffers->bind();
+}
+
+void GMGraphicEngine::clearFilterFramebuffer()
+{
+	IFramebuffers* filterFramebuffers = getFilterFramebuffers();
+	GM_ASSERT(filterFramebuffers);
 	filterFramebuffers->clear();
 }
 
-void GMGraphicEngine::unbindFilterFramebufferAndDraw()
+void GMGraphicEngine::unbindFilterFramebuffer()
 {
 	IFramebuffers* filterFramebuffers = getFilterFramebuffers();
 	GM_ASSERT(filterFramebuffers);
 	filterFramebuffers->unbind();
+}
+
+void GMGraphicEngine::drawFilterFramebuffer()
+{
 	getFilterQuad()->draw();
 }
 

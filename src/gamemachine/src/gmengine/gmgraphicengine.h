@@ -226,6 +226,7 @@ public:
 GM_PRIVATE_OBJECT(GMGraphicEngine)
 {
 	GMThreadId mtid = 0;
+	bool begun = false;
 	const IRenderContext* context = nullptr;
 	GMCamera camera;
 	GMGlyphManager* glyphManager = nullptr;
@@ -264,7 +265,9 @@ public:
 	virtual void init() override;
 	virtual IGBuffer* getGBuffer() override;
 	virtual IFramebuffers* getFilterFramebuffers() override;
+	virtual void begin() override;
 	virtual void draw(const GMGameObjectContainer& forwardRenderingObjects, const GMGameObjectContainer& deferredRenderingObjects) override;
+	virtual void end() override;
 	virtual GMLightIndex addLight(AUTORELEASE ILight* light) override;
 	virtual ILight* getLight(GMLightIndex index) override;
 	virtual bool removeLight(GMLightIndex index) override;
@@ -301,8 +304,12 @@ protected:
 	virtual void createFilterFramebuffer();
 	virtual void generateShadowBuffer(const GMGameObjectContainer& forwardRenderingObjects, const GMGameObjectContainer& deferredRenderingObjects);
 	virtual bool needUseFilterFramebuffer();
-	virtual void bindFilterFramebufferAndClear();
-	virtual void unbindFilterFramebufferAndDraw();
+
+protected:
+	void bindFilterFramebuffer();
+	void clearFilterFramebuffer();
+	void unbindFilterFramebuffer();
+	void drawFilterFramebuffer();
 
 public:
 	const GMFilterMode::Mode getCurrentFilterMode();

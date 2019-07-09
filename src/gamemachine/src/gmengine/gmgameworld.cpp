@@ -57,8 +57,10 @@ void GMGameWorld::renderScene()
 	D(d);
 	static GMGameObjectContainer s_emptyList;
 	IGraphicEngine* engine = d->context->getEngine();
+	engine->begin();
 	if (d->particleSystemMgr)
 		d->particleSystemMgr->render();
+
 	if (getRenderPreference() == GMRenderPreference::PreferForwardRendering)
 	{
 		engine->draw(d->renderList.deferred, s_emptyList);
@@ -68,6 +70,7 @@ void GMGameWorld::renderScene()
 	{
 		engine->draw(d->renderList.forward, d->renderList.deferred);
 	}
+	engine->end();
 }
 
 bool GMGameWorld::removeObject(GMGameObject* obj)
