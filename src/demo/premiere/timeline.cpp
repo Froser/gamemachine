@@ -57,8 +57,49 @@ struct CameraParams
 	GMfloat n, f;
 };
 
+template<class T>
+struct Nullable
+{
+	T value;
+	bool isNull;
+
+	Nullable() : isNull(true) {}
+	Nullable(const T& val) : value(val), isNull(false) {}
+	Nullable& operator=(T&& val) { isNull = false; value = std::forward<T>(val); return *this; }
+	operator T&() { return value; }
+	operator const T&() const { return value; }
+};
+
 namespace
 {
+	template <typename First>
+	bool isAny(First first)
+	{
+		return !!first;
+	}
+
+	template <typename First, typename... Others>
+	bool isAny(First first, Others... other)
+	{
+		return !!first || isAny(other...);
+	}
+
+	template <typename P, typename First, typename... Others>
+	void callEvery_1(P&& param, First first)
+	{
+		if (first)
+			first(std::forward<P>(param));
+	}
+
+	template <typename P, typename First, typename... Others>
+	void callEvery_1(P&& param, First first, Others... other)
+	{
+		if (first)
+			first(std::forward<P>(param));
+
+		callEvery_1(std::forward<P>(param), other...);
+	}
+
 	template <AssetType Type, typename Container>
 	bool getAssetAndType(Container& container, const GMString& objectName, REF AssetType& result, OUT void** out)
 	{
@@ -86,6 +127,34 @@ namespace
 
 		gm_warning(gm_dbg_wrap("Unrecognized boolean string '{0}', treat as false."), str);
 		return false;
+	}
+
+	GMS_BlendFunc toBlendFunc(const GMString& str)
+	{
+		GMS_BlendFunc result = GMS_BlendFunc::One;
+		if (str == L"Zero")
+			result = GMS_BlendFunc::Zero;
+		else if (str == L"One")
+			result = GMS_BlendFunc::One;
+		else if (str == L"SourceColor")
+			result = GMS_BlendFunc::SourceColor;
+		else if (str == L"DestColor")
+			result = GMS_BlendFunc::DestColor;
+		else if (str == L"SourceAlpha")
+			result = GMS_BlendFunc::SourceAlpha;
+		else if (str == L"DestAlpha")
+			result = GMS_BlendFunc::DestAlpha;
+		else if (str == L"OneMinusSourceAlpha")
+			result = GMS_BlendFunc::OneMinusSourceAlpha;
+		else if (str == L"OneMinusDestAlpha")
+			result = GMS_BlendFunc::OneMinusDestAlpha;
+		else if (str == L"OneMinusSourceColor")
+			result = GMS_BlendFunc::OneMinusSourceColor;
+		else if (str == L"OneMinusDestColor")
+			result = GMS_BlendFunc::OneMinusDestColor;
+		else
+			gm_warning(gm_dbg_wrap("Unrecognized blend function string '{0}', treat as One."), str);
+		return result;
 	}
 }
 
@@ -535,6 +604,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 			parseTextures(obj, e);
 			parseMaterial(obj, e);
 			parseTransform(obj, e);
+			parseBlend(obj, e);
 		}
 		else if (name == L"quad")
 		{
@@ -552,9 +622,19 @@ void Timeline::parseObjects(GMXMLElement* e)
 			obj->getModel()->getShader().setCull(GMS_Cull::None);
 			m_objects[id] = AutoReleasePtr<GMGameObject>(obj);
 
+			GMString type = e->Attribute("type");
+			if (!type.isEmpty())
+			{
+				if (type == "2d")
+					obj->getModel()->setType(GMModelType::Model2D);
+				else
+					gm_warning(gm_dbg_wrap("Cannot recognize type '{0}' of object '{1}"), type, id);
+			}
+
 			parseTextures(obj, e);
 			parseMaterial(obj, e);
 			parseTransform(obj, e);
+			parseBlend(obj, e);
 		}
 		else if (name == L"wave")
 		{
@@ -577,6 +657,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 			parseTextures(obj, e);
 			parseMaterial(obj, e);
 			parseTransform(obj, e);
+			parseBlend(obj, e);
 		}
 		else if (name == L"terrain")
 		{
@@ -661,6 +742,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 			parseTextures(obj, e);
 			parseMaterial(obj, e);
 			parseTransform(obj, e);
+			parseBlend(obj, e);
 		}
 		else if (name == L"shadow")
 		{
@@ -1615,42 +1697,31 @@ void Timeline::parseTextures(GMGameObject* o, GMXMLElement* e)
 	if (!o)
 		return;
 
+	ShaderCallback cbAmbient = parseTexture(e, "ambient", GMTextureType::Ambient);
+	ShaderCallback cbDiffuse = parseTexture(e, "diffuse", GMTextureType::Diffuse);
+	ShaderCallback cbNormal = parseTexture(e, "normal", GMTextureType::NormalMap);
+	ShaderCallback cbSpecular = parseTexture(e, "specular", GMTextureType::Specular);
+
+	ShaderCallback cbAmbientSpeed = parseTextureTransform(e, "ambientTranslateSpeed", GMTextureType::Ambient, GMS_TextureTransformType::Scroll);
+	ShaderCallback cbDiffuseSpeed = parseTextureTransform(e, "diffuseTranslateSpeed", GMTextureType::Diffuse, GMS_TextureTransformType::Scroll);
+	ShaderCallback cbNormalSpeed = parseTextureTransform(e, "normalTranslateSpeed", GMTextureType::NormalMap, GMS_TextureTransformType::Scroll);
+	ShaderCallback cbSpecularSpeed = parseTextureTransform(e, "specularTranslateSpeed", GMTextureType::Specular, GMS_TextureTransformType::Scroll);
+	ShaderCallback cbPbr = parseTexturePBR(e);
+
 	GMString id = e->Attribute("id");
-	o->foreachModel([this, e](GMModel* model)
+	if (isAny(cbAmbient, cbDiffuse, cbNormal, cbSpecular, cbAmbientSpeed, cbDiffuseSpeed, cbNormalSpeed, cbSpecularSpeed, cbPbr))
 	{
-		if (!model)
-			return;
-
-		GMShader& shader = model->getShader();
-		parseTexture(shader, e, "ambient", GMTextureType::Ambient);
-		parseTexture(shader, e, "diffuse", GMTextureType::Diffuse);
-		parseTexture(shader, e, "normal", GMTextureType::NormalMap);
-		parseTexture(shader, e, "specular", GMTextureType::Specular);
-
+		o->foreachModel([this, e, cbAmbient, cbDiffuse, cbNormal, cbSpecular, cbAmbientSpeed, cbDiffuseSpeed, cbNormalSpeed, cbSpecularSpeed, cbPbr](GMModel* model)
 		{
-			GMString pbrStr = e->Attribute("pbr");
-			if (!pbrStr.isEmpty())
-			{
-				const PBR* pbr = findPBR(pbrStr);
-				if (pbr)
-				{
-					shader.setIlluminationModel(gm::GMIlluminationModel::CookTorranceBRDF);
-					gm::GMToolUtil::addTextureToShader(shader, pbr->albedo, gm::GMTextureType::Albedo);
-					gm::GMToolUtil::addTextureToShader(shader, pbr->normal, gm::GMTextureType::NormalMap);
-					gm::GMToolUtil::addTextureToShader(shader, pbr->metallicRoughnessAO, gm::GMTextureType::MetallicRoughnessAO);
-				}
-				else
-				{
-					gm_warning(gm_dbg_wrap("Cannot find pbr assets: {0}"), pbrStr);
-				}
-			}
-		}
+			if (!model)
+				return;
 
-		parseTextureTransform(shader, e, "ambientTranslateSpeed", GMTextureType::Ambient, GMS_TextureTransformType::Scroll);
-		parseTextureTransform(shader, e, "diffuseTranslateSpeed", GMTextureType::Diffuse, GMS_TextureTransformType::Scroll);
-		parseTextureTransform(shader, e, "normalTranslateSpeed", GMTextureType::NormalMap, GMS_TextureTransformType::Scroll);
-		parseTextureTransform(shader, e, "specularTranslateSpeed", GMTextureType::Specular, GMS_TextureTransformType::Scroll);
-	});
+			GMShader& shader = model->getShader();
+			callEvery_1(shader, cbAmbient, cbDiffuse, cbNormal, cbSpecular);
+			callEvery_1(shader, cbAmbientSpeed, cbDiffuseSpeed, cbNormalSpeed, cbSpecularSpeed);
+			callEvery_1(shader, cbPbr);
+		});
+	}
 }
 
 void Timeline::parseMaterial(GMGameObject* o, GMXMLElement* e)
@@ -1658,81 +1729,169 @@ void Timeline::parseMaterial(GMGameObject* o, GMXMLElement* e)
 	if (!o)
 		return;
 
-	o->foreachModel([this, e](GMModel* model) {
+	ShaderCallback cbMaterial = parseMaterial(e);
+
+	o->foreachModel([this, e, cbMaterial](GMModel* model) {
 		GMShader& shader = model->getShader();
-		GMfloat x = 0, y = 0, z = 0;
-
-		{
-			GMString str = e->Attribute("ka");
-			if (!str.isEmpty())
-			{
-				Scanner scanner(str, *this);
-				scanner.nextFloat(x);
-				scanner.nextFloat(y);
-				scanner.nextFloat(z);
-				shader.getMaterial().setAmbient(GMVec3(x, y, z));
-			}
-		}
-
-		{
-			GMString str = e->Attribute("kd");
-			if (!str.isEmpty())
-			{
-				Scanner scanner(str, *this);
-				scanner.nextFloat(x);
-				scanner.nextFloat(y);
-				scanner.nextFloat(z);
-				shader.getMaterial().setDiffuse(GMVec3(x, y, z));
-			}
-		}
-
-		{
-			GMString str = e->Attribute("ks");
-			if (!str.isEmpty())
-			{
-				Scanner scanner(str, *this);
-				scanner.nextFloat(x);
-				scanner.nextFloat(y);
-				scanner.nextFloat(z);
-				shader.getMaterial().setSpecular(GMVec3(x, y, z));
-			}
-		}
-
-		{
-			GMString str = e->Attribute("shininess");
-			if (!str.isEmpty())
-			{
-				shader.getMaterial().setShininess(parseFloat(str));
-			}
-		}
+		callEvery_1(shader, cbMaterial);
 	});
 }
 
-void Timeline::parseTexture(GMShader& shader, GMXMLElement* e, const char* type, GMTextureType textureType)
+Timeline::ShaderCallback Timeline::parseMaterial(GMXMLElement* e)
+{
+	GMString kaStr = e->Attribute("ka");
+	GMString kdStr = e->Attribute("kd");
+	GMString ksStr = e->Attribute("ks");
+	GMString shininessStr = e->Attribute("shininess");
+
+	struct XYZ { GMfloat x, y, z; };
+	Nullable<XYZ> ka, ks, kd;
+	Nullable<GMfloat> shininess;
+	if (!kaStr.isEmpty())
+	{
+		XYZ xyz;
+		Scanner scanner(kaStr, *this);
+		scanner.nextFloat(xyz.x);
+		scanner.nextFloat(xyz.y);
+		scanner.nextFloat(xyz.z);
+		ka = xyz;
+	}
+
+	if (!kdStr.isEmpty())
+	{
+		XYZ xyz;
+		Scanner scanner(kdStr, *this);
+		scanner.nextFloat(xyz.x);
+		scanner.nextFloat(xyz.y);
+		scanner.nextFloat(xyz.z);
+		kd = xyz;
+	}
+
+	if (!ksStr.isEmpty())
+	{
+		XYZ xyz;
+		Scanner scanner(ksStr, *this);
+		scanner.nextFloat(xyz.x);
+		scanner.nextFloat(xyz.y);
+		scanner.nextFloat(xyz.z);
+		ks = xyz;
+	}
+
+	if (!shininessStr.isEmpty())
+		shininess = parseFloat(shininessStr);
+
+	if (isAny(!ka.isNull, !kd.isNull, !ks.isNull, !shininess.isNull))
+	{
+		ShaderCallback cb = [this, e, ka, kd, ks, shininess](GMShader& shader) {
+			if (!ka.isNull)
+				shader.getMaterial().setAmbient(GMVec3(ka.value.x, ka.value.y, ka.value.z));
+			if (!kd.isNull)
+				shader.getMaterial().setDiffuse(GMVec3(kd.value.x, kd.value.y, kd.value.z));
+			if (!ks.isNull)
+				shader.getMaterial().setSpecular(GMVec3(ks.value.x, ks.value.y, ks.value.z));
+			if (!shininess.isNull)
+				shader.getMaterial().setShininess(shininess.value);
+		};
+		return cb;
+	}
+	return ShaderCallback();
+}
+
+void Timeline::parseBlend(GMGameObject* o, GMXMLElement* e)
+{
+	if (!o)
+		return;
+
+	GMString blendStr = e->Attribute("blend");
+	Nullable<bool> blend;
+	if (!blendStr.isEmpty())
+		blend = toBool(blendStr);
+
+	Nullable<GMS_BlendFunc> source, dest;
+	GMString blendSrcStr = e->Attribute("source");
+	GMString blendDestStr = e->Attribute("dest");
+	if (!blendSrcStr.isEmpty())
+		source = toBlendFunc(blendSrcStr);
+	if (!blendDestStr.isEmpty())
+		dest = toBlendFunc(blendDestStr);
+
+	GMString id = e->Attribute("id");
+	if (!blend.isNull || !source.isNull || !dest.isNull)
+	{
+		o->foreachModel([=](GMModel* model)
+		{
+			GMShader& shader = model->getShader();
+			if (!blend.isNull)
+				shader.setBlend(blend);
+
+			if (!source.isNull)
+				shader.setBlendFactorSource(source);
+
+			if (!dest.isNull)
+				shader.setBlendFactorDest(dest);
+		});
+	}
+}
+
+Timeline::ShaderCallback Timeline::parseTexture(GMXMLElement* e, const char* type, GMTextureType textureType)
 {
 	GMString tex = e->Attribute(type);
 	if (!tex.isEmpty())
 	{
-		GMAsset asset = findAsset(tex);
-		if (!asset.isEmpty() && asset.isTexture())
-			GMToolUtil::addTextureToShader(shader, asset, textureType);
-		else
-			gm_warning(gm_dbg_wrap("Cannot find texture asset: {0}"), tex);
+		return [this, tex, textureType](GMShader& shader) {
+			GMAsset asset = findAsset(tex);
+			if (!asset.isEmpty() && asset.isTexture())
+			{
+				GMToolUtil::addTextureToShader(shader, asset, textureType);
+			}
+			else
+			{
+				gm_warning(gm_dbg_wrap("Cannot find texture asset: {0}"), tex);
+			}
+		};
 	}
+	return ShaderCallback();
 }
 
-void Timeline::parseTextureTransform(GMShader& shader, GMXMLElement* e, const char* type, GMTextureType textureType, GMS_TextureTransformType transformType)
+Timeline::ShaderCallback Timeline::parseTextureTransform(GMXMLElement* e, const char* type, GMTextureType textureType, GMS_TextureTransformType transformType)
 {
 	GMString val = e->Attribute(type);
 	if (!val.isEmpty())
 	{
-		Scanner scanner(val, *this);
-		GMS_TextureTransform tt;
-		tt.type = transformType;
-		scanner.nextFloat(tt.p1);
-		scanner.nextFloat(tt.p2);
-		shader.getTextureList().getTextureSampler(textureType).setTextureTransform(0, tt);
+		return [this, val, textureType, transformType](GMShader& shader) {
+			Scanner scanner(val, *this);
+			GMS_TextureTransform tt;
+			tt.type = transformType;
+			scanner.nextFloat(tt.p1);
+			scanner.nextFloat(tt.p2);
+			shader.getTextureList().getTextureSampler(textureType).setTextureTransform(0, tt);
+		};
 	}
+	return ShaderCallback();
+}
+
+Timeline::ShaderCallback Timeline::parseTexturePBR(GMXMLElement* e)
+{
+	GMString pbrStr = e->Attribute("pbr");
+	if (!pbrStr.isEmpty())
+	{
+		ShaderCallback cb = [this, e, pbrStr](GMShader& shader) {
+			const PBR* pbr = findPBR(pbrStr);
+			if (pbr)
+			{
+				shader.setIlluminationModel(gm::GMIlluminationModel::CookTorranceBRDF);
+				GMToolUtil::addTextureToShader(shader, pbr->albedo, gm::GMTextureType::Albedo);
+				GMToolUtil::addTextureToShader(shader, pbr->normal, gm::GMTextureType::NormalMap);
+				GMToolUtil::addTextureToShader(shader, pbr->metallicRoughnessAO, gm::GMTextureType::MetallicRoughnessAO);
+			}
+			else
+			{
+				gm_warning(gm_dbg_wrap("Cannot find pbr assets: {0}"), pbrStr);
+			}
+		};
+		return cb;
+	}
+	return ShaderCallback();
 }
 
 void Timeline::parseAttributes(GMGameObject* obj, GMXMLElement* e, Action& action)
@@ -2048,6 +2207,12 @@ GMfloat Timeline::parseFloat(const GMString& str, bool* ok)
 	GMString temp = str;
 	getValueFromDefines(temp);
 	return GMString::parseFloat(temp, ok);
+}
+
+void Timeline::call(ShaderCallback cb, GMShader& s)
+{
+	if (cb)
+		cb(s);
 }
 
 Scanner::Scanner(const GMString& line, Timeline& timeline)

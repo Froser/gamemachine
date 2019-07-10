@@ -1229,6 +1229,7 @@ void GMDx11Technique_CubeMap::prepareTextures(GMModel* model)
 GMDx11Technique_Filter::GMDx11Technique_Filter(const IRenderContext* context)
 	: GMDx11Technique(context)
 {
+	// 初始化
 	setHDR(getEngine()->getShaderProgram());
 }
 
@@ -1312,6 +1313,10 @@ void GMDx11Technique_Filter::beginModel(GMModel* model, const GMGameObject* pare
 		{
 			shaderProgram->setBool(VI_B(HDR.HDR), false);
 		}
+	}
+	else
+	{
+		shaderProgram->setBool(VI_B(HDR.HDR), false);
 	}
 }
 

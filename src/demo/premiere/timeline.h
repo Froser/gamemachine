@@ -155,6 +155,7 @@ class Scanner;
 class Timeline
 {
 	friend class Scanner;
+	using ShaderCallback = std::function<void(GMShader&)>;
 
 public:
 	Timeline(const IRenderContext* context, GMGameWorld* world);
@@ -192,8 +193,11 @@ private:
 	void parseTransform(GMGameObject*, GMXMLElement*);
 	void parseTextures(GMGameObject*, GMXMLElement*);
 	void parseMaterial(GMGameObject*, GMXMLElement*);
-	void parseTexture(GMShader&, GMXMLElement*, const char* type, GMTextureType textureType);
-	void parseTextureTransform(GMShader&, GMXMLElement*, const char* type, GMTextureType textureType, GMS_TextureTransformType transformType);
+	void parseBlend(GMGameObject*, GMXMLElement*);
+	ShaderCallback parseTexture(GMXMLElement*, const char* type, GMTextureType textureType);
+	ShaderCallback parseTextureTransform(GMXMLElement*, const char* type, GMTextureType textureType, GMS_TextureTransformType transformType);
+	ShaderCallback parseTexturePBR(GMXMLElement*);
+	ShaderCallback parseMaterial(GMXMLElement*);
 	void parseAttributes(GMGameObject*, GMXMLElement*, Action&);
 	void parseWaveObjectAttributes(GMWaveGameObjectDescription&, GMXMLElement*);
 	void parseWaveAttributes(GMWaveDescription&, GMXMLElement*);
@@ -216,6 +220,8 @@ private:
 	void getValueFromDefines(GMString& id);
 	GMint32 parseInt(const GMString& str, bool* ok = nullptr);
 	GMfloat parseFloat(const GMString& str, bool* ok = nullptr);
+
+	void call(ShaderCallback, GMShader&);
 
 private:
 	const IRenderContext* m_context;
