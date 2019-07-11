@@ -14,6 +14,7 @@ const int GM_Debug_Normal_WorldSpace = 1;
 const int GM_Debug_Normal_EyeSpace = 2;
 
 uniform int GM_ColorVertexOp = 0;
+const int GM_VertexColorOp_NoColor = 0;
 const int GM_VertexColorOp_Replace = 1;
 const int GM_VertexColorOp_Multiply = 2;
 const int GM_VertexColorOp_Add = 3;

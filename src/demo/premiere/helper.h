@@ -32,4 +32,26 @@ private:
 	Map<GMGameObject*, GMVec4, std::less<GMGameObject*>, AlignedAllocator<Pair<GMGameObject*, GMVec4>> > m_colorMap;
 };
 
+class GameObjectColorKeyframe : public GMAnimationKeyframe
+{
+
+public:
+	GameObjectColorKeyframe(Map<GMModel*, GMVertices>& cache, const Array<GMfloat, 4>& color, GMfloat timePoint);
+
+public:
+	virtual void reset(IDestroyObject* object) override;
+	virtual void beginFrame(IDestroyObject* object, GMfloat timeStart) override;
+	virtual void endFrame(IDestroyObject* object) override;
+	virtual void update(IDestroyObject* object, GMfloat time) override;
+
+private:
+	void update(GMModel*, const GMVertices&, const GMfloat color[4]);
+
+private:
+	Array<GMfloat, 4> m_color;
+	Map<GMModel*, GMVertices>& m_cache;
+	Map<GMModel*, Array<GMfloat, 4>> m_colorMap;
+	GMfloat m_timeStart;
+};
+
 #endif

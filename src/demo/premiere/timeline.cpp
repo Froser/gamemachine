@@ -9,6 +9,7 @@
 #include <gmgraphicengine.h>
 #include <gmparticle.h>
 #include <gmm.h>
+#include "helper.h"
 
 #define NoCameraComponent 0
 #define PositionComponent 0x01
@@ -631,6 +632,49 @@ void Timeline::parseObjects(GMXMLElement* e)
 					gm_warning(gm_dbg_wrap("Cannot recognize type '{0}' of object '{1}"), type, id);
 			}
 
+			GMString colorStr = e->Attribute("color");
+			if (!colorStr.isEmpty())
+			{
+				Scanner scanner(colorStr, *this);
+				Array<GMfloat, 4> color;
+				scanner.nextFloat(color[0]);
+				scanner.nextFloat(color[1]);
+				scanner.nextFloat(color[2]);
+				scanner.nextFloat(color[3]);
+
+				obj->foreachModel([this, color](GMModel* model) {
+					model->setUsageHint(GMUsageHint::DynamicDraw);
+
+					// 保存副本
+					GMVertices vertices;
+					vertices.reserve(model->getVerticesCount());
+					for (auto& part : model->getParts())
+					{
+						for (auto& vertex : part->vertices())
+						{
+							vertices.push_back(vertex);
+						}
+					}
+					m_verticesCache[model] = std::move(vertices);
+					setColorForModel(model, &color[0]);
+				});
+			}
+
+			GMString colorOpStr = e->Attribute("colorOp");
+			GMS_VertexColorOp op = GMS_VertexColorOp::DoNotUseVertexColor;
+			if (colorOpStr == "replace")
+				op = GMS_VertexColorOp::Replace;
+			else if (colorOpStr == "add")
+				op = GMS_VertexColorOp::Add;
+			else if (colorOpStr == "multiply")
+				op = GMS_VertexColorOp::Multiply;
+			if (op != GMS_VertexColorOp::DoNotUseVertexColor)
+			{
+				obj->foreachModel([op](GMModel* model) {
+					model->getShader().setVertexColorOp(op);
+				});
+			}
+
 			parseTextures(obj, e);
 			parseMaterial(obj, e);
 			parseTransform(obj, e);
@@ -1064,6 +1108,28 @@ void Timeline::interpolateObject(GMXMLElement* e, GMGameObject* obj, GMfloat tim
 		GMAnimation& animation = animationContainer.currentEditingAnimation();
 		animation.setTargetObjects(obj);
 		GMAnimationKeyframe* keyframe = new GMGameObjectKeyframe(component, translation, scaling, rotation, timePoint);
+		if (curve != CurveType::NoCurve)
+			keyframe->setFunctors(f);
+		animation.addKeyFrame(keyframe);
+	}
+
+	str = e->Attribute("color");
+	if (!str.isEmpty())
+	{
+		GMInterpolationFunctors f;
+		CurveType curve = parseCurve(e, f);
+		AnimationContainer& animationContainer = m_animations[GameObject][obj];
+		GMAnimation& animation = animationContainer.currentEditingAnimation();
+		animation.setTargetObjects(obj);
+
+		Scanner scanner(str, *this);
+		Array<float, 4> color;
+		scanner.nextFloat(color[0]);
+		scanner.nextFloat(color[1]);
+		scanner.nextFloat(color[2]);
+		scanner.nextFloat(color[3]);
+
+		GMAnimationKeyframe* keyframe = new GameObjectColorKeyframe(m_verticesCache, color, timePoint);
 		if (curve != CurveType::NoCurve)
 			keyframe->setFunctors(f);
 		animation.addKeyFrame(keyframe);
@@ -1899,10 +1965,36 @@ void Timeline::parseAttributes(GMGameObject* obj, GMXMLElement* e, Action& actio
 	GM_ASSERT(obj);
 	{
 		GMString value = e->Attribute("visible");
-		bool visible = toBool(value);
-		action.action = [obj, visible]() {
-			obj->setVisible(visible);
-		};
+		if (!value.isEmpty())
+		{
+			bool visible = toBool(value);
+			action.action = [action, obj, visible]() {
+				if (action.action)
+					action.action();
+				obj->setVisible(visible);
+			};
+		}
+	}
+
+	{
+		GMString value = e->Attribute("color");
+		if (!value.isEmpty())
+		{
+			Scanner scanner(value, *this);
+			Array<GMfloat, 4> color;
+			scanner.nextFloat(color[0]);
+			scanner.nextFloat(color[1]);
+			scanner.nextFloat(color[2]);
+			scanner.nextFloat(color[3]);
+
+			action.action = [this, action, obj, color]() {
+				obj->foreachModel([action, this, color, obj](GMModel* model) {
+					if (action.action)
+						action.action();
+					transferColorForModel(model, &color[0]);
+				});
+			};
+		}
 	}
 }
 
@@ -2052,6 +2144,45 @@ void Timeline::removeObject(GMGameObject* obj, GMXMLElement* e, Action& action)
 	};
 }
 
+void Timeline::setColorForModel(GMModel* model, const GMfloat color[4])
+{
+	GMParts& parts = model->getParts();
+	GMVertices tmp;
+	for (auto iter = parts.begin(); iter != parts.end(); ++iter)
+	{
+		GMPart* part = *iter;
+		part->swap(tmp);
+		for (GMVertex& v : tmp)
+		{
+			v.color = { color[0], color[1], color[2], color[3] };
+		}
+		part->swap(tmp);
+	}
+}
+
+void Timeline::transferColorForModel(GMModel* model, const GMfloat color[4])
+{
+	GMModelDataProxy* proxy = model->getModelDataProxy();
+	if (!proxy)
+	{
+		setColorForModel(model, color);
+	}
+	else
+	{
+		GMVertices& cache = m_verticesCache[model];
+		GM_ASSERT(model->getVerticesCount() == cache.size());
+
+		proxy->beginUpdateBuffer(GMModelBufferType::VertexBuffer);
+		for (GMsize_t i = 0; i < cache.size(); ++i)
+		{
+			cache[i].color = { color[0], color[1], color[2], color[3] };
+		}
+
+		memcpy_s(proxy->getBuffer(), sizeof(GMVertex) * model->getVerticesCount(), cache.data(), sizeof(GMVertex) * cache.size());
+		proxy->endUpdateBuffer();
+	}
+}
+
 CurveType Timeline::parseCurve(GMXMLElement* e, GMInterpolationFunctors& f)
 {
 	GMString function = e->Attribute("function");
@@ -2068,6 +2199,7 @@ CurveType Timeline::parseCurve(GMXMLElement* e, GMInterpolationFunctors& f)
 			scanner.nextFloat(cpy1);
 			f = GMInterpolationFunctors::getDefaultInterpolationFunctors();
 			f.vec3Functor = GMSharedPtr<IInterpolationVec3>(new GMCubicBezierFunctor<GMVec3>(GMVec2(cpx0, cpy0), GMVec2(cpx1, cpy1)));
+			f.vec4Functor = GMSharedPtr<IInterpolationVec4>(new GMCubicBezierFunctor<GMVec4>(GMVec2(cpx0, cpy0), GMVec2(cpx1, cpy1)));
 			return CurveType::CubicBezier;
 		}
 		else
@@ -2207,12 +2339,6 @@ GMfloat Timeline::parseFloat(const GMString& str, bool* ok)
 	GMString temp = str;
 	getValueFromDefines(temp);
 	return GMString::parseFloat(temp, ok);
-}
-
-void Timeline::call(ShaderCallback cb, GMShader& s)
-{
-	if (cb)
-		cb(s);
 }
 
 Scanner::Scanner(const GMString& line, Timeline& timeline)

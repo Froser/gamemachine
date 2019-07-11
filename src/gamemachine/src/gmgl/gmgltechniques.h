@@ -153,6 +153,7 @@ public:
 
 public:
 	virtual void beforeDraw(GMModel* model) override;
+	virtual void draw(GMModel* model) override;
 	virtual void initShadow() {}
 
 protected:

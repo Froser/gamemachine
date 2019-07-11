@@ -845,12 +845,21 @@ GMTextureAsset GMGLTechnique_3D::getWhiteTexture()
 //////////////////////////////////////////////////////////////////////////
 void GMGLTechnique_2D::beforeDraw(GMModel* model)
 {
-	D(d);
+	D_BASE(d, Base);
 	// 应用Shader
 	prepareShaderAttributes(model);
 
 	// 纹理
 	prepareTextures(model);
+}
+
+void GMGLTechnique_2D::draw(GMModel* model)
+{
+	D_BASE(d, Base);
+	if (d->engine->isDrawingShadow())
+		return; // 2d对象无阴影
+
+	Base::draw(model);
 }
 
 void GMGLTechnique_2D::prepareTextures(GMModel* model)

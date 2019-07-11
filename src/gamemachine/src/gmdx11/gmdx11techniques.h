@@ -149,7 +149,8 @@ protected:
 		return "GMTech_2D";
 	}
 
-	virtual void prepareTextures(GMModel* model);
+	virtual void prepareTextures(GMModel* model) override;
+	virtual void draw(GMModel* model) override;
 	virtual void initShadow() {}
 };
 

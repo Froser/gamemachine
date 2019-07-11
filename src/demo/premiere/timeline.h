@@ -179,14 +179,10 @@ private:
 	void parseParticlesAsset(GMXMLElement*);
 	void parseParticlesObject(GMXMLElement*);
 	void parseCocos2DParticleAttributes(IParticleSystem*, GMXMLElement*);
-
-private:
 	void interpolateCamera(GMXMLElement*, GMfloat);
 	void interpolateLight(GMXMLElement*, ILight*, GMfloat);
 	void interpolateObject(GMXMLElement*, GMGameObject*, GMfloat);
 	AnimationContainer& getAnimationFromObject(AssetType, void*);
-
-private:
 	GMAsset findAsset(const GMString& assetName);
 	const PBR* findPBR(const GMString& assetName);
 	GMBuffer findBuffer(const GMString& bufferName);
@@ -207,21 +203,18 @@ private:
 	void addObject(GMShadowSourceDesc*, GMXMLElement*, Action&);
 	void removeObject(ILight*, GMXMLElement*, Action&);
 	void removeObject(GMGameObject*, GMXMLElement*, Action&);
+	void setColorForModel(GMModel*, const GMfloat color[4]);
+	void transferColorForModel(GMModel*, const GMfloat color[4]);
 	CurveType parseCurve(GMXMLElement*, GMInterpolationFunctors&);
-
 	void bindAction(const Action& a);
 	void runImmediateActions();
 	void runActions();
-
 	AssetType getAssetType(const GMString& objectName, OUT void** out);
 	void playAudio(IAudioSource* source);
 	void play(GMGameObject*, const GMString&);
-
 	void getValueFromDefines(GMString& id);
 	GMint32 parseInt(const GMString& str, bool* ok = nullptr);
 	GMfloat parseFloat(const GMString& str, bool* ok = nullptr);
-
-	void call(ShaderCallback, GMShader&);
 
 private:
 	const IRenderContext* m_context;
@@ -236,6 +229,7 @@ private:
 	HashMap<GMString, AutoReleasePtr<IParticleSystem>, GMStringHashFunctor> m_particleSystems;
 	HashMap<GMString, GMShadowSourceDesc, GMStringHashFunctor> m_shadows;
 	HashMap<GMString, GMString, GMStringHashFunctor> m_defines;
+	Map<GMModel*, GMVertices> m_verticesCache;
 	std::multiset<Action> m_immediateActions;
 	std::multiset<Action> m_deferredActions;
 	std::multiset<Action>::iterator m_currentAction;

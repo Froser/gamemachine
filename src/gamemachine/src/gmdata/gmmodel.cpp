@@ -60,9 +60,9 @@ void GMModelDataProxy::prepareTangentSpace()
 void GMModelDataProxy::packVertices(Vector<GMVertex>& vertices)
 {
 	GMModel* model = getModel();
-	GMParts& meshes = model->getParts();
+	GMParts& parts = model->getParts();
 	GMuint32 offset = 0;
-	for (auto& part : meshes)
+	for (auto& part : parts)
 	{
 		for (auto& vertex : part->vertices())
 		{
@@ -74,9 +74,9 @@ void GMModelDataProxy::packVertices(Vector<GMVertex>& vertices)
 void GMModelDataProxy::packIndices(Vector<GMuint32>& indices)
 {
 	GMModel* model = getModel();
-	GMParts& meshes = model->getParts();
+	GMParts& parts = model->getParts();
 	GMuint32 offset = 0;
-	for (auto& part : meshes)
+	for (auto& part : parts)
 	{
 		for (GMuint32 index : part->indices())
 		{

@@ -46,6 +46,7 @@ static const int GM_Debug_Normal_EyeSpace = 2;
 // Color Op
 //--------------------------------------------------------------------------------------
 int GM_ColorVertexOp = 0;
+static const int GM_VertexColorOp_NoColor = 0;
 static const int GM_VertexColorOp_Replace = 1;
 static const int GM_VertexColorOp_Multiply = 2;
 static const int GM_VertexColorOp_Add = 3;
@@ -975,6 +976,9 @@ VS_OUTPUT VS_2D(VS_INPUT input)
 
 float4 PS_2D(PS_INPUT input) : SV_TARGET
 {
+    if (GM_ColorVertexOp == GM_VertexColorOp_Replace)
+        return input.Color;
+
     if (!GM_DiffuseTextureAttribute.Enabled && !GM_AmbientTextureAttribute.Enabled)
         return float4(0, 0, 0, 0);
 
@@ -982,10 +986,9 @@ float4 PS_2D(PS_INPUT input) : SV_TARGET
     color += GM_AmbientTextureAttribute.Sample(GM_AmbientTexture, GM_AmbientSampler, input.Texcoord);
     color += GM_DiffuseTextureAttribute.Sample(GM_DiffuseTexture, GM_DiffuseSampler, input.Texcoord);
 
-    if (GM_ColorVertexOp == GM_VertexColorOp_Replace)
-        return input.Color;
-
-    if (GM_ColorVertexOp == GM_VertexColorOp_Add)
+    if (GM_ColorVertexOp == GM_VertexColorOp_NoColor)
+        return color;
+    else if (GM_ColorVertexOp == GM_VertexColorOp_Add)
         return color + input.Color;
 
     return color * input.Color;

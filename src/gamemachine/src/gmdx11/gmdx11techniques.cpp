@@ -1192,6 +1192,9 @@ ID3DX11EffectTechnique* GMDx11Technique::getTechnique()
 void GMDx11Technique_2D::prepareTextures(GMModel* model)
 {
 	D(d);
+	if (d->engine->isDrawingShadow())
+		return; // 2d对象无阴影
+
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
 	{
 		GMTextureSampler& sampler = model->getShader().getTextureList().getTextureSampler(type);
@@ -1204,6 +1207,15 @@ void GMDx11Technique_2D::prepareTextures(GMModel* model)
 			texture.getTexture()->useTexture((GMint32)type);
 		}
 	}
+}
+
+void GMDx11Technique_2D::draw(GMModel* model)
+{
+	D(d);
+	if (d->engine->isDrawingShadow())
+		return; // 2d对象无阴影
+
+	GMDx11Technique::draw(model);
 }
 
 void GMDx11Technique_CubeMap::prepareTextures(GMModel* model)
