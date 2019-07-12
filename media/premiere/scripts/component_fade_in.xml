@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component version="1.0">
+    <actions>
+        <component file="component_filter.xml" >
+            <slot name="start">0</slot>
+            <slot name="end">1</slot>
+            <slot name="duration">@duration</slot>
+        </component>
+    </actions>
+</component>

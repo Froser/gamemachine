@@ -253,6 +253,28 @@ bool Timeline::parse(const GMString& timelineContent)
 	return false;
 }
 
+bool Timeline::parseComponent(const GMString& componentContent)
+{
+	GMXMLDocument doc;
+	std::string content = componentContent.toStdString();
+	if (GMXMLError::XML_SUCCESS == doc.Parse(content.c_str()))
+	{
+		auto root = doc.RootElement();
+		if (GMString::stringEquals(root->Name(), "component"))
+		{
+			auto firstElement = root->FirstChildElement();
+			parseElements(firstElement);
+			return true;
+		}
+	}
+	else
+	{
+		gm_warning(gm_dbg_wrap("Parse component file error: {0}, {1}, {2}"), GMString(doc.ErrorLineNum()), GMString(doc.ErrorName()), GMString(doc.ErrorStr()));
+	}
+	return false;
+}
+
+
 void Timeline::update(GMDuration dt)
 {
 	if (m_playing)
@@ -280,17 +302,31 @@ void Timeline::play()
 	m_playing = true;
 }
 
-void Timeline::getValueFromDefines(GMString& id)
+GMString Timeline::getValueFromDefines(GMString id)
 {
+	GMString sign;
+	if (id.startsWith("+") || id.startsWith("-"))
+	{
+		sign = id[0];
+		id = id.substr(1, id.length() - 1);
+	}
+
 	if (id.startsWith("$"))
 	{
 		GMString key = id.substr(1, id.length() - 1);
 		auto replacementIter = m_defines.find(key);
 		if (replacementIter != m_defines.end())
-		{
-			id = replacementIter->second;
-		}
+			return sign + replacementIter->second;
 	}
+	else if (id.startsWith("@"))
+	{
+		GMString key = id.substr(1, id.length() - 1);
+		GMString result;
+		if (m_slots.getSlotByName(key, result))
+			return sign + result;
+	}
+
+	return sign + id;
 }
 
 void Timeline::pause()
@@ -589,6 +625,9 @@ void Timeline::parseObjects(GMXMLElement* e)
 		}
 		else if (name == L"object")
 		{
+			if (objectExists(id))
+				return;
+
 			GMGameObject* obj = nullptr;
 			GMString assetName = e->Attribute("asset");
 			GMAsset asset = findAsset(assetName);
@@ -609,6 +648,9 @@ void Timeline::parseObjects(GMXMLElement* e)
 		}
 		else if (name == L"quad")
 		{
+			if (objectExists(id))
+				return;
+
 			GMString lengthStr = e->Attribute("length");
 			GMString widthStr = e->Attribute("width");
 			GMfloat length = 0, width = 0;
@@ -682,6 +724,9 @@ void Timeline::parseObjects(GMXMLElement* e)
 		}
 		else if (name == L"wave")
 		{
+			if (objectExists(id))
+				return;
+
 			GMWaveGameObjectDescription objDesc;
 			parseWaveObjectAttributes(objDesc, e);
 
@@ -705,6 +750,9 @@ void Timeline::parseObjects(GMXMLElement* e)
 		}
 		else if (name == L"terrain")
 		{
+			if (objectExists(id))
+				return;
+
 			GMfloat terrainX = 0, terrainZ = 0;
 			GMfloat width = 1, height = 1, heightScaling = 10.f;
 
@@ -1161,6 +1209,10 @@ void Timeline::parseActions(GMXMLElement* e)
 		{
 			parseInclude(e);
 		}
+		else if (name == L"component")
+		{
+			parseComponent(e);
+		}
 		else if (name == L"action")
 		{
 			Action action = { Action::Immediate };
@@ -1493,6 +1545,46 @@ void Timeline::parseInclude(GMXMLElement* e)
 		{
 			gm_warning(gm_dbg_wrap("File is empty with filename: {0}"), filename);
 		}
+	}
+}
+
+void Timeline::parseComponent(GMXMLElement* e)
+{
+	// component和include大体一致。只不过component的对象只会添加一次，并且可以接受槽作为参数。
+	GMString filename = e->Attribute("file");
+	if (filename.isEmpty())
+	{
+		gm_warning(gm_dbg_wrap("Component file name cannot be empty."));
+	}
+	else
+	{
+		// 解析Component下所有槽，再解析内容
+		m_supressedWarnings.set(Warning_ObjectExistsWarning);
+		m_slots.pushSlots();
+		{
+			GMXMLElement* el = e->FirstChildElement();
+			while (el)
+			{
+				if (GMString::stringEquals(el->Name(), "slot"))
+					m_slots.addSlot(el->Attribute("name"), getValueFromDefines(el->GetText()));
+				el = el->NextSiblingElement();
+			}
+		}
+
+		GMBuffer buffer;
+		GM.getGamePackageManager()->readFile(GMPackageIndex::Scripts, filename, &buffer);
+		if (buffer.getSize() > 0)
+		{
+			buffer.convertToStringBuffer();
+			GMString content((const char*)buffer.getData());
+			parseComponent(content);
+		}
+		else
+		{
+			gm_warning(gm_dbg_wrap("File is empty with filename: {0}"), filename);
+		}
+		m_slots.popSlots();
+		m_supressedWarnings.clear(Warning_ObjectExistsWarning);
 	}
 }
 
@@ -2330,15 +2422,26 @@ void Timeline::play(GMGameObject* obj, const GMString& name)
 GMint32 Timeline::parseInt(const GMString& str, bool* ok)
 {
 	GMString temp = str;
-	getValueFromDefines(temp);
+	temp = getValueFromDefines(temp);
 	return GMString::parseInt(temp, ok);
 }
 
 GMfloat Timeline::parseFloat(const GMString& str, bool* ok)
 {
 	GMString temp = str;
-	getValueFromDefines(temp);
+	temp = getValueFromDefines(temp);
 	return GMString::parseFloat(temp, ok);
+}
+
+bool Timeline::objectExists(const GMString& id)
+{
+	bool exists = !(m_objects.find(id) == m_objects.end());
+	if (exists)
+	{
+		if (!m_supressedWarnings.isSet(Warning_ObjectExistsWarning))
+			gm_warning(gm_dbg_wrap("Object exists: '{0}'"), id);
+	}
+	return exists;
 }
 
 Scanner::Scanner(const GMString& line, Timeline& timeline)
@@ -2354,7 +2457,7 @@ bool Scanner::nextInt(REF GMint32& value)
 	if (str.isEmpty())
 		return false;
 
-	value = m_timeline.parseFloat(str);
+	value = m_timeline.parseInt(str);
 	return true;
 }
 
@@ -2367,4 +2470,129 @@ bool Scanner::nextFloat(REF GMfloat& value)
 
 	value = m_timeline.parseFloat(str);
 	return true;
+}
+
+Slots::Slots(Slots* parent)
+	: m_parent(parent)
+{
+	if (parent)
+		parent->append(this);
+}
+
+Slots::~Slots()
+{
+	while (!m_children.empty())
+	{
+		m_children.front()->destroy();
+	}
+}
+
+Slots* Slots::getParent()
+{
+	return m_parent;
+}
+
+bool Slots::addSlot(const GMString& name, const GMString& value)
+{
+	if (name.isEmpty())
+	{
+		gm_warning(gm_dbg_wrap("slot name is empty."));
+		return false;
+	}
+
+	auto result = m_slots.insert(std::make_pair(name, value));
+	if (!result.second)
+		gm_warning(gm_dbg_wrap("Slot name exists: '{0}', add failed."), name);
+	return result.second;
+}
+
+bool Slots::getSlotByName(const GMString& name, GMString& result)
+{
+	auto iter = m_slots.find(name);
+	bool notFound = (iter == m_slots.end());
+	if (!notFound)
+	{
+		result = iter->second;
+		return true;
+	}
+	else
+	{
+		if (getParent())
+			return getParent()->getSlotByName(name, result);
+		return false;
+	}
+}
+
+void Slots::destroy()
+{
+	if (getParent())
+		getParent()->remove(this);
+	delete this;
+}
+
+void Slots::append(Slots* slots)
+{
+	m_children.push_back(slots);
+}
+
+void Slots::remove(Slots* slots)
+{
+	m_children.remove(slots);
+}
+
+SlotsStack::SlotsStack()
+	: m_currentSlots(nullptr)
+	, m_root(new Slots(nullptr))
+{
+	m_currentSlots = m_root.get();
+}
+
+void SlotsStack::pushSlots()
+{
+	m_currentSlots = new Slots(m_currentSlots);
+}
+
+void SlotsStack::popSlots()
+{
+	if (m_currentSlots->getParent())
+	{
+		Slots* tmp = m_currentSlots->getParent();
+		m_currentSlots->destroy();
+		m_currentSlots = tmp;
+	}
+	else
+	{
+		GM_ASSERT(m_currentSlots == m_root.get());
+	}
+}
+
+bool SlotsStack::addSlot(const GMString& name, const GMString& value)
+{
+	return m_currentSlots->addSlot(name, value);
+}
+
+bool SlotsStack::getSlotByName(const GMString& name, GMString& result)
+{
+	return m_currentSlots->getSlotByName(name, result);
+}
+
+SupressedWarnings::SupressedWarnings()
+{
+	GM_ZeroMemory(&m_data[0], sizeof(m_data));
+}
+
+void SupressedWarnings::set(Warning w)
+{
+	++m_data[w];
+}
+
+bool SupressedWarnings::isSet(Warning w)
+{
+	return m_data[w] > 0;
+}
+
+void SupressedWarnings::clear(Warning w)
+{
+	if (m_data[w] > 0)
+		--m_data[w];
 }

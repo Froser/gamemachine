@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component version="1.0">
+    <objects>
+        <quad id="obj_filter" type="2d"
+            color="0 0 0 1" colorOp="replace"
+            length="2" width="2"
+            blend="true" source="Zero" dest="SourceAlpha"
+        />
+    </objects>
+    <actions>
+        <action type="addObject" object="obj_filter" time="+0" />
+        <action type="attribute" object="obj_filter" color="0 0 0 @start" time="+0" />
+        <action type="animate" action="play" object="obj_filter" time="+0"/>
+        <action type="animate" function="linear" object="obj_filter" color="0 0 0 @end" endtime="@duration" />
+        <action type="animate" action="stop" object="obj_filter" time="+@duration"/>
+        <action type="removeObject" object="obj_filter" time="+@duration" />
+    </actions>
+</component>

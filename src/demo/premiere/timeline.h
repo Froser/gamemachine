@@ -151,6 +151,66 @@ struct AlignCache : AlignedVector<T>
 	}
 };
 
+
+
+class Slots
+{
+public:
+	Slots(Slots* parent);
+	~Slots();
+
+public:
+	Slots* getParent();
+	bool addSlot(const GMString& name, const GMString& value);
+	bool getSlotByName(const GMString& name, GMString& result);
+	void destroy();
+
+private:
+	void append(Slots*);
+	void remove(Slots*);
+	
+private:
+	HashMap<GMString, GMString, GMStringHashFunctor> m_slots;
+	Slots* m_parent;
+	List<Slots*> m_children;
+};
+
+enum Warning
+{
+	Warning_ObjectExistsWarning = 1,
+
+	Warning_WarningsEnd,
+};
+
+class SupressedWarnings
+{
+public:
+	SupressedWarnings();
+
+	void set(Warning);
+	bool isSet(Warning);
+	void clear(Warning);
+
+private:
+	Array<GMint32, Warning_WarningsEnd> m_data;
+};
+
+class SlotsStack
+{
+public:
+	SlotsStack();
+
+public:
+	void pushSlots();
+	void popSlots();
+	bool addSlot(const GMString& name, const GMString& value);
+	bool getSlotByName(const GMString& name, GMString& result);
+
+private:
+	GMOwnedPtr<Slots> m_root;
+	Slots* m_currentSlots;
+};
+
 class Scanner;
 class Timeline
 {
@@ -164,6 +224,7 @@ public:
 public:
 	// 解析一个Timeline文件
 	bool parse(const GMString& timelineContent);
+	bool parseComponent(const GMString& componentContent);
 	void update(GMDuration dt);
 	void play();
 	void pause();
@@ -175,6 +236,7 @@ private:
 	void parseObjects(GMXMLElement*);
 	void parseActions(GMXMLElement*);
 	void parseInclude(GMXMLElement*);
+	void parseComponent(GMXMLElement*);
 	GMint32 parseCameraAction(GMXMLElement*, REF CameraParams& cp, REF GMCameraLookAt& lookAt);
 	void parseParticlesAsset(GMXMLElement*);
 	void parseParticlesObject(GMXMLElement*);
@@ -212,9 +274,10 @@ private:
 	AssetType getAssetType(const GMString& objectName, OUT void** out);
 	void playAudio(IAudioSource* source);
 	void play(GMGameObject*, const GMString&);
-	void getValueFromDefines(GMString& id);
+	GMString getValueFromDefines(GMString id);
 	GMint32 parseInt(const GMString& str, bool* ok = nullptr);
 	GMfloat parseFloat(const GMString& str, bool* ok = nullptr);
+	bool objectExists(const GMString& id);
 
 private:
 	const IRenderContext* m_context;
@@ -242,6 +305,8 @@ private:
 	GMDuration m_checkpointTime;
 	IAudioReader* m_audioReader;
 	IAudioPlayer* m_audioPlayer;
+	SlotsStack m_slots;
+	SupressedWarnings m_supressedWarnings;
 };
 
 class Scanner
@@ -252,9 +317,6 @@ public:
 public:
 	bool nextInt(REF GMint32& value);
 	bool nextFloat(REF GMfloat& value);
-
-private:
-	void getValueFromDefines(GMString& id);
 
 private:
 	Timeline& m_timeline;

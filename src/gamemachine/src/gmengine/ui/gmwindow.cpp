@@ -22,7 +22,7 @@ bool GMWindow::handleSystemEvent(GMSystemEvent* event, REF GMLResult& result)
 	bool r = false;
 	switch (event->getType())
 	{
-	case GMSystemEventType::WindowAboutToDestory:
+	case GMSystemEventType::WindowAboutToDestroy:
 	{
 		GM.postMessage({ GameMachineMessageType::WindowAboutToDestroy, 0, static_cast<IWindow*>(this) });
 		break;

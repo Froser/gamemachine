@@ -250,7 +250,7 @@ void GameMachine::translateSystemEvent(GMuint32 uMsg, GMWParam wParam, GMLParam 
 	switch (uMsg)
 	{
 	case WM_DESTROY:
-		newSystemEvent = new GMSystemEvent(GMSystemEventType::WindowAboutToDestory);
+		newSystemEvent = new GMSystemEvent(GMSystemEventType::WindowAboutToDestroy);
 		break;
 	case WM_CLOSE:
 		newSystemEvent = new GMSystemEvent(GMSystemEventType::WindowAboutToClose);

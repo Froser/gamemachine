@@ -15,11 +15,9 @@
 
         <buffer id="mud_terrain" file="textures/mud/terrain.png" />
         <buffer id="coast_terrain" file="textures/water/coast.jpg" />
-        <object id="model_dragon" file="cat/cat.obj" />
         <object id="model_logo" file="logo/logo.fbx" />
     </assets>
     <objects>
-        <object id="obj_dragon" asset="model_dragon" scale="1.2 1.2 1.2" ks=".5 .5 .5" />
         <object id="obj_logo" asset="model_logo" scale="5 5 5" />
         <terrain
             id="obj_mud"
@@ -46,10 +44,10 @@
         <action type="camera" view="perspective" fovy="60" near=".1f" far="3200" />
         <action type="camera" direction="0 0 1" position="0 0 -30"  />
 
-        <!--<include file="ani_logo.xml" />
+        <include file="ani_logo.xml" />
         <include file="ani_dragon.xml" />
         <include file="ani_deathstroke.xml" />
-        <include file="ani_wave.xml" />-->
+        <include file="ani_wave.xml" />
         <include file="ani_flyingdragon.xml" />
     </actions>
 </timeline>

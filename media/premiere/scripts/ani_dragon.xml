@@ -10,11 +10,13 @@
             front="sky/sky_front.jpg"
             back="sky/sky_back.jpg"
         />
+        <object id="model_dragon" file="dragon/dragon.obj" />
     </assets>
     <objects>
         <light id="light_dragon_global" type="point" position="20 20 -20" ambient="0 0 0" diffuse="0 0 0" />
         <shadow id="shadow_dragon" cascades="1" position="30 30 -30" focus="0 0 0" width="$screen_width" height="$screen_height" view="perspective" fovy="45" near=".1f" far="1600" bias="0.000125" time="+0"/>
         <cubemap id="obj_sky" asset="tex_sky" scale="1500 1500 1500" translate="0 10 0" />
+        <object id="obj_dragon" asset="model_dragon" scale="1.2 1.2 1.2" ks=".5 .5 .5" />
     </objects>
     <actions>
         <action type="addObject" object="light_dragon_global" time="+0" />
@@ -37,9 +39,10 @@
         <action type="animate" function="cubic-bezier" control=".6 0 .4 1" object="$camera" focus="0 0 0" position="0 40 -30" endtime="11"/>
         <action type="animate" action="stop" object="$camera" time="+11"/>
 
-        <action type="animate" action="play" object="light_dragon_global" time="-4"/>
-        <action type="animate" function="linear" object="light_dragon_global" ambient="0 0 0" diffuse="0 0 0" specular="0" endtime="5"/>
-        <action type="animate" action="stop" object="light_dragon_global" time="+1"/>
+        <checkpoint type="time" time="-3" />
+        <component file="component_fade_out.xml" >
+            <slot name="duration">2</slot>
+        </component>
 
         <action type="removeObject" object="light_dragon_global" time="+0" />
         <action type="removeObject" object="obj_mud" time="+0" />

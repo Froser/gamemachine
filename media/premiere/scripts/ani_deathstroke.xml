@@ -4,7 +4,7 @@
         <object id="model_deathstroke" file="deathstroke/Deathstroke.fbx" />
     </assets>
     <objects>
-        <light id="light_deathstroke" type="point" position="50 50 -100" focus="0 0 0" ambient="0 0 0" diffuse="0 0 0" />
+        <light id="light_deathstroke" type="point" position="50 50 -100" focus="0 0 0" ambient="1 1 1" diffuse="2 2 2" specular="2 2 2" />
 
         <terrain
             id="obj_metalplate"
@@ -37,9 +37,9 @@
         <action type="addObject" object="obj_deathstroke" time="+0"/>
 
         <checkpoint type="save"/>
-        <action type="animate" action="play" object="light_deathstroke" time="+0"/>
-        <action type="animate" function="linear" object="light_deathstroke" ambient="1 1 1" diffuse="3 3 3" specular="2 2 2" endtime="6"/>
-        <action type="animate" action="stop" object="light_deathstroke" time="+6"/>
+        <component file="component_fade_in.xml" >
+            <slot name="duration">6</slot>
+        </component>
         <checkpoint type="load"/>
 
         <action type="animate" action="play" object="$camera" time="+0"/>
@@ -51,9 +51,10 @@
         <action type="animate" action="lerp" object="obj_deathstroke" translate="0 0 -125" endtime="12" />
         <action type="animate" action="stop" object="obj_deathstroke" time="+12"/>
 
-        <action type="animate" action="play" object="light_deathstroke" time="-2"/>
-        <action type="animate" function="linear" object="light_deathstroke" ambient="0 0 0" diffuse="0 0 0" specular="0" endtime="2"/>
-        <action type="animate" action="stop" object="light_deathstroke" time="+0"/>
+        <checkpoint type="time" time="-2" />
+        <component file="component_fade_out.xml" >
+            <slot name="duration">2</slot>
+        </component>
         
         <action type="removeObject" object="light_deathstroke" time="+0" />
         <action type="removeObject" object="obj_deathstroke" time="+0" />
