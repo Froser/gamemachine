@@ -166,7 +166,7 @@ GMTangentSpace GM_CalculateTangentSpaceRuntime(
     vec2 st1 = dFdx(texcoord);
     vec2 st2 = dFdy(texcoord);
 
-    vec3 N   = normalize(normal_World_N);
+    vec3 N  = normalize(normal_World_N);
     vec3 T  = normalize(Q1*st2.t - Q2*st1.t);
     vec3 B  = -normalize(cross(N, T));
     tangentSpace.TBN = transpose(mat3(T, B, N)); //TBN是世界空间到切线空间的变换矩阵

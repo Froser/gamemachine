@@ -599,6 +599,7 @@ void GMGLTechnique::prepareShadow(const GMShadowSourceDesc* shadowSourceDesc, GM
 	static const GMString s_cascadedShadowLevel = s_shadowInfo + GM_VariablesDesc.ShadowInfo.CascadedShadowLevel;
 	static const GMString s_viewCascade = s_shadowInfo + GM_VariablesDesc.ShadowInfo.ViewCascade;
 	static const GMString s_currentCascadeLevel = s_shadowInfo + GM_VariablesDesc.ShadowInfo.CurrentCascadeLevel;
+	static const GMString s_pcfRows = s_shadowInfo + GM_VariablesDesc.ShadowInfo.PCFRows;
 
 	IShaderProgram* shaderProgram = getShaderProgram();
 	if (hasShadow)
@@ -614,6 +615,7 @@ void GMGLTechnique::prepareShadow(const GMShadowSourceDesc* shadowSourceDesc, GM
 			shaderProgram->setVec4(VI_N(ShadowInfo.Position, s_position), viewPosition);
 			shaderProgram->setFloat(VI_N(ShadowInfo.BiasMin, s_biasMin), shadowSourceDesc->biasMin);
 			shaderProgram->setFloat(VI_N(ShadowInfo.BiasMax, s_biasMax), shadowSourceDesc->biasMax);
+			shaderProgram->setInt(VI_N(ShadowInfo.PCFRows, s_pcfRows), shadowSourceDesc->pcfRowCount);
 
 			shaderProgram->setInt(VI_N(ShadowInfo.ShadowMapWidth, s_width), shadowFramebuffers->getShadowMapWidth());
 			shaderProgram->setInt(VI_N(ShadowInfo.ShadowMapHeight, s_height), shadowFramebuffers->getShadowMapHeight());

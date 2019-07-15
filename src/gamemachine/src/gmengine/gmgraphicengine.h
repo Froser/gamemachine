@@ -88,6 +88,7 @@ struct GMShaderVariableShadowInfoDesc
 	T BiasMax;
 	T CascadedShadowLevel;
 	T ViewCascade;
+	T PCFRows;
 };
 
 template <typename T>
@@ -193,6 +194,7 @@ struct GM_EXPORT GMShadowSourceDesc
 	GMint32 height = 0;
 	GMint32 cascades = 1; //!< GameMachine将构造出一副(width*cascadedLevel, height)的纹理来记录shadow map。如果cascadedLevel为1，那么就是普通的阴影贴图。否则，它就是CSM方式的阴影贴图。
 	Array<GMfloat, GMMaxCascades> cascadePartitions = { 1 }; //!< 层级的分区，范围为(0, 1]。如果某个层级为0，则按照所在的索引来等分。
+	GMint32 pcfRowCount = 3; //!< PCM采样的行数。如为3，那么则采用PCM 3*3进行采样来计算阴影。如果未开启渲染的多重采样，则PCF不生效。
 	static GMint64 version;
 };
 

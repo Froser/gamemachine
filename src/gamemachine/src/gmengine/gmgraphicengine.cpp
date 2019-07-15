@@ -80,6 +80,7 @@ static GMShaderVariablesDesc s_defaultShaderVariablesDesc =
 		"BiasMax",
 		"CascadedShadowLevel",
 		"ViewCascade",
+		"PCFRows",
 	},
 
 	{

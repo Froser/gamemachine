@@ -306,6 +306,7 @@ public:
 	EFFECT_MEMBER_AS_SCALAR(ShadowMapHeight, ShadowInfo(), GM_VariablesDesc.ShadowInfo.ShadowMapHeight)
 	EFFECT_MEMBER_AS_SCALAR(ShadowBiasMin, ShadowInfo(), GM_VariablesDesc.ShadowInfo.BiasMin)
 	EFFECT_MEMBER_AS_SCALAR(ShadowBiasMax, ShadowInfo(), GM_VariablesDesc.ShadowInfo.BiasMax)
+	EFFECT_MEMBER_AS_SCALAR(PCFRows, ShadowInfo(), GM_VariablesDesc.ShadowInfo.PCFRows)
 	EFFECT_MEMBER_AS_SCALAR(CascadedShadowLevel, ShadowInfo(), GM_VariablesDesc.ShadowInfo.CascadedShadowLevel)
 	EFFECT_MEMBER_AS_SCALAR(ViewCascade, ShadowInfo(), GM_VariablesDesc.ShadowInfo.ViewCascade)
 	EFFECT_VARIABLE_AS_SHADER_RESOURCE(ShadowMap, GM_VariablesDesc.ShadowInfo.ShadowMap)
@@ -901,6 +902,7 @@ void GMDx11Technique::prepareShadow(bool isDrawingShadow)
 	ID3DX11EffectScalarVariable* shadowMapHeight = bank.ShadowMapHeight();
 	ID3DX11EffectScalarVariable* biasMin = bank.ShadowBiasMin();
 	ID3DX11EffectScalarVariable* biasMax = bank.ShadowBiasMax();
+	ID3DX11EffectScalarVariable* pcfRows = bank.PCFRows();
 
 	if (!isDrawingShadow) // 只有非绘制阴影时，才需要阴影贴图相关信息
 	{
@@ -916,6 +918,7 @@ void GMDx11Technique::prepareShadow(bool isDrawingShadow)
 			GMDx11ShadowFramebuffers* shadowFramebuffers = gm_cast<GMDx11ShadowFramebuffers*>(getEngine()->getShadowMapFramebuffers());
 			GM_DX_HR(shadowMapWidth->SetInt(shadowFramebuffers->getShadowMapWidth()));
 			GM_DX_HR(shadowMapHeight->SetInt(shadowFramebuffers->getShadowMapHeight()));
+			GM_DX_HR(pcfRows->SetInt(shadowSourceDesc.pcfRowCount));
 
 			ID3DX11EffectShaderResourceVariable* shadowMap = windowStates.sampleCount > 1 ? bank.ShadowMapMSAA() : bank.ShadowMap();
 			GM_DX_HR(shadowMap->SetResource(shadowFramebuffers->getShadowMapShaderResourceView()));

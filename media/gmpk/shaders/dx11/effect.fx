@@ -377,6 +377,7 @@ struct GMShadowInfo
     float BiasMax;
     int CascadedShadowLevel;
     bool ViewCascade;
+    int PCFRows;
 };
 Texture2D GM_ShadowMap;
 Texture2DMS<float4> GM_ShadowMapMSAA;
@@ -549,6 +550,41 @@ interface IIlluminationModel
 };
 int GM_IlluminationModel = 0;
 
+
+float GM_CalculateShadow_Multisampling(float3 projCoords, int cascade, float bias)
+{
+    if (projCoords.x > 1 || projCoords.x < 0 ||
+    projCoords.y > 1 || projCoords.y < 0 )
+    {
+        return 1.f;
+    }
+    
+    float result = 0;
+    float closestDepth = 0;
+
+    // 每一份Shadow Map的宽度
+    int pieceWidth = (uint) GM_ShadowInfo.ShadowMapWidth / (uint) GM_ShadowInfo.CascadedShadowLevel;
+
+    int x = pieceWidth * (projCoords.x + cascade);
+    int y = GM_ShadowInfo.ShadowMapHeight * projCoords.y;
+    int samples = 0;
+    int bound = GM_ShadowInfo.PCFRows - 1;
+    for (int i = -bound; i <= bound; ++i)
+    {
+        for (int j = -bound; j <= bound; ++j)
+        {
+            if ((x + i >= 0 && y + j >= 0) && (x + i <= GM_ShadowInfo.ShadowMapWidth && y + i <= GM_ShadowInfo.ShadowMapHeight) )
+            {
+                closestDepth = GM_ShadowMapMSAA.Load(int2(x + i, y + j), 0).x;
+                result += (projCoords.z - bias) > closestDepth ? 0.f : 1.f;
+                ++samples;
+            }
+        }
+    }
+    result /= samples;
+    return result;
+}
+
 float GM_CalculateShadow(PS_3D_INPUT input)
 {
     if (!GM_ShadowInfo.HasShadow)
@@ -578,36 +614,22 @@ float GM_CalculateShadow(PS_3D_INPUT input)
     projCoords.y = projCoords.y * (-0.5f) + 0.5f;
 
     float bias = (GM_ShadowInfo.BiasMin == GM_ShadowInfo.BiasMax) ? GM_ShadowInfo.BiasMin : max(GM_ShadowInfo.BiasMax * (1.0 - dot(normal_N, normalize(worldPos.xyz - GM_ShadowInfo.Position.xyz))), GM_ShadowInfo.BiasMin);
-    float closestDepth = 0;
     if (GM_ScreenInfo.Multisampling)
+        return GM_CalculateShadow_Multisampling(projCoords, cascade, bias);
+
+    // 非多重采样不支持PCF
+    float closestDepth = 0;
+    if (GM_ShadowInfo.CascadedShadowLevel == 1)
     {
-        // 每一份Shadow Map的宽度
-        int pieceWidth = (uint) GM_ShadowInfo.ShadowMapWidth / (uint) GM_ShadowInfo.CascadedShadowLevel;
-
-        int x = pieceWidth * (projCoords.x + cascade);
-        int y = GM_ShadowInfo.ShadowMapHeight * projCoords.y;
-        if (projCoords.x > 1 || projCoords.x < 0 ||
-            projCoords.y > 1 || projCoords.y < 0 )
-        {
-            return 1.f;
-        }
-
-        closestDepth = GM_ShadowMapMSAA.Load(int2(x, y), 0).x;
+        closestDepth = GM_ShadowMap.Sample(ShadowMapSampler, projCoords.xy).r;
     }
     else
     {
-        if (GM_ShadowInfo.CascadedShadowLevel == 1)
-        {
-            closestDepth = GM_ShadowMap.Sample(ShadowMapSampler, projCoords.xy).r;
-        }
-        else
-        {
-            // 每一份Shadow Map的缩放。例如，假设Cascade Level = 3，那么第一幅Shadow Map采样范围就是0~0.333。
-            float projRatio = 1.f / GM_ShadowInfo.CascadedShadowLevel;
+        // 每一份Shadow Map的缩放。例如，假设Cascade Level = 3，那么第一幅Shadow Map采样范围就是0~0.333。
+        float projRatio = 1.f / GM_ShadowInfo.CascadedShadowLevel;
 
-            float2 projCoordsInCSM = float2(projRatio * (projCoords.x + cascade), projCoords.y);
-            closestDepth = GM_ShadowMap.Sample(ShadowMapSampler, projCoordsInCSM.xy).r;
-        }
+        float2 projCoordsInCSM = float2(projRatio * (projCoords.x + cascade), projCoords.y);
+        closestDepth = GM_ShadowMap.Sample(ShadowMapSampler, projCoordsInCSM.xy).r;
     }
 
     return projCoords.z - bias > closestDepth ? 0.f : 1.f;

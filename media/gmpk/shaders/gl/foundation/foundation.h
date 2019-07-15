@@ -31,6 +31,7 @@ struct GMShadowInfo
     float BiasMax;
     int CascadedShadowLevel;
     int ViewCascade;
+    int PCFRows;
 };
 
 uniform GMShadowInfo GM_ShadowInfo;

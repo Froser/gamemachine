@@ -865,6 +865,13 @@ void Timeline::parseObjects(GMXMLElement* e)
 					bias = parseFloat(str);
 			}
 
+			Nullable<GMfloat> pcf;
+			{
+				GMString str = e->Attribute("pcf");
+				if (!str.isEmpty())
+					pcf = parseInt(str);
+			}
+
 			Vector<GMfloat> partitions;
 			if (cascades > 1)
 			{
@@ -918,6 +925,8 @@ void Timeline::parseObjects(GMXMLElement* e)
 			desc.height = height;
 			desc.cascades = cascades;
 			desc.biasMax = desc.biasMin = bias;
+			if (!pcf.isNull)
+				desc.pcfRowCount = pcf;
 			m_shadows[id] = desc;
 		}
 		else if (name == L"source")
