@@ -812,7 +812,7 @@ struct GMWindowStates
 	GMfloat maxDepth = 1; //!< 远平面的深度值。
 	GMString workingAdapterDesc; //!< 适配器信息。
 	GMint32 sampleCount; //!< 多重采样数量。
-	GMint32 sampleQuality; //!< 多重采样质量。
+	GMint32 sampleQuality; //!< 多重采样质量。OpenGL下为0。
 	bool vsyncEnabled = false; //!< 是否垂直同步。
 	GMRect renderRect; //!< 当前窗口渲染窗口位置信息。
 	GMRect framebufferRect; //!< 帧缓存矩形区域。它不随窗口大小而改变。它表示默认帧缓存的区域。

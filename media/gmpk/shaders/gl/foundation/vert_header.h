@@ -36,5 +36,9 @@ void init_layouts()
     _uv = uv;
     _lightmapuv = lightmapuv;
     _color = color;
-    _z = gl_Position.z;
+}
+
+void end_init_layouts()
+{
+    _z = gl_Position.z;    
 }

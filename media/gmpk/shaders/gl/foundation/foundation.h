@@ -35,3 +35,12 @@ struct GMShadowInfo
 };
 
 uniform GMShadowInfo GM_ShadowInfo;
+
+struct GMScreenInfo
+{
+    int ScreenWidth;
+    int ScreenHeight;
+    int Multisampling;
+};
+
+uniform GMScreenInfo GM_ScreenInfo;

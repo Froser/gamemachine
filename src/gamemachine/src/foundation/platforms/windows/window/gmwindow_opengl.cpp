@@ -198,6 +198,7 @@ GMWindow_OpenGL::~GMWindow_OpenGL()
 void GMWindow_OpenGL::onWindowCreated(const GMWindowDesc& wndAttrs)
 {
 	D(d);
+	D_BASE(db, Base);
 	GMWindowDesc attrs = wndAttrs;
 	attrs.dwExStyle |= WS_EX_CLIENTEDGE;
 	attrs.dwStyle |= WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_BORDER | WS_CAPTION;
@@ -228,6 +229,9 @@ void GMWindow_OpenGL::onWindowCreated(const GMWindowDesc& wndAttrs)
 		WGL_SAMPLES_ARB,		wndAttrs.samples,
 		0
 	};
+
+	db->windowStates.sampleCount = wndAttrs.samples;
+	db->windowStates.sampleQuality = 0;
 
 	GMint32 nFormat = 0;
 	GMuint32 nCount = 0;

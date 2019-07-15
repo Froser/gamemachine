@@ -211,6 +211,57 @@ vec3 GM_CalculateRefractionByNormalTangent(vec3 worldPos, GMTangentSpace tangent
     return GM_CalculateRefractionByNormalWorld(worldPos, normal_world_N, refractivity);
 }
 
+float GM_CalculateShadow_Multisampling(vec3 projCoords, int cascade, float bias)
+{
+    int samples = 0;
+    int bound = GM_ShadowInfo.PCFRows - 1;
+    float result = 0;
+    float closestDepth = 0;
+    float di = 1.f / GM_ShadowInfo.ShadowMapWidth;
+    float dj = 1.f / GM_ShadowInfo.ShadowMapHeight;
+    if (GM_ShadowInfo.CascadedShadowLevel == 1)
+    {
+        float x = projCoords.x, y = projCoords.y;
+        for (int i = -bound; i <= bound; ++i)
+        {
+            for (int j = -bound; j <= bound; ++j)
+            {
+                float distance_i = i * di, distance_j = j * dj;
+                if ((x + distance_i >= 0 && y + distance_j >= 0) && (x + distance_i <= 1 && y + distance_j <= 1) )
+                {
+                    closestDepth = texture(GM_ShadowInfo.GM_ShadowMap, vec2(x + distance_i, y + distance_j)).r;
+                    result += ((projCoords.z - bias) > closestDepth) ? 0.f : 1.f;
+                    ++samples;
+                }
+            }
+        }
+        result /= samples;
+        return result;
+    }
+    else
+    {
+        // 每一份Shadow Map的缩放。例如，假设Cascade Level = 3，那么第一幅Shadow Map采样范围就是0~0.333。
+        float projRatio = 1.f / GM_ShadowInfo.CascadedShadowLevel;
+        vec2 projCoordsInCSM = vec2(projRatio * (projCoords.x + cascade), projCoords.y);
+        float x = projCoordsInCSM.x, y = projCoordsInCSM.y;
+        for (int i = -bound; i <= bound; ++i)
+        {
+            for (int j = -bound; j <= bound; ++j)
+            {
+                float distance_i = i * di, distance_j = j * dj;
+                if ((x + distance_i >= 0 && y + distance_j >= 0) && (x + distance_i <= GM_ShadowInfo.ShadowMapWidth && y + distance_j <= GM_ShadowInfo.ShadowMapHeight) )
+                {
+                    closestDepth = texture(GM_ShadowInfo.GM_ShadowMap, vec2(x + distance_i, y + distance_j)).r;
+                    result += ((projCoords.z - bias) > closestDepth) ? 0.f : 1.f;
+                    ++samples;
+                }
+            }
+        }
+        result /= samples;
+        return result;
+    }
+}
+
 float GM_CalculateShadow(PS_3D_INPUT vertex)
 {
     if (GM_ShadowInfo.HasShadow == 0)
@@ -238,19 +289,33 @@ float GM_CalculateShadow(PS_3D_INPUT vertex)
 
     projCoords = projCoords * 0.5f + 0.5f;
 
+    if (projCoords.x > 1 || projCoords.x < 0 ||
+    projCoords.y > 1 || projCoords.y < 0 )
+    {
+        return 1.f;
+    }
+
     float bias = (GM_ShadowInfo.BiasMin == GM_ShadowInfo.BiasMax) ? GM_ShadowInfo.BiasMin : max(GM_ShadowInfo.BiasMax * (1.0 - dot(normal_N, normalize(worldPos.xyz - GM_ShadowInfo.Position.xyz))), GM_ShadowInfo.BiasMin);
 
     float closestDepth = 0.f;
-    if (GM_ShadowInfo.CascadedShadowLevel == 1)
+    if (GM_ScreenInfo.Multisampling != 0)
     {
-        closestDepth = texture(GM_ShadowInfo.GM_ShadowMap, projCoords.xy).r;
+        return GM_CalculateShadow_Multisampling(projCoords, cascade, bias);
     }
     else
     {
-        // 每一份Shadow Map的缩放。例如，假设Cascade Level = 3，那么第一幅Shadow Map采样范围就是0~0.333。
-        float projRatio = 1.f / GM_ShadowInfo.CascadedShadowLevel;
-        vec2 projCoordsInCSM = vec2(projRatio * (projCoords.x + cascade), projCoords.y);
-        closestDepth = texture(GM_ShadowInfo.GM_ShadowMap, projCoordsInCSM.xy).r;
+        // 非多重采样不支持PCF
+        if (GM_ShadowInfo.CascadedShadowLevel == 1)
+        {
+            closestDepth = texture(GM_ShadowInfo.GM_ShadowMap, projCoords.xy).r;
+        }
+        else
+        {
+            // 每一份Shadow Map的缩放。例如，假设Cascade Level = 3，那么第一幅Shadow Map采样范围就是0~0.333。
+            float projRatio = 1.f / GM_ShadowInfo.CascadedShadowLevel;
+            vec2 projCoordsInCSM = vec2(projRatio * (projCoords.x + cascade), projCoords.y);
+            closestDepth = texture(GM_ShadowInfo.GM_ShadowMap, projCoordsInCSM.xy).r;
+        }
     }
 
     return projCoords.z - bias > closestDepth ? 0.f : 1.f;

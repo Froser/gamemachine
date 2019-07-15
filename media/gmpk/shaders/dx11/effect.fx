@@ -553,12 +553,6 @@ int GM_IlluminationModel = 0;
 
 float GM_CalculateShadow_Multisampling(float3 projCoords, int cascade, float bias)
 {
-    if (projCoords.x > 1 || projCoords.x < 0 ||
-    projCoords.y > 1 || projCoords.y < 0 )
-    {
-        return 1.f;
-    }
-    
     float result = 0;
     float closestDepth = 0;
 
@@ -573,7 +567,7 @@ float GM_CalculateShadow_Multisampling(float3 projCoords, int cascade, float bia
     {
         for (int j = -bound; j <= bound; ++j)
         {
-            if ((x + i >= 0 && y + j >= 0) && (x + i <= GM_ShadowInfo.ShadowMapWidth && y + i <= GM_ShadowInfo.ShadowMapHeight) )
+            if ((x + i >= 0 && y + j >= 0) && (x + i <= GM_ShadowInfo.ShadowMapWidth && y + j <= GM_ShadowInfo.ShadowMapHeight) )
             {
                 closestDepth = GM_ShadowMapMSAA.Load(int2(x + i, y + j), 0).x;
                 result += (projCoords.z - bias) > closestDepth ? 0.f : 1.f;
@@ -613,6 +607,12 @@ float GM_CalculateShadow(PS_3D_INPUT input)
     projCoords.x = projCoords.x * 0.5f + 0.5f;
     projCoords.y = projCoords.y * (-0.5f) + 0.5f;
 
+    if (projCoords.x > 1 || projCoords.x < 0 ||
+    projCoords.y > 1 || projCoords.y < 0 )
+    {
+        return 1.f;
+    }
+    
     float bias = (GM_ShadowInfo.BiasMin == GM_ShadowInfo.BiasMax) ? GM_ShadowInfo.BiasMin : max(GM_ShadowInfo.BiasMax * (1.0 - dot(normal_N, normalize(worldPos.xyz - GM_ShadowInfo.Position.xyz))), GM_ShadowInfo.BiasMin);
     if (GM_ScreenInfo.Multisampling)
         return GM_CalculateShadow_Multisampling(projCoords, cascade, bias);

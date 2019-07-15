@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 #if GM_WINDOWS
 	windowDesc.dwStyle = WS_OVERLAPPEDWINDOW | WS_SIZEBOX;
 #endif
-	windowDesc.samples = 1;
+	// windowDesc.samples = 1;
 
 	gm::IWindow* mainWindow = nullptr;
 	factory->createWindow(hInstance, nullptr, &mainWindow);
