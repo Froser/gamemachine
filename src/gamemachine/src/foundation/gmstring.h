@@ -303,7 +303,7 @@ public:
 	}
 
 	//! 为字符串预先分配空间。
-	void reserve(GMint32 size)
+	void reserve(GMsize_t size)
 	{
 		D_STR(d);
 		d->data.reserve(size);

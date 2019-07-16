@@ -8,6 +8,64 @@
 
 #define PKD(d) GMGamePackage::Data* d = gamePackage()->gamePackageData();
 
+namespace
+{
+	template <class char_t>
+	char_t toLower(char_t in)
+	{
+		return (in >= (char_t)'A' && in <= (char_t)'Z') ? (char_t)(in + 0x20) : in;
+	}
+
+	GMString toLower(const GMString& in)
+	{
+		GMString result;
+		result.reserve(in.length());
+		for (GMint32 i = 0; i < in.length(); ++i)
+		{
+			result += toLower(in[i]);
+		}
+		return result;
+	}
+
+	GMString normalizePath(const GMString& in)
+	{
+		// 标准化一个路径： 先将所有字符串小写，将所有\替换为/，重叠的/替换为/，如果路径由/打头，则去掉这个字符
+		if (in == L"/")
+			return in;
+
+		GMString s1 = toLower(in).replace("\\", "/");
+		GMString s2;
+		s2.reserve(s1.length());
+		bool flag = false;
+
+		// 当前一个字符为/时，flag置为true
+		for (GMsize_t i = 0; i < s1.length(); ++i)
+		{
+			GMwchar ch = s1[i];
+			if (flag)
+			{
+				if (ch != L'/')
+				{
+					flag = false;
+					s2 += ch;
+				}
+			}
+			else
+			{
+				if (ch == L'/')
+					flag = true;
+				s2 += ch;
+			}
+		}
+
+		if (!s2.isEmpty() && s2[0] != L'/')
+			return s2;
+
+		return s2.substr(1, s2.length() - 1);
+	}
+
+}
+
 GMDefaultGamePackageHandler::GMDefaultGamePackageHandler(GMGamePackage* pk)
 	: m_pk(pk)
 	, m_packageIndex(0)
@@ -163,8 +221,7 @@ GMZipGamePackageHandler::~GMZipGamePackageHandler()
 
 bool GMZipGamePackageHandler::readFileFromPath(const GMString& path, REF GMBuffer* buffer)
 {
-	bool isRelativePath = (path.findLastOf('.') != GMString::npos);
-	GMString fileName = isRelativePath ? fromRelativePath(path).toStdString() : path.toStdString();
+	GMString fileName = fromRelativePath(path).toStdString();
 	if (loadBuffer(fileName, buffer))
 		return true;
 
@@ -172,7 +229,7 @@ bool GMZipGamePackageHandler::readFileFromPath(const GMString& path, REF GMBuffe
 	return false;
 }
 
-void gm::GMZipGamePackageHandler::initFiles()
+void GMZipGamePackageHandler::initFiles()
 {
 	PKD(d);
 	releaseUnzFile();
@@ -223,7 +280,8 @@ bool GMZipGamePackageHandler::loadZip()
 				err = unzGetCurrentFileInfo64(m_ufs[n], &file_info, filename, sizeof(filename), NULL, 0, NULL, 0);
 				CHECK(err);
 
-				auto& b = m_buffers[filename];
+				GMString normalized = normalizePath(filename);
+				auto& b = m_buffers[normalized];
 				b.first = n;
 				break;
 			}
@@ -265,7 +323,8 @@ GMString GMZipGamePackageHandler::fromRelativePath(const GMString& in)
 	};
 
 	size_t pos1 = 0, pos2 = 0;
-	const std::wstring& stdIn = in.toStdWString();
+	GMString normalized = normalizePath(in);
+	const std::wstring& stdIn = normalized.toStdWString();
 	for (; pos2 < stdIn.length(); pos2++)
 	{
 		if (stdIn[pos2] == L'\\' || stdIn[pos2] == L'/')
@@ -292,7 +351,8 @@ bool GMZipGamePackageHandler::loadBuffer(const GMString& path, REF GMBuffer* buf
 	constexpr GMuint32 bufSize = 4096;
 
 	// 如果已经有数据了，不需要从zip中读取
-	auto iter = m_buffers.find(path);
+	GMString normalized = normalizePath(path);
+	auto iter = m_buffers.find(normalized);
 	if (iter == m_buffers.end())
 		return false;
 
@@ -305,7 +365,7 @@ bool GMZipGamePackageHandler::loadBuffer(const GMString& path, REF GMBuffer* buf
 
 	// 获取path的索引，取出相应的zip file
 	unzFile uf = m_ufs[iter->second.first];
-	std::string stdFileName = path.toStdString();
+	std::string stdFileName = normalized.toStdString();
 	if (UNZ_OK != unzLocateFile(uf, stdFileName.c_str(), false))
 		return false;
 
@@ -369,12 +429,12 @@ GMString GMZipGamePackageHandler::pathRoot(GMPackageIndex index)
 
 GMString GMZipGamePackageHandler::pathOf(GMPackageIndex index, const GMString& fileName)
 {
-	return pathRoot(index) + fileName;
+	return normalizePath(pathRoot(index) + fileName);
 }
 
 bool GMZipGamePackageHandler::exists(GMPackageIndex index, const GMString& fileName)
 {
-	GMString path = pathOf(index, fileName);
+	GMString path = pathOf(index, normalizePath(fileName));
 	bool existed = (m_buffers.find(path) != m_buffers.end());
 	if (!fileName.endsWith(L'/') && !existed)
 	{
