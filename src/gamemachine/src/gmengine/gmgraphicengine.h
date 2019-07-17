@@ -228,7 +228,7 @@ public:
 GM_PRIVATE_OBJECT(GMGraphicEngine)
 {
 	GMThreadId mtid = 0;
-	bool begun = false;
+	GMint32 begun = 0;
 	const IRenderContext* context = nullptr;
 	GMCamera camera;
 	GMGlyphManager* glyphManager = nullptr;

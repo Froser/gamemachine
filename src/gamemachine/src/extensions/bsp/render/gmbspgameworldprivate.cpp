@@ -51,7 +51,7 @@ namespace
 			}
 		}
 
-		GMSpriteGameObject* sprite = new GMSpriteGameObject(6, GMVec3(0, 10, 0));
+		GMSpriteGameObject* sprite = new GMSpriteGameObject(6, GMVec3(0, 0, 0));
 		sprite->setMoveSpeed(GMVec3(193));
 		sprite->setJumpSpeed(GMVec3(0, 150, 0));
 		sprite->setPhysicsObject(new GMBSPPhysicsObject());
@@ -65,6 +65,7 @@ namespace
 		GM_SWAP(origin[1], origin[2]);
 		vecOrigin.setFloat4(origin);
 
+		sprite->setPosition(vecOrigin);
 		prop.transform = Translate(vecOrigin);
 		physics->setMotionStates(prop);
 		physics->shapeProperties().stepHeight = 18.f;

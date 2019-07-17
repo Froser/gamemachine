@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "helper.h"
+#include <extensions/bsp/gmbspfactory.h>
 
 GMRect Helper::getMiddleRectOfWindow(const GMRect& rc, IWindow* window)
 {
@@ -118,4 +119,51 @@ void GameObjectColorKeyframe::update(GMModel* model, const GMVertices& vertices,
 
 	memcpy_s(proxy->getBuffer(), sizeof(GMVertex) * model->getVerticesCount(), cache.data(), sizeof(GMVertex) * cache.size());
 	proxy->endUpdateBuffer();
+}
+
+BSPGameObject::BSPGameObject(const IRenderContext* context)
+{
+	setContext(context);
+}
+
+void BSPGameObject::load(const GMBuffer& buffer)
+{
+	GMBSPGameWorld* world = nullptr;
+	GMBSPFactory::createBSPGameWorld(getContext(), buffer, &world);
+	if (world)
+	{
+		if (auto phyw = world->getPhysicsWorld())
+		{
+			phyw->setEnabled(false);
+		}
+
+		m_world.reset(world);
+		m_lookAtCache = m_world->getSprite()->getCamera().getLookAt();
+	}
+}
+
+bool BSPGameObject::isValid()
+{
+	return !!m_world.get();
+}
+
+void BSPGameObject::draw()
+{
+	if (m_world)
+		m_world->renderScene();
+}
+
+void BSPGameObject::update(GMDuration dt)
+{
+	if (m_world)
+	{
+		m_world->updateGameWorld(dt);
+	}
+}
+
+void BSPGameObject::onAppendingObjectToWorld()
+{
+	GMCamera& camera = getContext()->getEngine()->getCamera();
+	camera.lookAt(m_lookAtCache);
+	GMGameObject::onAppendingObjectToWorld();
 }

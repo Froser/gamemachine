@@ -189,6 +189,9 @@ void GMWindow_OpenGL::onWindowCreated(const GMWindowDesc& wndAttrs)
 	Display* display = context->getDisplay();
 	setWindowHandle(window, true);
 
+	db->windowStates.sampleCount = wndAttrs.samples;
+	db->windowStates.sampleQuality = 0;
+
 	// CreateContext
 	GLXContext glxContext = createNewContext();
 	const_cast<GMXRenderContext*>(context)->setGlxContext(glxContext);

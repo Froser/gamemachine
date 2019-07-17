@@ -3,6 +3,7 @@
 #include <gamemachine.h>
 #include <gmanimation.h>
 #include <gm2dgameobject.h>
+#include <extensions/bsp/gmbspgameworld.h>
 
 using namespace gm;
 
@@ -54,4 +55,24 @@ private:
 	GMfloat m_timeStart;
 };
 
+GM_ALIGNED_16(class) BSPGameObject : public GMGameObject
+{
+	GM_DECLARE_ALIGNED_ALLOCATOR()
+
+public:
+	BSPGameObject(const IRenderContext* context);
+
+public:
+	void load(const GMBuffer& buffer);
+	bool isValid();
+
+public:
+	virtual void draw() override;
+	virtual void update(GMDuration dt) override;
+	virtual void onAppendingObjectToWorld() override;
+
+private:
+	GMOwnedPtr<GMBSPGameWorld> m_world;
+	GMCameraLookAt m_lookAtCache;
+};
 #endif

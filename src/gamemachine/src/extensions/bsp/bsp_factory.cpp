@@ -10,3 +10,12 @@ void GMBSPFactory::createBSPGameWorld(const IRenderContext* context, const GMStr
 	*gameWorld = world;
 	world->loadBSP(map);
 }
+
+void GMBSPFactory::createBSPGameWorld(const IRenderContext* context, const GMBuffer& buffer, OUT GMBSPGameWorld** gameWorld)
+{
+	GM_ASSERT(gameWorld);
+
+	GMBSPGameWorld* world = new GMBSPGameWorld(context);
+	*gameWorld = world;
+	world->loadBSP(buffer);
+}

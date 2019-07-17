@@ -646,6 +646,25 @@ void Timeline::parseObjects(GMXMLElement* e)
 			parseTransform(obj, e);
 			parseBlend(obj, e);
 		}
+		else if (name == L"bsp")
+		{
+			if (objectExists(id))
+				return;
+
+			BSPGameObject* bsp = nullptr;
+			GMString assetName = e->Attribute("asset");
+			GMBuffer asset = findBuffer(assetName);
+			if (asset.getSize() > 0)
+			{
+				bsp = new BSPGameObject(m_context);
+				bsp->load(asset);
+				m_objects[id] = AutoReleasePtr<GMGameObject>(bsp);
+			}
+			else
+			{
+				gm_warning(gm_dbg_wrap("Invalid asset buffer: {0}"), assetName);
+			}
+		}
 		else if (name == L"quad")
 		{
 			if (objectExists(id))
@@ -1387,10 +1406,13 @@ void Timeline::parseActions(GMXMLElement* e)
 				GMString object = e->Attribute("object");
 				void* targetObject = nullptr;
 				AssetType assetType = getAssetType(object, &targetObject);
+
+				GMString deleteFromMemoryStr = e->Attribute("delete");
+				bool deleteFromMemory = deleteFromMemoryStr.isEmpty() ? false : toBool(deleteFromMemoryStr);
 				if (assetType == AssetType::Light)
 					removeObject(asset_cast<ILight>(targetObject)->get(), e, action);
 				else if (assetType == AssetType::GameObject)
-					removeObject(asset_cast<GMGameObject>(targetObject)->get(), e, action);
+					removeObject(asset_cast<GMGameObject>(targetObject)->get(), e, action, deleteFromMemory);
 				else if (assetType == AssetType::NotFound)
 					gm_warning(gm_dbg_wrap("Object '{0}' not found."), object);
 				else
@@ -2234,13 +2256,25 @@ void Timeline::removeObject(ILight* light, GMXMLElement* e, Action& action)
 	};
 }
 
-void Timeline::removeObject(GMGameObject* obj, GMXMLElement* e, Action& action)
+void Timeline::removeObject(GMGameObject* obj, GMXMLElement* e, Action& action, bool deleteFromMemory)
 {
 	GMString objName = e->Attribute("object");
-	action.action = [this, obj, objName]() {
+	action.action = [this, obj, objName, deleteFromMemory]() {
 		if (!m_world->removeFromRenderList(obj))
 		{
 			gm_warning(gm_dbg_wrap("Cannot find object '{0}' from render list."), objName);
+		}
+
+		if (deleteFromMemory)
+		{
+			if (m_world->removeObject(obj))
+			{
+				m_objects.erase(objName);
+			}
+			else
+			{
+				gm_warning(gm_dbg_wrap("Cannot find object '{0}' in world."), objName);
+			}
 		}
 	};
 }

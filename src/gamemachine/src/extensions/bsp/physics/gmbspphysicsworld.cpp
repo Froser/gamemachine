@@ -46,12 +46,15 @@ GMBSPPhysicsWorld::Data& GMBSPPhysicsWorld::physicsData()
 void GMBSPPhysicsWorld::update(GMDuration dt, GMGameObject* obj)
 {
 	D(d);
-	BSPData& bsp = d->world->bspData();
-	GMPhysicsObject* phy = obj->getPhysicsObject();
-	if (phy)
+	if (getEnabled())
 	{
-		GMBSPMove* move = getMove(phy);
-		move->move(dt);
+		BSPData& bsp = d->world->bspData();
+		GMPhysicsObject* phy = obj->getPhysicsObject();
+		if (phy)
+		{
+			GMBSPMove* move = getMove(phy);
+			move->move(dt);
+		}
 	}
 }
 

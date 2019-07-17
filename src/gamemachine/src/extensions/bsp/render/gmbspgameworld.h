@@ -26,6 +26,7 @@ public:
 
 public:
 	void loadBSP(const GMString& mapName);
+	void loadBSP(const GMBuffer& buffer);
 	void setSky(AUTORELEASE GMGameObject* sky);
 	GMGameObject* getSky();
 	Map<GMint32, Set<GMBSPEntity*> >& getEntities();
@@ -36,8 +37,8 @@ public:
 
 	using GMGameWorld::addObjectAndInit;
 
-	void setRenderConfig(gm::GMBSPRenderConfigs config, const GMVariant& value);
-	const GMVariant& getRenderConfig(gm::GMBSPRenderConfigs config);
+	void setRenderConfig(GMBSPRenderConfigs config, const GMVariant& value);
+	const GMVariant& getRenderConfig(GMBSPRenderConfigs config);
 
 public:
 	virtual void renderScene() override;

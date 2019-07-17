@@ -180,7 +180,7 @@ IFramebuffers* GMGraphicEngine::getFilterFramebuffers()
 void GMGraphicEngine::begin()
 {
 	D(d);
-	d->begun = true;
+	++d->begun;
 
 	// 是否使用滤镜
 	bool useFilterFramebuffer = needUseFilterFramebuffer();
@@ -254,11 +254,20 @@ void GMGraphicEngine::draw(const GMGameObjectContainer& objects)
 void GMGraphicEngine::end()
 {
 	D(d);
-	d->begun = false;
+	--d->begun;
 
-	bool useFilterFramebuffer = needUseFilterFramebuffer();
-	if (useFilterFramebuffer)
-		drawFilterFramebuffer();
+	if (d->begun < 0)
+	{
+		d->begun = 0;
+		gm_warning(gm_dbg_wrap("Too many 'end()' have been invoked."));
+	}
+
+	if (!d->begun)
+	{
+		bool useFilterFramebuffer = needUseFilterFramebuffer();
+		if (useFilterFramebuffer)
+			drawFilterFramebuffer();
+	}
 }
 
 const GMFilterMode::Mode GMGraphicEngine::getCurrentFilterMode()

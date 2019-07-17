@@ -211,6 +211,13 @@ void GMBSPGameWorld::loadBSP(const GMString& mapName)
 	importBSP();
 }
 
+void GMBSPGameWorld::loadBSP(const GMBuffer& buffer)
+{
+	D(d);
+	d->bsp.loadBsp(buffer);
+	importBSP();
+}
+
 void GMBSPGameWorld::setSky(AUTORELEASE GMGameObject* sky)
 {
 	D(d);
@@ -227,8 +234,12 @@ GMGameObject* GMBSPGameWorld::getSky()
 void GMBSPGameWorld::renderScene()
 {
 	GM_PROFILE(getContext()->getEngine(), "renderScene");
+	D_BASE(d, Base);
+	IGraphicEngine* engine = d->context->getEngine();
+	engine->begin();
 	prepareAllToRenderList();
 	Base::renderScene();
+	engine->end();
 }
 
 void GMBSPGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj, bool alwaysVisible)

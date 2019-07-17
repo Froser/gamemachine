@@ -70,6 +70,8 @@ public:
 	void look(GMfloat pitch, GMfloat yaw);
 	const GMCamera& getCamera() GM_NOEXCEPT;
 
+	void setPosition(const GMVec3& position);
+
 public:
 	inline void setMoveSpeed(const GMVec3& speed)
 	{

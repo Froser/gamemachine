@@ -37,6 +37,7 @@ extern "C"
 namespace
 {
 	static GMMessage s_frameUpdateMsg(GameMachineMessageType::FrameUpdate);
+	GMMutex s_callableLock;
 }
 
 GameMachine& GameMachine::instance()
@@ -193,6 +194,8 @@ bool GameMachine::sendMessage(const GMMessage& msg)
 void GameMachine::invokeInMainThread(GMCallable callable)
 {
 	D(d);
+	GMMutexLock lock(&s_callableLock);
+	lock->lock();
 	d->callableQueue.push(callable);
 }
 
@@ -421,7 +424,9 @@ void GameMachine::initHandlers()
 void GameMachine::invokeCallables()
 {
 	D(d);
-	GMMutexLock mutex;
+	GMMutexLock lock(&s_callableLock);
+	lock->lock();
+
 	while (!d->callableQueue.empty())
 	{
 		GMCallable callable = d->callableQueue.front();

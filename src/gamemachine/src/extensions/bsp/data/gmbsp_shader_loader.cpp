@@ -169,7 +169,7 @@ void GMBSPShaderLoader::load()
 	D(d);
 	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 	GMBuffer buf;
-	pk->readFileFromPath(pk->pathOf(GMPackageIndex::Root, L"texshaders/sfx"), &buf);
+	pk->readFile(GMPackageIndex::Scripts, L"sfx", &buf);
 	buf.convertToStringBuffer();
 	parse((const char*) buf.getData());
 }

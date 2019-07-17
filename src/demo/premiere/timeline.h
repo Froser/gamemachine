@@ -264,7 +264,7 @@ private:
 	void addObject(AutoReleasePtr<IParticleSystem>*, GMXMLElement*, Action&);
 	void addObject(GMShadowSourceDesc*, GMXMLElement*, Action&);
 	void removeObject(ILight*, GMXMLElement*, Action&);
-	void removeObject(GMGameObject*, GMXMLElement*, Action&);
+	void removeObject(GMGameObject*, GMXMLElement*, Action&, bool);
 	void setColorForModel(GMModel*, const GMfloat color[4]);
 	void transferColorForModel(GMModel*, const GMfloat color[4]);
 	CurveType parseCurve(GMXMLElement*, GMInterpolationFunctors&);

@@ -7,6 +7,7 @@ class GMBSPGameWorld;
 struct GM_EXPORT GMBSPFactory
 {
 	static void createBSPGameWorld(const IRenderContext* context, const GMString& map, OUT GMBSPGameWorld** gameWorld);
+	static void createBSPGameWorld(const IRenderContext* context, const GMBuffer& buffer, OUT GMBSPGameWorld** gameWorld);
 };
 
 END_NS

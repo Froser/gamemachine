@@ -10,11 +10,13 @@ GM_PRIVATE_OBJECT(GMPhysicsWorld)
 {
 	GMGameWorld* world;
 	GMfloat gravity;
+	bool enabled = true;
 };
 
 class GM_EXPORT GMPhysicsWorld : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMPhysicsWorld)
+	GM_DECLARE_PROPERTY(Enabled, enabled)
 
 public:
 	GMPhysicsWorld(GMGameWorld* world);

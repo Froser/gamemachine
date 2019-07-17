@@ -12,7 +12,6 @@ GMSpriteGameObject::GMSpriteGameObject(GMfloat radius, const GMVec3& position)
 	d->cameraUtility.setCamera(&d->camera);
 }
 
-
 GMSpriteGameObject::GMSpriteGameObject(GMfloat radius, const GMCamera& camera)
 {
 	D(d);
@@ -47,6 +46,14 @@ const GMCamera& GMSpriteGameObject::getCamera() GM_NOEXCEPT
 {
 	D(d);
 	return d->camera;
+}
+
+void GMSpriteGameObject::setPosition(const GMVec3& position)
+{
+	D(d);
+	auto lookAt = d->camera.getLookAt();
+	lookAt.position = position;
+	d->camera.lookAt(lookAt);
 }
 
 void GMSpriteGameObject::update(GMDuration dt)

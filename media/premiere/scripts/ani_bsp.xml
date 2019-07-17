@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<timeline>
+    <assets>
+        <buffer id="bsp" file="maps/gv.bsp" />
+    </assets>
+    <objects>
+        <bsp id="bsp_map" asset="bsp" />
+    </objects>
+    <actions>
+        <action type="addObject" object="bsp_map" time="+0" />
+
+        <checkpoint type="save"/>
+        <component file="component_fade_in.xml">
+            <slot name="duration">1.5</slot>
+        </component>
+        <checkpoint type="load"/>
+
+        <action type="camera" direction="0 0 -1" position="112 10 2072" time="+0"/>
+        <action type="animate" action="play" object="$camera" time="+0"/>
+        <action type="animate" function="cubic-bezier" control=".5 0 .5 1" direction="-1 -.3 .5" object="$camera" position="80 200 1100" endtime="8"/>
+        <action type="animate" action="stop" object="$camera" time="+8"/>
+
+        <checkpoint type="time" time="-1" />
+        <component file="component_fade_out.xml" >
+            <slot name="duration">1.5</slot>
+        </component>
+
+        <checkpoint type="save"/>
+        <component file="component_fade_in.xml">
+            <slot name="duration">1.5</slot>
+        </component>
+        <checkpoint type="load"/>
+
+        <checkpoint type="time" time="-0.2" />
+        <action type="camera" direction="-.95 .27 .11" position="-225 40 2592" time="+0"/>
+        <action type="animate" action="play" object="$camera" time="+0"/>
+        <action type="animate" function="cubic-bezier" control=".25 0 .5 1" object="$camera" direction="-.56 -.16 .68" position="-1055 200 2568" endtime="5"/>
+        <action type="animate" action="stop" object="$camera" time="+5"/>
+
+        <checkpoint type="time" time="-1.5" />
+        <component file="component_fade_out.xml" >
+            <slot name="duration">1.5</slot>
+        </component>
+
+        <checkpoint type="save"/>
+        <component file="component_fade_in.xml">
+            <slot name="duration">1.5</slot>
+        </component>
+        <checkpoint type="load"/>
+
+        <action type="camera" direction="0.8 0.35 -0.46" position="-632 10 2013" time="+0"/>
+        <action type="animate" action="play" object="$camera" time="+0"/>
+        <action type="animate" function="cubic-bezier" control=".25 0 .5 1" direction="0.8 -0.1 -0.46" object="$camera" position="-700 150 2113" endtime="8"/>
+        <action type="animate" action="stop" object="$camera" time="+8"/>
+
+        <checkpoint type="time" time="-1.5" />
+        <component file="component_fade_out.xml" >
+            <slot name="duration">1.5</slot>
+        </component>
+
+        <action type="removeObject" object="bsp_map" time="+0" delete="true" />
+    </actions>
+</timeline>
