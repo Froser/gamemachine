@@ -388,7 +388,8 @@ void GMBSPGameWorld::prepareAllToRenderList()
 void GMBSPGameWorld::prepareSkyToRenderList()
 {
 	D(d);
-	addToRenderList(d->sky);
+	if (d->sky)
+		addToRenderList(d->sky);
 }
 
 void GMBSPGameWorld::prepareFacesToRenderList()

@@ -31,7 +31,6 @@ public:
 	GMGameObject* getSky();
 	Map<GMint32, Set<GMBSPEntity*> >& getEntities();
 	void addObjectAndInit(AUTORELEASE GMGameObject* obj, bool alwaysVisible);
-	void setDefaultLights();
 	void setSprite(GMSpriteGameObject* sprite);
 	GMSpriteGameObject* getSprite();
 
@@ -41,6 +40,7 @@ public:
 	const GMVariant& getRenderConfig(GMBSPRenderConfigs config);
 
 public:
+	virtual void setDefaultLights();
 	virtual void renderScene() override;
 
 	//renders:

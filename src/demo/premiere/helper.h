@@ -55,6 +55,14 @@ private:
 	GMfloat m_timeStart;
 };
 
+class BSPGameWorld : public GMBSPGameWorld
+{
+public:
+	using GMBSPGameWorld::GMBSPGameWorld;
+
+	virtual void setDefaultLights() override {} //do nothing
+};
+
 GM_ALIGNED_16(class) BSPGameObject : public GMGameObject
 {
 	GM_DECLARE_ALIGNED_ALLOCATOR()
@@ -72,7 +80,7 @@ public:
 	virtual void onAppendingObjectToWorld() override;
 
 private:
-	GMOwnedPtr<GMBSPGameWorld> m_world;
+	GMOwnedPtr<BSPGameWorld> m_world;
 	GMCameraLookAt m_lookAtCache;
 };
 #endif

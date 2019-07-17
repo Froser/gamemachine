@@ -128,8 +128,9 @@ BSPGameObject::BSPGameObject(const IRenderContext* context)
 
 void BSPGameObject::load(const GMBuffer& buffer)
 {
-	GMBSPGameWorld* world = nullptr;
-	GMBSPFactory::createBSPGameWorld(getContext(), buffer, &world);
+	BSPGameWorld* world = new BSPGameWorld(getContext());
+	world->loadBSP(buffer);
+
 	if (world)
 	{
 		if (auto phyw = world->getPhysicsWorld())

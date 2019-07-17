@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <timeline>
     <assets>
-        <buffer id="bsp" file="maps/gv.bsp" />
+        <buffer id="bsp" file="maps/quake.bsp" />
     </assets>
     <objects>
         <bsp id="bsp_map" asset="bsp" />
+        <light id="light_bsp_global" type="point" position="500 300 -500" ambient=".9 .9 .9" diffuse="1 1 1" />
     </objects>
     <actions>
         <action type="addObject" object="bsp_map" time="+0" />
+        <action type="addObject" object="light_bsp_global" time="+0" />
 
         <checkpoint type="save"/>
         <component file="component_fade_in.xml">
@@ -58,6 +60,7 @@
             <slot name="duration">1.5</slot>
         </component>
 
+        <action type="removeObject" object="light_bsp_global" time="+0" />
         <action type="removeObject" object="bsp_map" time="+0" delete="true" />
     </actions>
 </timeline>
