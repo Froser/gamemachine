@@ -967,7 +967,7 @@ inline GMQuat Lerp(const GMQuat& Q1, const GMQuat& Q2, gm::GMfloat T)
 #if GM_USE_DX_MATH
 	R.v_ = DirectX::XMQuaternionSlerp(Q1.v_, Q2.v_, T);
 #else
-	R.v_ = glm::mix(Q1.v_, Q2.v_, T);
+	R.v_ = glm::slerp(Q1.v_, Q2.v_, T);
 #endif
 	return R;
 }
