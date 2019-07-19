@@ -71,7 +71,7 @@ GMfloat GMClock::elapsedFromStart()
 {
 	D(d);
 	GMint64 now = highResolutionTimer();
-	return cycleToSecond(now - d->begin);
+	return cycleToSecond(now - d->begin) * d->timeScale;
 }
 
 GMfloat GMClock::getFps()

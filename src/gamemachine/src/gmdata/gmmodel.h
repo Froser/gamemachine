@@ -28,7 +28,7 @@ GM_ALIGNED_STRUCT(GMSkeletalBone)
 	GMMat4 offsetMatrix; //!< 从模型空间到绑定姿势的变换
 	GMModel* targetModel = nullptr;
 	Vector<GMSkeletonWeight> weights;
-	GMMat4 finalTransformation; //!< 所有的计算结果将会放到这里来
+	GMMat4 finalTransformation = Zero<GMMat4>(); //!< 所有的计算结果将会放到这里来
 };
 
 GM_PRIVATE_OBJECT(GMNode)
@@ -108,7 +108,7 @@ struct GMNodeAnimationKeyframe
 	T value;
 };
 
-GM_ALIGNED_STRUCT(GMAnimationNode)
+GM_ALIGNED_STRUCT(GMNodeAnimationNode)
 {
 	GMString name;
 	AlignedVector<GMNodeAnimationKeyframe<GMVec3>> positions;
@@ -121,7 +121,7 @@ GM_ALIGNED_STRUCT(GMNodeAnimation)
 	GMfloat frameRate = 25;
 	GMDuration duration;
 	GMString name;
-	AlignedVector<GMAnimationNode> nodes;
+	AlignedVector<GMNodeAnimationNode> nodes;
 };
 
 GM_PRIVATE_OBJECT(GMSkeletalAnimations)

@@ -293,7 +293,7 @@ namespace
 
 			for (auto i = 0u; i < animation->mNumChannels; ++i)
 			{
-				GMAnimationNode n;
+				GMNodeAnimationNode n;
 				const aiNodeAnim* node = animation->mChannels[i];
 				n.name = node->mNodeName.C_Str();
 				for (auto j = 0u; j < node->mNumPositionKeys; ++j)

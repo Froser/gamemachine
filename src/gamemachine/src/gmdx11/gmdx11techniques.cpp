@@ -367,6 +367,7 @@ GMTextureAsset GMDx11Technique::getWhiteTexture()
 void GMDx11Technique::updateBoneTransforms(IShaderProgram* shaderProgram, GMModel* model)
 {
 	D(d);
+	static const GMMat4 s_zero = Zero<GMMat4>();
 	auto bones = d->effect->GetVariableByName(GM_VariablesDesc.Bones.toStdString().c_str());
 	const auto& transforms = model->getBoneTransformations();
 	for (UINT i = 0; i < gm_sizet_to_uint(transforms.size()); ++i)

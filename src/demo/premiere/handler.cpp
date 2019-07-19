@@ -40,11 +40,11 @@ void Handler::init(const IRenderContext* context)
 	GMGamePackage* pk = GM.getGamePackageManager();
 
 #if GM_WINDOWS
-#	ifdef GM_DEBUG
+//#	ifdef GM_DEBUG
 	pk->loadPackage("D:/gmpk");
-#	else
-	pk->loadPackage((GMPath::getCurrentPath() + L"gm.pk0"));
-#	endif
+//#	else
+//	pk->loadPackage((GMPath::getCurrentPath() + L"gm.pk0"));
+//#	endif
 #else
 #	ifdef GM_DEBUG
 	pk->loadPackage("/home/froser/Documents/gmpk");

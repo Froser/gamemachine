@@ -150,6 +150,7 @@ bool GameMachine::renderFrame(IWindow* window)
 {
 	D(d);
 	GMClock frameCounter;
+
 	// 记录帧率
 	frameCounter.begin();
 

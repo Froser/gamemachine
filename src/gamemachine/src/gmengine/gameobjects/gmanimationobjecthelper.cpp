@@ -4,24 +4,6 @@
 #include "foundation/gamemachine.h"
 #include "gmengine/gmgameworld.h"
 
-namespace
-{
-	template <typename T>
-	GMsize_t findIndex(GMDuration animationTime, const AlignedVector<GMNodeAnimationKeyframe<T>>& frames)
-	{
-		GM_ASSERT(frames.size() > 0);
-		for (GMsize_t i = 0; i < frames.size() - 1; ++i)
-		{
-			const GMNodeAnimationKeyframe<T>& frame = frames[i + 1];
-			if (animationTime < frame.time)
-				return i;
-		}
-
-		GM_ASSERT(false);
-		return 0;
-	}
-}
-
 GMAnimationEvaluator::GMAnimationEvaluator(GMNode* root, GMSkeleton* skeleton)
 {
 	D(d);
@@ -58,31 +40,60 @@ void GMAnimationEvaluator::reset()
 {
 	D(d);
 	d->duration = 0;
+	d->lastFrameIdx.clear();
 }
 
 void GMAnimationEvaluator::updateNode(GMDuration animationTime, GMNode* node, const GMMat4& parentTransformation)
 {
 	D(d);
+	enum
+	{
+		Translation,
+		Rotation,
+		Scaling,
+	};
+
 	const GMString& nodeName = node->getName();
-	const GMAnimationNode* animationNode = findAnimationNode(nodeName);
+	const GMNodeAnimationNode* animationNode = findAnimationNode(nodeName);
 	GMMat4 nodeTransformation = node->getTransformToParent();
 	GMfloat factor = 0;
+
+	GMfloat time = 0;
+	if (d->animation->duration > 0)
+		time = Fmod(animationTime, d->animation->duration);
 
 	if (animationNode)
 	{
 		// Position
-		GMVec3 currentPosition;
+		GMVec3 currentPosition(0, 0, 0);
 		if (!animationNode->positions.empty())
 		{
 			const auto& v = animationNode->positions;
 			if (v.size() > 1)
 			{
-				GMfloat frameIdx = findIndex(animationTime, v);
-				GMfloat nextFrameIdx = frameIdx + 1;
+				GMuint32 frameIdx = (time >= d->lastTime) ? d->lastFrameIdx[animationNode][Translation] : 0;
+				while (frameIdx < animationNode->positions.size() - 1)
+				{
+					if (time < animationNode->positions[frameIdx + 1].time)
+						break;
+					frameIdx++;
+				}
+				
+				d->lastFrameIdx[animationNode][Translation] = frameIdx;
+				GMfloat nextFrameIdx = (frameIdx + 1) % animationNode->positions.size();
+
 				const auto& frame = v[frameIdx];
 				const auto& nextFrame = v[nextFrameIdx];
-				factor = (animationTime - frame.time) / (nextFrame.time - frame.time);
-				currentPosition = Lerp(frame.value, nextFrame.value, factor);
+				GMfloat diffTime = nextFrame.time - frame.time;
+				if (diffTime > 0)
+				{
+					factor = (animationTime - frame.time) / diffTime;
+					currentPosition = Lerp(frame.value, nextFrame.value, factor);
+				}
+				else
+				{
+					currentPosition = frame.value;
+				}
 			}
 			else
 			{
@@ -91,19 +102,35 @@ void GMAnimationEvaluator::updateNode(GMDuration animationTime, GMNode* node, co
 		}
 
 		// Rotation
-		GMQuat currentRotation;
+		GMQuat currentRotation = Identity<GMQuat>();
 		if (!animationNode->rotations.empty())
 		{
 			const auto& v = animationNode->rotations;
 			if (v.size() > 1)
 			{
-				GMfloat frameIdx = findIndex(animationTime, v);
-				GMfloat nextFrameIdx = frameIdx + 1;
+				GMuint32 frameIdx = (time >= d->lastTime) ? d->lastFrameIdx[animationNode][Rotation] : 0;
+				while (frameIdx < animationNode->rotations.size() - 1)
+				{
+					if (time < animationNode->rotations[frameIdx + 1].time)
+						break;
+					frameIdx++;
+				}
+
+				d->lastFrameIdx[animationNode][Rotation] = frameIdx;
+				GMfloat nextFrameIdx = (frameIdx + 1) % animationNode->rotations.size();
+
 				const auto& frame = v[frameIdx];
 				const auto& nextFrame = v[nextFrameIdx];
-				factor = (animationTime - frame.time) / (nextFrame.time - frame.time);
-				GMDuration diffTime = nextFrame.time - frame.time;
-				currentRotation = Lerp(frame.value, nextFrame.value, factor);
+				GMfloat diffTime = nextFrame.time - frame.time;
+				if (diffTime > 0)
+				{
+					factor = (animationTime - frame.time) / diffTime;
+					currentRotation = Lerp(frame.value, nextFrame.value, factor);
+				}
+				else
+				{
+					currentRotation = frame.value;
+				}
 			}
 			else
 			{
@@ -112,28 +139,45 @@ void GMAnimationEvaluator::updateNode(GMDuration animationTime, GMNode* node, co
 		}
 
 		// Scaling
-		GMVec3 currentScaling;
+		GMVec3 currentScaling(1, 1, 1);
 		if (!animationNode->scalings.empty())
 		{
 			const auto& v = animationNode->scalings;
 			if (v.size() > 1)
 			{
-				GMfloat frameIdx = findIndex(animationTime, v);
-				GMfloat nextFrameIdx = frameIdx + 1;
+				GMuint32 frameIdx = (time >= d->lastTime) ? d->lastFrameIdx[animationNode][Scaling] : 0;
+				while (frameIdx < animationNode->scalings.size() - 1)
+				{
+					if (time < animationNode->scalings[frameIdx + 1].time)
+						break;
+					frameIdx++;
+				}
+
+				d->lastFrameIdx[animationNode][Scaling] = frameIdx;
+				GMfloat nextFrameIdx = (frameIdx + 1) % animationNode->scalings.size();
+
 				const auto& frame = v[frameIdx];
 				const auto& nextFrame = v[nextFrameIdx];
-				factor = (animationTime - frame.time) / (nextFrame.time - frame.time);
-				GMDuration diffTime = nextFrame.time - frame.time;
-				currentScaling = Lerp(frame.value, nextFrame.value, factor);
+				GMfloat diffTime = nextFrame.time - frame.time;
+				if (diffTime > 0)
+				{
+					factor = (animationTime - frame.time) / diffTime;
+					currentScaling = Lerp(frame.value, nextFrame.value, factor);
+				}
+				else
+				{
+					currentScaling = frame.value;
+				}
 			}
 			else
 			{
 				currentScaling = v[0].value;
 			}
 		}
-
 		nodeTransformation = Scale(currentScaling) * QuatToMatrix(currentRotation) * Translate(currentPosition);
 	}
+
+	d->lastTime = time;
 
 	GMMat4 globalTransformation = nodeTransformation * parentTransformation;
 	node->setGlobalTransform(globalTransformation);
@@ -158,7 +202,7 @@ void GMAnimationEvaluator::updateNode(GMDuration animationTime, GMNode* node, co
 	}
 }
 
-const GMAnimationNode* GMAnimationEvaluator::findAnimationNode(const GMString& name)
+const GMNodeAnimationNode* GMAnimationEvaluator::findAnimationNode(const GMString& name)
 {
 	D(d);
 	for (auto& node : d->animation->nodes)
@@ -282,6 +326,7 @@ void GMAnimationGameObjectHelper::setAnimation(GMsize_t index)
 		gm_error(gm_dbg_wrap("Animation index overflow. Max count is {0}"), GMString(gm_sizet_to_int(getAnimationCount())));
 		index = 0;
 	}
+
 	d->animationIndex = index;
 }
 
