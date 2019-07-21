@@ -154,6 +154,7 @@ void GMGLFactory::createComputeContext(OUT const IRenderContext** out)
 			GMWindowFactory::createTempWindow(32, 8, 24, 8, hwnd, dc, rc);
 			GLenum err = glewInit();
 			GM_ASSERT(err == GLEW_OK);
+			glGetError(); // glewInit bug, clear error
 		}
 
 		~ComputeEngine()

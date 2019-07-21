@@ -5,6 +5,7 @@
 #include "gmengine/gmgraphicengine.h"
 #include "foundation/gamemachine.h"
 #include "gmengine/gmcsmhelper.h"
+#include "gmglgraphic_engine.h"
 
 GM_PRIVATE_OBJECT_UNALIGNED(GMGLFramebufferTexture)
 {
@@ -175,6 +176,9 @@ bool GMGLFramebuffers::init(const GMFramebuffersDesc& desc)
 	d->clearColor[1] = desc.clearColor[1];
 	d->clearColor[2] = desc.clearColor[2];
 	d->clearColor[3] = desc.clearColor[3];
+
+	// 需要手动清理error记录，否则不能直接拿glGetError来判断是否是否成功，它会拿最后一个错误。
+	GMGLGraphicEngine::clearGLErrors();
 
 	glGenFramebuffers(1, &d->fbo);
 	createDepthStencilBuffer(d->desc);
