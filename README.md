@@ -80,3 +80,22 @@
 ![Collision](https://github.com/Froser/gamemachine/blob/master/manual/pic/3.png)
 ![Gerstner wave](https://github.com/Froser/gamemachine/blob/master/manual/pic/4.png)
 ![GPGPU Compute](https://github.com/Froser/gamemachine/blob/master/manual/pic/5.png)
+
+# 关于GameMachine Premiere
+## GameMachine Premiere 是什么：
+GameMachine Premiere 是一个用GameMachine引擎制作的CG Demo。
+它可以将GameMachine中应用的一些渲染技术播放出来。
+
+## GameMachine Premiere 播放原理：
+GameMachine Premiere的代码存放在src/demo/premiere中。
+它主要是通过自己的时间轴解析器(timeline.h, timeline.cpp)，来解析时间轴xml文件。时间轴中定义了所用到的资源，它们出现的时间，动画的插值方式等，具体的时间轴文件存放在media/premiere/scripts中。
+
+## GameMachine Premiere 运行方法：
+编译好GameMachine Premiere之后，同GameMachine Demo类似：
+* 直接构建release，并将media/gm.pk0拷贝到release目录下，将media/premiere中的所有文件打包zip格式，并改名为gm.pk1，放到release目录下，便可以运行程序。
+* 如果运行debug，请将media/gm.pk0用WinRAR等压缩工具解压到D:/gmpk；将media/premiere中的所有文件放到D:/gmpk1中，便可运行程序。
+
+## 效果预览：
+![Particle And Models](https://github.com/Froser/gamemachine/blob/master/manual/pic/p1.png)
+![Waves And Terrains](https://github.com/Froser/gamemachine/blob/master/manual/pic/p2.png)
+![Animations](https://github.com/Froser/gamemachine/blob/master/manual/pic/p3.png)

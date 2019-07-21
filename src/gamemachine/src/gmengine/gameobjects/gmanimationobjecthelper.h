@@ -12,8 +12,6 @@ GM_PRIVATE_OBJECT(GMAnimationEvaluator)
 	GMSkeleton* skeleton = nullptr;
 	GMNode* rootNode = nullptr;
 	GMMat4 globalInverseTransform;
-	GMfloat lastTime = 0;
-	Map<const GMNodeAnimationNode*, Array<GMint32, 3>> lastFrameIdx;
 };
 
 class GMAnimationEvaluator
