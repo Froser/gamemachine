@@ -230,6 +230,7 @@ public:
 	void pause();
 
 private:
+	void initPresetConstants();
 	void parseElements(GMXMLElement*);
 	void parseDefines(GMXMLElement*);
 	void parseAssets(GMXMLElement*);
@@ -292,6 +293,7 @@ private:
 	HashMap<GMString, AutoReleasePtr<IParticleSystem>, GMStringHashFunctor> m_particleSystems;
 	HashMap<GMString, GMShadowSourceDesc, GMStringHashFunctor> m_shadows;
 	HashMap<GMString, GMString, GMStringHashFunctor> m_defines;
+	HashMap<GMString, GMString, GMStringHashFunctor> m_presetConstants;
 	Map<GMModel*, GMVertices> m_verticesCache;
 	std::multiset<Action> m_immediateActions;
 	std::multiset<Action> m_deferredActions;

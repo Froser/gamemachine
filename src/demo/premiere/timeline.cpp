@@ -234,6 +234,8 @@ Timeline::~Timeline()
 
 bool Timeline::parse(const GMString& timelineContent)
 {
+	initPresetConstants();
+
 	GMXMLDocument doc;
 	std::string content = timelineContent.toStdString();
 	if (GMXMLError::XML_SUCCESS == doc.Parse(content.c_str()))
@@ -317,6 +319,10 @@ GMString Timeline::getValueFromDefines(GMString id)
 		auto replacementIter = m_defines.find(key);
 		if (replacementIter != m_defines.end())
 			return sign + replacementIter->second;
+
+		replacementIter = m_presetConstants.find(key);
+		if (replacementIter != m_presetConstants.end())
+			return sign + replacementIter->second;
 	}
 	else if (id.startsWith("@"))
 	{
@@ -339,6 +345,14 @@ void Timeline::pause()
 			animation.second.pauseAnimation();
 		}
 	}
+}
+
+void Timeline::initPresetConstants()
+{
+	// 写入一些常量
+	const GMRect& winRc = m_context->getWindow()->getRenderRect();
+	m_presetConstants["GM_screenWidth"] = GMString(winRc.width);
+	m_presetConstants["GM_screenHeight"] = GMString(winRc.height);
 }
 
 void Timeline::parseElements(GMXMLElement* e)
@@ -371,7 +385,8 @@ void Timeline::parseDefines(GMXMLElement* e)
 {
 	while (e)
 	{
-		auto result = m_defines.insert(std::make_pair(e->Name(), e->GetText()));
+		GMString text = getValueFromDefines(e->GetText());
+		auto result = m_defines.insert(std::make_pair(e->Name(), text));
 		if (!result.second)
 			gm_warning(gm_dbg_wrap("The define name '{0}' has been already taken."), e->Name());
 		e = e->NextSiblingElement();
