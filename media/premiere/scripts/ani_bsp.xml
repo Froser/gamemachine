@@ -33,6 +33,7 @@
         </component>
         <checkpoint type="load"/>
 
+<!--
         <checkpoint type="time" time="-0.2" />
         <action type="camera" direction="-.95 .27 .11" position="-225 40 2592" time="+0"/>
         <action type="animate" action="play" object="$camera" time="+0"/>
@@ -49,6 +50,7 @@
             <slot name="duration">1.5</slot>
         </component>
         <checkpoint type="load"/>
+    -->
 
         <action type="camera" direction="0.8 0.35 -0.46" position="-632 10 2013" time="+0"/>
         <action type="animate" action="play" object="$camera" time="+0"/>

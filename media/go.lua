@@ -68,8 +68,8 @@ handler.init = function(context)
 	local fontBufferEN = gamepackage:readFile(8, "times.ttf")
 	local handleCN = glyphManager:addFontByMemory(fontBufferCN)
 	local handleEN = glyphManager:addFontByMemory(fontBufferEN)
-	glyphManager:setCN(handleCN)
-	glyphManager:setEN(handleEN)
+	glyphManager:setDefaultFontCN(handleCN)
+	glyphManager:setDefaultFontEN(handleEN)
 
 	uiconfiguration = GMUIConfiguration.new(context) -- 创建UI资源
 	local skinBuffer = gamepackage:readFile(3, "skin.gmskin") -- 3: 纹理资源。读取皮肤

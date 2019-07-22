@@ -9,7 +9,7 @@ using namespace luaapi;
 #define NAME "GMGlyphManager"
 
 /*
- * setCN([self], buffer)
+ * addFontByMemory([self], buffer)
  */
 GM_LUA_PROXY_IMPL(GMGlyphManagerProxy, addFontByMemory)
 {
@@ -25,39 +25,39 @@ GM_LUA_PROXY_IMPL(GMGlyphManagerProxy, addFontByMemory)
 }
 
 /*
- * setEN([self], fontHandle)
+ * setDefaultFontEN([self], fontHandle)
  */
-GM_LUA_PROXY_IMPL(GMGlyphManagerProxy, setEN)
+GM_LUA_PROXY_IMPL(GMGlyphManagerProxy, setDefaultFontEN)
 {
-	static const GMString s_invoker = NAME ".setEN";
-	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setEN");
+	static const GMString s_invoker = NAME ".setDefaultFontEN";
+	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setDefaultFontEN");
 	GMGlyphManagerProxy self(L);
 	GMFontHandle fontHandle = static_cast<GMFontHandle>(GMArgumentHelper::popArgument(L, s_invoker).toInt()); //fontHandle
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
-		self->setEN(fontHandle);
+		self->setDefaultFontEN(fontHandle);
 	return GMReturnValues();
 }
 
 /*
- * setCN([self], fontHandle)
+ * setDefaultFontCN([self], fontHandle)
  */
-GM_LUA_PROXY_IMPL(GMGlyphManagerProxy, setCN)
+GM_LUA_PROXY_IMPL(GMGlyphManagerProxy, setDefaultFontCN)
 {
-	static const GMString s_invoker = NAME ".setCN";
-	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setCN");
+	static const GMString s_invoker = NAME ".setDefaultFontCN";
+	GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setDefaultFontCN");
 	GMGlyphManagerProxy self(L);
 	GMFontHandle fontHandle = static_cast<GMFontHandle>(GMArgumentHelper::popArgument(L, s_invoker).toInt()); //fontHandle
 	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 	if (self)
-		self->setCN(fontHandle);
+		self->setDefaultFontCN(fontHandle);
 	return GMReturnValues();
 }
 
 bool GMGlyphManagerProxy::registerMeta()
 {
 	GM_META_FUNCTION(addFontByMemory);
-	GM_META_FUNCTION(setEN);
-	GM_META_FUNCTION(setCN);
+	GM_META_FUNCTION(setDefaultFontEN);
+	GM_META_FUNCTION(setDefaultFontCN);
 	return Base::registerMeta();
 }

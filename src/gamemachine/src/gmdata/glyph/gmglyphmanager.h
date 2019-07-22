@@ -72,7 +72,7 @@ public:
 	virtual GMTextureAsset glyphTexture() = 0;
 
 public:
-	void setCN(GMFontHandle fontHandle)
+	void setDefaultFontCN(GMFontHandle fontHandle)
 	{
 		D(d);
 		d->defaultCN = fontHandle;
@@ -80,7 +80,7 @@ public:
 			d->defaultCN = 0;
 	}
 
-	void setEN(GMFontHandle fontHandle)
+	void setDefaultFontEN(GMFontHandle fontHandle)
 	{
 		D(d);
 		d->defaultEN = fontHandle;
@@ -88,13 +88,13 @@ public:
 			d->defaultEN = 0;
 	}
 
-	inline GMFontHandle getSimHei()
+	inline GMFontHandle getDefaultFontCN()
 	{
 		D(d);
 		return d->defaultCN;
 	}
 
-	inline GMFontHandle getTimesNewRoman()
+	inline GMFontHandle getDefaultFontEN()
 	{
 		D(d);
 		return d->defaultEN;

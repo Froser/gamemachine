@@ -30,7 +30,8 @@ GMBuffer::GMBuffer(GMbyte* rhs, GMsize_t sz, bool owned)
 	size = sz;
 	if (isOwned)
 	{
-		data = new GMbyte[size];
+		GMsize_t allocSize = sz + 2; // 预留2个字节，用于convertToStringBuffer补0
+		data = new GMbyte[allocSize];
 		if (rhs)
 			memcpy_s(data, size, rhs, size);
 	}
@@ -130,12 +131,9 @@ void GMBuffer::swap(GMBuffer& rhs)
 
 void GMBuffer::convertToStringBuffer()
 {
-	GMBuffer buf;
-	buf.resize(size + 1);
-	memcpy_s(buf.data, size, data, size);
 	// 在末尾补0
-	buf.data[size] = 0;
-	*this = buf;
+	data[size] = 0;
+	data[size + 1] = 0;
 }
 
 void GMBuffer::addRef()

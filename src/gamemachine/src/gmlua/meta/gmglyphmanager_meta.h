@@ -11,8 +11,8 @@ namespace luaapi
 	GM_PRIVATE_OBJECT(GMGlyphManagerProxy)
 	{
 		GM_LUA_PROXY_FUNC(addFontByMemory);
-		GM_LUA_PROXY_FUNC(setEN);
-		GM_LUA_PROXY_FUNC(setCN);
+		GM_LUA_PROXY_FUNC(setDefaultFontEN);
+		GM_LUA_PROXY_FUNC(setDefaultFontCN);
 	};
 
 	class GMGlyphManagerProxy : public GMObjectProxy

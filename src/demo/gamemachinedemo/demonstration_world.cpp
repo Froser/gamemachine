@@ -723,7 +723,7 @@ void DemostrationEntrance::init(const gm::IRenderContext* context)
 		gm::GMGlyphManager* glyphManager = context->getEngine()->getGlyphManager();
 		pk->readFile(gm::GMPackageIndex::Fonts, L"simhei.ttf", &buf);
 		gm::GMFontHandle font = glyphManager->addFontByMemory(std::move(buf));
-		glyphManager->setCN(font);
+		glyphManager->setDefaultFontCN(font);
 	}
 
 	{
@@ -731,7 +731,7 @@ void DemostrationEntrance::init(const gm::IRenderContext* context)
 		gm::GMGlyphManager* glyphManager = context->getEngine()->getGlyphManager();
 		pk->readFile(gm::GMPackageIndex::Fonts, L"times.ttf", &buf);
 		gm::GMFontHandle font = glyphManager->addFontByMemory(std::move(buf));
-		glyphManager->setEN(font);
+		glyphManager->setDefaultFontEN(font);
 	}
 
 	context->getEngine()->setShaderLoadCallback(this);

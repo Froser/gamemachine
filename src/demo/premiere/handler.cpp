@@ -3,9 +3,10 @@
 #include "procedures.h"
 #include <gmshaderhelper.h>
 
-Handler::Handler(IWindow* window)
+Handler::Handler(IWindow* window, Config&& c) GM_NOEXCEPT
 	: m_mainWindow(window)
 	, m_world(nullptr)
+	, m_config(std::move(c))
 {
 }
 
@@ -39,34 +40,20 @@ void Handler::init(const IRenderContext* context)
 {
 	GMGamePackage* pk = GM.getGamePackageManager();
 
-#if GM_WINDOWS
-//#	ifdef GM_DEBUG
-	pk->loadPackage("D:/gmpk");
-//#	else
-//	pk->loadPackage((GMPath::getCurrentPath() + L"gm.pk0"));
-//#	endif
-#else
-#	ifdef GM_DEBUG
-	pk->loadPackage("/home/froser/Documents/gmpk");
-#	else
-	pk->loadPackage((GMPath::getCurrentPath() + L"gm.pk0"));
-#	endif
-#endif
-
 	{
 		GMBuffer buf;
 		GMGlyphManager* glyphManager = context->getEngine()->getGlyphManager();
-		pk->readFile(GMPackageIndex::Fonts, L"simhei.ttf", &buf);
+		pk->readFile(GMPackageIndex::Fonts, m_config.fontCN, &buf);
 		GMFontHandle font = glyphManager->addFontByMemory(std::move(buf));
-		glyphManager->setCN(font);
+		glyphManager->setDefaultFontCN(font);
 	}
 
 	{
 		GMBuffer buf;
 		GMGlyphManager* glyphManager = context->getEngine()->getGlyphManager();
-		pk->readFile(GMPackageIndex::Fonts, L"times.ttf", &buf);
+		pk->readFile(GMPackageIndex::Fonts, m_config.fontEN, &buf);
 		GMFontHandle font = glyphManager->addFontByMemory(std::move(buf));
-		glyphManager->setEN(font);
+		glyphManager->setDefaultFontEN(font);
 	}
 
 	context->getEngine()->setShaderLoadCallback(this);

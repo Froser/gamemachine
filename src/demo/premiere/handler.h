@@ -6,10 +6,20 @@
 
 using namespace gm;
 
+struct Config
+{
+	GMString windowName = L"GameMachine Premiere";
+	GMint32 windowWidth = 1024;
+	GMint32 windowHeight = 768;
+	GMint32 samples = 0;
+	GMString fontCN = L"simhei.ttf";
+	GMString fontEN = L"suigener.ttf";
+};
+
 class Handler : public IGameHandler, public IShaderLoadCallback
 {
 public:
-	Handler(IWindow*);
+	Handler(IWindow*, Config&&) GM_NOEXCEPT;
 	~Handler();
 
 public:
@@ -37,6 +47,7 @@ private:
 	IWindow* m_mainWindow;
 	GMOwnedPtr<Procedures> m_procedures;
 	GMClock m_clock;
+	Config m_config;
 };
 
 #endif
