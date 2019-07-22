@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <timeline version="1.0">
     <defines>
-        <screen_width>1024</screen_width>
-        <screen_height>768</screen_height>
+        <screen_width>$GM_screenWidth</screen_width>
+        <screen_height>$GM_screenHeight</screen_height>
     </defines>
     <assets>
         <audio id="audio_bgm" file="Thomas Greenberg - Curly Wurly.mp3" />
