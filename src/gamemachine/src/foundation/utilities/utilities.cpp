@@ -665,7 +665,7 @@ bool GMToolUtil::createPBRTextures(
 		GMImage combinedImage;
 		GMImage::Data& data = combinedImage.getData();
 		data.target = GMImageTarget::Texture2D;
-		data.mipLevels = 0;
+		data.mipLevels = 1;
 		data.format = GMImageFormat::RGBA;
 		data.internalFormat = GMImageInternalFormat::RGBA8;
 		data.type = GMImageDataType::UnsignedByte;

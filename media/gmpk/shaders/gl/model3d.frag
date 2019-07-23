@@ -36,7 +36,7 @@ void GM_Model3D()
     GMTangentSpace tangentSpace;
     if (GM_IsTangentSpaceInvalid(_tangent.xyz, _bitangent.xyz))
     {
-        tangentSpace = GM_CalculateTangentSpaceRuntime(vertex.WorldPos, _uv, _normal.xyz, GM_NormalMapTextureAttribute);
+        tangentSpace = GM_CalculateTangentSpaceRuntime(vertex.WorldPos, _uv, normal_World_N, GM_NormalMapTextureAttribute);
     }
     else
     {

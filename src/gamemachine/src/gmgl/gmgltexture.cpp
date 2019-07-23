@@ -129,8 +129,7 @@ void GMGLTexture::init()
 			d->internalFormat,
 			imgData.mip[0].width,
 			imgData.mip[0].height);
-		GMint32 maxLevel = imgData.mipLevels == 0 ? 1 : imgData.mipLevels;
-		for (level = 0; level <= maxLevel; ++level)
+		for (level = 0; level < imgData.mipLevels; ++level)
 		{
 			glTexSubImage2D(GL_TEXTURE_2D,
 				level,
@@ -145,8 +144,7 @@ void GMGLTexture::init()
 	}
 	case GL_TEXTURE_CUBE_MAP:
 	{
-		GMint32 maxLevel = imgData.mipLevels == 0 ? 1 : imgData.mipLevels;
-		for (level = 0; level <= maxLevel; ++level)
+		for (level = 0; level <= imgData.mipLevels; ++level)
 		{
 			GMbyte* ptr = (GMbyte *)imgData.mip[level].data;
 			for (int face = 0; face < 6; face++)

@@ -540,6 +540,7 @@ GMScene* GMSprite2DGameObject::createScene()
 	model->setType(GMModelType::Model2D);
 	model->setUsageHint(GMUsageHint::DynamicDraw);
 	model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
+	model->getShader().setVertexColorOp(GMS_VertexColorOp::Multiply);
 	initShader(model->getShader());
 	GMPart* part = new GMPart(model);
 	GMsize_t len = VerticesCount; //每个Sprite，用4个顶点来渲染
@@ -650,6 +651,7 @@ GMScene* GMBorder2DGameObject::createScene()
 	model->setUsageHint(GMUsageHint::DynamicDraw);
 	model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
 	model->setDrawMode(GMModelDrawMode::Index);
+	model->getShader().setVertexColorOp(GMS_VertexColorOp::Multiply);
 	initShader(model->getShader());
 	GMPart* part = new GMPart(model);
 	GMsize_t len = VerticesCount; //9个四边形，使用索引绘制，一共16个顶点

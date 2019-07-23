@@ -14,5 +14,6 @@ void GM_Shadow()
         position = GM_Bones[0] * position;
     }
     
+    position = _position;
     gl_Position = GM_ShadowInfo.ShadowMatrix[GM_ShadowInfo.CurrentCascadeLevel] * GM_WorldMatrix * position;
 }

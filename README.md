@@ -1,4 +1,5 @@
 # GameMachine 介绍：
+GameMachine是一款小巧的图形渲染引擎。
 
 ## 构建方法：
 安装3.9.0以上版本的CMake，并构建Coding下的CMakeLists.txt。

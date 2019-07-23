@@ -18,7 +18,7 @@ void GM_Model2D()
 
         if (GM_ColorVertexOp == GM_VertexColorOp_NoColor)
             ;// do nothing
-        if (GM_ColorVertexOp == GM_VertexColorOp_Add)
+        else if (GM_ColorVertexOp == GM_VertexColorOp_Add)
             _frag_color += _color;
         else
             _frag_color *= _color;

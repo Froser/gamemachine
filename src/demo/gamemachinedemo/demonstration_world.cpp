@@ -582,6 +582,7 @@ void DemonstrationWorld::initObjects()
 {
 	D(d);
 	d->logoLoadedFuture = gm::GMAsync::async(gm::GMAsync::Async, [this, d]() {
+		/*
 		GM_CHILD_THREAD_RENDER(getContext()->getWindow());
 		gm::GMGamePackage& pk = *GM.getGamePackageManager();
 		gm::GMModelLoadSettings loadSettings(
@@ -627,6 +628,7 @@ void DemonstrationWorld::initObjects()
 			this->addToRenderList(d->logoObj);
 			this->resetCameraAndLights();
 		});
+		*/
 	});
 }
 
