@@ -2,6 +2,8 @@
 #include "gmprofile.h"
 #include "foundation/gamemachine.h"
 
+BEGIN_NS
+
 //Profile
 static IProfileHandler* g_handler = nullptr;
 static GMProfileSessions g_sessions;
@@ -29,8 +31,18 @@ GMProfileSessions::GMProfileSession& GMProfile::profileSession()
 	return g_sessions.sessions[GMThread::getCurrentThreadId()];
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMProfile)
+{
+	GMDebugConfig debugConfig;
+	GMStopwatch stopwatch;
+	GMfloat durationSinceLastProfile = 0; // 距离上一次Profile的时间
+	bool valid = false;
+	GMString name;
+};
+
 GMProfile::GMProfile(IGraphicEngine* engine)
 {
+	GM_CREATE_DATA(GMProfile);
 	D(d);
 	d->debugConfig = engine->getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
 }
@@ -98,3 +110,5 @@ void GMProfile::stopRecord()
 	GMint32& level = ps.level;
 	g_handler->endProfile(d->name, d->stopwatch.timeInSecond(), id, --level);
 }
+
+END_NS

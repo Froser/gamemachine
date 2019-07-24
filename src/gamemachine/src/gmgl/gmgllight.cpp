@@ -123,5 +123,5 @@ void GMGLSpotlight::activateLight(GMuint32 index, ITechnique* technique)
 
 	shaderProgram->setFloat(
 		getVariableIndex(shaderProgram, d->lightIndices[shaderLightIdx][index].CutOff, L"GM_lights[" + strIndex + L"].CutOff"),
-		Cos(Radian(d->cutOff)));
+		Cos(Radians(d->cutOff)));
 }

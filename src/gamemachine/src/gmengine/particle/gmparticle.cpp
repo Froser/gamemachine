@@ -1,8 +1,17 @@
 ﻿#include "stdafx.h"
 #include "gmparticle.h"
 
+BEGIN_NS
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMParticleSystemManager)
+{
+	const IRenderContext* context;
+	Vector<GMOwnedPtr<IParticleSystem>> particleSystems;
+};
+
 GMParticleSystemManager::GMParticleSystemManager(const IRenderContext* context)
 {
+	GM_CREATE_DATA(GMParticleSystemManager);
 	D(d);
 	d->context = context;
 }
@@ -32,3 +41,5 @@ void GMParticleSystemManager::update(GMDuration dt)
 		system->update(dt);
 	}
 }
+
+END_NS

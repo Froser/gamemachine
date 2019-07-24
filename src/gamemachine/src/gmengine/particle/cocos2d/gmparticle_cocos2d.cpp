@@ -8,6 +8,8 @@
 #include <zlib.h>
 #include "foundation/gmasync.h"
 
+BEGIN_NS
+
 namespace
 {
 	const GMParticleDescription_Cocos2D* toCocos2DDesc(GMParticleDescription desc)
@@ -534,3 +536,35 @@ void GMParticleEmitter_Cocos2D::stopEmit()
 	d->canEmit = false;
 	d->particles.clear();
 }
+
+
+GM_PRIVATE_OBJECT_ALIGNED(GMParticleGravityMode)
+{
+	GMVec3 gravity = Zero<GMVec3>();
+	GMfloat tangentialAcceleration = 0;
+	GMfloat tangentialAccelerationV = 0;
+	GMfloat radialAcceleration = 0;
+	GMfloat radialAccelerationV = 0;
+};
+
+GMParticleGravityMode::GMParticleGravityMode()
+{
+	GM_CREATE_DATA(GMParticleGravityMode);
+}
+
+GM_PRIVATE_OBJECT_ALIGNED(GMParticleRadiusMode)
+{
+	GMfloat beginRadius = 0;
+	GMfloat beginRadiusV = 0;
+	GMfloat endRadius = 0;
+	GMfloat endRadiusV = 0;
+	GMfloat spinPerSecond = 0;
+	GMfloat spinPerSecondV = 0;
+};
+
+GMParticleRadiusMode::GMParticleRadiusMode()
+{
+	GM_CREATE_DATA(GMParticleRadiusMode);
+}
+
+END_NS

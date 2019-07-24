@@ -42,12 +42,7 @@ GM_ALIGNED_STRUCT(GMMotionStates)
 	GMVec3 linearVelocity = Zero<GMVec3>();
 };
 
-GM_PRIVATE_OBJECT(GMPhysicsObject)
-{
-	GMGameObject* gameObject = nullptr;
-	GMMotionStates motionStates;
-};
-
+GM_PRIVATE_CLASS(GMPhysicsObject);
 //! 表示一个物理对象
 /*!
   物理对象拥有一些物理性质，如边界大小等。
@@ -60,7 +55,7 @@ class GM_EXPORT GMPhysicsObject : public GMObject
 	GM_FRIEND_CLASS(GMGameObject);
 
 public:
-	GMPhysicsObject() = default;
+	GMPhysicsObject();
 
 public:
 	//! 获取物理对象的运动状态。
@@ -71,11 +66,7 @@ public:
 	virtual const GMMotionStates& getMotionStates();
 
 public:
-	inline void setMotionStates(const GMMotionStates& motionStates)
-	{
-		D(d);
-		d->motionStates = motionStates;
-	}
+	void setMotionStates(const GMMotionStates& motionStates);
 
 private:
 	//! 将此物理对象与一个GMGameObject绑定起来
@@ -83,12 +74,7 @@ private:
 	  在调用GMGameObject::setPhysicsObject时，此方法将会被GMGameObject调用，因此设置为私有。此对象生命周期由所绑定的GMGameObject管理。
 	  \sa GMGameObject::setPhysicsObject()
 	*/
-	inline void setGameObject(GMGameObject* gameObject)
-	{
-		D(d);
-		GM_ASSERT(!d->gameObject);
-		d->gameObject = gameObject;
-	}
+	void setGameObject(GMGameObject* gameObject);
 
 public:
 	//! 获取所绑定的GMGameObject对象。
@@ -96,11 +82,7 @@ public:
 	  本对象的生命周期由所绑定的GMGameObject对象所管理。
 	  \return 本对象所绑定的GMGameObject对象。
 	*/
-	GMGameObject* getGameObject()
-	{
-		D(d);
-		return d->gameObject;
-	}
+	GMGameObject* getGameObject();
 };
 
 enum class GMPhysicsActivationState
@@ -113,25 +95,17 @@ enum class GMPhysicsActivationState
 };
 
 class GMPhysicsShape;
-GM_PRIVATE_OBJECT(GMRigidPhysicsObject)
-{
-	GMint32 updateRevision = -1;
-	btRigidBody* body = nullptr; // btRigidBody在添加到物理世界后，应该由物理世界管理生命周期
-	bool bodyDetached = false;
-	btDefaultMotionState* motionState = nullptr;
-	GMPhysicsShapeAsset shape;
-	GMfloat mass = 0;
-	GMPhysicsActivationState state = GMPhysicsActivationState::ActiveTag;
-};
 
+GM_PRIVATE_CLASS(GMRigidPhysicsObject);
 class GM_EXPORT GMRigidPhysicsObject : public GMPhysicsObject
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMRigidPhysicsObject, GMPhysicsObject)
+	GM_DECLARE_PRIVATE(GMRigidPhysicsObject)
+	GM_DECLARE_BASE(GMPhysicsObject)
 
 	friend class GMDiscreteDynamicsWorld;
 
 public:
-	GMRigidPhysicsObject() = default;
+	GMRigidPhysicsObject();
 	~GMRigidPhysicsObject();
 
 public:
@@ -142,22 +116,9 @@ public:
 	  \sa GMAsset, GMGameObject::setPhysicsObject()
 	*/
 	void setShape(GMAsset shape);
-
-	void setMass(GMfloat mass) { D(d); d->mass = mass; }
-
-	btRigidBody* getRigidBody()
-	{
-		D(d);
-		GM_ASSERT(d->body);
-		return d->body;
-	}
-
-	GMPhysicsShapeAsset getShape()
-	{
-		D(d);
-		GM_ASSERT(!d->shape.isEmpty());
-		return d->shape;
-	}
+	void setMass(GMfloat mass);
+	btRigidBody* getRigidBody();
+	GMPhysicsShapeAsset getShape();
 
 	bool isStaticObject() const;
 	bool isKinematicObject() const;

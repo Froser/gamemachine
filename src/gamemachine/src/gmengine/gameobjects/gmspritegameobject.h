@@ -29,20 +29,11 @@ GM_ALIGNED_STRUCT(GMSpriteMovement)
 	GMMovement movement;
 };
 
-GM_PRIVATE_OBJECT(GMSpriteGameObject)
-{
-	GMfloat radius;
-	GMfloat limitPitch;
-	AlignedVector<GMSpriteMovement> movements;
-	GMVec3 moveSpeed = Zero<GMVec3>();
-	GMVec3 jumpSpeed = Zero<GMVec3>();
-	GMCamera camera;
-	GMCameraUtility cameraUtility;
-};
-
+GM_PRIVATE_CLASS(GMSpriteGameObject);
 class GM_EXPORT GMSpriteGameObject : public GMGameObject
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMSpriteGameObject, GMGameObject)
+	GM_DECLARE_PRIVATE(GMSpriteGameObject)
+	GM_DECLARE_BASE(GMGameObject)
 
 public:
 	GMSpriteGameObject(GMfloat radius, const GMCamera& camera);
@@ -69,23 +60,10 @@ public:
 	*/
 	void look(GMfloat pitch, GMfloat yaw);
 	const GMCamera& getCamera() GM_NOEXCEPT;
-
 	void setPosition(const GMVec3& position);
-
-public:
-	inline void setMoveSpeed(const GMVec3& speed)
-	{
-		D(d);
-		d->moveSpeed = speed;
-	}
-
-	inline void setJumpSpeed(const GMVec3& speed)
-	{
-		D(d);
-		d->jumpSpeed = speed;
-	}
+	void setMoveSpeed(const GMVec3& speed);
+	void setJumpSpeed(const GMVec3& speed);
 };
-
 
 END_NS
 #endif

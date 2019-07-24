@@ -6,6 +6,9 @@
 #include "gmassets.h"
 #include "gmanimationobjecthelper.h"
 #include "../gmcomputeshadermanager.h"
+#include <gmphysicsworld.h>
+
+BEGIN_NS
 
 namespace
 {
@@ -43,10 +46,61 @@ namespace
 	}
 }
 
+GM_PRIVATE_OBJECT_ALIGNED(GMGameObject)
+{
+	GMuint32 id = 0;
+	GMGameObjectRenderPriority renderPriority = GMGameObjectRenderPriority::Normal; //!< 渲染优先级。优先级最高的对象将会在GMGameWorld中被优先渲染。
+	GMOwnedPtr<GMPhysicsObject> physics;
+	GMGameWorld* world = nullptr;
+	const IRenderContext* context = nullptr;
+	bool autoUpdateTransformMatrix = true;
+	GMAsset asset;
+	GMAnimationGameObjectHelper* helper = nullptr;
+
+	GM_ALIGNED_16(struct) AABB
+	{
+		GMVec4 points[8];
+	};
+	GMGameObjectCullOption cullOption = GMGameObjectCullOption::NoCull;
+	AlignedVector<AABB> cullAABB;
+	GMCamera* cullCamera = nullptr;
+	IComputeShaderProgram* cullShaderProgram = nullptr;
+	GMComputeBufferHandle cullAABBsBuffer = 0;
+	GMComputeBufferHandle cullGPUResultBuffer = 0;
+	GMComputeBufferHandle cullCPUResultBuffer = 0;
+	GMComputeBufferHandle cullFrustumBuffer = 0;
+	GMComputeSRVHandle cullAABBsSRV = 0;
+	GMComputeUAVHandle cullResultUAV = 0;
+	GMsize_t cullSize = 0;
+	bool cullGPUAccelerationValid = true;
+
+	GM_ALIGNED_16(struct)
+	{
+		GMMat4 scaling = Identity<GMMat4>();
+		GMMat4 translation = Identity<GMMat4>();
+		GMQuat rotation = Identity<GMQuat>();
+		GMMat4 transformMatrix = Identity<GMMat4>();
+	} transforms;
+
+	struct
+	{
+		bool visible = true;
+	} attributes;
+
+	struct
+	{
+		ITechnique* currentTechnique = nullptr;
+	} drawContext;
+};
+
 GMString GMGameObject::s_defaultComputeShaderCode;
+
+GM_DEFINE_PROPERTY(GMGameObject, GMGameObjectRenderPriority, RenderPriority, renderPriority)
 
 GMGameObject::GMGameObject()
 {
+	GM_CREATE_DATA(GMGameObject);
+
 	D(d);
 	d->helper = new GMAnimationGameObjectHelper(this);
 }
@@ -361,6 +415,58 @@ GMAnimationType GMGameObject::getAnimationType() const
 	return GMAnimationType::NoAnimation;
 }
 
+bool GMGameObject::getVisible() const GM_NOEXCEPT
+{
+	D(d);
+	return d->attributes.visible;
+}
+
+const GMMat4& GMGameObject::getTransform() const GM_NOEXCEPT
+{
+	D(d);
+	return d->transforms.transformMatrix;
+}
+
+const GMMat4& GMGameObject::getScaling() const GM_NOEXCEPT {
+	D(d);
+	return d->transforms.scaling;
+}
+
+const GMMat4& GMGameObject::getTranslation() const GM_NOEXCEPT
+{
+	D(d);
+	return d->transforms.translation;
+}
+
+const GMQuat& GMGameObject::getRotation() const GM_NOEXCEPT {
+	D(d);
+	return d->transforms.rotation;
+}
+
+GMPhysicsObject* GMGameObject::getPhysicsObject()
+{
+	D(d);
+	return d->physics.get();
+}
+
+void GMGameObject::setContext(const IRenderContext* context)
+{
+	D(d);
+	d->context = context;
+}
+
+void GMGameObject::setVisible(bool visible) const GM_NOEXCEPT
+{
+	D(d);
+	d->attributes.visible = visible;
+}
+
+void GMGameObject::setAutoUpdateTransformMatrix(bool autoUpdateTransformMatrix) GM_NOEXCEPT
+{
+	D(d);
+	d->autoUpdateTransformMatrix = autoUpdateTransformMatrix;
+}
+
 void GMGameObject::releaseAllBufferHandle()
 {
 	D(d);
@@ -571,8 +677,16 @@ void GMGameObject::cull()
 	}
 }
 
+GM_PRIVATE_OBJECT_ALIGNED(GMBSPSkyGameObject)
+{
+	GMVec3 min;
+	GMVec3 max;
+	GMShader shader;
+};
+
 GMCubeMapGameObject::GMCubeMapGameObject(GMTextureAsset texture)
 {
+	GM_CREATE_DATA(GMCubeMapGameObject);
 	createCubeMap(texture);
 }
 
@@ -663,3 +777,5 @@ bool GMCubeMapGameObject::canDeferredRendering()
 {
 	return false;
 }
+
+END_NS

@@ -6,26 +6,13 @@
 BEGIN_NS
 
 class GMParticleSystem_Cocos2D;
-GM_PRIVATE_OBJECT(GMParticleModel_Cocos2D)
-{
-	GMOwnedPtr<GMGameObject> particleObject;
-	GMModel* particleModel = nullptr;
-	GMParticleSystem_Cocos2D* system = nullptr;
-	bool GPUValid = true;
-	GMComputeBufferHandle constantBuffer = 0;
-	GMComputeBufferHandle particleBuffer = 0;
-	GMComputeSRVHandle particleView = 0;
-	GMComputeBufferHandle resultBuffer = 0;
-	GMComputeUAVHandle resultView = 0;
-	GMComputeBufferHandle resultBuffer_CPU = 0;
-	bool particleSizeChanged = true;
-	GMsize_t lastMaxSize = 0;
-};
+GM_PRIVATE_CLASS(GMParticleModel_Cocos2D);
 
 //! 表示一个2D粒子，是一个四边形
-class GM_EXPORT GMParticleModel_Cocos2D : public GMObject
+class GM_EXPORT GMParticleModel_Cocos2D : public IDestroyObject
 {
 	GM_DECLARE_PRIVATE(GMParticleModel_Cocos2D)
+	GM_DISABLE_COPY_ASSIGN(GMParticleModel_Cocos2D)
 
 public:
 	enum BufferFlags

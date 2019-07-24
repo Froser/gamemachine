@@ -6,17 +6,12 @@ BEGIN_NS
 
 class GMGameWorld;
 class GMPhysicsObject;
-GM_PRIVATE_OBJECT(GMPhysicsWorld)
-{
-	GMGameWorld* world;
-	GMfloat gravity;
-	bool enabled = true;
-};
 
+GM_PRIVATE_CLASS(GMPhysicsWorld);
 class GM_EXPORT GMPhysicsWorld : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMPhysicsWorld)
-	GM_DECLARE_PROPERTY(Enabled, enabled)
+	GM_DECLARE_PROPERTY(bool, Enabled)
 
 public:
 	GMPhysicsWorld(GMGameWorld* world);

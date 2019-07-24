@@ -83,11 +83,11 @@ GM_ALIGNED_16(struct) GMObjectPrivateAlignedBase
 	void set##name(const type& arg); \
 	void set##name(type&& arg) GM_NOEXCEPT; \
 
-#define GM_DEFINE_GETTER_ACCESSOR(type, name, memberName, clsName) \
+#define GM_DEFINE_GETTER(clsName, type, name, memberName) \
 	type& clsName::get##name() GM_NOEXCEPT { D(d); return d-> memberName; } \
 	const type& clsName::get##name() const GM_NOEXCEPT { D(d); return d-> memberName; }
 
-#define GM_DEFINE_SETTER_ACCESSOR(type, name, memberName, clsName) \
+#define GM_DEFINE_SETTER(clsName, type, name, memberName) \
 	void clsName::set##name(const type& arg) { D(d); d-> memberName = arg; } \
 	void clsName::set##name(type&& arg) GM_NOEXCEPT { D(d); d->memberName = std::move(arg); }
 
@@ -96,8 +96,8 @@ GM_ALIGNED_16(struct) GMObjectPrivateAlignedBase
 	GM_DECLARE_SETTER_ACCESSOR(type, name, public)
 
 #define GM_DEFINE_PROPERTY(clsName, type, name, memberName) \
-	GM_DEFINE_GETTER_ACCESSOR(type, name, memberName, clsName) \
-	GM_DEFINE_SETTER_ACCESSOR(type, name, memberName, clsName)
+	GM_DEFINE_GETTER(clsName, type, name, memberName) \
+	GM_DEFINE_SETTER(clsName, type, name, memberName)
 
 #define GM_DISABLE_COPY(clsName) public: clsName(const clsName&) = delete; clsName(clsName&&) GM_NOEXCEPT = delete;
 #define GM_DISABLE_ASSIGN(clsName) public: clsName& operator =(const clsName&) = delete; clsName& operator =(clsName&&) GM_NOEXCEPT = delete;

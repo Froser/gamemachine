@@ -4,11 +4,11 @@
 #include <gmtools.h>
 #include <gmmodel.h>
 #include <linearmath.h>
-#include <gmphysicsworld.h>
 
 BEGIN_NS
 
 class GMAnimationGameObjectHelper;
+class GMPhysicsObject;
 
 enum class GMGameObjectCullOption
 {
@@ -22,57 +22,11 @@ enum class GMGameObjectRenderPriority
 	Normal,
 };
 
-GM_PRIVATE_OBJECT(GMGameObject)
-{
-	GMuint32 id = 0;
-	GMGameObjectRenderPriority renderPriority = GMGameObjectRenderPriority::Normal; //!< 渲染优先级。优先级最高的对象将会在GMGameWorld中被优先渲染。
-	GMOwnedPtr<GMPhysicsObject> physics;
-	GMGameWorld* world = nullptr;
-	const IRenderContext* context = nullptr;
-	bool autoUpdateTransformMatrix = true;
-	GMAsset asset;
-	GMAnimationGameObjectHelper* helper = nullptr;
-
-	GM_ALIGNED_16(struct) AABB
-	{
-		GMVec4 points[8];
-	};
-	GMGameObjectCullOption cullOption = GMGameObjectCullOption::NoCull;
-	AlignedVector<AABB> cullAABB;
-	GMCamera* cullCamera = nullptr;
-	IComputeShaderProgram* cullShaderProgram = nullptr;
-	GMComputeBufferHandle cullAABBsBuffer = 0;
-	GMComputeBufferHandle cullGPUResultBuffer = 0;
-	GMComputeBufferHandle cullCPUResultBuffer = 0;
-	GMComputeBufferHandle cullFrustumBuffer = 0;
-	GMComputeSRVHandle cullAABBsSRV = 0;
-	GMComputeUAVHandle cullResultUAV = 0;
-	GMsize_t cullSize = 0;
-	bool cullGPUAccelerationValid = true;
-
-	GM_ALIGNED_16(struct)
-	{
-		GMMat4 scaling = Identity<GMMat4>();
-		GMMat4 translation = Identity<GMMat4>();
-		GMQuat rotation = Identity<GMQuat>();
-		GMMat4 transformMatrix = Identity<GMMat4>();
-	} transforms;
-
-	struct
-	{
-		bool visible = true;
-	} attributes;
-
-	struct
-	{
-		ITechnique* currentTechnique = nullptr;
-	} drawContext;
-};
-
+GM_PRIVATE_CLASS(GMGameObject);
 class GM_EXPORT GMGameObject : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMGameObject)
-	GM_DECLARE_PROPERTY(RenderPriority, renderPriority)
+	GM_DECLARE_PROPERTY(GMGameObjectRenderPriority, RenderPriority)
 
 public:
 	enum
@@ -135,59 +89,17 @@ public:
 	void setCullOption(GMGameObjectCullOption option, GMCamera* camera = nullptr);
 	GMAnimationType getAnimationType() const;
 
-	inline bool getVisible() const GM_NOEXCEPT
-	{
-		D(d);
-		return d->attributes.visible;
-	}
-
-	inline const GMMat4& getTransform() const GM_NOEXCEPT
-	{
-		D(d);
-		return d->transforms.transformMatrix;
-	}
-
-	inline const GMMat4& getScaling() const GM_NOEXCEPT {
-		D(d);
-		return d->transforms.scaling;
-	}
-
-	inline const GMMat4& getTranslation() const GM_NOEXCEPT
-	{
-		D(d);
-		return d->transforms.translation;
-	}
-
-	inline const GMQuat& getRotation() const GM_NOEXCEPT {
-		D(d);
-		return d->transforms.rotation;
-	}
-
-	inline GMPhysicsObject* getPhysicsObject()
-	{
-		D(d);
-		return d->physics.get();
-	}
-
-	inline void setContext(const IRenderContext* context)
-	{
-		D(d);
-		d->context = context;
-	}
-
-	inline void setVisible(bool visible) const GM_NOEXCEPT
-	{
-		D(d);
-		d->attributes.visible = visible;
-	}
+	bool getVisible() const GM_NOEXCEPT;
+	const GMMat4& getTransform() const GM_NOEXCEPT;
+	const GMMat4& getScaling() const GM_NOEXCEPT;
+	const GMMat4& getTranslation() const GM_NOEXCEPT;
+	const GMQuat& getRotation() const GM_NOEXCEPT;
+	GMPhysicsObject* getPhysicsObject();
+	void setContext(const IRenderContext* context);
+	void setVisible(bool visible) const GM_NOEXCEPT;
 
 private:
-	inline void setAutoUpdateTransformMatrix(bool autoUpdateTransformMatrix) GM_NOEXCEPT
-	{
-		D(d);
-		d->autoUpdateTransformMatrix = autoUpdateTransformMatrix;
-	}
-
+	void setAutoUpdateTransformMatrix(bool autoUpdateTransformMatrix) GM_NOEXCEPT;
 	void releaseAllBufferHandle();
 
 public:
@@ -204,15 +116,11 @@ private:
 
 // GMSkyObject
 // 一个天空的盒子，用6个面模拟一个天空
-GM_PRIVATE_OBJECT(GMBSPSkyGameObject)
-{
-	GMVec3 min;
-	GMVec3 max;
-	GMShader shader;
-};
-
+GM_PRIVATE_CLASS(GMCubeMapGameObject);
 class GM_EXPORT GMCubeMapGameObject : public GMGameObject
 {
+	GM_DECLARE_PRIVATE(GMCubeMapGameObject)
+
 public:
 	GMCubeMapGameObject(GMTextureAsset texture);
 

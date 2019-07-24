@@ -20,6 +20,7 @@ class GM_EXPORT GMClock
 
 public:
 	GMClock();
+	~GMClock();
 
 public:
 	void setTimeScale(GMfloat);
@@ -48,6 +49,7 @@ class GMStopwatch
 
 public:
 	GMStopwatch();
+	~GMStopwatch();
 
 public:
 	void start();
@@ -59,11 +61,11 @@ public:
 };
 
 //Plane
-enum class PointPosition
+enum class GMPointPosition
 {
-	POINT_ON_PLANE = 0,
-	POINT_IN_FRONT_OF_PLANE,
-	POINT_BEHIND_PLANE,
+	PointOnPlane = 0,
+	PointInFrontOfPlane,
+	PointBehindPlane,
 };
 
 GM_ALIGNED_STRUCT(GMPlane)
@@ -113,7 +115,7 @@ GM_ALIGNED_STRUCT(GMPlane)
 	bool intersect3(const GMPlane & p2, const GMPlane & p3, GMVec3 & result);
 
 	GMfloat getDistance(const GMVec3 & point) const;
-	PointPosition classifyPoint(const GMVec3 & point) const;
+	GMPointPosition classifyPoint(const GMVec3 & point) const;
 
 	GMPlane lerp(const GMPlane & p2, GMfloat factor);
 

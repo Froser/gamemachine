@@ -33,12 +33,7 @@ GM_INTERFACE(IParticleEmitter)
 	virtual void stopEmit() = 0;
 };
 
-GM_PRIVATE_OBJECT(GMParticleSystemManager)
-{
-	const IRenderContext* context;
-	Vector<GMOwnedPtr<IParticleSystem>> particleSystems;
-};
-
+GM_PRIVATE_CLASS(GMParticleSystemManager);
 class GM_EXPORT GMParticleSystemManager : public GMObject, public IParticleSystemManager
 {
 	GM_DECLARE_PRIVATE(GMParticleSystemManager)

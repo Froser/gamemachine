@@ -4,10 +4,58 @@
 #include <gmgameobject.h>
 #include "gmphysicsshape.h"
 
+BEGIN_NS
+
+GM_PRIVATE_OBJECT_ALIGNED(GMPhysicsObject)
+{
+	GMGameObject* gameObject = nullptr;
+	GMMotionStates motionStates;
+};
+
+GMPhysicsObject::GMPhysicsObject()
+{
+	GM_CREATE_DATA(GMPhysicsObject);
+}
+
 const GMMotionStates& GMPhysicsObject::getMotionStates()
 {
 	D(d);
 	return d->motionStates;
+}
+
+GMGameObject* GMPhysicsObject::getGameObject()
+{
+	D(d);
+	return d->gameObject;
+}
+
+void GMPhysicsObject::setGameObject(GMGameObject* gameObject)
+{
+	D(d);
+	GM_ASSERT(!d->gameObject);
+	d->gameObject = gameObject;
+}
+
+void GMPhysicsObject::setMotionStates(const GMMotionStates& motionStates)
+{
+	D(d);
+	d->motionStates = motionStates;
+}
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMRigidPhysicsObject)
+{
+	GMint32 updateRevision = -1;
+	btRigidBody* body = nullptr; // btRigidBody在添加到物理世界后，应该由物理世界管理生命周期
+	bool bodyDetached = false;
+	btDefaultMotionState* motionState = nullptr;
+	GMPhysicsShapeAsset shape;
+	GMfloat mass = 0;
+	GMPhysicsActivationState state = GMPhysicsActivationState::ActiveTag;
+};
+
+GMRigidPhysicsObject::GMRigidPhysicsObject()
+{
+	GM_CREATE_DATA(GMRigidPhysicsObject);
 }
 
 GMRigidPhysicsObject::~GMRigidPhysicsObject()
@@ -120,6 +168,26 @@ void GMRigidPhysicsObject::setShape(GMAsset shape)
 	);
 }
 
+void GMRigidPhysicsObject::setMass(GMfloat mass)
+{
+	D(d);
+	d->mass = mass;
+}
+
+btRigidBody* GMRigidPhysicsObject::getRigidBody()
+{
+	D(d);
+	GM_ASSERT(d->body);
+	return d->body;
+}
+
+GMPhysicsShapeAsset GMRigidPhysicsObject::getShape()
+{
+	D(d);
+	GM_ASSERT(!d->shape.isEmpty());
+	return d->shape;
+}
+
 void GMRigidPhysicsObject::initRigidBody(GMfloat mass, const btTransform& startTransform, const GMVec3& color)
 {
 	D(d);
@@ -146,3 +214,5 @@ void GMRigidPhysicsObject::detachRigidBody()
 	D(d);
 	d->bodyDetached = true;
 }
+
+END_NS

@@ -56,49 +56,38 @@ enum class GMFrustumType
 	Orthographic,
 };
 
-GM_PRIVATE_OBJECT(GMFrustum)
-{
-	GMFrustumType type = GMFrustumType::Perspective;
-
-	union Parameters
-	{
-		struct
-		{
-			GMfloat fovy;
-			GMfloat aspect;
-		};
-
-		struct
-		{
-			GMfloat left;
-			GMfloat right;
-			GMfloat bottom;
-			GMfloat top;
-		};
-	} parameters;
-	GMfloat n;
-	GMfloat f;
-
-	GMMat4 projectionMatrix;
-	GMMat4 viewMatrix;
-	GMMat4 inverseViewMatrix;
-
-	bool dirty = true;
-};
-
 class GMCamera;
 class GMSpriteGameObject;
+union GMFrustumParameters
+{
+	struct
+	{
+		GMfloat fovy;
+		GMfloat aspect;
+	};
+
+	struct
+	{
+		GMfloat left;
+		GMfloat right;
+		GMfloat bottom;
+		GMfloat top;
+	};
+};
+
+GM_PRIVATE_CLASS(GMFrustum);
 class GMFrustum
 {
-	GM_DECLARE_PRIVATE_NGO(GMFrustum)
-	GM_DECLARE_ALIGNED_ALLOCATOR()
-	GM_DECLARE_GETTER(Near, n)
-	GM_DECLARE_GETTER(Far, f)
-	GM_DECLARE_GETTER(Parameters, parameters)
+	GM_DECLARE_PRIVATE(GMFrustum)
+	GM_DISABLE_COPY_ASSIGN(GMFrustum)
+	GM_DECLARE_GETTER_ACCESSOR(GMfloat, Near, public)
+	GM_DECLARE_GETTER_ACCESSOR(GMfloat, Far, public)
+	GM_DECLARE_GETTER_ACCESSOR(GMFrustumParameters, Parameters, public)
 
 	friend class GMCamera;
 
-	GMFrustum() = default;
+	GMFrustum();
+	~GMFrustum();
 
 	bool operator== (const GMFrustum&);
 	bool operator!= (const GMFrustum&);
@@ -119,14 +108,14 @@ class GMFrustum
 	const GMMat4& getViewMatrix() const;
 	const GMMat4& getInverseViewMatrix() const;
 
-	inline bool isDirty() { D(d); return d->dirty; }
-	inline void cleanDirty() { D(d); d->dirty = false; }
+	bool isDirty();
+	void cleanDirty();
 
 private:
 	static bool isBoundingBoxInside(const GMFrustumPlanes& planes, const GMVec3 (&vertices)[8]);
 };
 
-inline bool operator ==(const GM_PRIVATE_NAME(GMFrustum)::Parameters& lhs, const GM_PRIVATE_NAME(GMFrustum)::Parameters& rhs)
+inline bool operator ==(const GMFrustumParameters& lhs, const GMFrustumParameters& rhs)
 {
 	return lhs.fovy == rhs.fovy &&
 		lhs.aspect == rhs.aspect &&
@@ -136,26 +125,25 @@ inline bool operator ==(const GM_PRIVATE_NAME(GMFrustum)::Parameters& lhs, const
 		lhs.top == rhs.top;
 }
 
-inline bool operator !=(const GM_PRIVATE_NAME(GMFrustum)::Parameters& lhs, const GM_PRIVATE_NAME(GMFrustum)::Parameters& rhs)
+inline bool operator !=(const GMFrustumParameters& lhs, const GMFrustumParameters& rhs)
 {
 	return !(lhs == rhs);
 }
 
-GM_PRIVATE_OBJECT(GMCamera)
-{
-	GMFrustum frustum;
-	GMCameraLookAt lookAt;
-};
-
-class GM_EXPORT GMCamera : public GMObject
+GM_PRIVATE_CLASS(GMCamera);
+class GM_EXPORT GMCamera
 {
 	GM_DECLARE_PRIVATE(GMCamera)
-	GM_ALLOW_COPY_MOVE(GMCamera)
-	GM_DECLARE_GETTER(LookAt, lookAt)
-	GM_DECLARE_GETTER(Frustum, frustum)
+	GM_DECLARE_GETTER_ACCESSOR(GMCameraLookAt, LookAt, public)
+	GM_DECLARE_GETTER_ACCESSOR(GMFrustum, Frustum, public)
 
 public:
 	GMCamera();
+	GMCamera(const GMCamera&);
+	GMCamera(GMCamera&&) GM_NOEXCEPT;
+	GMCamera& operator=(const GMCamera&);
+	GMCamera& operator=(GMCamera&&) GM_NOEXCEPT;
+	~GMCamera();
 
 public:
 	bool operator==(const GMCamera& rhs);
@@ -183,34 +171,27 @@ public:
 	*/
 	void getPlanes(GMFrustumPlanes& planes);
 
-public:
-	inline bool isDirty() const { D(d); return d->frustum.isDirty(); }
-	inline void cleanDirty() { D(d); d->frustum.cleanDirty(); }
-	inline const GMMat4& getProjectionMatrix() const { D(d); return d->frustum.getProjectionMatrix(); }
-	inline const GMMat4& getViewMatrix() const { D(d); return d->frustum.getViewMatrix(); }
-	const GMMat4& getInverseViewMatrix() const { D(d); return d->frustum.getInverseViewMatrix(); }
+	bool isDirty() const;
+	void cleanDirty();
+	const GMMat4& getProjectionMatrix() const;
+	const GMMat4& getViewMatrix() const;
+	const GMMat4& getInverseViewMatrix() const;
 
 public:
 	static bool isBoundingBoxInside(const GMFrustumPlanes& planes, const GMVec3(&vertices)[8]);
 };
 
 //////////////////////////////////////////////////////////////////////////
-GM_PRIVATE_OBJECT_UNALIGNED(GMCameraUtility)
-{
-	GMCamera* camera;
-	GMfloat limitPitch = Radian(85.f);
-	GMVec3 position;
-	GMVec3 lookDirection;
-};
-
+GM_PRIVATE_CLASS(GMCameraUtility);
 //! 用于响应鼠标移动时调整摄像机的一个便捷类
 class GM_EXPORT GMCameraUtility
 {
-	GM_DECLARE_PRIVATE_NGO(GMCameraUtility)
-	GM_DECLARE_PROPERTY(LimitPitch, limitPitch)
+	GM_DECLARE_PRIVATE(GMCameraUtility)
+	GM_DECLARE_PROPERTY(GMfloat, LimitPitch)
 
 public:
 	GMCameraUtility(GMCamera* camera = nullptr);
+	~GMCameraUtility();
 
 public:
 	void update(GMfloat yaw, GMfloat pitch);

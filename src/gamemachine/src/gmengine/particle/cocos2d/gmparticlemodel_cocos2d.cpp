@@ -5,6 +5,8 @@
 #include "foundation/gmasync.h"
 #include <gmengine/gmcomputeshadermanager.h>
 
+BEGIN_NS
+
 struct Constant
 {
 	GMMat4 billboardRotation;
@@ -26,8 +28,25 @@ namespace
 	enum { VerticesPerParticle = 6 };
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMParticleModel_Cocos2D)
+{
+	GMOwnedPtr<GMGameObject> particleObject;
+	GMModel* particleModel = nullptr;
+	GMParticleSystem_Cocos2D* system = nullptr;
+	bool GPUValid = true;
+	GMComputeBufferHandle constantBuffer = 0;
+	GMComputeBufferHandle particleBuffer = 0;
+	GMComputeSRVHandle particleView = 0;
+	GMComputeBufferHandle resultBuffer = 0;
+	GMComputeUAVHandle resultView = 0;
+	GMComputeBufferHandle resultBuffer_CPU = 0;
+	bool particleSizeChanged = true;
+	GMsize_t lastMaxSize = 0;
+};
+
 GMParticleModel_Cocos2D::GMParticleModel_Cocos2D(GMParticleSystem_Cocos2D* system)
 {
+	GM_CREATE_DATA(GMParticleModel_Cocos2D);
 	D(d);
 	d->system = system;
 }
@@ -484,3 +503,5 @@ GMComputeBufferHandle GMParticleModel_3D::prepareBuffers(IComputeShaderProgram* 
 {
 	return GMParticleModel_Cocos2D::prepareBuffers(shaderProgram, GMParticleModel_Cocos2D::None);
 }
+
+END_NS

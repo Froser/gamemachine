@@ -89,7 +89,7 @@ inline T Clamp(T v, T minv, T maxv)
 }
 
 template<typename genType>
-constexpr genType Radian(genType degrees)
+constexpr genType Radians(genType degrees)
 {
 	GM_STATIC_ASSERT(std::numeric_limits<genType>::is_iec559, "'radians' only accept floating-point input");
 	return degrees * static_cast<genType>(0.01745329251994329576923690768489);

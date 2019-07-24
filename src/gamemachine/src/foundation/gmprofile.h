@@ -16,15 +16,6 @@ GM_INTERFACE(IProfileHandler)
 	virtual void endProfile(const GMString& name, GMfloat elapsedInSecond, GMThreadId id, GMint32 level) = 0;
 };
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMProfile)
-{
-	GMDebugConfig debugConfig;
-	GMStopwatch stopwatch;
-	GMfloat durationSinceLastProfile = 0; // 距离上一次Profile的时间
-	bool valid = false;
-	GMString name;
-};
-
 struct GMProfileSessions : public GMObject
 {
 	struct GMProfileSession
@@ -37,9 +28,10 @@ struct GMProfileSessions : public GMObject
 	Map<GMThreadId, GMProfileSession> sessions;
 };
 
-class GMProfile
+GM_PRIVATE_CLASS(GMProfile);
+class GMProfile : public IDestroyObject
 {
-	GM_DECLARE_PRIVATE_NGO(GMProfile)
+	GM_DECLARE_PRIVATE(GMProfile)
 
 public:
 	static GMProfileSessions::GMProfileSession& profileSession();

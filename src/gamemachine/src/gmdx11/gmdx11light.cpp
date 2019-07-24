@@ -110,5 +110,5 @@ void GMDx11Spotlight::activateLight(GMuint32 index, ITechnique* tech)
 	ID3DX11EffectVariable* lightStruct = db->lightAttributes->GetElement(index);
 
 	ID3DX11EffectScalarVariable* cutOff = lightStruct->GetMemberByName("CutOff")->AsScalar();
-	GM_DX_TRY(cutOff, cutOff->SetFloat(Cos(Radian(d->cutOff))));
+	GM_DX_TRY(cutOff, cutOff->SetFloat(Cos(Radians(d->cutOff))));
 }

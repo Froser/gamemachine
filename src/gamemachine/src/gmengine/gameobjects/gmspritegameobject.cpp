@@ -3,21 +3,36 @@
 #include "gmspritegameobject.h"
 #include "gmphysics/gmphysicsworld.h"
 
+BEGIN_NS
+
+GM_PRIVATE_OBJECT_ALIGNED(GMSpriteGameObject)
+{
+	GMfloat radius;
+	GMfloat limitPitch;
+	AlignedVector<GMSpriteMovement> movements;
+	GMVec3 moveSpeed = Zero<GMVec3>();
+	GMVec3 jumpSpeed = Zero<GMVec3>();
+	GMCamera camera;
+	GMCameraUtility cameraUtility;
+};
+
 GMSpriteGameObject::GMSpriteGameObject(GMfloat radius, const GMVec3& position)
 {
+	GM_CREATE_DATA(GMSpriteGameObject);
 	D(d);
 	d->radius = radius;
 	d->camera.lookAt(GMCameraLookAt(GMVec3(0, 0, -1), position));
-	d->limitPitch = Radian(85.f);
+	d->limitPitch = Radians(85.f);
 	d->cameraUtility.setCamera(&d->camera);
 }
 
 GMSpriteGameObject::GMSpriteGameObject(GMfloat radius, const GMCamera& camera)
 {
+	GM_CREATE_DATA(GMSpriteGameObject);
 	D(d);
 	d->radius = radius;
 	d->camera = camera;
-	d->limitPitch = Radian(85.f);
+	d->limitPitch = Radians(85.f);
 	d->cameraUtility.setCamera(&d->camera);
 }
 
@@ -54,6 +69,19 @@ void GMSpriteGameObject::setPosition(const GMVec3& position)
 	auto lookAt = d->camera.getLookAt();
 	lookAt.position = position;
 	d->camera.lookAt(lookAt);
+}
+
+
+void GMSpriteGameObject::setJumpSpeed(const GMVec3& speed)
+{
+	D(d);
+	d->jumpSpeed = speed;
+}
+
+void GMSpriteGameObject::setMoveSpeed(const GMVec3& speed)
+{
+	D(d);
+	d->moveSpeed = speed;
 }
 
 void GMSpriteGameObject::update(GMDuration dt)
@@ -108,3 +136,5 @@ void GMSpriteGameObject::update(GMDuration dt)
 	}
 	d->movements.clear();
 }
+
+END_NS

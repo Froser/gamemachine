@@ -31,6 +31,11 @@ GMClock::GMClock()
 	d->timeScale = 1.f;
 }
 
+GMClock::~GMClock()
+{
+
+}
+
 void GMClock::setTimeScale(GMfloat s)
 {
 	D(d);
@@ -148,6 +153,11 @@ GMStopwatch::GMStopwatch()
 	d->end = 0;
 }
 
+GMStopwatch::~GMStopwatch()
+{
+
+}
+
 void GMStopwatch::start()
 {
 	D(d);
@@ -218,17 +228,17 @@ GMfloat GMPlane::getDistance(const GMVec3 & point) const
 	return Dot(point, normal) + getIntercept();
 }
 
-PointPosition GMPlane::classifyPoint(const GMVec3 & point) const
+GMPointPosition GMPlane::classifyPoint(const GMVec3 & point) const
 {
 	GMfloat distance = getDistance(point);
 
 	if (distance > EPSILON)
-		return PointPosition::POINT_IN_FRONT_OF_PLANE;
+		return GMPointPosition::PointInFrontOfPlane;
 
 	if (distance < -EPSILON)
-		return PointPosition::POINT_BEHIND_PLANE;
+		return GMPointPosition::PointBehindPlane;
 
-	return PointPosition::POINT_ON_PLANE;
+	return GMPointPosition::PointOnPlane;
 }
 
 GMPlane GMPlane::lerp(const GMPlane & p2, GMfloat factor)

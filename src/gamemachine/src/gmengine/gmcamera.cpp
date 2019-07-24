@@ -4,6 +4,8 @@
 #include "foundation/gamemachine.h"
 #include <gmdxincludes.h>
 
+BEGIN_NS
+
 bool GMFrustum::operator==(const GMFrustum& rhs)
 {
 	D(d);
@@ -28,6 +30,34 @@ bool GMFrustum::operator==(const GMFrustum& rhs)
 bool GMFrustum::operator!=(const GMFrustum& rhs)
 {
 	return !(*this == rhs);
+}
+
+GM_PRIVATE_OBJECT_ALIGNED(GMFrustum)
+{
+	GMFrustumType type = GMFrustumType::Perspective;
+	GMFrustumParameters parameters;
+	GMfloat n;
+	GMfloat f;
+
+	GMMat4 projectionMatrix;
+	GMMat4 viewMatrix;
+	GMMat4 inverseViewMatrix;
+
+	bool dirty = true;
+};
+
+GM_DEFINE_GETTER(GMFrustum, GMfloat, Near, n, public)
+GM_DEFINE_GETTER(GMFrustum, GMfloat, Far, f, public)
+GM_DEFINE_GETTER(GMFrustum, GMFrustumParameters, Parameters, parameters, public)
+
+GMFrustum::GMFrustum()
+{
+	GM_CREATE_DATA(GMFrustum);
+}
+
+GMFrustum::~GMFrustum()
+{
+
 }
 
 void GMFrustum::setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f)
@@ -104,21 +134,21 @@ bool GMFrustum::isBoundingBoxInside(const GMFrustumPlanes& frustumPlanes, const 
 	for (int i = 0; i < 6; ++i)
 	{
 		//if a point is not behind this plane, try next plane
-		if (planes[i]->classifyPoint(vertices[0]) != POINT_BEHIND_PLANE)
+		if (planes[i]->classifyPoint(vertices[0]) != GMPointPosition::PointBehindPlane)
 			continue;
-		if (planes[i]->classifyPoint(vertices[1]) != POINT_BEHIND_PLANE)
+		if (planes[i]->classifyPoint(vertices[1]) != GMPointPosition::PointBehindPlane)
 			continue;
-		if (planes[i]->classifyPoint(vertices[2]) != POINT_BEHIND_PLANE)
+		if (planes[i]->classifyPoint(vertices[2]) != GMPointPosition::PointBehindPlane)
 			continue;
-		if (planes[i]->classifyPoint(vertices[3]) != POINT_BEHIND_PLANE)
+		if (planes[i]->classifyPoint(vertices[3]) != GMPointPosition::PointBehindPlane)
 			continue;
-		if (planes[i]->classifyPoint(vertices[4]) != POINT_BEHIND_PLANE)
+		if (planes[i]->classifyPoint(vertices[4]) != GMPointPosition::PointBehindPlane)
 			continue;
-		if (planes[i]->classifyPoint(vertices[5]) != POINT_BEHIND_PLANE)
+		if (planes[i]->classifyPoint(vertices[5]) != GMPointPosition::PointBehindPlane)
 			continue;
-		if (planes[i]->classifyPoint(vertices[6]) != POINT_BEHIND_PLANE)
+		if (planes[i]->classifyPoint(vertices[6]) != GMPointPosition::PointBehindPlane)
 			continue;
-		if (planes[i]->classifyPoint(vertices[7]) != POINT_BEHIND_PLANE)
+		if (planes[i]->classifyPoint(vertices[7]) != GMPointPosition::PointBehindPlane)
 			continue;
 
 		//All vertices of the box are behind this plane
@@ -154,13 +184,61 @@ const GMMat4& GMFrustum::getInverseViewMatrix() const
 	return d->inverseViewMatrix;
 }
 
+void GMFrustum::cleanDirty()
+{
+	D(d);
+	d->dirty = false;
+}
+
+bool GMFrustum::isDirty()
+{
+	D(d);
+	return d->dirty;
+}
+
 //////////////////////////////////////////////////////////////////////////
+GM_PRIVATE_OBJECT_ALIGNED(GMCamera)
+{
+	GMFrustum frustum;
+	GMCameraLookAt lookAt;
+};
+
+GM_DEFINE_GETTER(GMCamera, GMCameraLookAt, LookAt, lookAt)
+GM_DEFINE_GETTER(GMCamera, GMFrustum, Frustum, frustum)
+
 GMCamera::GMCamera()
 {
 	D(d);
-	d->frustum.setPerspective(Radian(75.f), 1.333f, .1f, 3200);
+	d->frustum.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
 	d->lookAt.position = GMVec3(0);
 	d->lookAt.lookDirection = GMVec3(0, 0, 1);
+}
+
+GMCamera::GMCamera(const GMCamera& rhs)
+{
+	*this = rhs;
+}
+
+GMCamera::GMCamera(GMCamera&& rhs) GM_NOEXCEPT
+{
+	*this = std::move(rhs);
+}
+
+GMCamera& GMCamera::operator=(const GMCamera& rhs)
+{
+	GM_COPY(rhs);
+	return *this;
+}
+
+GMCamera& GMCamera::operator=(GMCamera&& rhs) GM_NOEXCEPT
+{
+	GM_MOVE(rhs);
+	return *this;
+}
+
+GMCamera::~GMCamera()
+{
+
 }
 
 bool GMCamera::operator==(const GMCamera& rhs)
@@ -223,15 +301,60 @@ void GMCamera::getPlanes(GMFrustumPlanes& planes)
 	d->frustum.getPlanes(planes);
 }
 
+bool GMCamera::isDirty() const
+{
+	D(d);
+	return d->frustum.isDirty();
+}
+
+void GMCamera::cleanDirty()
+{
+	D(d);
+	d->frustum.cleanDirty();
+}
+
+const GMMat4& GMCamera::getProjectionMatrix() const
+{
+	D(d);
+	return d->frustum.getProjectionMatrix();
+}
+
+const GMMat4& GMCamera::getViewMatrix() const
+{
+	D(d);
+	return d->frustum.getViewMatrix();
+}
+
+const GMMat4& GMCamera::getInverseViewMatrix() const
+{
+	D(d);
+	return d->frustum.getInverseViewMatrix();
+}
+
 bool GMCamera::isBoundingBoxInside(const GMFrustumPlanes& planes, const GMVec3(&vertices)[8])
 {
 	return GMFrustum::isBoundingBoxInside(planes, vertices);
 }
 
 //////////////////////////////////////////////////////////////////////////
+GM_PRIVATE_OBJECT_ALIGNED(GMCameraUtility)
+{
+	GMCamera* camera;
+	GMfloat limitPitch = Radians(85.f);
+	GMVec3 position;
+	GMVec3 lookDirection;
+};
+
+GM_DEFINE_PROPERTY(GMCameraUtility, GMfloat, LimitPitch, limitPitch)
 GMCameraUtility::GMCameraUtility(GMCamera* camera)
 {
+	GM_CREATE_DATA(GMCameraUtility);
 	setCamera(camera);
+}
+
+GMCameraUtility::~GMCameraUtility()
+{
+
 }
 
 void GMCameraUtility::update(GMfloat yaw, GMfloat pitch)
@@ -275,3 +398,5 @@ void GMCameraUtility::setCamera(GMCamera* camera)
 		d->lookDirection = camera->getLookAt().lookDirection;
 	}
 }
+
+END_NS

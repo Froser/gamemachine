@@ -28,26 +28,8 @@ enum class GMParticleMotionMode
 	Relative
 };
 
-GM_PRIVATE_OBJECT(GMParticleGravityMode)
-{
-	GMVec3 gravity = Zero<GMVec3>();
-	GMfloat tangentialAcceleration = 0;
-	GMfloat tangentialAccelerationV = 0;
-	GMfloat radialAcceleration = 0;
-	GMfloat radialAccelerationV = 0;
-};
-
-GM_PRIVATE_OBJECT(GMParticleRadiusMode)
-{
-	GMfloat beginRadius = 0;
-	GMfloat beginRadiusV = 0;
-	GMfloat endRadius = 0;
-	GMfloat endRadiusV = 0;
-	GMfloat spinPerSecond = 0;
-	GMfloat spinPerSecondV = 0;
-};
-
-class GMParticleGravityMode : public GMObject
+GM_PRIVATE_CLASS(GMParticleGravityMode);
+class GMParticleGravityMode
 {
 	GM_DECLARE_PRIVATE(GMParticleGravityMode)
 	GM_ALLOW_COPY_MOVE(GMParticleGravityMode)
@@ -58,10 +40,11 @@ class GMParticleGravityMode : public GMObject
 	GM_DECLARE_PROPERTY(RadialAccelerationV, radialAccelerationV)
 
 public:
-	GMParticleGravityMode() = default;
+	GMParticleGravityMode();
 };
 
-class GMParticleRadiusMode : public GMObject
+GM_PRIVATE_CLASS(GMParticleRadiusMode);
+class GMParticleRadiusMode
 {
 	GM_DECLARE_PRIVATE(GMParticleRadiusMode)
 	GM_ALLOW_COPY_MOVE(GMParticleRadiusMode)
@@ -73,7 +56,7 @@ class GMParticleRadiusMode : public GMObject
 	GM_DECLARE_PROPERTY(SpinPerSecondV, spinPerSecondV)
 
 public:
-	GMParticleRadiusMode() = default;
+	GMParticleRadiusMode();
 };
 
 GM_PRIVATE_OBJECT(GMParticleDescription_Cocos2D)

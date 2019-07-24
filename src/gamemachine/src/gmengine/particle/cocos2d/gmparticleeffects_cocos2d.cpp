@@ -79,8 +79,8 @@ void GMParticleEffect_Cocos2D::initParticle(GMParticle_Cocos2D* particle)
 	particle->setSize(beginSize);
 	particle->setDeltaSize((endSize - beginSize) / particle->getRemainingLife());
 
-	GMfloat beginSpin = Radian(Max(0, getBeginSpin() + getBeginSpinV() * GMRandomMt19937::random_real(-1.f, 1.f)));
-	GMfloat endSpin = Radian(Max(0, getEndSpin() + getEndSpin() * GMRandomMt19937::random_real(-1.f, 1.f)));
+	GMfloat beginSpin = Radians(Max(0, getBeginSpin() + getBeginSpinV() * GMRandomMt19937::random_real(-1.f, 1.f)));
+	GMfloat endSpin = Radians(Max(0, getEndSpin() + getEndSpin() * GMRandomMt19937::random_real(-1.f, 1.f)));
 	particle->setRotation(beginSpin);
 	particle->setDeltaRotation((endSpin - beginSpin) * remainingLifeRev);
 }
@@ -215,7 +215,7 @@ void GMGravityParticleEffect_Cocos2D::initParticle(GMParticle_Cocos2D* particle)
 	GMfloat particleSpeed = d->emitter->getEmitSpeed() + d->emitter->getEmitSpeedV() * GMRandomMt19937::random_real(-1.f, 1.f);
 	GMfloat angle = d->emitter->getEmitAngle() + d->emitter->getEmitAngleV() * GMRandomMt19937::random_real(-1.f, 1.f);
 
-	GMQuat rotationQuat = Rotate(Radian(angle), d->emitter->getRotationAxis());
+	GMQuat rotationQuat = Rotate(Radians(angle), d->emitter->getRotationAxis());
 	particle->getGravityModeData().initialVelocity = Inhomogeneous(s_rotateStartVector * rotationQuat) * particleSpeed;
 	particle->getGravityModeData().tangentialAcceleration = getGravityMode().getTangentialAcceleration() + getGravityMode().getTangentialAccelerationV() * GMRandomMt19937::random_real(-1.f, 1.f);
 	particle->getGravityModeData().radialAcceleration = getGravityMode().getRadialAcceleration() + getGravityMode().getRadialAccelerationV() * GMRandomMt19937::random_real(-1.f, 1.f);
@@ -344,7 +344,7 @@ void GMRadialParticleEffect_Cocos2D::initParticle(GMParticle_Cocos2D* particle)
 	particle->getRadiusModeData().deltaRadius = (endRadius - beginRadius) / particle->getRemainingLife();
 
 	particle->getRadiusModeData().angle = d->emitter->getEmitAngle() + d->emitter->getEmitAngleV() * GMRandomMt19937::random_real(-1.f, 1.f);
-	particle->getRadiusModeData().degressPerSecond = Radian(getRadiusMode().getSpinPerSecond() + getRadiusMode().getSpinPerSecondV() * GMRandomMt19937::random_real(-1.f, 1.f));
+	particle->getRadiusModeData().degressPerSecond = Radians(getRadiusMode().getSpinPerSecond() + getRadiusMode().getSpinPerSecondV() * GMRandomMt19937::random_real(-1.f, 1.f));
 }
 
 void GMRadialParticleEffect_Cocos2D::CPUUpdate(GMDuration dt)

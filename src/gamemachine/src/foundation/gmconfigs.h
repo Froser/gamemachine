@@ -130,6 +130,7 @@ class GM_EXPORT GMConfigs : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMConfigs)
 
+public:
 	enum Category
 	{
 		Debug,
