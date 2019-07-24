@@ -4,6 +4,17 @@
 #	include <process.h>
 #endif
 
+BEGIN_NS
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMThread)
+{
+	IThreadCallback* callback = nullptr;
+	GMThreadHandle handle = 0;
+	ThreadState state;
+	ThreadPriority priority = ThreadPriority::Normal;
+	bool done = false;
+};
+
 namespace
 {
 	unsigned WINAPI threadProc(PVOID pvParam)
@@ -47,6 +58,8 @@ namespace
 
 GMThread::GMThread()
 {
+	GM_CREATE_DATA(GMThread);
+
 	D(d);
 	d->state = ThreadState::NotRunning;
 	d->callback = nullptr;
@@ -109,8 +122,27 @@ void GMThread::sleep(GMint32 milliseconds)
 	::Sleep(milliseconds);
 }
 
+GMThreadHandle& GMThread::handle()
+{
+	D(d);
+	return d->handle;
+}
+
+bool GMThread::isDone()
+{
+	D(d);
+	return d->done;
+}
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMMutex)
+{
+	HANDLE mutex = NULL;
+};
+
 GMMutex::GMMutex()
 {
+	GM_CREATE_DATA(GMMutex);
+
 	D(d);
 	SECURITY_ATTRIBUTES sa = { sizeof(SECURITY_ATTRIBUTES), NULL, FALSE };
 	d->mutex = ::CreateMutex(&sa, FALSE, L"");
@@ -133,3 +165,5 @@ void GMMutex::unlock()
 	D(d);
 	::ReleaseMutex(d->mutex);
 }
+
+END_NS

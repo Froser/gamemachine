@@ -4,13 +4,16 @@
 #include "mad.h"
 #include "common/utilities/gmmstream.h"
 #include "gmmaudioreader_stream.h"
+#include "gmmaudioreader_stream_p.h"
 #include <gmthread.h>
 
 #define _MAD_CHECK_FLOW(i) if ((i) == MAD_FLOW_STOP) return MAD_FLOW_STOP;
 
+BEGIN_MEDIA_NS
+
 typedef void(*DecodeCallback)(void* data);
 
-GM_PRIVATE_OBJECT(GMMDecodeThread)
+GM_PRIVATE_OBJECT_UNALIGNED(GMMDecodeThread)
 {
 	void* data;
 	DecodeCallback callback;
@@ -22,6 +25,11 @@ class GMMDecodeThread : public gm::GMThread
 	GM_DECLARE_PRIVATE(GMMDecodeThread)
 
 public:
+	GMMDecodeThread()
+	{
+		GM_CREATE_DATA(GMMDecodeThread);
+	}
+
 	void setData(void* dt, DecodeCallback callback)
 	{
 		D(d);
@@ -37,7 +45,7 @@ private:
 	}
 };
 
-GM_PRIVATE_OBJECT(GMMAudioFile_MP3)
+GM_PRIVATE_OBJECT_UNALIGNED(GMMAudioFile_MP3)
 {
 	typedef GMMAudioFile_Stream Base;
 
@@ -49,13 +57,14 @@ GM_PRIVATE_OBJECT(GMMAudioFile_MP3)
 
 class GM_MEDIA_EXPORT GMMAudioFile_MP3 : public GMMAudioFile_Stream
 {
-	GM_DECLARE_PRIVATE_NGO(GMMAudioFile_MP3)
+	GM_DECLARE_PRIVATE(GMMAudioFile_MP3)
 	GM_DECLARE_ALIGNED_ALLOCATOR()
 	typedef GMMAudioFile_Stream Base;
 
 public:
 	GMMAudioFile_MP3()
 	{
+		GM_CREATE_DATA(GMMAudioFile_MP3);
 		D(d);
 		d->baseData = Base::data();
 	}
@@ -255,3 +264,5 @@ bool GMMAudioReader_MP3::test(const gm::GMBuffer& buffer)
 	ms.read((gm::GMbyte*)&header, sizeof(header));
 	return strnEqual(header, "ID3", 3);
 }
+
+END_MEDIA_NS

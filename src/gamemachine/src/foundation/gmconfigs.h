@@ -125,11 +125,7 @@ public:
 	}
 };
 
-GM_PRIVATE_OBJECT(GMConfigs)
-{
-	Vector<GMConfig> configs;
-};
-
+GM_PRIVATE_CLASS(GMConfigs);
 class GM_EXPORT GMConfigs : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMConfigs)

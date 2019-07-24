@@ -18,39 +18,21 @@ GM_INTERFACE(IDebugOutput)
 	virtual void debug(const GMString& msg) = 0;
 };
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMDebugger)
-{
-	IDebugOutput* debugger;
-};
-
+GM_PRIVATE_CLASS(GMDebugger);
 class GM_EXPORT GMDebugger
 {
-	GM_DECLARE_PRIVATE_NGO(GMDebugger)
+	GM_DECLARE_PRIVATE(GMDebugger)
+	GM_DISABLE_COPY_ASSIGN(GMDebugger)
 
 public:
 	static GMDebugger& instance();
 
 private:
-	GMDebugger()
-	{
-		D(d);
-		d->debugger = nullptr;
-	}
+	GMDebugger();
 
 public:
-	static void setDebugOutput(IDebugOutput* output)
-	{
-		if (instance().data())
-			instance().data()->debugger = output;
-	}
-
-	static IDebugOutput* getDebugOutput()
-	{
-		if (instance().data())
-			return instance().data()->debugger;
-		// 单例已经被析构
-		return nullptr;
-	}
+	static void setDebugOutput(IDebugOutput* output);
+	static IDebugOutput* getDebugOutput();
 
 private:
 	void info(const GMString& string, const std::initializer_list<GMString>& arguments);

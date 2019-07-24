@@ -4,6 +4,8 @@
 #include <AL/al.h>
 #include <gmtools.h>
 
+BEGIN_MEDIA_NS
+
 #pragma pack(push, 4)
 struct WAVEFILEHEADER
 {
@@ -27,11 +29,12 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMMAudioFile_Wav)
 
 class GMMAudioFile_Wav : public gm::IAudioFile
 {
-	GM_DECLARE_PRIVATE_NGO(GMMAudioFile_Wav)
+	GM_DECLARE_PRIVATE(GMMAudioFile_Wav)
 
 public:
 	GMMAudioFile_Wav()
 	{
+		GM_CREATE_DATA(GMMAudioFile_Wav);
 	}
 
 	~GMMAudioFile_Wav()
@@ -112,3 +115,5 @@ bool GMMAudioReader_Wav::test(const gm::GMBuffer& buffer)
 	ms.read((gm::GMbyte*)&header, sizeof(header));
 	return strnEqual(header.szRIFF, "RIFF", 4) && strnEqual(header.szWAVE, "WAVE", 4);
 }
+
+END_MEDIA_NS

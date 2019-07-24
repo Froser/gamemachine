@@ -1,6 +1,8 @@
 ﻿#include "stdafx.h"
 #include "gmmessage.h"
 
+BEGIN_NS
+
 extern "C"
 {
 	GM_EXPORT GMKey GM_ASCIIToKey(GMbyte key)
@@ -48,7 +50,37 @@ extern "C"
 
 GMSystemEvent::GMSystemEvent(GMSystemEventType type)
 {
-	D(d);
 	setType(type);
-	d->message.object = this;
+	message.object = this;
 }
+
+GMSystemKeyEvent::GMSystemKeyEvent(GMSystemEventType type, GMKey key, GMModifier modifier) : GMSystemEvent(type)
+{
+	this->key = key;
+	this->modifier = modifier;
+}
+
+GMSystemCharEvent::GMSystemCharEvent(GMSystemEventType type, GMKey key, GMwchar character, GMModifier modifier) : GMSystemKeyEvent(type, key, modifier)
+{
+	this->character = character;
+}
+
+GMSystemMouseEvent::GMSystemMouseEvent(GMSystemEventType type, const GMPoint& pt, GMMouseButton button, GMMouseButton buttons, GMModifier modifier) : GMSystemEvent(type)
+{
+	this->point = pt;
+	this->button = button;
+	this->buttons = buttons;
+	this->modifier = modifier;
+}
+
+GMSystemMouseWheelEvent::GMSystemMouseWheelEvent(const GMPoint& pt, GMMouseButton button, GMMouseButton buttons, GMModifier modifier, GMshort delta) : GMSystemMouseEvent(GMSystemEventType::MouseWheel, pt, button, buttons, modifier)
+{
+	this->delta = delta;
+}
+
+GMSystemCaptureChangedEvent::GMSystemCaptureChangedEvent(GMWindowHandle capturedWnd) : GMSystemEvent(GMSystemEventType::CaptureChanged)
+{
+	setCapturedWindow(capturedWnd);
+}
+
+END_NS

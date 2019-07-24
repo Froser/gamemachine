@@ -252,130 +252,84 @@ enum GMModifierType
 
 typedef GMuint32 GMModifier;
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMSystemEvent)
-{
-	GMMessage message = { GameMachineMessageType::SystemMessage };
-	GMSystemEventType type;
-};
-
 class GMSystemEvent
 {
-	GM_DECLARE_PRIVATE_NGO(GMSystemEvent)
-	GM_DECLARE_PROPERTY(Type, type);
+	GM_DECLARE_INLINE_PROPERTY(Type, type);
 
 public:
 	GMSystemEvent() = default;
 	GMSystemEvent(GMSystemEventType type);
-};
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMSystemKeyEvent)
-{
-	GMKey key = GMKey_Unknown;
-	GMModifier modifier;
+private:
+	GMMessage message = { GameMachineMessageType::SystemMessage };
+	GMSystemEventType type;
 };
 
 class GMSystemKeyEvent : public GMSystemEvent
 {
-	GM_DECLARE_PRIVATE_NGO(GMSystemKeyEvent);
-	GM_DECLARE_PROPERTY(Key, key)
-	GM_DECLARE_PROPERTY(Modifier, modifier)
+	GM_DECLARE_INLINE_PROPERTY(Key, key)
+	GM_DECLARE_INLINE_PROPERTY(Modifier, modifier)
 
 public:
 	GMSystemKeyEvent() = default;
-	GMSystemKeyEvent(GMSystemEventType type, GMKey key, GMModifier modifier)
-		: GMSystemEvent(type)
-	{
-		D(d);
-		d->key = key;
-		d->modifier = modifier;
-	}
-};
+	GMSystemKeyEvent(GMSystemEventType type, GMKey key, GMModifier modifier);
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMSystemCharEvent)
-{
-	GMwchar character;
+private:
+	GMKey key = GMKey_Unknown;
+	GMModifier modifier;
 };
 
 class GMSystemCharEvent : public GMSystemKeyEvent
 {
-	GM_DECLARE_PRIVATE_NGO(GMSystemCharEvent);
-	GM_DECLARE_PROPERTY(Character, character)
+	GM_DECLARE_INLINE_PROPERTY(Character, character)
 
 public:
-	GMSystemCharEvent(GMSystemEventType type, GMKey key, GMwchar character, GMModifier modifier)
-	: GMSystemKeyEvent(type, key, modifier)
-	{
-		D(d);
-		d->character = character;
-	}
+	GMSystemCharEvent(GMSystemEventType type, GMKey key, GMwchar character, GMModifier modifier);
+
+private:
+	GMwchar character = 0;
 };
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMSystemMouseEvent)
+class GMSystemMouseEvent : public GMSystemEvent
 {
+	GM_DECLARE_INLINE_PROPERTY(Point, point)
+	GM_DECLARE_INLINE_PROPERTY(Button, button)
+	GM_DECLARE_INLINE_PROPERTY(Buttons, buttons)
+	GM_DECLARE_INLINE_PROPERTY(Modifier, modifier)
+	
+public:
+	GMSystemMouseEvent() = default;
+	GMSystemMouseEvent(GMSystemEventType type, const GMPoint& pt, GMMouseButton button, GMMouseButton buttons, GMModifier modifier);
+
+private:
 	GMPoint point;
 	GMMouseButton buttons; //!< 表示当前事件产生时，鼠标按键的状态。
 	GMMouseButton button; //!< 表示引起当前事件的鼠标按键。
 	GMModifier modifier;
 };
 
-class GMSystemMouseEvent : public GMSystemEvent
-{
-	GM_DECLARE_PRIVATE_NGO(GMSystemMouseEvent);
-	GM_DECLARE_PROPERTY(Point, point)
-	GM_DECLARE_PROPERTY(Button, button)
-	GM_DECLARE_PROPERTY(Buttons, buttons)
-	GM_DECLARE_PROPERTY(Modifier, modifier)
-	
-public:
-	GMSystemMouseEvent() = default;
-	GMSystemMouseEvent(GMSystemEventType type, const GMPoint& pt, GMMouseButton button, GMMouseButton buttons, GMModifier modifier)
-		: GMSystemEvent(type)
-	{
-		D(d);
-		d->point = pt;
-		d->button = button;
-		d->buttons = buttons;
-		d->modifier = modifier;
-	}
-};
-
-GM_PRIVATE_OBJECT_UNALIGNED(GMSystemMouseWheelEvent)
-{
-	GMshort delta;
-};
-
 class GMSystemMouseWheelEvent : public GMSystemMouseEvent
 {
-	GM_DECLARE_PRIVATE_NGO(GMSystemMouseWheelEvent)
-	GM_DECLARE_PROPERTY(Delta, delta)
+	GM_DECLARE_INLINE_PROPERTY(Delta, delta)
 
 public:
 	GMSystemMouseWheelEvent() = default;
 
-	GMSystemMouseWheelEvent(const GMPoint& pt, GMMouseButton button, GMMouseButton buttons, GMModifier modifier, GMshort delta)
-		: GMSystemMouseEvent(GMSystemEventType::MouseWheel, pt, button, buttons, modifier)
-	{
-		D(d);
-		d->delta = delta;
-	}
-};
+	GMSystemMouseWheelEvent(const GMPoint& pt, GMMouseButton button, GMMouseButton buttons, GMModifier modifier, GMshort delta);
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMSystemCaptureChangedEvent)
-{
-	GMWindowHandle capturedWnd = 0;
+private:
+	GMshort delta = 0;
 };
 
 class GMSystemCaptureChangedEvent : public GMSystemEvent
 {
-	GM_DECLARE_PRIVATE_NGO(GMSystemCaptureChangedEvent)
-	GM_DECLARE_PROPERTY(CapturedWindow, capturedWnd)
+	GM_DECLARE_INLINE_PROPERTY(CapturedWindow, capturedWnd)
 
 public:
-	GMSystemCaptureChangedEvent(GMWindowHandle capturedWnd)
-		: GMSystemEvent(GMSystemEventType::CaptureChanged)
-	{
-		setCapturedWindow(capturedWnd);
-	}
+	GMSystemCaptureChangedEvent(GMWindowHandle capturedWnd);
+
+private:
+	GMWindowHandle capturedWnd = 0;
 };
 
 class GMSystemPaintEvent : public GMSystemEvent

@@ -1,9 +1,21 @@
 ﻿#include "stdafx.h"
-#include <gamemachine.h>
 #include "gmmstream.h"
+
+BEGIN_MEDIA_NS
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMMStream)
+{
+	gm::GMbyte* data = nullptr;
+	gm::GMManualResetEvent preventRead;
+	std::atomic_uint ptr;
+	gm::GMsize_t capacity = 0;
+	bool writing = false;
+};
 
 GMMStream::GMMStream()
 {
+	GM_CREATE_DATA(GMMStream);
+
 	D(d);
 	d->ptr = 0;
 }
@@ -81,3 +93,5 @@ bool GMMStream::read(gm::GMbyte* buffer)
 	memcpy_s(buffer, d->capacity, d->data, d->capacity);
 	return true;
 }
+
+END_MEDIA_NS

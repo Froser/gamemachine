@@ -4,15 +4,11 @@
 #include <gmmcommon.h>
 #include <gminterfaces.h>
 #include <gmobject.h>
-#include "aldlist.h"
 
 BEGIN_MEDIA_NS
+class ALDeviceList;
 
-GM_PRIVATE_OBJECT(GMMAudioPlayer)
-{
-	ALDeviceList devices;
-};
-
+GM_PRIVATE_CLASS(GMMAudioPlayer);
 class GMMAudioPlayer : public gm::GMObject, public gm::IAudioPlayer
 {
 	GM_DECLARE_PRIVATE(GMMAudioPlayer)
@@ -22,7 +18,7 @@ public:
 	~GMMAudioPlayer();
 
 public:
-	ALDeviceList& getDevices() { D(d); return d->devices; }
+	ALDeviceList& getDevices();
 
 public:
 	virtual void createPlayerSource(gm::IAudioFile* f, OUT gm::IAudioSource** handle) override;

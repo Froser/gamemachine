@@ -7,6 +7,8 @@
 #include "gmmessage.h"
 #include "wrapper/dx11wrapper.h"
 
+BEGIN_NS
+
 extern "C"
 {
 	GM_EXPORT bool GMQueryCapability(GMCapability cp)
@@ -40,6 +42,23 @@ namespace
 	GMMutex s_callableLock;
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GameMachine)
+{
+	GMClock clock;
+	bool inited = false;
+	bool gamemachinestarted = false;
+	Set<IWindow*> windows;
+	const IRenderContext* computeContext = nullptr;
+	IFactory* factory = nullptr;
+	GMGamePackage* gamePackageManager = nullptr;
+	GMMessage lastMessage;
+	Queue<GMMessage> messageQueue;
+	Vector<IDestroyObject*> managerQueue;
+	Queue<GMCallable> callableQueue;
+	GMGameMachineRunningStates states;
+	GMGameMachineRunningMode runningMode;
+};
+
 GameMachine& GameMachine::instance()
 {
 	static GameMachine s_instance;
@@ -48,6 +67,7 @@ GameMachine& GameMachine::instance()
 
 GameMachine::GameMachine()
 {
+	GM_CREATE_DATA(GameMachine);
 	GMDebugger::instance();
 	updateGameMachine();
 }
@@ -81,6 +101,21 @@ void GameMachine::init(
 	}
 
 	d->inited = true;
+}
+
+GMGamePackage* GameMachine::getGamePackageManager()
+{
+	D(d); return d->gamePackageManager;
+}
+
+IFactory* GameMachine::getFactory()
+{
+	D(d); return d->factory;
+}
+
+const GMGameMachineRunningStates& GameMachine::getRunningStates() const
+{
+	D(d); return d->states;
 }
 
 void GameMachine::postMessage(GMMessage msg)
@@ -140,7 +175,7 @@ void GameMachine::removeWindow(IWindow* window)
 	postMessage({ GameMachineMessageType::DeleteWindowLater, 0, window });
 }
 
-const IRenderContext* gm::GameMachine::getComputeContext()
+const IRenderContext* GameMachine::getComputeContext()
 {
 	D(d);
 	return d->computeContext;
@@ -300,6 +335,12 @@ bool GameMachine::handleMessages()
 	return true;
 }
 
+void GameMachine::setGameMachineRunningStates(const GMGameMachineRunningStates& states)
+{
+	D(d);
+	d->states = states;
+}
+
 bool GameMachine::handleMessage(const GMMessage& msg)
 {
 	D(d);
@@ -436,3 +477,5 @@ void GameMachine::invokeCallables()
 		d->callableQueue.pop();
 	}
 }
+
+END_NS

@@ -3,6 +3,7 @@
 #include "gmdata/gmmodel.h"
 #include "gmphysics/gmphysicsshape.h"
 
+BEGIN_NS
 static GMAsset s_invalid;
 
 GM_DEFINE_ASSET_GETTER(ITexture*, Texture, GMAssetType::Texture);
@@ -10,8 +11,17 @@ GM_DEFINE_ASSET_GETTER(GMModel*, Model, GMAssetType::Model);
 GM_DEFINE_ASSET_GETTER(GMScene*, Scene, GMAssetType::Scene);
 GM_DEFINE_ASSET_GETTER(GMPhysicsShape*, PhysicsShape, GMAssetType::PhysicsShape);
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMAsset)
+{
+	GMSharedPtr<GMAtomic<GMlong>> ref;
+	GMAssetType type = GMAssetType::Invalid;
+	void* asset = nullptr;
+};
+
 GMAsset::GMAsset()
 {
+	GM_CREATE_DATA(GMAsset);
+
 	D(d);
 	d->ref = std::make_shared<GMAtomic<GMlong>>(1);
 }
@@ -28,6 +38,30 @@ GMAsset::~GMAsset()
 {
 	D(d);
 	release();
+}
+
+GMAssetType GMAsset::getType() const GM_NOEXCEPT
+{
+	D(d);
+	return d->type;
+}
+
+void GMAsset::setType(GMAssetType type) GM_NOEXCEPT
+{
+	D(d);
+	d->type = type;
+}
+
+bool GMAsset::isEmpty() const GM_NOEXCEPT
+{
+	D(d);
+	return !d->asset;
+}
+
+void* GMAsset::getAsset() const GM_NOEXCEPT
+{
+	D(d);
+	return d->asset;
 }
 
 GMAsset::GMAsset(const GMAsset& asset)
@@ -126,6 +160,17 @@ const GMAsset& GMAsset::invalidAsset()
 	return s_invalid;
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMAssets)
+{
+	Vector<GMAsset> unnamedAssets;
+	HashMap<GMString, GMAsset, GMStringHashFunctor> childs;
+};
+
+GMAssets::GMAssets()
+{
+	GM_CREATE_DATA(GMAssets);
+}
+
 GMAsset GMAssets::addAsset(GMAsset asset)
 {
 	D(d);
@@ -156,3 +201,4 @@ GMAsset GMAssets::getAsset(const GMString& name)
 		return iter->second;
 	return GMAsset::invalidAsset();
 }
+END_NS

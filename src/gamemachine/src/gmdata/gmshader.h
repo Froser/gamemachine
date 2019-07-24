@@ -13,40 +13,30 @@ enum
 	MAX_TEX_TRANS = 3,
 };
 
-GM_ALIGNED_STRUCT(GMS_TextureTransform)
+struct GMS_TextureTransform
 {
 	GMS_TextureTransformType type = GMS_TextureTransformType::NoTextureTransform;
 	GMfloat p1 = 0;
 	GMfloat p2 = 0;
 };
 
-GM_PRIVATE_OBJECT(GMTextureSampler)
-{
-	Array<GMTextureAsset, MAX_ANIMATION_FRAME> frames; // 每个texture由TEXTURE_INDEX_MAX个纹理动画组成。静态纹理的纹理动画数量为1
-	Array<GMS_TextureTransform, MAX_TEX_TRANS> texTransform;
-	GMsize_t frameCount = 0;
-	GMint32 animationMs = 1; //每一帧动画间隔 (ms)
-	GMS_TextureFilter magFilter = GMS_TextureFilter::Linear;
-	GMS_TextureFilter minFilter = GMS_TextureFilter::LinearMipmapLinear;
-	GMS_Wrap wrapS = GMS_Wrap::Repeat;
-	GMS_Wrap wrapT = GMS_Wrap::Repeat;
-};
-
 struct GMTextureAttributeBank;
+GM_PRIVATE_CLASS(GMTextureSampler);
 class GM_EXPORT GMTextureSampler
 {
-	GM_DECLARE_PRIVATE_NGO(GMTextureSampler)
+	GM_DECLARE_PRIVATE(GMTextureSampler)
 
 public:
-	GM_DECLARE_PROPERTY(FrameCount, frameCount);
-	GM_DECLARE_PROPERTY(AnimationMs, animationMs);
-	GM_DECLARE_PROPERTY(MagFilter, magFilter);
-	GM_DECLARE_PROPERTY(MinFilter, minFilter);
-	GM_DECLARE_PROPERTY(WrapS, wrapS);
-	GM_DECLARE_PROPERTY(WrapT, wrapT);
+	GM_DECLARE_PROPERTY(GMsize_t, FrameCount);
+	GM_DECLARE_PROPERTY(GMint32, AnimationMs);
+	GM_DECLARE_PROPERTY(GMS_TextureFilter, MagFilter);
+	GM_DECLARE_PROPERTY(GMS_TextureFilter, MinFilter);
+	GM_DECLARE_PROPERTY(GMS_Wrap, WrapS);
+	GM_DECLARE_PROPERTY(GMS_Wrap, WrapT);
 
 public:
-	GMTextureSampler() = default;
+	GMTextureSampler();
+	GMTextureSampler& operator=(const GMTextureSampler& rhs);
 
 public:
 	GMS_TextureTransform& getTextureTransform(GMsize_t index);
@@ -55,7 +45,6 @@ public:
 	GMsize_t addFrame(GMTextureAsset texture);
 	bool setTexture(GMsize_t frameIndex, GMTextureAsset texture);
 	void applyTexMode(GMfloat timeSeconds, std::function<void(const GMTextureAttributeBank*, GMS_TextureTransformType, Pair<GMfloat, GMfloat>&&)> callback, const GMTextureAttributeBank* bank);
-	GMTextureSampler& operator=(const GMTextureSampler& rhs);
 };
 
 enum class GMTextureType
@@ -100,71 +89,18 @@ struct GMTextureRegisterQuery<GMTextureType::BeginOfEnum>
 	enum { Value = 0 };
 };
 
-GM_PRIVATE_OBJECT(GMTextureList)
+GM_PRIVATE_CLASS(GMTextureList);
+class GMTextureList
 {
-	GMTextureSampler ambientMap;
-	GMTextureSampler diffuseMap;
-	GMTextureSampler normalMap;
-	GMTextureSampler lightMap;
-	GMTextureSampler specularMap;
-	GMTextureSampler albedoMap;
-	GMTextureSampler metallicRoughnessAOMap;
-	GMTextureSampler cubeMap;
-};
-
-GM_ALIGNED_16(class) GMTextureList
-{
-	GM_DECLARE_PRIVATE_NGO(GMTextureList)
-	GM_DECLARE_ALIGNED_ALLOCATOR()
+	GM_DECLARE_PRIVATE(GMTextureList)
 
 public:
-	GMTextureList() = default;
+	GMTextureList();
 
 public:
-	inline GMTextureSampler& getTextureSampler(GMTextureType type)
-	{
-		D(d);
-		switch (type)
-		{
-		case GMTextureType::Ambient:
-			return d->ambientMap;
-		case GMTextureType::Diffuse:
-			return d->diffuseMap;
-		case GMTextureType::NormalMap:
-			return d->normalMap;
-		case GMTextureType::Lightmap:
-			return d->lightMap;
-		case GMTextureType::Specular:
-			return d->specularMap;
-		case GMTextureType::Albedo:
-			return d->albedoMap;
-		case GMTextureType::MetallicRoughnessAO:
-			return d->metallicRoughnessAOMap;
-		case GMTextureType::CubeMap:
-			return d->cubeMap;
-		default:
-			GM_ASSERT(false);
-			return d->ambientMap;
-		}
-	}
-
-	inline const GMTextureSampler& getTextureSampler(GMTextureType type) const
-	{
-		return const_cast<GMTextureList*>(this)->getTextureSampler(type);
-	}
-
-	inline GMTextureList& operator=(const GMTextureList& rhs)
-	{
-		D(d);
-		D_OF(rhs_d, &rhs);
-
-		GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
-		{
-			getTextureSampler(type) = rhs.getTextureSampler(type);
-		}
-
-		return *this;
-	}
+	GMTextureSampler& getTextureSampler(GMTextureType type);
+	const GMTextureSampler& getTextureSampler(GMTextureType type) const;
+	GMTextureList& operator=(const GMTextureList& rhs);
 };
 
 enum class GMIlluminationModel
@@ -175,83 +111,61 @@ enum class GMIlluminationModel
 };
 
 // 光照参数
-GM_PRIVATE_OBJECT(GMMaterial)
+GM_PRIVATE_CLASS(GMMaterial);
+class GMMaterial : public IDestroyObject
 {
-	GMfloat shininess = 1;
-	GMfloat refractivity = 0;
-	GMVec3 ambient = GMVec3(0);
-	GMVec3 specular = GMVec3(1);
-	GMVec3 diffuse = GMVec3(1);
-	GMVec3 f0 = GMVec3(0.04f); //!< 基础反射率，用于PBR(BRDF)模型的渲染。对于金属，这个值为0.04。
-	HashMap<GMString, GMVariant, GMStringHashFunctor> customMaterials;
-};
+	GM_DECLARE_PRIVATE(GMMaterial)
+	GM_DECLARE_PROPERTY(GMfloat, Shininess)
+	GM_DECLARE_PROPERTY(GMfloat, Refractivity)
+	GM_DECLARE_PROPERTY(GMVec3, Ambient)
+	GM_DECLARE_PROPERTY(GMVec3, Specular)
+	GM_DECLARE_PROPERTY(GMVec3, Diffuse)
+	GM_DECLARE_PROPERTY(GMVec3, F0)
 
-GM_ALIGNED_16(class) GMMaterial : public IDestroyObject
-{
-	GM_DECLARE_PRIVATE_NGO(GMMaterial)
-	GM_DECLARE_ALIGNED_ALLOCATOR()
-	GM_DECLARE_PROPERTY(Shininess, shininess)
-	GM_DECLARE_PROPERTY(Refractivity, refractivity)
-	GM_DECLARE_PROPERTY(Ambient, ambient)
-	GM_DECLARE_PROPERTY(Specular, specular)
-	GM_DECLARE_PROPERTY(Diffuse, diffuse)
-	GM_DECLARE_PROPERTY(F0, f0)
+public:
+	GMMaterial();
+	GMMaterial(const GMMaterial&);
+	GMMaterial(GMMaterial&&) GM_NOEXCEPT;
+	GMMaterial& operator=(const GMMaterial& rhs);
+	GMMaterial& operator=(GMMaterial&& rhs) GM_NOEXCEPT;
 
 public:
 	const GMVariant& getCustomMaterial(const GMString& name) const;
 	void setCustomMaterial(const GMString& name, const GMVariant& value);
 };
 
-GM_PRIVATE_OBJECT(GMShader)
+GM_PRIVATE_CLASS(GMShader);
+class GMShader : public IDestroyObject
 {
-	GMIlluminationModel illuminationModel = GMIlluminationModel::Phong;
-	GMuint32 surfaceFlag = 0;
-	GMS_Cull cull = GMS_Cull::Cull;
-	GMS_FrontFace frontFace = GMS_FrontFace::Closewise;
-	GMS_BlendFunc blendFactorSrcRGB = GMS_BlendFunc::Zero;
-	GMS_BlendFunc blendFactorDestRGB = GMS_BlendFunc::Zero;
-	GMS_BlendFunc blendFactorSrcAlpha = GMS_BlendFunc::Zero;
-	GMS_BlendFunc blendFactorDestAlpha = GMS_BlendFunc::Zero;
-	GMS_BlendOp blendOpRGB = GMS_BlendOp::Add;
-	GMS_BlendOp blendOpAlpha = GMS_BlendOp::Add;
-	GMS_VertexColorOp vertexColorOp = GMS_VertexColorOp::DoNotUseVertexColor;
-	bool blend = false;
-	bool visible = true;
-	bool culled = false;
-	bool noDepthTest = false;
-	bool drawBorder = false;
-	GMVec3 lineColor = GMVec3(0);
-	GMTextureList textureList;
-	GMMaterial material;
-};
-
-GM_ALIGNED_16(class) GMShader : public IDestroyObject
-{
-	GM_DECLARE_PRIVATE_NGO(GMShader)
+	GM_DECLARE_PRIVATE(GMShader)
 	GM_FRIEND_CLASS(GMGameObject)
-	GM_DECLARE_ALIGNED_ALLOCATOR()
 
 public:
-	GMShader() = default;
+	GMShader();
+	GMShader(const GMShader&);
+	GMShader(GMShader&&) GM_NOEXCEPT;
+	GMShader& operator=(const GMShader& rhs);
+	GMShader& operator=(GMShader&& rhs) GM_NOEXCEPT;
+	~GMShader();
 
 public:
-	GM_DECLARE_PROPERTY(SurfaceFlag, surfaceFlag);
-	GM_DECLARE_PROPERTY(Cull, cull);
-	GM_DECLARE_PROPERTY(FrontFace, frontFace);
-	GM_DECLARE_PROPERTY(BlendFactorSourceRGB, blendFactorSrcRGB);
-	GM_DECLARE_PROPERTY(BlendFactorDestRGB, blendFactorDestRGB);
-	GM_DECLARE_PROPERTY(BlendOpRGB, blendOpRGB);
-	GM_DECLARE_PROPERTY(BlendFactorSourceAlpha, blendFactorSrcAlpha);
-	GM_DECLARE_PROPERTY(BlendFactorDestAlpha, blendFactorDestAlpha);
-	GM_DECLARE_PROPERTY(BlendOpAlpha, blendOpAlpha);
-	GM_DECLARE_PROPERTY(Blend, blend);
-	GM_DECLARE_PROPERTY(Visible, visible);
-	GM_DECLARE_PROPERTY(NoDepthTest, noDepthTest);
-	GM_DECLARE_PROPERTY(TextureList, textureList);
-	GM_DECLARE_PROPERTY(LineColor, lineColor);
-	GM_DECLARE_PROPERTY(Material, material);
-	GM_DECLARE_PROPERTY(IlluminationModel, illuminationModel);
-	GM_DECLARE_PROPERTY(VertexColorOp, vertexColorOp)
+	GM_DECLARE_PROPERTY(GMuint32, SurfaceFlag); // to be deprecated
+	GM_DECLARE_PROPERTY(GMS_Cull, Cull);
+	GM_DECLARE_PROPERTY(GMS_FrontFace, FrontFace);
+	GM_DECLARE_PROPERTY(GMS_BlendFunc, BlendFactorSourceRGB);
+	GM_DECLARE_PROPERTY(GMS_BlendFunc, BlendFactorDestRGB);
+	GM_DECLARE_PROPERTY(GMS_BlendOp, BlendOpRGB);
+	GM_DECLARE_PROPERTY(GMS_BlendFunc, BlendFactorSourceAlpha);
+	GM_DECLARE_PROPERTY(GMS_BlendFunc, BlendFactorDestAlpha);
+	GM_DECLARE_PROPERTY(GMS_BlendOp, BlendOpAlpha);
+	GM_DECLARE_PROPERTY(bool, Blend);
+	GM_DECLARE_PROPERTY(bool, Visible);
+	GM_DECLARE_PROPERTY(bool, NoDepthTest);
+	GM_DECLARE_PROPERTY(GMTextureList, TextureList);
+	GM_DECLARE_PROPERTY(GMVec3, LineColor);
+	GM_DECLARE_PROPERTY(GMMaterial, Material);
+	GM_DECLARE_PROPERTY(GMIlluminationModel, IlluminationModel);
+	GM_DECLARE_PROPERTY(GMS_VertexColorOp, VertexColorOp)
 
 public:
 	inline void setBlendFactorSource(GMS_BlendFunc func)
@@ -274,18 +188,8 @@ public:
 
 	// GMGameObject:
 private:
-	inline void setCulled(bool culled)
-	{
-		// 设置一个物体是否被裁剪，如果为true，则表示它不在frustum内，一般情况下不进行绘制
-		D(d);
-		d->culled = culled;
-	}
-
-	inline bool isCulled()
-	{
-		D(d);
-		return d->culled;
-	}
+	void setCulled(bool culled);
+	bool isCulled();
 };
 END_NS
 #endif

@@ -26,6 +26,7 @@ set(SOURCES
 		src/common/audio/gmmaudioplayer.cpp
 		src/common/audio/gmmaudioreader.h
 		src/common/audio/gmmaudioreader_stream.h
+		src/common/audio/gmmaudioreader_stream_p.h
 		src/common/audio/gmmaudioreader_stream.cpp
 		src/common/audio/gmmaudioreader_mp3.h
 		src/common/audio/gmmaudioreader_mp3.cpp

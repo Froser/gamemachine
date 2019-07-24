@@ -28,6 +28,8 @@
 #include <AL/al.h>
 #include <gmstring.h>
 
+BEGIN_MEDIA_NS
+
 /*
  * Init call
  */
@@ -320,3 +322,5 @@ unsigned int ALDeviceList::GetMaxNumSources()
 
 	return iSourceCount;
 }
+
+END_MEDIA_NS

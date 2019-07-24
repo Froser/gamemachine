@@ -3,6 +3,18 @@
 #include "gmgamepackagehandler.h"
 #include <sys/stat.h>
 
+BEGIN_NS
+GM_PRIVATE_OBJECT_UNALIGNED(GMGamePackage)
+{
+	GMString packagePath;
+	GMScopedPtr<IGamePackageHandler> handler;
+};
+
+GMGamePackage::GMGamePackage()
+{
+	GM_CREATE_DATA(GMGamePackage);
+}
+
 GMGamePackage::Data* GMGamePackage::gamePackageData()
 {
 	D(d);
@@ -91,3 +103,4 @@ void GMGamePackage::createGamePackage(GMGamePackage* pk, GMGamePackageType t, OU
 		break;
 	}
 }
+END_NS

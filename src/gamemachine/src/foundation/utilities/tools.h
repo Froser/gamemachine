@@ -12,28 +12,14 @@ template <typename T, typename DeleteFunc = std::default_delete<T>>
 using GMScopedPtr = GMOwnedPtr<T, DeleteFunc>;
 
 //GMClock
-GM_PRIVATE_OBJECT_UNALIGNED(GMClock)
-{
-	GMint64 frequency;
-	GMint64 timeCycles;
-	GMint64 begin, end;
-	GMint64 deltaCycles;
-	GMfloat timeScale;
-	GMfloat fps;
-	bool paused;
-
-	//以下用于计算帧率
-	GMint32 frameCount;
-	GMint64 lastCycle;
-};
-
+GM_PRIVATE_CLASS(GMClock);
 class GM_EXPORT GMClock
 {
-	GM_DECLARE_PRIVATE_NGO(GMClock)
+	GM_DECLARE_PRIVATE(GMClock)
+	GM_DISABLE_COPY_ASSIGN(GMClock)
 
 public:
 	GMClock();
-	~GMClock() {}
 
 public:
 	void setTimeScale(GMfloat);
@@ -54,16 +40,11 @@ private:
 };
 
 //GMStopwatch
-GM_PRIVATE_OBJECT_UNALIGNED(GMStopwatch)
-{
-	GMint64 frequency;
-	GMint64 start;
-	GMint64 end;
-};
-
+GM_PRIVATE_CLASS(GMStopwatch);
 class GMStopwatch
 {
-	GM_DECLARE_PRIVATE_NGO(GMStopwatch);
+	GM_DECLARE_PRIVATE(GMStopwatch);
+	GM_DISABLE_COPY_ASSIGN(GMStopwatch)
 
 public:
 	GMStopwatch();
@@ -78,7 +59,7 @@ public:
 };
 
 //Plane
-enum PointPosition
+enum class PointPosition
 {
 	POINT_ON_PLANE = 0,
 	POINT_IN_FRONT_OF_PLANE,
@@ -164,17 +145,10 @@ GM_ALIGNED_STRUCT(GMFrustumPlanes)
 };
 
 //GMMemoryStream
-GM_PRIVATE_OBJECT_UNALIGNED(GMMemoryStream)
-{
-	const GMbyte* ptr;
-	const GMbyte* start;
-	const GMbyte* end;
-	GMsize_t size;
-};
-
+GM_PRIVATE_CLASS(GMMemoryStream);
 class GM_EXPORT GMMemoryStream
 {
-	GM_DECLARE_PRIVATE_NGO(GMMemoryStream)
+	GM_DECLARE_PRIVATE(GMMemoryStream)
 
 public:
 	enum SeekMode
@@ -185,6 +159,7 @@ public:
 
 public:
 	GMMemoryStream(const GMbyte* buffer, GMsize_t size);
+	~GMMemoryStream();
 
 public:
 	GMsize_t read(GMbyte* buf, GMsize_t size);
@@ -197,15 +172,11 @@ public:
 };
 
 //Bitset
-GM_PRIVATE_OBJECT(Bitset)
-{
-	GMint32 numBytes;
-	GMbyte* bits;
-};
-
+GM_PRIVATE_CLASS(Bitset);
 class GM_EXPORT Bitset : public GMObject
 {
 	GM_DECLARE_PRIVATE(Bitset)
+	GM_DISABLE_COPY_ASSIGN(Bitset)
 
 public:
 	Bitset();
@@ -244,21 +215,12 @@ struct GM_EXPORT GMScreen
 };
 
 //GMEvent: platforms/[os]/event.cpp
-#if GM_WINDOWS
-typedef HANDLE GMEventHandle;
-#else
-typedef void* GMEventHandle;
-#endif
-
-GM_PRIVATE_OBJECT_UNALIGNED(GMEvent)
-{
-	GMEventHandle handle;
-};
-
 // 表示一个Wait之后能够自动Set的事件
+GM_PRIVATE_CLASS(GMEvent);
 class GM_EXPORT GMEvent
 {
-	GM_DECLARE_PRIVATE_NGO(GMEvent)
+	GM_DECLARE_PRIVATE(GMEvent)
+	GM_DISABLE_COPY_ASSIGN(GMEvent)
 
 protected:
 	GMEvent(bool manualReset, bool initialState);

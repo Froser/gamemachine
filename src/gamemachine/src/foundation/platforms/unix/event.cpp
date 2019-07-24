@@ -3,6 +3,11 @@
 #include "../../utilities/tools.h"
 #include <pthread.h>
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMEvent)
+{
+	void* handle = nullptr;
+};
+
 struct GMEventHandleStruct
 {
 	pthread_mutex_t mutex;
@@ -13,6 +18,8 @@ struct GMEventHandleStruct
 
 GMEvent::GMEvent(bool manualReset, bool initialState)
 {
+	GM_CREATE_DATA(GMEvent);
+
 	D(d);
 	GMEventHandleStruct* handle = new GMEventHandleStruct();
 	d->handle = (void*) handle;

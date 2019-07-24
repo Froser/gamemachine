@@ -5,6 +5,9 @@
 #include "decoder.h"
 #include <gmthread.h>
 #include "../src/foundation/gamemachine.h"
+#include "aldlist.h"
+
+BEGIN_MEDIA_NS
 
 // 大小保持一致
 static_assert(sizeof(gm::GMint32) == sizeof(ALenum), "Size error");
@@ -12,15 +15,18 @@ static_assert(sizeof(gm::GMint32) == sizeof(ALsizei), "Size error");
 static ALenum s_alErrCode;
 #define GMM_CHECK_AL_ERROR() GM_ASSERT((s_alErrCode = alGetError()) == AL_NO_ERROR);
 
-inline void waitForSourceStop(ALuint source)
+namespace
 {
-	alSourceStop(source);
-	ALint state;
-	do
+	void waitForSourceStop(ALuint source)
 	{
-		GMM_SLEEP_FOR_ONE_FRAME();
-		alGetSourcei(source, AL_SOURCE_STATE, &state);
-	} while (state == AL_PLAYING);
+		alSourceStop(source);
+		ALint state;
+		do
+		{
+			GMM_SLEEP_FOR_ONE_FRAME();
+			alGetSourcei(source, AL_SOURCE_STATE, &state);
+		} while (state == AL_PLAYING);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -34,7 +40,13 @@ enum class GMMAudioSourcePlayOperation
 };
 
 //////////////////////////////////////////////////////////////////////////
-GM_PRIVATE_OBJECT(GMMAudioStaticSource)
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMMAudioPlayer)
+{
+	ALDeviceList devices;
+};
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMMAudioStaticSource)
 {
 	gm::IAudioFile* file = nullptr;
 	ALuint sourceId = 0;
@@ -129,7 +141,8 @@ void GMMAudioStaticSource::operate(GMMAudioSourcePlayOperation op)
 //////////////////////////////////////////////////////////////////////////
 
 class GMMAudioStreamPlayThread;
-GM_PRIVATE_OBJECT(GMMAudioStreamSource)
+class GMMAudioStreamSource;
+GM_PRIVATE_OBJECT_UNALIGNED(GMMAudioStreamSource)
 {
 	ALuint* buffers = nullptr;
 	gm::IAudioFile* file = nullptr;
@@ -137,7 +150,7 @@ GM_PRIVATE_OBJECT(GMMAudioStreamSource)
 	ALuint sourceId = 0;
 };
 
-GM_PRIVATE_OBJECT(GMMAudioStreamPlayThread)
+GM_PRIVATE_OBJECT_UNALIGNED(GMMAudioStreamPlayThread)
 {
 	GMMAudioStreamSource* source = nullptr;
 	bool started = false;
@@ -365,6 +378,12 @@ GMMAudioPlayer::~GMMAudioPlayer()
 	shutdownDevice();
 }
 
+ALDeviceList& GMMAudioPlayer::getDevices()
+{
+	D(d);
+	return d->devices;
+}
+
 bool GMMAudioPlayer::openDevice(gm::GMint32 idx)
 {
 	D(d);
@@ -410,3 +429,5 @@ void GMMAudioPlayer::createPlayerSource(gm::IAudioFile* f, OUT gm::IAudioSource*
 		(*handle) = h;
 	}
 }
+
+END_MEDIA_NS

@@ -3,6 +3,8 @@
 #include "gmmaudioreader_wav.h"
 #include "common/audio/gmmaudioreader_mp3.h"
 
+BEGIN_MEDIA_NS
+
 class GMAudioFormatReaders
 {
 public:
@@ -54,3 +56,5 @@ bool GMMAudioReader::load(gm::GMBuffer& buffer, OUT gm::IAudioFile** f)
 
 	return getReader(type)->load(buffer, f);
 }
+
+END_MEDIA_NS

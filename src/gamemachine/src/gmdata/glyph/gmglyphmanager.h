@@ -34,18 +34,7 @@ struct GMFont
 
 typedef HashMap<GMFontHandle, HashMap<GMint32, HashMap<GMwchar, GMGlyphInfo> > > CharList;
 
-GM_PRIVATE_OBJECT(GMGlyphManager)
-{
-	const IRenderContext* context = nullptr;
-	CharList chars;
-	GMint32 cursor_u, cursor_v;
-	GMfloat maxHeight;
-	Vector<GMFont> fonts;
-
-	GMFontHandle defaultCN = GMInvalidFontHandle;
-	GMFontHandle defaultEN = GMInvalidFontHandle;
-};
-
+GM_PRIVATE_CLASS(GMGlyphManager);
 class GM_EXPORT GMGlyphManager : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMGlyphManager);
@@ -72,33 +61,10 @@ public:
 	virtual GMTextureAsset glyphTexture() = 0;
 
 public:
-	void setDefaultFontCN(GMFontHandle fontHandle)
-	{
-		D(d);
-		d->defaultCN = fontHandle;
-		if (d->defaultCN == GMInvalidFontHandle)
-			d->defaultCN = 0;
-	}
-
-	void setDefaultFontEN(GMFontHandle fontHandle)
-	{
-		D(d);
-		d->defaultEN = fontHandle;
-		if (d->defaultEN == GMInvalidFontHandle)
-			d->defaultEN = 0;
-	}
-
-	inline GMFontHandle getDefaultFontCN()
-	{
-		D(d);
-		return d->defaultCN;
-	}
-
-	inline GMFontHandle getDefaultFontEN()
-	{
-		D(d);
-		return d->defaultEN;
-	}
+	void setDefaultFontCN(GMFontHandle fontHandle);
+	void setDefaultFontEN(GMFontHandle fontHandle);
+	GMFontHandle getDefaultFontCN();
+	GMFontHandle getDefaultFontEN();
 
 private:
 	virtual void updateTexture(const GMGlyphBitmap& bitmapGlyph, const GMGlyphInfo& glyphInfo) = 0;

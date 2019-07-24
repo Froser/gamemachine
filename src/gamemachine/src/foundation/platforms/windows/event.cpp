@@ -2,8 +2,17 @@
 #include "check.h"
 #include "../../utilities/tools.h"
 
+BEGIN_NS
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMEvent)
+{
+	HANDLE handle = NULL;
+};
+
 GMEvent::GMEvent(bool manualReset, bool initialState)
 {
+	GM_CREATE_DATA(GMEvent);
+
 	D(d);
 	d->handle = ::CreateEvent(NULL, manualReset, initialState ? TRUE : FALSE, L"");
 }
@@ -42,3 +51,5 @@ GMManualResetEvent::GMManualResetEvent(bool initialState)
 	: GMEvent(true, initialState)
 {
 }
+
+END_NS

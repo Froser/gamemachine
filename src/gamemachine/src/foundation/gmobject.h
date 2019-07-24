@@ -15,72 +15,21 @@
 BEGIN_NS
 
 // 对象存储
-template <typename T>
-GM_ALIGNED_16(struct) GMObjectPrivateBase
+GM_ALIGNED_16(struct) GMObjectPrivateAlignedBase
 {
 	GM_DECLARE_ALIGNED_ALLOCATOR();
-	virtual ~GMObjectPrivateBase() {}
+	virtual ~GMObjectPrivateAlignedBase() {}
 };
 
-template <typename T>
-class GMConstructHelper
-{
-public:
-	GMConstructHelper()
-	{
-		m_ref = new T();
-	}
-
-	~GMConstructHelper()
-	{
-		GM_delete(m_ref);
-	}
-
-	const T* data() const
-	{
-		return m_ref;
-	}
-
-	T* data()
-	{
-		return m_ref;
-	}
-
-	void swap(GMConstructHelper<T>& another) GM_NOEXCEPT
-	{
-		GM_SWAP(m_ref, another.m_ref);
-	}
-
-private:
-	T* m_ref;
-};
-
-#define GM_DECLARE_PRIVATE_AND_BASE(className, base)										\
+#define GM_DECLARE_PRIVATE(className)														\
 	public:																					\
-		typedef base Base;																	\
 		typedef className##Private Data;													\
-	private:																				\
-		gm::GMConstructHelper<Data> m_data;													\
-	private:																				\
-		void noop() {}																		\
-	public:																					\
+	protected:																				\
+		gm::GMOwnedPtr<Data> _gm_data;														\
 		inline Data* data() const {															\
-			(static_cast<const gm::GMObject*>(this));										\
-			return const_cast<Data*>(m_data.data()); }										\
+			return const_cast<Data*>(_gm_data.get()); }
 
-#define GM_DECLARE_PRIVATE(className) GM_DECLARE_PRIVATE_AND_BASE(className, gm::GMObject)
-
-/*! \def GM_DECLARE_PRIVATE_NGO
-  为一个不是GMObject的对象定义数据段使用的宏。
-*/
-#define GM_DECLARE_PRIVATE_NGO(className) 													\
-	public:																					\
-		typedef className##Private Data;													\
-	private:																				\
-		Data m_data;																		\
-		void noop() {}																		\
-	public:																					\
-		inline Data* data() const { return const_cast<Data*>(&m_data); }
+#define GM_DECLARE_BASE(base) typedef base Base;
 
 /*! \def GM
   \brief 。
@@ -88,9 +37,6 @@ private:
   表示当前GameMachine运行实例。任何时候都推荐用GM来获取GameMachine实例。由于GameMachine实例为单例，因此
   不要尝试创建一个新的GameMachine实例。
 */
-#define GM_DECLARE_PRIVATE_FROM_STRUCT(name, anotherStruct) \
-	typedef anotherStruct GM_PRIVATE_NAME(name); \
-	GM_DECLARE_PRIVATE(name)
 
 // 获取私有成员
 #define D(d) auto d = data()
@@ -98,66 +44,84 @@ private:
 #define D_OF(d, ptr) auto d = (ptr)->data()
 
 // 为一个对象定义private部分
-#define GM_PRIVATE_OBJECT(name) class name; GM_ALIGNED_16(struct) name##Private : public gm::GMObjectPrivateBase<name>
-#define GM_PRIVATE_OBJECT_FROM(name, extends) class name; GM_ALIGNED_16(struct) name##Private : public extends##Private
 #define GM_PRIVATE_NAME(name) name##Private
-#define GM_PRIVATE_DESTRUCT(name) ~name##Private()
-#define GM_PRIVATE_OBJECT_UNALIGNED(name) class name; struct name##Private
-#define GM_PRIVATE_OBJECT_UNALIGNED_FROM(name, extends) class name; struct name##Private : public extends##Private
+#define GM_PRIVATE_CLASS(name) struct GM_PRIVATE_NAME(name)
+#define GM_PRIVATE_DESTRUCTOR(name) ~GM_PRIVATE_NAME(name)
 
-#define GM_DECLARE_GETTER_ACCESSOR(name, memberName, accessor, callback) \
+#define GM_PRIVATE_OBJECT_ALIGNED(name) GM_ALIGNED_16(struct) GM_PRIVATE_NAME(name) : public gm::GMObjectPrivateAlignedBase
+#define GM_PRIVATE_OBJECT_ALIGNED_FROM(name, extends) GM_ALIGNED_16(struct) GM_PRIVATE_NAME(name) : public GM_PRIVATE_NAME(extends)
+#define GM_PRIVATE_OBJECT_UNALIGNED(name) struct GM_PRIVATE_NAME(name)
+#define GM_PRIVATE_OBJECT_UNALIGNED_FROM(name, extends) struct GM_PRIVATE_NAME(name) : public GM_PRIVATE_NAME(extends)
+
+#define GM_CREATE_DATA(name) _gm_data.reset(new GM_PRIVATE_NAME(name)());
+
+//////////////////////////////////////////////////////////////////////////
+#define GM_DECLARE_INLINE_GETTER_ACCESSOR(name, memberName, accessor) \
 	accessor: \
-	inline auto& get##name() GM_NOEXCEPT { D(d); callback; return d-> memberName; } \
-	inline const auto& get##name() const GM_NOEXCEPT { D(d); const_cast<std::remove_const_t<std::remove_pointer_t<decltype(this)>>*>(this)->callback; return d-> memberName; }
+	auto& get##name() GM_NOEXCEPT { return memberName; } \
+	const auto& get##name() const GM_NOEXCEPT { return memberName; }
 
-#define GM_DECLARE_SETTER_ACCESSOR(name, memberName, accessor, callback) \
+#define GM_DECLARE_INLINE_SETTER_ACCESSOR(name, memberName, accessor) \
 	accessor: \
-	template <typename T> void set##name(T&& arg) { D(d); d-> memberName = std::forward<T>(arg); callback; }
+	template <typename T> void set##name(T&& arg) { memberName = std::forward<T>(arg); }
 
-#define GM_DECLARE_GETTER(name, memberName) GM_DECLARE_GETTER_ACCESSOR(name, memberName, public, noop()) 
-#define GM_DECLARE_SETTER(name, memberName) GM_DECLARE_SETTER_ACCESSOR(name, memberName, public, noop()) 
-#define GM_DECLARE_GETTER_WITH_CALLBACK(name, memberName, cb) GM_DECLARE_GETTER_ACCESSOR(name, memberName, public, cb)
-#define GM_DECLARE_SETTER_WITH_CALLBACK(name, memberName, cb) GM_DECLARE_SETTER_ACCESSOR(name, memberName, public, cb)
+#define GM_DECLARE_INLINE_GETTER(name, memberName) GM_DECLARE_INLINE_GETTER_ACCESSOR(name, memberName, public) 
+#define GM_DECLARE_INLINE_SETTER(name, memberName) GM_DECLARE_INLINE_SETTER_ACCESSOR(name, memberName, public) 
 
-#define GM_DECLARE_PROPERTY(name, memberName) \
-	GM_DECLARE_GETTER_ACCESSOR(name, memberName, public, noop()) \
-	GM_DECLARE_SETTER_ACCESSOR(name, memberName, public, noop())
+#define GM_DECLARE_INLINE_PROPERTY(name, memberName) \
+	GM_DECLARE_INLINE_GETTER_ACCESSOR(name, memberName, public) \
+	GM_DECLARE_INLINE_SETTER_ACCESSOR(name, memberName, public)
 
-#define GM_DECLARE_PROPERTY_WITH_CALLBACK(name, memberName, getterCb, setterCb) \
-	GM_DECLARE_GETTER_ACCESSOR(name, memberName, public, getterCb) \
-	GM_DECLARE_SETTER_ACCESSOR(name, memberName, public, setterCb)
+//////////////////////////////////////////////////////////////////////////
+#define GM_DECLARE_GETTER_ACCESSOR(type, name, accessor) \
+	accessor: \
+	type& get##name() GM_NOEXCEPT; \
+	const type& get##name() const GM_NOEXCEPT;
 
-#define GM_DECLARE_PROTECTED_PROPERTY(name, memberName) \
-	GM_DECLARE_GETTER_ACCESSOR(name, memberName, protected, noop()) \
-	GM_DECLARE_SETTER_ACCESSOR(name, memberName, protected, noop())
+#define GM_DECLARE_SETTER_ACCESSOR(type, name, accessor) \
+	accessor: \
+	void set##name(const type& arg); \
+	void set##name(type&& arg) GM_NOEXCEPT; \
+
+#define GM_DEFINE_GETTER_ACCESSOR(type, name, memberName, clsName) \
+	type& clsName::get##name() GM_NOEXCEPT { D(d); return d-> memberName; } \
+	const type& clsName::get##name() const GM_NOEXCEPT { D(d); return d-> memberName; }
+
+#define GM_DEFINE_SETTER_ACCESSOR(type, name, memberName, clsName) \
+	void clsName::set##name(const type& arg) { D(d); d-> memberName = arg; } \
+	void clsName::set##name(type&& arg) GM_NOEXCEPT { D(d); d->memberName = std::move(arg); }
+
+#define GM_DECLARE_PROPERTY(type, name) \
+	GM_DECLARE_GETTER_ACCESSOR(type, name, public) \
+	GM_DECLARE_SETTER_ACCESSOR(type, name, public)
+
+#define GM_DEFINE_PROPERTY(clsName, type, name, memberName) \
+	GM_DEFINE_GETTER_ACCESSOR(type, name, memberName, clsName) \
+	GM_DEFINE_SETTER_ACCESSOR(type, name, memberName, clsName)
 
 #define GM_DISABLE_COPY(clsName) public: clsName(const clsName&) = delete; clsName(clsName&&) GM_NOEXCEPT = delete;
 #define GM_DISABLE_ASSIGN(clsName) public: clsName& operator =(const clsName&) = delete; clsName& operator =(clsName&&) GM_NOEXCEPT = delete;
-
-#define GM_ALLOW_COPY_MOVE(clsName) \
-	GM_ALLOW_COPY(clsName) \
-	GM_ALLOW_MOVE(clsName)
-
-#define GM_ALLOW_COPY(clsName) \
-	public: \
-		clsName(const clsName& o) { copyData(o); } \
-		clsName& operator=(const clsName& o) { D(d); copyData(o); return *this; } \
-		void copyData(const clsName& another) { \
-		D(d); D_OF(d_another, &another); *d = *d_another; \
-			(static_cast<Base*>(this))->copyData(static_cast<const Base&>(another)); }
-
-#define GM_ALLOW_MOVE(clsName) \
-	public: \
-	clsName(clsName&& o) GM_NOEXCEPT { swapData(std::move(o)); } \
-	clsName& operator=(clsName&& o) GM_NOEXCEPT { D(d); swapData(std::move(o)); return *this; } \
-	void swapData(clsName&& another) GM_NOEXCEPT { m_data.swap(another.m_data); \
-		(static_cast<Base*>(this))->swapData(std::move(static_cast<Base&>(another))); }
+#define GM_DISABLE_COPY_ASSIGN(clsName) \
+	GM_DISABLE_COPY(clsName) \
+	GM_DISABLE_ASSIGN(clsName)
 
 #define GM_FRIEND_CLASS(clsName) \
 	friend class clsName; \
 	friend struct GM_PRIVATE_NAME(clsName);
 
+#define GM_DECLARE_POINTER(name) class name; typedef name *name##Ptr;
+
 #define friend_methods(clsName) private
+
+#define GM_COPY(rhs) \
+	{ D(d); \
+	D_OF(d_rhs, &rhs); \
+	*d = *d_rhs ; }
+
+#define GM_MOVE(rhs) \
+	{ D(d); \
+	D_OF(d_rhs, &rhs); \
+	*d = std::move(*d_rhs) ; }
 
 class GMObject;
 
@@ -290,15 +254,8 @@ using GMSlots = HashMap<GMSignal, Vector<GMCallbackTarget>, GMStringHashFunctor>
 #define GM_END_META_MAP \
 	return true; }
 
+GM_PRIVATE_CLASS(GMObject);
 // 所有GM对象的基类，如果可以用SSE指令，那么它是16字节对齐的
-GM_PRIVATE_OBJECT(GMObject)
-{
-	bool metaRegistered = false;
-	GMMeta meta;
-	GMSlots objSlots;
-	GMThreadId tid = 0;
-	GMConnectionTargets connectionTargets;
-};
 
 struct GMMessage;
 //! 所有GameMachine对象的基类。
@@ -313,7 +270,8 @@ GM_DECLARE_PRIVATE(子类名)来将子类的数据指针成员添加到子类中
 */
 class GM_EXPORT GMObject : public IDestroyObject
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMObject, IDestroyObject)
+	GM_DECLARE_PRIVATE(GMObject)
+	GM_DECLARE_BASE(IDestroyObject)
 	GM_DISABLE_COPY(GMObject)
 	GM_DISABLE_ASSIGN(GMObject)
 
@@ -364,43 +322,17 @@ public:
 	*/
 	void emitSignal(GMSignal sig);
 
-	//! 拷贝GMObject私有数据
-	/*!
-	  GMObject不允许拷贝GMObject基类私有数据，因此是个空实现。<BR>
-	  但是，GMObject的子类可以使用GM_ALLOW_COPY_MOVE宏，允许子类调用其copyData方法，依次拷贝私有数据。
-	  \param another 拷贝私有数据的目标对象，将目标对象的私有数据拷贝到此对象。
-	*/
-	void copyData(const GMObject& another) {}
-
-	//! 交换GMObject私有数据
-	/*!
-	  GMObject允许交换其私有数据。<BR>
-	  \param another 交换私有数据的目标对象，将目标对象的私有数据交换到此对象。
-	*/
-	void swapData(GMObject&& another) GM_NOEXCEPT
-	{
-		m_data.swap(another.m_data);
-	}
-
 	//! 获取对象创建时的线程ID。
 	/*!
 	  return 对象创建时的线程ID。
 	*/
-	GMThreadId getThreadId() GM_NOEXCEPT
-	{
-		D(d);
-		return d->tid;
-	}
+	GMThreadId getThreadId() GM_NOEXCEPT;
 
 	//! 将一个对象移交到另外一个线程。
 	/*!
 	  \param tid 将要移交到的线程。
 	*/
-	void moveToThread(GMThreadId tid) GM_NOEXCEPT
-	{
-		D(d);
-		d->tid = tid;
-	}
+	void moveToThread(GMThreadId tid) GM_NOEXCEPT;
 
 private:
 	void addConnection(GMSignal sig, GMObject& receiver, GMEventCallback callback);

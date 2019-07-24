@@ -4,6 +4,13 @@
 #include "assert.h"
 #include "gmstring.h"
 
+BEGIN_NS
+
+GM_PRIVATE_OBJECT_ALIGNED(GMConfigs)
+{
+	Vector<GMConfig> configs;
+};
+
 GMDebugConfig GMConfig::asDebugConfig()
 {
 	return GMDebugConfig(*this);
@@ -26,6 +33,7 @@ const GMRenderConfig GMConfig::asRenderConfig() const
 
 GMConfigs::GMConfigs()
 {
+	GM_CREATE_DATA(GMConfigs);
 	init();
 }
 
@@ -75,3 +83,5 @@ void GMConfigs::verify(Category state) const
 	if (d->configs.size() <= s)
 		d->configs.resize(s + 1);
 }
+
+END_NS

@@ -4,6 +4,8 @@
 #include <utility>
 #include "gmthread.h"
 
+BEGIN_NS
+
 template <typename ContainerType>
 static size_t removeIf(ContainerType& container, std::function<bool(typename ContainerType::iterator)> pred)
 {
@@ -22,8 +24,19 @@ static size_t removeIf(ContainerType& container, std::function<bool(typename Con
 	return cnt;
 }
 
+GM_PRIVATE_OBJECT_ALIGNED(GMObject)
+{
+	bool metaRegistered = false;
+	GMMeta meta;
+	GMSlots objSlots;
+	GMThreadId tid = 0;
+	GMConnectionTargets connectionTargets;
+};
+
 GMObject::GMObject()
 {
+	GM_CREATE_DATA(GMObject);
+
 	D(d);
 	d->tid = GMThread::getCurrentThreadId();
 }
@@ -86,6 +99,18 @@ void GMObject::emitSignal(GMSignal sig)
 	}
 }
 
+GMThreadId GMObject::getThreadId() GM_NOEXCEPT
+{
+	D(d);
+	return d->tid;
+}
+
+void GMObject::moveToThread(GMThreadId tid) GM_NOEXCEPT
+{
+	D(d);
+	d->tid = tid;
+}
+
 void GMObject::removeSignal(GMSignal sig, GMObject& receiver)
 {
 	D(d);
@@ -138,3 +163,5 @@ void GMObject::removeConnection(GMObject* host, GMSignal sig)
 		return iter->name == sig && iter->host == host;
 	});
 }
+
+END_NS

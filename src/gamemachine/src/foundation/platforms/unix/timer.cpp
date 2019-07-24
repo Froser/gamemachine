@@ -4,6 +4,7 @@
 #include "foundation/assert.h"
 #include <time.h>
 
+BEGIN_NS
 extern "C"
 {
 	GMint64 highResolutionTimerFrequency()
@@ -19,3 +20,4 @@ extern "C"
 		return now.tv_sec * highResolutionTimerFrequency() + now.tv_nsec;
 	}
 }
+END_NS

@@ -5,9 +5,27 @@
 #include <zlib.h>
 #include <fstream>
 
+BEGIN_NS
 //GMClock
+GM_PRIVATE_OBJECT_UNALIGNED(GMClock)
+{
+	GMint64 frequency;
+	GMint64 timeCycles;
+	GMint64 begin, end;
+	GMint64 deltaCycles;
+	GMfloat timeScale;
+	GMfloat fps;
+	bool paused;
+
+	//以下用于计算帧率
+	GMint32 frameCount;
+	GMint64 lastCycle;
+};
+
 GMClock::GMClock()
 {
+	GM_CREATE_DATA(GMClock);
+
 	D(d);
 	d->fps = 0;
 	d->timeScale = 1.f;
@@ -98,12 +116,12 @@ extern "C" GMint64 highResolutionTimer();
 
 GMint64 GMClock::highResolutionTimerFrequency()
 {
-	return ::highResolutionTimerFrequency();
+	return gm::highResolutionTimerFrequency();
 }
 
 GMint64 GMClock::highResolutionTimer()
 {
-	return ::highResolutionTimer();
+	return gm::highResolutionTimer();
 }
 
 GMfloat GMClock::cycleToSecond(GMint64 cycle)
@@ -113,8 +131,17 @@ GMfloat GMClock::cycleToSecond(GMint64 cycle)
 }
 
 //GMStopwatch
+GM_PRIVATE_OBJECT_UNALIGNED(GMStopwatch)
+{
+	GMint64 frequency;
+	GMint64 start;
+	GMint64 end;
+};
+
 GMStopwatch::GMStopwatch()
 {
+	GM_CREATE_DATA(GMStopwatch);
+
 	D(d);
 	d->frequency = GMClock::highResolutionTimerFrequency();
 	d->start = 0;
@@ -196,12 +223,12 @@ PointPosition GMPlane::classifyPoint(const GMVec3 & point) const
 	GMfloat distance = getDistance(point);
 
 	if (distance > EPSILON)
-		return POINT_IN_FRONT_OF_PLANE;
+		return PointPosition::POINT_IN_FRONT_OF_PLANE;
 
 	if (distance < -EPSILON)
-		return POINT_BEHIND_PLANE;
+		return PointPosition::POINT_BEHIND_PLANE;
 
-	return POINT_ON_PLANE;
+	return PointPosition::POINT_ON_PLANE;
 }
 
 GMPlane GMPlane::lerp(const GMPlane & p2, GMfloat factor)
@@ -222,13 +249,28 @@ bool GMPlane::operator ==(const GMPlane & rhs) const
 }
 
 //MemoryStream
+GM_PRIVATE_OBJECT_UNALIGNED(GMMemoryStream)
+{
+	const GMbyte* ptr = nullptr;
+	const GMbyte* start = nullptr;
+	const GMbyte* end = nullptr;
+	GMsize_t size = 0;
+};
+
 GMMemoryStream::GMMemoryStream(const GMbyte* buffer, GMsize_t size)
 {
+	GM_CREATE_DATA(GMMemoryStream);
+
 	D(d);
 	d->start = buffer;
 	d->size = size;
 	d->ptr = buffer;
 	d->end = d->start + d->size;
+}
+
+GMMemoryStream::~GMMemoryStream()
+{
+
 }
 
 GMsize_t GMMemoryStream::read(GMbyte* buf, GMsize_t size)
@@ -291,20 +333,28 @@ void GMMemoryStream::seek(GMsize_t cnt, SeekMode mode)
 		GM_ASSERT(false);
 }
 
-gm::Bitset::~Bitset()
+//Bitset
+GM_PRIVATE_OBJECT_UNALIGNED(Bitset)
+{
+	GMint32 numBytes = 0;
+	GMbyte* bits = nullptr;
+};
+
+Bitset::~Bitset()
 {
 	D(d);
 	GM_delete_array(d->bits);
 }
 
-gm::Bitset::Bitset()
+Bitset::Bitset()
 {
+	GM_CREATE_DATA(Bitset);
+
 	D(d);
 	d->numBytes = 0;
 	d->bits = nullptr;
 }
 
-//Bitset
 bool Bitset::init(GMint32 numberOfBits)
 {
 	D(d);
@@ -620,3 +670,5 @@ GMZip::ErrorCode GMZip::translateError(GMint32 err)
 	}
 	return UnknownError;
 }
+
+END_NS

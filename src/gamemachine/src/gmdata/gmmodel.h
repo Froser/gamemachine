@@ -31,67 +31,57 @@ GM_ALIGNED_STRUCT(GMSkeletalBone)
 	GMMat4 finalTransformation = Zero<GMMat4>(); //!< 所有的计算结果将会放到这里来
 };
 
-GM_PRIVATE_OBJECT(GMNode)
-{
-	GMString name;
-	GMNode* parent = nullptr;
-	Vector<GMNode*> children;
-	GMMat4 transformToParent;
-	GMMat4 globalTransform;
-	Vector<GMuint32> modelIndices;
-};
+GM_PRIVATE_CLASS(GMNode);
+GM_DECLARE_POINTER(GMNode);
 
-GM_ALIGNED_16(class) GMNode
+class GMNode
 {
-	GM_DECLARE_PRIVATE_NGO(GMNode)
-	GM_DECLARE_ALIGNED_ALLOCATOR()
-	GM_DECLARE_PROPERTY(Name, name)
-	GM_DECLARE_PROPERTY(Parent, parent)
-	GM_DECLARE_PROPERTY(Children, children)
-	GM_DECLARE_PROPERTY(ModelIndices, modelIndices)
-	GM_DECLARE_PROPERTY(TransformToParent, transformToParent)
-	GM_DECLARE_PROPERTY(GlobalTransform, globalTransform)
+	GM_DECLARE_PRIVATE(GMNode)
+	GM_DISABLE_COPY_ASSIGN(GMNode)
+
+	GM_DECLARE_PROPERTY(GMString, Name)
+	GM_DECLARE_PROPERTY(GMNodePtr, Parent)
+	GM_DECLARE_PROPERTY(Vector<GMNodePtr>, Children)
+	GM_DECLARE_PROPERTY(Vector<GMuint32>, ModelIndices)
+	GM_DECLARE_PROPERTY(GMMat4, TransformToParent)
+	GM_DECLARE_PROPERTY(GMMat4, GlobalTransform)
 
 public:
-	~GMNode()
-	{
-		for (auto& child : getChildren())
-		{
-			GM_delete(child);
-		}
-	}
+	GMNode();
+	~GMNode();
 };
 
-GM_PRIVATE_OBJECT(GMSkeletalBones)
-{
-	AlignedVector<GMSkeletalBone> bones;
-	Map<GMString, GMsize_t> boneNameIndexMap;
-};
-
+GM_PRIVATE_CLASS(GMSkeletalBones);
 class GMSkeletalBones
 {
-	GM_DECLARE_PRIVATE_NGO(GMSkeletalBones)
-	GM_DECLARE_ALIGNED_ALLOCATOR()
-	GM_DECLARE_PROPERTY(Bones, bones)
-	GM_DECLARE_PROPERTY(BoneNameIndexMap, boneNameIndexMap)
+public:
+	typedef Map<GMString, GMsize_t> BoneNameIndexMap_t;
+
+	GM_DECLARE_PRIVATE(GMSkeletalBones)
+	GM_DECLARE_PROPERTY(AlignedVector<GMSkeletalBone>, Bones)
+	GM_DECLARE_PROPERTY(BoneNameIndexMap_t, BoneNameIndexMap)
+
+public:
+	GMSkeletalBones();
+	GMSkeletalBones(const GMSkeletalBones&);
+	GMSkeletalBones(GMSkeletalBones&&) GM_NOEXCEPT;
+	GMSkeletalBones& operator=(const GMSkeletalBones& rhs);
+	GMSkeletalBones& operator=(GMSkeletalBones&& rhs) GM_NOEXCEPT;
 };
 
-GM_PRIVATE_OBJECT(GMSkeleton)
-{
-	GMSkeletalBones bones;
-};
-
+GM_PRIVATE_CLASS(GMSkeleton);
 class GMSkeleton
 {
-	GM_DECLARE_PRIVATE_NGO(GMSkeleton)
-	GM_DECLARE_ALIGNED_ALLOCATOR()
-	GM_DECLARE_PROPERTY(Bones, bones)
+	GM_DECLARE_PRIVATE(GMSkeleton)
+	GM_DECLARE_PROPERTY(GMSkeletalBones, Bones)
 
 public:
 	enum
 	{
 		BonesPerVertex = 4
 	};
+
+	GMSkeleton();
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -124,29 +114,19 @@ GM_ALIGNED_STRUCT(GMNodeAnimation)
 	AlignedVector<GMNodeAnimationNode> nodes;
 };
 
-GM_PRIVATE_OBJECT(GMSkeletalAnimations)
+GM_PRIVATE_CLASS(GMSkeletalAnimations);
+class GMSkeletalAnimations
 {
-	AlignedVector<GMNodeAnimation> animations;
-};
-
-GM_ALIGNED_16(class) GMSkeletalAnimations
-{
-	GM_DECLARE_PRIVATE_NGO(GMSkeletalAnimations)
-	GM_DECLARE_ALIGNED_ALLOCATOR()
-	GM_DECLARE_PROPERTY(Animations, animations)
+	GM_DECLARE_PRIVATE(GMSkeletalAnimations)
+	GM_DISABLE_ASSIGN(GMSkeletalAnimations)
+	GM_DECLARE_PROPERTY(AlignedVector<GMNodeAnimation>, Animations)
 
 public:
-	inline GMNodeAnimation* getAnimation(GMsize_t index) GM_NOEXCEPT
-	{
-		D(d);
-		return &d->animations[index];
-	}
+	GMSkeletalAnimations();
 
-	inline GMsize_t getAnimationCount()
-	{
-		D(d);
-		return d->animations.size();
-	}
+public:
+	GMNodeAnimation* getAnimation(GMsize_t index) GM_NOEXCEPT;
+	GMsize_t getAnimationCount();
 };
 
 class GMModel;
@@ -186,25 +166,14 @@ enum class GMModelBufferType
 	IndexBuffer,
 };
 
-GM_PRIVATE_OBJECT(GMModelDataProxy)
-{
-	const IRenderContext* context = nullptr;
-	GMModel* model = nullptr;
-};
-
-class GMPart;
 class GMModelBuffer;
+GM_PRIVATE_CLASS(GMModelDataProxy);
 class GM_EXPORT GMModelDataProxy : public GMObject, public IQueriable
 {
 	GM_DECLARE_PRIVATE(GMModelDataProxy)
 
 public:
-	GMModelDataProxy(const IRenderContext* context, GMModel* obj)
-	{
-		D(d);
-		d->context = context;
-		d->model = obj;
-	}
+	GMModelDataProxy(const IRenderContext* context, GMModel* obj);
 
 public:
 	virtual void transfer() = 0;
@@ -222,7 +191,7 @@ public:
 	virtual const IRenderContext* getContext();
 
 protected:
-	inline GMModel* getModel() { D(d); return d->model; }
+	GMModel* getModel();
 
 protected:
 	void prepareTangentSpace();
@@ -257,56 +226,21 @@ struct GMModelBufferData
 	};
 };
 
-GM_PRIVATE_OBJECT(GMModelBuffer)
-{
-	GMModelBufferData buffer = { 0 };
-	GMAtomic<GMint32> ref;
-	GMModelDataProxy* modelDataProxy = nullptr;
-};
-
+GM_PRIVATE_CLASS(GMModelBuffer);
 //! 用来管理GMModelBuffer生命周期的类，包含引用计数功能。
-class GM_EXPORT GMModelBuffer : public GMObject
+class GM_EXPORT GMModelBuffer
 {
 	GM_DECLARE_PRIVATE(GMModelBuffer)
+	GM_DISABLE_COPY_ASSIGN(GMModelBuffer)
 
 	GMModelBuffer();
 	~GMModelBuffer();
 
 	void dispose();
-	void setData(const GMModelBufferData& bufferData)
-	{
-		D(d);
-		d->buffer = bufferData;
-	}
-
-	const GMModelBufferData& getMeshBuffer()
-	{
-		D(d);
-		return d->buffer;
-	}
-
-	void addRef()
-	{
-		D(d);
-		++d->ref;
-	}
-
-	void releaseRef()
-	{
-		D(d);
-		--d->ref;
-		if (hasNoRef())
-		{
-			dispose();
-			delete this;
-		}
-	}
-
-	bool hasNoRef()
-	{
-		D(d);
-		return d->ref <= 0;
-	}
+	void setData(const GMModelBufferData& bufferData);
+	const GMModelBufferData& getMeshBuffer();
+	void addRef();
+	void releaseRef();
 };
 
 // 绘制时候的排列方式
@@ -321,27 +255,6 @@ enum class GMModelDrawMode
 {
 	Vertex,
 	Index,
-};
-
-class GMModel;
-GM_PRIVATE_OBJECT(GMModel)
-{
-	GMUsageHint hint = GMUsageHint::StaticDraw;
-	GMParts parts;
-	GMOwnedPtr<GMModelDataProxy> modelDataProxy;
-	GMShader shader;
-	GMModelBuffer* modelBuffer = nullptr;
-	GMModelDrawMode drawMode = GMModelDrawMode::Vertex;
-	GMModelType type = GMModelType::Model3D;
-	GMTopologyMode mode = GMTopologyMode::Triangles;
-	GMsize_t verticesCount = 0;
-	bool needTransfer = true;
-	GMRenderTechniqueID techniqueId = 0;
-	GMModelAsset parentAsset;
-	GMOwnedPtr<GMSkeleton> skeleton;
-	Vector<GMNode*> nodes;
-	// 骨骼变换矩阵，对于无骨骼的model，使用首个元素表示变换。
-	AlignedVector<GMMat4> boneTransformations;
 };
 
 // 所有的顶点属性类型
@@ -363,10 +276,11 @@ enum class GMVertexDataType
 
 #define gmVertexIndex(i) ((GMuint32)i)
 
-GM_ALIGNED_16(class) GM_EXPORT GMModel : public IDestroyObject
+GM_PRIVATE_CLASS(GMModel);
+class GM_EXPORT GMModel : public IDestroyObject
 {
-	GM_DECLARE_PRIVATE_NGO(GMModel)
-	GM_DECLARE_ALIGNED_ALLOCATOR()
+	GM_DECLARE_PRIVATE(GMModel)
+	GM_DISABLE_COPY_ASSIGN(GMModel)
 
 public:
 	typedef GMfloat DataType;
@@ -376,33 +290,21 @@ public:
 	GMModel(GMModelAsset parentAsset);
 	~GMModel();
 
-	GM_DECLARE_PROPERTY(PrimitiveTopologyMode, mode);
-	GM_DECLARE_PROPERTY(Type, type);
-	GM_DECLARE_PROPERTY(Shader, shader);
-	GM_DECLARE_PROPERTY(VerticesCount, verticesCount);
-	GM_DECLARE_PROPERTY(DrawMode, drawMode);
-	GM_DECLARE_PROPERTY(TechniqueId, techniqueId);
-	GM_DECLARE_PROPERTY(Nodes, nodes)
-	GM_DECLARE_PROPERTY(BoneTransformations, boneTransformations)
+	GM_DECLARE_PROPERTY(GMTopologyMode, PrimitiveTopologyMode);
+	GM_DECLARE_PROPERTY(GMModelType, Type);
+	GM_DECLARE_PROPERTY(GMShader, Shader);
+	GM_DECLARE_PROPERTY(GMsize_t, VerticesCount);
+	GM_DECLARE_PROPERTY(GMModelDrawMode, DrawMode);
+	GM_DECLARE_PROPERTY(GMRenderTechniqueID, TechniqueId);
+	GM_DECLARE_PROPERTY(Vector<GMNode*>, Nodes)
+	GM_DECLARE_PROPERTY(AlignedVector<GMMat4>, BoneTransformations)
 
 public:
-	inline void setModelDataProxy(AUTORELEASE GMModelDataProxy* modelDataProxy)
-	{
-		D(d);
-		d->modelDataProxy.reset(modelDataProxy);
-	}
+	void setModelDataProxy(AUTORELEASE GMModelDataProxy* modelDataProxy);
 
-	inline GMModelDataProxy* getModelDataProxy() GM_NOEXCEPT
-	{
-		D(d);
-		return d->modelDataProxy.get();
-	}
+	GMModelDataProxy* getModelDataProxy() GM_NOEXCEPT;
 
-	inline GMParts& getParts() GM_NOEXCEPT
-	{
-		D(d);
-		return d->parts;
-	}
+	GMParts& getParts() GM_NOEXCEPT;
 
 	//! 表示此模型是否需要被GMModelDataProxy将顶点数据传输到显卡。
 	/*!
@@ -410,60 +312,27 @@ public:
 	  然而，如果此模型如果与其他模型共享一份顶点数据，那么此模型不需要传输顶点数据到显卡，因为数据已经存在。
 	  \sa GMModelDataProxy()
 	*/
-	inline bool isNeedTransfer() GM_NOEXCEPT { D(d); return d->needTransfer; }
+	bool isNeedTransfer() GM_NOEXCEPT;
 
 	//! 表示此模型不再需要将顶点数据传输到显卡了。
 	/*!
 	  当使用了已经传输过的顶点数据，或者顶点数据传输完成时调用此方法。
 	*/
-	inline void doNotTransferAnymore() GM_NOEXCEPT
-	{
-		D(d);
-		d->needTransfer = false;
-	}
+	void doNotTransferAnymore() GM_NOEXCEPT;
 
 	// 绘制方式
-	inline void setUsageHint(GMUsageHint hint) GM_NOEXCEPT
-	{
-		D(d);
-		d->hint = hint;
-	}
+	void setUsageHint(GMUsageHint hint) GM_NOEXCEPT;
 
-	inline GMUsageHint getUsageHint() GM_NOEXCEPT
-	{
-		D(d);
-		return d->hint;
-	}
+	GMUsageHint getUsageHint() GM_NOEXCEPT;
+	GMModel* getParentModel() GM_NOEXCEPT;
 
-	inline GMModel* getParentModel() GM_NOEXCEPT
-	{
-		D(d);
-		return d->parentAsset.getModel();
-	}
-
-	inline GMSkeleton* getSkeleton() GM_NOEXCEPT
-	{
-		D(d);
-		return d->skeleton.get();
-	}
-
-	void setSkeleton(AUTORELEASE GMSkeleton* skeleton)
-	{
-		D(d);
-		d->skeleton.reset(skeleton);
-	}
-
+	GMSkeleton* getSkeleton() GM_NOEXCEPT;
+	void setSkeleton(AUTORELEASE GMSkeleton* skeleton);
 	void setModelBuffer(AUTORELEASE GMModelBuffer* mb);
 	GMModelBuffer* getModelBuffer();
 	void releaseModelBuffer();
 	void addPart(GMPart* part);
 };
-
-#define GM_DEFINE_VERTEX_DATA(name) \
-	Vector<GMModel::DataType> name;
-
-#define GM_DEFINE_VERTEX_PROPERTY(name) \
-	inline auto& name() { D(d); return d->name; }
 
 enum class GMAnimationType
 {
@@ -472,19 +341,12 @@ enum class GMAnimationType
 	AffineAnimation,
 };
 
-GM_PRIVATE_OBJECT(GMScene)
-{
-	Vector<GMAsset> models;
-	GMOwnedPtr<GMSkeletalAnimations> animations;
-	GMOwnedPtr<GMNode> root;
-	GMAnimationType animationType = GMAnimationType::NoAnimation;
-};
-
+GM_PRIVATE_CLASS(GMScene);
 class GM_EXPORT GMScene : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMScene)
-	GM_DECLARE_PROPERTY(Models, models)
-	GM_DECLARE_PROPERTY(AnimationType, animationType)
+	GM_DECLARE_PROPERTY(Vector<GMAsset>, Models)
+	GM_DECLARE_PROPERTY(GMAnimationType, AnimationType)
 
 public:
 	enum
@@ -495,70 +357,39 @@ public:
 	static GMSceneAsset createSceneFromSingleModel(GMModelAsset modelAsset);
 
 public:
+	GMScene();
 	void addModelAsset(GMModelAsset model);
 	void swap(GMScene* scene);
 
 public:
-	inline bool isEmpty() GM_NOEXCEPT
-	{
-		D(d);
-		return d->models.empty();
-	}
+	inline bool isEmpty() GM_NOEXCEPT;
 
-	inline GMSkeletalAnimations* getAnimations() GM_NOEXCEPT
-	{
-		D(d);
-		return d->animations.get();
-	}
+	GMSkeletalAnimations* getAnimations() GM_NOEXCEPT;
 
-	void setAnimations(AUTORELEASE GMSkeletalAnimations* animations)
-	{
-		D(d);
-		GM_ASSERT(d->animationType != GMAnimationType::NoAnimation);
-		d->animations.reset(animations);
-	}
+	void setAnimations(AUTORELEASE GMSkeletalAnimations* animations);
 
-	void setRootNode(GMNode* root)
-	{
-		D(d);
-		d->root.reset(root);
-	}
+	void setRootNode(GMNode* root);
 
-	bool hasAnimation() GM_NOEXCEPT
-	{
-		D(d);
-		return !!d->animations;
-	}
+	bool hasAnimation() GM_NOEXCEPT;
 
-	GMNode* getRootNode()
-	{
-		D(d);
-		return d->root.get();
-	}
+	GMNode* getRootNode() GM_NOEXCEPT;
 
-	GMModel* operator[](GMsize_t i)
-	{
-		D(d);
-		return d->models[i].getModel();
-	}
+public:
+	GMModel* operator[](GMsize_t i);
 };
 
 typedef Vector<GMVertex> GMVertices;
 typedef Vector<GMuint32> GMIndices;
 
-GM_PRIVATE_OBJECT(GMPart)
-{
-	GMVertices vertices;
-	GMIndices indices;
-};
-
+GM_PRIVATE_CLASS(GMPart);
 //! 表示模型中的一部分数据。
 /*!
   网格数据可能仅仅是模型中的一段数据。
 */
-class GM_EXPORT GMPart : public GMObject
+class GM_EXPORT GMPart
 {
 	GM_DECLARE_PRIVATE(GMPart)
+	GM_DISABLE_COPY_ASSIGN(GMPart)
 
 public:
 	GMPart(GMModel* parent);
@@ -580,19 +411,8 @@ public:
 	void invalidateTangentSpace();
 	void swap(GMVertices& vertex);
 	void swap(GMIndices& indices);
-
-public:
-	const GMVertices& vertices()
-	{
-		D(d);
-		return d->vertices;
-	}
-
-	const GMIndices& indices()
-	{
-		D(d);
-		return d->indices;
-	}
+	const GMVertices& vertices();
+	const GMIndices& indices();
 
 private:
 	enum

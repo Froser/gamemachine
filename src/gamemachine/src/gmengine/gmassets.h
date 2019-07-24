@@ -41,16 +41,10 @@ enum class GMAssetType
 		return getType() == predictType;							\
 	}
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMAsset)
-{
-	GMSharedPtr<GMAtomic<GMlong>> ref;
-	GMAssetType type = GMAssetType::Invalid;
-	void* asset = nullptr;
-};
-
+GM_PRIVATE_CLASS(GMAsset);
 class GM_EXPORT GMAsset : public IDestroyObject
 {
-	GM_DECLARE_PRIVATE_NGO(GMAsset)
+	GM_DECLARE_PRIVATE(GMAsset)
 
 public:
 	GM_DECLARE_ASSET_GETTER(ITexture*, Texture);
@@ -69,29 +63,13 @@ public:
 	GMAsset& operator=(GMAsset&& asset) GM_NOEXCEPT;
 
 public:
-	inline void* getAsset() const GM_NOEXCEPT
-	{
-		D(d);
-		return d->asset;
-	}
+	void* getAsset() const GM_NOEXCEPT;
 
-	inline bool isEmpty() const GM_NOEXCEPT
-	{
-		D(d);
-		return !d->asset;
-	}
+	bool isEmpty() const GM_NOEXCEPT;
 
-	inline GMAssetType getType() const GM_NOEXCEPT
-	{
-		D(d);
-		return d->type;
-	}
+	GMAssetType getType() const GM_NOEXCEPT;
 
-	inline void setType(GMAssetType type) GM_NOEXCEPT
-	{
-		D(d);
-		d->type = type;
-	}
+	void setType(GMAssetType type) GM_NOEXCEPT;
 
 	template <typename T>
 	T get()
@@ -118,19 +96,13 @@ inline bool operator !=(const GMAsset& a, const GMAsset& b) GM_NOEXCEPT
 	return !(a == b);
 }
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMAssets)
-{
-	Vector<GMAsset> unnamedAssets;
-	HashMap<GMString, GMAsset, GMStringHashFunctor> childs;
-};
-
+GM_PRIVATE_CLASS(GMAssets);
 class GM_EXPORT GMAssets
 {
-	GM_DECLARE_PRIVATE_NGO(GMAssets)
+	GM_DECLARE_PRIVATE(GMAssets)
 
 public:
-	GMAssets() = default;
-	~GMAssets() = default;
+	GMAssets();
 
 public:
 	GMAsset addAsset(GMAsset asset);

@@ -3,6 +3,7 @@
 #include "defines.h"
 #include "foundation/assert.h"
 
+BEGIN_NS
 extern "C"
 {
 	GMint64 highResolutionTimerFrequency()
@@ -21,3 +22,4 @@ extern "C"
 		return i.QuadPart;
 	}
 }
+END_NS

@@ -3,6 +3,16 @@
 #include "foundation/utilities/tools.h"
 #include "foundation/gamemachine.h"
 
+BEGIN_NS
+GM_PRIVATE_OBJECT_UNALIGNED(GMRenderTechniqueManager)
+{
+	const IRenderContext* context = nullptr;
+	GMAtomic<GMRenderTechniqueID> id;
+	Set<GMRenderTechniques> renderTechniques;
+	Map<GMRenderTechniqueID, GMOwnedPtr<IShaderProgram>> shaderPrograms;
+	bool inited = false;
+};
+
 GMRenderTechniqueID GMRenderTechniqueManager::addRenderTechniques(GMRenderTechniques renderTechniques)
 {
 	D(d);
@@ -25,8 +35,16 @@ bool GMRenderTechniqueManager::isEmpty()
 	return d->renderTechniques.empty();
 }
 
+const Set<GMRenderTechniques>& GMRenderTechniqueManager::getRenderTechniques() const GM_NOEXCEPT
+{
+	D(d);
+	return d->renderTechniques;
+}
+
 GMRenderTechniqueManager::GMRenderTechniqueManager(const IRenderContext* context)
 {
+	GM_CREATE_DATA(GMRenderTechniqueManager);
+
 	D(d);
 	d->id = StartupTechinqueID;
 	d->context = context;
@@ -62,9 +80,60 @@ void GMRenderTechniqueManager::init()
 	}
 }
 
+//////////////////////////////////////////////////////////////////////////
+GM_PRIVATE_OBJECT_UNALIGNED(GMRenderTechnique)
+{
+	GMShaderType shaderType;
+	GMString code[static_cast<GMsize_t>(GMRenderEnvironment::EndOfRenderEnvironment)];
+	GMString path[static_cast<GMsize_t>(GMRenderEnvironment::EndOfRenderEnvironment)];
+	GMString prefetch[static_cast<GMsize_t>(GMRenderEnvironment::EndOfRenderEnvironment)];
+	GMRenderTechniques* parent = nullptr;
+};
+
 GMRenderTechnique::GMRenderTechnique(GMShaderType shaderType)
 {
+	GM_CREATE_DATA(GMRenderTechnique);
 	setShaderType(shaderType);
+}
+
+const GMString& GMRenderTechnique::getCode(GMRenderEnvironment type) const GM_NOEXCEPT
+{
+	D(d);
+	return d->code[static_cast<GMsize_t>(type)];
+}
+
+GMRenderTechnique::GMRenderTechnique(const GMRenderTechnique& rhs)
+{
+	*this = rhs;
+}
+
+GMRenderTechnique::GMRenderTechnique(GMRenderTechnique&& rhs) GM_NOEXCEPT
+{
+	*this = std::move(rhs);
+}
+
+GMRenderTechnique& GMRenderTechnique::operator=(GMRenderTechnique&& rhs) GM_NOEXCEPT
+{
+	GM_COPY(rhs);
+	return *this;
+}
+
+GMRenderTechnique& GMRenderTechnique::operator=(const GMRenderTechnique& rhs)
+{
+	GM_MOVE(rhs);
+	return *this;
+}
+
+const GMString& GMRenderTechnique::getPath(GMRenderEnvironment type) const GM_NOEXCEPT
+{
+	D(d);
+	return d->path[static_cast<GMsize_t>(type)];
+}
+
+const GMString& GMRenderTechnique::getPrefetch(GMRenderEnvironment type) const GM_NOEXCEPT
+{
+	D(d);
+	return d->prefetch[static_cast<GMsize_t>(type)];
 }
 
 void GMRenderTechnique::setCode(GMRenderEnvironment type, GMString code)
@@ -85,9 +154,51 @@ void GMRenderTechnique::setPrefetch(GMRenderEnvironment type, GMString prefetch)
 	d->prefetch[static_cast<GMsize_t>(type)] = std::move(prefetch);
 }
 
+void GMRenderTechnique::setParent(GMRenderTechniques* parent) GM_NOEXCEPT
+{
+	D(d);
+	d->parent = parent;
+}
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMRenderTechniques)
+{
+	GMRenderTechniqueID id;
+	Vector<GMRenderTechnique> techniques;
+};
+
+GMRenderTechniques::GMRenderTechniques(const GMRenderTechniques& rhs)
+{
+	*this = rhs;
+}
+
+GMRenderTechniques::GMRenderTechniques(GMRenderTechniques&& rhs) GM_NOEXCEPT
+{
+	*this = std::move(rhs);
+}
+
+GMRenderTechniques& GMRenderTechniques::operator=(const GMRenderTechniques& rhs)
+{
+	GM_COPY(rhs);
+	return *this;
+}
+
+GMRenderTechniques& GMRenderTechniques::operator=(GMRenderTechniques&& rhs) GM_NOEXCEPT
+{
+	GM_MOVE(rhs);
+	return *this;
+}
+
 void GMRenderTechniques::addRenderTechnique(GMRenderTechnique technique)
 {
 	D(d);
 	technique.setParent(this);
 	d->techniques.push_back(std::move(technique));
 }
+
+const Vector<GMRenderTechnique>& GMRenderTechniques::getTechniques() const GM_NOEXCEPT
+{
+	D(d);
+	return d->techniques;
+}
+
+END_NS

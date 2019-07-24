@@ -1,9 +1,13 @@
 ﻿#include "stdafx.h"
 #include "gmmaudioreader_stream.h"
 #include "common/utilities/gmmstream.h"
+#include "gmmaudioreader_stream_p.h"
+
+BEGIN_MEDIA_NS
 
 GMMAudioFile_Stream::GMMAudioFile_Stream()
 {
+	GM_CREATE_DATA(GMMAudioFile_Stream);
 	init();
 }
 
@@ -174,3 +178,5 @@ void GMMAudioFile_Stream::setStreamReady(Data* d)
 {
 	d->streamReadyEvent.set();
 }
+
+END_MEDIA_NS

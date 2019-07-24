@@ -31,7 +31,6 @@ enum class GMPackageIndex
 	Prefetch, //!< 预读数据，如预编译着色器等，存放在"资源包/prefetch"
 };
 
-class GMBSPGameWorld;
 GM_INTERFACE(IGamePackageHandler)
 {
 	virtual ~IGamePackageHandler() {}
@@ -41,13 +40,7 @@ GM_INTERFACE(IGamePackageHandler)
 	virtual bool exists(GMPackageIndex index, const GMString& fileName) = 0;
 };
 
-GM_PRIVATE_OBJECT(GMGamePackage)
-{
-	GMString packagePath;
-	GMScopedPtr<IGamePackageHandler> handler;
-};
-
-class GMBSPGameWorld;
+GM_PRIVATE_CLASS(GMGamePackage);
 
 //! 游戏资源包管理器。
 /*!
@@ -61,6 +54,8 @@ class GM_EXPORT GMGamePackage : public GMObject
 	friend class GameMachine;
 
 public:
+	GMGamePackage();
+
 	//! 获取资源包管理器私有成员。
 	/*!
 	  不建议IGamePackageHandler派生类以外的类使用此方法。

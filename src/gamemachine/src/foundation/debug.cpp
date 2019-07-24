@@ -11,6 +11,8 @@
 #include <iostream>
 #endif
 
+BEGIN_NS
+
 namespace
 {
 	GMString getFormattedTime()
@@ -23,10 +25,34 @@ namespace
 	}
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMDebugger)
+{
+	IDebugOutput* debugger = nullptr;
+};
+
 GMDebugger& GMDebugger::instance()
 {
 	static GMDebugger s_debugger;
 	return s_debugger;
+}
+
+GMDebugger::GMDebugger()
+{
+	GM_CREATE_DATA(GMDebugger);
+}
+
+void GMDebugger::setDebugOutput(IDebugOutput* output)
+{
+	if (instance().data())
+		instance().data()->debugger = output;
+}
+
+IDebugOutput* GMDebugger::getDebugOutput()
+{
+	if (instance().data())
+		return instance().data()->debugger;
+	// 单例已经被析构
+	return nullptr;
 }
 
 void GMDebugger::info(const GMString& string, const std::initializer_list<GMString>& arguments)
@@ -81,3 +107,5 @@ void GMDebugger::print(
 }
 
 Map<GMsize_t, void*> HookFactory::g_hooks;
+
+END_NS

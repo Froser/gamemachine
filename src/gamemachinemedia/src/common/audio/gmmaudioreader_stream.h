@@ -8,33 +8,17 @@
 BEGIN_MEDIA_NS
 
 // 所有流文件的基类，支持多线程解码，编码写入以及线程同步
-class GMMStream;
-GM_PRIVATE_OBJECT_UNALIGNED(GMMAudioFile_Stream)
-{
-	// 缓存相关
-	gm::GMBuffer fileBuffer;
-	gm::GMuint32 bufferNum = 0;
-	gm::GMAudioFileInfo fileInfo;
-	GMMStream* output = nullptr;
 
-	// stream相关
-	gm::GMulong bufferSize = 0;
-	bool eof = false;
-	gm::GMlong eofPtr = 0;
-	GMAtomic<gm::GMlong> writePtr;
-	GMAtomic<gm::GMlong> readPtr;
-	gm::GMManualResetEvent streamReadyEvent;
-	gm::GMManualResetEvent blockWriteEvent;
-	GMAtomic<gm::GMlong> chunkNum; //表示当前应该写入多少个chunk
-};
-
+GM_PRIVATE_OBJECT_UNALIGNED(GMMAudioFile_Stream);
 class GM_MEDIA_EXPORT GMMAudioFile_Stream : public gm::IAudioFile, public gm::IAudioStream
 {
-	GM_DECLARE_PRIVATE_NGO(GMMAudioFile_Stream)
+	GM_DECLARE_PRIVATE(GMMAudioFile_Stream)
+	GM_DISABLE_COPY_ASSIGN(GMMAudioFile_Stream)
 
 public:
 	GMMAudioFile_Stream();
 	~GMMAudioFile_Stream();
+
 public:
 	bool load(gm::GMBuffer& buffer);
 

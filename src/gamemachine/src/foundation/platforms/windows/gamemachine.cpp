@@ -3,6 +3,8 @@
 #include "defines.h"
 #include "../../gamemachine.h"
 
+BEGIN_NS
+
 namespace
 {
 	GMEndiannessMode getMachineEndianness()
@@ -411,3 +413,5 @@ void GameMachine::initSystemInfo()
 		inited = true;
 	}
 }
+
+END_NS

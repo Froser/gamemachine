@@ -5,6 +5,8 @@
 #include "freetype/freetype.h"
 #include "freetype/ftglyph.h"
 
+BEGIN_NS
+
 namespace
 {
 	struct TypoLibrary
@@ -36,6 +38,18 @@ namespace
 		return err;
 	}
 }
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMGlyphManager)
+{
+	const IRenderContext* context = nullptr;
+	CharList chars;
+	GMint32 cursor_u, cursor_v;
+	GMfloat maxHeight;
+	Vector<GMFont> fonts;
+
+	GMFontHandle defaultCN = GMInvalidFontHandle;
+	GMFontHandle defaultEN = GMInvalidFontHandle;
+};
 
 const GMGlyphInfo& GMGlyphManager::getChar(GMwchar c, GMint32 fontSize, GMFontHandle font)
 {
@@ -112,6 +126,34 @@ GMFontHandle GMGlyphManager::addFontByMemory(GMBuffer&& buffer)
 	return GMInvalidFontHandle;
 }
 
+GMFontHandle GMGlyphManager::getDefaultFontEN()
+{
+	D(d);
+	return d->defaultEN;
+}
+
+GMFontHandle GMGlyphManager::getDefaultFontCN()
+{
+	D(d);
+	return d->defaultCN;
+}
+
+void GMGlyphManager::setDefaultFontEN(GMFontHandle fontHandle)
+{
+	D(d);
+	d->defaultEN = fontHandle;
+	if (d->defaultEN == GMInvalidFontHandle)
+		d->defaultEN = 0;
+}
+
+void GMGlyphManager::setDefaultFontCN(GMFontHandle fontHandle)
+{
+	D(d);
+	d->defaultCN = fontHandle;
+	if (d->defaultCN == GMInvalidFontHandle)
+		d->defaultCN = 0;
+}
+
 GMGlyphInfo& GMGlyphManager::insertChar(GMint32 fontSize, GMFontHandle font, GMwchar ch, const GMGlyphInfo& glyph)
 {
 	D(d);
@@ -122,6 +164,8 @@ GMGlyphInfo& GMGlyphManager::insertChar(GMint32 fontSize, GMFontHandle font, GMw
 
 GMGlyphManager::GMGlyphManager(const IRenderContext* context)
 {
+	GM_CREATE_DATA(GMGlyphManager);
+
 	D(d);
 	d->context = context;
 }
@@ -222,3 +266,5 @@ GMFont* GMGlyphManager::getFont(GMFontHandle handle)
 		return nullptr;
 	return &d->fonts[handle];
 }
+
+END_NS

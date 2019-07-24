@@ -8,15 +8,7 @@
 
 BEGIN_MEDIA_NS
 
-GM_PRIVATE_OBJECT(GMMStream)
-{
-	gm::GMbyte* data = nullptr;
-	gm::GMManualResetEvent preventRead;
-	std::atomic_uint ptr;
-	gm::GMsize_t capacity = 0;
-	bool writing = false;
-};
-
+GM_PRIVATE_CLASS(GMMStream);
 class GMMStream : public gm::GMObject
 {
 	GM_DECLARE_PRIVATE(GMMStream)

@@ -1,6 +1,13 @@
 ﻿#include "stdafx.h"
 #include <gmimage.h>
 
+BEGIN_NS
+
+GMImage::GMImage()
+{
+	GM_CREATE_DATA(GMImage);
+}
+
 GMImage::~GMImage()
 {
 	dispose();
@@ -24,3 +31,20 @@ void GMImage::dispose()
 		d->mip[0].data = nullptr;
 	}
 }
+
+void GMImage::setGenerateMipmap(bool b)
+{
+	getData().generateMipmap = b;
+}
+
+GMint32 GMImage::getHeight(GMint32 mipLevel /*= 0*/) const
+{
+	return getData().mip[mipLevel].height;
+}
+
+GMint32 GMImage::getWidth(GMint32 mipLevel /*= 0*/) const
+{
+	return getData().mip[mipLevel].width;
+}
+
+END_NS

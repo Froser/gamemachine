@@ -104,23 +104,7 @@ struct GMGameMachineDesc
 
 typedef std::function<void()> GMCallable;
 
-GM_PRIVATE_OBJECT_UNALIGNED(GameMachine)
-{
-	GMClock clock;
-	bool inited = false;
-	bool gamemachinestarted = false;
-	Set<IWindow*> windows;
-	const IRenderContext* computeContext = nullptr;
-	IFactory* factory = nullptr;
-	GMGamePackage* gamePackageManager = nullptr;
-	GMMessage lastMessage;
-	Queue<GMMessage> messageQueue;
-	Vector<IDestroyObject*> managerQueue;
-	Queue<GMCallable> callableQueue;
-	GMGameMachineRunningStates states;
-	GMGameMachineRunningMode runningMode;
-};
-
+GM_PRIVATE_CLASS(GameMachine);
 //! GameMachine类负责掌管整个进程的生命周期。
 /*!
   GameMachine掌控整个进程的生命周期，提供对绘制、IO、内存和资源的管理。<BR>
@@ -128,7 +112,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GameMachine)
 */
 class GM_EXPORT GameMachine
 {
-	GM_DECLARE_PRIVATE_NGO(GameMachine)
+	GM_DECLARE_PRIVATE(GameMachine)
 
 public:
 	static GameMachine& instance();
@@ -144,7 +128,6 @@ protected:
 	  构造一个GameMachine实例。不要试图自己创建一个GameMachine实例，而是使用GM宏来获取它的单例。
 	*/
 	GameMachine();
-	~GameMachine() = default;
 
 public:
 	//! 初始化GameMachine。
@@ -159,21 +142,21 @@ public:
 	  获取程序在初始化时存入的工厂类。工厂类将用于实例化各种引擎相关类型。
 	  \return 程序工厂类。
 	*/
-	inline IFactory* getFactory() { D(d); return d->factory; }
+	IFactory* getFactory();
 
 	//! 获取资源管理器。
 	/*!
 	  所有程序的资产，如音乐、贴图、字体的原始数据，都可以从资源管理器中获取。
 	  \return 程序资源管理器。
 	*/
-	inline GMGamePackage* getGamePackageManager() { D(d); return d->gamePackageManager; }
+	GMGamePackage* getGamePackageManager();
 
 	//! 获取程序当前的运行时状态。
 	/*!
 	  如当前窗口大小、上一帧执行时间等。
 	  \return 程序当前运行状态。
 	*/
-	inline const GMGameMachineRunningStates& getRunningStates() const { D(d); return d->states; }
+	const GMGameMachineRunningStates& getRunningStates() const;
 
 	//! 发送一条GameMachine的消息。
 	/*!
@@ -225,11 +208,7 @@ public:
 	  \param states 需要更新的运行状态
 	  \sa getGameMachineRunningStates()
 	*/
-	void setGameMachineRunningStates(const GMGameMachineRunningStates& states)
-	{
-		D(d);
-		d->states = states;
-	}
+	void setGameMachineRunningStates(const GMGameMachineRunningStates& states);
 
 	//! 将系统事件翻译成GameMachine事件。
 	/*!

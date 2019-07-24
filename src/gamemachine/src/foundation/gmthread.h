@@ -33,18 +33,7 @@ struct IThreadCallback
 	virtual void afterRun(GMThread*) = 0;
 };
 
-GM_PRIVATE_OBJECT(GMThread)
-{
-	IThreadCallback* callback = nullptr;
-	GMThreadHandle handle = 0;
-	ThreadState state;
-	ThreadPriority priority = ThreadPriority::Normal;
-#if GM_UNIX
-	GMThreadAttr attr;
-#endif
-	bool done = false;
-};
-
+GM_PRIVATE_CLASS(GMThread);
 //! 表示一个线程类。
 /*!
   通过继承此类来定义一个线程。
@@ -52,6 +41,7 @@ GM_PRIVATE_OBJECT(GMThread)
 class GM_EXPORT GMThread : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMThread)
+	GM_DISABLE_COPY_ASSIGN(GMThread)
 
 public:
 	//! 类的构造函数。
@@ -117,13 +107,13 @@ public:
 	/*！
 	  \return 线程句柄。
 	*/
-	GMThreadHandle& handle() { D(d); return d->handle; }
+	GMThreadHandle& handle();
 
 	//! 获得线程是否结束。
 	/*！
 	  \return 线程是否结束。
 	*/
-	bool isDone() { D(d); return d->done; }
+	bool isDone();
 
 public:
 	//! 线程执行函数。
@@ -157,20 +147,12 @@ public:
 	static void sleep(GMint32 milliseconds);
 };
 
-GM_PRIVATE_OBJECT(GMMutex)
-{
-#if GM_WINDOWS
-	HANDLE mutex;
-#endif
-#if GM_UNIX
-	pthread_mutex_t mutex;
-#endif
-};
-
+GM_PRIVATE_CLASS(GMMutex);
 //! 此类表示一个互斥量
 class GM_EXPORT GMMutex : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMMutex)
+	GM_DISABLE_COPY_ASSIGN(GMMutex)
 
 public:
 	//! 构造一个互斥量。

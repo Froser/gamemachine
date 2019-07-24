@@ -4,6 +4,8 @@
 #include <signal.h>
 #include <unistd.h>
 
+BEGIN_NS
+
 namespace
 {
 	void* threadProc(void* param)
@@ -22,8 +24,20 @@ namespace
 	}
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMThread)
+{
+	IThreadCallback* callback = nullptr;
+	GMThreadHandle handle = 0;
+	ThreadState state;
+	ThreadPriority priority = ThreadPriority::Normal;
+	GMThreadAttr attr;
+	bool done = false;
+};
+
 GMThread::GMThread()
 {
+	GM_CREATE_DATA(GMThread);
+
 	D(d);
 	d->state = ThreadState::NotRunning;
 	d->callback = nullptr;
@@ -91,9 +105,27 @@ void GMThread::sleep(GMint32 milliseconds)
 	usleep(milliseconds * 1000);
 }
 
+GMThreadHandle& GMThread::handle()
+{
+	D(d);
+	return d->handle;
+}
+
+bool GMThread::isDone()
+{
+	D(d);
+	return d->done;
+}
+
 // Mutex
+GM_PRIVATE_OBJECT_UNALIGNED(GMMutex)
+{
+	pthread_mutex_t mutex;
+};
+
 GMMutex::GMMutex()
 {
+	GM_CREATE_DATA(GMMutex);
 	D(d);
 	pthread_mutex_init(&d->mutex, NULL);
 }
@@ -115,3 +147,5 @@ void GMMutex::unlock()
 	D(d);
 	pthread_mutex_unlock(&d->mutex);
 }
+
+END_NS

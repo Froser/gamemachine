@@ -7,15 +7,7 @@ typedef GMlong GMRenderTechniqueID;
 class GMRenderTechnique;
 class GMRenderTechniques;
 
-GM_PRIVATE_OBJECT(GMRenderTechniqueManager)
-{
-	const IRenderContext* context = nullptr;
-	GMAtomic<GMRenderTechniqueID> id;
-	Set<GMRenderTechniques> renderTechniques;
-	Map<GMRenderTechniqueID, GMOwnedPtr<IShaderProgram>> shaderPrograms;
-	bool inited = false;
-};
-
+GM_PRIVATE_CLASS(GMRenderTechniqueManager);
 class GM_EXPORT GMRenderTechniqueManager : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMRenderTechniqueManager)
@@ -36,53 +28,30 @@ public:
 	bool isEmpty();
 
 public:
-	inline const Set<GMRenderTechniques>& getRenderTechniques() const GM_NOEXCEPT
-	{
-		D(d);
-		return d->renderTechniques;
-	}
+	const Set<GMRenderTechniques>& getRenderTechniques() const GM_NOEXCEPT;
 };
 
 
-GM_PRIVATE_OBJECT(GMRenderTechnique)
-{
-	GMShaderType shaderType;
-	GMString code[static_cast<GMsize_t>(GMRenderEnvironment::EndOfRenderEnvironment)];
-	GMString path[static_cast<GMsize_t>(GMRenderEnvironment::EndOfRenderEnvironment)];
-	GMString prefetch[static_cast<GMsize_t>(GMRenderEnvironment::EndOfRenderEnvironment)];
-	GMRenderTechniques* parent = nullptr;
-};
-
+GM_PRIVATE_CLASS(GMRenderTechnique);
 //! 表示一种渲染技术的类，它可以让GMGameObject在渲染时，调用到指定的着色器代码，完成预预设流程不一样的渲染。
-class GM_EXPORT GMRenderTechnique : public GMObject
+class GM_EXPORT GMRenderTechnique
 {
 	GM_DECLARE_PRIVATE(GMRenderTechnique)
-	GM_ALLOW_COPY_MOVE(GMRenderTechnique)
-	GM_DECLARE_PROPERTY(ShaderType, shaderType)
+	GM_DECLARE_PROPERTY(GMShaderType, ShaderType)
 	GM_FRIEND_CLASS(GMRenderTechniqueManager)
 	GM_FRIEND_CLASS(GMRenderTechniques)
 
 public:
 	GMRenderTechnique(GMShaderType shaderType);
+	GMRenderTechnique(const GMRenderTechnique& rhs);
+	GMRenderTechnique(GMRenderTechnique&& rhs) GM_NOEXCEPT;
+	GMRenderTechnique& operator=(const GMRenderTechnique& rhs);
+	GMRenderTechnique& operator=(GMRenderTechnique&& rhs) GM_NOEXCEPT;
 
 public:
-	inline const GMString& getCode(GMRenderEnvironment type) const GM_NOEXCEPT
-	{
-		D(d);
-		return d->code[static_cast<GMsize_t>(type)];
-	}
-
-	inline const GMString& getPath(GMRenderEnvironment type) const GM_NOEXCEPT
-	{
-		D(d);
-		return d->path[static_cast<GMsize_t>(type)];
-	}
-
-	inline const GMString& getPrefetch(GMRenderEnvironment type) const GM_NOEXCEPT
-	{
-		D(d);
-		return d->prefetch[static_cast<GMsize_t>(type)];
-	}
+	const GMString& getCode(GMRenderEnvironment type) const GM_NOEXCEPT;
+	const GMString& getPath(GMRenderEnvironment type) const GM_NOEXCEPT;
+	const GMString& getPrefetch(GMRenderEnvironment type) const GM_NOEXCEPT;
 
 public:
 	void setCode(GMRenderEnvironment type, GMString code);
@@ -93,37 +62,27 @@ friend_methods(GMRenderTechniqueManager):
 	void setId(GMRenderTechniqueID id);
 
 friend_methods(GMRenderTechniques):
-	inline void setParent(GMRenderTechniques* parent) GM_NOEXCEPT
-	{
-		D(d);
-		d->parent = parent;
-	}
+	void setParent(GMRenderTechniques* parent) GM_NOEXCEPT;
 };
 
-GM_PRIVATE_OBJECT(GMRenderTechniques)
-{
-	GMRenderTechniqueID id;
-	Vector<GMRenderTechnique> techniques;
-};
-
+GM_PRIVATE_CLASS(GMRenderTechniques);
 class GM_EXPORT GMRenderTechniques : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMRenderTechniques)
-	GM_DECLARE_PROPERTY(Id, id)
-	GM_ALLOW_COPY_MOVE(GMRenderTechniques)
+	GM_DECLARE_PROPERTY(GMRenderTechniqueID, Id)
 
 public:
-	GMRenderTechniques() = default;
+	GMRenderTechniques();
+	GMRenderTechniques(const GMRenderTechniques& rhs);
+	GMRenderTechniques(GMRenderTechniques&& rhs) GM_NOEXCEPT;
+	GMRenderTechniques& operator=(const GMRenderTechniques& rhs);
+	GMRenderTechniques& operator=(GMRenderTechniques&& rhs) GM_NOEXCEPT;
 
 public:
 	void addRenderTechnique(GMRenderTechnique technique);
 
 public:
-	inline const Vector<GMRenderTechnique>& getTechniques() const GM_NOEXCEPT
-	{
-		D(d);
-		return d->techniques;
-	}
+	const Vector<GMRenderTechnique>& getTechniques() const GM_NOEXCEPT;
 };
 
 inline bool operator < (const GMRenderTechniques& lhs, const GMRenderTechniques& rhs)
