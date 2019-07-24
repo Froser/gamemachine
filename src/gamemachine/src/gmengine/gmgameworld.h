@@ -27,31 +27,19 @@ struct GMRenderList
 	GMGameObjectContainer deferred;
 };
 
-GM_PRIVATE_OBJECT(GMGameWorld)
-{
-	const IRenderContext* context = nullptr;
-	GMOwnedPtr<GMPhysicsWorld> physicsWorld = nullptr;
-	Set<GMOwnedPtr<GMGameObject>> gameObjects;
-	GMAssets assets;
-	GMRenderPreference renderPreference = GMRenderPreference::PreferForwardRendering;
-	GMRenderList renderList;
-	GMMutex renderListMutex;
-	GMMutex addObjectMutex;
-	GMOwnedPtr<IParticleSystemManager> particleSystemMgr;
-};
-
+GM_PRIVATE_CLASS(GMGameWorld);
 class GM_EXPORT GMGameWorld : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMGameWorld)
 	GM_FRIEND_CLASS(GMPhysicsWorld)
-	GM_DECLARE_PROPERTY(RenderPreference, renderPreference)
+	GM_DECLARE_PROPERTY(GMRenderPreference, RenderPreference)
 
 public:
 	GMGameWorld(const IRenderContext* context);
-	~GMGameWorld() = default;
+	~GMGameWorld();
 
 public:
-	GMPhysicsWorld* getPhysicsWorld() { D(d); return d->physicsWorld.get(); }
+	GMPhysicsWorld* getPhysicsWorld();
 
 public:
 	virtual void renderScene();
@@ -65,15 +53,11 @@ public:
 	void clearRenderList();
 	void addToRenderList(GMGameObject* object);
 	bool removeFromRenderList(GMGameObject* object);
-	inline IParticleSystemManager* getParticleSystemManager() { D(d); return d->particleSystemMgr.get(); }
-	inline GMAssets& getAssets() { D(d); return d->assets; }
+	IParticleSystemManager* getParticleSystemManager();
+	GMAssets& getAssets();
 
 protected:
-	inline GMRenderList& getRenderList()
-	{
-		D(d);
-		return d->renderList;
-	}
+	GMRenderList& getRenderList();
 
 private:
 	void updateGameObjects(GMDuration dt, GMPhysicsWorld* phyw, const Set<GMOwnedPtr<GMGameObject>>& gameObjects);

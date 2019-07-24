@@ -3,6 +3,9 @@
 #include "foundation/gmasync.h"
 #include "foundation/gamemachine.h"
 #include <gmengine/gmcomputeshadermanager.h>
+#include "gmparticle_cocos2d_p.h"
+
+BEGIN_NS
 
 namespace
 {
@@ -17,6 +20,36 @@ namespace
 		return static_cast<const GMParticleDescription_Cocos2D*>(desc);
 	}
 }
+
+GM_PRIVATE_OBJECT_ALIGNED(GMParticleEffect_Cocos2D)
+{
+	GMParticleEmitter_Cocos2D* emitter = nullptr;
+	GMParticleMotionMode motionMode = GMParticleMotionMode::Free;
+	GMParticleGravityMode gravityMode;
+	GMParticleRadiusMode radiusMode;
+	GMDuration life = 0;
+	GMDuration lifeV = 0;
+	GMVec4 beginColor = 0;
+	GMVec4 beginColorV = 0;
+	GMVec4 endColor = 0;
+	GMVec4 endColorV = 0;
+	GMfloat beginSize = 0;
+	GMfloat beginSizeV = 0;
+	GMfloat endSize = 0;
+	GMfloat endSizeV = 0;
+	GMfloat beginSpin = 0;
+	GMfloat beginSpinV = 0;
+	GMfloat endSpin = 0;
+	GMfloat endSpinV = 0;
+	Map<const IRenderContext*, IComputeShaderProgram*> shaderPrograms;
+	bool GPUValid = true;
+	GMComputeBufferHandle particles = 0;
+	GMComputeSRVHandle particlesSRV = 0;
+	GMComputeBufferHandle particlesResult = 0;
+	GMComputeSRVHandle particlesUAV = 0;
+	GMComputeBufferHandle particleCpuResult = 0;
+	GMComputeBufferHandle constant = 0;
+};
 
 GMParticleEffect_Cocos2D::~GMParticleEffect_Cocos2D()
 {
@@ -40,8 +73,28 @@ GMParticleEffect_Cocos2D::~GMParticleEffect_Cocos2D()
 	}
 }
 
+GM_DEFINE_PROPERTY(GMParticleEffect_Cocos2D, GMDuration, Life, life)
+GM_DEFINE_PROPERTY(GMParticleEffect_Cocos2D, GMDuration, LifeV, lifeV)
+GM_DEFINE_PROPERTY(GMParticleEffect_Cocos2D, GMVec4, BeginColor, beginColor)
+GM_DEFINE_PROPERTY(GMParticleEffect_Cocos2D, GMVec4, BeginColorV, beginColorV)
+GM_DEFINE_PROPERTY(GMParticleEffect_Cocos2D, GMVec4, EndColor, endColor)
+GM_DEFINE_PROPERTY(GMParticleEffect_Cocos2D, GMVec4, EndColorV, endColorV)
+GM_DEFINE_PROPERTY(GMParticleEffect_Cocos2D, GMfloat, BeginSize, beginSize)
+GM_DEFINE_PROPERTY(GMParticleEffect_Cocos2D, GMfloat, BeginSizeV, beginSizeV)
+GM_DEFINE_PROPERTY(GMParticleEffect_Cocos2D, GMfloat, EndSize, endSize)
+GM_DEFINE_PROPERTY(GMParticleEffect_Cocos2D, GMfloat, EndSizeV, endSizeV)
+GM_DEFINE_PROPERTY(GMParticleEffect_Cocos2D, GMfloat, BeginSpin, beginSpin)
+GM_DEFINE_PROPERTY(GMParticleEffect_Cocos2D, GMfloat, BeginSpinV, beginSpinV)
+GM_DEFINE_PROPERTY(GMParticleEffect_Cocos2D, GMfloat, EndSpin, endSpin)
+GM_DEFINE_PROPERTY(GMParticleEffect_Cocos2D, GMfloat, EndSpinV, endSpinV)
+GM_DEFINE_PROPERTY(GMParticleEffect_Cocos2D, GMParticleMotionMode, MotionMode, motionMode)
+GM_DEFINE_PROPERTY(GMParticleEffect_Cocos2D, GMParticleGravityMode, GravityMode, gravityMode)
+GM_DEFINE_PROPERTY(GMParticleEffect_Cocos2D, GMParticleRadiusMode, RadiusMode, radiusMode)
+
 GMParticleEffect_Cocos2D::GMParticleEffect_Cocos2D(GMParticleEmitter_Cocos2D* emitter)
 {
+	GM_CREATE_DATA(GMParticleEffect_Cocos2D);
+
 	D(d);
 	d->emitter = emitter;
 }
@@ -133,29 +186,29 @@ bool GMParticleEffect_Cocos2D::GPUUpdate(GMDuration dt)
 	// 粒子信息
 	if (!progParticles)
 	{
-		shaderProgram->createBuffer(sizeof(*particles[0].data()), gm_sizet_to_uint(particles.size()), nullptr, GMComputeBufferType::Structured, &progParticles);
+		shaderProgram->createBuffer(sizeof(particles[0].dataRef()), gm_sizet_to_uint(particles.size()), nullptr, GMComputeBufferType::Structured, &progParticles);
 		shaderProgram->createBufferShaderResourceView(progParticles, &progParticlesSRV);
 
-		shaderProgram->createBuffer(sizeof(*particles[0].data()), gm_sizet_to_uint(particles.size()), nullptr, GMComputeBufferType::UnorderedStructured, &progParticlesResult);
+		shaderProgram->createBuffer(sizeof(particles[0].dataRef()), gm_sizet_to_uint(particles.size()), nullptr, GMComputeBufferType::UnorderedStructured, &progParticlesResult);
 		shaderProgram->createBufferUnorderedAccessView(progParticlesResult, &progParticlesUAV);
 	}
 	else
 	{
 		// 如果粒子数量变多了，则重新生成buffer
 		GMsize_t sz = shaderProgram->getBufferSize(GMComputeBufferType::Structured, progParticles);
-		if (sz < sizeof(*particles[0].data()) * (particles.size()))
+		if (sz < sizeof(particles[0].dataRef()) * (particles.size()))
 		{
 			shaderProgram->release(progParticles);
 			shaderProgram->release(progParticlesSRV);
 			shaderProgram->release(progParticlesResult);
 			shaderProgram->release(progParticlesUAV);
-			shaderProgram->createBuffer(sizeof(*particles[0].data()), gm_sizet_to_uint(particles.size()), particles.data(), GMComputeBufferType::Structured, &progParticles);
+			shaderProgram->createBuffer(sizeof(particles[0].dataRef()), gm_sizet_to_uint(particles.size()), particles.data(), GMComputeBufferType::Structured, &progParticles);
 			shaderProgram->createBufferShaderResourceView(progParticles, &progParticlesSRV);
-			shaderProgram->createBuffer(sizeof(*particles[0].data()), gm_sizet_to_uint(particles.size()), nullptr, GMComputeBufferType::UnorderedStructured, &progParticlesResult);
+			shaderProgram->createBuffer(sizeof(particles[0].dataRef()), gm_sizet_to_uint(particles.size()), nullptr, GMComputeBufferType::UnorderedStructured, &progParticlesResult);
 			shaderProgram->createBufferUnorderedAccessView(progParticlesResult, &progParticlesUAV);
 		}
 	}
-	shaderProgram->setBuffer(progParticles, GMComputeBufferType::Structured, particles.data(), sizeof(*particles[0].data()) * gm_sizet_to_uint(particles.size()));
+	shaderProgram->setBuffer(progParticles, GMComputeBufferType::Structured, particles.data(), sizeof(particles[0].dataRef()) * gm_sizet_to_uint(particles.size()));
 	shaderProgram->bindShaderResourceView(1, &progParticlesSRV);
 
 	// 传入时间等变量
@@ -187,7 +240,7 @@ bool GMParticleEffect_Cocos2D::GPUUpdate(GMDuration dt)
 			shaderProgram->copyBuffer(resultHandle, progParticlesResult);
 		typedef GM_PRIVATE_NAME(GMParticle_Cocos2D) ParticleData;
 		const ParticleData* resultPtr = static_cast<ParticleData*>(shaderProgram->mapBuffer(resultHandle));
-		memcpy_s(particles.data(), sizeof(ParticleData) * particles.size(), resultPtr, sizeof(*particles[0].data()) * particles.size());
+		memcpy_s(particles.data(), sizeof(ParticleData) * particles.size(), resultPtr, sizeof(particles[0].dataRef()) * particles.size());
 
 		// 将存活的粒子放入临时容器，最后交换
 		Vector<GMParticle_Cocos2D> tmp;
@@ -412,3 +465,5 @@ void GMRadialParticleEffect_Cocos2D::setDefaultCodeAndEntry(const GMString& code
 	s_radialCode = code;
 	s_radialEntry = entry;
 }
+
+END_NS

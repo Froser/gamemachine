@@ -73,6 +73,23 @@ GM_ALIGNED_16(struct) GMObjectPrivateAlignedBase
 	GM_DECLARE_INLINE_SETTER_ACCESSOR(name, memberName, public)
 
 //////////////////////////////////////////////////////////////////////////
+#define GM_DECLARE_EMBEDDED_GETTER_ACCESSOR(name, memberName, accessor) \
+	accessor: \
+	auto& get##name() GM_NOEXCEPT { D(d); return d-> memberName; } \
+	const auto& get##name() const GM_NOEXCEPT { D(d); return d-> memberName; }
+
+#define GM_DECLARE_EMBEDDED_SETTER_ACCESSOR(name, memberName, accessor) \
+	accessor: \
+	template <typename T> void set##name(T&& arg) { D(d); d-> memberName = std::forward<T>(arg); }
+
+#define GM_DECLARE_EMBEDDED_GETTER(name, memberName) GM_DECLARE_EMBEDDED_GETTER_ACCESSOR(name, memberName, public) 
+#define GM_DECLARE_EMBEDDED_SETTER(name, memberName) GM_DECLARE_EMBEDDED_SETTER_ACCESSOR(name, memberName, public) 
+
+#define GM_DECLARE_EMBEDDED_PROPERTY(name, memberName) \
+	GM_DECLARE_EMBEDDED_GETTER_ACCESSOR(name, memberName, public) \
+	GM_DECLARE_EMBEDDED_SETTER_ACCESSOR(name, memberName, public)
+
+//////////////////////////////////////////////////////////////////////////
 #define GM_DECLARE_GETTER_ACCESSOR(type, name, accessor) \
 	accessor: \
 	type& get##name() GM_NOEXCEPT; \
@@ -254,7 +271,14 @@ using GMSlots = HashMap<GMSignal, Vector<GMCallbackTarget>, GMStringHashFunctor>
 #define GM_END_META_MAP \
 	return true; }
 
-GM_PRIVATE_CLASS(GMObject);
+GM_PRIVATE_OBJECT_ALIGNED(GMObject)
+{
+	bool metaRegistered = false;
+	GMMeta meta;
+	GMSlots objSlots;
+	GMThreadId tid = 0;
+	GMConnectionTargets connectionTargets;
+};
 // 所有GM对象的基类，如果可以用SSE指令，那么它是16字节对齐的
 
 struct GMMessage;

@@ -24,15 +24,6 @@ static size_t removeIf(ContainerType& container, std::function<bool(typename Con
 	return cnt;
 }
 
-GM_PRIVATE_OBJECT_ALIGNED(GMObject)
-{
-	bool metaRegistered = false;
-	GMMeta meta;
-	GMSlots objSlots;
-	GMThreadId tid = 0;
-	GMConnectionTargets connectionTargets;
-};
-
 GMObject::GMObject()
 {
 	GM_CREATE_DATA(GMObject);

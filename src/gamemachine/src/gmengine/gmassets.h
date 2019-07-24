@@ -103,6 +103,7 @@ class GM_EXPORT GMAssets
 
 public:
 	GMAssets();
+	~GMAssets();
 
 public:
 	GMAsset addAsset(GMAsset asset);

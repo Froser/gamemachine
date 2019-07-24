@@ -11,20 +11,13 @@ enum GMComputeShader
 	GMCS_PARTICLE_DATA_TRANSFER,
 };
 
-typedef GMuint32 GMComputeToken;
-
-GM_PRIVATE_OBJECT_UNALIGNED(GMComputeShaderManager)
+GM_PRIVATE_CLASS(GMComputeShaderManager);
+class GMComputeShaderManager : public GMObject
 {
-	Map<const IRenderContext*, Vector<IComputeShaderProgram*>> shaders;
-	IComputeShaderProgram* deleter = nullptr;
-};
-
-class GMComputeShaderManager
-{
-	GM_DECLARE_PRIVATE_NGO(GMComputeShaderManager)
+	GM_DECLARE_PRIVATE(GMComputeShaderManager)
 
 protected:
-	GMComputeShaderManager() = default;
+	GMComputeShaderManager();
 	~GMComputeShaderManager();
 
 public:

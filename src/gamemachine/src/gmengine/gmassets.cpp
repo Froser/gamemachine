@@ -171,6 +171,11 @@ GMAssets::GMAssets()
 	GM_CREATE_DATA(GMAssets);
 }
 
+GMAssets::~GMAssets()
+{
+
+}
+
 GMAsset GMAssets::addAsset(GMAsset asset)
 {
 	D(d);

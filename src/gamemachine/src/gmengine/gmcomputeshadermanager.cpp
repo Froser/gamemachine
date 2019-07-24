@@ -2,6 +2,19 @@
 #include <gamemachine.h>
 #include "gmcomputeshadermanager.h"
 
+BEGIN_NS
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMComputeShaderManager)
+{
+	Map<const IRenderContext*, Vector<IComputeShaderProgram*>> shaders;
+	IComputeShaderProgram* deleter = nullptr;
+};
+
+GMComputeShaderManager::GMComputeShaderManager()
+{
+	GM_CREATE_DATA(GMComputeShaderManager);
+}
+
 GMComputeShaderManager::~GMComputeShaderManager()
 {
 	D(d);
@@ -74,3 +87,5 @@ GMComputeShaderManager& GMComputeShaderManager::instance()
 	static GMComputeShaderManager s_mgr;
 	return s_mgr;
 }
+
+END_NS

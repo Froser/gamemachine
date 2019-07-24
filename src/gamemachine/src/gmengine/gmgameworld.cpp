@@ -6,6 +6,8 @@
 #include <time.h>
 #include "foundation/gamemachine.h"
 
+BEGIN_NS
+
 namespace
 {
 	bool needBlend(GMGameObject* object)
@@ -23,10 +25,31 @@ namespace
 	}
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMGameWorld)
+{
+	const IRenderContext* context = nullptr;
+	GMOwnedPtr<GMPhysicsWorld> physicsWorld = nullptr;
+	Set<GMOwnedPtr<GMGameObject>> gameObjects;
+	GMAssets assets;
+	GMRenderPreference renderPreference = GMRenderPreference::PreferForwardRendering;
+	GMRenderList renderList;
+	GMMutex renderListMutex;
+	GMMutex addObjectMutex;
+	GMOwnedPtr<IParticleSystemManager> particleSystemMgr;
+};
+
+GM_DEFINE_PROPERTY(GMGameWorld, GMRenderPreference, RenderPreference, renderPreference)
 GMGameWorld::GMGameWorld(const IRenderContext* context)
 {
+	GM_CREATE_DATA(GMGameWorld);
+
 	D(d);
 	d->context = context;
+}
+
+GMGameWorld::~GMGameWorld()
+{
+
 }
 
 void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
@@ -50,6 +73,12 @@ void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
 		else
 			GM.invokeInMainThread([context, d, m]() {context->getEngine()->createModelDataProxy(d->context, m); });
 	});
+}
+
+GMPhysicsWorld* GMGameWorld::getPhysicsWorld()
+{
+	D(d);
+	return d->physicsWorld.get();
 }
 
 void GMGameWorld::renderScene()
@@ -126,6 +155,12 @@ void GMGameWorld::clearRenderList()
 	d->renderList.forward.clear();
 }
 
+GMRenderList& GMGameWorld::getRenderList()
+{
+	D(d);
+	return d->renderList;
+}
+
 void GMGameWorld::updateGameObjects(GMDuration dt, GMPhysicsWorld* phyw, const Set<GMOwnedPtr<GMGameObject>>& gameObjects)
 {
 	for (decltype(auto) gameObject : gameObjects)
@@ -180,6 +215,16 @@ bool GMGameWorld::removeFromRenderList(GMGameObject* object)
 	return flag;
 }
 
+GMAssets& GMGameWorld::getAssets()
+{
+	D(d); return d->assets;
+}
+
+IParticleSystemManager* GMGameWorld::getParticleSystemManager()
+{
+	D(d); return d->particleSystemMgr.get();
+}
+
 void GMGameWorld::setPhysicsWorld(AUTORELEASE GMPhysicsWorld* w)
 {
 	D(d);
@@ -202,3 +247,5 @@ void GMGameWorld::addToContainerByPriority(GMGameObjectContainer& c, GMGameObjec
 			c.push_back(o);
 	}
 }
+
+END_NS
