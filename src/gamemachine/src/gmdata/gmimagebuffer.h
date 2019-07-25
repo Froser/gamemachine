@@ -5,21 +5,16 @@
 #include <gmassets.h>
 BEGIN_NS
 
-GM_PRIVATE_OBJECT(GMImageBuffer)
-{
-	GMuint32 width;
-	GMuint32 height;
-	GMsize_t size = 0;
-	GMbyte* buffer = nullptr;
-};
-
 // 表示一个来自内存的图片
+GM_PRIVATE_CLASS(GMImageBuffer);
 class GMImageBuffer : public GMImage
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMImageBuffer, GMImage)
+	GM_DECLARE_PRIVATE(GMImageBuffer)
+	GM_DECLARE_BASE(GMImage)
 
 public:
 	GMImageBuffer(GMImageFormat format, GMuint32 width, GMuint32 height, GMsize_t bufferSize, GMbyte* buffer);
+	~GMImageBuffer();
 
 private:
 	void generateData();

@@ -12,6 +12,8 @@ namespace
 	}
 }
 
+BEGIN_NS
+
 bool GMImageReader_TIFF::load(const GMbyte* data, size_t size, OUT GMImage** image)
 {
 	GMImage* img = new GMImage();
@@ -78,3 +80,5 @@ bool GMImageReader_TIFF::test(const GMbyte* data, GMsize_t size)
 
 	return false;
 }
+
+END_NS

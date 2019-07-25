@@ -54,6 +54,7 @@ set(SOURCES
 		gmdata/xml/gmxml.h
 		gmdata/xml/gmxml.cpp
 		gmdata/gmimage.h
+		gmdata/gmimage_p.h
 		gmdata/gmimage.cpp
 		gmdata/gmimagebuffer.h
 		gmdata/gmimagebuffer.cpp

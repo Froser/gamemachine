@@ -2,6 +2,8 @@
 #include "gmbuffer.h"
 #include "foundation/debug.h"
 
+BEGIN_NS
+
 GMBuffer::GMBuffer()
 	: isOwned(true)
 	, size(0)
@@ -156,3 +158,5 @@ void GMBuffer::releaseRef()
 		}
 	}
 }
+
+END_NS

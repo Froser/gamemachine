@@ -1,6 +1,8 @@
 ﻿#include "stdafx.h"
 #include "gmxml.h"
 
+BEGIN_NS
+
 namespace
 {
 	void parseMember(const GMXMLElement* element, GMObject& object)
@@ -135,3 +137,5 @@ bool GMXML::parsePlist(const GMString& content, GMObject& object)
 	}
 	return true;
 }
+
+END_NS

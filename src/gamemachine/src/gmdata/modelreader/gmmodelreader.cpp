@@ -1,9 +1,10 @@
 ﻿#include "stdafx.h"
 #include "gmmodelreader.h"
-// #include "gmmodelreader_md5.h"
 #include "gmmodelreader_assimp.h"
 #include "gmdata/gamepackage/gmgamepackage.h"
 #include "foundation/gamemachine.h"
+
+BEGIN_NS
 
 class GMModelReaderContainer : public GMObject
 {
@@ -65,3 +66,5 @@ bool GMModelReader::load(const GMModelLoadSettings& settings, EngineType type, R
 	GMOwnedPtr<IModelReader> reader(createReader(type));
 	return reader->load(settingsCache, buffer, asset);
 }
+
+END_NS

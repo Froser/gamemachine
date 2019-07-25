@@ -6,6 +6,8 @@
 #include <GL/glew.h>
 
 #define PNG_BYTES_TO_CHECK 4
+BEGIN_NS
+
 struct PngImage
 {
 	const GMbyte* data;
@@ -160,3 +162,5 @@ void GMImageReader_PNG::writeDataToImage(PngData& png, GMImage* img, GMsize_t si
 	data.mip[0].data = png.rgba;
 	data.size = size;
 }
+
+END_NS

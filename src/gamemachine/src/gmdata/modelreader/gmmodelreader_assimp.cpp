@@ -11,6 +11,8 @@
 #include "foundation/utilities/utilities.h"
 #include "gmdata/imagereader/gmimagereader.h"
 
+BEGIN_NS
+
 class GamePackageIOSystem : public Assimp::MemoryIOSystem
 {
 public:
@@ -447,6 +449,21 @@ namespace
 	}
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMModelReader_Assimp)
+{
+	HashMap<GMString, GMAsset, GMStringHashFunctor> textureMap;
+	GMModelLoadSettings settings;
+};
+
+GMModelReader_Assimp::GMModelReader_Assimp()
+{
+	GM_CREATE_DATA(GMModelReader_Assimp);
+}
+
+GMModelReader_Assimp::~GMModelReader_Assimp()
+{
+}
+
 bool GMModelReader_Assimp::load(const GMModelLoadSettings& settings, GMBuffer& buffer, REF GMAsset& asset)
 {
 	D(d);
@@ -521,3 +538,16 @@ bool GMModelReader_Assimp::test(const GMModelLoadSettings& settings, const GMBuf
 	return false;
 }
 
+const GMModelLoadSettings& GMModelReader_Assimp::getSettings()
+{
+	D(d);
+	return d->settings;
+}
+
+HashMap<GMString, GMAsset, GMStringHashFunctor>& GMModelReader_Assimp::getTextureMap() GM_NOEXCEPT
+{
+	D(d);
+	return d->textureMap;
+}
+
+END_NS

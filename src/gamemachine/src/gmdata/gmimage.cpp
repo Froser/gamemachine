@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include <gmimage.h>
+#include "gmimage_p.h"
 
 BEGIN_NS
 
@@ -17,6 +18,11 @@ const GMImage::Data& GMImage::getData() const
 {
 	D(d);
 	return *d;
+}
+
+GMImage::Data& GMImage::getData()
+{
+	D(d); return *d;
 }
 
 void GMImage::dispose()

@@ -2,6 +2,8 @@
 #include "gmimagereader_tga.h"
 #include "foundation/utilities/tools.h"
 
+BEGIN_NS
+
 namespace {
 
 	/* Tell C++ that we have C types and declarations. */
@@ -127,7 +129,7 @@ static const char*
 
 	/* TGA image handle */
 	struct _TGA {
-		GMMemoryStream*	ms = nullptr;		/* file stream */
+		gm::GMMemoryStream*	ms = nullptr;		/* file stream */
 		size_t		off;				/* current offset in file*/
 		int				last;				/* last error code */
 		TGAHeader		hdr;				/* image header */
@@ -647,3 +649,4 @@ bool GMImageReader_TGA::test(const GMbyte* data, GMsize_t size)
 		data[3] == 11
 	;
 }
+END_NS

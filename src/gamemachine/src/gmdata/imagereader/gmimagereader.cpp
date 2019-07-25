@@ -7,6 +7,8 @@
 #include "gmimagereader_tga.h"
 #include "gmimagereader_tiff.h"
 
+BEGIN_NS
+
 class GMImageReaderContainer
 {
 public:
@@ -68,3 +70,5 @@ GMImageReader::ImageType GMImageReader::test(const GMbyte* data, GMsize_t size)
 	}
 	return ImageType_End;
 }
+
+END_NS

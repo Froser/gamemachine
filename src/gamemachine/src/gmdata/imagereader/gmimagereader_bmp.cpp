@@ -65,7 +65,6 @@ struct ImageRGB
 	GMint32 g;
 	GMint32 b;
 };
-END_NS
 
 class ImageBMP : public GMImage
 {
@@ -181,3 +180,5 @@ void GMImageReader_BMP::flipVertically(GMbyte* data, GMuint32 width, GMuint32 he
 
 	GM_delete_array(tempRow);
 }
+
+END_NS

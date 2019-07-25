@@ -58,6 +58,8 @@ extern "C"
 	}
 }
 
+BEGIN_NS
+
 GMImageReader_JPG::GMImageReader_JPG()
 {
 	// 设置回调
@@ -182,3 +184,5 @@ bool GMImageReader_JPG::test(const GMbyte* data, GMsize_t size)
 	const short* p = reinterpret_cast<const short*>(data);
 	return p && *p == (short) 0xd8ff;
 }
+
+END_NS

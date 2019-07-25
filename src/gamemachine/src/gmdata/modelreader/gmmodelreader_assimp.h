@@ -4,32 +4,21 @@
 #include <gmmodelreader.h>
 BEGIN_NS
 
-GM_PRIVATE_OBJECT(GMModelReader_Assimp)
-{
-	HashMap<GMString, GMAsset, GMStringHashFunctor> textureMap;
-	GMModelLoadSettings settings;
-};
-
-class GMModelReader_Assimp : public GMObject, public IModelReader
+GM_PRIVATE_CLASS(GMModelReader_Assimp);
+class GMModelReader_Assimp : public IModelReader
 {
 	GM_DECLARE_PRIVATE(GMModelReader_Assimp)
 
 public:
+	GMModelReader_Assimp();
+	~GMModelReader_Assimp();
+
 	virtual bool load(const GMModelLoadSettings& settings, GMBuffer& buffer, REF GMAsset& asset) override;
 	virtual bool test(const GMModelLoadSettings& settings, const GMBuffer& buffer) override;
 
 public:
-	inline HashMap<GMString, GMAsset, GMStringHashFunctor>& getTextureMap() GM_NOEXCEPT
-	{
-		D(d);
-		return d->textureMap;
-	}
-
-	inline const GMModelLoadSettings& getSettings()
-	{
-		D(d);
-		return d->settings;
-	}
+	const GMModelLoadSettings& getSettings();
+	HashMap<GMString, GMAsset, GMStringHashFunctor>& getTextureMap() GM_NOEXCEPT;
 };
 
 END_NS

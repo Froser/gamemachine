@@ -50,37 +50,23 @@ struct ImageMipData
 
 typedef void(*GMImageDataDeleter)(void*);
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMImage)
-{
-	GMImageTarget target = GMImageTarget::Invalid;
-	GMImageInternalFormat internalFormat;
-	GMImageFormat format;
-	GMImageDataType type;
-	GMint32 mipLevels;
-	GMint32 slices = 1;
-	GMptrdiff sliceStride = 0;
-	ImageMipData mip[MAX_MIP_CNT];
-	GMsize_t size = 0;
-	GMuint32 channels = GM_IMAGE_DEFAULT_CHANNELS;
-	GMImageDataDeleter deleter = nullptr;
-	bool generateMipmap = true;
-};
-
+GM_PRIVATE_CLASS(GMImage);
 //! 表示一张或一系列图片。
 /*!
   图片数据一般为32位形式保存，有RGBA共计4个通道。<BR>
   一个图片对象中，可能会存有多个MipMap，这通常出现在DDS等格式中。
 */
-class GM_EXPORT GMImage : public GMObject
+class GM_EXPORT GMImage
 {
 	GM_DECLARE_PRIVATE(GMImage)
+	GM_DISABLE_COPY_ASSIGN(GMImage)
 
 public:
 	GMImage();
-	virtual ~GMImage();
+	~GMImage();
 
 public:
-	inline Data& getData() { D(d); return *d; }
+	Data& getData();
 	const Data& getData() const;
 	virtual void dispose();
 

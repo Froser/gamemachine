@@ -1,9 +1,22 @@
 ﻿#include "stdafx.h"
 #include "gmimagebuffer.h"
 #include <GL/glew.h>
+#include "gmdata/gmimage_p.h"
+
+BEGIN_NS
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMImageBuffer)
+{
+	GMuint32 width;
+	GMuint32 height;
+	GMsize_t size = 0;
+	GMbyte* buffer = nullptr;
+};
 
 GMImageBuffer::GMImageBuffer(GMImageFormat format, GMuint32 width, GMuint32 height, GMsize_t bufferSize, GMbyte* buffer)
 {
+	GM_CREATE_DATA(GMImageBuffer);
+
 	D(d);
 	d->width = width;
 	d->height = height;
@@ -104,3 +117,5 @@ GMCubeMapBuffer::GMCubeMapBuffer(
 		ptr += sz;
 	}
 }
+
+END_NS
