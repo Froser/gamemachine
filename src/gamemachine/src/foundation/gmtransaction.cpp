@@ -2,7 +2,24 @@
 #include "gmtransaction.h"
 #include "gmthread.h"
 
+BEGIN_NS
+
 constexpr GMTransaction* TransactionBeginTag = nullptr;
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMTransaction)
+{
+	List<GMOwnedPtr<ITransactionAtom>> atoms;
+};
+
+GMTransaction::GMTransaction()
+{
+	GM_CREATE_DATA(GMTransaction);
+}
+
+GMTransaction::~GMTransaction()
+{
+
+}
 
 void GMTransaction::clear()
 {
@@ -48,6 +65,28 @@ void GMTransaction::unexecute()
 	{
 		(*iter)->unexecute();
 	}
+}
+
+bool GMTransaction::isEmpty()
+{
+	D(d);
+	return d->atoms.empty();
+}
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMTransactionManager)
+{
+	GMint32 nest = 0;
+	GMTransactionContext* transactionContext = nullptr;
+};
+
+GMTransactionManager::GMTransactionManager()
+{
+	GM_CREATE_DATA(GMTransactionManager);
+}
+
+GMTransactionManager::~GMTransactionManager()
+{
+
 }
 
 void GMTransactionManager::beginTransaction(GMTransactionContext* transactionContext)
@@ -212,3 +251,5 @@ GMScopeTransaction::GMScopeTransaction(GMTransactionContext* context /*= nullptr
 {
 	m_mgr->beginTransaction(m_context);
 }
+
+END_NS

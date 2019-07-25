@@ -10,6 +10,9 @@
 #include "gmengine/gmmessage.h"
 #include "gmcontroltextedit.h"
 #include "gmuiconfiguration.h"
+#include "gmwidget_p.h"
+
+BEGIN_NS
 
 namespace
 {
@@ -94,6 +97,17 @@ protected:
 	}
 };
 
+GM_PRIVATE_OBJECT_ALIGNED(GMElementBlendColor)
+{
+	GMVec4 states[GMControlState::EndOfControlState];
+	GMVec4 current;
+};
+
+GMElementBlendColor::GMElementBlendColor()
+{
+	GM_CREATE_DATA(GMElementBlendColor);
+}
+
 void GMElementBlendColor::init(const GMVec4& defaultColor, const GMVec4& disabledColor, const GMVec4& hiddenColor)
 {
 	D(d);
@@ -113,15 +127,76 @@ void GMElementBlendColor::blend(GMControlState::State state, GMfloat elapsedTime
 	d->current = Lerp(d->current, destColor, 1 - Pow(rate, 60.f * elapsedTime));
 }
 
+GMVec4* GMElementBlendColor::getStates()
+{
+	D(d);
+	return d->states;
+}
+
+void GMElementBlendColor::setCurrent(const GMVec4& current)
+{
+	D(d);
+	d->current = current;
+}
+
+const GMVec4& GMElementBlendColor::getCurrent()
+{
+	D(d);
+	return d->current;
+}
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMStyle)
+{
+	GMlong texture;
+	GMFontHandle font = 0;
+	GMRect rc;
+	GMRect cornerRc;
+	GMElementBlendColor textureColor;
+	GMElementBlendColor fontColor;
+	GMShadowStyle shadowStyle;
+};
+
+GM_DEFINE_PROPERTY(GMStyle, GMRect, CornerRc, cornerRc)
 GMStyle::GMStyle(
 	const GMVec4& defaultTextureColor,
 	const GMVec4& disabledTextureColor,
 	const GMVec4& hiddenTextureColor
 )
 {
+	GM_CREATE_DATA(GMStyle);
+
 	D(d);
 	resetTextureColor(defaultTextureColor, disabledTextureColor, hiddenTextureColor);
 }
+
+GMStyle::~GMStyle()
+{
+
+}
+
+
+GMStyle::GMStyle(const GMStyle& rhs)
+{
+	*this = rhs;
+}
+
+GMStyle::GMStyle(GMStyle&& rhs) GM_NOEXCEPT
+{
+	*this = std::move(rhs);
+}
+
+GMStyle& GMStyle::operator=(const GMStyle& rhs)
+{
+	GM_COPY(rhs);
+	return *this;
+}
+
+GMStyle& GMStyle::operator=(GMStyle&& rhs) GM_NOEXCEPT
+{
+	GM_MOVE(rhs);
+	return *this;
+}
+
 
 void GMStyle::setTexture(const GMWidgetTextureArea& idRc)
 {
@@ -172,8 +247,69 @@ void GMStyle::refresh()
 	d->fontColor.setCurrent(d->fontColor.getStates()[GMControlState::Hidden]);
 }
 
+const GMShadowStyle& GMStyle::getShadowStyle()
+{
+	D(d);
+	return d->shadowStyle;
+}
+
+void GMStyle::setShadowStyle(const GMShadowStyle& shadowStyle)
+{
+	D(d);
+	d->shadowStyle = shadowStyle;
+}
+
+GMlong GMStyle::getTexture()
+{
+	D(d);
+	return d->texture;
+}
+
+const GMRect& GMStyle::getTextureRect()
+{
+	D(d);
+	return d->rc;
+}
+
+GMFontHandle GMStyle::getFont()
+{
+	D(d);
+	return d->font;
+}
+
+GMElementBlendColor& GMStyle::getFontColor()
+{
+	D(d);
+	return d->fontColor;
+}
+
+GMElementBlendColor& GMStyle::getTextureColor()
+{
+	D(d);
+	return d->textureColor;
+}
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMWidgetResourceManager)
+{
+	const IRenderContext* context = nullptr;
+	GMOwnedPtr<GMTextGameObject> textObject;
+	GMOwnedPtr<GMSprite2DGameObject> spriteObject;
+	GMOwnedPtr<GMSprite2DGameObject> opaqueSpriteObject;
+	GMOwnedPtr<GMBorder2DGameObject> borderObject;
+	Vector<GMWidget*> widgets;
+	GMint32 backBufferWidth = 0;
+	GMint32 backBufferHeight = 0;
+	Vector<GMCanvasTextureInfo> textureResources;
+	GMTextureAsset whiteTexture;
+	GMAtomic<GMlong> textureId;
+	GMlong whiteTextureId = 0;
+	GMUIConfiguration* configuration = nullptr;
+};
+
 GMWidgetResourceManager::GMWidgetResourceManager(const IRenderContext* context)
 {
+	GM_CREATE_DATA(GMWidgetResourceManager);
+
 	D(d);
 	d->configuration = new GMUIConfiguration(context);
 	d->context = context;
@@ -214,6 +350,12 @@ GMlong GMWidgetResourceManager::addTexture(GMAsset texture, GMint32 width, GMint
 
 	d->textureResources.push_back(std::move(texInfo));
 	return d->textureId++;
+}
+
+const IRenderContext* GMWidgetResourceManager::getContext()
+{
+	D(d);
+	return d->context;
 }
 
 void GMWidgetResourceManager::registerWidget(GMWidget* widget)
@@ -267,10 +409,62 @@ void GMWidgetResourceManager::setUIConfiguration(const GMUIConfiguration& config
 	*(d->configuration) = config;
 }
 
+GMlong GMWidgetResourceManager::getWhiteTextureId() GM_NOEXCEPT
+{
+	D(d);
+	return d->whiteTextureId;
+}
+
+GMBorder2DGameObject* GMWidgetResourceManager::getBorderObject()
+{
+	D(d);
+	return d->borderObject.get();
+}
+
+GMSprite2DGameObject* GMWidgetResourceManager::getOpaqueSpriteObject()
+{
+	D(d);
+	return d->opaqueSpriteObject.get();
+}
+
+GMSprite2DGameObject* GMWidgetResourceManager::getSpriteObject()
+{
+	D(d);
+	return d->spriteObject.get();
+}
+
+GMTextGameObject* GMWidgetResourceManager::getTextObject()
+{
+	D(d);
+	return d->textObject.get();
+}
+
+GMint32 GMWidgetResourceManager::getBackBufferHeight()
+{
+	D(d);
+	return d->backBufferHeight;
+}
+
+GMint32 GMWidgetResourceManager::getBackBufferWidth()
+{
+	D(d);
+	return d->backBufferWidth;
+}
+
+const Vector<GMWidget*>& GMWidgetResourceManager::getCanvases()
+{
+	D(d);
+	return d->widgets;
+}
+
 GMfloat GMWidget::s_timeRefresh = 0;
 GMControl* GMWidget::s_controlFocus = nullptr;
 GMControl* GMWidget::s_controlPressed = nullptr;
-
+GM_DEFINE_PROPERTY(GMWidget, bool, Minimum, minimized)
+GM_DEFINE_PROPERTY(GMWidget, bool, Visible, visible)
+GM_DEFINE_PROPERTY(GMWidget, GMint32, ScrollStep, scrollStep)
+GM_DEFINE_PROPERTY(GMWidget, GMint32, ScrollOffsetY, scrollOffsetY)
+GM_DEFINE_PROPERTY(GMWidget, GMint32, VerticalScrollbarWidth, verticalScrollbarWidth)
 GMWidget::GMWidget(GMWidgetResourceManager* manager)
 {
 	D(d);
@@ -1415,6 +1609,152 @@ GMSystemMouseEvent* GMWidget::adjustMouseEvent(GMSystemMouseEvent* event, const 
 	return event;
 }
 
+ForwardDeclare* GMWidget::getParentWindow()
+{
+	D(d);
+	return d->parentWindow;
+}
+
+void GMWidget::setParentWindow(IWindow* window)
+{
+	D(d);
+	d->parentWindow = window;
+}
+
+GMWidget* GMWidget::getNextCanvas()
+{
+	D(d);
+	return d->nextWidget;
+}
+
+GMWidget* GMWidget::getPrevCanvas()
+{
+	D(d);
+	return d->prevWidget;
+}
+
+const Vector<GMControl*>& GMWidget::getControls()
+{
+	D(d);
+	return d->controls;
+}
+
+bool GMWidget::canKeyboardInput()
+{
+	D(d);
+	return d->keyboardInput;
+}
+
+void GMWidget::setKeyboardInput(bool keyboardInput)
+{
+	D(d);
+	d->keyboardInput = keyboardInput;
+}
+
+void GMWidget::setPosition(GMint32 x, GMint32 y)
+{
+	D(d);
+	d->x = x;
+	d->y = y;
+}
+
+void GMWidget::setBorderMargin(GMint32 left, GMint32 top)
+{
+	D(d);
+	d->borderMarginLeft = left;
+	d->borderMarginTop = top;
+}
+
+GMint32 GMWidget::getTitleHeight()
+{
+	D(d);
+	return d->titleHeight;
+}
+
+GMWidgetResourceManager* GMWidget::getManager()
+{
+	D(d);
+	return d->manager;
+}
+
+GMRect GMWidget::getSize()
+{
+	D(d);
+	GMRect rc = { 0, 0, d->width, d->height };
+	return rc;
+}
+
+void GMWidget::resetControlMouseOver()
+{
+	D(d);
+	d->controlMouseOver = nullptr;
+}
+
+GMOverflowStyle GMWidget::getOverflow() GM_NOEXCEPT;
+{
+	D(d);
+	return d->overflow;
+}
+
+void GMWidget::setOverflow(GMOverflowStyle overflow)
+{
+	D(d);
+	d->overflow = overflow;
+	updateVerticalScrollbar();
+}
+
+GMint32 GMWidget::getContentPaddingLeft() GM_NOEXCEPT
+{
+	D(d);
+	return d->contentPaddingLeft;
+}
+
+void GMWidget::setContentPaddingLeft(GMint32 padding)
+{
+	D(d);
+	d->contentPaddingLeft = padding;
+	updateVerticalScrollbar();
+}
+
+GMint32 GMWidget::getContentPaddingTop() GM_NOEXCEPT
+{
+	D(d);
+	return d->contentPaddingTop;
+}
+
+void GMWidget::setContentPaddingTop(GMint32 padding)
+{
+	D(d);
+	d->contentPaddingTop = padding;
+	updateVerticalScrollbar();
+}
+
+GMint32 GMWidget::getContentPaddingRight() GM_NOEXCEPT
+{
+	D(d);
+	return d->contentPaddingRight;
+}
+
+void GMWidget::setContentPaddingRight(GMint32 padding)
+{
+	D(d);
+	d->contentPaddingRight = padding;
+	updateVerticalScrollbar();
+}
+
+GMint32 GMWidget::getContentPaddingBottom() GM_NOEXCEPT
+{
+	D(d);
+	return d->contentPaddingBottom;
+}
+
+void GMWidget::setContentPaddingBottom(GMint32 padding)
+{
+	D(d);
+	d->contentPaddingBottom = padding;
+	updateVerticalScrollbar();
+}
+
 void GMWidget::clearFocus(GMWidget* sender)
 {
 	if (s_controlFocus)
@@ -1427,3 +1767,5 @@ void GMWidget::clearFocus(GMWidget* sender)
 	if (window)
 		window->setWindowCapture(false);
 }
+
+END_NS

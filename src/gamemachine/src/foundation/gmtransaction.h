@@ -9,17 +9,14 @@ GM_INTERFACE(ITransactionAtom)
 	virtual void unexecute() = 0;
 };
 
-GM_PRIVATE_OBJECT(GMTransaction)
-{
-	List<GMOwnedPtr<ITransactionAtom>> atoms;
-};
-
-class GMTransaction : public GMObject
+GM_PRIVATE_CLASS(GMTransaction);
+class GMTransaction
 {
 	GM_DECLARE_PRIVATE(GMTransaction)
 
 public:
-	GMTransaction() = default;
+	GMTransaction();
+	~GMTransaction();
 
 public:
 	void clear();
@@ -27,13 +24,7 @@ public:
 	bool removeAtom(ITransactionAtom* atom);
 	void execute();
 	void unexecute();
-
-public:
-	bool isEmpty()
-	{
-		D(d);
-		return d->atoms.empty();
-	}
+	bool isEmpty();
 };
 
 struct GMTransactionContext
@@ -48,20 +39,16 @@ struct GMTransactionContext
 	GMTransactionContext& operator=(const GMTransactionContext&) = delete;
 };
 
-GM_PRIVATE_OBJECT(GMTransactionManager)
-{
-	GMint32 nest = 0;
-	GMTransactionContext* transactionContext = nullptr;
-};
-
-class GMTransactionManager : public GMObject
+GM_PRIVATE_CLASS(GMTransactionManager);
+class GMTransactionManager
 {
 	GM_DECLARE_PRIVATE(GMTransactionManager)
-	friend class GMScopeTransaction;
-	friend class GMWeakTransaction;
+	GM_FRIEND_CLASS(GMScopeTransaction);
+	GM_FRIEND_CLASS(GMWeakTransaction);
 
 private:
-	GMTransactionManager() = default;
+	GMTransactionManager();
+	~GMTransactionManager();
 
 public:
 	void beginTransaction(GMTransactionContext* transactionContext);

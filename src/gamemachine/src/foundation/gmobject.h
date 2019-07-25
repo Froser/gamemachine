@@ -136,9 +136,7 @@ GM_ALIGNED_16(struct) GMObjectPrivateAlignedBase
 	*d = *d_rhs ; }
 
 #define GM_MOVE(rhs) \
-	{ D(d); \
-	D_OF(d_rhs, &rhs); \
-	*d = std::move(*d_rhs) ; }
+	{ using namespace std; swap(_gm_data, rhs._gm_data); }
 
 class GMObject;
 

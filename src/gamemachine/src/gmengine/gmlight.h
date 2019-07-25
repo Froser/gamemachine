@@ -3,35 +3,11 @@
 #include <gmcommon.h>
 BEGIN_NS
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMLight)
-{
-	GMfloat position[4] = { 1, 1, 1, 1 };
-	GMfloat color[4] = { 1, 1, 1, 1 };
-	GMfloat ambientIntensity[4] = { 1, 1, 1, 1 };
-	GMfloat diffuseIntensity[4] = { 1, 1, 1, 1 };
-	GMfloat specularIntensity = 1;
-
-	struct
-	{
-		gm::GMfloat constant = 1.f;
-		gm::GMfloat linear = 0.0f;
-		gm::GMfloat exp = 0.0f;
-	} attenuation;
-};
-
-GM_PRIVATE_OBJECT_UNALIGNED(GMDirectionalLight_t)
-{
-	GMfloat direction[4] = { 0, -1, 0, 0 };
-};
-
-GM_PRIVATE_OBJECT_UNALIGNED(GMSpotlight_t)
-{
-	GMfloat cutOff; //!< 切光角，单位是角度。
-};
-
+GM_PRIVATE_CLASS(GMLight);
 class GM_EXPORT GMLight : public ILight
 {
-	GM_DECLARE_PRIVATE_NGO(GMLight)
+	GM_DECLARE_PRIVATE(GMLight)
+	GM_DISABLE_COPY_ASSIGN(GMLight)
 
 public:
 	enum
@@ -50,6 +26,9 @@ public:
 	};
 
 public:
+	GMLight();
+	~GMLight();
+
 	virtual bool setLightAttribute3(GMLightAttribute attr, GMfloat value[3]) override;
 	virtual bool setLightAttribute(GMLightAttribute, GMfloat) override;
 	virtual bool getLightAttribute3(GMLightAttribute, OUT GMfloat[3]) override;

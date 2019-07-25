@@ -10,6 +10,8 @@
 #include "gmcsmhelper.h"
 #include "gmcomputeshadermanager.h"
 
+BEGIN_NS
+
 static GMShaderVariablesDesc s_defaultShaderVariablesDesc =
 {
 	"GM_WorldMatrix",
@@ -104,6 +106,21 @@ static GMShaderVariablesDesc s_defaultShaderVariablesDesc =
 
 GMint64 GMShadowSourceDesc::version = 0;
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMFramebuffersStack)
+{
+	Stack<IFramebuffers*> framebuffers;
+};
+
+GMFramebuffersStack::GMFramebuffersStack()
+{
+	GM_CREATE_DATA(GMFramebuffersStack);
+}
+
+GMFramebuffersStack::~GMFramebuffersStack()
+{
+
+}
+
 void GMFramebuffersStack::push(IFramebuffers* framebuffers)
 {
 	D(d);
@@ -129,8 +146,40 @@ IFramebuffers* GMFramebuffersStack::peek()
 	return d->framebuffers.top();
 }
 
+GM_PRIVATE_OBJECT_ALIGNED(GMGraphicEngine)
+{
+	GMThreadId mtid = 0;
+	GMint32 begun = 0;
+	const IRenderContext* context = nullptr;
+	GMCamera camera;
+	GMGlyphManager* glyphManager = nullptr;
+	IFramebuffers* defaultFramebuffers = nullptr;
+	IFramebuffers* filterFramebuffers = nullptr;
+	GMGameObject* filterQuad = nullptr;
+	GMFramebuffersStack framebufferStack;
+	IGBuffer* gBuffer = nullptr;
+	GMRenderConfig renderConfig;
+	GMDebugConfig debugConfig;
+	GMStencilOptions stencilOptions;
+	Vector<ILight*> lights;
+	IShaderLoadCallback* shaderLoadCallback = nullptr;
+	GMGlobalBlendStateDesc blendState;
+	GMOwnedPtr<GMRenderTechniqueManager> renderTechniqueManager;
+	GMOwnedPtr<GMPrimitiveManager> primitiveManager;
+	GMConfigs configs;
+
+	// Shadow
+	GMShadowSourceDesc shadow;
+	GMShadowSourceDesc lastShadow;
+	IFramebuffers* shadowDepthFramebuffers = nullptr;
+	GMMat4 shadowCameraVPmatrices[GMMaxCascades];
+	bool isDrawingShadow = false;
+};
+
 GMGraphicEngine::GMGraphicEngine(const IRenderContext* context)
 {
+	GM_CREATE_DATA(GMGraphicEngine);
+
 	D(d);
 	d->mtid = GMThread::getCurrentThreadId();
 	d->context = context;
@@ -535,6 +584,30 @@ const GMMat4& GMGraphicEngine::getCascadeCameraVPMatrix(GMCascadeLevel level)
 	return d->shadowCameraVPmatrices[level];
 }
 
+GMGameObject* GMGraphicEngine::getFilterQuad()
+{
+	D(d);
+	return d->filterQuad;
+}
+
+GMFramebuffersStack& GMGraphicEngine::getFramebuffersStack()
+{
+	D(d);
+	return d->framebufferStack;
+}
+
+IShaderLoadCallback* GMGraphicEngine::getShaderLoadCallback()
+{
+	D(d);
+	return d->shaderLoadCallback;
+}
+
+const Vector<ILight*>& GMGraphicEngine::getLights()
+{
+	D(d);
+	return d->lights;
+}
+
 void GMGraphicEngine::dispose()
 {
 	D(d);
@@ -724,3 +797,23 @@ const GMShaderVariablesDesc& GMGraphicEngine::getDefaultShaderVariablesDesc()
 {
 	return s_defaultShaderVariablesDesc;
 }
+
+const GMGlobalBlendStateDesc& GMGraphicEngine::getGlobalBlendState()
+{
+	D(d);
+	return d->blendState;
+}
+
+bool GMGraphicEngine::isDrawingShadow()
+{
+	D(d);
+	return d->isDrawingShadow;
+}
+
+const GMShadowSourceDesc& GMGraphicEngine::getShadowSourceDesc()
+{
+	D(d);
+	return d->shadow;
+}
+
+END_NS

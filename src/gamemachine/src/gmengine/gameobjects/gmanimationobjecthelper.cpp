@@ -4,6 +4,8 @@
 #include "foundation/gamemachine.h"
 #include "gmengine/gmgameworld.h"
 
+BEGIN_NS
+
 namespace
 {
 	template <typename T>
@@ -22,8 +24,24 @@ namespace
 	}
 }
 
+GM_PRIVATE_OBJECT_ALIGNED(GMAnimationEvaluator)
+{
+	const GMNodeAnimation* animation = nullptr;
+	GMDuration duration = 0;
+	AlignedVector<GMMat4> transforms;
+	GMSkeletonPtr skeleton = nullptr;
+	GMNodePtr rootNode = nullptr;
+	GMMat4 globalInverseTransform;
+};
+
+GM_DEFINE_PROPERTY(GMAnimationEvaluator, GMSkeletonPtr, Skeleton, skeleton)
+GM_DEFINE_PROPERTY(GMAnimationEvaluator, GMNodePtr, RootNode, rootNode)
+GM_DEFINE_PROPERTY(GMAnimationEvaluator, GMNodeAnimationPtr, Animation, animation)
+GM_DEFINE_GETTER(GMAnimationEvaluator, AlignedVector<GMMat4>, Transforms, transforms)
 GMAnimationEvaluator::GMAnimationEvaluator(GMNode* root, GMSkeleton* skeleton)
 {
+	GM_CREATE_DATA(GMAnimationEvaluator);
+
 	D(d);
 	setRootNode(root);
 	setSkeleton(skeleton);
@@ -169,8 +187,22 @@ const GMNodeAnimationNode* GMAnimationEvaluator::findAnimationNode(const GMStrin
 	return nullptr;
 }
 
+GM_PRIVATE_OBJECT_ALIGNED(GMAnimationGameObjectHelper)
+{
+	enum { AutoPlayFrame = -1 };
+
+	bool playing = true;
+	GMGameObject* host = nullptr;
+	GMVec4 skeletonColor = GMVec4(0, 1, 0, 1);
+	Map<GMModel*, GMAnimationEvaluator*> modelEvaluatorMap;
+	Vector<GMString> nameList;
+	GMsize_t animationIndex = 0;
+};
+
 GMAnimationGameObjectHelper::GMAnimationGameObjectHelper(GMGameObject* host)
 {
+	GM_CREATE_DATA(GMAnimationGameObjectHelper);
+
 	D(d);
 	d->host = host;
 }
@@ -323,3 +355,11 @@ GMsize_t GMAnimationGameObjectHelper::getAnimationIndexByName(const GMString& na
 
 	return findResult - animationNames.begin();
 }
+
+bool GMAnimationGameObjectHelper::isPlaying() GM_NOEXCEPT
+{
+	D(d);
+	return d->playing;
+}
+
+END_NS

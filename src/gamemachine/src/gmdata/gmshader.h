@@ -142,11 +142,11 @@ class GMShader : public IDestroyObject
 
 public:
 	GMShader();
+	~GMShader();
 	GMShader(const GMShader&);
 	GMShader(GMShader&&) GM_NOEXCEPT;
 	GMShader& operator=(const GMShader& rhs);
 	GMShader& operator=(GMShader&& rhs) GM_NOEXCEPT;
-	~GMShader();
 
 public:
 	GM_DECLARE_PROPERTY(GMuint32, SurfaceFlag); // to be deprecated

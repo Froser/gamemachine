@@ -4,24 +4,18 @@
 #include <gmgameobject.h>
 BEGIN_NS
 
-GM_PRIVATE_OBJECT(GMAnimationEvaluator)
-{
-	const GMNodeAnimation* animation = nullptr;
-	GMDuration duration = 0;
-	AlignedVector<GMMat4> transforms;
-	GMSkeleton* skeleton = nullptr;
-	GMNode* rootNode = nullptr;
-	GMMat4 globalInverseTransform;
-};
-
+GM_DECLARE_POINTER(GMSkeleton);
+GM_DECLARE_POINTER(GMNode);
+typedef const GMNodeAnimation* GMNodeAnimationPtr;
+GM_PRIVATE_CLASS(GMAnimationEvaluator);
 class GMAnimationEvaluator
 {
-	GM_DECLARE_PRIVATE_NGO(GMAnimationEvaluator)
-	GM_DECLARE_ALIGNED_ALLOCATOR()
-	GM_DECLARE_PROPERTY(Skeleton, skeleton)
-	GM_DECLARE_PROPERTY(RootNode, rootNode)
-	GM_DECLARE_PROPERTY(Animation, animation)
-	GM_DECLARE_GETTER(Transforms, transforms)
+	GM_DECLARE_PRIVATE(GMAnimationEvaluator)
+	GM_DISABLE_COPY_ASSIGN(GMAnimationEvaluator)
+	GM_DECLARE_PROPERTY(GMSkeletonPtr, Skeleton)
+	GM_DECLARE_PROPERTY(GMNodePtr, RootNode)
+	GM_DECLARE_PROPERTY(GMNodeAnimationPtr, Animation)
+	GM_DECLARE_GETTER_ACCESSOR(AlignedVector<GMMat4>, Transforms, public)
 
 public:
 	GMAnimationEvaluator(GMNode* root, GMSkeleton* skeleton);
@@ -35,23 +29,12 @@ private:
 	const GMNodeAnimationNode* findAnimationNode(const GMString& name);
 };
 
-GM_PRIVATE_OBJECT(GMAnimationGameObjectHelper)
-{
-	enum { AutoPlayFrame = -1 };
-
-	bool playing = true;
-	GMGameObject* host = nullptr;
-	GMVec4 skeletonColor = GMVec4(0, 1, 0, 1);
-	Map<GMModel*, GMAnimationEvaluator*> modelEvaluatorMap;
-	Vector<GMString> nameList;
-	GMsize_t animationIndex = 0;
-};
-
+GM_PRIVATE_CLASS(GMAnimationGameObjectHelper);
 class GMAnimationGameObjectHelper
 {
-	GM_DECLARE_ALIGNED_ALLOCATOR()
-	GM_DECLARE_PRIVATE_NGO(GMAnimationGameObjectHelper)
-	GM_DECLARE_PROPERTY(SkeletonColor, skeletonColor)
+	GM_DECLARE_PRIVATE(GMAnimationGameObjectHelper)
+	GM_DISABLE_COPY_ASSIGN(GMAnimationGameObjectHelper)
+	GM_DECLARE_PROPERTY(GMVec4, SkeletonColor)
 
 public:
 	enum { AutoPlayFrame = -1 };
@@ -72,11 +55,7 @@ public:
 	GMsize_t getAnimationIndexByName(const GMString& name);
 
 public:
-	inline bool isPlaying() GM_NOEXCEPT
-	{
-		D(d);
-		return d->playing;
-	}
+	inline bool isPlaying() GM_NOEXCEPT;
 };
 
 END_NS

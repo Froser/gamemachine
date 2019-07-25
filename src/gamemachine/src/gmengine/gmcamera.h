@@ -131,7 +131,7 @@ inline bool operator !=(const GMFrustumParameters& lhs, const GMFrustumParameter
 }
 
 GM_PRIVATE_CLASS(GMCamera);
-class GM_EXPORT GMCamera
+class GM_EXPORT GMCamera : public IDestroyObject
 {
 	GM_DECLARE_PRIVATE(GMCamera)
 	GM_DECLARE_GETTER_ACCESSOR(GMCameraLookAt, LookAt, public)

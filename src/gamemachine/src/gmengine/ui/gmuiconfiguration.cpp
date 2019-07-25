@@ -6,6 +6,8 @@
 #include "gmdata/imagereader/gmimagereader.h"
 #include "foundation/gamemachine.h"
 
+BEGIN_NS
+
 GM_INTERFACE(IGMUIParser)
 {
 	virtual bool Parse(GMUIConfiguration& configuration, GMXMLElement* root) = 0;
@@ -128,10 +130,48 @@ bool GMUIParser<0>::Parse(GMUIConfiguration& configuration, GMXMLElement* root)
 	return true;
 }
 
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMUIConfiguration)
+{
+	const IRenderContext* context;
+	Vector<GMUITexture> textures;
+	Vector<GMUIArea> areas;
+	Map<GMlong, GMlong> textureMap;
+};
+
 GMUIConfiguration::GMUIConfiguration(const IRenderContext* context)
 {
+	GM_CREATE_DATA(GMUIConfiguration);
+
 	D(d);
 	d->context = context;
+}
+
+GMUIConfiguration::~GMUIConfiguration()
+{
+
+}
+
+GMUIConfiguration::GMUIConfiguration(const GMUIConfiguration& rhs)
+{
+	*this = rhs;
+}
+
+GMUIConfiguration::GMUIConfiguration(GMUIConfiguration&& rhs) GM_NOEXCEPT
+{
+	*this = std::move(rhs);
+}
+
+GMUIConfiguration& GMUIConfiguration::operator=(const GMUIConfiguration& rhs)
+{
+	GM_COPY(rhs);
+	return *this;
+}
+
+GMUIConfiguration& GMUIConfiguration::operator=(GMUIConfiguration&& rhs) GM_NOEXCEPT
+{
+	GM_MOVE(rhs);
+	return *this;
 }
 
 void GMUIConfiguration::initResourceManager(GMWidgetResourceManager* manager)
@@ -200,3 +240,11 @@ void GMUIConfiguration::addArea(GMUIArea area)
 	D(d);
 	d->areas.push_back(std::move(area));
 }
+
+const IRenderContext* GMUIConfiguration::getContext() GM_NOEXCEPT
+{
+	D(d);
+	return d->context;
+}
+
+END_NS

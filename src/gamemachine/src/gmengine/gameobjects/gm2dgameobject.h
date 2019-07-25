@@ -10,16 +10,11 @@ BEGIN_NS
 struct ITypoEngine;
 class GMTypoTextBuffer;
 
-GM_PRIVATE_OBJECT(GM2DGameObjectBase)
-{
-	GMRect renderRc;
-	bool dirty = true;
-	GMRect geometry = { 0 };
-};
-
+GM_PRIVATE_CLASS(GM2DGameObjectBase);
 class GM_EXPORT GM2DGameObjectBase : public GMGameObject
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GM2DGameObjectBase, GMGameObject)
+	GM_DECLARE_PRIVATE(GM2DGameObjectBase)
+	GM_DECLARE_BASE(GMGameObject)
 
 public:
 	GM2DGameObjectBase(const GMRect& renderRc);
@@ -32,38 +27,16 @@ public:
 	GMShader& getShader();
 
 public:
-	inline const GMRect& getGeometry()
-	{
-		D(d);
-		return d->geometry;
-	}
+	const GMRect& getGeometry();
 
 protected:
 	virtual void initShader(GMShader& shader);
 
-	inline const GMRect& getRenderRect() GM_NOEXCEPT
-	{
-		D(d);
-		return d->renderRc;
-	}
-
-	inline void markDirty() GM_NOEXCEPT
-	{
-		D(d);
-		d->dirty = true;
-	}
-
-	inline void cleanDirty() GM_NOEXCEPT
-	{
-		D(d);
-		d->dirty = false;
-	}
-
-	inline bool isDirty() GM_NOEXCEPT
-	{
-		D(d);
-		return d->dirty;
-	}
+protected:
+	inline const GMRect& getRenderRect() GM_NOEXCEPT;
+	inline void markDirty() GM_NOEXCEPT;
+	inline void cleanDirty() GM_NOEXCEPT;
+	inline bool isDirty() GM_NOEXCEPT;
 
 protected:
 	static GMRectF toViewportRect(const GMRect& rc, const GMRect& renderRc);
@@ -81,29 +54,11 @@ enum class GMTextDrawMode
 	UseBuffer,
 };
 
-GM_PRIVATE_OBJECT(GMTextGameObject)
-{
-	GMString text;
-	GMint32 lineSpacing = 0;
-	bool center = false;
-	bool newline = true;
-	GMsize_t length = 0;
-	GMAsset texture;
-	ITypoEngine* typoEngine = nullptr;
-	bool insetTypoEngine = true;
-	GMFontHandle font = 0;
-	GMScene* scene = nullptr;
-	GMTextColorType colorType = GMTextColorType::ByScript;
-	GMFloat4 color = GMFloat4(1, 1, 1, 1);
-	GMint32 fontSize = 12;
-	Vector<GMVertex> vericesCache;
-	GMTypoTextBuffer* textBuffer = nullptr;
-	GMTextDrawMode drawMode = GMTextDrawMode::Immediate;
-};
-
+GM_PRIVATE_CLASS(GMTextGameObject);
 class GM_EXPORT GMTextGameObject : public GM2DGameObjectBase
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMTextGameObject, GM2DGameObjectBase)
+	GM_DECLARE_PRIVATE(GMTextGameObject)
+	GM_DECLARE_BASE(GM2DGameObjectBase);
 
 public:
 	GMTextGameObject(const GMRect& renderRc);
@@ -137,18 +92,12 @@ public:
 	  \sa setTextBuffer()
 	*/
 	void setDrawMode(GMTextDrawMode mode) GM_NOEXCEPT;
+	ITypoEngine* getTypoEngine() GM_NOEXCEPT;
 
 public:
 	virtual GMModel* getModel() override;
 	virtual void onAppendingObjectToWorld() override;
 	virtual void draw() override;
-
-public:
-	inline ITypoEngine* getTypoEngine() GM_NOEXCEPT
-	{
-		D(d);
-		return d->typoEngine;
-	}
 
 private:
 	void update();
@@ -157,21 +106,11 @@ private:
 	void updateVertices(GMScene* scene);
 };
 
-GM_PRIVATE_OBJECT(GMSprite2DGameObject)
-{
-	GMScene* scene = nullptr;
-	GMAsset texture;
-	GMRect textureRc;
-	GMint32 texHeight = 0;
-	GMint32 texWidth = 0;
-	GMfloat depth = 0;
-	bool needUpdateTexture = false;
-	GMFloat4 color = GMFloat4(1, 1, 1, 1);
-};
-
+GM_PRIVATE_CLASS(GMSprite2DGameObject);
 class GM_EXPORT GMSprite2DGameObject : public GM2DGameObjectBase
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMSprite2DGameObject, GM2DGameObjectBase)
+	GM_DECLARE_PRIVATE(GMSprite2DGameObject)
+	GM_DECLARE_BASE(GM2DGameObjectBase)
 
 	enum
 	{
@@ -179,8 +118,8 @@ class GM_EXPORT GMSprite2DGameObject : public GM2DGameObjectBase
 	};
 
 public:
-	using Base::Base;
-	~GMSprite2DGameObject() = default;
+	GMSprite2DGameObject(const GMRect& renderRc);
+	~GMSprite2DGameObject();
 
 public:
 	virtual void draw() override;
@@ -201,15 +140,11 @@ protected:
 	virtual GMScene* createScene();
 };
 
-GM_PRIVATE_OBJECT(GMBorder2DGameObject)
-{
-	GMModel* model = nullptr;
-	GMRect corner;
-};
-
+GM_PRIVATE_CLASS(GMBorder2DGameObject);
 class GMBorder2DGameObject : public GMSprite2DGameObject
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMBorder2DGameObject, GMSprite2DGameObject)
+	GM_DECLARE_PRIVATE(GMBorder2DGameObject)
+	GM_DECLARE_BASE(GMSprite2DGameObject)
 	GM_FRIEND_CLASS(GMImage2DGameObject)
 
 	enum
@@ -218,8 +153,8 @@ class GMBorder2DGameObject : public GMSprite2DGameObject
 	};
 
 public:
-	using GMSprite2DGameObject::GMSprite2DGameObject;
-	~GMBorder2DGameObject() = default;
+	GMBorder2DGameObject(const GMRect& renderRc);
+	~GMBorder2DGameObject();
 
 public:
 	void setCornerRect(const GMRect& rc);

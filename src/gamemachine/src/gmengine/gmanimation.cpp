@@ -5,6 +5,8 @@
 #include <gmcamera.h>
 #include <gmlight.h>
 
+BEGIN_NS
+
 #define RUN_AND_CHECK(expr) { bool b = expr; GM_ASSERT(b); }
 
 namespace
@@ -205,12 +207,39 @@ void GMAnimation::update(GMDuration dt)
 	}
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMAnimationKeyframe)
+{
+	GMfloat time;
+	GMInterpolationFunctors functors;
+};
+
 GMAnimationKeyframe::GMAnimationKeyframe(GMfloat timePoint)
 {
+	GM_CREATE_DATA(GMAnimationKeyframe);
 	setTime(timePoint);
 	setFunctors(GMInterpolationFunctors::getDefaultInterpolationFunctors());
 }
 
+GMAnimationKeyframe::~GMAnimationKeyframe()
+{
+
+}
+
+GM_PRIVATE_OBJECT_ALIGNED(GMGameObjectKeyframe)
+{
+	Map<GMGameObject*, GMVec4, std::less<GMGameObject*>, AlignedAllocator<Pair<GMGameObject*, GMVec4>> > translationMap;
+	Map<GMGameObject*, GMVec4, std::less<GMGameObject*>, AlignedAllocator<Pair<GMGameObject*, GMVec4>> > scalingMap;
+	Map<GMGameObject*, GMQuat, std::less<GMGameObject*>, AlignedAllocator<Pair<GMGameObject*, GMQuat>> > rotationMap;
+	GMVec4 translation;
+	GMVec4 scaling;
+	GMQuat rotation;
+	GMfloat timeStart = 0;
+	GMint32 component = GMGameObjectKeyframeComponent::NoComponent;
+};
+
+GM_DEFINE_PROPERTY(GMGameObjectKeyframe, GMVec4, Translation, translation)
+GM_DEFINE_PROPERTY(GMGameObjectKeyframe, GMVec4, Scaling, scaling)
+GM_DEFINE_PROPERTY(GMGameObjectKeyframe, GMQuat, Rotation, rotation)
 GMGameObjectKeyframe::GMGameObjectKeyframe(
 	GMint32 component,
 	const GMVec4& translation,
@@ -220,6 +249,8 @@ GMGameObjectKeyframe::GMGameObjectKeyframe(
 )
 	: GMAnimationKeyframe(timePoint)
 {
+	GM_CREATE_DATA(GMGameObjectKeyframe);
+
 	D(d);
 	d->component = component;
 	setTranslation(translation);
@@ -296,9 +327,25 @@ void GMGameObjectKeyframe::update(IDestroyObject* object, GMfloat time)
 }
 
 //////////////////////////////////////////////////////////////////////////
+GM_PRIVATE_OBJECT_ALIGNED(GMCameraKeyframe)
+{
+	Map<GMCamera*, GMVec3, std::less<GMCamera*>, AlignedAllocator<Pair<GMGameObject*, GMVec3>> > positionMap;
+	Map<GMCamera*, GMVec3, std::less<GMCamera*>, AlignedAllocator<Pair<GMGameObject*, GMVec3>> > lookAtDirectionMap;
+	Map<GMCamera*, GMVec3, std::less<GMCamera*>, AlignedAllocator<Pair<GMGameObject*, GMVec3>> > focusMap;
+	GMCameraKeyframeComponent component = GMCameraKeyframeComponent::NoComponent;
+	GMVec3 position;
+	GMVec3 lookAtDirection;
+	GMVec3 focusAt;
+	GMfloat timeStart = 0;
+};
+GM_DEFINE_PROPERTY(GMCameraKeyframe, GMVec3, Position, position)
+GM_DEFINE_PROPERTY(GMCameraKeyframe, GMVec3, LookAtDirection, lookAtDirection)
+GM_DEFINE_PROPERTY(GMCameraKeyframe, GMVec3, FocusAt, focusAt)
+
 GMCameraKeyframe::GMCameraKeyframe(GMCameraKeyframeComponent component, const GMVec3& position, const GMVec3& lookAtDirectionOrFocusAt, GMfloat timePoint)
 	: GMAnimationKeyframe(timePoint)
 {
+	GM_CREATE_DATA(GMCameraKeyframe);
 	D(d);
 	setPosition(position);
 	if (component == GMCameraKeyframeComponent::LookAtDirection)
@@ -370,6 +417,28 @@ void GMCameraKeyframe::update(IDestroyObject* object, GMfloat time)
 }
 
 //////////////////////////////////////////////////////////////////////////
+GM_PRIVATE_OBJECT_ALIGNED(GMLightKeyframe)
+{
+	Map<ILight*, GMVec3, std::less<ILight*>, AlignedAllocator<Pair<GMGameObject*, GMVec3>> > ambientMap;
+	Map<ILight*, GMVec3, std::less<ILight*>, AlignedAllocator<Pair<GMGameObject*, GMVec3>> > diffuseMap;
+	Map<ILight*, GMVec3, std::less<ILight*>, AlignedAllocator<Pair<GMGameObject*, GMVec3>> > positionMap;
+	Map<ILight*, GMfloat, std::less<ILight*>> specularMap;
+	Map<ILight*, GMfloat, std::less<ILight*>> cutOffMap;
+	GMint32 component = GMLightKeyframeComponent::NoComponent;
+	GMVec3 ambient;
+	GMVec3 diffuse;
+	GMfloat specular;
+	GMVec3 position;
+	GMfloat cutOff;
+	GMfloat timeStart = 0;
+	const IRenderContext* context = nullptr;
+};
+GM_DEFINE_PROPERTY(GMLightKeyframe, GMVec3, Ambient, ambient)
+GM_DEFINE_PROPERTY(GMLightKeyframe, GMVec3, Diffuse, diffuse)
+GM_DEFINE_PROPERTY(GMLightKeyframe, GMfloat, Specular, specular)
+GM_DEFINE_PROPERTY(GMLightKeyframe, GMfloat, CutOff, cutOff)
+GM_DEFINE_PROPERTY(GMLightKeyframe, GMVec3, Position, position)
+
 GMLightKeyframe::GMLightKeyframe(
 	const IRenderContext* context,
 	GMint32 component,
@@ -382,6 +451,7 @@ GMLightKeyframe::GMLightKeyframe(
 )
 	: GMAnimationKeyframe(timePoint)
 {
+	GM_CREATE_DATA(GMLightKeyframe);
 	D(d);
 	setAmbient(ambient);
 	setDiffuse(diffuse);
@@ -476,3 +546,5 @@ void GMLightKeyframe::update(IDestroyObject* object, GMfloat time)
 		d->context->getEngine()->update(GMUpdateDataType::LightChanged);
 	}
 }
+
+END_NS

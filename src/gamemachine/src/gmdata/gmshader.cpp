@@ -267,6 +267,11 @@ GMShader::GMShader()
 	GM_CREATE_DATA(GMShader);
 }
 
+GMShader::~GMShader()
+{
+
+}
+
 GMShader::GMShader(const GMShader& rhs)
 {
 	*this = rhs;
@@ -275,11 +280,6 @@ GMShader::GMShader(const GMShader& rhs)
 GMShader::GMShader(GMShader&& rhs) GM_NOEXCEPT
 {
 	*this = std::move(rhs);
-}
-
-GMShader::~GMShader()
-{
-
 }
 
 GMShader& GMShader::operator=(const GMShader& rhs)

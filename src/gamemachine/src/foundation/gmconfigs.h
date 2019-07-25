@@ -139,6 +139,7 @@ public:
 
 public:
 	GMConfigs();
+	~GMConfigs();
 
 public:
 	GMConfig& getConfig(Category state);

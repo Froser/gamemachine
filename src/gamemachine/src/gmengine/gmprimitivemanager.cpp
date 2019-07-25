@@ -1,7 +1,11 @@
 ﻿#include "stdafx.h"
 #include "gmprimitivemanager.h"
 #include "gameobjects/gm2dgameobject.h"
+#include "gameobjects/gmgameobject_p.h"
+#include "gameobjects/gm2dgameobject_p.h"
 #include "foundation/gamemachine.h"
+
+BEGIN_NS
 
 // 基本图元
 class GMLine2D : public GMSprite2DGameObject
@@ -102,6 +106,50 @@ void GMPrimitive3DObject::setColor(const GMVec4& color)
 		d->color = color;
 		d->dirty = true;
 	}
+}
+
+void GMPrimitive3DObject::markDirty() GM_NOEXCEPT
+{
+	D(d);
+	d->dirty = true;
+}
+
+void GMPrimitive3DObject::cleanDirty() GM_NOEXCEPT
+{
+	D(d);
+	d->dirty = false;
+}
+
+bool GMPrimitive3DObject::isDirty() GM_NOEXCEPT
+{
+	D(d);
+	return d->dirty;
+}
+
+GM_PRIVATE_OBJECT_ALIGNED(GMPrimitive3DObject)
+{
+	bool dirty = true;
+	GMVec3 p1;
+	GMVec3 p2;
+	GMVec4 color;
+	GMModelAsset modelAsset;
+	GMModel* model = nullptr;
+};
+
+GMPrimitive3DObject::GMPrimitive3DObject()
+{
+	GM_CREATE_DATA(GMPrimitive3DObject);
+}
+
+GMPrimitive3DObject::GMPrimitive3DObject(GMSceneAsset asset)
+	: Base(asset)
+{
+	GM_CREATE_DATA(GMPrimitive3DObject);
+}
+
+GMPrimitive3DObject::~GMPrimitive3DObject()
+{
+
 }
 
 void GMPrimitive3DObject::draw()
@@ -208,13 +256,14 @@ GMModel* GMLine3D::createModel()
 }
 
 //////////////////////////////////////////////////////////////////////////
-GM_PRIVATE_OBJECT(GMPrimitiveLine2D)
+GM_PRIVATE_OBJECT_ALIGNED(GMPrimitiveLine2D)
 {
 	GMPrimitiveManager* manager;
 	GMPoint p1, p2;
 	GMVec4 color;
 };
 
+GM_PRIVATE_CLASS(GMPrimitiveLine2D);
 class GMPrimitiveLine2D : public GMObject, public IPrimitive
 {
 	GM_DECLARE_PRIVATE(GMPrimitiveLine2D)
@@ -222,6 +271,8 @@ class GMPrimitiveLine2D : public GMObject, public IPrimitive
 public:
 	GMPrimitiveLine2D(GMPrimitiveManager& manager, const GMPoint& p1, const GMPoint& p2, const GMVec4& color)
 	{
+		GM_CREATE_DATA(GMPrimitiveLine2D);
+
 		D(d);
 		d->manager = &manager;
 		d->p1 = p1;
@@ -245,7 +296,7 @@ void GMPrimitiveLine2D::drawPrimitive()
 	line2D->draw();
 }
 
-GM_PRIVATE_OBJECT(GMPrimitiveLine3D)
+GM_PRIVATE_OBJECT_ALIGNED(GMPrimitiveLine3D)
 {
 	GMPrimitiveManager* manager;
 	GMVec3 p1, p2;
@@ -281,8 +332,21 @@ void GMPrimitiveLine3D::drawPrimitive()
 }
 
 //////////////////////////////////////////////////////////////////////////
+GM_PRIVATE_OBJECT_UNALIGNED(GMPrimitiveManager)
+{
+	const IRenderContext* context = nullptr;
+	GMAtomic<GMPrimitiveID> current;
+	Map<GMPrimitiveID, GMOwnedPtr<IPrimitive>> primitives;
+
+	// 图元
+	GMOwnedPtr<GMSprite2DGameObject> line2D;
+	GMOwnedPtr<GMPrimitive3DObject> line3D;
+};
+
 GMPrimitiveManager::GMPrimitiveManager(const IRenderContext* context)
 {
+	GM_CREATE_DATA(GMPrimitiveManager);
+
 	D(d);
 	d->context = context;
 
@@ -336,3 +400,17 @@ void GMPrimitiveManager::render()
 			primitive.second->drawPrimitive();
 	}
 }
+
+GMSprite2DGameObject* GMPrimitiveManager::getLine2D() GM_NOEXCEPT
+{
+	D(d);
+	return d->line2D.get();
+}
+
+GMPrimitive3DObject* GMPrimitiveManager::getLine3D() GM_NOEXCEPT
+{
+	D(d);
+	return d->line3D.get();
+}
+
+END_NS

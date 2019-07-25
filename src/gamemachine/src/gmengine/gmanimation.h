@@ -110,21 +110,17 @@ private:
 	AlignedVector<GMVec2> m_interpolations;
 };
 
-GM_PRIVATE_OBJECT(GMAnimationKeyframe)
-{
-	GMfloat time;
-	GMInterpolationFunctors functors;
-};
-
 //! 动画的关键帧。
+GM_PRIVATE_CLASS(GMAnimationKeyframe);
 class GM_EXPORT GMAnimationKeyframe : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMAnimationKeyframe)
-	GM_DECLARE_PROPERTY(Time, time);
-	GM_DECLARE_PROPERTY(Functors, functors);
+	GM_DECLARE_PROPERTY(GMfloat, Time);
+	GM_DECLARE_PROPERTY(GMInterpolationFunctors, Functors);
 
 public:
 	GMAnimationKeyframe(GMfloat timePoint);
+	~GMAnimationKeyframe();
 
 	virtual void reset(IDestroyObject* object) = 0;
 	virtual void beginFrame(IDestroyObject* object, GMfloat timeStart) = 0;
@@ -154,7 +150,7 @@ public:
 	}
 };
 
-GM_PRIVATE_OBJECT(GMAnimation)
+GM_PRIVATE_OBJECT_UNALIGNED(GMAnimation)
 {
 	bool playLoop = false;
 	bool isPlaying = false;
@@ -169,8 +165,7 @@ GM_PRIVATE_OBJECT(GMAnimation)
 class GM_EXPORT GMAnimation : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMAnimation)
-	GM_ALLOW_COPY_MOVE(GMAnimation)
-	GM_DECLARE_PROPERTY(PlayLoop, playLoop)
+	GM_DECLARE_EMBEDDED_PROPERTY(PlayLoop, playLoop)
 
 public:
 	template <typename... Objects>
@@ -180,10 +175,9 @@ public:
 	}
 
 #if GM_MSVC
-	template <>
-	GMAnimation(void) {};
+	GMAnimation(void);
 #elif GM_GCC
-	GMAnimation() = default;
+	GMAnimation();
 #endif
 
 	~GMAnimation();
@@ -233,24 +227,13 @@ struct GMGameObjectKeyframeComponent
 	};
 };
 
-GM_PRIVATE_OBJECT(GMGameObjectKeyframe)
-{
-	Map<GMGameObject*, GMVec4, std::less<GMGameObject*>, AlignedAllocator<Pair<GMGameObject*, GMVec4>> > translationMap;
-	Map<GMGameObject*, GMVec4, std::less<GMGameObject*>, AlignedAllocator<Pair<GMGameObject*, GMVec4>> > scalingMap;
-	Map<GMGameObject*, GMQuat, std::less<GMGameObject*>, AlignedAllocator<Pair<GMGameObject*, GMQuat>> > rotationMap;
-	GMVec4 translation;
-	GMVec4 scaling;
-	GMQuat rotation;
-	GMfloat timeStart = 0;
-	GMint32 component = GMGameObjectKeyframeComponent::NoComponent;
-};
-
+GM_PRIVATE_CLASS(GMGameObjectKeyframe);
 class GM_EXPORT GMGameObjectKeyframe : public GMAnimationKeyframe
 {
 	GM_DECLARE_PRIVATE(GMGameObjectKeyframe)
-	GM_DECLARE_PROPERTY(Translation, translation)
-	GM_DECLARE_PROPERTY(Scaling, scaling)
-	GM_DECLARE_PROPERTY(Rotation, rotation)
+	GM_DECLARE_PROPERTY(GMVec4, Translation)
+	GM_DECLARE_PROPERTY(GMVec4, Scaling)
+	GM_DECLARE_PROPERTY(GMQuat, Rotation)
 
 public:
 	GMGameObjectKeyframe(
@@ -275,24 +258,14 @@ enum class GMCameraKeyframeComponent
 	LookAtDirection,
 };
 
-GM_PRIVATE_OBJECT(GMCameraKeyframe)
-{
-	Map<GMCamera*, GMVec3, std::less<GMCamera*>, AlignedAllocator<Pair<GMGameObject*, GMVec3>> > positionMap;
-	Map<GMCamera*, GMVec3, std::less<GMCamera*>, AlignedAllocator<Pair<GMGameObject*, GMVec3>> > lookAtDirectionMap;
-	Map<GMCamera*, GMVec3, std::less<GMCamera*>, AlignedAllocator<Pair<GMGameObject*, GMVec3>> > focusMap;
-	GMCameraKeyframeComponent component = GMCameraKeyframeComponent::NoComponent;
-	GMVec3 position;
-	GMVec3 lookAtDirection;
-	GMVec3 focusAt;
-	GMfloat timeStart = 0;
-};
-
+GM_PRIVATE_CLASS(GMCameraKeyframe);
 class GM_EXPORT GMCameraKeyframe : public GMAnimationKeyframe
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMCameraKeyframe, GMAnimationKeyframe)
-	GM_DECLARE_PROPERTY(Position, position)
-	GM_DECLARE_PROPERTY(LookAtDirection, lookAtDirection)
-	GM_DECLARE_PROPERTY(FocusAt, focusAt)
+	GM_DECLARE_PRIVATE(GMCameraKeyframe)
+	GM_DECLARE_BASE(GMAnimationKeyframe)
+	GM_DECLARE_PROPERTY(GMVec3, Position)
+	GM_DECLARE_PROPERTY(GMVec3, LookAtDirection)
+	GM_DECLARE_PROPERTY(GMVec3, FocusAt)
 
 public:
 	GMCameraKeyframe(
@@ -322,31 +295,16 @@ struct GMLightKeyframeComponent
 	};
 };
 
-GM_PRIVATE_OBJECT(GMLightKeyframe)
-{
-	Map<ILight*, GMVec3, std::less<ILight*>, AlignedAllocator<Pair<GMGameObject*, GMVec3>> > ambientMap;
-	Map<ILight*, GMVec3, std::less<ILight*>, AlignedAllocator<Pair<GMGameObject*, GMVec3>> > diffuseMap;
-	Map<ILight*, GMVec3, std::less<ILight*>, AlignedAllocator<Pair<GMGameObject*, GMVec3>> > positionMap;
-	Map<ILight*, GMfloat, std::less<ILight*>> specularMap;
-	Map<ILight*, GMfloat, std::less<ILight*>> cutOffMap;
-	GMint32 component = GMLightKeyframeComponent::NoComponent;
-	GMVec3 ambient;
-	GMVec3 diffuse;
-	GMfloat specular;
-	GMVec3 position;
-	GMfloat cutOff;
-	GMfloat timeStart = 0;
-	const IRenderContext* context = nullptr;
-};
-
+GM_PRIVATE_CLASS(GMLightKeyframe);
 class GM_EXPORT GMLightKeyframe : public GMAnimationKeyframe
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMLightKeyframe, GMAnimationKeyframe)
-	GM_DECLARE_PROPERTY(Ambient, ambient)
-	GM_DECLARE_PROPERTY(Diffuse, diffuse)
-	GM_DECLARE_PROPERTY(Specular, specular)
-	GM_DECLARE_PROPERTY(CutOff, cutOff)
-	GM_DECLARE_PROPERTY(Position, position)
+	GM_DECLARE_PRIVATE(GMLightKeyframe)
+	GM_DECLARE_BASE(GMAnimationKeyframe)
+	GM_DECLARE_PROPERTY(GMVec3, Ambient)
+	GM_DECLARE_PROPERTY(GMVec3, Diffuse)
+	GM_DECLARE_PROPERTY(GMfloat, Specular)
+	GM_DECLARE_PROPERTY(GMfloat, CutOff)
+	GM_DECLARE_PROPERTY(GMVec3, Position)
 
 public:
 	GMLightKeyframe(

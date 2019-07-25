@@ -3,7 +3,22 @@
 #include "foundation/gamemachine.h"
 #include <regex>
 
+BEGIN_NS
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMTypoIterator)
+{
+	ITypoEngine* typo = nullptr;
+	GMsize_t index = 0;
+	GMint32 offset[2] = { 0 };
+};
+
+GMTypoIterator::GMTypoIterator()
+{
+	GM_CREATE_DATA(GMTypoIterator);
+}
+
 GMTypoIterator::GMTypoIterator(ITypoEngine* typo, GMsize_t index)
+	: GMTypoIterator()
 {
 	D(d);
 	d->typo = typo;
@@ -17,6 +32,28 @@ GMTypoResult GMTypoIterator::operator*()
 	r.x -= d->offset[0];
 	r.y -= d->offset[1];
 	return r;
+}
+
+GMTypoIterator::GMTypoIterator(const GMTypoIterator& rhs)
+{
+	*this = rhs;
+}
+
+GMTypoIterator::GMTypoIterator(GMTypoIterator&& rhs) GM_NOEXCEPT
+{
+	*this = std::move(rhs);
+}
+
+GMTypoIterator& GMTypoIterator::operator=(const GMTypoIterator& rhs)
+{
+	GM_COPY(rhs);
+	return *this;
+}
+
+GMTypoIterator& GMTypoIterator::operator=(GMTypoIterator&& rhs) GM_NOEXCEPT
+{
+	GM_MOVE(rhs);
+	return *this;
 }
 
 GMTypoIterator& GMTypoIterator::operator ++()
@@ -47,8 +84,17 @@ void GMTypoIterator::setOffset(GMsize_t cp)
 }
 
 //////////////////////////////////////////////////////////////////////////
+GM_PRIVATE_OBJECT_UNALIGNED(GMTypoStateMachine)
+{
+	GMTypoEngine* typoEngine = nullptr;
+	GMTypoStateMachineParseState state = GMTypoStateMachineParseState::Literature;
+	GMString parsedSymbol;
+};
+
 GMTypoStateMachine::GMTypoStateMachine(GMTypoEngine* engine)
 {
+	GM_CREATE_DATA(GMTypoStateMachine);
+
 	D(d);
 	GM_ASSERT(engine);
 	d->typoEngine = engine;
@@ -187,8 +233,33 @@ bool GMTypoStateMachine::preciseParse(const GMString& name)
 }
 
 //////////////////////////////////////////////////////////////////////////
+GM_PRIVATE_OBJECT_UNALIGNED(GMTypoEngine)
+{
+	GMFontHandle font = 0;
+
+	GMTypoStateMachine* stateMachine = nullptr;
+	const IRenderContext* context = nullptr;
+	bool insetStateMachine = false;
+
+	GMGlyphManager* glyphManager = nullptr;
+	std::wstring literature;
+	GMTypoOptions options;
+	GMfloat lineHeight = 0;
+
+	// 绘制状态
+	GMint32 current_x = 0;
+	GMint32 current_y = 0;
+	GMint32 currentLineNo = 1;
+	GMFontSizePt fontSize = 12;
+	GMfloat color[3] = { 1.f, 1.f, 1.f };
+
+	Vector<GMTypoResult> results;
+};
+
 GMTypoEngine::GMTypoEngine(const IRenderContext* context)
 {
+	GM_CREATE_DATA(GMTypoEngine);
+
 	D(d);
 	d->stateMachine = new GMTypoStateMachine(this);
 	d->context = context;
@@ -218,7 +289,7 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 		GM_ASSERT(literature.isEmpty() || (literature.length() > 0 && options.renderEnd > 0));
 
 		// 在使用缓存绘制时，我们一般通过renderStart和renderEnd指定了一块区域，因此绘制出来后需要做一个偏移
-		GMTypoIterator iter = GMTypoIterator(this, options.renderStart);
+		GMTypoIterator iter(this, options.renderStart);
 		iter.setOffset(options.renderStart);
 		return std::move(iter);
 	}
@@ -465,7 +536,7 @@ const GMTypoResultInfo GMTypoEngine::getResults() const
 	return const_cast<GMTypoEngine*>(this)->getResults();
 }
 
-GM_PRIVATE_OBJECT(GMTypoTextTransactionAtom)
+GM_PRIVATE_OBJECT_UNALIGNED(GMTypoTextTransactionAtom)
 {
 	GMsize_t cp = 0;
 	GMString addedContent;
@@ -473,9 +544,10 @@ GM_PRIVATE_OBJECT(GMTypoTextTransactionAtom)
 	GMTypoTextBuffer* buffer = nullptr;
 };
 
-class GMTypoTextTransactionAtom : public GMObject, public ITransactionAtom
+class GMTypoTextTransactionAtom : public ITransactionAtom
 {
 	GM_DECLARE_PRIVATE(GMTypoTextTransactionAtom)
+	GM_DISABLE_COPY_ASSIGN(GMTypoTextTransactionAtom)
 
 public:
 	GMTypoTextTransactionAtom(
@@ -496,6 +568,7 @@ GMTypoTextTransactionAtom::GMTypoTextTransactionAtom(
 	GMString removedContent
 )
 {
+	GM_CREATE_DATA(GMTypoTextTransactionAtom);
 	D(d);
 	d->buffer = buffer;
 	d->cp = cp;
@@ -517,10 +590,46 @@ void GMTypoTextTransactionAtom::unexecute()
 	d->buffer->insertString(d->cp, d->removedContent);
 }
 
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMTypoTextBuffer)
+{
+	ITypoEngine* engine = nullptr;
+	GMString buffer;
+	GMRect rc;
+	bool newline = true;
+	bool dirty = false;
+	GMsize_t renderStart = 0;
+	GMsize_t renderEnd = 0;
+};
+
+GMTypoTextBuffer::GMTypoTextBuffer()
+{
+	GM_CREATE_DATA(GMTypoTextBuffer);
+}
+
 GMTypoTextBuffer::~GMTypoTextBuffer()
 {
 	D(d);
 	d->engine->destroy();
+}
+
+const ITypoEngine* GMTypoTextBuffer::getTypoEngine() const GM_NOEXCEPT
+{
+	D(d);
+	return d->engine;
+}
+
+void GMTypoTextBuffer::setTypoEngine(AUTORELEASE ITypoEngine* engine)
+{
+	D(d);
+	d->engine = engine;
+}
+
+
+const GMString& GMTypoTextBuffer::getBuffer() const GM_NOEXCEPT
+{
+	D(d);
+	return d->buffer;
 }
 
 void GMTypoTextBuffer::setBuffer(const GMString& buffer)
@@ -528,6 +637,31 @@ void GMTypoTextBuffer::setBuffer(const GMString& buffer)
 	D(d);
 	d->buffer = buffer.replace(L"\r", L""); //去掉\r
 	markDirty();
+}
+
+void GMTypoTextBuffer::setRenderRange(GMsize_t cpStart, GMsize_t cpEnd) GM_NOEXCEPT
+{
+	D(d);
+	d->renderStart = cpStart;
+	d->renderEnd = cpEnd;
+}
+
+GMsize_t GMTypoTextBuffer::getRenderStart() GM_NOEXCEPT
+{
+	D(d);
+	return d->renderStart;
+}
+
+GMsize_t GMTypoTextBuffer::getRenderEnd() GM_NOEXCEPT
+{
+	D(d);
+	return d->renderEnd;
+}
+
+void GMTypoTextBuffer::markDirty()
+{
+	D(d);
+	d->dirty = true;
 }
 
 void GMTypoTextBuffer::setSize(const GMRect& rc)
@@ -792,3 +926,5 @@ void GMTypoTextBuffer::getNextItemPos(GMint32 cp, GMint32* next)
 
 	*next = gm_sizet_to_int(r.size() - 1);
 }
+
+END_NS

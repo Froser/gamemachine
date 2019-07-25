@@ -210,14 +210,14 @@ struct GMGlobalBlendStateDesc
 	GMint32 blendRefCount = 0;
 };
 
-GM_PRIVATE_OBJECT(GMFramebuffersStack)
-{
-	Stack<IFramebuffers*> framebuffers;
-};
-
+GM_PRIVATE_CLASS(GMFramebuffersStack);
 class GM_EXPORT GMFramebuffersStack : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMFramebuffersStack);
+
+public:
+	GMFramebuffersStack();
+	~GMFramebuffersStack();
 
 public:
 	void push(IFramebuffers* framebuffers);
@@ -225,36 +225,7 @@ public:
 	IFramebuffers* peek();
 };
 
-GM_PRIVATE_OBJECT(GMGraphicEngine)
-{
-	GMThreadId mtid = 0;
-	GMint32 begun = 0;
-	const IRenderContext* context = nullptr;
-	GMCamera camera;
-	GMGlyphManager* glyphManager = nullptr;
-	IFramebuffers* defaultFramebuffers = nullptr;
-	IFramebuffers* filterFramebuffers = nullptr;
-	GMGameObject* filterQuad = nullptr;
-	GMFramebuffersStack framebufferStack;
-	IGBuffer* gBuffer = nullptr;
-	GMRenderConfig renderConfig;
-	GMDebugConfig debugConfig;
-	GMStencilOptions stencilOptions;
-	Vector<ILight*> lights;
-	IShaderLoadCallback* shaderLoadCallback = nullptr;
-	GMGlobalBlendStateDesc blendState;
-	GMOwnedPtr<GMRenderTechniqueManager> renderTechniqueManager;
-	GMOwnedPtr<GMPrimitiveManager> primitiveManager;
-	GMConfigs configs;
-
-	// Shadow
-	GMShadowSourceDesc shadow;
-	GMShadowSourceDesc lastShadow;
-	IFramebuffers* shadowDepthFramebuffers = nullptr;
-	GMMat4 shadowCameraVPmatrices[GMMaxCascades];
-	bool isDrawingShadow = false;
-};
-
+GM_PRIVATE_CLASS(GMGraphicEngine);
 class GM_EXPORT GMGraphicEngine : public GMObject, public IGraphicEngine
 {
 	GM_DECLARE_PRIVATE(GMGraphicEngine)
@@ -296,8 +267,6 @@ public:
 	virtual GMConfigs& getConfigs() override;
 	virtual void createModelDataProxy(const IRenderContext* context, GMModel* model, bool transfer = true) override;
 	virtual bool isCurrentMainThread() override;
-
-public:
 	virtual ICSMFramebuffers* getCSMFramebuffers();
 
 protected:
@@ -316,46 +285,24 @@ protected:
 public:
 	const GMFilterMode::Mode getCurrentFilterMode();
 	const GMVec3 getCurrentFilterBlendFactor();
-
 	void draw(const GMGameObjectContainer& objects);
 	IFramebuffers* getShadowMapFramebuffers();
-
 	bool needGammaCorrection();
 	GMfloat getGammaValue();
-
 	bool needHDR();
 	GMToneMapping::Mode getToneMapping();
-
 	bool isWireFrameMode(GMModel* model);
 	bool isNeedDiscardTexture(GMModel* model, GMTextureType type);
-
 	const GMMat4& getCascadeCameraVPMatrix(GMCascadeLevel level);
-
-public:
-	inline GMFramebuffersStack& getFramebuffersStack()
-	{
-		D(d);
-		return d->framebufferStack;
-	}
+	const GMShadowSourceDesc& getShadowSourceDesc();
+	bool isDrawingShadow();
+	const GMGlobalBlendStateDesc& getGlobalBlendState();
+	GMFramebuffersStack& getFramebuffersStack();
 
 protected:
-	inline GMGameObject* getFilterQuad()
-	{
-		D(d);
-		return d->filterQuad;
-	}
-
-	inline IShaderLoadCallback* getShaderLoadCallback()
-	{
-		D(d);
-		return d->shaderLoadCallback;
-	}
-
-	inline const Vector<ILight*>& getLights()
-	{
-		D(d);
-		return d->lights;
-	}
+	GMGameObject* getFilterQuad();
+	IShaderLoadCallback* getShaderLoadCallback();
+	const Vector<ILight*>& getLights();
 
 private:
 	void dispose();
@@ -375,23 +322,6 @@ public:
 		return GMMaxCascades;
 	}
 
-	inline const GMShadowSourceDesc& getShadowSourceDesc()
-	{
-		D(d);
-		return d->shadow;
-	}
-
-	inline bool isDrawingShadow()
-	{
-		D(d);
-		return d->isDrawingShadow;
-	}
-
-	inline const GMGlobalBlendStateDesc& getGlobalBlendState()
-	{
-		D(d);
-		return d->blendState;
-	}
 };
 
 END_NS

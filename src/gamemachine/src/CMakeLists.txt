@@ -67,6 +67,7 @@ set(SOURCES
 		gmengine/gmgameworld.h
 		gmengine/gmgameworld.cpp
 		gmengine/gmlight.h
+		gmengine/gmlight_p.h
 		gmengine/gmlight.cpp
 		gmengine/gmcamera.h
 		gmengine/gmcamera.cpp
@@ -101,17 +102,21 @@ set(SOURCES
 		gmengine/particle/cocos2d/gmparticlemodel_cocos2d.cpp
 		gmengine/gameobjects/gmgameobject.h
 		gmengine/gameobjects/gmgameobject.cpp
+		gmengine/gameobjects/gmgameobject.h
 		gmengine/gameobjects/gmspritegameobject.h
 		gmengine/gameobjects/gmspritegameobject.cpp
 		gmengine/gameobjects/gm2dgameobject.h
+		gmengine/gameobjects/gm2dgameobject_p.h
 		gmengine/gameobjects/gm2dgameobject.cpp
 		gmengine/gameobjects/gmanimationobjecthelper.h
 		gmengine/gameobjects/gmanimationobjecthelper.cpp
 		gmengine/ui/gmwidget.h
+		gmengine/ui/gmwidget_p.h
 		gmengine/ui/gmwidget.cpp
 		gmengine/ui/gmwindow.h
 		gmengine/ui/gmwindow.cpp
 		gmengine/ui/gmcontrols.h
+		gmengine/ui/gmcontrols_p.h
 		gmengine/ui/gmcontrols.cpp
 		gmengine/ui/gmcontroltextedit.h
 		gmengine/ui/gmcontroltextedit.cpp

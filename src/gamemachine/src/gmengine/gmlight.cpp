@@ -1,5 +1,18 @@
 ﻿#include "stdafx.h"
 #include "gmlight.h"
+#include "gmlight_p.h"
+
+BEGIN_NS
+
+GMLight::GMLight()
+{
+	GM_CREATE_DATA(GMLight);
+}
+
+GMLight::~GMLight()
+{
+
+}
 
 bool GMLight::setLightAttribute3(GMLightAttribute attr, GMfloat value[3])
 {
@@ -122,3 +135,5 @@ bool GMLight::getLightAttribute3(GMLightAttribute attr, OUT GMfloat value[3])
 	}
 	return true;
 }
+
+END_NS

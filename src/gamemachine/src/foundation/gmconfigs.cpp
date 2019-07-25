@@ -37,6 +37,11 @@ GMConfigs::GMConfigs()
 	init();
 }
 
+GMConfigs::~GMConfigs()
+{
+
+}
+
 void GMConfigs::init()
 {
 	D(d);

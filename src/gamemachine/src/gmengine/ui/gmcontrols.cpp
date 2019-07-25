@@ -2,9 +2,14 @@
 #include "gmcontrols.h"
 #include "gmwidget.h"
 #include "foundation/gamemachine.h"
+#include "gmcontrols_p.h"
+
+BEGIN_NS
 
 GMControl::GMControl(GMWidget* widget)
 {
+	GM_CREATE_DATA(GMControl);
+
 	D(d);
 	d->widget = widget;
 }
@@ -13,9 +18,101 @@ GMControl::~GMControl()
 {
 }
 
+void GMControl::setVisible(bool visible)
+{
+	D(d);
+	d->visible = visible;
+}
+
+bool GMControl::getEnabled()
+{
+	D(d);
+	return d->enabled;
+}
+
+void GMControl::setEnabled(bool enabled)
+{
+	D(d);
+	d->enabled = enabled;
+}
+
 bool GMControl::handleSystemEvent(GMSystemEvent* event)
 {
 	return false;
+}
+
+bool GMControl::getVisible()
+{
+	D(d);
+	return d->visible;
+}
+
+bool GMControl::getMouseOver()
+{
+	D(d);
+	return d->mouseOver;
+}
+
+bool GMControl::hasFocus()
+{
+	D(d);
+	return d->hasFocus;
+}
+
+bool GMControl::isDefault() GM_NOEXCEPT
+{
+	D(d);
+	return d->isDefault;
+}
+
+GMWidget* GMControl::getParent() GM_NOEXCEPT
+{
+	D(d);
+	return d->widget;
+}
+
+GMint32 GMControl::getIndex() GM_NOEXCEPT
+{
+	D(d);
+	return d->index;
+}
+
+const GMRect& GMControl::getBoundingRect() GM_NOEXCEPT
+{
+	D(d);
+	return d->boundingBox;
+}
+
+GMint32 GMControl::getWidth() GM_NOEXCEPT
+{
+	D(d);
+	return d->width;
+}
+
+GMint32 GMControl::getHeight() GM_NOEXCEPT
+{
+	D(d);
+	return d->height;
+}
+
+GMPoint GMControl::toControlSpace(const GMPoint& rc) GM_NOEXCEPT
+{
+	D(d);
+	GMPoint r = { rc.x - d->boundingBox.x, rc.y - d->boundingBox.y };
+	return r;
+}
+
+void GMControl::setPositionFlag(GMControlPositionFlag flag) GM_NOEXCEPT
+{
+	D(d);
+	if (d->positionFlag != flag)
+		d->positionFlag = flag;
+}
+
+GMControlPositionFlag GMControl::getPositionFlag() const GM_NOEXCEPT
+{
+	D(d);
+	return d->positionFlag;
 }
 
 bool GMControl::handleKeyboard(GMSystemKeyEvent* event)
@@ -69,6 +166,30 @@ void GMControl::updateRect()
 	d->boundingBox.height = d->height;
 }
 
+void GMControl::onFocusIn()
+{
+	D(d);
+	d->hasFocus = true;
+}
+
+void GMControl::onFocusOut()
+{
+	D(d);
+	d->hasFocus = false;
+}
+
+void GMControl::onMouseEnter()
+{
+	D(d);
+	d->mouseOver = true;
+}
+
+void GMControl::onMouseLeave()
+{
+	D(d);
+	d->mouseOver = false;
+}
+
 void GMControl::refresh()
 {
 	D(d);
@@ -86,6 +207,40 @@ bool GMControl::containsPoint(GMPoint point)
 {
 	D(d);
 	return GM_inRect(d->boundingBox, point);
+}
+
+void GMControl::setIsDefault(bool isDefault)
+{
+	D(d);
+	d->isDefault = isDefault;
+}
+
+void GMControl::setSize(GMint32 width, GMint32 height)
+{
+	D(d);
+	if (d->width != width || d->height != height)
+	{
+		d->width = width;
+		d->height = height;
+		updateRect();
+	}
+}
+
+void GMControl::setPosition(GMint32 x, GMint32 y)
+{
+	D(d);
+	if (d->x != x || d->y != y)
+	{
+		d->x = x;
+		d->y = y;
+		updateRect();
+	}
+}
+
+void GMControl::setIndex(GMint32 index)
+{
+	D(d);
+	d->index = index;
 }
 
 GMControlLabel* GMControlLabel::createControl(
@@ -106,6 +261,17 @@ GMControlLabel* GMControlLabel::createControl(
 	labelControl->setFontColor(fontColor);
 	labelControl->setIsDefault(isDefault);
 	return labelControl;
+}
+
+GMControlLabel::GMControlLabel(GMWidget* widget) : Base(widget)
+{
+	GM_CREATE_DATA(GMControlLabel);
+	initStyles(widget);
+}
+
+GMControlLabel::~GMControlLabel()
+{
+
 }
 
 void GMControlLabel::render(GMDuration elapsed)
@@ -150,6 +316,12 @@ void GMControlLabel::initStyles(GMWidget* widget)
 	D(d);
 	d->foreStyle.setFont(0);
 	d->foreStyle.setFontColor(GMControlState::Disabled, GMVec4(.87f, .87f, .87f, .87f));
+}
+
+const GMString& GMControlLabel::getText() const
+{
+	D(d);
+	return d->text;
 }
 
 void GMControlLabel::setText(const GMString& text)
@@ -426,6 +598,12 @@ GMControlBorder* GMControlBorder::createControl(
 	return borderControl;
 }
 
+GMControlBorder::GMControlBorder(GMWidget* widget) : Base(widget)
+{
+	GM_CREATE_DATA(GMControlBorder);
+	initStyles(widget);
+}
+
 void GMControlBorder::render(GMDuration elapsed)
 {
 	if (!getVisible())
@@ -449,6 +627,35 @@ void GMControlBorder::initStyles(GMWidget* widget)
 	d->borderStyle.setTexture(widget->getArea(GMTextureArea::BorderArea));
 	d->borderStyle.setTextureColor(GMControlState::Normal, GMVec4(1.f, 1.f, 1.f, 1.f));
 }
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMControlScrollBar)
+{
+	bool draggingThumb = false;
+	bool showThumb = true;
+	bool canRequestFocus = true;
+	GMint32 maximum = 10;
+	GMint32 minimum = 0;
+	GMint32 pageStep = 1;
+	GMint32 singleStep = 1;
+	GMint32 value = 0;
+
+	GMPoint mousePt; //!< 相对于GMControlScrollBar本身的坐标
+	GMRect rcUp;
+	GMRect rcDown;
+	GMRect rcThumb;
+	GMRect rcTrack;
+	GMfloat thumbOffset = 0;
+	GMControlScrollBarArrowState arrowState = GMControlScrollBarArrowState::Clear;
+	GMfloat arrowTime = 0;
+
+	GMStyle styleUp;
+	GMStyle styleDown;
+	GMOwnedPtr<GMControlBorder> thumb;
+	GMStyle styleTrack;
+
+	GMfloat allowClickDelay = .33f;
+	GMfloat allowClickRepeat = .05f;
+};
 
 bool GMControlScrollBar::handleMouse(GMSystemMouseEvent* event)
 {
@@ -690,12 +897,24 @@ GMControlScrollBar* GMControlScrollBar::createControl(
 	return scrollBar;
 }
 
+GM_DEFINE_PROPERTY(GMControlScrollBar, GMint32, PageStep, pageStep)
+GM_DEFINE_PROPERTY(GMControlScrollBar, GMint32, SingleStep, singleStep)
+GM_DEFINE_GETTER(GMControlScrollBar, GMint32, Value, value)
+GM_DEFINE_GETTER(GMControlScrollBar, GMint32, Maximum, maximum)
+GM_DEFINE_GETTER(GMControlScrollBar, GMint32, Minimum, minimum)
+GM_DEFINE_PROPERTY(GMControlScrollBar, bool, CanRequestFocus, canRequestFocus)
 GMControlScrollBar::GMControlScrollBar(GMWidget* widget)
 	: Base(widget) 
 {
+	GM_CREATE_DATA(GMControlScrollBar);
 	D(d);
 	initStyles(widget);
 	d->thumb = gm_makeOwnedPtr<GMControlScrollBarThumb>(widget);
+}
+
+GMControlScrollBar::~GMControlScrollBar()
+{
+
 }
 
 void GMControlScrollBar::setMaximum(GMint32 maximum)
@@ -956,3 +1175,5 @@ void GMControlScrollBar::scroll(GMint32 value)
 	updateThumbRect();
 	emitSignal(GM_SIGNAL(GMControlScrollBar, valueChanged));
 }
+
+END_NS

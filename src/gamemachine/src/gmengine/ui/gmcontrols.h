@@ -14,26 +14,7 @@ enum class GMControlType
 	Static,
 };
 
-GM_PRIVATE_OBJECT(GMControl)
-{
-	GMint32 x = 0;
-	GMint32 y = 0;
-	GMint32 width = 0;
-	GMint32 height = 0;
-	GMRect boundingBox;
-	GMWidget* widget = nullptr;
-
-	bool styleInited = false;
-	bool enabled = true;
-	bool visible = true;
-	bool mouseOver = false;
-	bool hasFocus = false;
-	bool isDefault = false;
-
-	GMint32 index = 0; //在控件列表中的索引
-	GMControlPositionFlag positionFlag = GMControlPositionFlag::Auto;
-};
-
+GM_PRIVATE_CLASS(GMControl);
 class GM_EXPORT GMControl : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMControl)
@@ -49,44 +30,24 @@ public:
 	~GMControl();
 
 public:
-	inline void setEnabled(bool enabled)
-	{
-		D(d);
-		d->enabled = enabled;
-	}
+	void setEnabled(bool enabled);
+	bool getEnabled();
+	void setVisible(bool visible);
+	bool getVisible();
+	bool getMouseOver();
+	bool hasFocus();
+	bool isDefault() GM_NOEXCEPT;
+	GMWidget* getParent() GM_NOEXCEPT;
+	GMint32 getIndex() GM_NOEXCEPT;
+	const GMRect& getBoundingRect() GM_NOEXCEPT;
+	GMint32 getWidth() GM_NOEXCEPT;
+	GMint32 getHeight() GM_NOEXCEPT;
+	GMPoint toControlSpace(const GMPoint& rc) GM_NOEXCEPT;
+	void setPositionFlag(GMControlPositionFlag flag) GM_NOEXCEPT;
+	GMControlPositionFlag getPositionFlag() const GM_NOEXCEPT;
 
-	inline bool getEnabled()
-	{
-		D(d);
-		return d->enabled;
-	}
-
-	inline void setVisible(bool visible)
-	{
-		D(d);
-		d->visible = visible;
-	}
-
-	inline bool getVisible()
-	{
-		D(d);
-		return d->visible;
-	}
-
-	inline bool getMouseOver()
-	{
-		D(d);
-		return d->mouseOver;
-	}
-
-	inline bool hasFocus()
-	{
-		D(d);
-		return d->hasFocus;
-	}
-
+public:
 	virtual bool handleKeyboard(GMSystemKeyEvent* event);
-
 	virtual bool handleMouse(GMSystemMouseEvent* event);
 
 	//! 控件第一次处理消息的方法。
@@ -143,29 +104,13 @@ public:
 		return false;
 	}
 
-	virtual void onFocusIn()
-	{
-		D(d);
-		d->hasFocus = true;
-	}
+	virtual void onFocusIn();
 
-	virtual void onFocusOut()
-	{
-		D(d);
-		d->hasFocus = false;
-	}
+	virtual void onFocusOut();
 
-	virtual void onMouseEnter()
-	{
-		D(d);
-		d->mouseOver = true;
-	}
+	virtual void onMouseEnter();
 
-	virtual void onMouseLeave()
-	{
-		D(d);
-		d->mouseOver = false;
-	}
+	virtual void onMouseLeave();
 
 	virtual void onHotkey()
 	{
@@ -189,110 +134,23 @@ public:
 
 	virtual bool containsPoint(GMPoint point);
 
-	virtual void setIndex(GMint32 index)
-	{
-		D(d);
-		d->index = index;
-	}
+	virtual void setIndex(GMint32 index);
 
-	virtual void setPosition(GMint32 x, GMint32 y)
-	{
-		D(d);
-		if (d->x != x || d->y != y)
-		{
-			d->x = x;
-			d->y = y;
-			updateRect();
-		}
-	}
+	virtual void setPosition(GMint32 x, GMint32 y);
 
-	virtual void setSize(GMint32 width, GMint32 height)
-	{
-		D(d);
-		if (d->width != width || d->height != height)
-		{
-			d->width = width;
-			d->height = height;
-			updateRect();
-		}
-	}
+	virtual void setSize(GMint32 width, GMint32 height);
 
-	virtual void setIsDefault(bool isDefault)
-	{
-		D(d);
-		d->isDefault = isDefault;
-	}
-
-public:
-	inline bool isDefault() GM_NOEXCEPT
-	{
-		D(d);
-		return d->isDefault;
-	}
-
-	inline GMWidget* getParent() GM_NOEXCEPT
-	{
-		D(d);
-		return d->widget;
-	}
-
-	inline GMint32 getIndex() GM_NOEXCEPT
-	{
-		D(d);
-		return d->index;
-	}
-
-	inline const GMRect& getBoundingRect() GM_NOEXCEPT
-	{
-		D(d);
-		return d->boundingBox;
-	}
-
-	inline GMint32 getWidth() GM_NOEXCEPT
-	{
-		D(d);
-		return d->width;
-	}
-
-	inline GMint32 getHeight() GM_NOEXCEPT
-	{
-		D(d);
-		return d->height;
-	}
-
-	GMPoint toControlSpace(const GMPoint& rc) GM_NOEXCEPT
-	{
-		D(d);
-		GMPoint r = { rc.x - d->boundingBox.x, rc.y - d->boundingBox.y };
-		return r;
-	}
-
-	void setPositionFlag(GMControlPositionFlag flag) GM_NOEXCEPT
-	{
-		D(d);
-		if (d->positionFlag != flag)
-			d->positionFlag = flag;
-	}
-
-	inline GMControlPositionFlag getPositionFlag() const GM_NOEXCEPT
-	{
-		D(d);
-		return d->positionFlag;
-	}
+	virtual void setIsDefault(bool isDefault);
 
 protected:
 	virtual void updateRect();
 };
 
-GM_PRIVATE_OBJECT(GMControlLabel)
-{
-	GMString text;
-	GMStyle foreStyle;
-};
-
+GM_PRIVATE_CLASS(GMControlLabel);
 class GM_EXPORT GMControlLabel : public GMControl
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMControlLabel, GMControl)
+	GM_DECLARE_PRIVATE(GMControlLabel)
+	GM_DECLARE_BASE(GMControl);
 
 public:
 	enum StyleType
@@ -313,13 +171,15 @@ public:
 	);
 
 protected:
-	GMControlLabel(GMWidget* widget) : Base(widget) { initStyles(widget); }
+	GMControlLabel(GMWidget* widget);
+
+public:
+	~GMControlLabel();
 
 public:
 	virtual void render(GMDuration elapsed) override;
 	virtual void refresh() override;
 	virtual GMStyle& getStyle(Base::StyleType style) override;
-
 	virtual bool containsPoint(GMPoint) override
 	{
 		return false;
@@ -329,27 +189,16 @@ private:
 	void initStyles(GMWidget* widget);
 
 public:
-	inline const GMString& getText() const
-	{
-		D(d);
-		return d->text;
-	}
-
+	const GMString& getText() const;
 	void setText(const GMString& text);
 	void setFontColor(const GMVec4& color);
 };
 
-GM_PRIVATE_OBJECT(GMControlButton)
-{
-	bool pressed = false;
-	GMStyle fillStyle;
-	GMOwnedPtr<GMControlBorder> fillBorder;
-	GMOwnedPtr<GMControlBorder> foreBorder;
-};
-
+GM_PRIVATE_CLASS(GMControlButton);
 class GM_EXPORT GMControlButton : public GMControlLabel
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMControlButton, GMControlLabel)
+	GM_DECLARE_PRIVATE(GMControlButton)
+	GM_DECLARE_BASE(GMControlLabel)
 
 public:
 	enum StyleType
@@ -394,18 +243,13 @@ private:
 	void initStyles(GMWidget* widget);
 };
 
-
-GM_PRIVATE_OBJECT(GMControlBorder)
-{
-	GMStyle borderStyle;
-	GMRect corner;
-};
-
+GM_PRIVATE_CLASS(GMControlBorder);
 class GMControlBorder : public GMControl
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMControlBorder, GMControl);
-	GM_DECLARE_PROPERTY(Corner, corner);
-	GM_DECLARE_PROPERTY(BorderStyle, borderStyle);
+	GM_DECLARE_PRIVATE(GMControlBorder);
+	GM_DECLARE_BASE(GMControl)
+	GM_DECLARE_PROPERTY(GMRect, Corner);
+	GM_DECLARE_PROPERTY(GMStyle, BorderStyle);
 
 public:
 	static GMControlBorder* createControl(
@@ -418,7 +262,7 @@ public:
 	);
 
 protected:
-	GMControlBorder(GMWidget* widget) : Base(widget) { initStyles(widget); }
+	GMControlBorder(GMWidget* widget);
 
 public:
 	virtual void render(GMDuration elapsed) override;
@@ -441,44 +285,17 @@ enum class GMControlScrollBarArrowState
 	TrackHeldDown,
 };
 
-GM_PRIVATE_OBJECT(GMControlScrollBar)
-{
-	bool draggingThumb = false;
-	bool showThumb = true;
-	bool canRequestFocus = true;
-	GMint32 maximum = 10;
-	GMint32 minimum = 0;
-	GMint32 pageStep = 1;
-	GMint32 singleStep = 1;
-	GMint32 value = 0;
-
-	GMPoint mousePt; //!< 相对于GMControlScrollBar本身的坐标
-	GMRect rcUp;
-	GMRect rcDown;
-	GMRect rcThumb;
-	GMRect rcTrack;
-	GMfloat thumbOffset = 0;
-	GMControlScrollBarArrowState arrowState = GMControlScrollBarArrowState::Clear;
-	GMfloat arrowTime = 0;
-
-	GMStyle styleUp;
-	GMStyle styleDown;
-	GMOwnedPtr<GMControlBorder> thumb;
-	GMStyle styleTrack;
-
-	GMfloat allowClickDelay = .33f;
-	GMfloat allowClickRepeat = .05f;
-};
-
+GM_PRIVATE_CLASS(GMControlScrollBar);
 class GM_EXPORT GMControlScrollBar : public GMControl
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMControlScrollBar, GMControl)
-	GM_DECLARE_PROPERTY(PageStep, pageStep)
-	GM_DECLARE_PROPERTY(SingleStep, singleStep)
-	GM_DECLARE_GETTER(Value, value)
-	GM_DECLARE_GETTER(Maximum, maximum)
-	GM_DECLARE_GETTER(Minimum, minimum)
-	GM_DECLARE_PROPERTY(CanRequestFocus, canRequestFocus)
+	GM_DECLARE_PRIVATE(GMControlScrollBar)
+	GM_DECLARE_BASE(GMControl)
+	GM_DECLARE_PROPERTY(GMint32, PageStep)
+	GM_DECLARE_PROPERTY(GMint32, SingleStep)
+	GM_DECLARE_GETTER_ACCESSOR(GMint32, Value, public)
+	GM_DECLARE_GETTER_ACCESSOR(GMint32, Maximum, public)
+	GM_DECLARE_GETTER_ACCESSOR(GMint32, Minimum, public)
+	GM_DECLARE_PROPERTY(bool, CanRequestFocus)
 
 	GM_DECLARE_SIGNAL(valueChanged)
 	GM_DECLARE_SIGNAL(startDragThumb)
@@ -502,6 +319,8 @@ public:
 		GMint32 height,
 		bool isDefault
 	);
+
+	~GMControlScrollBar();
 
 protected:
 	GMControlScrollBar(GMWidget* widget);

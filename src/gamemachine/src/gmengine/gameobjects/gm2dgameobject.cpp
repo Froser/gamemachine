@@ -2,6 +2,9 @@
 #include "gm2dgameobject.h"
 #include "gmgameworld.h"
 #include "gmtypoengine.h"
+#include "gm2dgameobject_p.h"
+
+BEGIN_NS
 
 enum Margins
 {
@@ -45,8 +48,16 @@ GMRectF GM2DGameObjectBase::toViewportRect(const GMRect& rc, const GMRect& rende
 	return out;
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GM2DGameObjectBase)
+{
+	GMRect renderRc;
+	bool dirty = true;
+	GMRect geometry = { 0 };
+};
+
 GM2DGameObjectBase::GM2DGameObjectBase(const GMRect& renderRc)
 {
+	GM_CREATE_DATA(GM2DGameObjectBase);
 	D(d);
 	d->renderRc = renderRc;
 }
@@ -72,6 +83,13 @@ GMShader& GM2DGameObjectBase::getShader()
 	return getModel()->getShader();
 }
 
+
+const GMRect& GM2DGameObjectBase::getGeometry()
+{
+	D(d);
+	return d->geometry;
+}
+
 void GM2DGameObjectBase::initShader(GMShader& shader)
 {
 	GMGlyphManager* glyphManager = getContext()->getEngine()->getGlyphManager();
@@ -86,14 +104,60 @@ void GM2DGameObjectBase::initShader(GMShader& shader)
 	shader.setBlendFactorDest(GMS_BlendFunc::OneMinusSourceAlpha);
 }
 
+const GMRect& GM2DGameObjectBase::getRenderRect() GM_NOEXCEPT
+{
+	D(d);
+	return d->renderRc;
+}
+
+void GM2DGameObjectBase::markDirty() GM_NOEXCEPT
+{
+	D(d);
+	d->dirty = true;
+}
+
+void GM2DGameObjectBase::cleanDirty() GM_NOEXCEPT
+{
+	D(d);
+	d->dirty = false;
+}
+
+bool GM2DGameObjectBase::isDirty() GM_NOEXCEPT
+{
+	D(d);
+	return d->dirty;
+}
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMTextGameObject)
+{
+	GMString text;
+	GMint32 lineSpacing = 0;
+	bool center = false;
+	bool newline = true;
+	GMsize_t length = 0;
+	GMAsset texture;
+	ITypoEngine* typoEngine = nullptr;
+	bool insetTypoEngine = true;
+	GMFontHandle font = 0;
+	GMScene* scene = nullptr;
+	GMTextColorType colorType = GMTextColorType::ByScript;
+	GMFloat4 color = GMFloat4(1, 1, 1, 1);
+	GMint32 fontSize = 12;
+	Vector<GMVertex> vericesCache;
+	GMTypoTextBuffer* textBuffer = nullptr;
+	GMTextDrawMode drawMode = GMTextDrawMode::Immediate;
+};
+
 GMTextGameObject::GMTextGameObject(const GMRect& renderRc)
 	: GM2DGameObjectBase(renderRc)
 {
+	GM_CREATE_DATA(GMTextGameObject);
 }
 
 GMTextGameObject::GMTextGameObject(const GMRect& renderRc, ITypoEngine* typo)
 	: GM2DGameObjectBase(renderRc)
 {
+	GM_CREATE_DATA(GMTextGameObject);
 	D(d);
 	d->typoEngine = typo;
 	d->insetTypoEngine = false;
@@ -229,6 +293,12 @@ void GMTextGameObject::setDrawMode(GMTextDrawMode mode) GM_NOEXCEPT
 		d->drawMode = mode;
 		markDirty();
 	}
+}
+
+ITypoEngine* GMTextGameObject::getTypoEngine() GM_NOEXCEPT
+{
+	D(d);
+	return d->typoEngine;
 }
 
 GMModel* GMTextGameObject::getModel()
@@ -444,6 +514,17 @@ GMModel* GMTextGameObject::createModel()
 	return model;
 }
 
+GMSprite2DGameObject::GMSprite2DGameObject(const GMRect& renderRc)
+	: Base(renderRc)
+{
+	GM_CREATE_DATA(GMSprite2DGameObject);
+}
+
+GMSprite2DGameObject::~GMSprite2DGameObject()
+{
+
+}
+
 void GMSprite2DGameObject::draw()
 {
 	D(d);
@@ -630,6 +711,24 @@ void GMSprite2DGameObject::updateTexture(GMScene* scene)
 #define INDICES(part, i1, i2, i3, i4) \
 	{ part->index(i3); part->index(i1); part->index(i4); } \
 	{ part->index(i4); part->index(i1); part->index(i2); }
+
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMBorder2DGameObject)
+{
+	GMModel* model = nullptr;
+	GMRect corner;
+};
+
+GMBorder2DGameObject::GMSprite2DGameObject(const GMRect& renderRc)
+	: Base(renderRc)
+{
+	GM_CREATE_DATA(GMBorder2DGameObject);
+}
+
+GMBorder2DGameObject::~GMBorder2DGameObject()
+{
+
+}
 
 void GMBorder2DGameObject::setCornerRect(const GMRect& rc)
 {
@@ -926,3 +1025,5 @@ void GMBorder2DGameObject::updateVertices(GMScene* scene)
 	memcpy_s(ptr, sz, V, sz);
 	proxy->endUpdateBuffer();
 }
+
+END_NS
