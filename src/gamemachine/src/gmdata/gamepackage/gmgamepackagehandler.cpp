@@ -5,6 +5,9 @@
 #include "foundation/gamemachine.h"
 #include "foundation/gmasync.h"
 #include "gmgamepackage.h"
+#include "gmgamepackage_p.h"
+
+BEGIN_NS
 
 #define PKD(d) GMGamePackage::Data* d = gamePackage()->gamePackageData();
 
@@ -172,7 +175,7 @@ GMGamePackage* GMDefaultGamePackageHandler::gamePackage()
 	return m_pk;
 }
 
-GMString gm::GMDefaultGamePackageHandler::packagePath()
+GMString GMDefaultGamePackageHandler::packagePath()
 {
 	PKD(d);
 	if (m_packageIndex == 0)
@@ -444,3 +447,5 @@ bool GMZipGamePackageHandler::exists(GMPackageIndex index, const GMString& fileN
 	}
 	return existed;
 }
+
+END_NS

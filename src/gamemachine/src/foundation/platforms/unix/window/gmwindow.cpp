@@ -22,10 +22,6 @@ namespace
 	}
 }
 
-GMWindow::GMWindow()
-{
-}
-
 GMWindow::~GMWindow()
 {
 

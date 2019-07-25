@@ -14,6 +14,9 @@
 #include "gmglglyphmanager.h"
 #include "gmengine/gmcsmhelper.h"
 #include <gmwindow.h>
+#include "../gmengine/gmgraphicengine_p.h"
+
+BEGIN_NS
 
 extern "C"
 {
@@ -45,9 +48,36 @@ extern "C"
 	}
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMGLGraphicEngine)
+{
+	bool inited = false;
+	bool engineReady = false;
+
+	// 著色器程序
+	GMOwnedPtr<GMGLShaderProgram> forwardShaderProgram;
+	GMOwnedPtr<GMGLShaderProgram> deferredShaderPrograms[2];
+	GMOwnedPtr<GMGLShaderProgram> filterShaderProgram;
+
+	// 渲染器
+	GMOwnedPtr<ITechnique> technique_2d;
+	GMOwnedPtr<ITechnique> technique_3d;
+	GMOwnedPtr<ITechnique> technique_cubeMap;
+	GMOwnedPtr<ITechnique> technique_filter;
+	GMOwnedPtr<ITechnique> technique_lightPass;
+	GMOwnedPtr<ITechnique> technique_3d_shadow;
+	GMOwnedPtr<ITechnique> technique_particle;
+	GMOwnedPtr<ITechnique> technique_custom;
+
+	GMTextureAsset cubeMap;
+	GMGLLightContext lightContext;
+
+	Vector<GMint32> lightCountIndices;
+};
+
 GMGLGraphicEngine::GMGLGraphicEngine(const IRenderContext* context)
 	: GMGraphicEngine(context)
 {
+	GM_CREATE_DATA(GMGLGraphicEngine);
 }
 
 void GMGLGraphicEngine::init()
@@ -132,6 +162,19 @@ bool GMGLGraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
 		return false;
 	}
 	return true;
+}
+
+void GMGLGraphicEngine::setCubeMap(GMTextureAsset tex)
+{
+	D(d);
+	if (d->cubeMap != tex)
+		d->cubeMap = tex;
+}
+
+GMTextureAsset GMGLGraphicEngine::getCubeMap()
+{
+	D(d);
+	return d->cubeMap;
 }
 
 void GMGLGraphicEngine::activateLights(ITechnique* technique)
@@ -393,3 +436,5 @@ void GMGLGraphicEngine::checkGLErrors(const GMuint32* errors)
 			break;
 	}
 }
+
+END_NS

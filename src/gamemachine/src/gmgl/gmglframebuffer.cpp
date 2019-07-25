@@ -6,6 +6,21 @@
 #include "foundation/gamemachine.h"
 #include "gmengine/gmcsmhelper.h"
 #include "gmglgraphic_engine.h"
+#include "gmgltexture_p.h"
+
+BEGIN_NS
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMGLFramebuffers)
+{
+	GMuint32 fbo = 0;
+	GMuint32 depthStencilBuffer = 0;
+	Vector<GMGLFramebuffer*> framebuffers;
+	bool framebuffersCreated = false;
+	GMGraphicEngine* engine = nullptr;
+	GMFramebufferDesc desc;
+	GMfloat clearColor[4];
+	const IRenderContext* context = nullptr;
+};
 
 GM_PRIVATE_OBJECT_UNALIGNED(GMGLFramebufferTexture)
 {
@@ -14,13 +29,14 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLFramebufferTexture)
 
 class GMGLFramebufferTexture : public GMGLTexture
 {
-	GM_DECLARE_PRIVATE_NGO(GMGLFramebufferTexture)
-	typedef GMGLTexture Base;
+	GM_DECLARE_PRIVATE(GMGLFramebufferTexture)
+	GM_DECLARE_BASE(GMGLTexture)
 
 public:
 	GMGLFramebufferTexture(const GMFramebufferDesc& desc)
 		: GMGLTexture(nullptr)
 	{
+		GM_CREATE_DATA(GMGLFramebufferTexture);
 		D(d);
 		d->desc = desc;
 	}
@@ -64,7 +80,6 @@ public:
 	}
 };
 
-BEGIN_NS
 class GMGLDefaultFramebuffers : public GMGLFramebuffers
 {
 public:
@@ -109,12 +124,23 @@ private:
 		glViewport(0, 0, rect.width, rect.height);
 	}
 };
-END_NS
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMGLFramebuffer)
+{
+	const IRenderContext* context = nullptr;
+	GMTextureAsset texture;
+};
 
 GMGLFramebuffer::GMGLFramebuffer(const IRenderContext* context)
 {
+	GM_CREATE_DATA(GMGLFramebuffer);
 	D(d);
 	d->context = context;
+}
+
+GMGLFramebuffer::~GMGLFramebuffer()
+{
+
 }
 
 bool GMGLFramebuffer::init(const GMFramebufferDesc& desc)
@@ -148,6 +174,8 @@ GMuint32 GMGLFramebuffer::getTextureId()
 
 GMGLFramebuffers::GMGLFramebuffers(const IRenderContext* context)
 {
+	GM_CREATE_DATA(GMGLFramebuffers);
+
 	D(d);
 	d->context = context;
 	d->engine = gm_cast<GMGraphicEngine*>(context->getEngine());
@@ -266,6 +294,13 @@ GMuint32 GMGLFramebuffers::framebufferId()
 	return d->fbo;
 }
 
+
+const GMFramebufferDesc& GMGLFramebuffers::getDesc()
+{
+	D(d);
+	return d->desc;
+}
+
 void GMGLFramebuffers::createDepthStencilBuffer(const GMFramebufferDesc& desc)
 {
 	D(d);
@@ -368,8 +403,15 @@ IFramebuffers* GMGLFramebuffers::createDefaultFramebuffers(const IRenderContext*
 	return new GMGLDefaultFramebuffers(context);
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMGLShadowMapTexture)
+{
+	GMuint32 textureId;
+};
+
 GMGLShadowMapTexture::GMGLShadowMapTexture(GMuint32 textureId)
 {
+	GM_CREATE_DATA(GMGLShadowMapTexture);
+
 	D(d);
 	d->textureId = textureId;
 }
@@ -391,9 +433,29 @@ void GMGLShadowMapTexture::init()
 {
 }
 
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMGLShadowFramebuffers)
+{
+	GMint32 width = 0;
+	GMint32 height = 0;
+	GMTextureAsset shadowMapTexture;
+	GMShadowSourceDesc shadowSource;
+	GMfloat cascadeEndClip[GMGraphicEngine::getMaxCascades()] = { 0 };
+	GMCascadeLevel currentViewport;
+
+	struct
+	{
+		GMfloat topLeftX;
+		GMfloat topLeftY;
+		GMfloat width;
+		GMfloat height;
+	} viewports[GMGraphicEngine::getMaxCascades()] = { 0 };
+};
+
 GMGLShadowFramebuffers::GMGLShadowFramebuffers(const IRenderContext* context)
 	: GMGLFramebuffers(context)
 {
+	GM_CREATE_DATA(GMGLShadowFramebuffers);
 }
 
 bool GMGLShadowFramebuffers::init(const GMFramebuffersDesc& desc)
@@ -473,6 +535,24 @@ void GMGLShadowFramebuffers::setShadowSource(const GMShadowSourceDesc& shadowSou
 	d->shadowSource = shadowSource;
 }
 
+GMTextureAsset GMGLShadowFramebuffers::getShadowMapTexture()
+{
+	D(d);
+	return d->shadowMapTexture;
+}
+
+GMint32 GMGLShadowFramebuffers::getShadowMapHeight()
+{
+	D(d);
+	return d->height;
+}
+
+GMint32 GMGLShadowFramebuffers::getShadowMapWidth()
+{
+	D(d);
+	return d->width;
+}
+
 GMCascadeLevel GMGLShadowFramebuffers::cascadedBegin()
 {
 	D(d);
@@ -516,3 +596,5 @@ void GMGLShadowFramebuffers::setEachCascadeEndClip(GMCascadeLevel level)
 	GMVec4 clip = view * camera.getProjectionMatrix();
 	d->cascadeEndClip[level] = clip.getZ();
 }
+
+END_NS

@@ -7,18 +7,11 @@ struct IFramebuffers;
 class GMGameObject;
 class GMModel;
 class GMGraphicEngine;
-GM_PRIVATE_OBJECT(GMGBuffer)
-{
-	const IRenderContext* context = nullptr;
-	IFramebuffers* geometryFramebuffers = nullptr;
-	GMGameObject* quad = nullptr;
-	GMGeometryPassingState state = GMGeometryPassingState::Done;
-	GMGraphicEngine* engine = nullptr;
-};
-
-class GM_EXPORT GMGBuffer : public GMObject, public IGBuffer
+GM_PRIVATE_CLASS(GMGBuffer);
+class GM_EXPORT GMGBuffer : public IGBuffer
 {
 	GM_DECLARE_PRIVATE(GMGBuffer)
+	GM_DISABLE_COPY_ASSIGN(GMGBuffer)
 
 protected:
 	GMGBuffer(const IRenderContext* context);

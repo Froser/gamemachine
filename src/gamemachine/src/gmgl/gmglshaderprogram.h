@@ -17,26 +17,18 @@ struct GM_EXPORT GMGLShaderInfo
 typedef AlignedVector<GMuint32> GMGLShaderIDList;
 typedef AlignedVector<GMGLShaderInfo> GMGLShaderInfos;
 
-GM_PRIVATE_OBJECT(GMGLShaderProgram)
+GM_PRIVATE_CLASS(GMGLShaderProgram);
+class GM_EXPORT GMGLShaderProgram : public IShaderProgram
 {
-	const IRenderContext* context = nullptr;
-	GMGLShaderInfos shaderInfos;
-	GMGLShaderIDList shaders;
-	GMuint32 shaderProgram = 0;
-	GMuint32 techniqueIndex = 0;
-	HashMap<GMString, GMString, GMStringHashFunctor> aliasMap;
-};
-
-class GM_EXPORT GMGLShaderProgram : public GMObject, public IShaderProgram
-{
-	GM_DECLARE_PRIVATE(GMGLShaderProgram);
+	GM_DECLARE_PRIVATE(GMGLShaderProgram)
+	GM_DISABLE_COPY_ASSIGN(GMGLShaderProgram)
 
 public:
 	GMGLShaderProgram(const IRenderContext* context);
 	~GMGLShaderProgram();
 
 	bool load();
-	GMuint32 getProgram() { D(d); return d->shaderProgram; }
+	GMuint32 getProgram();
 	void attachShader(const GMGLShaderInfo& shaderCfgs);
 
 public:
@@ -51,7 +43,7 @@ public:
 	virtual bool setInterfaceInstance(const GMString& interfaceName, const GMString& instanceName, GMShaderType type) override;
 
 private:
-	void setProgram(GMuint32 program) { D(d); d->shaderProgram = program; }
+	void setProgram(GMuint32 program);
 	void removeShaders();
 	void expandSource(REF GMGLShaderInfo& shaderInfo);
 	GMString expandSource(const GMString& workingDir, const GMString& source);
@@ -74,17 +66,11 @@ public:
 	}
 };
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMGLComputeShaderProgram)
-{
-	const IRenderContext* context = nullptr;
-	GMuint32 shaderProgram = 0;
-	GMuint32 shaderId = 0;
-	GMuint32 boBase = 0;
-};
-
+GM_PRIVATE_CLASS(GMGLComputeShaderProgram);
 class GM_EXPORT GMGLComputeShaderProgram : public IComputeShaderProgram
 {
-	GM_DECLARE_PRIVATE_NGO(GMGLComputeShaderProgram)
+	GM_DECLARE_PRIVATE(GMGLComputeShaderProgram)
+	GM_DISABLE_COPY_ASSIGN(GMGLComputeShaderProgram)
 
 public:
 	GMGLComputeShaderProgram(const IRenderContext* context);

@@ -5,18 +5,15 @@
 #include <gmgraphicengine.h>
 BEGIN_NS
 
-GM_PRIVATE_OBJECT(GMGLFramebuffer)
+GM_PRIVATE_CLASS(GMGLFramebuffer);
+class GMGLFramebuffer : public IFramebuffer
 {
-	const IRenderContext* context = nullptr;
-	GMTextureAsset texture;
-};
-
-class GMGLFramebuffer : public GMObject, public IFramebuffer
-{
-	GM_DECLARE_PRIVATE(GMGLFramebuffer);
+	GM_DECLARE_PRIVATE(GMGLFramebuffer)
+	GM_DISABLE_COPY_ASSIGN(GMGLFramebuffer)
 
 public:
 	GMGLFramebuffer(const IRenderContext* context);
+	~GMGLFramebuffer();
 
 public:
 	virtual bool init(const GMFramebufferDesc& desc) override;
@@ -29,21 +26,11 @@ public:
 };
 
 class GMGLDefaultFramebuffers;
-GM_PRIVATE_OBJECT(GMGLFramebuffers)
-{
-	GMuint32 fbo = 0;
-	GMuint32 depthStencilBuffer = 0;
-	Vector<GMGLFramebuffer*> framebuffers;
-	bool framebuffersCreated = false;
-	GMGraphicEngine* engine = nullptr;
-	GMFramebufferDesc desc;
-	GMfloat clearColor[4];
-	const IRenderContext* context = nullptr;
-};
-
-class GMGLFramebuffers : public GMObject, public IFramebuffers
+GM_PRIVATE_CLASS(GMGLFramebuffers);
+class GMGLFramebuffers : public IFramebuffers
 {
 	GM_DECLARE_PRIVATE(GMGLFramebuffers)
+	GM_DECLARE_BASE(GMGLFramebuffers)
 
 public:
 	GMGLFramebuffers(const IRenderContext* context);
@@ -62,15 +49,10 @@ public:
 
 public:
 	virtual const IRenderContext* getContext();
-
-public:
 	virtual GMuint32 framebufferId();
 
-	const GMFramebufferDesc& getDesc()
-	{
-		D(d);
-		return d->desc;
-	}
+public:
+	const GMFramebufferDesc& getDesc();
 
 private:
 	void createFramebuffers();
@@ -83,14 +65,11 @@ public:
 	static IFramebuffers* createDefaultFramebuffers(const IRenderContext* context);
 };
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMGLShadowMapTexture)
-{
-	GMuint32 textureId;
-};
-
+GM_PRIVATE_CLASS(GMGLShadowMapTexture);
 class GMGLShadowMapTexture : public ITexture
 {
-	GM_DECLARE_PRIVATE_NGO(GMGLShadowMapTexture)
+	GM_DECLARE_PRIVATE(GMGLShadowMapTexture)
+	GM_DISABLE_COPY_ASSIGN(GMGLShadowMapTexture)
 
 public:
 	GMGLShadowMapTexture(GMuint32 textureId);
@@ -101,27 +80,11 @@ public:
 	virtual void useTexture(GMint32) override;
 };
 
-GM_PRIVATE_OBJECT(GMGLShadowFramebuffers)
-{
-	GMint32 width = 0;
-	GMint32 height = 0;
-	GMTextureAsset shadowMapTexture;
-	GMShadowSourceDesc shadowSource;
-	GMfloat cascadeEndClip[GMGraphicEngine::getMaxCascades()] = { 0 };
-	GMCascadeLevel currentViewport;
-
-	struct
-	{
-		GMfloat topLeftX;
-		GMfloat topLeftY;
-		GMfloat width;
-		GMfloat height;
-	} viewports[GMGraphicEngine::getMaxCascades()] = { 0 };
-};
-
+GM_PRIVATE_CLASS(GMGLShadowFramebuffers);
 class GMGLShadowFramebuffers : public GMGLFramebuffers, public ICSMFramebuffers
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMGLShadowFramebuffers, GMGLFramebuffers)
+	GM_DECLARE_PRIVATE(GMGLShadowFramebuffers)
+	GM_DECLARE_BASE(GMGLFramebuffers)
 
 public:
 	GMGLShadowFramebuffers(const IRenderContext* context);
@@ -130,38 +93,21 @@ public:
 	virtual bool init(const GMFramebuffersDesc& desc) override;
 	virtual void use() override;
 	virtual void bind() override;
-
-public:
-	virtual void setShadowSource(const GMShadowSourceDesc& shadowSource);
 	virtual GMCascadeLevel cascadedBegin() override;
 	virtual GMCascadeLevel cascadedEnd() override;
 	virtual void applyCascadedLevel(GMCascadeLevel) override;
 	virtual GMCascadeLevel currentLevel() override;
 	virtual GMfloat getEndClip(GMCascadeLevel) override;
 	virtual void setEachCascadeEndClip(GMCascadeLevel) override;
+	virtual void setShadowSource(const GMShadowSourceDesc& shadowSource) override;
 
 public:
-	inline GMint32 getShadowMapWidth()
-	{
-		D(d);
-		return d->width;
-	}
-
-	inline GMint32 getShadowMapHeight()
-	{
-		D(d);
-		return d->height;
-	}
-
-	inline GMTextureAsset getShadowMapTexture()
-	{
-		D(d);
-		return d->shadowMapTexture;
-	}
+	GMint32 getShadowMapWidth();
+	GMint32 getShadowMapHeight();
+	GMTextureAsset getShadowMapTexture();
 
 private:
 	virtual void createDepthStencilBuffer(const GMFramebufferDesc& desc);
-
 };
 
 END_NS

@@ -25,24 +25,11 @@ private:
 	IGraphicEngine* engine = nullptr;
 };
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMWindow)
-{
-	GMOwnedPtr<IInput> input;
-	GMOwnedPtr<IGameHandler> handler;
-	GMOwnedPtr<IGraphicEngine> engine;
-	GMOwnedPtr<IRenderContext> context;
-
-	GMWindowHandle handle = 0;
-	bool ownedHandle = true; //!< 是否控制原生窗口句柄生命周期
-
-	Vector<GMWidget*> widgets;
-	GMWindowStates windowStates;
-	GMCursorType cursor = GMCursorType::Arrow;
-};
-
+GM_PRIVATE_CLASS(GMWindow);
 class GM_EXPORT GMWindow : public IWindow
 {
-	GM_DECLARE_PRIVATE_NGO(GMWindow)
+	GM_DECLARE_PRIVATE(GMWindow)
+	GM_DISABLE_COPY_ASSIGN(GMWindow)
 
 public:
 	GMWindow();
@@ -59,7 +46,7 @@ public:
 	virtual void setWindowCapture(bool capture) override;
 	virtual void showWindow() override;
 	virtual GMWindowHandle create(const GMWindowDesc& desc) override;
-	virtual GMWindowHandle getWindowHandle() const override { D(d); return d->handle; }
+	virtual GMWindowHandle getWindowHandle() const override;
 	virtual bool addWidget(GMWidget* widget) override;
 	virtual void setHandler(AUTORELEASE IGameHandler* handler) override;
 	virtual IGameHandler* getHandler() override;
@@ -74,17 +61,12 @@ public:
 	virtual bool setInterface(GameMachineInterfaceID id, void* in) override;
 
 public:
-	inline void setWindowHandle(GMWindowHandle handle, bool autoRelease)
-	{
-		D(d);
-		d->handle = handle;
-		d->ownedHandle = autoRelease;
-	}
+	void setWindowHandle(GMWindowHandle handle, bool autoRelease);
 
 	// 以下是由GMWindow子类override的
 public:
 	virtual bool handleSystemEvent(GMSystemEvent* event, REF GMLResult& result);
-	virtual const GMwchar* getWindowClassName() { return L"GameMachine Window"; }
+	virtual const GMwchar* getWindowClassName();
 
 protected:
 	virtual void changeCursor();

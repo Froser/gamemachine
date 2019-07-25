@@ -3,6 +3,8 @@
 #include "gmcryptographic.h"
 #include <md5.h>
 
+BEGIN_NS
+
 void GMCryptographic::hash(const GMBuffer& in, Alogrithm method, GMBuffer& out)
 {
 	GM_ASSERT(method == MD5);
@@ -11,3 +13,5 @@ void GMCryptographic::hash(const GMBuffer& in, Alogrithm method, GMBuffer& out)
 	out.resize(CryptoPP::Weak1::MD5::DIGESTSIZE);
 	hash.CalculateDigest(out.getData(), in.getData(), in.getSize());
 }
+
+END_NS

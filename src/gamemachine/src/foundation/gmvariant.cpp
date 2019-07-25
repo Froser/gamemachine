@@ -3,6 +3,8 @@
 #include "gmstring.h"
 #include "gmvariant.h"
 
+BEGIN_NS
+
 #define BEGIN_DEFINE_TYPE_ENUM_MAP() \
 	template <typename T> struct TypeEnumMap { enum { Value = GMVariant::Unknown }; }; \
 	struct InvalidType {}; \
@@ -395,3 +397,5 @@ GMString& GMVariant::toString()
 	const GMVariant* pThis = this;
 	return const_cast<GMString&>(pThis->toString());
 }
+
+END_NS

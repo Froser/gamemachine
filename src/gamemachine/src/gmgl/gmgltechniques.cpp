@@ -11,6 +11,8 @@
 #include "gmglgbuffer.h"
 #include "gmglframebuffer.h"
 
+BEGIN_NS
+
 namespace
 {
 	// variable index getter (with shaderProgram)
@@ -186,8 +188,62 @@ void GMGammaHelper::setGamma(GMGLTechnique* tech, GMGraphicEngine* engine, IShad
 	}
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMGLTechnique)
+{
+	struct TechniqueContext
+	{
+		GMModel* currentModel = nullptr;
+		GMScene* currentScene = nullptr;
+	};
+
+	struct ShadowContext
+	{
+		GMint64 lastShadowVersion = 0;
+	};
+
+	const IRenderContext* context = nullptr;
+	GMGLGraphicEngine* engine = nullptr;
+	const GMShaderVariablesDesc* variablesDesc = nullptr;
+	GMDebugConfig debugConfig;
+	GMGammaHelper gammaHelper;
+	TechniqueContext techContext;
+	ShadowContext shadowContext;
+
+	Vector<GMShaderVariablesIndices> indexBank;
+
+	struct TextureIndices
+	{
+		Array<GMint32, (GMsize_t)GMTextureType::EndOfEnum> Texture;
+		Array<GMint32, (GMsize_t)GMTextureType::EndOfEnum> Enabled;
+	};
+	Vector<TextureIndices> textureIndices;
+
+	struct TextureTransformIndices
+	{
+		Array<GMint32, (GMsize_t)GMTextureType::EndOfEnum> ScrollS;
+		Array<GMint32, (GMsize_t)GMTextureType::EndOfEnum> ScrollT;
+		Array<GMint32, (GMsize_t)GMTextureType::EndOfEnum> ScaleS;
+		Array<GMint32, (GMsize_t)GMTextureType::EndOfEnum> ScaleT;
+	};
+	Vector<TextureTransformIndices> textureTransformIndices;
+
+	struct ScreenInfoIndices
+	{
+		GMint32 Multisampling;
+		GMint32 ScreenWidth;
+		GMint32 ScreenHeight;
+	};
+	Vector<ScreenInfoIndices> screenInfoIndices;
+	Array<GMint32, GMScene::MaxBoneCount> boneVariableIndices = { 0 };
+	Array<GMint32, GMGraphicEngine::getMaxCascades()> cascadeEndClipVariableIndices = { 0 };
+	Array<GMint32, GMGraphicEngine::getMaxCascades()> cascadeShadowMatrixVariableIndices = { 0 };
+	bool isShadowDirty = true;
+};
+
 GMGLTechnique::GMGLTechnique(const IRenderContext* context)
 {
+	GM_CREATE_DATA(GMGLTechnique);
+
 	D(d);
 	d->context = context;
 	d->engine = gm_cast<GMGLGraphicEngine*>(d->context->getEngine());
@@ -550,7 +606,7 @@ void GMGLTechnique::prepareDebug(GMModel* model)
 {
 	D(d);
 	IShaderProgram* shaderProgram = getShaderProgram();
-	GMint32 mode = d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonNormalMode).toInt();
+	GMint32 mode = d->debugConfig.get(GMDebugConfigs::DrawPolygonNormalMode).toInt();
 	shaderProgram->setInt(VI(Debug.Normal), mode);
 }
 
@@ -689,6 +745,24 @@ void GMGLTechnique::startDraw(GMModel* model)
 		glDrawArrays(mode, 0, gm_sizet_to<GLsizei>(model->getVerticesCount()));
 	else
 		glDrawElements(mode, gm_sizet_to<GLsizei>(model->getVerticesCount()), GL_UNSIGNED_INT, 0);
+}
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMGLTechnique_3D)
+{
+	GMRenderMode renderMode = GMRenderMode::Forward;
+	GMTextureAsset whiteTexture;
+	GMint32 drawDebugNormalIndex = 0;
+};
+
+GMGLTechnique_3D::GMGLTechnique_3D(const IRenderContext* context)
+	: Base(context)
+{
+	GM_CREATE_DATA(GMGLTechnique_3D);
+}
+
+GMGLTechnique_3D::~GMGLTechnique_3D()
+{
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -917,6 +991,24 @@ void GMGLTechnique_CubeMap::prepareTextures(GMModel* model)
 		db->engine->setCubeMap(glTex);
 	}
 }
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMGLTechnique_Filter)
+{
+	struct HDRState
+	{
+		GMToneMapping::Mode toneMapping = GMToneMapping::Reinhard;
+		bool HDR = false;
+	};
+	HDRState state;
+	GMint32 framebufferIndex = 0;
+};
+
+GMGLTechnique_Filter::GMGLTechnique_Filter(const IRenderContext* context)
+	: Base(context)
+{
+	GM_CREATE_DATA(GMGLTechnique_Filter);
+}
+
 //////////////////////////////////////////////////////////////////////////
 void GMGLTechnique_Filter::beforeDraw(GMModel* model)
 {
@@ -991,6 +1083,17 @@ GMint32 GMGLTechnique_Filter::activateTexture(GMModel* model, GMTextureType type
 		shaderProgram->setVec3(VI(FilterAttributes.BlendFactor), ValuePointer(d->engine->getCurrentFilterBlendFactor()));
 
 	return texId;
+}
+
+GM_PRIVATE_OBJECT_ALIGNED(GMGLTechnique_LightPass)
+{
+	Vector<Vector<GMint32>> gbufferIndices;
+};
+
+GMGLTechnique_LightPass::GMGLTechnique_LightPass(const IRenderContext* context)
+	: Base(context)
+{
+	GM_CREATE_DATA(GMGLTechnique_LightPass);
 }
 
 IShaderProgram* GMGLTechnique_LightPass::getShaderProgram()
@@ -1123,3 +1226,5 @@ IShaderProgram* GMGLTechnique_Custom::getShaderProgram()
 	GM_ASSERT(shaderProgram);
 	return shaderProgram;
 }
+
+END_NS

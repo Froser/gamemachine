@@ -46,9 +46,11 @@ class GMTransactionManager
 	GM_FRIEND_CLASS(GMScopeTransaction);
 	GM_FRIEND_CLASS(GMWeakTransaction);
 
+public:
+	~GMTransactionManager();
+
 private:
 	GMTransactionManager();
-	~GMTransactionManager();
 
 public:
 	void beginTransaction(GMTransactionContext* transactionContext);

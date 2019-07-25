@@ -50,11 +50,18 @@ public:
 private:
 	GMuint32 m_id;
 };
-END_NS
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMGLGlyphManager)
+{
+	GMint32 cursor_u, cursor_v;
+	GMfloat maxHeight;
+	GMTextureAsset texture;
+};
 
 GMGLGlyphManager::GMGLGlyphManager(const IRenderContext* context)
 	: GMGlyphManager(context)
 {
+	GM_CREATE_DATA(GMGLGlyphManager);
 	D(d);
 	d->cursor_u = d->cursor_v = 0;
 	d->maxHeight = 0;
@@ -90,3 +97,5 @@ void GMGLGlyphManager::updateTexture(const GMGlyphBitmap& bitmapGlyph, const GMG
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
+
+END_NS

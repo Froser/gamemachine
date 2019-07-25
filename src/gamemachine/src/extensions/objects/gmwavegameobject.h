@@ -58,30 +58,16 @@ enum class GMWaveGameObjectHardwareAcceleration
 	CPU,
 };
 
-GM_PRIVATE_OBJECT(GMWaveGameObject)
-{
-	GMWaveGameObjectDescription objectDescription;
-	Vector<GMWaveDescription> waveDescriptions;
-	GMVertices vertices;
-	bool isPlaying = false;
-	GMDuration duration = 0;
-	GMModel* waveModel = nullptr;
-
-	// GPU 相关变量
-	Vector<Vector<GMWaveDescriptionIndices>> waveIndices;
-	Vector<GMWaveIndices> globalIndices;
-
-	GMWaveGameObjectHardwareAcceleration acceleration = GMWaveGameObjectHardwareAcceleration::GPU;
-};
-
+GM_PRIVATE_CLASS(GMWaveGameObject);
 class GM_EXPORT GMWaveGameObject : public GMGameObject
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMWaveGameObject, GMGameObject)
-	GM_DECLARE_PROPERTY(ObjectDescription, objectDescription)
-	GM_DECLARE_PROPERTY(HandwareAcceleration, acceleration)
+	GM_DECLARE_PRIVATE(GMWaveGameObject)
+	GM_DECLARE_BASE(GMGameObject)
+	GM_DECLARE_PROPERTY(GMWaveGameObjectDescription, ObjectDescription)
+	GM_DECLARE_PROPERTY(GMWaveGameObjectHardwareAcceleration, HandwareAcceleration)
 
 private:
-	GMWaveGameObject() = default;
+	GMWaveGameObject();
 
 public:
 	static void initShader(const IRenderContext* context);

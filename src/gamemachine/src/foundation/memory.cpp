@@ -3,6 +3,8 @@
 #include "debug.h"
 #include <gmthread.h>
 
+BEGIN_NS
+
 GMint32 gm_s_numAlignedAllocs = 0;
 GMint32 gm_s_numAlignedFree = 0;
 GMint32 gm_s_totalBytesAlignedAllocs = 0;//detect memory leaks
@@ -94,3 +96,5 @@ void AlignedMemoryAlloc::gmAlignedFreeInternal(void* ptr)
 	gm_s_numAlignedFree++;
 	gm_s_alignedFreeFunc(ptr);
 }
+
+END_NS

@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmgraphicengine.h"
+#include "gmgraphicengine_p.h"
 #include "foundation/utilities/utilities.h"
 #include "gmassets.h"
 #include "foundation/gamemachine.h"
@@ -145,36 +146,6 @@ IFramebuffers* GMFramebuffersStack::peek()
 		return nullptr;
 	return d->framebuffers.top();
 }
-
-GM_PRIVATE_OBJECT_ALIGNED(GMGraphicEngine)
-{
-	GMThreadId mtid = 0;
-	GMint32 begun = 0;
-	const IRenderContext* context = nullptr;
-	GMCamera camera;
-	GMGlyphManager* glyphManager = nullptr;
-	IFramebuffers* defaultFramebuffers = nullptr;
-	IFramebuffers* filterFramebuffers = nullptr;
-	GMGameObject* filterQuad = nullptr;
-	GMFramebuffersStack framebufferStack;
-	IGBuffer* gBuffer = nullptr;
-	GMRenderConfig renderConfig;
-	GMDebugConfig debugConfig;
-	GMStencilOptions stencilOptions;
-	Vector<ILight*> lights;
-	IShaderLoadCallback* shaderLoadCallback = nullptr;
-	GMGlobalBlendStateDesc blendState;
-	GMOwnedPtr<GMRenderTechniqueManager> renderTechniqueManager;
-	GMOwnedPtr<GMPrimitiveManager> primitiveManager;
-	GMConfigs configs;
-
-	// Shadow
-	GMShadowSourceDesc shadow;
-	GMShadowSourceDesc lastShadow;
-	IFramebuffers* shadowDepthFramebuffers = nullptr;
-	GMMat4 shadowCameraVPmatrices[GMMaxCascades];
-	bool isDrawingShadow = false;
-};
 
 GMGraphicEngine::GMGraphicEngine(const IRenderContext* context)
 {

@@ -17,61 +17,11 @@ private:
 	GMfloat m_gamma = 0.f;
 };
 
-GM_PRIVATE_OBJECT(GMGLTechnique)
-{
-	struct TechniqueContext
-	{
-		GMModel* currentModel = nullptr;
-		GMScene* currentScene = nullptr;
-	};
-
-	struct ShadowContext
-	{
-		GMint64 lastShadowVersion = 0;
-	};
-
-	const IRenderContext* context = nullptr;
-	GMGLGraphicEngine* engine = nullptr;
-	const GMShaderVariablesDesc* variablesDesc = nullptr;
-	GMDebugConfig debugConfig;
-	GMGammaHelper gammaHelper;
-	TechniqueContext techContext;
-	ShadowContext shadowContext;
-
-	Vector<GMShaderVariablesIndices> indexBank;
-
-	struct TextureIndices
-	{
-		Array<GMint32, (GMsize_t)GMTextureType::EndOfEnum> Texture;
-		Array<GMint32, (GMsize_t)GMTextureType::EndOfEnum> Enabled;
-	};
-	Vector<TextureIndices> textureIndices;
-
-	struct TextureTransformIndices
-	{
-		Array<GMint32, (GMsize_t)GMTextureType::EndOfEnum> ScrollS;
-		Array<GMint32, (GMsize_t)GMTextureType::EndOfEnum> ScrollT;
-		Array<GMint32, (GMsize_t)GMTextureType::EndOfEnum> ScaleS;
-		Array<GMint32, (GMsize_t)GMTextureType::EndOfEnum> ScaleT;
-	};
-	Vector<TextureTransformIndices> textureTransformIndices;
-
-	struct ScreenInfoIndices
-	{
-		GMint32 Multisampling;
-		GMint32 ScreenWidth;
-		GMint32 ScreenHeight;
-	};
-	Vector<ScreenInfoIndices> screenInfoIndices;
-	Array<GMint32, GMScene::MaxBoneCount> boneVariableIndices = { 0 };
-	Array<GMint32, GMGraphicEngine::getMaxCascades()> cascadeEndClipVariableIndices = { 0 };
-	Array<GMint32, GMGraphicEngine::getMaxCascades()> cascadeShadowMatrixVariableIndices = { 0 };
-	bool isShadowDirty = true;
-};
-
-class GMGLTechnique : public GMObject, public ITechnique
+GM_PRIVATE_CLASS(GMGLTechnique);
+class GMGLTechnique : public ITechnique
 {
 	GM_DECLARE_PRIVATE(GMGLTechnique)
+	GM_DISABLE_COPY_ASSIGN(GMGLTechnique)
 
 public:
 	GMGLTechnique(const IRenderContext* context);
@@ -117,19 +67,15 @@ private:
 	void startDraw(GMModel* model);
 };
 
-GM_PRIVATE_OBJECT(GMGLTechnique_3D)
-{
-	GMRenderMode renderMode = GMRenderMode::Forward;
-	GMTextureAsset whiteTexture;
-	GMint32 drawDebugNormalIndex = 0;
-};
-
+GM_PRIVATE_CLASS(GMGLTechnique_3D);
 class GMGLTechnique_3D : public GMGLTechnique
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMGLTechnique_3D, GMGLTechnique)
+	GM_DECLARE_PRIVATE(GMGLTechnique_3D)
+	GM_DECLARE_BASE(GMGLTechnique)
 
 public:
-	using GMGLTechnique::GMGLTechnique;
+	GMGLTechnique_3D(const IRenderContext* context);
+	~GMGLTechnique_3D();
 
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
@@ -175,23 +121,14 @@ protected:
 	void prepareTextures(GMModel* model);
 };
 
-GM_PRIVATE_OBJECT(GMGLTechnique_Filter)
-{
-	struct HDRState
-	{
-		GMToneMapping::Mode toneMapping = GMToneMapping::Reinhard;
-		bool HDR = false;
-	};
-	HDRState state;
-	GMint32 framebufferIndex = 0;
-};
-
+GM_PRIVATE_CLASS(GMGLTechnique_Filter);
 class GMGLTechnique_Filter : public GMGLTechnique
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMGLTechnique_Filter, GMGLTechnique)
+	GM_DECLARE_PRIVATE(GMGLTechnique_Filter)
+	GM_DECLARE_BASE(GMGLTechnique)
 
 public:
-	using GMGLTechnique::GMGLTechnique;
+	GMGLTechnique_Filter(const IRenderContext* context);
 
 private:
 	virtual void beforeDraw(GMModel* model) override;
@@ -210,17 +147,14 @@ private:
 	void setHDR(IShaderProgram* shaderProgram);
 };
 
-GM_PRIVATE_OBJECT(GMGLTechnique_LightPass)
-{
-	Vector<Vector<GMint32>> gbufferIndices;
-};
-
+GM_PRIVATE_CLASS(GMGLTechnique_LightPass);
 class GMGLTechnique_LightPass : public GMGLTechnique
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMGLTechnique_LightPass, GMGLTechnique)
+	GM_DECLARE_PRIVATE(GMGLTechnique_LightPass)
+	GM_DECLARE_BASE(GMGLTechnique)
 
 public:
-	using GMGLTechnique::GMGLTechnique;
+	GMGLTechnique_LightPass(const IRenderContext* context);
 
 protected:
 	virtual IShaderProgram* getShaderProgram() override;

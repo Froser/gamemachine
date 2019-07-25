@@ -3,6 +3,9 @@
 #include "gmengine/gmmessage.h"
 #include "foundation/gamemachine.h"
 #include "gmwidget.h"
+#include "gmwindow_p.h"
+
+BEGIN_NS
 
 bool GMWindow::getInterface(GameMachineInterfaceID id, void** out)
 {
@@ -12,6 +15,13 @@ bool GMWindow::getInterface(GameMachineInterfaceID id, void** out)
 bool GMWindow::setInterface(GameMachineInterfaceID id, void* in)
 {
 	return false;
+}
+
+void GMWindow::setWindowHandle(GMWindowHandle handle, bool autoRelease)
+{
+	D(d);
+	d->handle = handle;
+	d->ownedHandle = autoRelease;
 }
 
 bool GMWindow::handleSystemEvent(GMSystemEvent* event, REF GMLResult& result)
@@ -51,6 +61,17 @@ bool GMWindow::handleSystemEvent(GMSystemEvent* event, REF GMLResult& result)
 			return true;
 	}
 	return r;
+}
+
+const GMwchar* GMWindow::getWindowClassName()
+{
+	return L"GameMachine Window";
+}
+
+GMWindowHandle GMWindow::getWindowHandle() const
+{
+	D(d);
+	return d->handle;
 }
 
 bool GMWindow::addWidget(GMWidget* widget)
@@ -101,6 +122,11 @@ bool GMWindow::canClose()
 	return true;
 }
 
+GMWindow::GMWindow()
+{
+	GM_CREATE_DATA(GMWindow);
+}
+
 void GMWindow::msgProc(const GMMessage& message)
 {
 	D(d);
@@ -145,3 +171,5 @@ GMRect GMWindow::getFramebufferRect()
 	D(d);
 	return d->windowStates.framebufferRect;
 }
+
+END_NS

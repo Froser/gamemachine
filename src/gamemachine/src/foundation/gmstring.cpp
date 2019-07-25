@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #endif
 
+BEGIN_NS
+
 GMsize_t GMString::npos = std::string::npos;
 
 namespace
@@ -599,3 +601,5 @@ void GMScanner::peek(REF GMString& ref)
 	next(ref);
 	d->p = t;
 }
+
+END_NS

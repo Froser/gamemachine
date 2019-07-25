@@ -45,6 +45,7 @@ set(SOURCES
 		gmdata/modelreader/gmmodelreader_assimp.h
 		gmdata/modelreader/gmmodelreader_assimp.cpp
 		gmdata/gamepackage/gmgamepackage.h
+		gmdata/gamepackage/gmgamepackage_p.h
 		gmdata/gamepackage/gmgamepackage.cpp
 		gmdata/gamepackage/gmgamepackagehandler.h
 		gmdata/gamepackage/gmgamepackagehandler.cpp
@@ -61,6 +62,7 @@ set(SOURCES
 		gmdata/gmshader.h
 		gmdata/gmshader.cpp
 		gmengine/gmgraphicengine.h
+		gmengine/gmgraphicengine_p.h
 		gmengine/gmgraphicengine.cpp
 		gmengine/gmassets.h
 		gmengine/gmassets.cpp
@@ -114,6 +116,7 @@ set(SOURCES
 		gmengine/ui/gmwidget_p.h
 		gmengine/ui/gmwidget.cpp
 		gmengine/ui/gmwindow.h
+		gmengine/ui/gmwindow_p.h
 		gmengine/ui/gmwindow.cpp
 		gmengine/ui/gmcontrols.h
 		gmengine/ui/gmcontrols_p.h
@@ -138,6 +141,7 @@ set(SOURCES
 		gmgl/gmglshaderprogram.h
 		gmgl/gmglshaderprogram.cpp
 		gmgl/gmgltexture.h
+		gmgl/gmgltexture_p.h
 		gmgl/gmgltexture.cpp
 		gmgl/gmglframebuffer.h
 		gmgl/gmglframebuffer.cpp

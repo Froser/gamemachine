@@ -1,15 +1,10 @@
 ﻿#include "stdafx.h"
 #include "gmgamepackage.h"
 #include "gmgamepackagehandler.h"
+#include "gmgamepackage_p.h"
 #include <sys/stat.h>
 
 BEGIN_NS
-GM_PRIVATE_OBJECT_UNALIGNED(GMGamePackage)
-{
-	GMString packagePath;
-	GMScopedPtr<IGamePackageHandler> handler;
-};
-
 GMGamePackage::GMGamePackage()
 {
 	GM_CREATE_DATA(GMGamePackage);

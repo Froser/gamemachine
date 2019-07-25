@@ -7,12 +7,22 @@
 #include "gmglgraphic_engine.h"
 #include "foundation/gamemachine.h"
 
+BEGIN_NS
+
 GM_STATIC_ASSERT(sizeof(gm::GMfloat) == sizeof(gm::GMint32), "Wrong type size.");
 #define BIT32_OFFSET(i) ((void*)(sizeof(gm::GMfloat) * i))
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMGLModelDataProxy)
+{
+	GMGLGraphicEngine* engine = nullptr;
+	bool inited = false;
+	GMModelBufferType lastType;
+};
 
 GMGLModelDataProxy::GMGLModelDataProxy(const IRenderContext* context, GMModel* objs)
 	: GMModelDataProxy(context, objs)
 {
+	GM_CREATE_DATA(GMGLModelDataProxy);
 	D(d);
 	if (context)
 		d->engine = static_cast<GMGLGraphicEngine*>(context->getEngine());
@@ -151,3 +161,5 @@ void* GMGLModelDataProxy::getBuffer()
 	else
 		return glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE);
 }
+
+END_NS

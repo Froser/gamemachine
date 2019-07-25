@@ -7,16 +7,11 @@ BEGIN_NS
 
 class GMGLGraphicEngine;
 struct ITechnique;
-GM_PRIVATE_OBJECT(GMGLModelDataProxy)
-{
-	GMGLGraphicEngine* engine = nullptr;
-	bool inited = false;
-	GMModelBufferType lastType;
-};
-
+GM_PRIVATE_CLASS(GMGLModelDataProxy);
 class GMGLModelDataProxy : public GMModelDataProxy
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMGLModelDataProxy, GMModelDataProxy)
+	GM_DECLARE_PRIVATE(GMGLModelDataProxy)
+	GM_DECLARE_BASE(GMModelDataProxy)
 
 public:
 	GMGLModelDataProxy(const IRenderContext* context, GMModel* objs);

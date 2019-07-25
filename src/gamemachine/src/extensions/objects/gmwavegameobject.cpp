@@ -4,6 +4,8 @@
 #include <gmgl/shader_constants.h>
 #include "wrapper/dx11wrapper.h"
 
+BEGIN_NS
+
 #define getVertexIndex(x, y) ((x) + (y) * (sliceM + 1))
 #define __L(txt) L ## txt
 #define _L(txt) __L(txt)
@@ -174,6 +176,29 @@ namespace
 
 		return q * desc.amplitude * desc.direction[2] * pos[2] * Cos(rad);
 	}
+}
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMWaveGameObject)
+{
+	GMWaveGameObjectDescription objectDescription;
+	Vector<GMWaveDescription> waveDescriptions;
+	GMVertices vertices;
+	bool isPlaying = false;
+	GMDuration duration = 0;
+	GMModel* waveModel = nullptr;
+
+	// GPU 相关变量
+	Vector<Vector<GMWaveDescriptionIndices>> waveIndices;
+	Vector<GMWaveIndices> globalIndices;
+
+	GMWaveGameObjectHardwareAcceleration acceleration = GMWaveGameObjectHardwareAcceleration::GPU;
+};
+
+GM_DECLARE_PROPERTY(GMWaveGameObject, GMWaveGameObjectDescription, ObjectDescription, objectDescription)
+GM_DECLARE_PROPERTY(GMWaveGameObject, GMWaveGameObjectHardwareAcceleration, HandwareAcceleration, acceleration)
+GMWaveGameObject::GMWaveGameObject()
+{
+	GM_CREATE_DATA(GMWaveGameObject);
 }
 
 void GMWaveGameObject::initShader(const IRenderContext* context)
@@ -491,3 +516,5 @@ void GMWaveGameObject::setVertices(const GMVertices& vertices)
 	D(d);
 	d->vertices = vertices;
 }
+
+END_NS

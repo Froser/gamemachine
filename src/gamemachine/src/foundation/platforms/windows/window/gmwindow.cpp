@@ -3,6 +3,7 @@
 #include "foundation/platforms/windows/window/gminput.h"
 #include "foundation/gamemachine.h"
 #include "gmengine/ui/gmwidget.h"
+#include "gmengine/ui/gmwindow_p.h"
 
 #ifndef GetWindowOwner
 #	define GetWindowOwner(hwnd) GetWindow(hwnd, GW_OWNER)
@@ -14,6 +15,8 @@
 
 #define DefaultWindowWidth 1024
 #define DefaultWindowHeight 768
+
+BEGIN_NS
 
 namespace
 {
@@ -118,10 +121,6 @@ IGraphicEngine* GMRenderContext::getEngine() const
 GMWindowProcHandler GMWindow::getProcHandler()
 {
 	return &WndProc;
-}
-
-GMWindow::GMWindow()
-{
 }
 
 GMWindow::~GMWindow()
@@ -306,3 +305,5 @@ void GMWindow::onWindowDestroyed()
 void GMWindow::setMultithreadRenderingFlag(GMMultithreadRenderingFlag)
 {
 }
+
+END_NS

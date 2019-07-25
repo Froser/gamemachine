@@ -5,6 +5,9 @@
 #include "gmdata/gmmodel.h"
 #include <GL/glew.h>
 #include "gmglgraphic_engine.h"
+#include "gmgltexture_p.h"
+
+BEGIN_NS
 
 namespace
 {
@@ -83,6 +86,8 @@ namespace
 
 GMGLTexture::GMGLTexture(const GMImage* image)
 {
+	GM_CREATE_DATA(GMGLTexture);
+
 	D(d);
 	if (image)
 	{
@@ -227,8 +232,16 @@ void GMGLTexture::useTexture(GMint32 textureIndex)
 	glBindTexture(d->target, d->id);
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMGLWhiteTexture)
+{
+	GMuint32 textureId = 0;
+	const IRenderContext* context = nullptr;
+};
+
 GMGLWhiteTexture::GMGLWhiteTexture(const IRenderContext* context)
 {
+	GM_CREATE_DATA(GMGLWhiteTexture);
+
 	D(d);
 	d->context = context;
 }
@@ -276,3 +289,5 @@ void GMGLEmptyTexture::init()
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
+
+END_NS

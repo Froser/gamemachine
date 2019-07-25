@@ -11,6 +11,8 @@
 #pragma warning (disable: 4311)
 #pragma warning (disable: 4312)
 
+BEGIN_NS
+
 namespace
 {
 	GMint32 toTechniqueEntranceId(const GMString& instanceName)
@@ -119,8 +121,20 @@ GMShaderType GMGLShaderInfo::fromGLShaderType(GMuint32 type)
 	return GMShaderType::Unknown;
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMGLShaderProgram)
+{
+	const IRenderContext* context = nullptr;
+	GMGLShaderInfos shaderInfos;
+	GMGLShaderIDList shaders;
+	GMuint32 shaderProgram = 0;
+	GMuint32 techniqueIndex = 0;
+	HashMap<GMString, GMString, GMStringHashFunctor> aliasMap;
+};
+
 GMGLShaderProgram::GMGLShaderProgram(const IRenderContext* context)
 {
+	GM_CREATE_DATA(GMGLShaderProgram);
+
 	D(d);
 	d->context = context;
 }
@@ -292,6 +306,18 @@ bool GMGLShaderProgram::load()
 	return true;
 }
 
+GMuint32 GMGLShaderProgram::getProgram()
+{
+	D(d);
+	return d->shaderProgram;
+}
+
+void GMGLShaderProgram::setProgram(GMuint32 program)
+{
+	D(d);
+	d->shaderProgram = program;
+}
+
 void GMGLShaderProgram::removeShaders()
 {
 	D(d);
@@ -408,8 +434,17 @@ bool GMGLShaderProgram::getInterface(GameMachineInterfaceID id, void** out)
 }
 
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMGLComputeShaderProgram)
+{
+	const IRenderContext* context = nullptr;
+	GMuint32 shaderProgram = 0;
+	GMuint32 shaderId = 0;
+	GMuint32 boBase = 0;
+};
+
 GMGLComputeShaderProgram::GMGLComputeShaderProgram(const IRenderContext* context)
 {
+	GM_CREATE_DATA(GMGLComputeShaderProgram);
 	D(d);
 	d->context = context;
 }
@@ -678,3 +713,5 @@ void GMGLComputeShaderProgram::cleanUp()
 	D(d);
 	d->boBase = 0;
 }
+
+END_NS
