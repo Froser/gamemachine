@@ -8,10 +8,48 @@
 #include "gmdx11gbuffer.h"
 #include "gmdx11glyphmanager.h"
 #include "gmengine/gmcsmhelper.h"
+#include "gmengine/gmgraphicengine_p.h"
+
+BEGIN_NS
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMDx11GraphicEngine)
+{
+	GMComPtr<ID3D11Device> device;
+	GMComPtr<ID3D11DeviceContext> deviceContext;
+	GMComPtr<IDXGISwapChain> swapChain;
+	GMComPtr<ID3D11DepthStencilView> depthStencilView;
+	GMComPtr<ID3D11Texture2D> depthStencilTexture;
+	GMComPtr<ID3D11RenderTargetView> renderTargetView;
+	GMScopedPtr<IShaderProgram> shaderProgram;
+	GMDx11CubeMapState cubemapState;
+
+	bool inited = false;
+	bool ready = false;
+	bool lightDirty = true;
+
+	GMOwnedPtr<ITechnique> technique_3d;
+	GMOwnedPtr<ITechnique> technique_2d;
+	GMOwnedPtr<ITechnique> technique_text;
+	GMOwnedPtr<ITechnique> technique_cubemap;
+	GMOwnedPtr<ITechnique> technique_filter;
+	GMOwnedPtr<ITechnique> technique_deferred_3d;
+	GMOwnedPtr<ITechnique> technique_deferred_3d_lightpass;
+	GMOwnedPtr<ITechnique> technique_3d_shadow;
+	GMOwnedPtr<ITechnique> technique_particle;
+	GMOwnedPtr<ITechnique> technique_custom;
+
+	GMint32 lightCountIndices = 0;
+};
 
 GMDx11GraphicEngine::GMDx11GraphicEngine(const IRenderContext* context)
 	: GMGraphicEngine(context)
 {
+	GM_CREATE_DATA();
+}
+
+GMDx11GraphicEngine::~GMDx11GraphicEngine()
+{
+
 }
 
 void GMDx11GraphicEngine::init()
@@ -76,6 +114,48 @@ void GMDx11GraphicEngine::activateLights(ITechnique* technique)
 		}
 		d->lightDirty = false;
 	}
+}
+
+const GMVec2 GMDx11GraphicEngine::getCurrentFilterKernelDelta()
+{
+	D_BASE(d, Base);
+	return d->renderConfig.get(GMRenderConfigs::FilterKernelOffset_Vec2).toVec2();
+}
+
+ID3D11RenderTargetView* GMDx11GraphicEngine::getRenderTargetView()
+{
+	D(d);
+	return d->renderTargetView;
+}
+
+ID3D11DepthStencilView* GMDx11GraphicEngine::getDepthStencilView()
+{
+	D(d);
+	return d->depthStencilView;
+}
+
+IDXGISwapChain* GMDx11GraphicEngine::getSwapChain()
+{
+	D(d);
+	return d->swapChain;
+}
+
+ID3D11DeviceContext* GMDx11GraphicEngine::getDeviceContext()
+{
+	D(d);
+	return d->deviceContext;
+}
+
+ID3D11Device* GMDx11GraphicEngine::getDevice()
+{
+	D(d);
+	return d->device;
+}
+
+GMDx11CubeMapState& GMDx11GraphicEngine::getCubeMapState()
+{
+	D(d);
+	return d->cubemapState;
 }
 
 IShaderProgram* GMDx11GraphicEngine::getShaderProgram(GMShaderProgramType type)
@@ -252,3 +332,5 @@ GMGlyphManager* GMDx11GraphicEngine::getGlyphManager()
 	}
 	return d->glyphManager;
 }
+
+END_NS

@@ -138,13 +138,13 @@ GM_PRIVATE_OBJECT_ALIGNED(GMPrimitive3DObject)
 
 GMPrimitive3DObject::GMPrimitive3DObject()
 {
-	GM_CREATE_DATA(GMPrimitive3DObject);
+	GM_CREATE_DATA();
 }
 
 GMPrimitive3DObject::GMPrimitive3DObject(GMSceneAsset asset)
 	: Base(asset)
 {
-	GM_CREATE_DATA(GMPrimitive3DObject);
+	GM_CREATE_DATA();
 }
 
 GMPrimitive3DObject::~GMPrimitive3DObject()
@@ -271,7 +271,7 @@ class GMPrimitiveLine2D : public GMObject, public IPrimitive
 public:
 	GMPrimitiveLine2D(GMPrimitiveManager& manager, const GMPoint& p1, const GMPoint& p2, const GMVec4& color)
 	{
-		GM_CREATE_DATA(GMPrimitiveLine2D);
+		GM_CREATE_DATA();
 
 		D(d);
 		d->manager = &manager;
@@ -345,7 +345,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMPrimitiveManager)
 
 GMPrimitiveManager::GMPrimitiveManager(const IRenderContext* context)
 {
-	GM_CREATE_DATA(GMPrimitiveManager);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->context = context;

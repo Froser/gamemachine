@@ -77,7 +77,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLGraphicEngine)
 GMGLGraphicEngine::GMGLGraphicEngine(const IRenderContext* context)
 	: GMGraphicEngine(context)
 {
-	GM_CREATE_DATA(GMGLGraphicEngine);
+	GM_CREATE_DATA();
 }
 
 void GMGLGraphicEngine::init()

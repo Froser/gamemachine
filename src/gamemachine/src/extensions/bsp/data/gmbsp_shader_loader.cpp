@@ -10,6 +10,8 @@
 #include "gmdata/xml/gmxml.h"
 #include <gmlight.h>
 
+BEGIN_NS
+
 #define BEGIN_PARSE(name) if ( GMString::stringEquals(it->Value(), #name) ) parse_##name(shader, it)
 #define PARSE(name) else if ( GMString::stringEquals(it->Value(), #name) ) parse_##name(shader, it)
 #define END_PARSE
@@ -101,8 +103,21 @@ namespace
 	}
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMBSPShaderLoader)
+{
+	GMString directory;
+	GMBSPGameWorld* world;
+	GMBSPRenderData* bspRender;
+	Map<GMString, GMXMLElement*> items;
+	AlignedVector<GMXMLDocument*> shaderDocs;
+
+	// 纹理编号，从TEXTURE_INDEX_AMBIENT开始
+	GMint32 lightmapId;
+};
+
 GMBSPShaderLoader::GMBSPShaderLoader()
 {
+	GM_CREATE_DATA();
 	D(d);
 	d->world = nullptr;
 	d->bspRender = nullptr;
@@ -252,7 +267,7 @@ void GMBSPShaderLoader::parseItem(GMXMLElement* elem, GMint32 lightmapId, REF GM
 		END_PARSE;
 	}
 
-	if (shader.getSurfaceFlag() & SURF_SKY)
+	if (shader.getFlag() & SURF_SKY)
 		createSky(shader);
 
 	parseEnd();
@@ -270,7 +285,7 @@ void GMBSPShaderLoader::parseEnd()
 
 void GMBSPShaderLoader::parse_surfaceparm(GMShader& shader, GMXMLElement* elem)
 {
-	shader.setSurfaceFlag(shader.getSurfaceFlag() | parseSurfaceParm(elem->GetText()));
+	shader.setSurfaceFlag(shader.getFlag() | parseSurfaceParm(elem->GetText()));
 }
 
 void GMBSPShaderLoader::parse_cull(GMShader& shader, GMXMLElement* elem)
@@ -558,3 +573,5 @@ void GMBSPShaderLoader::createSky(GMShader& shader)
 		d->world->setSky(sky);
 	}
 }
+
+END_NS

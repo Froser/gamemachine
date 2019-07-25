@@ -215,7 +215,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMAnimationKeyframe)
 
 GMAnimationKeyframe::GMAnimationKeyframe(GMfloat timePoint)
 {
-	GM_CREATE_DATA(GMAnimationKeyframe);
+	GM_CREATE_DATA();
 	setTime(timePoint);
 	setFunctors(GMInterpolationFunctors::getDefaultInterpolationFunctors());
 }
@@ -249,7 +249,7 @@ GMGameObjectKeyframe::GMGameObjectKeyframe(
 )
 	: GMAnimationKeyframe(timePoint)
 {
-	GM_CREATE_DATA(GMGameObjectKeyframe);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->component = component;
@@ -345,7 +345,7 @@ GM_DEFINE_PROPERTY(GMCameraKeyframe, GMVec3, FocusAt, focusAt)
 GMCameraKeyframe::GMCameraKeyframe(GMCameraKeyframeComponent component, const GMVec3& position, const GMVec3& lookAtDirectionOrFocusAt, GMfloat timePoint)
 	: GMAnimationKeyframe(timePoint)
 {
-	GM_CREATE_DATA(GMCameraKeyframe);
+	GM_CREATE_DATA();
 	D(d);
 	setPosition(position);
 	if (component == GMCameraKeyframeComponent::LookAtDirection)
@@ -451,7 +451,7 @@ GMLightKeyframe::GMLightKeyframe(
 )
 	: GMAnimationKeyframe(timePoint)
 {
-	GM_CREATE_DATA(GMLightKeyframe);
+	GM_CREATE_DATA();
 	D(d);
 	setAmbient(ambient);
 	setDiffuse(diffuse);

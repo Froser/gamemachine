@@ -10,24 +10,11 @@ BEGIN_NS
 class GMBSPGameWorld;
 class GMBSPMove;
 
-GM_PRIVATE_OBJECT_FROM(GMBSPPhysicsWorld, GMPhysicsWorld)
-{
-	GMBSPGameWorld* world;
-
-	AlignedVector<BSPTracePlane> planes;
-	AlignedVector<GMBSP_Physics_Brush> brushes;
-	AlignedVector<GMBSP_Physics_BrushSide> brushsides;
-
-	GMBSPTrace trace;
-	GMBSPPatch patch;
-
-	Map<GMPhysicsObject*, GMBSPMove*> objectMoves;
-	Map<GMGameObject*, GMPhysicsObject*> collisionObjects;
-};
-
+GM_PRIVATE_CLASS(GMBSPPhysicsWorld);
 class GMBSPPhysicsWorld : public GMPhysicsWorld
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMBSPPhysicsWorld, GMPhysicsWorld)
+	GM_DECLARE_PRIVATE(GMBSPPhysicsWorld)
+	GM_DECLARE_BASE(GMPhysicsWorld)
 
 public:
 	GMBSPPhysicsWorld(GMGameWorld* world);

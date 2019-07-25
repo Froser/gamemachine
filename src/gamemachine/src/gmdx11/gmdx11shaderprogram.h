@@ -6,16 +6,11 @@
 #include <gmgraphicengine.h>
 BEGIN_NS
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMDx11EffectShaderProgram)
-{
-	GMComPtr<ID3DX11Effect> effect;
-	Vector<ID3DX11EffectVariable*> variables;
-	GMAtomic<GMint32> nextVariableIndex;
-};
-
+GM_PRIVATE_CLASS(GMDx11EffectShaderProgram);
 class GMDx11EffectShaderProgram : public IShaderProgram
 {
-	GM_DECLARE_PRIVATE_NGO(GMDx11EffectShaderProgram)
+	GM_DECLARE_PRIVATE(GMDx11EffectShaderProgram)
+	GM_DISABLE_COPY_ASSIGN(GMDx11EffectShaderProgram)
 
 public:
 	GMDx11EffectShaderProgram(GMComPtr<ID3DX11Effect> effect);
@@ -44,21 +39,15 @@ private:
 	ID3DX11EffectClassInstanceVariable* getInstanceVariable(GMint32 index);
 };
 
-class GMDx11GraphicEngine;
-GM_PRIVATE_OBJECT_UNALIGNED(GMDx11ComputeShaderProgram)
-{
-	const IRenderContext* context = nullptr;
-	GMDx11GraphicEngine* engine = nullptr;
-	GMComPtr<ID3D11ComputeShader> shader;
-	GMuint32 SRV_UAV_CB_count[3] = { 0 };
-};
-
+GM_PRIVATE_CLASS(GMDx11ComputeShaderProgram);
 class GMDx11ComputeShaderProgram : public IComputeShaderProgram
 {
-	GM_DECLARE_PRIVATE_NGO(GMDx11ComputeShaderProgram)
+	GM_DECLARE_PRIVATE(GMDx11ComputeShaderProgram)
+	GM_DISABLE_COPY_ASSIGN(GMDx11ComputeShaderProgram)
 
 public:
 	GMDx11ComputeShaderProgram(const IRenderContext* context);
+	~GMDx11ComputeShaderProgram();
 
 public:
 	virtual void dispatch(GMint32 threadGroupCountX, GMint32 threadGroupCountY, GMint32 threadGroupCountZ) override;

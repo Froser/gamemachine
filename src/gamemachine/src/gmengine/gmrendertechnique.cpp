@@ -43,7 +43,7 @@ const Set<GMRenderTechniques>& GMRenderTechniqueManager::getRenderTechniques() c
 
 GMRenderTechniqueManager::GMRenderTechniqueManager(const IRenderContext* context)
 {
-	GM_CREATE_DATA(GMRenderTechniqueManager);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->id = StartupTechinqueID;
@@ -92,7 +92,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMRenderTechnique)
 
 GMRenderTechnique::GMRenderTechnique(GMShaderType shaderType)
 {
-	GM_CREATE_DATA(GMRenderTechnique);
+	GM_CREATE_DATA();
 	setShaderType(shaderType);
 }
 
@@ -114,13 +114,13 @@ GMRenderTechnique::GMRenderTechnique(GMRenderTechnique&& rhs) GM_NOEXCEPT
 
 GMRenderTechnique& GMRenderTechnique::operator=(GMRenderTechnique&& rhs) GM_NOEXCEPT
 {
-	GM_COPY(rhs);
+	GM_MOVE(rhs);
 	return *this;
 }
 
 GMRenderTechnique& GMRenderTechnique::operator=(const GMRenderTechnique& rhs)
 {
-	GM_MOVE(rhs);
+	GM_COPY(rhs);
 	return *this;
 }
 
@@ -174,6 +174,11 @@ GMRenderTechniques::GMRenderTechniques(const GMRenderTechniques& rhs)
 GMRenderTechniques::GMRenderTechniques(GMRenderTechniques&& rhs) GM_NOEXCEPT
 {
 	*this = std::move(rhs);
+}
+
+GMRenderTechniques::~GMRenderTechniques()
+{
+
 }
 
 GMRenderTechniques& GMRenderTechniques::operator=(const GMRenderTechniques& rhs)

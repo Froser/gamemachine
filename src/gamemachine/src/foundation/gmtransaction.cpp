@@ -13,7 +13,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMTransaction)
 
 GMTransaction::GMTransaction()
 {
-	GM_CREATE_DATA(GMTransaction);
+	GM_CREATE_DATA();
 }
 
 GMTransaction::~GMTransaction()
@@ -81,7 +81,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMTransactionManager)
 
 GMTransactionManager::GMTransactionManager()
 {
-	GM_CREATE_DATA(GMTransactionManager);
+	GM_CREATE_DATA();
 }
 
 GMTransactionManager::~GMTransactionManager()

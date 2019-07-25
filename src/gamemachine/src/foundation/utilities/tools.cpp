@@ -24,7 +24,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMClock)
 
 GMClock::GMClock()
 {
-	GM_CREATE_DATA(GMClock);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->fps = 0;
@@ -145,7 +145,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMStopwatch)
 
 GMStopwatch::GMStopwatch()
 {
-	GM_CREATE_DATA(GMStopwatch);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->frequency = GMClock::highResolutionTimerFrequency();
@@ -269,7 +269,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMMemoryStream)
 
 GMMemoryStream::GMMemoryStream(const GMbyte* buffer, GMsize_t size)
 {
-	GM_CREATE_DATA(GMMemoryStream);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->start = buffer;
@@ -358,7 +358,7 @@ Bitset::~Bitset()
 
 Bitset::Bitset()
 {
-	GM_CREATE_DATA(Bitset);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->numBytes = 0;

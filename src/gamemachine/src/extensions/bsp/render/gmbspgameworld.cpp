@@ -4,6 +4,7 @@
 #include "gmdata/imagereader/gmimagereader.h"
 #include "foundation/utilities/tools.h"
 #include "gmdata/gmimagebuffer.h"
+#include "extensions/bsp/data/gmbsp.h"
 #include "extensions/bsp/data/gmbsp_shader_loader.h"
 #include "gmdata/gamepackage/gmgamepackage.h"
 #include <algorithm>
@@ -14,6 +15,7 @@
 #include "gmengine/gameobjects/gmgameobject.h"
 #include "extensions/bsp/physics/gmbspphysicsworld.h"
 #include <gmlight.h>
+#include "gmbspgameworld_p.h"
 
 BEGIN_NS
 
@@ -53,8 +55,17 @@ namespace
 	};
 }
 
+GM_PRIVATE_OBJECT_ALIGNED(GMBSPSkyGameObject)
+{
+	GMVec3 min;
+	GMVec3 max;
+	GMShader shader;
+};
+
 GMBSPSkyGameObject::GMBSPSkyGameObject(const GMShader& shader, const GMVec3& min, const GMVec3& max)
 {
+	GM_CREATE_DATA();
+
 	D(d);
 	d->shader = shader;
 	d->min = min;
@@ -188,11 +199,11 @@ namespace
 	}
 }
 
-END_NS
-
 GMBSPGameWorld::GMBSPGameWorld(const IRenderContext* context)
 	: GMGameWorld(context)
 {
+	GM_CREATE_DATA();
+
 	D(d);
 	d->physics = new GMBSPPhysicsWorld(this);
 	d->debugConfig = context->getEngine()->getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
@@ -234,8 +245,7 @@ GMGameObject* GMBSPGameWorld::getSky()
 void GMBSPGameWorld::renderScene()
 {
 	GM_PROFILE(getContext()->getEngine(), "renderScene");
-	D_BASE(d, Base);
-	IGraphicEngine* engine = d->context->getEngine();
+	IGraphicEngine* engine = getContext()->getEngine();
 	engine->begin();
 	prepareAllToRenderList();
 	Base::renderScene();
@@ -310,7 +320,7 @@ void GMBSPGameWorld::calculateVisibleFaces()
 
 	GMCamera& camera = getContext()->getEngine()->getCamera();
 	GMVec3 pos = camera.getLookAt().position;
-	BSPData& bsp = d->bsp.bspData();
+	GMBSPData& bsp = d->bsp.bspData();
 
 	rd.facesToDraw.clearAll();
 	rd.entitiesToDraw.clearAll();
@@ -341,7 +351,7 @@ void GMBSPGameWorld::calculateVisibleFaces()
 GMint32 GMBSPGameWorld::calculateLeafNode(const GMVec3& position)
 {
 	D(d);
-	BSPData& bsp = d->bsp.bspData();
+	GMBSPData& bsp = d->bsp.bspData();
 
 	GMint32 currentNode = 0;
 
@@ -349,7 +359,7 @@ GMint32 GMBSPGameWorld::calculateLeafNode(const GMVec3& position)
 	while (currentNode >= 0)
 	{
 		//if the camera is in front of the plane for this node, assign i to be the front node
-		if (bsp.planes[bsp.nodes[currentNode].planeNum].classifyPoint(position) == POINT_IN_FRONT_OF_PLANE)
+		if (bsp.planes[bsp.nodes[currentNode].planeNum].classifyPoint(position) == GMPointPosition::PointInFrontOfPlane)
 			currentNode = bsp.nodes[currentNode].children[0]; //front
 		else
 			currentNode = bsp.nodes[currentNode].children[1]; //back
@@ -362,7 +372,7 @@ GMint32 GMBSPGameWorld::calculateLeafNode(const GMVec3& position)
 GMint32 GMBSPGameWorld::isClusterVisible(GMint32 cameraCluster, GMint32 testCluster)
 {
 	D(d);
-	BSPData& bsp = d->bsp.bspData();
+	GMBSPData& bsp = d->bsp.bspData();
 	GMBSPRenderData& rd = d->render.renderData();
 
 	GMint32 index = cameraCluster * rd.visibilityData.bytesPerCluster + testCluster / 8;
@@ -395,9 +405,9 @@ void GMBSPGameWorld::prepareSkyToRenderList()
 void GMBSPGameWorld::prepareFacesToRenderList()
 {
 	GM_PROFILE(getContext()->getEngine(), "drawFaces");
-	::drawFacesToRenderList(this, renderData().polygonIndices, &GMBSPGameWorld::preparePolygonFaceToRenderList, MST_PLANAR);
-	::drawFacesToRenderList(this, renderData().meshFaceIndices, &GMBSPGameWorld::prepareMeshFaceToRenderList, MST_TRIANGLE_SOUP);
-	::drawFacesToRenderList(this, renderData().patchIndices, &GMBSPGameWorld::preparePatchToRenderList, MST_PATCH);
+	drawFacesToRenderList(this, renderData().polygonIndices, &GMBSPGameWorld::preparePolygonFaceToRenderList, MST_PLANAR);
+	drawFacesToRenderList(this, renderData().meshFaceIndices, &GMBSPGameWorld::prepareMeshFaceToRenderList, MST_TRIANGLE_SOUP);
+	drawFacesToRenderList(this, renderData().patchIndices, &GMBSPGameWorld::preparePatchToRenderList, MST_PATCH);
 }
 
 void GMBSPGameWorld::preparePolygonFace(GMint32 polygonFaceNumber, GMint32 drawSurfaceIndex)
@@ -459,7 +469,7 @@ void GMBSPGameWorld::prepareMeshFace(GMint32 meshFaceNumber, GMint32 drawSurface
 void GMBSPGameWorld::preparePatch(GMint32 patchNumber, GMint32 drawSurfaceIndex)
 {
 	D(d);
-	BSPData& bsp = d->bsp.bspData();
+	GMBSPData& bsp = d->bsp.bspData();
 	GMBSPRenderData& rd = d->render.renderData();
 	rd.patchIndices.push_back(drawSurfaceIndex);
 
@@ -488,7 +498,7 @@ void GMBSPGameWorld::preparePatch(GMint32 patchNumber, GMint32 drawSurfaceIndex)
 void GMBSPGameWorld::preparePolygonFaceToRenderList(GMint32 polygonFaceNumber)
 {
 	D(d);
-	BSPData& bsp = d->bsp.bspData();
+	GMBSPData& bsp = d->bsp.bspData();
 	GMBSPRenderData& rd = d->render.renderData();
 
 	GMBSP_Render_Face& polygonFace = rd.polygonFaces[polygonFaceNumber];
@@ -506,7 +516,7 @@ void GMBSPGameWorld::preparePolygonFaceToRenderList(GMint32 polygonFaceNumber)
 void GMBSPGameWorld::prepareMeshFaceToRenderList(GMint32 meshFaceNumber)
 {
 	D(d);
-	BSPData& bsp = d->bsp.bspData();
+	GMBSPData& bsp = d->bsp.bspData();
 	GMBSPRenderData& rd = d->render.renderData();
 
 	GMBSP_Render_Face& meshFace = rd.meshFaces[meshFaceNumber];
@@ -524,7 +534,7 @@ void GMBSPGameWorld::prepareMeshFaceToRenderList(GMint32 meshFaceNumber)
 void GMBSPGameWorld::preparePatchToRenderList(GMint32 patchNumber)
 {
 	D(d);
-	BSPData& bsp = d->bsp.bspData();
+	GMBSPData& bsp = d->bsp.bspData();
 	GMBSPRenderData& rd = d->render.renderData();
 
 	for (GMint32 i = 0; i < rd.patches[patchNumber].numQuadraticPatches; ++i)
@@ -561,7 +571,7 @@ template <typename T>
 bool GMBSPGameWorld::setMaterialTexture(T& face, REF GMShader& shader)
 {
 	D(d);
-	BSPData& bsp = d->bsp.bspData();
+	GMBSPData& bsp = d->bsp.bspData();
 	GMint32 textureid = face.textureIndex;
 	GMint32 lightmapid = face.lightmapIndex;
 	const GMString& name = bsp.shaders[textureid].shader;
@@ -587,7 +597,7 @@ void GMBSPGameWorld::setMaterialLightmap(GMint32 lightmapid, REF GMShader& shade
 	const GMint32 WHITE_LIGHTMAP = -1;
 	GMint32 id = 0;
 
-	if (shader.getSurfaceFlag() & SURF_NOLIGHTMAP)
+	if (shader.getFlag() & SURF_NOLIGHTMAP)
 		id = WHITE_LIGHTMAP;
 	else
 		id = lightmapid >= 0 ? lightmapid : WHITE_LIGHTMAP;
@@ -619,7 +629,7 @@ void GMBSPGameWorld::initTextures()
 {
 	D(d);
 	D_BASE(db, GMGameWorld);
-	BSPData& bsp = d->bsp.bspData();
+	GMBSPData& bsp = d->bsp.bspData();
 
 	IFactory* factory = GM.getFactory();
 
@@ -677,7 +687,7 @@ bool GMBSPGameWorld::findTexture(const GMString& textureFilename, OUT GMImage** 
 void GMBSPGameWorld::initLightmaps()
 {
 	D(d);
-	BSPData& bsp = d->bsp.bspData();
+	GMBSPData& bsp = d->bsp.bspData();
 	IFactory* factory = GM.getFactory();
 
 	const GMint32 BSP_LIGHTMAP_EXT = 128;
@@ -708,7 +718,7 @@ void GMBSPGameWorld::initLightmaps()
 void GMBSPGameWorld::prepareFaces()
 {
 	D(d);
-	BSPData& bsp = d->bsp.bspData();
+	GMBSPData& bsp = d->bsp.bspData();
 	GMBSPRenderData& rd = d->render.renderData();
 
 	//loop through faces
@@ -731,7 +741,7 @@ void GMBSPGameWorld::prepareFaces()
 void GMBSPGameWorld::prepareEntities()
 {
 	D(d);
-	BSPData& bsp = d->bsp.bspData();
+	GMBSPData& bsp = d->bsp.bspData();
 
 	for (auto entity : bsp.entities)
 	{
@@ -741,7 +751,7 @@ void GMBSPGameWorld::prepareEntities()
 	}
 }
 
-BSPData& GMBSPGameWorld::bspData()
+GMBSPData& GMBSPGameWorld::bspData()
 {
 	D(d);
 	return d->bsp.bspData();
@@ -752,3 +762,5 @@ GMBSPRenderData& GMBSPGameWorld::renderData()
 	D(d);
 	return d->render.renderData();
 }
+
+END_NS

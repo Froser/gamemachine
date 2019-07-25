@@ -11,7 +11,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMEvent)
 
 GMEvent::GMEvent(bool manualReset, bool initialState)
 {
-	GM_CREATE_DATA(GMEvent);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->handle = ::CreateEvent(NULL, manualReset, initialState ? TRUE : FALSE, L"");

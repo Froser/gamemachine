@@ -457,7 +457,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMModelReader_Assimp)
 
 GMModelReader_Assimp::GMModelReader_Assimp()
 {
-	GM_CREATE_DATA(GMModelReader_Assimp);
+	GM_CREATE_DATA();
 }
 
 GMModelReader_Assimp::~GMModelReader_Assimp()

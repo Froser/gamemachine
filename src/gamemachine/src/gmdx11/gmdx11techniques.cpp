@@ -9,6 +9,8 @@
 #include "gmdx11gbuffer.h"
 #include "gmdx11framebuffer.h"
 
+BEGIN_NS
+
 #define GMSHADER_SEMANTIC_NAME_POSITION "POSITION"
 #define GMSHADER_SEMANTIC_NAME_NORMAL "NORMAL"
 #define GMSHADER_SEMANTIC_NAME_TEXCOORD "TEXCOORD"
@@ -18,7 +20,7 @@
 #define GMSHADER_SEMANTIC_NAME_COLOR "COLOR"
 #define GMSHADER_SEMANTIC_NAME_BONES "BONES"
 #define GMSHADER_SEMANTIC_NAME_WEIGHTS "WEIGHTS"
-#define BIT32_OFFSET(i) (sizeof(gm::GMfloat) * i)
+#define BIT32_OFFSET(i) (sizeof(GMfloat) * i)
 #define CHECK_VAR(var) if (!var->IsValid()) { return; }
 
 #define getVariableIndex(shaderProgram, index, name) (index ? index : (index = shaderProgram->getIndex(name)))
@@ -286,7 +288,6 @@ namespace
 #define EFFECT_MEMBER_AS_VECTOR(funcName, effect, name) \
 	EFFECT_MEMBER_AS(funcName, effect, name, ID3DX11EffectVectorVariable, AsVector)
 
-BEGIN_NS
 class GMDx11EffectVariableBank
 {
 public:
@@ -345,7 +346,39 @@ public:
 private:
 	ID3DX11Effect* m_effect = nullptr;
 };
-END_NS
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMDx11Technique)
+{
+	struct TechniqueContext
+	{
+		GMModel* currentModel = nullptr;
+		GMScene* currentScene = nullptr;
+	};
+
+	TechniqueContext techContext;
+	const IRenderContext* context = nullptr;
+	GMTextureAsset whiteTexture;
+	GMOwnedPtr<GMDx11RasterizerStates> rasterizerStates;
+	GMOwnedPtr<GMDx11BlendStates> blendStates;
+	GMOwnedPtr<GMDx11DepthStencilStates> depthStencilStates;
+	GMDx11EffectVariableBank* bank = nullptr;
+
+	GMComPtr<ID3D11InputLayout> inputLayout;
+	GMComPtr<ID3DX11Effect> effect;
+	GMDebugConfig debugConfig;
+	ID3D11DeviceContext* deviceContext = nullptr;
+	ID3DX11EffectTechnique* technique = nullptr;
+	ID3DX11EffectRasterizerVariable* rasterizer = nullptr;
+	ID3DX11EffectBlendVariable* blend = nullptr;
+	ID3DX11EffectDepthStencilVariable* depthStencil = nullptr;
+	bool screenInfoPrepared = false;
+	GMComPtr<ID3D11Resource> shadowMapResource;
+	GMDx11GraphicEngine* engine = nullptr;
+	GMfloat gamma = 0;
+	Map<ID3DX11EffectVariable*, GMTextureAttributeBank> textureVariables;
+	GMShaderVariablesIndices indexBank = { 0 };
+	GMint64 lastShadowVersion = { 0 };
+};
 
 GMDx11EffectVariableBank& GMDx11Technique::getVarBank()
 {
@@ -358,7 +391,6 @@ GMDx11EffectVariableBank& GMDx11Technique::getVarBank()
 GMTextureAsset GMDx11Technique::getWhiteTexture()
 {
 	D(d);
-	D_BASE(db, Base);
 	if (d->whiteTexture.isEmpty())
 		d->whiteTexture = createWhiteTexture(d->context);
 	return d->whiteTexture;
@@ -423,7 +455,6 @@ const std::string& GMDx11Technique::getTechniqueNameByTechniqueId(GMRenderTechni
 	return *result;
 }
 
-BEGIN_NS
 struct GMDx11RasterizerStates
 {
 	enum
@@ -576,10 +607,9 @@ private:
 	GMDx11GraphicEngine* engine = nullptr;
 };
 
-END_NS
-
 GMDx11Technique::GMDx11Technique(const IRenderContext* context)
 {
+	GM_CREATE_DATA();
 	D(d);
 	if (context)
 	{
@@ -713,6 +743,12 @@ const IRenderContext* GMDx11Technique::getContext()
 	return d->context;
 }
 
+ID3DX11Effect* GMDx11Technique::getEffect()
+{
+	D(d);
+	return d->effect;
+}
+
 void GMDx11Technique::initShadow()
 {
 	D(d);
@@ -730,6 +766,20 @@ void GMDx11Technique::initShadow()
 			}
 		}
 	}
+}
+
+GMDx11GraphicEngine* GMDx11Technique::getEngine()
+{
+	D(d);
+	if (!d->engine)
+		d->engine = gm_cast<GMDx11GraphicEngine*>(d->context->getEngine());
+	return d->engine;
+}
+
+GMModel* GMDx11Technique::getCurrentModel()
+{
+	D(d);
+	return d->techContext.currentModel;
 }
 
 void GMDx11Technique::prepareScreenInfo()
@@ -932,7 +982,7 @@ void GMDx11Technique::prepareShadow(bool isDrawingShadow)
 	ID3DX11EffectScalarVariable* viewCascade = bank.ViewCascade();
 
 	// 是否显示CSM范围
-	GMRenderConfig config = d->context->getEngine()->getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+	GMRenderConfig config = d->context->getEngine()->getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
 	bool vc = config.get(GMRenderConfigs::ViewCascade_Bool).toBool();
 	GM_DX_HR(viewCascade->SetBool(vc ? TRUE : FALSE));
 
@@ -1108,7 +1158,7 @@ void GMDx11Technique::prepareDepthStencil(GMModel* model)
 void GMDx11Technique::prepareDebug(GMModel* model)
 {
 	D(d);
-	GMint32 mode = d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonNormalMode).toInt();
+	GMint32 mode = d->debugConfig.get(GMDebugConfigs::DrawPolygonNormalMode).toInt();
 	
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
 	shaderProgram->setInt(VI(Debug.Normal), mode);
@@ -1242,9 +1292,20 @@ void GMDx11Technique_CubeMap::prepareTextures(GMModel* model)
 	}
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMDx11Technique_Filter)
+{
+	struct HDRState
+	{
+		GMToneMapping::Mode toneMapping = GMToneMapping::Reinhard;
+		bool HDR = false;
+	};
+	HDRState state;
+};
+
 GMDx11Technique_Filter::GMDx11Technique_Filter(const IRenderContext* context)
 	: GMDx11Technique(context)
 {
+	GM_CREATE_DATA();
 	// 初始化
 	setHDR(getEngine()->getShaderProgram());
 }
@@ -1461,6 +1522,22 @@ void GMDx11Technique_3D_Shadow::draw(GMModel* model)
 	passAllAndDraw(model);
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMDx11Technique_Custom)
+{
+	Vector<GMString> techniqueNames;
+};
+
+GMDx11Technique_Custom::GMDx11Technique_Custom(const IRenderContext* context)
+	: Base(context)
+{
+
+}
+
+GMDx11Technique_Custom::~GMDx11Technique_Custom()
+{
+
+}
+
 ID3DX11EffectTechnique* GMDx11Technique_Custom::getTechnique()
 {
 	GMComPtr<ID3DX11Effect> effect;
@@ -1475,3 +1552,5 @@ const char* GMDx11Technique_Custom::getTechniqueName()
 	GM_ASSERT(getCurrentModel());
 	return getTechniqueNameByTechniqueId(getCurrentModel()->getTechniqueId()).c_str();
 }
+
+END_NS

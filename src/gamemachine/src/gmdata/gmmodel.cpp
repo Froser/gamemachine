@@ -29,7 +29,7 @@ GM_DEFINE_PROPERTY(GMScene, Vector<GMAsset>, Models, models)
 GM_DEFINE_PROPERTY(GMScene, GMAnimationType, AnimationType, animationType)
 GMScene::GMScene()
 {
-	GM_CREATE_DATA(GMScene);
+	GM_CREATE_DATA();
 }
 
 void GMScene::addModelAsset(GMModelAsset model)
@@ -99,10 +99,15 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMModelDataProxy)
 
 GMModelDataProxy::GMModelDataProxy(const IRenderContext* context, GMModel* obj)
 {
-	GM_CREATE_DATA(GMModelDataProxy);
+	GM_CREATE_DATA();
 	D(d);
 	d->context = context;
 	d->model = obj;
+}
+
+GMModelDataProxy::~GMModelDataProxy()
+{
+
 }
 
 const IRenderContext* GMModelDataProxy::getContext()
@@ -217,14 +222,14 @@ GM_DEFINE_PROPERTY(GMModel, AlignedVector<GMMat4>, BoneTransformations, boneTran
 
 GMModel::GMModel()
 {
-	GM_CREATE_DATA(GMModel);
+	GM_CREATE_DATA();
 	D(d);
 	d->modelBuffer = new GMModelBuffer();
 }
 
 GMModel::GMModel(GMModelAsset parentAsset)
 {
-	GM_CREATE_DATA(GMModel);
+	GM_CREATE_DATA();
 	D(d);
 	GM_ASSERT(parentAsset.getModel());
 	GMModel* parentModel = parentAsset.getModel();
@@ -353,7 +358,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMModelBuffer)
 
 GMModelBuffer::GMModelBuffer()
 {
-	GM_CREATE_DATA(GMModelBuffer);
+	GM_CREATE_DATA();
 	D(d);
 	d->ref = 1;
 	// 创建一个空的proxy，用于dispose
@@ -411,7 +416,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMPart)
 
 GMPart::GMPart(GMModel* parent)
 {
-	GM_CREATE_DATA(GMPart);
+	GM_CREATE_DATA();
 	parent->addPart(this);
 }
 
@@ -609,7 +614,7 @@ GM_DEFINE_PROPERTY(GMNode, GMMat4, GlobalTransform, globalTransform)
 
 GMNode::GMNode()
 {
-	GM_CREATE_DATA(GMNode);
+	GM_CREATE_DATA();
 }
 
 GMNode::~GMNode()
@@ -630,7 +635,7 @@ GM_DEFINE_PROPERTY(GMSkeletalBones, AlignedVector<GMSkeletalBone>, Bones, bones)
 GM_DEFINE_PROPERTY(GMSkeletalBones, GMSkeletalBones::BoneNameIndexMap_t, BoneNameIndexMap, boneNameIndexMap)
 GMSkeletalBones::GMSkeletalBones()
 {
-	GM_CREATE_DATA(GMSkeletalBones);
+	GM_CREATE_DATA();
 }
 
 GMSkeletalBones::GMSkeletalBones(const GMSkeletalBones& rhs)
@@ -663,7 +668,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMSkeleton)
 GM_DEFINE_PROPERTY(GMSkeleton, GMSkeletalBones, Bones, bones)
 GMSkeleton::GMSkeleton()
 {
-	GM_CREATE_DATA(GMSkeleton);
+	GM_CREATE_DATA();
 }
 
 GM_PRIVATE_OBJECT_UNALIGNED(GMSkeletalAnimations)
@@ -673,7 +678,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMSkeletalAnimations)
 
 GMSkeletalAnimations::GMSkeletalAnimations()
 {
-	GM_CREATE_DATA(GMSkeletalAnimations);
+	GM_CREATE_DATA();
 }
 
 GMNodeAnimation* GMSkeletalAnimations::getAnimation(GMsize_t index) GM_NOEXCEPT

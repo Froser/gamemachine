@@ -1,14 +1,26 @@
 ﻿#ifndef __BSPGAMEWORLD_H__
 #define __BSPGAMEWORLD_H__
 #include <gmcommon.h>
-#include "gmgameworld.h"
-#include "gmbspgameworldprivate.h"
 #include <gmassets.h>
+#include <gmgameworld.h>
+#include "../data/gmbsp.h"
+
 BEGIN_NS
 
+enum class GMBSPRenderConfigs
+{
+	DrawSkyOnly_Bool,
+	CalculateFace_Bool,
+	Max,
+};
+
+GM_DEFINE_CONFIG(GMBSPRenderConfigs, GMBSPRenderConfig);
+
+GM_PRIVATE_CLASS(GMBSPSkyGameObject);
 class GM_EXPORT GMBSPSkyGameObject : public GMGameObject
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMBSPSkyGameObject, GMGameObject)
+	GM_DECLARE_PRIVATE(GMBSPSkyGameObject)
+	GM_DECLARE_BASE(GMGameObject)
 
 public:
 	GMBSPSkyGameObject(const GMShader& shader, const GMVec3& min, const GMVec3& max);
@@ -17,9 +29,12 @@ private:
 	void createSkyBox(OUT GMModel** obj);
 };
 
+struct GMBSPEntity;
+GM_PRIVATE_CLASS(GMBSPGameWorld);
 class GM_EXPORT GMBSPGameWorld : public GMGameWorld
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMBSPGameWorld, GMGameWorld);
+	GM_DECLARE_PRIVATE(GMBSPGameWorld);
+	GM_DECLARE_BASE(GMGameWorld)
 
 public:
 	GMBSPGameWorld(const IRenderContext* context);
@@ -77,7 +92,7 @@ private:
 
 	// this is usually used by BSPShaderLoader, BSPGameWorldEntityReader, physics world
 public:
-	BSPData& bspData();
+	GMBSPData& bspData();
 	GMBSPRenderData& renderData();
 };
 

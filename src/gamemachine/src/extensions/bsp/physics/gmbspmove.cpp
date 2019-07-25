@@ -5,17 +5,38 @@
 #include "gmphysics/gmphysicsobject.h"
 #include "foundation/gamemachine.h"
 #include "foundation/gmprofile.h"
+#include "gmbspphysicsworld_p.h"
+
+BEGIN_NS
 
 static const GMfloat OVERCLIP = 1.f;
 static const GMfloat CLIP_IGNORE = .2f;
 
+GM_PRIVATE_OBJECT_ALIGNED(GMBSPMove)
+{
+	bool inited = false;
+	GMBSPPhysicsWorld* world = nullptr;
+	GMPhysicsObject* object = nullptr;
+	GMBSPTrace* trace = nullptr;
+	GMBSPMovement movementState;
+	GMBSPAction action;
+	GMVec3 initialVelocity = Zero<GMVec3>();
+};
+
 GMBSPMove::GMBSPMove(GMBSPPhysicsWorld* world, GMPhysicsObject* obj)
 {
+	GM_CREATE_DATA();
+
 	D(d);
 	d->inited = false;
 	d->world = world;
 	d->object = obj;
 	d->trace = &world->physicsData().trace;
+}
+
+GMBSPMove::~GMBSPMove()
+{
+
 }
 
 void GMBSPMove::move(GMDuration dt)
@@ -393,3 +414,5 @@ void GMBSPMove::synchronizeMotionStates()
 	s.linearVelocity = d->movementState.velocity;
 	d->object->setMotionStates(s);
 }
+
+END_NS

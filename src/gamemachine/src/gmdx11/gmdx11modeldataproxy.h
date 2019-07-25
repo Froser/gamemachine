@@ -7,20 +7,11 @@
 
 BEGIN_NS
 
-class GMDx11GraphicEngine;
-GM_PRIVATE_OBJECT(GMDx11ModelDataProxy)
-{
-	GMDx11GraphicEngine* engine = nullptr;
-	GMComPtr<ID3D11Buffer> vertexBuffer;
-	GMComPtr<ID3D11Buffer> indexBuffer;
-	bool inited = false;
-	D3D11_MAPPED_SUBRESOURCE* mappedSubResource = nullptr;
-	GMModelBufferType lastType;
-};
-
+GM_PRIVATE_CLASS(GMDx11ModelDataProxy);
 class GMDx11ModelDataProxy : public GMModelDataProxy
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMDx11ModelDataProxy, GMModelDataProxy)
+	GM_DECLARE_PRIVATE(GMDx11ModelDataProxy)
+	GM_DECLARE_BASE(GMModelDataProxy)
 
 public:
 	GMDx11ModelDataProxy(const IRenderContext* context, GMModel* obj);

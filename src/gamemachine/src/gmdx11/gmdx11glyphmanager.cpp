@@ -7,14 +7,33 @@
 #include "foundation/utilities/tools.h"
 #include "gmdxincludes.h"
 #include "gmdx11helper.h"
+#include "gmdx11texture_p.h"
+
+BEGIN_NS
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMDx11GlyphManager)
+{
+	GMComPtr<ID3D11DeviceContext> deviceContext;
+	GMAsset texture;
+};
+
+GMDx11GlyphManager::GMDx11GlyphManager(const IRenderContext* context)
+	: Base(context)
+{
+
+}
+
+GMDx11GlyphManager::~GMDx11GlyphManager()
+{
+
+}
 
 GMTextureAsset GMDx11GlyphManager::glyphTexture()
 {
 	D(d);
-	D_BASE(db, Base);
 	if (d->texture.isEmpty())
 	{
-		d->texture = GMAsset(GMAssetType::Texture, new GMDx11GlyphTexture(db->context));
+		d->texture = GMAsset(GMAssetType::Texture, new GMDx11GlyphTexture(getContext()));
 		d->texture.getTexture()->init();
 	}
 	return d->texture;
@@ -23,10 +42,9 @@ GMTextureAsset GMDx11GlyphManager::glyphTexture()
 void GMDx11GlyphManager::updateTexture(const GMGlyphBitmap& bitmapGlyph, const GMGlyphInfo& glyphInfo)
 {
 	D(d);
-	D_BASE(db, Base);
 	if (!d->deviceContext)
 	{
-		db->context->getEngine()->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
+		getContext()->getEngine()->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
 		GM_ASSERT(d->deviceContext);
 	}
 
@@ -53,9 +71,15 @@ void GMDx11GlyphManager::updateTexture(const GMGlyphBitmap& bitmapGlyph, const G
 	);
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMDx11GlyphTexture)
+{
+	GMComPtr<ID3D11Texture2D> texture;
+};
+
 GMDx11GlyphTexture::GMDx11GlyphTexture(const IRenderContext* context)
 	: GMDx11Texture(context, nullptr)
 {
+	GM_CREATE_DATA();
 }
 
 void GMDx11GlyphTexture::init()
@@ -109,3 +133,11 @@ void GMDx11GlyphTexture::useTexture(GMint32)
 	D(d);
 	Base::useTexture((GMint32)GMTextureType::Ambient);
 }
+
+ID3D11Texture2D* GMDx11GlyphTexture::getD3D11Texture()
+{
+	D(d);
+	return d->texture;
+}
+
+END_NS

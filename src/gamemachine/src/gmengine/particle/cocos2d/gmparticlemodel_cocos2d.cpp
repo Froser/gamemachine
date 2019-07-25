@@ -46,7 +46,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMParticleModel_Cocos2D)
 
 GMParticleModel_Cocos2D::GMParticleModel_Cocos2D(GMParticleSystem_Cocos2D* system)
 {
-	GM_CREATE_DATA(GMParticleModel_Cocos2D);
+	GM_CREATE_DATA();
 	D(d);
 	d->system = system;
 }

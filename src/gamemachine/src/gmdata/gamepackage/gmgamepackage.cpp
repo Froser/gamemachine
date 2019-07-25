@@ -7,7 +7,7 @@
 BEGIN_NS
 GMGamePackage::GMGamePackage()
 {
-	GM_CREATE_DATA(GMGamePackage);
+	GM_CREATE_DATA();
 }
 
 GMGamePackage::Data* GMGamePackage::gamePackageData()

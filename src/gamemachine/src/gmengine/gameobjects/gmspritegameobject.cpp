@@ -18,7 +18,7 @@ GM_PRIVATE_OBJECT_ALIGNED(GMSpriteGameObject)
 
 GMSpriteGameObject::GMSpriteGameObject(GMfloat radius, const GMVec3& position)
 {
-	GM_CREATE_DATA(GMSpriteGameObject);
+	GM_CREATE_DATA();
 	D(d);
 	d->radius = radius;
 	d->camera.lookAt(GMCameraLookAt(GMVec3(0, 0, -1), position));
@@ -28,7 +28,7 @@ GMSpriteGameObject::GMSpriteGameObject(GMfloat radius, const GMVec3& position)
 
 GMSpriteGameObject::GMSpriteGameObject(GMfloat radius, const GMCamera& camera)
 {
-	GM_CREATE_DATA(GMSpriteGameObject);
+	GM_CREATE_DATA();
 	D(d);
 	d->radius = radius;
 	d->camera = camera;

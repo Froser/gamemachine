@@ -124,7 +124,7 @@ bool GMWindow::canClose()
 
 GMWindow::GMWindow()
 {
-	GM_CREATE_DATA(GMWindow);
+	GM_CREATE_DATA();
 }
 
 void GMWindow::msgProc(const GMMessage& message)

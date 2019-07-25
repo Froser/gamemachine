@@ -6,9 +6,25 @@
 #include "gmconstraint.h"
 #include <algorithm>
 
+BEGIN_NS
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMDiscreteDynamicsWorld)
+{
+	GM_OWNED btDiscreteDynamicsWorld* worldImpl = nullptr;
+	GM_OWNED btDefaultCollisionConfiguration* collisionConfiguration = nullptr;
+	GM_OWNED btCollisionDispatcher* dispatcher = nullptr;
+	GM_OWNED btBroadphaseInterface* overlappingPairCache = nullptr;
+	GM_OWNED btSequentialImpulseConstraintSolver* solver = nullptr;
+	Vector<GMRigidPhysicsObject*> rigidObjs;
+	Vector<GMConstraint*> constraintObjs; // 生命周期由GMDiscreteDynamicsWorld管理
+	GM_OWNED Vector<btRigidBody*> bulletRigidPool;
+};
+
 GMDiscreteDynamicsWorld::GMDiscreteDynamicsWorld(GMGameWorld* world)
 	: GMPhysicsWorld(world)
 {
+	GM_CREATE_DATA();
+
 	D(d);
 	d->collisionConfiguration = new btDefaultCollisionConfiguration();
 	d->dispatcher = new btCollisionDispatcher(d->collisionConfiguration);
@@ -70,7 +86,6 @@ void GMDiscreteDynamicsWorld::setGravity(const GMVec3& gravity)
 void GMDiscreteDynamicsWorld::addRigidObject(AUTORELEASE GMRigidPhysicsObject* rigidObj)
 {
 	D(d);
-	D_BASE(db, Base);
 	d->rigidObjs.push_back(rigidObj);
 	btRigidBody* btBody = rigidObj->getRigidBody();
 	d->bulletRigidPool.push_back(btBody);
@@ -119,3 +134,5 @@ GMPhysicsRayTestResult GMDiscreteDynamicsWorld::rayTest(const GMVec3& rayFromWor
 
 	return result;
 }
+
+END_NS

@@ -42,7 +42,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMProfile)
 
 GMProfile::GMProfile(IGraphicEngine* engine)
 {
-	GM_CREATE_DATA(GMProfile);
+	GM_CREATE_DATA();
 	D(d);
 	d->debugConfig = engine->getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
 }

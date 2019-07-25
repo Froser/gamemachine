@@ -107,18 +107,16 @@ GM_ALIGNED_STRUCT(GMBSPShapeProperties)
 	GMfloat stepHeight;
 };
 
-GM_PRIVATE_OBJECT(GMBSPPhysicsObject)
-{
-	GMBSPShapeProperties shapeProps;
-};
-
+GM_PRIVATE_CLASS(GMBSPPhysicsObject);
 class GMBSPPhysicsObject : public GMPhysicsObject
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMBSPPhysicsObject, GMPhysicsObject)
+	GM_DECLARE_PRIVATE(GMBSPPhysicsObject)
+	GM_DECLARE_BASE(GMPhysicsObject)
 	GM_FRIEND_CLASS(GMBSPPhysicsWorld);
 
 public:
-	GMBSPPhysicsObject() = default;
+	GMBSPPhysicsObject();
+	~GMBSPPhysicsObject();
 
 public:
 	//! 形状参数
@@ -126,7 +124,7 @@ public:
 	  用户可以直接修改拿到的形状参数。
 	  \return 当前物理对象的形状参数。
 	*/
-	inline GMBSPShapeProperties& shapeProperties() { D(d); return d->shapeProps; }
+	GMBSPShapeProperties& shapeProperties();
 };
 
 END_NS

@@ -133,7 +133,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLShaderProgram)
 
 GMGLShaderProgram::GMGLShaderProgram(const IRenderContext* context)
 {
-	GM_CREATE_DATA(GMGLShaderProgram);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->context = context;
@@ -444,7 +444,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLComputeShaderProgram)
 
 GMGLComputeShaderProgram::GMGLComputeShaderProgram(const IRenderContext* context)
 {
-	GM_CREATE_DATA(GMGLComputeShaderProgram);
+	GM_CREATE_DATA();
 	D(d);
 	d->context = context;
 }

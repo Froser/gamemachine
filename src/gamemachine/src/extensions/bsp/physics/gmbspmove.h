@@ -39,23 +39,16 @@ GM_ALIGNED_STRUCT(GMBSPAction)
 	GMBSPJumpArgs jump;
 };
 
-GM_PRIVATE_OBJECT(GMBSPMove)
-{
-	bool inited = false;
-	GMBSPPhysicsWorld* world = nullptr;
-	GMPhysicsObject* object = nullptr;
-	GMBSPTrace* trace = nullptr;
-	GMBSPMovement movementState;
-	GMBSPAction action;
-	GMVec3 initialVelocity = Zero<GMVec3>();
-};
-
-class GMBSPMove : public GMObject
+GM_PRIVATE_CLASS(GMBSPMove);
+class GMBSPMove
 {
 	GM_DECLARE_PRIVATE(GMBSPMove)
+	GM_DISABLE_COPY_ASSIGN(GMBSPMove)
 
 public:
 	GMBSPMove(GMBSPPhysicsWorld* world, GMPhysicsObject* obj);
+	~GMBSPMove();
+
 	void move(GMDuration dt);
 	void applyMove(const GMPhysicsMoveArgs& args);
 	void applyJump(const GMVec3& speed);

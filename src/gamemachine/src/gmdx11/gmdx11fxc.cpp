@@ -17,6 +17,8 @@
 #define GM_FXC_VERSION_MAJOR 1
 #define GM_FXC_VERSION_MINOR 0
 
+BEGIN_NS
+
 namespace
 {
 	struct GMBlob : ID3DBlob
@@ -374,3 +376,5 @@ bool GMDx11FXC::tryLoadCache(IN OUT GMDx11FXCDescription& desc, ID3D11Device* pD
 
 	return (canLoad(desc, buf) && load(buf, pDevice, ppComputeShader));
 }
+
+END_NS

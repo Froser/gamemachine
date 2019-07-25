@@ -13,6 +13,8 @@
 #include "gmdx11techniques.h"
 #include "gmdx11shaderprogram.h"
 
+BEGIN_NS
+
 void GMDx11Factory::createWindow(GMInstance instance, IWindow* parent, OUT IWindow** window)
 {
 	bool b = GMWindowFactory::createWindowWithDx11(instance, parent, window);
@@ -337,3 +339,5 @@ void GMDx11Factory::createComputeContext(OUT const IRenderContext** out)
 		*out = ctx;
 	}
 }
+
+END_NS

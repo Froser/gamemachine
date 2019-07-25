@@ -1,13 +1,18 @@
 ﻿#include "stdafx.h"
 #include "gmbspphysicsworld.h"
+#include "../data/gmbsp.h"
 #include "gmbspmove.h"
 #include <gmphysicsworld.h>
 #include "extensions/bsp/render/gmbspgameworld.h"
+#include "gmphysics/gmphysicsworld_p.h"
+#include "gmbspphysicsworld_p.h"
 
-//class
+BEGIN_NS
+
 GMBSPPhysicsWorld::GMBSPPhysicsWorld(GMGameWorld* world)
 	: GMPhysicsWorld(world)
 {
+	GM_CREATE_DATA();
 	D(d);
 	d->world = static_cast<GMBSPGameWorld*>(world);
 	d->trace.initTrace(
@@ -48,7 +53,7 @@ void GMBSPPhysicsWorld::update(GMDuration dt, GMGameObject* obj)
 	D(d);
 	if (getEnabled())
 	{
-		BSPData& bsp = d->world->bspData();
+		GMBSPData& bsp = d->world->bspData();
 		GMPhysicsObject* phy = obj->getPhysicsObject();
 		if (phy)
 		{
@@ -100,7 +105,7 @@ void GMBSPPhysicsWorld::generatePhysicsPlaneData()
 {
 	D(d);
 	GMFloat4 f4_normal;
-	BSPData& bsp = d->world->bspData();
+	GMBSPData& bsp = d->world->bspData();
 	d->planes.resize(bsp.numplanes);
 	for (GMint32 i = 0; i < bsp.numplanes; i++)
 	{
@@ -114,7 +119,7 @@ void GMBSPPhysicsWorld::generatePhysicsPlaneData()
 void GMBSPPhysicsWorld::generatePhysicsBrushSideData()
 {
 	D(d);
-	BSPData& bsp = d->world->bspData();
+	GMBSPData& bsp = d->world->bspData();
 	d->brushsides.resize(bsp.numbrushsides);
 	for (GMint32 i = 0; i < bsp.numbrushsides; i++)
 	{
@@ -128,7 +133,7 @@ void GMBSPPhysicsWorld::generatePhysicsBrushSideData()
 void GMBSPPhysicsWorld::generatePhysicsBrushData()
 {
 	D(d);
-	BSPData& bsp = d->world->bspData();
+	GMBSPData& bsp = d->world->bspData();
 	d->brushes.resize(bsp.numbrushes);
 	for (GMint32 i = 0; i < bsp.numbrushes; i++)
 	{
@@ -145,7 +150,7 @@ void GMBSPPhysicsWorld::generatePhysicsBrushData()
 void GMBSPPhysicsWorld::generatePhysicsPatches()
 {
 	D(d);
-	BSPData& bsp = d->world->bspData();
+	GMBSPData& bsp = d->world->bspData();
 	// scan through all the surfaces, but only load patches,
 	// not planar faces
 
@@ -171,3 +176,5 @@ void GMBSPPhysicsWorld::generatePhysicsPatches()
 		d->patch.generatePatchCollide(i, width, height, points.data(), patch);
 	}
 }
+
+END_NS

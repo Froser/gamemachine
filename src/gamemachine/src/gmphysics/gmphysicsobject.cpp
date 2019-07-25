@@ -14,7 +14,7 @@ GM_PRIVATE_OBJECT_ALIGNED(GMPhysicsObject)
 
 GMPhysicsObject::GMPhysicsObject()
 {
-	GM_CREATE_DATA(GMPhysicsObject);
+	GM_CREATE_DATA();
 }
 
 const GMMotionStates& GMPhysicsObject::getMotionStates()
@@ -55,7 +55,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMRigidPhysicsObject)
 
 GMRigidPhysicsObject::GMRigidPhysicsObject()
 {
-	GM_CREATE_DATA(GMRigidPhysicsObject);
+	GM_CREATE_DATA();
 }
 
 GMRigidPhysicsObject::~GMRigidPhysicsObject()

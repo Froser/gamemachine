@@ -7,6 +7,8 @@
 #include "gmdx11/main.h"
 #endif
 
+BEGIN_NS
+
 #if GM_WINDOWS
 typedef IFactory* (*CREATE_PROC)();
 typedef void(*SHADER_LOAD_PROC)(const IRenderContext*, const GMString&);
@@ -131,3 +133,5 @@ extern "C"
 #endif
 	}
 }
+
+END_NS

@@ -1,21 +1,12 @@
-﻿#ifndef __BSPGAMEWORLDPRIVATE_H__
-#define __BSPGAMEWORLDPRIVATE_H__
+﻿#ifndef __BSPGAMEWORLD_P_H__
+#define __BSPGAMEWORLD_P_H__
 #include <gmcommon.h>
 #include <extensions/bsp/gmbsp.h>
 #include <extensions/bsp/gmbspphysicsworld.h>
 BEGIN_NS
 
-enum class GMBSPRenderConfigs
-{
-	DrawSkyOnly_Bool,
-	CalculateFace_Bool,
-	Max,
-};
-
-GM_DEFINE_CONFIG(GMBSPRenderConfigs, GMBSPRenderConfig);
-
 class GMBSPPhysicsWorld;
-GM_PRIVATE_OBJECT(GMBSPGameWorld)
+GM_PRIVATE_OBJECT_ALIGNED(GMBSPGameWorld)
 {
 	GMBSP bsp;
 	GMGameObject* sky = nullptr;

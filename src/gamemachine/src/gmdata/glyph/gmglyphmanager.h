@@ -74,6 +74,9 @@ private:
 	GMFont* getFont(GMFontHandle);
 	GMGlyphInfo& insertChar(GMFontSizePt fontSize, GMFontHandle font, GMwchar ch, const GMGlyphInfo& glyph);
 	const GMGlyphInfo& getCharInner(GMwchar c, GMFontSizePt fontSize, GMFontHandle font, GMFontHandle candidate);
+
+protected:
+	const IRenderContext* getContext();
 };
 
 END_NS

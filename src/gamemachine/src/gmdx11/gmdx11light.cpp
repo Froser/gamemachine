@@ -1,6 +1,25 @@
 ﻿#include "stdafx.h"
 #include "gmdx11light.h"
 #include "gmdx11techniques.h"
+#include "gmengine/gmlight_p.h"
+
+BEGIN_NS
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMDx11Light)
+{
+	ID3DX11Effect* effect = nullptr;
+	ID3DX11EffectVariable* lightAttributes = nullptr;
+};
+
+GMDx11Light::GMDx11Light()
+{
+	GM_CREATE_DATA();
+}
+
+GMDx11Light::~GMDx11Light()
+{
+
+}
 
 void GMDx11Light::activateLight(GMuint32 index, ITechnique* technique)
 {
@@ -56,6 +75,20 @@ void GMDx11Light::activateLight(GMuint32 index, ITechnique* technique)
 	GM_DX_TRY(attenuationExp, attenuationExp->SetFloat(db->attenuation.exp));
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED_FROM(GMDx11DirectionalLight, GMDirectionalLight_t)
+{
+};
+
+GMDx11DirectionalLight::GMDx11DirectionalLight()
+{
+	GM_CREATE_DATA();
+}
+
+GMDx11DirectionalLight::~GMDx11DirectionalLight()
+{
+
+}
+
 bool GMDx11DirectionalLight::setLightAttribute3(GMLightAttribute attr, GMfloat value[3])
 {
 	D(d);
@@ -86,6 +119,20 @@ void GMDx11DirectionalLight::activateLight(GMuint32 index, ITechnique* tech)
 	GM_DX_TRY(direction, direction->SetFloatVector(d->direction));
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED_FROM(GMDx11Spotlight, GMSpotlight_t)
+{
+};
+
+GMDx11Spotlight::GMDx11Spotlight()
+{
+	GM_CREATE_DATA();
+}
+
+GMDx11Spotlight::~GMDx11Spotlight()
+{
+
+}
+
 bool GMDx11Spotlight::setLightAttribute(GMLightAttribute attr, GMfloat value)
 {
 	D(d);
@@ -112,3 +159,5 @@ void GMDx11Spotlight::activateLight(GMuint32 index, ITechnique* tech)
 	ID3DX11EffectScalarVariable* cutOff = lightStruct->GetMemberByName("CutOff")->AsScalar();
 	GM_DX_TRY(cutOff, cutOff->SetFloat(Cos(Radians(d->cutOff))));
 }
+
+END_NS

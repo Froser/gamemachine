@@ -52,25 +52,23 @@ GM_ALIGNED_STRUCT(BSPSphere)
 
 class GMBSPPhysicsWorld;
 class GMEntityObject;
-GM_PRIVATE_OBJECT(GMBSPTrace)
-{
-	BSPData* bsp;
-	Map<GMint32, Set<GMBSPEntity*> >* entities;
-	Map<GMBSPEntity*, GMEntityObject*>* entityObjects;
-	GMBSPPhysicsWorld* world;
-	GMint32 checkcount = 0;
-};
-
 struct GMBSP_Physics_Brush;
 struct GMBSP_Physics_Patch;
 struct GMBSPPatchCollide;
 struct GMBSPTraceWork;
-class GMBSPTrace : public GMObject
+
+GM_PRIVATE_CLASS(GMBSPTrace);
+class GMBSPTrace
 {
 	GM_DECLARE_PRIVATE(GMBSPTrace)
+	GM_DISABLE_COPY_ASSIGN(GMBSPTrace)
 
 public:
-	void initTrace(BSPData* bsp, Map<GMint32, Set<GMBSPEntity*> >* entities, Map<GMBSPEntity*, GMEntityObject*>* entityObjects, GMBSPPhysicsWorld* world);
+	GMBSPTrace();
+	~GMBSPTrace();
+
+public:
+	void initTrace(GMBSPData* bsp, Map<GMint32, Set<GMBSPEntity*> >* entities, Map<GMBSPEntity*, GMEntityObject*>* entityObjects, GMBSPPhysicsWorld* world);
 	void trace(const GMVec3& start, const GMVec3& end, const GMVec3& origin, const GMVec3& min, const GMVec3& max, REF BSPTraceResult& trace);
 	void traceThroughTree(GMBSPTraceWork& tw, GMint32 num, GMfloat p1f, GMfloat p2f, const GMVec3& p1, const GMVec3& p2);
 	void traceThroughLeaf(GMBSPTraceWork& tw, GMBSPLeaf* leaf);

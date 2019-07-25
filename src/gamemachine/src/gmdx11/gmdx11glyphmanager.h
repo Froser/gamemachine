@@ -6,15 +6,11 @@
 #include "gmdx11texture.h"
 BEGIN_NS
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMDx11GlyphTexture)
-{
-	GMComPtr<ID3D11Texture2D> texture;
-};
-
+GM_PRIVATE_CLASS(GMDx11GlyphTexture);
 class GMDx11GlyphTexture : public GMDx11Texture
 {
-	GM_DECLARE_PRIVATE_NGO(GMDx11GlyphTexture)
-	typedef GMDx11Texture Base;
+	GM_DECLARE_PRIVATE(GMDx11GlyphTexture)
+	GM_DECLARE_BASE(GMDx11Texture)
 
 public:
 	GMDx11GlyphTexture(const IRenderContext* context);
@@ -25,25 +21,18 @@ public:
 	virtual void useTexture(GMint32 textureIndex) override;
 
 public:
-	inline ID3D11Texture2D* getD3D11Texture()
-	{
-		D(d);
-		return d->texture;
-	}
+	ID3D11Texture2D* getD3D11Texture();
 };
 
-GM_PRIVATE_OBJECT(GMDx11GlyphManager)
-{
-	GMComPtr<ID3D11DeviceContext> deviceContext;
-	GMAsset texture;
-};
-
+GM_PRIVATE_CLASS(GMDx11GlyphManager);
 class GMDx11GlyphManager : public GMGlyphManager
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMDx11GlyphManager, GMGlyphManager)
+	GM_DECLARE_PRIVATE(GMDx11GlyphManager)
+	GM_DECLARE_BASE(GMGlyphManager)
 
 public:
-	using GMGlyphManager::GMGlyphManager;
+	GMDx11GlyphManager(const IRenderContext* context);
+	~GMDx11GlyphManager();
 
 public:
 	virtual GMTextureAsset glyphTexture() override;

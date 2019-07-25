@@ -1,9 +1,12 @@
 ﻿#include "stdafx.h"
 #include "gmbspgameworld.h"
+#include "gmbspgameworld_p.h"
 #include "foundation/utilities/tools.h"
 #include "gmengine/gameobjects/gmspritegameobject.h"
 
 #define EACH_PAIR_OF_ENTITY(entity, pair) GMBSPEPair* pair = entity.epairs; for (; pair; pair = pair->next)
+
+BEGIN_NS
 
 namespace
 {
@@ -84,3 +87,5 @@ void BSPGameWorldEntityReader::import(const GMBSPEntity& entity, GMBSPGameWorld*
 	else if (classname == "info_player_deathmatch")
 		import_info_player_deathmatch(entity, world);
 }
+
+END_NS

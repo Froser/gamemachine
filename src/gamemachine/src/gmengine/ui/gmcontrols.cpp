@@ -8,7 +8,7 @@ BEGIN_NS
 
 GMControl::GMControl(GMWidget* widget)
 {
-	GM_CREATE_DATA(GMControl);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->widget = widget;
@@ -265,7 +265,7 @@ GMControlLabel* GMControlLabel::createControl(
 
 GMControlLabel::GMControlLabel(GMWidget* widget) : Base(widget)
 {
-	GM_CREATE_DATA(GMControlLabel);
+	GM_CREATE_DATA();
 	initStyles(widget);
 }
 
@@ -600,7 +600,7 @@ GMControlBorder* GMControlBorder::createControl(
 
 GMControlBorder::GMControlBorder(GMWidget* widget) : Base(widget)
 {
-	GM_CREATE_DATA(GMControlBorder);
+	GM_CREATE_DATA();
 	initStyles(widget);
 }
 
@@ -906,7 +906,7 @@ GM_DEFINE_PROPERTY(GMControlScrollBar, bool, CanRequestFocus, canRequestFocus)
 GMControlScrollBar::GMControlScrollBar(GMWidget* widget)
 	: Base(widget) 
 {
-	GM_CREATE_DATA(GMControlScrollBar);
+	GM_CREATE_DATA();
 	D(d);
 	initStyles(widget);
 	d->thumb = gm_makeOwnedPtr<GMControlScrollBarThumb>(widget);

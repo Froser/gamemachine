@@ -6,7 +6,7 @@ BEGIN_NS
 
 GMImage::GMImage()
 {
-	GM_CREATE_DATA(GMImage);
+	GM_CREATE_DATA();
 }
 
 GMImage::~GMImage()

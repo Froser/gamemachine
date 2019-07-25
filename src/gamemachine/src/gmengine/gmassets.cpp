@@ -20,7 +20,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMAsset)
 
 GMAsset::GMAsset()
 {
-	GM_CREATE_DATA(GMAsset);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->ref = std::make_shared<GMAtomic<GMlong>>(1);
@@ -168,7 +168,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMAssets)
 
 GMAssets::GMAssets()
 {
-	GM_CREATE_DATA(GMAssets);
+	GM_CREATE_DATA();
 }
 
 GMAssets::~GMAssets()

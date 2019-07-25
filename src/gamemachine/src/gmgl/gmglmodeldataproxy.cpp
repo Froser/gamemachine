@@ -22,7 +22,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLModelDataProxy)
 GMGLModelDataProxy::GMGLModelDataProxy(const IRenderContext* context, GMModel* objs)
 	: GMModelDataProxy(context, objs)
 {
-	GM_CREATE_DATA(GMGLModelDataProxy);
+	GM_CREATE_DATA();
 	D(d);
 	if (context)
 		d->engine = static_cast<GMGLGraphicEngine*>(context->getEngine());

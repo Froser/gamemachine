@@ -3,6 +3,7 @@
 #include <gmutilities.h>
 #include <gmgl/shader_constants.h>
 #include "wrapper/dx11wrapper.h"
+#include "gmwavegameobject_p.h"
 
 BEGIN_NS
 
@@ -178,27 +179,11 @@ namespace
 	}
 }
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMWaveGameObject)
-{
-	GMWaveGameObjectDescription objectDescription;
-	Vector<GMWaveDescription> waveDescriptions;
-	GMVertices vertices;
-	bool isPlaying = false;
-	GMDuration duration = 0;
-	GMModel* waveModel = nullptr;
-
-	// GPU 相关变量
-	Vector<Vector<GMWaveDescriptionIndices>> waveIndices;
-	Vector<GMWaveIndices> globalIndices;
-
-	GMWaveGameObjectHardwareAcceleration acceleration = GMWaveGameObjectHardwareAcceleration::GPU;
-};
-
-GM_DECLARE_PROPERTY(GMWaveGameObject, GMWaveGameObjectDescription, ObjectDescription, objectDescription)
-GM_DECLARE_PROPERTY(GMWaveGameObject, GMWaveGameObjectHardwareAcceleration, HandwareAcceleration, acceleration)
+GM_DEFINE_PROPERTY(GMWaveGameObject, GMWaveGameObjectDescription, ObjectDescription, objectDescription)
+GM_DEFINE_PROPERTY(GMWaveGameObject, GMWaveGameObjectHardwareAcceleration, HandwareAcceleration, acceleration)
 GMWaveGameObject::GMWaveGameObject()
 {
-	GM_CREATE_DATA(GMWaveGameObject);
+	GM_CREATE_DATA();
 }
 
 void GMWaveGameObject::initShader(const IRenderContext* context)
@@ -347,6 +332,16 @@ void GMWaveGameObject::setWaveDescriptions(Vector<GMWaveDescription> desc)
 {
 	D(d);
 	d->waveDescriptions = std::move(desc);
+}
+
+GMWaveGameObject::Data& GMWaveGameObject::dataRef()
+{
+	return *data();
+}
+
+const GMWaveGameObject::Data& GMWaveGameObject::dataRef() const
+{
+	return *data();
 }
 
 void GMWaveGameObject::play()

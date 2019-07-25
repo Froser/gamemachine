@@ -82,6 +82,8 @@ public:
 
 public:
 	void setWaveDescriptions(Vector<GMWaveDescription> desc);
+	Data& dataRef();
+	const Data& dataRef() const;
 
 public:
 	virtual void onRenderShader(GMModel* model, IShaderProgram* shaderProgram) const;
@@ -89,8 +91,6 @@ public:
 
 private:
 	void updateEachVertex();
-
-private:
 	void setVertices(const GMVertices& vertices);
 };
 

@@ -204,7 +204,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMParticleSystem_Cocos2D)
 GM_DEFINE_PROPERTY(GMParticleSystem_Cocos2D, GMTextureAsset, Texture, texture)
 GMParticleSystem_Cocos2D::GMParticleSystem_Cocos2D(const IRenderContext* context)
 {
-	GM_CREATE_DATA(GMParticleSystem_Cocos2D);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->context = context;
@@ -466,7 +466,7 @@ GM_DEFINE_PROPERTY(GMParticleEmitter_Cocos2D, GMDuration, Duration, duration)
 GM_DEFINE_PROPERTY(GMParticleEmitter_Cocos2D, GMVec3, RotationAxis, rotationAxis)
 GMParticleEmitter_Cocos2D::GMParticleEmitter_Cocos2D(GMParticleSystem_Cocos2D* system)
 {
-	GM_CREATE_DATA(GMParticleEmitter_Cocos2D);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->system = system;
@@ -650,7 +650,7 @@ GM_DEFINE_PROPERTY(GMParticleGravityMode, GMfloat, RadialAcceleration, radialAcc
 GM_DEFINE_PROPERTY(GMParticleGravityMode, GMfloat, RadialAccelerationV, radialAccelerationV)
 GMParticleGravityMode::GMParticleGravityMode()
 {
-	GM_CREATE_DATA(GMParticleGravityMode);
+	GM_CREATE_DATA();
 }
 
 GMParticleGravityMode::GMParticleGravityMode(const GMParticleGravityMode& rhs)
@@ -693,7 +693,7 @@ GM_DEFINE_PROPERTY(GMParticleRadiusMode, GMfloat, SpinPerSecond, spinPerSecond)
 GM_DEFINE_PROPERTY(GMParticleRadiusMode, GMfloat, SpinPerSecondV, spinPerSecondV)
 GMParticleRadiusMode::GMParticleRadiusMode()
 {
-	GM_CREATE_DATA(GMParticleRadiusMode);
+	GM_CREATE_DATA();
 }
 
 GMParticleRadiusMode::GMParticleRadiusMode(const GMParticleRadiusMode& rhs)
@@ -791,7 +791,7 @@ GM_DEFINE_PROPERTY(GMParticleDescription_Cocos2D, GMBuffer, TextureImageData, te
 GM_DEFINE_PROPERTY(GMParticleDescription_Cocos2D, GMParticleModelType, ParticleModelType, particleModelType)
 GMParticleDescription_Cocos2D::GMParticleDescription_Cocos2D()
 {
-	GM_CREATE_DATA(GMParticleDescription_Cocos2D);
+	GM_CREATE_DATA();
 }
 
 GMParticleDescription_Cocos2D::GMParticleDescription_Cocos2D(const GMParticleDescription_Cocos2D& rhs)
@@ -832,7 +832,7 @@ GM_DEFINE_PROPERTY(GMParticle_Cocos2D, GMParticle_Cocos2D_GravityModeData, Gravi
 GM_DEFINE_PROPERTY(GMParticle_Cocos2D, GMParticle_Cocos2D_RadiusModeData, RadiusModeData, radiusModeData)
 GMParticle_Cocos2D::GMParticle_Cocos2D()
 {
-	GM_CREATE_DATA(GMParticle_Cocos2D);
+	GM_CREATE_DATA();
 }
 
 GMParticle_Cocos2D::GMParticle_Cocos2D(const GMParticle_Cocos2D& rhs)

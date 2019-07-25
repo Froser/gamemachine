@@ -10,17 +10,11 @@
 
 BEGIN_NS
 
-GM_PRIVATE_OBJECT(GMDx11Framebuffer)
-{
-	const IRenderContext* context = nullptr;
-	GMTextureAsset renderTexture;
-	GMComPtr<ID3D11RenderTargetView> renderTargetView;
-	GMString name;
-};
-
-class GMDx11Framebuffer : public GMObject, public IFramebuffer
+GM_PRIVATE_CLASS(GMDx11Framebuffer);
+class GMDx11Framebuffer : public IFramebuffer
 {
 	GM_DECLARE_PRIVATE(GMDx11Framebuffer)
+	GM_DISABLE_COPY_ASSIGN(GMDx11Framebuffer)
 
 public:
 	GMDx11Framebuffer(const IRenderContext* context);
@@ -34,35 +28,19 @@ public:
 	virtual const IRenderContext* getContext();
 
 public:
-	ID3D11RenderTargetView* getRenderTargetView()
-	{
-		D(d);
-		GM_ASSERT(d->renderTargetView);
-		return d->renderTargetView;
-	}
+	ID3D11RenderTargetView* getRenderTargetView();
 };
 
 class GMGraphicEngine;
-GM_PRIVATE_OBJECT(GMDx11Framebuffers)
-{
-	const IRenderContext* context = nullptr;
-	GMComPtr<ID3D11DeviceContext> deviceContext;
-	Vector<GMOwnedPtr<GMDx11Framebuffer>> framebuffers;
-	Vector<ID3D11RenderTargetView*> renderTargetViews;
-	GMComPtr<ID3D11DepthStencilView> depthStencilView;
-	GMComPtr<ID3D11Texture2D> depthStencilTexture;
-	GMGraphicEngine* engine = nullptr;
-	GMfloat clearColor[4];
-	D3D11_VIEWPORT viewport;
-};
-
-class GMDx11Framebuffers : public GMObject, public IFramebuffers
+GM_PRIVATE_CLASS(GMDx11Framebuffers);
+class GMDx11Framebuffers : public IFramebuffers
 {
 	GM_DECLARE_PRIVATE(GMDx11Framebuffers)
+	GM_DISABLE_COPY_ASSIGN(GMDx11Framebuffers)
 
 public:
 	GMDx11Framebuffers(const IRenderContext* context);
-	~GMDx11Framebuffers() = default;
+	~GMDx11Framebuffers();
 
 public:
 	virtual bool init(const GMFramebuffersDesc& desc) override;
@@ -86,23 +64,15 @@ public:
 	static IFramebuffers* createDefaultFramebuffers(const IRenderContext* context);
 };
 
-GM_PRIVATE_OBJECT(GMDx11ShadowFramebuffers)
-{
-	GMComPtr<ID3D11ShaderResourceView> depthShaderResourceView;
-	GMint32 width = 0;
-	GMint32 height = 0;
-	GMShadowSourceDesc shadowSource;
-	D3D11_VIEWPORT viewports[GMGraphicEngine::getMaxCascades()];
-	GMfloat cascadeEndClip[GMGraphicEngine::getMaxCascades()] = { 0 };
-	GMCascadeLevel currentViewport;
-};
-
+GM_PRIVATE_CLASS(GMDx11ShadowFramebuffers);
 class GMDx11ShadowFramebuffers : public GMDx11Framebuffers, public ICSMFramebuffers
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMDx11ShadowFramebuffers, GMDx11Framebuffers)
+	GM_DECLARE_PRIVATE(GMDx11ShadowFramebuffers)
+	GM_DECLARE_BASE(GMDx11Framebuffers)
 
 public:
-	using GMDx11Framebuffers::GMDx11Framebuffers;
+	GMDx11ShadowFramebuffers(const IRenderContext* context);
+	~GMDx11ShadowFramebuffers();
 
 public:
 	virtual bool init(const GMFramebuffersDesc& desc) override;
@@ -119,19 +89,8 @@ public:
 
 public:
 	ID3D11ShaderResourceView* getShadowMapShaderResourceView();
-
-public:
-	inline GMint32 getShadowMapWidth() GM_NOEXCEPT
-	{
-		D(d);
-		return d->width;
-	}
-
-	inline GMint32 getShadowMapHeight() GM_NOEXCEPT
-	{
-		D(d);
-		return d->height;
-	}
+	inline GMint32 getShadowMapWidth() GM_NOEXCEPT;
+	inline GMint32 getShadowMapHeight() GM_NOEXCEPT;
 };
 
 END_NS

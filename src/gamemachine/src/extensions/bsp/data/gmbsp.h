@@ -200,9 +200,9 @@ GM_ALIGNED_STRUCT(BSPLightVolumes)
 	GMbyte* volData;
 };
 
-GM_PRIVATE_OBJECT(GMBSP)
+GM_PRIVATE_OBJECT_UNALIGNED(GMBSP)
 {
-	friend class GMBSP;
+	GM_FRIEND_CLASS(GMBSP);
 
 	BSPLightVolumes lightVols;
 	AlignedVector<BSPPlane> planes;
@@ -254,7 +254,7 @@ private:
 	GMint32 scriptline;
 };
 
-typedef GMBSPPrivate BSPData;
+typedef GMBSPPrivate GMBSPData;
 class GMBSP : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMBSP);
@@ -265,7 +265,7 @@ public:
 
 public:
 	void loadBsp(const GMBuffer& buf);
-	BSPData& bspData();
+	GMBSPData& bspData();
 
 private:
 	void loadPlanes();

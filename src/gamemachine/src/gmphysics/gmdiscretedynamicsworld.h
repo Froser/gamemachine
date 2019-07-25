@@ -7,21 +7,11 @@
 BEGIN_NS
 class GMConstraint;
 
-GM_PRIVATE_OBJECT(GMDiscreteDynamicsWorld)
-{
-	GM_OWNED btDiscreteDynamicsWorld* worldImpl = nullptr;
-	GM_OWNED btDefaultCollisionConfiguration* collisionConfiguration = nullptr;
-	GM_OWNED btCollisionDispatcher* dispatcher = nullptr;
-	GM_OWNED btBroadphaseInterface* overlappingPairCache = nullptr;
-	GM_OWNED btSequentialImpulseConstraintSolver* solver = nullptr;
-	Vector<GMRigidPhysicsObject*> rigidObjs;
-	Vector<GMConstraint*> constraintObjs; // 生命周期由GMDiscreteDynamicsWorld管理
-	GM_OWNED Vector<btRigidBody*> bulletRigidPool;
-};
-
+GM_PRIVATE_CLASS(GMDiscreteDynamicsWorld);
 class GM_EXPORT GMDiscreteDynamicsWorld : public GMPhysicsWorld
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMDiscreteDynamicsWorld, GMPhysicsWorld);
+	GM_DECLARE_PRIVATE(GMDiscreteDynamicsWorld);
+	GM_DECLARE_BASE(GMPhysicsWorld)
 
 public:
 	GMDiscreteDynamicsWorld(GMGameWorld* world);

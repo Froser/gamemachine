@@ -57,7 +57,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GM2DGameObjectBase)
 
 GM2DGameObjectBase::GM2DGameObjectBase(const GMRect& renderRc)
 {
-	GM_CREATE_DATA(GM2DGameObjectBase);
+	GM_CREATE_DATA();
 	D(d);
 	d->renderRc = renderRc;
 }
@@ -151,13 +151,13 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMTextGameObject)
 GMTextGameObject::GMTextGameObject(const GMRect& renderRc)
 	: GM2DGameObjectBase(renderRc)
 {
-	GM_CREATE_DATA(GMTextGameObject);
+	GM_CREATE_DATA();
 }
 
 GMTextGameObject::GMTextGameObject(const GMRect& renderRc, ITypoEngine* typo)
 	: GM2DGameObjectBase(renderRc)
 {
-	GM_CREATE_DATA(GMTextGameObject);
+	GM_CREATE_DATA();
 	D(d);
 	d->typoEngine = typo;
 	d->insetTypoEngine = false;
@@ -517,7 +517,7 @@ GMModel* GMTextGameObject::createModel()
 GMSprite2DGameObject::GMSprite2DGameObject(const GMRect& renderRc)
 	: Base(renderRc)
 {
-	GM_CREATE_DATA(GMSprite2DGameObject);
+	GM_CREATE_DATA();
 }
 
 GMSprite2DGameObject::~GMSprite2DGameObject()
@@ -722,7 +722,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMBorder2DGameObject)
 GMBorder2DGameObject::GMSprite2DGameObject(const GMRect& renderRc)
 	: Base(renderRc)
 {
-	GM_CREATE_DATA(GMBorder2DGameObject);
+	GM_CREATE_DATA();
 }
 
 GMBorder2DGameObject::~GMBorder2DGameObject()

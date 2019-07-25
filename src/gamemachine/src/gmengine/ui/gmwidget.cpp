@@ -105,7 +105,7 @@ GM_PRIVATE_OBJECT_ALIGNED(GMElementBlendColor)
 
 GMElementBlendColor::GMElementBlendColor()
 {
-	GM_CREATE_DATA(GMElementBlendColor);
+	GM_CREATE_DATA();
 }
 
 void GMElementBlendColor::init(const GMVec4& defaultColor, const GMVec4& disabledColor, const GMVec4& hiddenColor)
@@ -163,7 +163,7 @@ GMStyle::GMStyle(
 	const GMVec4& hiddenTextureColor
 )
 {
-	GM_CREATE_DATA(GMStyle);
+	GM_CREATE_DATA();
 
 	D(d);
 	resetTextureColor(defaultTextureColor, disabledTextureColor, hiddenTextureColor);
@@ -308,7 +308,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMWidgetResourceManager)
 
 GMWidgetResourceManager::GMWidgetResourceManager(const IRenderContext* context)
 {
-	GM_CREATE_DATA(GMWidgetResourceManager);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->configuration = new GMUIConfiguration(context);
@@ -1609,7 +1609,7 @@ GMSystemMouseEvent* GMWidget::adjustMouseEvent(GMSystemMouseEvent* event, const 
 	return event;
 }
 
-ForwardDeclare* GMWidget::getParentWindow()
+IWindow* GMWidget::getParentWindow()
 {
 	D(d);
 	return d->parentWindow;
@@ -1690,7 +1690,7 @@ void GMWidget::resetControlMouseOver()
 	d->controlMouseOver = nullptr;
 }
 
-GMOverflowStyle GMWidget::getOverflow() GM_NOEXCEPT;
+GMOverflowStyle GMWidget::getOverflow() GM_NOEXCEPT
 {
 	D(d);
 	return d->overflow;

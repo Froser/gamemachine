@@ -15,6 +15,8 @@
 #define	MAX_GRID_SIZE 129
 #define	MAX_FACETS 1024
 
+BEGIN_NS
+
 enum EdgeName
 {
 	EN_TOP,
@@ -1181,12 +1183,27 @@ namespace
 	}
 }
 
-GM_PRIVATE_NAME(GMBSPPatch)::GM_PRIVATE_DESTRUCT(GMBSPPatch)
+GM_PRIVATE_OBJECT_UNALIGNED(GMBSPPatch)
 {
-	for (auto patch : patches)
+	GM_PRIVATE_DESTRUCTOR(GMBSPPatch)
 	{
-		GM_delete(patch);
+		for (auto patch : patches)
+		{
+			GM_delete(patch);
+		}
 	}
+
+	AUTORELEASE AlignedVector<GMBSP_Physics_Patch*> patches;
+};
+
+GMBSPPatch::GMBSPPatch()
+{
+	GM_CREATE_DATA();
+}
+
+GMBSPPatch::~GMBSPPatch()
+{
+
 }
 
 void GMBSPPatch::alloc(GMint32 num)
@@ -1266,3 +1283,5 @@ void GMBSPPatch::generatePatchCollide(GMint32 index, GMint32 width, GMint32 heig
 	patch->pc = pf;
 	d->patches[index] = patch;
 }
+
+END_NS

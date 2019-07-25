@@ -7,21 +7,16 @@
 struct GMVec3;
 BEGIN_NS
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMPhysicsShape)
-{
-	btCollisionShape* shape = nullptr;
-	GMModelAsset modelCache;
-};
-
+GM_PRIVATE_CLASS(GMPhysicsShape);
 class GM_EXPORT GMPhysicsShape
 {
-	GM_DECLARE_PRIVATE_NGO(GMPhysicsShape);
-	GM_DECLARE_PROPERTY(ModelCache, modelCache)
-
-	friend struct GMPhysicsShapeHelper;
+	GM_DECLARE_PRIVATE(GMPhysicsShape);
+	GM_DISABLE_COPY_ASSIGN(GMPhysicsShape)
+	GM_DECLARE_PROPERTY(GMModelAsset, ModelCache)
+	GM_FRIEND_STRUCT(GMPhysicsShapeHelper);
 
 private:
-	GMPhysicsShape() = default;
+	GMPhysicsShape();
 
 public:
 	~GMPhysicsShape();

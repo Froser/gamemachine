@@ -12,7 +12,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMComputeShaderManager)
 
 GMComputeShaderManager::GMComputeShaderManager()
 {
-	GM_CREATE_DATA(GMComputeShaderManager);
+	GM_CREATE_DATA();
 }
 
 GMComputeShaderManager::~GMComputeShaderManager()

@@ -67,7 +67,7 @@ GameMachine& GameMachine::instance()
 
 GameMachine::GameMachine()
 {
-	GM_CREATE_DATA(GameMachine);
+	GM_CREATE_DATA();
 	GMDebugger::instance();
 	updateGameMachine();
 }

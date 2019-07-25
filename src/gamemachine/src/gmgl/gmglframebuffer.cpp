@@ -36,7 +36,7 @@ public:
 	GMGLFramebufferTexture(const GMFramebufferDesc& desc)
 		: GMGLTexture(nullptr)
 	{
-		GM_CREATE_DATA(GMGLFramebufferTexture);
+		GM_CREATE_DATA();
 		D(d);
 		d->desc = desc;
 	}
@@ -133,7 +133,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLFramebuffer)
 
 GMGLFramebuffer::GMGLFramebuffer(const IRenderContext* context)
 {
-	GM_CREATE_DATA(GMGLFramebuffer);
+	GM_CREATE_DATA();
 	D(d);
 	d->context = context;
 }
@@ -174,7 +174,7 @@ GMuint32 GMGLFramebuffer::getTextureId()
 
 GMGLFramebuffers::GMGLFramebuffers(const IRenderContext* context)
 {
-	GM_CREATE_DATA(GMGLFramebuffers);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->context = context;
@@ -410,7 +410,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLShadowMapTexture)
 
 GMGLShadowMapTexture::GMGLShadowMapTexture(GMuint32 textureId)
 {
-	GM_CREATE_DATA(GMGLShadowMapTexture);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->textureId = textureId;
@@ -455,7 +455,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLShadowFramebuffers)
 GMGLShadowFramebuffers::GMGLShadowFramebuffers(const IRenderContext* context)
 	: GMGLFramebuffers(context)
 {
-	GM_CREATE_DATA(GMGLShadowFramebuffers);
+	GM_CREATE_DATA();
 }
 
 bool GMGLShadowFramebuffers::init(const GMFramebuffersDesc& desc)

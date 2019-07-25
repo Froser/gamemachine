@@ -6,6 +6,8 @@
 #include "gmdx11shaderprogram.h"
 #include "gmdx11fxc.h"
 
+BEGIN_NS
+
 namespace
 {
 	IShaderProgram* newShaderProgram(IGraphicEngine* engine, ID3DX11Effect* effect)
@@ -140,3 +142,5 @@ D3D11_FILTER GMDx11Helper::getTextureFilter(GMS_TextureFilter min, GMS_TextureFi
 	//TODO
 	return D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 }
+
+END_NS

@@ -174,6 +174,7 @@ class GM_EXPORT GMModelDataProxy : public GMObject, public IQueriable
 
 public:
 	GMModelDataProxy(const IRenderContext* context, GMModel* obj);
+	~GMModelDataProxy();
 
 public:
 	virtual void transfer() = 0;

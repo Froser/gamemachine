@@ -5,6 +5,8 @@
 #include <gmmodel.h>
 #include <gmassets.h>
 
+BEGIN_NS
+
 namespace
 {
 	void collisionShape2TriangleMesh(
@@ -137,6 +139,18 @@ namespace
 			*shape = btShape;
 		}
 	}
+}
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMPhysicsShape)
+{
+	btCollisionShape* shape = nullptr;
+	GMModelAsset modelCache;
+};
+
+GM_DEFINE_PROPERTY(GMPhysicsShape, GMModelAsset, ModelCache, modelCache)
+GMPhysicsShape::GMPhysicsShape()
+{
+	GM_CREATE_DATA();
 }
 
 GMPhysicsShape::~GMPhysicsShape()
@@ -272,3 +286,5 @@ void GMPhysicsShapeHelper::createModelFromShape(
 		asset = GMAsset(GMAssetType::Model, newModel);
 	}
 }
+
+END_NS

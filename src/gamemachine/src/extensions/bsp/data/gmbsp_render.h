@@ -118,7 +118,7 @@ struct GMBSP_Render_VisibilityData
 };
 
 class GMEntityObject;
-GM_PRIVATE_OBJECT(GMBSPRender)
+GM_PRIVATE_OBJECT_UNALIGNED(GMBSPRender)
 {
 	AlignedVector<GMBSP_Render_Vertex> vertices;
 	AlignedVector<GMBSP_Render_FaceDirectoryEntry> faceDirectory;
@@ -137,7 +137,7 @@ GM_PRIVATE_OBJECT(GMBSPRender)
 	Vector<GMint32> meshFaceIndices;
 	Vector<GMint32> patchIndices;
 
-	BSPData* bsp = nullptr;
+	GMBSPData* bsp = nullptr;
 	Bitset facesToDraw;
 	Bitset entitiesToDraw;
 	GMint32 numPolygonFaces = 0;
@@ -154,11 +154,14 @@ GM_PRIVATE_OBJECT(GMBSPRender)
 typedef GMBSPRenderPrivate GMBSPRenderData;
 class GMBSPRender
 {
-	GM_DECLARE_PRIVATE_NGO(GMBSPRender);
+	GM_DECLARE_PRIVATE(GMBSPRender);
+
+public:
+	GMBSPRender();
 
 public:
 	GMBSPRenderData& renderData();
-	void generateRenderData(BSPData* bsp);
+	void generateRenderData(GMBSPData* bsp);
 	void createObject(const GMBSP_Render_Face& face, const GMShader& shader, OUT GMModel** obj);
 	void createObject(const GMBSP_Render_BiquadraticPatch& biqp, const GMShader& shader, OUT GMScene** obj);
 	void createBox(const GMVec3& extents, const GMVec3& position, const GMShader& shader, OUT GMModel** obj);

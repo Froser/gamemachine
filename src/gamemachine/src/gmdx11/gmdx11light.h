@@ -4,15 +4,14 @@
 #include <gmlight.h>
 BEGIN_NS
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMDx11Light)
-{
-	ID3DX11Effect* effect = nullptr;
-	ID3DX11EffectVariable* lightAttributes = nullptr;
-};
-
+GM_PRIVATE_CLASS(GMDx11Light);
 class GMDx11Light : public GMLight
 {
-	GM_DECLARE_PRIVATE_NGO(GMDx11Light)
+	GM_DECLARE_PRIVATE(GMDx11Light)
+
+public:
+	GMDx11Light();
+	~GMDx11Light();
 
 public:
 	virtual void activateLight(GMuint32, ITechnique*) override;
@@ -21,6 +20,7 @@ protected:
 	virtual int getLightType() = 0;
 };
 
+GM_PRIVATE_CLASS(GMDx11PointLight);
 class GMDx11PointLight : public GMDx11Light
 {
 	enum { PointLight = 0 };
@@ -32,18 +32,18 @@ public:
 	}
 };
 
-GM_PRIVATE_OBJECT_UNALIGNED_FROM(GMDx11DirectionalLight, GMDirectionalLight_t)
-{
-};
-
+GM_PRIVATE_CLASS(GMDx11DirectionalLight);
 class GMDx11DirectionalLight : public GMDx11Light
 {
-	GM_DECLARE_PRIVATE_NGO(GMDx11DirectionalLight)
-	typedef GMDx11Light Base;
+	GM_DECLARE_PRIVATE(GMDx11DirectionalLight)
+	GM_DECLARE_BASE(GMDx11Light)
 
 	enum { DirectionalLight = 1 };
 
 public:
+	GMDx11DirectionalLight();
+	~GMDx11DirectionalLight();
+
 	virtual int getLightType() override
 	{
 		return DirectionalLight;
@@ -53,18 +53,18 @@ public:
 	virtual void activateLight(GMuint32, ITechnique*) override;
 };
 
-GM_PRIVATE_OBJECT_UNALIGNED_FROM(GMDx11Spotlight, GMSpotlight_t)
-{
-};
-
+GM_PRIVATE_CLASS(GMDx11Spotlight);
 class GMDx11Spotlight : public GMDx11DirectionalLight
 {
-	GM_DECLARE_PRIVATE_NGO(GMDx11Spotlight)
-	typedef GMDx11DirectionalLight Base;
+	GM_DECLARE_PRIVATE(GMDx11Spotlight)
+	GM_DECLARE_BASE(GMDx11DirectionalLight)
 
 	enum { Spotlight = 2 };
 
 public:
+	GMDx11Spotlight();
+	~GMDx11Spotlight();
+
 	virtual int getLightType() override
 	{
 		return Spotlight;

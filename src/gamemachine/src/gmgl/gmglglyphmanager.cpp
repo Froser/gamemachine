@@ -61,7 +61,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLGlyphManager)
 GMGLGlyphManager::GMGLGlyphManager(const IRenderContext* context)
 	: GMGlyphManager(context)
 {
-	GM_CREATE_DATA(GMGLGlyphManager);
+	GM_CREATE_DATA();
 	D(d);
 	d->cursor_u = d->cursor_v = 0;
 	d->maxHeight = 0;

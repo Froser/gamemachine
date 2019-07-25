@@ -6,7 +6,7 @@ BEGIN_NS
 
 GMLight::GMLight()
 {
-	GM_CREATE_DATA(GMLight);
+	GM_CREATE_DATA();
 }
 
 GMLight::~GMLight()

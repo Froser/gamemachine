@@ -2,6 +2,13 @@
 #include "gmbsp_render.h"
 #include "gmdata/gmmodel.h"
 
+BEGIN_NS
+
+GMBSPRender::GMBSPRender()
+{
+	GM_CREATE_DATA();
+}
+
 GMBSPRenderData& GMBSPRender::renderData()
 {
 	D(d);
@@ -84,7 +91,7 @@ bool GMBSP_Render_BiquadraticPatch::tesselate(GMint32 newTesselation)
 	return true;
 }
 
-void GMBSPRender::generateRenderData(BSPData* bsp)
+void GMBSPRender::generateRenderData(GMBSPData* bsp)
 {
 	D(d);
 	d->bsp = bsp;
@@ -447,3 +454,5 @@ void GMBSPRender::createBox(const GMVec3& extents, const GMVec3& position, const
 	}
 	*obj = model;
 }
+
+END_NS

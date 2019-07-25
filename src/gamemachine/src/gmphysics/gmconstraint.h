@@ -8,11 +8,6 @@ struct GMVec3;
 BEGIN_NS
 
 class GMRigidPhysicsObject;
-GM_PRIVATE_OBJECT(GMConstraint)
-{
-	btTypedConstraint* constraint = nullptr;
-};
-
 class GM_EXPORT GMConstraint : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMConstraint)
@@ -22,18 +17,14 @@ public:
 	~GMConstraint();
 
 public:
-	btTypedConstraint* getConstraint()
-	{
-		D(d);
-		return d->constraint;
-	}
+	btTypedConstraint* getConstraint();
 
 protected:
 	template <typename T>
 	void upcast()
 	{
 		D(d);
-		return static_cast<T>(d->constraint);
+		return static_cast<T>(getConstraint());
 	}
 };
 
@@ -44,17 +35,11 @@ struct GMConstraintSetting
 	GMfloat impulseClamp = 0.f;
 };
 
-GM_PRIVATE_OBJECT(GMPoint2PointConstraint)
-{
-	btPoint2PointConstraint* constraint = nullptr;
-	GMConstraintSetting setting;
-	GMRigidPhysicsObject* bodyA = nullptr;
-	GMRigidPhysicsObject* bodyB = nullptr;
-};
-
+GM_PRIVATE_CLASS(GMPoint2PointConstraint);
 class GM_EXPORT GMPoint2PointConstraint : public GMConstraint
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMPoint2PointConstraint, GMConstraint)
+	GM_DECLARE_PRIVATE(GMPoint2PointConstraint)
+	GM_DECLARE_BASE(GMConstraint)
 
 public:
 	GMPoint2PointConstraint(GMRigidPhysicsObject* body, const GMVec3& pivotA);
@@ -65,17 +50,8 @@ public:
 	void setPivotB(const GMVec3& pivot);
 
 public:
-	const GMConstraintSetting& getConstraintSetting()
-	{
-		D(d);
-		return d->setting;
-	}
-
-	void setConstraintSetting(const GMConstraintSetting& setting)
-	{
-		D(d);
-		d->setting = setting;
-	}
+	const GMConstraintSetting& getConstraintSetting();
+	void setConstraintSetting(const GMConstraintSetting& setting);
 };
 
 END_NS

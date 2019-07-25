@@ -41,7 +41,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGameWorld)
 GM_DEFINE_PROPERTY(GMGameWorld, GMRenderPreference, RenderPreference, renderPreference)
 GMGameWorld::GMGameWorld(const IRenderContext* context)
 {
-	GM_CREATE_DATA(GMGameWorld);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->context = context;

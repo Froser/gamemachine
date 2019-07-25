@@ -242,7 +242,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLTechnique)
 
 GMGLTechnique::GMGLTechnique(const IRenderContext* context)
 {
-	GM_CREATE_DATA(GMGLTechnique);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->context = context;
@@ -757,7 +757,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLTechnique_3D)
 GMGLTechnique_3D::GMGLTechnique_3D(const IRenderContext* context)
 	: Base(context)
 {
-	GM_CREATE_DATA(GMGLTechnique_3D);
+	GM_CREATE_DATA();
 }
 
 GMGLTechnique_3D::~GMGLTechnique_3D()
@@ -1006,7 +1006,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLTechnique_Filter)
 GMGLTechnique_Filter::GMGLTechnique_Filter(const IRenderContext* context)
 	: Base(context)
 {
-	GM_CREATE_DATA(GMGLTechnique_Filter);
+	GM_CREATE_DATA();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1093,7 +1093,7 @@ GM_PRIVATE_OBJECT_ALIGNED(GMGLTechnique_LightPass)
 GMGLTechnique_LightPass::GMGLTechnique_LightPass(const IRenderContext* context)
 	: Base(context)
 {
-	GM_CREATE_DATA(GMGLTechnique_LightPass);
+	GM_CREATE_DATA();
 }
 
 IShaderProgram* GMGLTechnique_LightPass::getShaderProgram()

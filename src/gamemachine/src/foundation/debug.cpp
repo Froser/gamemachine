@@ -38,7 +38,7 @@ GMDebugger& GMDebugger::instance()
 
 GMDebugger::GMDebugger()
 {
-	GM_CREATE_DATA(GMDebugger);
+	GM_CREATE_DATA();
 }
 
 void GMDebugger::setDebugOutput(IDebugOutput* output)

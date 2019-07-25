@@ -149,7 +149,7 @@ public:
 	GMShader& operator=(GMShader&& rhs) GM_NOEXCEPT;
 
 public:
-	GM_DECLARE_PROPERTY(GMuint32, SurfaceFlag); // to be deprecated
+	GM_DECLARE_PROPERTY(GMint32, Flag); // to be deprecated
 	GM_DECLARE_PROPERTY(GMS_Cull, Cull);
 	GM_DECLARE_PROPERTY(GMS_FrontFace, FrontFace);
 	GM_DECLARE_PROPERTY(GMS_BlendFunc, BlendFactorSourceRGB);

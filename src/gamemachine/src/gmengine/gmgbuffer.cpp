@@ -4,20 +4,12 @@
 #include "gameobjects/gmgameobject.h"
 #include "foundation/gamemachine.h"
 #include "gmgraphicengine.h"
+#include "gmgbuffer_p.h"
 
 BEGIN_NS
-GM_PRIVATE_OBJECT_UNALIGNED(GMGBuffer)
-{
-	const IRenderContext* context = nullptr;
-	IFramebuffers* geometryFramebuffers = nullptr;
-	GMGameObject* quad = nullptr;
-	GMGeometryPassingState state = GMGeometryPassingState::Done;
-	GMGraphicEngine* engine = nullptr;
-};
-
 GMGBuffer::GMGBuffer(const IRenderContext* context)
 {
-	GM_CREATE_DATA(GMGBuffer);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->context = context;

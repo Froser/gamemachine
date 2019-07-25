@@ -20,42 +20,15 @@ struct GMDx11CubeMapState
 
 class GMDx11Framebuffers;
 class GMDx11GBuffer;
-GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
-{
-	GMComPtr<ID3D11Device> device;
-	GMComPtr<ID3D11DeviceContext> deviceContext;
-	GMComPtr<IDXGISwapChain> swapChain;
-	GMComPtr<ID3D11DepthStencilView> depthStencilView;
-	GMComPtr<ID3D11Texture2D> depthStencilTexture;
-	GMComPtr<ID3D11RenderTargetView> renderTargetView;
-	GMScopedPtr<IShaderProgram> shaderProgram;
-	GMDx11CubeMapState cubemapState;
-
-	bool inited = false;
-	bool ready = false;
-	bool lightDirty = true;
-
-	GMOwnedPtr<ITechnique> technique_3d;
-	GMOwnedPtr<ITechnique> technique_2d;
-	GMOwnedPtr<ITechnique> technique_text;
-	GMOwnedPtr<ITechnique> technique_cubemap;
-	GMOwnedPtr<ITechnique> technique_filter;
-	GMOwnedPtr<ITechnique> technique_deferred_3d;
-	GMOwnedPtr<ITechnique> technique_deferred_3d_lightpass;
-	GMOwnedPtr<ITechnique> technique_3d_shadow;
-	GMOwnedPtr<ITechnique> technique_particle;
-	GMOwnedPtr<ITechnique> technique_custom;
-
-	GMint32 lightCountIndices = 0;
-};
-
+GM_PRIVATE_CLASS(GMDx11GraphicEngine);
 class GMDx11GraphicEngine : public GMGraphicEngine
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMDx11GraphicEngine, GMGraphicEngine)
+	GM_DECLARE_PRIVATE(GMDx11GraphicEngine)
+	GM_DECLARE_BASE(GMGraphicEngine)
 
 public:
 	GMDx11GraphicEngine(const IRenderContext* context);
-	~GMDx11GraphicEngine() = default;
+	~GMDx11GraphicEngine();
 
 public:
 	virtual void init() override;
@@ -74,47 +47,13 @@ public:
 	virtual void activateLights(ITechnique* technique);
 
 public:
-	inline GMDx11CubeMapState& getCubeMapState()
-	{
-		D(d);
-		return d->cubemapState;
-	}
-
-	inline ID3D11Device* getDevice()
-	{
-		D(d);
-		return d->device;
-	}
-
-	inline ID3D11DeviceContext* getDeviceContext()
-	{
-		D(d);
-		return d->deviceContext;
-	}
-
-	inline IDXGISwapChain* getSwapChain()
-	{
-		D(d);
-		return d->swapChain;
-	}
-
-	inline ID3D11DepthStencilView* getDepthStencilView()
-	{
-		D(d);
-		return d->depthStencilView;
-	}
-
-	inline ID3D11RenderTargetView* getRenderTargetView()
-	{
-		D(d);
-		return d->renderTargetView;
-	}
-
-	const GMVec2 getCurrentFilterKernelDelta()
-	{
-		D_BASE(d, Base);
-		return d->renderConfig.get(GMRenderConfigs::FilterKernelOffset_Vec2).toVec2();
-	}
+	GMDx11CubeMapState& getCubeMapState();
+	ID3D11Device* getDevice();
+	ID3D11DeviceContext* getDeviceContext();
+	IDXGISwapChain* getSwapChain();
+	ID3D11DepthStencilView* getDepthStencilView();
+	ID3D11RenderTargetView* getRenderTargetView();
+	const GMVec2 getCurrentFilterKernelDelta();
 
 private:
 	void initShaders(const IRenderContext* context);

@@ -141,7 +141,7 @@ void GMBSP::loadBsp(const GMBuffer& buf)
 	generateLightVolumes();
 }
 
-BSPData& GMBSP::bspData()
+GMBSPData& GMBSP::bspData()
 {
 	D(d);
 	return *d;

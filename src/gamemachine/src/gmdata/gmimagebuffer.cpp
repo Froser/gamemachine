@@ -15,7 +15,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMImageBuffer)
 
 GMImageBuffer::GMImageBuffer(GMImageFormat format, GMuint32 width, GMuint32 height, GMsize_t bufferSize, GMbyte* buffer)
 {
-	GM_CREATE_DATA(GMImageBuffer);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->width = width;

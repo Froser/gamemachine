@@ -6,6 +6,9 @@
 #include "gmengine/gameobjects/gmgameobject.h"
 #include "gmdata/gmmodel.h"
 #include "gmdx11texture.h"
+#include "gmengine/gmgbuffer_p.h"
+
+BEGIN_NS
 
 namespace
 {
@@ -117,3 +120,5 @@ bool GMDx11GBuffer::isMultisamping()
 	D(d);
 	return d->context->getWindow()->getWindowStates().sampleCount > 1;
 }
+
+END_NS

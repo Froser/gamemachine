@@ -33,7 +33,7 @@ const GMRenderConfig GMConfig::asRenderConfig() const
 
 GMConfigs::GMConfigs()
 {
-	GM_CREATE_DATA(GMConfigs);
+	GM_CREATE_DATA();
 	init();
 }
 

@@ -8,22 +8,11 @@ BEGIN_NS
 // 解析一些纹理配置，如天空、特效、动画等，并加入世界
 class GMBSPGameWorld;
 
-GM_PRIVATE_OBJECT(GMBSPShaderLoader)
-{
-	GMString directory;
-	GMBSPGameWorld* world;
-	GMBSPRenderData* bspRender;
-	Map<GMString, GMXMLElement*> items;
-	AlignedVector<GMXMLDocument*> shaderDocs;
-
-	// 纹理编号，从TEXTURE_INDEX_AMBIENT开始
-	GMint32 lightmapId;
-};
-
-
-class GMBSPShaderLoader : public GMObject
+GM_PRIVATE_CLASS(GMBSPShaderLoader);
+class GMBSPShaderLoader
 {
 	GM_DECLARE_PRIVATE(GMBSPShaderLoader)
+	GM_DISABLE_ASSIGN(GMBSPShaderLoader)
 
 public:
 	GMBSPShaderLoader();

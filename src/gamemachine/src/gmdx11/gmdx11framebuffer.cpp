@@ -8,14 +8,15 @@
 
 BEGIN_NS
 
-GM_PRIVATE_OBJECT(GMDx11DefaultFramebuffers)
+GM_PRIVATE_OBJECT_UNALIGNED(GMDx11DefaultFramebuffers)
 {
 	GMComPtr<ID3D11RenderTargetView> defaultRenderTargetView;
 };
 
 class GMDx11DefaultFramebuffers : public GMDx11Framebuffers
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMDx11DefaultFramebuffers, GMDx11Framebuffers);
+	GM_DECLARE_PRIVATE(GMDx11DefaultFramebuffers);
+	GM_DECLARE_BASE(GMDx11Framebuffers)
 
 public:
 	GMDx11DefaultFramebuffers(const IRenderContext* context)
@@ -68,8 +69,8 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMDx11FramebufferTexture)
 
 class GMDx11FramebufferTexture : public GMDx11Texture
 {
-	GM_DECLARE_PRIVATE_NGO(GMDx11FramebufferTexture);
-	typedef GMDx11Texture Base;
+	GM_DECLARE_PRIVATE(GMDx11FramebufferTexture);
+	GM_DECLARE_BASE(GMDx11Texture)
 
 public:
 	GMDx11FramebufferTexture(const IRenderContext* context, const GMFramebufferDesc& desc);
@@ -84,6 +85,7 @@ public:
 GMDx11FramebufferTexture::GMDx11FramebufferTexture(const IRenderContext* context, const GMFramebufferDesc& desc)
 	: GMDx11Texture(context, nullptr)
 {
+	GM_CREATE_DATA();
 	D(d);
 	d->desc = desc;
 }
@@ -148,10 +150,18 @@ ID3D11Resource* GMDx11FramebufferTexture::getTexture()
 	D_BASE(db, Base);
 	return db->resource;
 }
-END_NS
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMDx11Framebuffer)
+{
+	const IRenderContext* context = nullptr;
+	GMTextureAsset renderTexture;
+	GMComPtr<ID3D11RenderTargetView> renderTargetView;
+	GMString name;
+};
 
 GMDx11Framebuffer::GMDx11Framebuffer(const IRenderContext* context)
 {
+	GM_CREATE_DATA();
 	D(d);
 	d->context = context;
 }
@@ -196,13 +206,40 @@ const IRenderContext* GMDx11Framebuffer::getContext()
 	return d->context;
 }
 
+ID3D11RenderTargetView* GMDx11Framebuffer::getRenderTargetView()
+{
+	D(d);
+	GM_ASSERT(d->renderTargetView);
+	return d->renderTargetView;
+}
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMDx11Framebuffers)
+{
+	const IRenderContext* context = nullptr;
+	GMComPtr<ID3D11DeviceContext> deviceContext;
+	Vector<GMOwnedPtr<GMDx11Framebuffer>> framebuffers;
+	Vector<ID3D11RenderTargetView*> renderTargetViews;
+	GMComPtr<ID3D11DepthStencilView> depthStencilView;
+	GMComPtr<ID3D11Texture2D> depthStencilTexture;
+	GMGraphicEngine* engine = nullptr;
+	GMfloat clearColor[4];
+	D3D11_VIEWPORT viewport;
+};
+
 GMDx11Framebuffers::GMDx11Framebuffers(const IRenderContext* context)
 {
+	GM_CREATE_DATA();
+
 	D(d);
 	d->context = context;
 	d->context->getEngine()->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
 	GM_ASSERT(d->deviceContext);
 	d->engine = gm_cast<GMGraphicEngine*>(d->context->getEngine());
+}
+
+GMDx11Framebuffers::~GMDx11Framebuffers()
+{
+
 }
 
 bool GMDx11Framebuffers::init(const GMFramebuffersDesc& desc)
@@ -380,6 +417,28 @@ IFramebuffers* GMDx11Framebuffers::createDefaultFramebuffers(const IRenderContex
 	return new GMDx11DefaultFramebuffers(context);
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMDx11ShadowFramebuffers)
+{
+	GMComPtr<ID3D11ShaderResourceView> depthShaderResourceView;
+	GMint32 width = 0;
+	GMint32 height = 0;
+	GMShadowSourceDesc shadowSource;
+	D3D11_VIEWPORT viewports[GMGraphicEngine::getMaxCascades()];
+	GMfloat cascadeEndClip[GMGraphicEngine::getMaxCascades()] = { 0 };
+	GMCascadeLevel currentViewport;
+};
+
+GMDx11ShadowFramebuffers::GMDx11ShadowFramebuffers(const IRenderContext* context)
+	: Base(context)
+{
+	GM_CREATE_DATA();
+}
+
+GMDx11ShadowFramebuffers::~GMDx11ShadowFramebuffers()
+{
+
+}
+
 bool GMDx11ShadowFramebuffers::init(const GMFramebuffersDesc& desc)
 {
 	bool b = Base::init(desc);
@@ -493,3 +552,17 @@ ID3D11ShaderResourceView* GMDx11ShadowFramebuffers::getShadowMapShaderResourceVi
 	D(d);
 	return d->depthShaderResourceView;
 }
+
+inline GMint32 GMDx11ShadowFramebuffers::getShadowMapWidth() GM_NOEXCEPT
+{
+	D(d);
+	return d->width;
+}
+
+inline GMint32 GMDx11ShadowFramebuffers::getShadowMapHeight() GM_NOEXCEPT
+{
+	D(d);
+	return d->height;
+}
+
+END_NS

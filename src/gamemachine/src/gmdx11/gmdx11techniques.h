@@ -22,42 +22,11 @@ struct GMTextureAttributeBank
 	ID3DX11EffectScalarVariable* scaleY = nullptr;
 };
 
-GM_PRIVATE_OBJECT(GMDx11Technique)
-{
-	struct TechniqueContext
-	{
-		GMModel* currentModel = nullptr;
-		GMScene* currentScene = nullptr;
-	};
-
-	TechniqueContext techContext;
-	const IRenderContext* context = nullptr;
-	GMTextureAsset whiteTexture;
-	GMOwnedPtr<GMDx11RasterizerStates> rasterizerStates;
-	GMOwnedPtr<GMDx11BlendStates> blendStates;
-	GMOwnedPtr<GMDx11DepthStencilStates> depthStencilStates;
-	GMDx11EffectVariableBank* bank = nullptr;
-
-	GMComPtr<ID3D11InputLayout> inputLayout;
-	GMComPtr<ID3DX11Effect> effect;
-	GMDebugConfig debugConfig;
-	ID3D11DeviceContext* deviceContext = nullptr;
-	ID3DX11EffectTechnique* technique = nullptr;
-	ID3DX11EffectRasterizerVariable* rasterizer = nullptr;
-	ID3DX11EffectBlendVariable* blend = nullptr;
-	ID3DX11EffectDepthStencilVariable* depthStencil = nullptr;
-	bool screenInfoPrepared = false;
-	GMComPtr<ID3D11Resource> shadowMapResource;
-	GMDx11GraphicEngine* engine = nullptr;
-	GMfloat gamma = 0;
-	Map<ID3DX11EffectVariable*, GMTextureAttributeBank> textureVariables;
-	GMShaderVariablesIndices indexBank = { 0 };
-	GMint64 lastShadowVersion = { 0 };
-};
-
-class GMDx11Technique : public GMObject, public ITechnique
+GM_PRIVATE_CLASS(GMDx11Technique);
+class GMDx11Technique : public ITechnique
 {
 	GM_DECLARE_PRIVATE(GMDx11Technique)
+	GM_DISABLE_COPY_ASSIGN(GMDx11Technique)
 
 public:
 	GMDx11Technique(const IRenderContext* context);
@@ -73,26 +42,7 @@ public:
 	virtual const IRenderContext* getContext();
 
 public:
-	inline ID3DX11Effect* getEffect()
-	{
-		D(d);
-		return d->effect;
-	}
-
-protected:
-	inline GMDx11GraphicEngine* getEngine()
-	{
-		D(d);
-		if (!d->engine)
-			d->engine = gm_cast<GMDx11GraphicEngine*>(d->context->getEngine());
-		return d->engine;
-	}
-
-	inline GMModel* getCurrentModel()
-	{
-		D(d);
-		return d->techContext.currentModel;
-	}
+	ID3DX11Effect* getEffect();
 
 protected:
 	virtual void prepareScreenInfo();
@@ -117,6 +67,8 @@ private:
 	GMTextureAsset getWhiteTexture();
 
 protected:
+	GMDx11GraphicEngine* getEngine();
+	GMModel* getCurrentModel();
 	void updateBoneTransforms(IShaderProgram* shaderProgram, GMModel* model);
 	void updateNodeTransforms(IShaderProgram* shaderProgram, GMModel* model);
 	virtual void setCascadeEndClip(GMCascadeLevel level, GMfloat endClip);
@@ -184,19 +136,11 @@ public:
 	virtual void initShadow() {}
 };
 
-GM_PRIVATE_OBJECT(GMDx11Technique_Filter)
-{
-	struct HDRState
-	{
-		GMToneMapping::Mode toneMapping = GMToneMapping::Reinhard;
-		bool HDR = false;
-	};
-	HDRState state;
-};
-
+GM_PRIVATE_CLASS(GMDx11Technique_Filter);
 class GMDx11Technique_Filter : public GMDx11Technique
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMDx11Technique_Filter, GMDx11Technique)
+	GM_DECLARE_PRIVATE(GMDx11Technique_Filter)
+	GM_DECLARE_BASE(GMDx11Technique)
 
 public:
 	GMDx11Technique_Filter(const IRenderContext* context);
@@ -276,17 +220,15 @@ protected:
 	}
 };
 
-GM_PRIVATE_OBJECT(GMDx11Technique_Custom)
-{
-	Vector<GMString> techniqueNames;
-};
-
+GM_PRIVATE_CLASS(GMDx11Technique_Custom);
 class GMDx11Technique_Custom : public GMDx11Technique
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMDx11Technique_Custom, GMDx11Technique)
+	GM_DECLARE_PRIVATE(GMDx11Technique_Custom)
+	GM_DECLARE_BASE(GMDx11Technique)
 
 public:
-	using GMDx11Technique::GMDx11Technique;
+	GMDx11Technique_Custom(const IRenderContext* context);
+	~GMDx11Technique_Custom();
 
 protected:
 	virtual ID3DX11EffectTechnique* getTechnique() override;

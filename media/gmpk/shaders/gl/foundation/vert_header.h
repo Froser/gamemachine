@@ -30,6 +30,7 @@ void init_layouts()
     tangent = vec4(gm_tangent.xyz, 1);
     bitangent = vec4(gm_bitangent.xyz, 1);
 
+    _position = position;
     _normal = normal;
     _tangent = tangent;
     _bitangent = bitangent;

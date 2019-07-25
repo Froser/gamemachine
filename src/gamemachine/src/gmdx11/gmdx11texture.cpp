@@ -3,6 +3,10 @@
 #include <gamemachine.h>
 #include "gmdx11graphic_engine.h"
 #include "gmdx11helper.h"
+#include "gmdata/gmimage_p.h"
+#include "gmdx11texture_p.h"
+
+BEGIN_NS
 
 namespace
 {
@@ -62,6 +66,8 @@ namespace
 
 GMDx11Texture::GMDx11Texture(const IRenderContext* context, GMImage* image)
 {
+	GM_CREATE_DATA();
+
 	D(d);
 	d->context = context;
 	d->image = image;
@@ -142,6 +148,13 @@ const IRenderContext* GMDx11Texture::getContext()
 {
 	D(d);
 	return d->context;
+}
+
+ID3D11ShaderResourceView* GMDx11Texture::getResourceView()
+{
+	D(d);
+	GM_ASSERT(d->shaderResourceView);
+	return d->shaderResourceView;
 }
 
 void GMDx11Texture::init()
@@ -265,6 +278,12 @@ void GMDx11Texture::init()
 	GM_delete_array(resourceData);
 }
 
+GMDx11WhiteTexture::GMDx11WhiteTexture(const IRenderContext* context)
+	: GMDx11Texture(context, nullptr)
+{
+
+}
+
 void GMDx11WhiteTexture::init()
 {
 	static GMbyte texData[] = { 0xFF, 0xFF, 0xFF, 0xFF };
@@ -352,3 +371,5 @@ void GMDx11EmptyTexture::init()
 		&d->shaderResourceView
 	));
 }
+
+END_NS

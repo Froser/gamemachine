@@ -16,7 +16,7 @@ GM_PRIVATE_OBJECT_ALIGNED(GMMaterial)
 
 GMMaterial::GMMaterial()
 {
-	GM_CREATE_DATA(GMMaterial);
+	GM_CREATE_DATA();
 }
 
 GMMaterial::GMMaterial(const GMMaterial& rhs)
@@ -174,7 +174,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMTextureList)
 
 GMTextureList::GMTextureList()
 {
-	GM_CREATE_DATA(GMTextureList);
+	GM_CREATE_DATA();
 }
 
 GMTextureList& GMTextureList::operator=(const GMTextureList& rhs)
@@ -225,7 +225,7 @@ GMTextureSampler& GMTextureList::getTextureSampler(GMTextureType type)
 GM_PRIVATE_OBJECT_ALIGNED(GMShader)
 {
 	GMIlluminationModel illuminationModel = GMIlluminationModel::Phong;
-	GMuint32 surfaceFlag = 0;
+	GMint32 flag = 0;
 	GMS_Cull cull = GMS_Cull::Cull;
 	GMS_FrontFace frontFace = GMS_FrontFace::Closewise;
 	GMS_BlendFunc blendFactorSrcRGB = GMS_BlendFunc::Zero;
@@ -244,7 +244,7 @@ GM_PRIVATE_OBJECT_ALIGNED(GMShader)
 	GMMaterial material;
 };
 
-GM_DEFINE_PROPERTY(GMShader, GMuint32, SurfaceFlag, surfaceFlag); // to be deprecated
+GM_DEFINE_PROPERTY(GMShader, GMint32, Flag, flag);
 GM_DEFINE_PROPERTY(GMShader, GMS_Cull, Cull, cull);
 GM_DEFINE_PROPERTY(GMShader, GMS_FrontFace, FrontFace, frontFace);
 GM_DEFINE_PROPERTY(GMShader, GMS_BlendFunc, BlendFactorSourceRGB, blendFactorSrcRGB);
@@ -264,7 +264,7 @@ GM_DEFINE_PROPERTY(GMShader, GMS_VertexColorOp, VertexColorOp, vertexColorOp)
 
 GMShader::GMShader()
 {
-	GM_CREATE_DATA(GMShader);
+	GM_CREATE_DATA();
 }
 
 GMShader::~GMShader()

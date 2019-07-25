@@ -3,9 +3,24 @@
 #include <gamemachine.h>
 #include "gmdx11graphic_engine.h"
 
+BEGIN_NS
+class GMDx11GraphicEngine;
+
+GM_PRIVATE_OBJECT_ALIGNED(GMDx11ModelDataProxy)
+{
+	GMDx11GraphicEngine* engine = nullptr;
+	GMComPtr<ID3D11Buffer> vertexBuffer;
+	GMComPtr<ID3D11Buffer> indexBuffer;
+	bool inited = false;
+	D3D11_MAPPED_SUBRESOURCE* mappedSubResource = nullptr;
+	GMModelBufferType lastType;
+};
+
 GMDx11ModelDataProxy::GMDx11ModelDataProxy(const IRenderContext* context, GMModel* model)
 	: GMModelDataProxy(context, model)
 {
+	GM_CREATE_DATA();
+
 	D(d);
 	if (context)
 		d->engine = gm_cast<GMDx11GraphicEngine*>(context->getEngine());
@@ -17,7 +32,6 @@ GMDx11ModelDataProxy::~GMDx11ModelDataProxy()
 
 bool GMDx11ModelDataProxy::getInterface(GameMachineInterfaceID id, void** out)
 {
-	D_BASE(db, Base);
 	D(d);
 	if (id == GameMachineInterfaceID::D3D11VertexBuffer)
 	{
@@ -28,7 +42,7 @@ bool GMDx11ModelDataProxy::getInterface(GameMachineInterfaceID id, void** out)
 		}
 		else
 		{
-			ID3D11Buffer* buffer = db->model->getModelBuffer()->getMeshBuffer().vertexBuffer;
+			ID3D11Buffer* buffer = getModel()->getModelBuffer()->getMeshBuffer().vertexBuffer;
 			GM_ASSERT(buffer);
 			buffer->AddRef();
 			(*out) = buffer;
@@ -44,7 +58,7 @@ bool GMDx11ModelDataProxy::getInterface(GameMachineInterfaceID id, void** out)
 		}
 		else
 		{
-			ID3D11Buffer* buffer = db->model->getModelBuffer()->getMeshBuffer().indexBuffer;
+			ID3D11Buffer* buffer = getModel()->getModelBuffer()->getMeshBuffer().indexBuffer;
 			GM_ASSERT(buffer);
 			buffer->AddRef();
 			(*out) = buffer;
@@ -183,3 +197,5 @@ void* GMDx11ModelDataProxy::getBuffer()
 
 	return d->mappedSubResource->pData;
 }
+
+END_NS

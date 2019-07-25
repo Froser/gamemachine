@@ -52,7 +52,7 @@ GM_DEFINE_GETTER(GMFrustum, GMFrustumParameters, Parameters, parameters, public)
 
 GMFrustum::GMFrustum()
 {
-	GM_CREATE_DATA(GMFrustum);
+	GM_CREATE_DATA();
 }
 
 GMFrustum::~GMFrustum()
@@ -348,7 +348,7 @@ GM_PRIVATE_OBJECT_ALIGNED(GMCameraUtility)
 GM_DEFINE_PROPERTY(GMCameraUtility, GMfloat, LimitPitch, limitPitch)
 GMCameraUtility::GMCameraUtility(GMCamera* camera)
 {
-	GM_CREATE_DATA(GMCameraUtility);
+	GM_CREATE_DATA();
 	setCamera(camera);
 }
 

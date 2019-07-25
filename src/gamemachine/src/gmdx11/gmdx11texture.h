@@ -11,23 +11,11 @@ struct GMDx11TextureSamplerVariable
 	ID3DX11EffectSamplerVariable* sampler;
 };
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMDx11Texture)
-{
-	const IRenderContext* context = nullptr;
-	GMImage* image = nullptr;
-	GMComPtr<ID3D11Device> device;
-	GMComPtr<ID3D11DeviceContext> deviceContext;
-	GMComPtr<ID3D11Resource> resource;
-	GMComPtr<ID3D11ShaderResourceView> shaderResourceView;
-	GMComPtr<ID3D11SamplerState> samplerState;
-	GMComPtr<ID3DX11Effect> effect;
-	Vector<ID3DX11EffectShaderResourceVariable*> shaderResourceVariables;
-	Vector<ID3DX11EffectSamplerVariable*> samplerVariables;
-};
-
+GM_PRIVATE_CLASS(GMDx11Texture);
 class GMDx11Texture : public ITexture
 {
-	GM_DECLARE_PRIVATE_NGO(GMDx11Texture)
+	GM_DECLARE_PRIVATE(GMDx11Texture)
+	GM_DISABLE_COPY_ASSIGN(GMDx11Texture)
 
 public:
 	GMDx11Texture(const IRenderContext* context, GMImage* image);
@@ -37,26 +25,18 @@ public:
 	virtual void init() override;
 	virtual void bindSampler(GMTextureSampler* sampler) override;
 	virtual void useTexture(GMint32 textureType) override;
-
 	virtual const IRenderContext* getContext();
 
 public:
-	ID3D11ShaderResourceView* getResourceView()
-	{
-		D(d);
-		GM_ASSERT(d->shaderResourceView);
-		return d->shaderResourceView;
-	}
+	ID3D11ShaderResourceView* getResourceView();
 };
 
 class GMDx11WhiteTexture : public GMDx11Texture
 {
 public:
-	GMDx11WhiteTexture(const IRenderContext* context)
-		: GMDx11Texture(context, nullptr)
-	{
-	}
+	GMDx11WhiteTexture(const IRenderContext* context);
 
+public:
 	virtual void init() override;
 	virtual void bindSampler(GMTextureSampler*) override;
 };

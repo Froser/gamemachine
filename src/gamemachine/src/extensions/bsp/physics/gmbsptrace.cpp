@@ -24,9 +24,27 @@ GM_ALIGNED_STRUCT(GMBSPTraceWork)
 	BSPTraceResult trace; // returned from trace call
 	BSPSphere sphere; // sphere for oriendted capsule collision
 };
-END_NS
 
-void GMBSPTrace::initTrace(BSPData* bsp, Map<GMint32, Set<GMBSPEntity*> >* entities, Map<GMBSPEntity*, GMEntityObject*>* entityObjects, GMBSPPhysicsWorld* world)
+GM_PRIVATE_OBJECT_UNALIGNED(GMBSPTrace)
+{
+	GMBSPData* bsp = nullptr;
+	Map<GMint32, Set<GMBSPEntity*> >* entities;
+	Map<GMBSPEntity*, GMEntityObject*>* entityObjects;
+	GMBSPPhysicsWorld* world;
+	GMint32 checkcount = 0;
+};
+
+GMBSPTrace::GMBSPTrace()
+{
+	GM_CREATE_DATA();
+}
+
+GMBSPTrace::~GMBSPTrace()
+{
+
+}
+
+void GMBSPTrace::initTrace(GMBSPData* bsp, Map<GMint32, Set<GMBSPEntity*> >* entities, Map<GMBSPEntity*, GMEntityObject*>* entityObjects, GMBSPPhysicsWorld* world)
 {
 	D(d);
 	d->bsp = bsp;
@@ -46,7 +64,7 @@ trace: 返回的碰撞跟踪结果
 void GMBSPTrace::trace(const GMVec3& start, const GMVec3& end, const GMVec3& origin, const GMVec3& min, const GMVec3& max, REF BSPTraceResult& trace)
 {
 	D(d);
-	BSPData& bsp = *d->bsp;
+	GMBSPData& bsp = *d->bsp;
 	d->checkcount++;
 
 	GMBSPTraceWork tw;
@@ -202,7 +220,7 @@ void GMBSPTrace::trace(const GMVec3& start, const GMVec3& end, const GMVec3& ori
 void GMBSPTrace::traceThroughTree(GMBSPTraceWork& tw, GMint32 num, GMfloat p1f, GMfloat p2f, const GMVec3& p1, const GMVec3& p2)
 {
 	D(d);
-	BSPData& bsp = *d->bsp;
+	GMBSPData& bsp = *d->bsp;
 	GMBSPPhysicsWorld::Data& pw = d->world->physicsData();
 	GMBSPNode* node;
 	BSPTracePlane* plane;
@@ -328,7 +346,7 @@ void GMBSPTrace::traceThroughTree(GMBSPTraceWork& tw, GMint32 num, GMfloat p1f, 
 void GMBSPTrace::traceThroughLeaf(GMBSPTraceWork& tw, GMBSPLeaf* leaf)
 {
 	D(d);
-	BSPData& bsp = *d->bsp;
+	GMBSPData& bsp = *d->bsp;
 	GMBSPPhysicsWorld::Data& pw = d->world->physicsData();
 	// trace line against all brushes in the leaf
 	for (GMint32 k = 0; k < leaf->numLeafBrushes; k++)
@@ -649,7 +667,7 @@ GMint32 GMBSPTrace::checkFacetPlane(const GMVec4& plane, const GMVec3& start, co
 void GMBSPTrace::traceThroughBrush(GMBSPTraceWork& tw, GMBSP_Physics_Brush *brush)
 {
 	D(d);
-	BSPData& bsp = *d->bsp;
+	GMBSPData& bsp = *d->bsp;
 	GMBSPPhysicsWorld::Data& pw = d->world->physicsData();
 
 	if (!brush->brush->numSides) {
@@ -835,3 +853,4 @@ bool GMBSPTrace::boundsIntersect(const GMVec3& mins, const GMVec3& maxs, const G
 
 	return true;
 }
+END_NS

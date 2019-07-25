@@ -141,7 +141,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMUIConfiguration)
 
 GMUIConfiguration::GMUIConfiguration(const IRenderContext* context)
 {
-	GM_CREATE_DATA(GMUIConfiguration);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->context = context;

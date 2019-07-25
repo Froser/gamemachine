@@ -14,7 +14,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMTypoIterator)
 
 GMTypoIterator::GMTypoIterator()
 {
-	GM_CREATE_DATA(GMTypoIterator);
+	GM_CREATE_DATA();
 }
 
 GMTypoIterator::GMTypoIterator(ITypoEngine* typo, GMsize_t index)
@@ -93,7 +93,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMTypoStateMachine)
 
 GMTypoStateMachine::GMTypoStateMachine(GMTypoEngine* engine)
 {
-	GM_CREATE_DATA(GMTypoStateMachine);
+	GM_CREATE_DATA();
 
 	D(d);
 	GM_ASSERT(engine);
@@ -258,7 +258,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMTypoEngine)
 
 GMTypoEngine::GMTypoEngine(const IRenderContext* context)
 {
-	GM_CREATE_DATA(GMTypoEngine);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->stateMachine = new GMTypoStateMachine(this);
@@ -568,7 +568,7 @@ GMTypoTextTransactionAtom::GMTypoTextTransactionAtom(
 	GMString removedContent
 )
 {
-	GM_CREATE_DATA(GMTypoTextTransactionAtom);
+	GM_CREATE_DATA();
 	D(d);
 	d->buffer = buffer;
 	d->cp = cp;
@@ -604,7 +604,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMTypoTextBuffer)
 
 GMTypoTextBuffer::GMTypoTextBuffer()
 {
-	GM_CREATE_DATA(GMTypoTextBuffer);
+	GM_CREATE_DATA();
 }
 
 GMTypoTextBuffer::~GMTypoTextBuffer()

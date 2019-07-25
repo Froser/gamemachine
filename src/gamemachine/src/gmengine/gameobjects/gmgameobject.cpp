@@ -53,7 +53,7 @@ GM_DEFINE_PROPERTY(GMGameObject, GMGameObjectRenderPriority, RenderPriority, ren
 
 GMGameObject::GMGameObject()
 {
-	GM_CREATE_DATA(GMGameObject);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->helper = new GMAnimationGameObjectHelper(this);
@@ -640,7 +640,7 @@ GM_PRIVATE_OBJECT_ALIGNED(GMCubeMapGameObject)
 
 GMCubeMapGameObject::GMCubeMapGameObject(GMTextureAsset texture)
 {
-	GM_CREATE_DATA(GMCubeMapGameObject);
+	GM_CREATE_DATA();
 	createCubeMap(texture);
 }
 

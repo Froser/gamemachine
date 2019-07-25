@@ -79,6 +79,7 @@ set(SOURCES
 		gmengine/gmtypoengine.h
 		gmengine/gmtypoengine.cpp
 		gmengine/gmgbuffer.h
+		gmengine/gmgbuffer_p.h
 		gmengine/gmgbuffer.cpp
 		gmengine/gmmessage.h
 		gmengine/gmmessage.cpp
@@ -152,6 +153,7 @@ set(SOURCES
 		gmgl/gmglhelper.cpp
 		gmgl/shader_constants.h
 		gmphysics/gmphysicsworld.h
+		gmphysics/gmphysicsworld_p.h
 		gmphysics/gmphysicsworld.cpp
 		gmphysics/gmphysicsshape.h
 		gmphysics/gmphysicsshape.cpp
@@ -266,16 +268,18 @@ set(SOURCES
 		extensions/bsp/physics/gmbspphysicsworld.h
 		extensions/bsp/physics/gmbspphysicsworld.cpp
 		extensions/bsp/physics/gmbspphysicsstructs.h
+		extensions/bsp/physics/gmbspphysicsstructs.cpp
 		extensions/bsp/physics/gmbsppatch.h
 		extensions/bsp/physics/gmbsppatch.cpp
 		extensions/bsp/physics/gmbspmove.h
 		extensions/bsp/physics/gmbspmove.cpp
-		extensions/bsp/render/gmbspgameworldprivate.h
-		extensions/bsp/render/gmbspgameworldprivate.cpp
+		extensions/bsp/render/gmbspgameworld_p.h
+		extensions/bsp/render/gmbspgameworld_p.cpp
 		extensions/bsp/render/gmbspgameworld.h
 		extensions/bsp/render/gmbspgameworld.cpp
 
 		extensions/objects/gmwavegameobject.h
+		extensions/objects/gmwavegameobject_p.h
 		extensions/objects/gmwavegameobject.cpp
 	)
 
@@ -311,6 +315,7 @@ set(WIN32_DX11_SOURCES
 		gmdx11/gmdx11techniques.h
 		gmdx11/gmdx11techniques.cpp
 		gmdx11/gmdx11texture.h
+		gmdx11/gmdx11texture_p.h
 		gmdx11/gmdx11texture.cpp
 		gmdx11/gmdx11shaderprogram.h
 		gmdx11/gmdx11shaderprogram.cpp

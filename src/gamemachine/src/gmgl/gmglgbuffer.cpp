@@ -6,8 +6,11 @@
 #include "shader_constants.h"
 #include "gmgltexture.h"
 #include "gmglframebuffer.h"
+#include "gmengine/gmgbuffer_p.h"
 
 #define GMEngine static_cast<GMGLGraphicEngine*>(GM.getGraphicEngine())
+
+BEGIN_NS
 
 namespace
 {
@@ -121,3 +124,5 @@ const GMString* GMGLGBuffer::GBufferGeometryUniformNames()
 {
 	return s_GBufferGeometryUniformNames.data();
 }
+
+END_NS

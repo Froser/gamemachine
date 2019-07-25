@@ -66,13 +66,14 @@ friend_methods(GMRenderTechniques):
 };
 
 GM_PRIVATE_CLASS(GMRenderTechniques);
-class GM_EXPORT GMRenderTechniques : public GMObject
+class GM_EXPORT GMRenderTechniques
 {
 	GM_DECLARE_PRIVATE(GMRenderTechniques)
 	GM_DECLARE_PROPERTY(GMRenderTechniqueID, Id)
 
 public:
 	GMRenderTechniques();
+	~GMRenderTechniques();
 	GMRenderTechniques(const GMRenderTechniques& rhs);
 	GMRenderTechniques(GMRenderTechniques&& rhs) GM_NOEXCEPT;
 	GMRenderTechniques& operator=(const GMRenderTechniques& rhs);

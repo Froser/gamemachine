@@ -77,6 +77,13 @@ const GMGlyphInfo& GMGlyphManager::getCharInner(GMwchar c, GMFontSizePt fontSize
 	return glyph;
 }
 
+
+const IRenderContext* GMGlyphManager::getContext()
+{
+	D(d);
+	return d->context;
+}
+
 GMFontHandle GMGlyphManager::addFontByFileName(const GMString& fontFileName)
 {
 	static GMString fontPath = GMPath::getSpecialFolderPath(GMPath::Fonts);
@@ -164,7 +171,7 @@ GMGlyphInfo& GMGlyphManager::insertChar(GMint32 fontSize, GMFontHandle font, GMw
 
 GMGlyphManager::GMGlyphManager(const IRenderContext* context)
 {
-	GM_CREATE_DATA(GMGlyphManager);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->context = context;

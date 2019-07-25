@@ -46,14 +46,14 @@ GM_ALIGNED_16(struct) GMObjectPrivateAlignedBase
 // 为一个对象定义private部分
 #define GM_PRIVATE_NAME(name) name##Private
 #define GM_PRIVATE_CLASS(name) struct GM_PRIVATE_NAME(name)
-#define GM_PRIVATE_DESTRUCTOR(name) ~GM_PRIVATE_NAME(name)
+#define GM_PRIVATE_DESTRUCTOR(name) ~GM_PRIVATE_NAME(name)()
 
 #define GM_PRIVATE_OBJECT_ALIGNED(name) GM_ALIGNED_16(struct) GM_PRIVATE_NAME(name) : public gm::GMObjectPrivateAlignedBase
 #define GM_PRIVATE_OBJECT_ALIGNED_FROM(name, extends) GM_ALIGNED_16(struct) GM_PRIVATE_NAME(name) : public GM_PRIVATE_NAME(extends)
 #define GM_PRIVATE_OBJECT_UNALIGNED(name) struct GM_PRIVATE_NAME(name)
 #define GM_PRIVATE_OBJECT_UNALIGNED_FROM(name, extends) struct GM_PRIVATE_NAME(name) : public GM_PRIVATE_NAME(extends)
 
-#define GM_CREATE_DATA(name) _gm_data.reset(new GM_PRIVATE_NAME(name)());
+#define GM_CREATE_DATA();
 
 //////////////////////////////////////////////////////////////////////////
 #define GM_DECLARE_INLINE_GETTER_ACCESSOR(name, memberName, accessor) \
@@ -124,6 +124,10 @@ GM_ALIGNED_16(struct) GMObjectPrivateAlignedBase
 
 #define GM_FRIEND_CLASS(clsName) \
 	friend class clsName; \
+	friend struct GM_PRIVATE_NAME(clsName);
+
+#define GM_FRIEND_STRUCT(clsName) \
+	friend struct clsName; \
 	friend struct GM_PRIVATE_NAME(clsName);
 
 #define GM_DECLARE_POINTER(name) class name; typedef name *name##Ptr;

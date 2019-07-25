@@ -114,7 +114,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMFramebuffersStack)
 
 GMFramebuffersStack::GMFramebuffersStack()
 {
-	GM_CREATE_DATA(GMFramebuffersStack);
+	GM_CREATE_DATA();
 }
 
 GMFramebuffersStack::~GMFramebuffersStack()
@@ -149,7 +149,7 @@ IFramebuffers* GMFramebuffersStack::peek()
 
 GMGraphicEngine::GMGraphicEngine(const IRenderContext* context)
 {
-	GM_CREATE_DATA(GMGraphicEngine);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->mtid = GMThread::getCurrentThreadId();

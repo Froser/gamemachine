@@ -86,7 +86,7 @@ namespace
 
 GMGLTexture::GMGLTexture(const GMImage* image)
 {
-	GM_CREATE_DATA(GMGLTexture);
+	GM_CREATE_DATA();
 
 	D(d);
 	if (image)
@@ -240,7 +240,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLWhiteTexture)
 
 GMGLWhiteTexture::GMGLWhiteTexture(const IRenderContext* context)
 {
-	GM_CREATE_DATA(GMGLWhiteTexture);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->context = context;

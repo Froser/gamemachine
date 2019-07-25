@@ -58,7 +58,7 @@ namespace
 
 GMThread::GMThread()
 {
-	GM_CREATE_DATA(GMThread);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->state = ThreadState::NotRunning;
@@ -141,7 +141,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMMutex)
 
 GMMutex::GMMutex()
 {
-	GM_CREATE_DATA(GMMutex);
+	GM_CREATE_DATA();
 
 	D(d);
 	SECURITY_ATTRIBUTES sa = { sizeof(SECURITY_ATTRIBUTES), NULL, FALSE };

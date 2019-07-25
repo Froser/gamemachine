@@ -6,6 +6,8 @@
 #include "foundation/gamemachine.h"
 #include "foundation/gmcryptographic.h"
 
+BEGIN_NS
+
 namespace
 {
 	GMString toMD5String(const GMBuffer& md5Data)
@@ -23,13 +25,21 @@ namespace
 	}
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMDx11EffectShaderProgram)
+{
+	GMComPtr<ID3DX11Effect> effect;
+	Vector<ID3DX11EffectVariable*> variables;
+	GMAtomic<GMint32> nextVariableIndex;
+};
+
 GMDx11EffectShaderProgram::GMDx11EffectShaderProgram(GMComPtr<ID3DX11Effect> effect)
 {
+	GM_CREATE_DATA();
+
 	D(d);
 	d->effect = effect;
 	d->nextVariableIndex.exchange(0);
 }
-
 
 GMDx11EffectShaderProgram::~GMDx11EffectShaderProgram()
 {
@@ -198,12 +208,27 @@ namespace
 	}
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMDx11ComputeShaderProgram)
+{
+	const IRenderContext* context = nullptr;
+	GMDx11GraphicEngine* engine = nullptr;
+	GMComPtr<ID3D11ComputeShader> shader;
+	GMuint32 SRV_UAV_CB_count[3] = { 0 };
+};
+
 GMDx11ComputeShaderProgram::GMDx11ComputeShaderProgram(const IRenderContext* context)
 {
+	GM_CREATE_DATA();
+
 	D(d);
 	d->context = context;
 	if (context)
 		d->engine = gm_cast<GMDx11GraphicEngine*>(d->context->getEngine());
+}
+
+GMDx11ComputeShaderProgram::~GMDx11ComputeShaderProgram()
+{
+
 }
 
 void GMDx11ComputeShaderProgram::dispatch(GMint32 threadGroupCountX, GMint32 threadGroupCountY, GMint32 threadGroupCountZ)
@@ -609,3 +634,5 @@ bool GMDx11ComputeShaderProgram::getInterface(GameMachineInterfaceID id, void** 
 	}
 	return false;
 }
+
+END_NS

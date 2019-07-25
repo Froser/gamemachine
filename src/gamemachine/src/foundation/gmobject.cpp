@@ -26,7 +26,7 @@ static size_t removeIf(ContainerType& container, std::function<bool(typename Con
 
 GMObject::GMObject()
 {
-	GM_CREATE_DATA(GMObject);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->tid = GMThread::getCurrentThreadId();

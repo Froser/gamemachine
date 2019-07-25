@@ -93,7 +93,7 @@ GM_DEFINE_PROPERTY(GMParticleEffect_Cocos2D, GMParticleRadiusMode, RadiusMode, r
 
 GMParticleEffect_Cocos2D::GMParticleEffect_Cocos2D(GMParticleEmitter_Cocos2D* emitter)
 {
-	GM_CREATE_DATA(GMParticleEffect_Cocos2D);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->emitter = emitter;

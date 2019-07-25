@@ -40,7 +40,7 @@ GM_DEFINE_PROPERTY(GMAnimationEvaluator, GMNodeAnimationPtr, Animation, animatio
 GM_DEFINE_GETTER(GMAnimationEvaluator, AlignedVector<GMMat4>, Transforms, transforms)
 GMAnimationEvaluator::GMAnimationEvaluator(GMNode* root, GMSkeleton* skeleton)
 {
-	GM_CREATE_DATA(GMAnimationEvaluator);
+	GM_CREATE_DATA();
 
 	D(d);
 	setRootNode(root);
@@ -201,7 +201,7 @@ GM_PRIVATE_OBJECT_ALIGNED(GMAnimationGameObjectHelper)
 
 GMAnimationGameObjectHelper::GMAnimationGameObjectHelper(GMGameObject* host)
 {
-	GM_CREATE_DATA(GMAnimationGameObjectHelper);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->host = host;
