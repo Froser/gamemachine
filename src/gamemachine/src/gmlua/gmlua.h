@@ -97,17 +97,11 @@ struct GMLuaResult
 	GMString message;
 };
 
-GM_PRIVATE_OBJECT(GMLua)
-{
-	GMLuaCoreState* luaState = nullptr;
-	GMLuaRuntime luaRuntime;
-	bool isWeakLuaStatePtr = false;
-	bool libraryLoaded = false;
-};
-
-class GM_EXPORT GMLua : public GMObject
+GM_PRIVATE_CLASS(GMLua);
+class GM_EXPORT GMLua
 {
 	GM_DECLARE_PRIVATE(GMLua)
+	GM_DISABLE_COPY_ASSIGN(GMLua)
 	friend struct luaapi::GMArgumentHelper;
 	friend struct luaapi::GMReturnValues;
 
@@ -239,11 +233,7 @@ private:
 	void pop(GMint32 num);
 
 public:
-	inline GMLuaCoreState* getLuaCoreState() GM_NOEXCEPT
-	{
-		D(d);
-		return d->luaState;
-	}
+	GMLuaCoreState* getLuaCoreState() GM_NOEXCEPT;
 
 public:
 	static GMLuaRuntime* getRuntime(GMLuaCoreState*);
@@ -309,7 +299,6 @@ private:
 
 #define GM_LUA_PROXY_OBJ(realType, baseName) \
 	public:																			\
-		using baseName::baseName;													\
 		realType* get() const { return gm_cast<realType*>(baseName::get()); }		\
 		realType* operator->() const { return get(); }
 
@@ -317,7 +306,7 @@ private:
 #define GM_LUA_BEGIN_PROPERTY(proxyClass) \
 	{																										\
 		static const GMString s_invoker = #proxyClass ".__index";											\
-		proxyClass self(L);																					\
+		proxyClass self(L, nullptr);																		\
 		GMVariant key = gm::luaapi::GMArgumentHelper::peekArgument(L, 2, s_invoker); /*key*/				\
 		HashMap<GMString, std::function<gm::luaapi::GMReturnValues()>, GMStringHashFunctor> __s_indexMap;	\
 		if (__s_indexMap.empty())																			\
@@ -327,7 +316,7 @@ private:
 		{ __s_indexMap[#memberName] = [&]() {													\
 			gm::luaapi::GMArgumentHelper::popArgument(L, s_invoker); /*key*/					\
 			gm::luaapi::GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/		\
-			targetProxy proxy(L);																\
+			targetProxy proxy(L, nullptr);														\
 			proxy.set(&self->get##name());														\
 			return gm::luaapi::GMReturnValues(L, proxy); }; }
 

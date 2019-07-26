@@ -3,6 +3,7 @@
 #include <linearmath.h>
 #include "gmbspphysicsworld.h"
 #include "gmengine/gameobjects/gmgameobject.h"
+#include "gmbspphysicsworld_p.h"
 
 // keep 1/8 unit away to keep the position valid before network snapping
 // and to avoid various numeric issues

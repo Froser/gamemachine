@@ -17,6 +17,11 @@ GMPhysicsObject::GMPhysicsObject()
 	GM_CREATE_DATA();
 }
 
+GMPhysicsObject::~GMPhysicsObject()
+{
+
+}
+
 const GMMotionStates& GMPhysicsObject::getMotionStates()
 {
 	D(d);

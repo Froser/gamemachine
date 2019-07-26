@@ -5,8 +5,30 @@
 #include "gmengine/gmgraphicengine.h"
 #include "gmdx11helper.h"
 #include "gmengine/gmcsmhelper.h"
+#include "gmdx11texture_p.h"
 
 BEGIN_NS
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMDx11Framebuffer)
+{
+	const IRenderContext* context = nullptr;
+	GMTextureAsset renderTexture;
+	GMComPtr<ID3D11RenderTargetView> renderTargetView;
+	GMString name;
+};
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMDx11Framebuffers)
+{
+	const IRenderContext* context = nullptr;
+	GMComPtr<ID3D11DeviceContext> deviceContext;
+	Vector<GMOwnedPtr<GMDx11Framebuffer>> framebuffers;
+	Vector<ID3D11RenderTargetView*> renderTargetViews;
+	GMComPtr<ID3D11DepthStencilView> depthStencilView;
+	GMComPtr<ID3D11Texture2D> depthStencilTexture;
+	GMGraphicEngine* engine = nullptr;
+	GMfloat clearColor[4];
+	D3D11_VIEWPORT viewport;
+};
 
 GM_PRIVATE_OBJECT_UNALIGNED(GMDx11DefaultFramebuffers)
 {
@@ -151,14 +173,6 @@ ID3D11Resource* GMDx11FramebufferTexture::getTexture()
 	return db->resource;
 }
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMDx11Framebuffer)
-{
-	const IRenderContext* context = nullptr;
-	GMTextureAsset renderTexture;
-	GMComPtr<ID3D11RenderTargetView> renderTargetView;
-	GMString name;
-};
-
 GMDx11Framebuffer::GMDx11Framebuffer(const IRenderContext* context)
 {
 	GM_CREATE_DATA();
@@ -212,19 +226,6 @@ ID3D11RenderTargetView* GMDx11Framebuffer::getRenderTargetView()
 	GM_ASSERT(d->renderTargetView);
 	return d->renderTargetView;
 }
-
-GM_PRIVATE_OBJECT_UNALIGNED(GMDx11Framebuffers)
-{
-	const IRenderContext* context = nullptr;
-	GMComPtr<ID3D11DeviceContext> deviceContext;
-	Vector<GMOwnedPtr<GMDx11Framebuffer>> framebuffers;
-	Vector<ID3D11RenderTargetView*> renderTargetViews;
-	GMComPtr<ID3D11DepthStencilView> depthStencilView;
-	GMComPtr<ID3D11Texture2D> depthStencilTexture;
-	GMGraphicEngine* engine = nullptr;
-	GMfloat clearColor[4];
-	D3D11_VIEWPORT viewport;
-};
 
 GMDx11Framebuffers::GMDx11Framebuffers(const IRenderContext* context)
 {

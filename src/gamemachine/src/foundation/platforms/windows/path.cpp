@@ -5,6 +5,8 @@
 #include <direct.h>
 #include <shlobj.h>
 
+BEGIN_NS
+
 namespace
 {
 	void getAllFiles(Vector<GMString>& v, const GMString& directory, bool recursive)
@@ -100,3 +102,5 @@ GMString GMPath::getSpecialFolderPath(SpecialFolder sf)
 		return GMString();
 	}
 }
+
+END_NS

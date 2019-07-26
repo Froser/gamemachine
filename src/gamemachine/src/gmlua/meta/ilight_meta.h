@@ -7,16 +7,16 @@ BEGIN_NS
 
 namespace luaapi
 {
-	GM_PRIVATE_OBJECT(ILightProxy)
-	{
-		GM_LUA_PROXY_FUNC(setLightAttribute3);
-		GM_LUA_PROXY_FUNC(setLightAttribute);
-	};
-
+	GM_PRIVATE_CLASS(ILightProxy);
 	class ILightProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(ILight, GMAnyProxy)
-		GM_DECLARE_PRIVATE_AND_BASE(ILightProxy, GMAnyProxy)
+		GM_DECLARE_PRIVATE(ILightProxy)
+		GM_DECLARE_BASE(GMAnyProxy)
+
+	public:
+		ILightProxy(GMLuaCoreState* l, IDestroyObject* handler = nullptr);
+		~ILightProxy();
 
 	protected:
 		virtual bool registerMeta() override;

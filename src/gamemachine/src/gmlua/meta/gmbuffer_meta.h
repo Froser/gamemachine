@@ -10,6 +10,8 @@ namespace luaapi
 	class GMBufferProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(GMBuffer, GMAnyProxy)
+
+		using GMAnyProxy::GMAnyProxy;
 	};
 }
 

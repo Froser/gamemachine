@@ -3,9 +3,19 @@
 #include "foundation/gamemachine.h"
 #include "gameobjects/gm2dgameobject.h"
 
+BEGIN_NS
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMDemoGameWorld)
+{
+	HashMap<GMString, GMGameObject*, GMStringHashFunctor> renderList;
+	Map<const GMGameObject*, GMString> renderListInv;
+	bool sorted = false;
+};
+
 GMDemoGameWorld::GMDemoGameWorld(const IRenderContext* context)
 	: GMGameWorld(context)
 {
+	GM_CREATE_DATA();
 }
 
 GMDemoGameWorld::~GMDemoGameWorld()
@@ -73,3 +83,5 @@ bool GMDemoGameWorld::removeObject(GMGameObject* obj)
 	}
 	return false;
 }
+
+END_NS

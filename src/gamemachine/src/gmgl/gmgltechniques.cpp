@@ -175,19 +175,6 @@ namespace
 	}
 }
 
-void GMGammaHelper::setGamma(GMGLTechnique* tech, GMGraphicEngine* engine, IShaderProgram* shaderProgram)
-{
-	D_OF(d, tech);
-	shaderProgram->setBool(VI(GammaCorrection.GammaCorrection), engine->needGammaCorrection());
-	GMfloat gamma = engine->getGammaValue();
-	if (gamma != m_gamma)
-	{
-		shaderProgram->setFloat(VI(GammaCorrection.GammaValue), gamma);
-		shaderProgram->setFloat(VI(GammaCorrection.GammaInvValue), 1.f / gamma);
-		m_gamma = gamma;
-	}
-}
-
 GM_PRIVATE_OBJECT_UNALIGNED(GMGLTechnique)
 {
 	struct TechniqueContext
@@ -239,6 +226,19 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLTechnique)
 	Array<GMint32, GMGraphicEngine::getMaxCascades()> cascadeShadowMatrixVariableIndices = { 0 };
 	bool isShadowDirty = true;
 };
+
+void GMGammaHelper::setGamma(GMGLTechnique* tech, GMGraphicEngine* engine, IShaderProgram* shaderProgram)
+{
+	D_OF(d, tech);
+	shaderProgram->setBool(VI(GammaCorrection.GammaCorrection), engine->needGammaCorrection());
+	GMfloat gamma = engine->getGammaValue();
+	if (gamma != m_gamma)
+	{
+		shaderProgram->setFloat(VI(GammaCorrection.GammaValue), gamma);
+		shaderProgram->setFloat(VI(GammaCorrection.GammaInvValue), 1.f / gamma);
+		m_gamma = gamma;
+	}
+}
 
 GMGLTechnique::GMGLTechnique(const IRenderContext* context)
 {

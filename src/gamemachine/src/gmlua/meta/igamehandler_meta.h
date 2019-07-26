@@ -7,23 +7,17 @@ BEGIN_NS
 
 namespace luaapi
 {
-	GM_PRIVATE_OBJECT(IGameHandlerProxy)
-	{
-		IShaderLoadCallback* shaderCallback = nullptr;
-		GMLuaReference init = 0;
-		GMLuaReference start = 0;
-		GMLuaReference event = 0;
-		GMLuaReference onLoadShaders = 0;
-	};
-
+	GM_PRIVATE_CLASS(IGameHandlerProxy);
 	class IGameHandlerProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(IGameHandler, GMAnyProxy)
-		GM_DECLARE_PRIVATE_AND_BASE(IGameHandlerProxy, GMAnyProxy)
+		GM_DECLARE_PRIVATE(IGameHandlerProxy)
+		GM_DECLARE_BASE(GMAnyProxy)
 
 	public:
 		IGameHandlerProxy() = delete;
 		IGameHandlerProxy(GMLuaCoreState* L);
+		~IGameHandlerProxy();
 
 	public:
 		void init();

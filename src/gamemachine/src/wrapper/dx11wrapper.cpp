@@ -109,7 +109,7 @@ extern "C"
 #endif
 	}
 
-	void Ext_RenderWaveObjectShader(const gm::GMWaveGameObject* waveObject, IShaderProgram* shaderProgram)
+	void Ext_RenderWaveObjectShader(gm::GMWaveGameObject* waveObject, IShaderProgram* shaderProgram)
 	{
 #if GM_WINDOWS
 #if GM_USE_DX11

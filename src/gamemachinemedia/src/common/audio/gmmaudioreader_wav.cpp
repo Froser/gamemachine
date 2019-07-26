@@ -34,7 +34,7 @@ class GMMAudioFile_Wav : public gm::IAudioFile
 public:
 	GMMAudioFile_Wav()
 	{
-		GM_CREATE_DATA(GMMAudioFile_Wav);
+		GM_CREATE_DATA();
 	}
 
 	~GMMAudioFile_Wav()

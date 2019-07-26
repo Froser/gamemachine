@@ -1,5 +1,5 @@
-﻿#ifndef __GM_TYPO_H__
-#define __GM_TYPO_H__
+﻿#ifndef __GM_TYPOENGINE_H__
+#define __GM_TYPOENGINE_H__
 #include <gmcommon.h>
 #include <gamemachine.h>
 #include <gmtransaction.h>
@@ -39,6 +39,7 @@ public:
 	GMTypoIterator(GMTypoIterator&&) GM_NOEXCEPT;
 	GMTypoIterator& operator=(const GMTypoIterator&);
 	GMTypoIterator& operator=(GMTypoIterator&&) GM_NOEXCEPT;
+	~GMTypoIterator();
 
 public:
 	GMTypoResult operator*();

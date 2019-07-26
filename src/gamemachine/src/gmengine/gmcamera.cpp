@@ -6,6 +6,25 @@
 
 BEGIN_NS
 
+inline GMMat4 getViewMatrixFromLookAt(const GMCameraLookAt& lookAt)
+{
+	return LookAt(lookAt.position, lookAt.lookDirection + lookAt.position, lookAt.up);
+}
+
+GM_PRIVATE_OBJECT_ALIGNED(GMFrustum)
+{
+	GMFrustumType type = GMFrustumType::Perspective;
+	GMFrustumParameters parameters;
+	GMfloat n;
+	GMfloat f;
+
+	GMMat4 projectionMatrix;
+	GMMat4 viewMatrix;
+	GMMat4 inverseViewMatrix;
+
+	bool dirty = true;
+};
+
 bool GMFrustum::operator==(const GMFrustum& rhs)
 {
 	D(d);
@@ -32,23 +51,9 @@ bool GMFrustum::operator!=(const GMFrustum& rhs)
 	return !(*this == rhs);
 }
 
-GM_PRIVATE_OBJECT_ALIGNED(GMFrustum)
-{
-	GMFrustumType type = GMFrustumType::Perspective;
-	GMFrustumParameters parameters;
-	GMfloat n;
-	GMfloat f;
-
-	GMMat4 projectionMatrix;
-	GMMat4 viewMatrix;
-	GMMat4 inverseViewMatrix;
-
-	bool dirty = true;
-};
-
-GM_DEFINE_GETTER(GMFrustum, GMfloat, Near, n, public)
-GM_DEFINE_GETTER(GMFrustum, GMfloat, Far, f, public)
-GM_DEFINE_GETTER(GMFrustum, GMFrustumParameters, Parameters, parameters, public)
+GM_DEFINE_GETTER(GMFrustum, GMfloat, Near, n)
+GM_DEFINE_GETTER(GMFrustum, GMfloat, Far, f)
+GM_DEFINE_GETTER(GMFrustum, GMFrustumParameters, Parameters, parameters)
 
 GMFrustum::GMFrustum()
 {
@@ -58,6 +63,28 @@ GMFrustum::GMFrustum()
 GMFrustum::~GMFrustum()
 {
 
+}
+
+GMFrustum::GMFrustum(const GMFrustum& rhs)
+{
+	*this = rhs;
+}
+
+GMFrustum::GMFrustum(GMFrustum&& rhs) GM_NOEXCEPT
+{
+	*this = std::move(rhs);
+}
+
+GMFrustum& GMFrustum::operator=(const GMFrustum& rhs)
+{
+	GM_COPY(rhs);
+	return *this;
+}
+
+GMFrustum& GMFrustum::operator=(GMFrustum&& rhs) GM_NOEXCEPT
+{
+	GM_MOVE(rhs);
+	return *this;
 }
 
 void GMFrustum::setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f)
@@ -268,14 +295,14 @@ void GMCamera::setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top
 void GMCamera::updateViewMatrix()
 {
 	D(d);
-	d->frustum.updateViewMatrix(::getViewMatrix(d->lookAt));
+	d->frustum.updateViewMatrix(getViewMatrixFromLookAt(d->lookAt));
 }
 
 void GMCamera::lookAt(const GMCameraLookAt& lookAt)
 {
 	D(d);
 	d->lookAt = lookAt;
-	d->frustum.updateViewMatrix(::getViewMatrix(lookAt));
+	d->frustum.updateViewMatrix(getViewMatrixFromLookAt(lookAt));
 }
 
 GMVec3 GMCamera::getRayToWorld(const GMRect& renderRect, GMint32 x, GMint32 y) const

@@ -4,65 +4,86 @@
 #include <gmlua.h>
 #include "igraphicengine_meta.h"
 
-using namespace luaapi;
-
 #define NAME "IRenderContext"
 
-bool IRenderContextProxy::registerMeta()
-{
-	GM_META_FUNCTION(getWindow);
-	GM_META_FUNCTION(getEngine);
-	return Base::registerMeta();
-}
+BEGIN_NS
 
-void IRenderContextProxy::set(const IRenderContext* o)
+namespace luaapi
 {
-	Base::set(const_cast<IRenderContext*>(o));
-}
-
-void IRenderContextProxy::setLuaCoreState(GMLuaCoreState* l)
-{
-	D_BASE(d, Base);
-	d->l = l;
-}
-
-IRenderContextProxy::IRenderContextProxy(const IRenderContextProxy& rhs)
-	: GMAnyProxy(rhs.getLuaCoreState(), const_cast<IRenderContext*>(static_cast<const IRenderContext*>(rhs.get())))
-{
-}
-
-/*
- * getWindow([self])
- */
-GM_LUA_PROXY_IMPL(IRenderContextProxy, getWindow)
-{
-	static const GMString s_invoker = NAME ".getWindow";
-	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getWindow");
-	IRenderContextProxy self(L);
-	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
-	if (self)
+	GM_PRIVATE_OBJECT_UNALIGNED(IRenderContextProxy)
 	{
-		IWindowProxy window(L);
-		window.set(self->getWindow());
-		return GMReturnValues(L, window);
-	}
-	return GMReturnValues();
-}
+		GM_LUA_PROXY_FUNC(getWindow);
+		GM_LUA_PROXY_FUNC(getEngine);
+	};
 
-/*
- * getWindow([self])
- */
-GM_LUA_PROXY_IMPL(IRenderContextProxy, getEngine)
-{
-	static const GMString s_invoker = NAME ".getEngine";
-	GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getEngine");
-	IRenderContextProxy self(L);
-	GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
-	if (self)
+	bool IRenderContextProxy::registerMeta()
 	{
-		IGraphicEngineProxy engine(L);
-		engine.set(self->getEngine());
-		return GMReturnValues(L, engine);
+		GM_META_FUNCTION(getWindow);
+		GM_META_FUNCTION(getEngine);
+		return Base::registerMeta();
 	}
-	return GMReturnValues();
+
+	void IRenderContextProxy::set(const IRenderContext* o)
+	{
+		Base::set(const_cast<IRenderContext*>(o));
+	}
+
+	void IRenderContextProxy::setLuaCoreState(GMLuaCoreState* l)
+	{
+		D_BASE(d, Base);
+		d->l = l;
+	}
+
+	IRenderContextProxy::IRenderContextProxy(const IRenderContextProxy& rhs)
+		: GMAnyProxy(rhs.getLuaCoreState(), const_cast<IRenderContext*>(static_cast<const IRenderContext*>(rhs.get())))
+	{
+		GM_CREATE_DATA();
+	}
+
+	IRenderContextProxy::IRenderContextProxy(GMLuaCoreState* l, IDestroyObject* handler /*= nullptr*/)
+		: Base(l, handler)
+	{
+		GM_CREATE_DATA();
+	}
+
+	IRenderContextProxy::~IRenderContextProxy()
+	{
+	}
+
+	/*
+	 * getWindow([self])
+	 */
+	GM_LUA_PROXY_IMPL(IRenderContextProxy, getWindow)
+	{
+		static const GMString s_invoker = NAME ".getWindow";
+		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getWindow");
+		IRenderContextProxy self(L);
+		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		if (self)
+		{
+			IWindowProxy window(L);
+			window.set(self->getWindow());
+			return GMReturnValues(L, window);
+		}
+		return GMReturnValues();
+	}
+
+	/*
+	 * getWindow([self])
+	 */
+	GM_LUA_PROXY_IMPL(IRenderContextProxy, getEngine)
+	{
+		static const GMString s_invoker = NAME ".getEngine";
+		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getEngine");
+		IRenderContextProxy self(L);
+		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		if (self)
+		{
+			IGraphicEngineProxy engine(L);
+			engine.set(self->getEngine());
+			return GMReturnValues(L, engine);
+		}
+		return GMReturnValues();
+	}
 }
+END_NS

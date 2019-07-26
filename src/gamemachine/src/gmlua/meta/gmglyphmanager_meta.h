@@ -8,17 +8,16 @@ BEGIN_NS
 
 namespace luaapi
 {
-	GM_PRIVATE_OBJECT(GMGlyphManagerProxy)
-	{
-		GM_LUA_PROXY_FUNC(addFontByMemory);
-		GM_LUA_PROXY_FUNC(setDefaultFontEN);
-		GM_LUA_PROXY_FUNC(setDefaultFontCN);
-	};
-
+	GM_PRIVATE_CLASS(GMGlyphManagerProxy);
 	class GMGlyphManagerProxy : public GMObjectProxy
 	{
 		GM_LUA_PROXY_OBJ(GMGlyphManager, GMObjectProxy)
-		GM_DECLARE_PRIVATE_AND_BASE(GMGlyphManagerProxy, GMObjectProxy)
+		GM_DECLARE_PRIVATE(GMGlyphManagerProxy)
+		GM_DECLARE_BASE(GMObjectProxy)
+
+	public:
+		GMGlyphManagerProxy(GMLuaCoreState* l, GMObject* handler = nullptr);
+		~GMGlyphManagerProxy();
 
 	protected:
 		virtual bool registerMeta() override;

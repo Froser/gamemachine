@@ -6,19 +6,22 @@
 #include "iwindow_meta.h"
 #include "gmgamepackage_meta.h"
 
-using namespace gm::luaapi;
-
 #define NAME "GM"
 
-namespace
+BEGIN_NS
+
+namespace luaapi
 {
+	typedef GMGameMachineRunningStates GMGameMachineRunningStatesProxyPrivate;
+
 	class GMGameMachineRunningStatesProxy : public GMObject
 	{
-		GM_DECLARE_PRIVATE_FROM_STRUCT(GMGameMachineRunningStatesProxy, GMGameMachineRunningStates)
+		GM_DECLARE_PRIVATE(GMGameMachineRunningStatesProxy)
 
 	public:
 		GMGameMachineRunningStatesProxy()
 		{
+			GM_CREATE_DATA();
 			D(d);
 			*d = GM.getRunningStates();
 		}
@@ -101,6 +104,8 @@ namespace
 		// {{END META DECLARATIONS}}
 		{ 0, 0 }
 	};
+
+	GM_LUA_REGISTER_IMPL(GameMachine_Meta, NAME, g_meta);
 }
 
-GM_LUA_REGISTER_IMPL(GameMachine_Meta, NAME, g_meta);
+END_NS

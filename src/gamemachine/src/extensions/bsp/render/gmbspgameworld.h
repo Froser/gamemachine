@@ -4,6 +4,7 @@
 #include <gmassets.h>
 #include <gmgameworld.h>
 #include "../data/gmbsp.h"
+#include "../data/gmbsp_render.h"
 
 BEGIN_NS
 

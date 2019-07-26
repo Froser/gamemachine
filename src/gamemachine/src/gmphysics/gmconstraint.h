@@ -8,6 +8,7 @@ struct GMVec3;
 BEGIN_NS
 
 class GMRigidPhysicsObject;
+GM_PRIVATE_CLASS(GMConstraint);
 class GM_EXPORT GMConstraint : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMConstraint)

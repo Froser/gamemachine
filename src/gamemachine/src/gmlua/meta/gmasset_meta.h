@@ -8,18 +8,15 @@ BEGIN_NS
 
 namespace luaapi
 {
-	GM_PRIVATE_OBJECT(GMAssetProxy)
-	{
-		GM_LUA_PROXY_FUNC(getScene);
-		GM_LUA_PROXY_FUNC(getModel);
-	};
-
+	GM_PRIVATE_CLASS(GMAssetProxy);
 	class GMAssetProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(GMAsset, GMAnyProxy)
-		GM_DECLARE_PRIVATE_AND_BASE(GMAssetProxy, GMAnyProxy)
+		GM_DECLARE_PRIVATE(GMAssetProxy)
+		GM_DECLARE_BASE(GMAnyProxy)
 
 	public:
+		GMAssetProxy(GMLuaCoreState* l, IDestroyObject* handler = nullptr);
 		GMAssetProxy(GMLuaCoreState* l, GMAsset asset);
 		GMAssetProxy(const GMAssetProxy& rhs);
 		~GMAssetProxy();
@@ -29,15 +26,20 @@ namespace luaapi
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	GM_PRIVATE_OBJECT(GMSceneProxy)
+	GM_PRIVATE_OBJECT_UNALIGNED(GMSceneProxy)
 	{
 		GM_LUA_PROXY_FUNC(getModels);
 	};
 
+	GM_PRIVATE_CLASS(GMSceneProxy);
 	class GMSceneProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(GMScene, GMAnyProxy)
-		GM_DECLARE_PRIVATE_AND_BASE(GMSceneProxy, GMAnyProxy)
+		GM_DECLARE_PRIVATE(GMSceneProxy)
+		GM_DECLARE_BASE(GMAnyProxy)
+
+	public:
+		GMSceneProxy(GMLuaCoreState* l, IDestroyObject* handler = nullptr);
 
 	protected:
 		virtual bool registerMeta() override;

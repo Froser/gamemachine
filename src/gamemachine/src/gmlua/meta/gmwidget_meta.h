@@ -12,48 +12,44 @@ namespace luaapi
 	GM_LUA_REGISTER(GMWidgetResourceManager_Meta);
 	GM_LUA_REGISTER(GMUIConfiguration_Meta);
 
-	GM_PRIVATE_OBJECT(GMUIConfigurationProxy)
-	{
-		GM_LUA_PROXY_FUNC(initResourceManager);
-		GM_LUA_PROXY_FUNC(import);
-	};
-
+	GM_PRIVATE_CLASS(GMUIConfigurationProxy);
 	class GMUIConfigurationProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(GMUIConfiguration, GMAnyProxy)
-		GM_DECLARE_PRIVATE_AND_BASE(GMUIConfigurationProxy, GMAnyProxy)
+		GM_DECLARE_PRIVATE(GMUIConfigurationProxy)
+		GM_DECLARE_BASE(GMAnyProxy)
+
+	public:
+		GMUIConfigurationProxy(GMLuaCoreState* l, IDestroyObject* handler = nullptr);
 
 	public:
 		virtual bool registerMeta() override;
 	};
 
-	GM_PRIVATE_OBJECT(GMWidgetResourceManagerProxy)
-	{
-		GM_LUA_PROXY_FUNC(registerWidget);
-		GM_LUA_PROXY_FUNC(createWidget);
-	};
-
+	GM_PRIVATE_CLASS(GMWidgetResourceManagerProxy);
 	class GMWidgetResourceManagerProxy : public GMObjectProxy
 	{
 		GM_LUA_PROXY_OBJ(GMWidgetResourceManager, GMObjectProxy)
-		GM_DECLARE_PRIVATE_AND_BASE(GMWidgetResourceManagerProxy, GMObjectProxy)
+		GM_DECLARE_PRIVATE(GMWidgetResourceManagerProxy)
+		GM_DECLARE_BASE(GMObjectProxy)
+
+	public:
+		GMWidgetResourceManagerProxy(GMLuaCoreState* l, GMObject* handler = nullptr);
 
 	public:
 		virtual bool registerMeta() override;
 	};
 
-	GM_PRIVATE_OBJECT(GMWidgetProxy)
-	{
-		GM_LUA_PROXY_FUNC(setPosition);
-		GM_LUA_PROXY_FUNC(setSize);
-		GM_LUA_PROXY_FUNC(setTitle);
-		GM_LUA_PROXY_FUNC(addControl);
-	};
-
+	GM_PRIVATE_CLASS(GMWidgetProxy);
 	class GMWidgetProxy : public GMObjectProxy
 	{
 		GM_LUA_PROXY_OBJ(GMWidget, GMObjectProxy)
-		GM_DECLARE_PRIVATE_AND_BASE(GMWidgetProxy, GMObjectProxy)
+		GM_DECLARE_PRIVATE(GMWidgetProxy)
+		GM_DECLARE_BASE(GMObjectProxy)
+
+	public:
+		GMWidgetProxy(GMLuaCoreState* l, GMObject* handler = nullptr);
+		~GMWidgetProxy();
 
 	public:
 		virtual bool registerMeta() override;

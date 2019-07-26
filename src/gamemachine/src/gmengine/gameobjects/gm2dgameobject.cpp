@@ -2,6 +2,7 @@
 #include "gm2dgameobject.h"
 #include "gmgameworld.h"
 #include "gmtypoengine.h"
+#include "gmengine/gameobjects/gmgameobject_p.h"
 #include "gm2dgameobject_p.h"
 
 BEGIN_NS
@@ -719,7 +720,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMBorder2DGameObject)
 	GMRect corner;
 };
 
-GMBorder2DGameObject::GMSprite2DGameObject(const GMRect& renderRc)
+GMBorder2DGameObject::GMBorder2DGameObject(const GMRect& renderRc)
 	: Base(renderRc)
 {
 	GM_CREATE_DATA();

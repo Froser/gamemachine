@@ -2,10 +2,12 @@
 #include <gmtypoengine.h>
 #include "gmcontroltextedit.h"
 #include "foundation/gamemachine.h"
+#include "gmengine/gmtypoengine_p.h"
+#include "gmcontrols_p.h"
 
 BEGIN_NS
 
-GM_PRIVATE_OBJECT(GMMultiLineTypoTextBuffer)
+GM_PRIVATE_OBJECT_UNALIGNED(GMMultiLineTypoTextBuffer)
 {
 	GMint32 lineSpacing = 5;
 	GMint32 lineHeight = 0;
@@ -22,7 +24,8 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMControlTextControlTransactionAtom)
 
 class GMControlTextControlTransactionAtom : public ITransactionAtom
 {
-	GM_DECLARE_PRIVATE_NGO(GMControlTextControlTransactionAtom)
+	GM_DECLARE_PRIVATE(GMControlTextControlTransactionAtom)
+	GM_DISABLE_COPY_ASSIGN(GMControlTextControlTransactionAtom)
 
 public:
 	GMControlTextControlTransactionAtom(
@@ -69,10 +72,11 @@ void GMControlTextControlTransactionAtom::unexecute()
 
 class GMMultiLineTypoTextBuffer : public GMTypoTextBuffer
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMMultiLineTypoTextBuffer, GMTypoTextBuffer)
+	GM_DECLARE_PRIVATE(GMMultiLineTypoTextBuffer)
+	GM_DECLARE_BASE(GMTypoTextBuffer)
 
 public:
-	GMMultiLineTypoTextBuffer() = default;
+	GMMultiLineTypoTextBuffer();
 
 public:
 	virtual void analyze(GMint32 start) override;
@@ -107,6 +111,22 @@ public:
 		d->lineHeight = lineHeight;
 	}
 };
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMControlTextArea)
+{
+	GMint32 caretTopRelative = 0;
+	GMMultiLineTypoTextBuffer* buffer = nullptr;
+	GMint32 scrollOffset = 0;
+	bool hasScrollBar = false;
+	GMint32 scrollBarSize = 20;
+	bool scrollBarLocked = false;
+	GMOwnedPtr<GMControlScrollBar> scrollBar;
+};
+
+GMMultiLineTypoTextBuffer::GMMultiLineTypoTextBuffer()
+{
+	GM_CREATE_DATA();
+}
 
 void GMMultiLineTypoTextBuffer::analyze(GMint32 start)
 {
@@ -340,8 +360,30 @@ bool GMMultiLineTypoTextBuffer::isNewLine(GMint32 cp)
 	return r[cp].newLineOrEOFSeparator;
 }
 
-END_NS
 //////////////////////////////////////////////////////////////////////////
+
+GM_PRIVATE_OBJECT_ALIGNED(GMControlTextEdit)
+{
+	GMVec4 textColor = GMVec4(0, 0, 0, 1);
+	GMVec4 selectionBackColor = GMConvertion::hexToRGB(L"#A3CEF1");
+	GMVec4 caretColor = GMVec4(0, 0, 0, 1);
+	GMint32 cp = 0;
+	GMint32 firstVisibleCP = 0;
+	GMint32 selectionStartCP = 0;
+	GMRect rcText;
+	GMStyle textStyle;
+	GMOwnedPtr<GMTypoTextBuffer> buffer;
+	GMOwnedPtr<GMControlBorder> borderControl;
+	GMTransactionContext transactionContext;
+	GMint32 borderWidth = 5;
+	GMfloat lastBlink = 0;
+	GMfloat deltaBlink = .5f;
+	bool caretOn = true;
+	bool showCaret = true;
+	bool insertMode = true;
+	bool mouseDragging = false;
+	GMint32 padding[2] = { 5, 10 };
+};
 
 class GMControlTextEditBorder : public GMControlBorder
 {
@@ -373,6 +415,7 @@ GMControlTextEdit* GMControlTextEdit::createControl(
 GMControlTextEdit::GMControlTextEdit(GMWidget* widget)
 	: GMControl(widget)
 {
+	GM_CREATE_DATA();
 	D(d);
 	d->borderControl = gm_makeOwnedPtr<GMControlTextEditBorder>(widget);
 	d->buffer = gm_makeOwnedPtr<GMTypoTextBuffer>();
@@ -1201,6 +1244,41 @@ void GMControlTextEdit::setBufferRenderRange(GMint32 xFirst)
 		d->buffer->setRenderRange(d->firstVisibleCP, lastCP);
 }
 
+GMControlBorder* GMControlTextEdit::getBorder() GM_NOEXCEPT
+{
+	D(d);
+	return d->borderControl.get();
+}
+
+void GMControlTextEdit::setBorderWidth(GMint32 width) GM_NOEXCEPT
+{
+	D(d);
+	d->borderWidth = width;
+}
+
+void GMControlTextEdit::setShowCaret(bool showCaret) GM_NOEXCEPT
+{
+	D(d);
+	d->showCaret = showCaret;
+}
+
+void GMControlTextEdit::setCaretBlinkSpeed(GMfloat blinkSpeedSecond) GM_NOEXCEPT
+{
+	D(d);
+	d->deltaBlink = blinkSpeedSecond;
+}
+
+GMRect GMControlTextEdit::expandStencilRect(const GMRect& rc)
+{
+	GMRect r = {
+		rc.x - 4,
+		rc.y - 2,
+		rc.width + 8,
+		rc.height + 4
+	};
+	return r;
+}
+
 GMControlTextArea* GMControlTextArea::createControl(
 	GMWidget* widget,
 	const GMString& text,
@@ -1221,9 +1299,11 @@ GMControlTextArea* GMControlTextArea::createControl(
 	return textArea;
 }
 
+GM_DEFINE_PROPERTY(GMControlTextArea, GMint32, ScrollBarSize, scrollBarSize)
 GMControlTextArea::GMControlTextArea(GMWidget* widget)
 	: Base(widget)
 {
+	GM_CREATE_DATA();
 	D(d);
 	D_BASE(db, Base);
 	d->buffer = new GMMultiLineTypoTextBuffer();
@@ -1522,6 +1602,12 @@ void GMControlTextArea::setLineHeight(GMint32 lineHeight) GM_NOEXCEPT
 {
 	D(d);
 	d->buffer->setLineHeight(lineHeight);
+}
+
+GMControlScrollBar* GMControlTextArea::getScrollBar() GM_NOEXCEPT
+{
+	D(d);
+	return d->scrollBar.get();
 }
 
 void GMControlTextArea::placeCaret(GMint32 cp, bool adjustVisibleCP)
@@ -1951,3 +2037,40 @@ void GMControlTextArea::updateRect()
 		updateScrollBarPageStep();
 	}
 }
+
+void GMControlTextArea::setCaretTopRelative(GMint32 caretTopRelative) GM_NOEXCEPT
+{
+	D(d);
+	d->caretTopRelative = caretTopRelative;
+}
+
+GMRect GMControlTextArea::adjustRectByScrollOffset(const GMRect& rc) GM_NOEXCEPT
+{
+	D(d);
+	GMRect r = {
+		rc.x,
+		rc.y + d->scrollOffset,
+		rc.width,
+		rc.height
+	};
+	return r;
+}
+
+void GMControlTextArea::lockScrollBar() GM_NOEXCEPT
+{
+	D(d);
+	d->scrollBarLocked = true;
+}
+
+void GMControlTextArea::unlockScrollBar() GM_NOEXCEPT
+{
+	D(d);
+	d->scrollBarLocked = false;
+}
+
+bool GMControlTextArea::isScrollBarLocked() GM_NOEXCEPT
+{
+	D(d);
+	return d->scrollBarLocked;
+}
+END_NS

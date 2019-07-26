@@ -6,6 +6,7 @@
 #include "gmengine/ui/gmwidget.h"
 #include "gmmessage.h"
 #include "wrapper/dx11wrapper.h"
+#include "gamemachine_p.h"
 
 BEGIN_NS
 
@@ -41,23 +42,6 @@ namespace
 	static GMMessage s_frameUpdateMsg(GameMachineMessageType::FrameUpdate);
 	GMMutex s_callableLock;
 }
-
-GM_PRIVATE_OBJECT_UNALIGNED(GameMachine)
-{
-	GMClock clock;
-	bool inited = false;
-	bool gamemachinestarted = false;
-	Set<IWindow*> windows;
-	const IRenderContext* computeContext = nullptr;
-	IFactory* factory = nullptr;
-	GMGamePackage* gamePackageManager = nullptr;
-	GMMessage lastMessage;
-	Queue<GMMessage> messageQueue;
-	Vector<IDestroyObject*> managerQueue;
-	Queue<GMCallable> callableQueue;
-	GMGameMachineRunningStates states;
-	GMGameMachineRunningMode runningMode;
-};
 
 GameMachine& GameMachine::instance()
 {

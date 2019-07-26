@@ -2,6 +2,7 @@
 #include "gmimagereader_bmp.h"
 #include <sstream>
 #include <gmimage.h>
+#include "gmdata/gmimage_p.h"
 #include "foundation/utilities/tools.h"
 #include <GL/glew.h>
 

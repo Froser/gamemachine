@@ -380,7 +380,7 @@ void GMWaveGameObject::update(GMDuration dt)
 
 	// 使用CPU进行运算，需要手动update每个顶点
 	if (!d->waveModel)
-		d->waveModel = db->asset.getScene()->getModels()[0].getModel();
+		d->waveModel = getScene()->getModels()[0].getModel();
 
 	if (d->acceleration == GMWaveGameObjectHardwareAcceleration::CPU)
 	{
@@ -457,7 +457,7 @@ void GMWaveGameObject::onRenderShader(GMModel* model, IShaderProgram* shaderProg
 		}
 		else
 		{
-			Ext_RenderWaveObjectShader(this, shaderProgram);
+			Ext_RenderWaveObjectShader(const_cast<GMWaveGameObject*>(this), shaderProgram);
 		}
 	}
 }

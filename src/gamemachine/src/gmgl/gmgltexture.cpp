@@ -5,6 +5,7 @@
 #include "gmdata/gmmodel.h"
 #include <GL/glew.h>
 #include "gmglgraphic_engine.h"
+#include "gmdata/gmimage_p.h"
 #include "gmgltexture_p.h"
 
 BEGIN_NS

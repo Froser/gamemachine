@@ -9,32 +9,11 @@ BEGIN_NS
 class GMTypoTextBuffer;
 class GMMultiLineTypoTextBuffer;
 
-GM_PRIVATE_OBJECT(GMControlTextEdit)
-{
-	GMVec4 textColor = GMVec4(0, 0, 0, 1);
-	GMVec4 selectionBackColor = GMConvertion::hexToRGB(L"#A3CEF1");
-	GMVec4 caretColor = GMVec4(0, 0, 0, 1);
-	GMint32 cp = 0;
-	GMint32 firstVisibleCP = 0;
-	GMint32 selectionStartCP = 0;
-	GMRect rcText;
-	GMStyle textStyle;
-	GMOwnedPtr<GMTypoTextBuffer> buffer;
-	GMOwnedPtr<GMControlBorder> borderControl;
-	GMTransactionContext transactionContext;
-	GMint32 borderWidth = 5;
-	GMfloat lastBlink = 0;
-	GMfloat deltaBlink = .5f;
-	bool caretOn = true;
-	bool showCaret = true;
-	bool insertMode = true;
-	bool mouseDragging = false;
-	GMint32 padding[2] = { 5, 10 };
-};
-
+GM_PRIVATE_CLASS(GMControlTextEdit);
 class GM_EXPORT GMControlTextEdit : public GMControl
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMControlTextEdit, GMControl)
+	GM_DECLARE_PRIVATE(GMControlTextEdit)
+	GM_DECLARE_BASE(GMControl)
 
 public:
 	enum StyleType
@@ -98,6 +77,11 @@ public:
 	void undo();
 	bool canRedo() GM_NOEXCEPT;
 	void redo();
+	GMControlBorder* getBorder() GM_NOEXCEPT;
+	void setBorderWidth(GMint32 width) GM_NOEXCEPT;
+	void setShowCaret(bool showCaret) GM_NOEXCEPT;
+	void setCaretBlinkSpeed(GMfloat blinkSpeedSecond) GM_NOEXCEPT;
+	GMRect expandStencilRect(const GMRect& rc);
 
 protected:
 	virtual void renderCaret(GMint32 firstX, GMint32 caretX);
@@ -120,62 +104,17 @@ protected:
 	void initStyles(GMWidget* widget);
 	void setBufferRenderRange(GMint32 xFirst);
 
-public:
-	inline GMControlBorder* getBorder() GM_NOEXCEPT
-	{
-		D(d);
-		return d->borderControl.get();
-	}
-
-	inline void setBorderWidth(GMint32 width) GM_NOEXCEPT
-	{
-		D(d);
-		d->borderWidth = width;
-	}
-
-	inline void setShowCaret(bool showCaret) GM_NOEXCEPT
-	{
-		D(d);
-		d->showCaret = showCaret;
-	}
-
-	inline void setCaretBlinkSpeed(GMfloat blinkSpeedSecond) GM_NOEXCEPT
-	{
-		D(d);
-		d->deltaBlink = blinkSpeedSecond;
-	}
-
-	inline GMRect expandStencilRect(const GMRect& rc)
-	{
-		GMRect r = {
-			rc.x - 4,
-			rc.y - 2,
-			rc.width + 8,
-			rc.height + 4
-		};
-		return r;
-	}
-
 protected:
 	virtual void updateRect() override;
 	virtual void insertCharacter(GMwchar ch);
 };
 
-GM_PRIVATE_OBJECT(GMControlTextArea)
-{
-	GMint32 caretTopRelative = 0;
-	GMMultiLineTypoTextBuffer* buffer = nullptr;
-	GMint32 scrollOffset = 0;
-	bool hasScrollBar = false;
-	GMint32 scrollBarSize = 20;
-	bool scrollBarLocked = false;
-	GMOwnedPtr<GMControlScrollBar> scrollBar;
-};
-
+GM_PRIVATE_CLASS(GMControlTextArea);
 class GM_EXPORT GMControlTextArea : public GMControlTextEdit
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMControlTextArea, GMControlTextEdit)
-	GM_DECLARE_PROPERTY(ScrollBarSize, scrollBarSize)
+	GM_DECLARE_PRIVATE(GMControlTextArea)
+	GM_DECLARE_BASE(GMControlTextEdit)
+	GM_DECLARE_PROPERTY(GMint32, ScrollBarSize)
 
 public:
 	static GMControlTextArea* createControl(
@@ -222,13 +161,7 @@ public:
 	void setScrollBar(bool scrollBar);
 	void setLineSpacing(GMint32 lineSpacing) GM_NOEXCEPT;
 	void setLineHeight(GMint32 lineHeight) GM_NOEXCEPT;
-
-public:
-	inline GMControlScrollBar* getScrollBar() GM_NOEXCEPT
-	{
-		D(d);
-		return d->scrollBar.get();
-	}
+	GMControlScrollBar* getScrollBar() GM_NOEXCEPT;
 
 protected:
 	void setBufferRenderRange(GMint32 xFirst, GMint32 yFirst);
@@ -240,43 +173,11 @@ private:
 	void moveToLine(GMint32 lineNo);
 	GMint32 getCurrentVisibleLineNo();
 	void onScrollBarValueChanged(const GMControlScrollBar* sb);
-
-private:
-	inline void setCaretTopRelative(GMint32 caretTopRelative) GM_NOEXCEPT
-	{
-		D(d);
-		d->caretTopRelative = caretTopRelative;
-	}
-
-	inline GMRect adjustRectByScrollOffset(const GMRect& rc) GM_NOEXCEPT
-	{
-		D(d);
-		GMRect r = {
-			rc.x,
-			rc.y + d->scrollOffset,
-			rc.width,
-			rc.height
-		};
-		return r;
-	}
-
-	void lockScrollBar() GM_NOEXCEPT
-	{
-		D(d);
-		d->scrollBarLocked = true;
-	}
-
-	void unlockScrollBar() GM_NOEXCEPT
-	{
-		D(d);
-		d->scrollBarLocked = false;
-	}
-
-	bool isScrollBarLocked() GM_NOEXCEPT
-	{
-		D(d);
-		return d->scrollBarLocked;
-	}
+	inline void setCaretTopRelative(GMint32 caretTopRelative) GM_NOEXCEPT;
+	inline GMRect adjustRectByScrollOffset(const GMRect& rc) GM_NOEXCEPT;
+	void lockScrollBar() GM_NOEXCEPT;
+	void unlockScrollBar() GM_NOEXCEPT;
+	bool isScrollBarLocked() GM_NOEXCEPT;
 };
 
 END_NS

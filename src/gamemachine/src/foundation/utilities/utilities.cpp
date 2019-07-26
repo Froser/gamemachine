@@ -3,9 +3,12 @@
 #include "foundation/gamemachine.h"
 #include "gmengine/gmgameworld.h"
 #include "gmdata/gmimagebuffer.h"
+#include "gmdata/gmimage_p.h"
 
 #define getVertex(x, y) (vertices[(x) + (y) * (sliceM + 1)])
 #define getIndex(x, y) ((x) + (y) * (sliceM + 1))
+
+BEGIN_NS
 
 namespace
 {
@@ -698,3 +701,5 @@ bool GMToolUtil::createPBRTextures(
 	}
 	return false;
 }
+
+END_NS

@@ -2,6 +2,8 @@
 #include "gmglhelper.h"
 #include "gmglshaderprogram.h"
 
+BEGIN_NS
+
 namespace
 {
 	GMGLShaderInfo s_defaultVS;
@@ -190,3 +192,5 @@ const GMGLShaderInfo& GMGLHelper::getDefaultShaderCode(GMShaderType type)
 
 	return *result;
 }
+
+END_NS

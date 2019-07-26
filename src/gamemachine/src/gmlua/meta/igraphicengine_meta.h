@@ -7,31 +7,23 @@ BEGIN_NS
 
 namespace luaapi
 {
-	GM_PRIVATE_OBJECT(IGraphicEngineProxy)
-	{
-		GM_LUA_PROXY_FUNC(addLight);
-		GM_LUA_PROXY_FUNC(getCamera);
-		GM_LUA_PROXY_FUNC(getDefaultFramebuffers);
-		GM_LUA_PROXY_FUNC(getGlyphManager);
-	};
-
+	GM_PRIVATE_CLASS(IGraphicEngineProxy);
 	class IGraphicEngineProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(IGraphicEngine, GMAnyProxy)
-		GM_DECLARE_PRIVATE_AND_BASE(IGraphicEngineProxy, GMAnyProxy)
+		GM_DECLARE_PRIVATE(IGraphicEngineProxy)
+		GM_DECLARE_BASE(GMAnyProxy)
+
+	public:
+		IGraphicEngineProxy(GMLuaCoreState* l, IDestroyObject* handler = nullptr);
+		~IGraphicEngineProxy();
 
 	protected:
 		virtual bool registerMeta() override;
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	GM_PRIVATE_OBJECT(GMCameraLookAtProxy)
-	{
-		GMVec3 lookAt;
-		GMVec3 position;
-		GMVec3 up;
-	};
-
+	GM_PRIVATE_CLASS(GMCameraLookAtProxy);
 	class GMCameraLookAtProxy : public GMObject
 	{
 		GM_DECLARE_PRIVATE(GMCameraLookAtProxy)
@@ -43,32 +35,30 @@ namespace luaapi
 		GMCameraLookAt toCameraLookAt();
 	};
 
-	GM_PRIVATE_OBJECT(GMCameraProxy)
-	{
-		GM_LUA_PROXY_FUNC(lookAt);
-		GM_LUA_PROXY_FUNC(setPerspective);
-		GM_LUA_PROXY_FUNC(setOrtho);
-	};
-
+	GM_PRIVATE_CLASS(GMCameraProxy);
 	class GMCameraProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(GMCamera, GMAnyProxy)
-		GM_DECLARE_PRIVATE_AND_BASE(GMCameraProxy, GMAnyProxy)
+		GM_DECLARE_PRIVATE(GMCameraProxy)
+		GM_DECLARE_BASE(GMAnyProxy)
+
+	public:
+		GMCameraProxy(GMLuaCoreState* l, IDestroyObject* handler = nullptr);
 
 	protected:
 		virtual bool registerMeta() override;
 	};
 
 	//////////////////////////////////////////////////////////////////////////
-	GM_PRIVATE_OBJECT(IFramebuffersProxy)
-	{
-		GM_LUA_PROXY_FUNC(clear);
-	};
-
+	GM_PRIVATE_CLASS(IFramebuffersProxy);
 	class IFramebuffersProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(IFramebuffers, GMAnyProxy)
-		GM_DECLARE_PRIVATE_AND_BASE(IFramebuffersProxy, GMAnyProxy)
+		GM_DECLARE_PRIVATE(IFramebuffersProxy)
+		GM_DECLARE_BASE(GMAnyProxy)
+
+	public:
+		IFramebuffersProxy(GMLuaCoreState* l, IDestroyObject* handler = nullptr);
 
 	protected:
 		virtual bool registerMeta() override;

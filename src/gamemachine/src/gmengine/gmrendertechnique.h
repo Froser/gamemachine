@@ -47,6 +47,7 @@ public:
 	GMRenderTechnique(GMRenderTechnique&& rhs) GM_NOEXCEPT;
 	GMRenderTechnique& operator=(const GMRenderTechnique& rhs);
 	GMRenderTechnique& operator=(GMRenderTechnique&& rhs) GM_NOEXCEPT;
+	~GMRenderTechnique();
 
 public:
 	const GMString& getCode(GMRenderEnvironment type) const GM_NOEXCEPT;

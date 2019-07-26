@@ -12,6 +12,8 @@
 #include "gmglhelper.h"
 #include <GL/glew.h>
 
+BEGIN_NS
+
 void GMGLFactory::createWindow(GMInstance instance, IWindow* parent, OUT IWindow** window)
 {
 	bool b = GMWindowFactory::createWindowWithOpenGL(instance, parent, window);
@@ -191,3 +193,5 @@ void GMGLFactory::createComputeContext(OUT const IRenderContext** out)
 		*out = ctx;
 	}
 }
+
+END_NS

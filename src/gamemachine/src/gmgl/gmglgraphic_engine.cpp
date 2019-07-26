@@ -80,6 +80,11 @@ GMGLGraphicEngine::GMGLGraphicEngine(const IRenderContext* context)
 	GM_CREATE_DATA();
 }
 
+GMGLGraphicEngine::~GMGLGraphicEngine()
+{
+
+}
+
 void GMGLGraphicEngine::init()
 {
 	D(d);

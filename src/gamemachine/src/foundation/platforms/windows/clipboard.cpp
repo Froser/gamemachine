@@ -3,6 +3,8 @@
 #include "foundation/utilities/tools.h"
 #include "foundation/assert.h"
 
+BEGIN_NS
+
 namespace
 {
 	UINT toWindowsClipboardFormat(GMClipboardMIME mime)
@@ -71,3 +73,5 @@ GMBuffer GMClipboard::getData(GMClipboardMIME mime)
 	}
 	return buffer;
 }
+
+END_NS

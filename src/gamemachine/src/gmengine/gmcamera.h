@@ -44,11 +44,6 @@ GM_ALIGNED_STRUCT(GMCameraLookAt)
 	}
 };
 
-inline GMMat4 getViewMatrix(const GMCameraLookAt& lookAt)
-{
-	return LookAt(lookAt.position, lookAt.lookDirection + lookAt.position, lookAt.up);
-}
-
 //Frustum
 enum class GMFrustumType
 {
@@ -79,15 +74,17 @@ GM_PRIVATE_CLASS(GMFrustum);
 class GMFrustum
 {
 	GM_DECLARE_PRIVATE(GMFrustum)
-	GM_DISABLE_COPY_ASSIGN(GMFrustum)
 	GM_DECLARE_GETTER_ACCESSOR(GMfloat, Near, public)
 	GM_DECLARE_GETTER_ACCESSOR(GMfloat, Far, public)
 	GM_DECLARE_GETTER_ACCESSOR(GMFrustumParameters, Parameters, public)
-
-	friend class GMCamera;
+	GM_FRIEND_CLASS(GMCamera);
 
 	GMFrustum();
 	~GMFrustum();
+	GMFrustum(const GMFrustum&);
+	GMFrustum(GMFrustum&&) GM_NOEXCEPT;
+	GMFrustum& operator=(const GMFrustum&);
+	GMFrustum& operator=(GMFrustum&&) GM_NOEXCEPT;
 
 	bool operator== (const GMFrustum&);
 	bool operator!= (const GMFrustum&);

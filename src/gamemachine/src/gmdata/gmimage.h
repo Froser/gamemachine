@@ -56,7 +56,7 @@ GM_PRIVATE_CLASS(GMImage);
   图片数据一般为32位形式保存，有RGBA共计4个通道。<BR>
   一个图片对象中，可能会存有多个MipMap，这通常出现在DDS等格式中。
 */
-class GM_EXPORT GMImage
+class GM_EXPORT GMImage : public IDestroyObject
 {
 	GM_DECLARE_PRIVATE(GMImage)
 	GM_DISABLE_COPY_ASSIGN(GMImage)

@@ -4,17 +4,38 @@
 #include <gmlua.h>
 #include "gmshader_meta.h"
 
-using namespace gm::luaapi;
+BEGIN_NS
 
-bool GMModelProxy::registerMeta()
+namespace luaapi
 {
-	GM_META_FUNCTION(__index)
-	return Base::registerMeta();
-}
+	GM_PRIVATE_OBJECT_UNALIGNED(GMModelProxy)
+	{
+		GM_LUA_PROXY_FUNC(__index);
+	};
 
-GM_LUA_PROXY_IMPL(GMModelProxy, __index)
-{
-	GM_LUA_BEGIN_PROPERTY(GMModelProxy)
+	bool GMModelProxy::registerMeta()
+	{
+		GM_META_FUNCTION(__index)
+			return Base::registerMeta();
+	}
+
+	GMModelProxy::GMModelProxy(GMLuaCoreState* l, IDestroyObject* handler /*= nullptr*/)
+		: Base(l, handler)
+	{
+		GM_CREATE_DATA();
+	}
+
+	GMModelProxy::~GMModelProxy()
+	{
+
+	}
+
+	GM_LUA_PROXY_IMPL(GMModelProxy, __index)
+	{
+		GM_LUA_BEGIN_PROPERTY(GMModelProxy)
 		GM_LUA_PROPERTY_PROXY_GETTER(GMShaderProxy, Shader, shader)
-	GM_LUA_END_PROPERTY()
+		GM_LUA_END_PROPERTY()
+	}
 }
+
+END_NS

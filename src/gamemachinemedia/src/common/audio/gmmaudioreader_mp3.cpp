@@ -27,7 +27,7 @@ class GMMDecodeThread : public gm::GMThread
 public:
 	GMMDecodeThread()
 	{
-		GM_CREATE_DATA(GMMDecodeThread);
+		GM_CREATE_DATA();
 	}
 
 	void setData(void* dt, DecodeCallback callback)
@@ -64,7 +64,7 @@ class GM_MEDIA_EXPORT GMMAudioFile_MP3 : public GMMAudioFile_Stream
 public:
 	GMMAudioFile_MP3()
 	{
-		GM_CREATE_DATA(GMMAudioFile_MP3);
+		GM_CREATE_DATA();
 		D(d);
 		d->baseData = Base::data();
 	}

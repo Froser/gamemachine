@@ -4,6 +4,7 @@
 #include <gmimage.h>
 #include "png.h"
 #include <GL/glew.h>
+#include "gmdata/gmimage_p.h"
 
 #define PNG_BYTES_TO_CHECK 4
 BEGIN_NS

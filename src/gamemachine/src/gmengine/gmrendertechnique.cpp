@@ -96,6 +96,11 @@ GMRenderTechnique::GMRenderTechnique(GMShaderType shaderType)
 	setShaderType(shaderType);
 }
 
+GMRenderTechnique::~GMRenderTechnique()
+{
+
+}
+
 const GMString& GMRenderTechnique::getCode(GMRenderEnvironment type) const GM_NOEXCEPT
 {
 	D(d);

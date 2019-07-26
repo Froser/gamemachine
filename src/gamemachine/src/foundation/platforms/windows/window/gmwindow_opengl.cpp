@@ -2,6 +2,7 @@
 #include <GL/glew.h>
 #include <GL/wglew.h>
 #include "gmengine/ui/gmwindow.h"
+#include "gmengine/ui/gmwindow_p.h"
 #include "foundation/gamemachine.h"
 #include "gmgl/gmglgraphic_engine.h"
 #include "foundation/gmthread.h"
@@ -10,9 +11,11 @@
 #define EXIT __exit
 #define RUN_AND_CHECK(i) if (!(i)) { GM_ASSERT(false); goto EXIT; }
 
+BEGIN_NS
+
 namespace
 {
-	HWND createTempWindow()
+	HWND createTempWindowWin()
 	{
 		LPWSTR lpszClassName = L"Gamemachine TempWindowClass";
 		WNDCLASS wc;
@@ -109,6 +112,7 @@ private:
 	GMMutex mutex;
 };
 
+class GMWindow_OpenGL;
 GM_PRIVATE_OBJECT_UNALIGNED(GMWindow_OpenGL)
 {
 	BYTE depthBits, stencilBits;
@@ -122,7 +126,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMWindow_OpenGL)
 
 class GMWindow_OpenGL : public GMWindow
 {
-	GM_DECLARE_PRIVATE_NGO(GMWindow_OpenGL)
+	GM_DECLARE_PRIVATE(GMWindow_OpenGL)
 	GM_FRIEND_CLASS(GMGLRenderContext)
 	typedef GMWindow Base;
 
@@ -177,6 +181,7 @@ private:
 
 GMWindow_OpenGL::GMWindow_OpenGL(IWindow* parent)
 {
+	GM_CREATE_DATA();
 	D(d);
 	d->mtid = GMThread::getCurrentThreadId();
 	d->depthBits = 24;
@@ -362,10 +367,10 @@ bool GMWindowFactory::createWindowWithOpenGL(GMInstance instance, IWindow* paren
 
 bool GMWindowFactory::createTempWindow(GMbyte colorDepth, GMbyte alphaBits, GMbyte depthBits, GMbyte stencilBits, OUT GMWindowHandle& tmpWnd, OUT GMDeviceContextHandle& tmpDC, OUT GMOpenGLRenderContextHandle& tmpRC)
 {
-	auto pfd = ::getDefaultPixelFormatDescriptor(colorDepth, alphaBits, depthBits, stencilBits);
+	auto pfd = getDefaultPixelFormatDescriptor(colorDepth, alphaBits, depthBits, stencilBits);
 	GMint32 pixelFormat = 0;
 
-	RUN_AND_CHECK(tmpWnd = ::createTempWindow());
+	RUN_AND_CHECK(tmpWnd = createTempWindowWin());
 	RUN_AND_CHECK(tmpDC = ::GetDC(tmpWnd));
 	RUN_AND_CHECK(pixelFormat = ::ChoosePixelFormat(tmpDC, &pfd));
 	RUN_AND_CHECK(::SetPixelFormat(tmpDC, pixelFormat, &pfd));
@@ -392,3 +397,5 @@ bool GMWindowFactory::destroyTempWindow(GMWindowHandle tmpWnd, GMDeviceContextHa
 
 	return sucRC && sucWnd;
 }
+
+END_NS

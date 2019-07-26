@@ -3,6 +3,18 @@
 #include <gmobject.h>
 #include <gmthread.h>
 
+BEGIN_NS
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMLuaRuntime)
+{
+	Set<IDestroyObject*> autoReleasePool;
+};
+
+GMLuaRuntime::GMLuaRuntime()
+{
+
+}
+
 GMLuaRuntime::~GMLuaRuntime()
 {
 	D(d);
@@ -47,3 +59,5 @@ bool GMLuaRuntime::containsObject(IDestroyObject* object)
 	m.unlock();
 	return contains;
 }
+
+END_NS

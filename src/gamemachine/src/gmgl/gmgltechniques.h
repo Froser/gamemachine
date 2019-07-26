@@ -18,10 +18,11 @@ private:
 };
 
 GM_PRIVATE_CLASS(GMGLTechnique);
-class GMGLTechnique : public ITechnique
+class GMGLTechnique : public GMObject, public ITechnique
 {
 	GM_DECLARE_PRIVATE(GMGLTechnique)
 	GM_DISABLE_COPY_ASSIGN(GMGLTechnique)
+	GM_FRIEND_CLASS(GMGammaHelper)
 
 public:
 	GMGLTechnique(const IRenderContext* context);

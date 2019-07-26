@@ -11,6 +11,8 @@
 #undef far
 #endif
 
+BEGIN_NS
+
 namespace
 {
 	struct Frustum
@@ -170,3 +172,5 @@ void GMCSMHelper::setOrthoCamera(ICSMFramebuffers* csm, const GMCamera& viewerCa
 
 	shadowCamera.setOrtho(shadowOrthoMin.getX(), shadowOrthoMax.getX(), shadowOrthoMin.getY(), shadowOrthoMax.getY(), shadowOrthoMin.getZ(), shadowOrthoMax.getZ());
 }
+
+END_NS

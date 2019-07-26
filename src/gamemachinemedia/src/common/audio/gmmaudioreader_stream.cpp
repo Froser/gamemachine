@@ -7,7 +7,7 @@ BEGIN_MEDIA_NS
 
 GMMAudioFile_Stream::GMMAudioFile_Stream()
 {
-	GM_CREATE_DATA(GMMAudioFile_Stream);
+	GM_CREATE_DATA();
 	init();
 }
 

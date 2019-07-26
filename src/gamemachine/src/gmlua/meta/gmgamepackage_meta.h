@@ -7,16 +7,16 @@ BEGIN_NS
 
 namespace luaapi
 {
-	GM_PRIVATE_OBJECT(GMGamePackageProxy)
-	{
-		GM_LUA_PROXY_FUNC(loadPackage)
-		GM_LUA_PROXY_FUNC(readFile)
-	};
-
+	GM_PRIVATE_CLASS(GMGamePackageProxy);
 	class GMGamePackageProxy : public GMObjectProxy
 	{
 		GM_LUA_PROXY_OBJ(GMGamePackage, GMObjectProxy)
-		GM_DECLARE_PRIVATE_AND_BASE(GMGamePackageProxy, GMObjectProxy)
+		GM_DECLARE_PRIVATE(GMGamePackageProxy)
+		GM_DECLARE_BASE(GMObjectProxy)
+
+	public:
+		GMGamePackageProxy(GMLuaCoreState* l, GMObject* handler = nullptr);
+		~GMGamePackageProxy();
 
 	protected:
 		virtual bool registerMeta() override;

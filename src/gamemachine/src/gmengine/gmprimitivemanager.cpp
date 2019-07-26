@@ -7,6 +7,30 @@
 
 BEGIN_NS
 
+GM_PRIVATE_OBJECT_ALIGNED(GMPrimitiveLine2D)
+{
+	GMPrimitiveManager* manager;
+	GMPoint p1, p2;
+	GMVec4 color;
+};
+
+GM_PRIVATE_OBJECT_ALIGNED(GMPrimitiveLine3D)
+{
+	GMPrimitiveManager* manager;
+	GMVec3 p1, p2;
+	GMVec4 color;
+};
+
+GM_PRIVATE_OBJECT_ALIGNED(GMPrimitive3DObject)
+{
+	bool dirty = true;
+	GMVec3 p1;
+	GMVec3 p2;
+	GMVec4 color;
+	GMModelAsset modelAsset;
+	GMModel* model = nullptr;
+};
+
 // 基本图元
 class GMLine2D : public GMSprite2DGameObject
 {
@@ -125,16 +149,6 @@ bool GMPrimitive3DObject::isDirty() GM_NOEXCEPT
 	D(d);
 	return d->dirty;
 }
-
-GM_PRIVATE_OBJECT_ALIGNED(GMPrimitive3DObject)
-{
-	bool dirty = true;
-	GMVec3 p1;
-	GMVec3 p2;
-	GMVec4 color;
-	GMModelAsset modelAsset;
-	GMModel* model = nullptr;
-};
 
 GMPrimitive3DObject::GMPrimitive3DObject()
 {
@@ -256,13 +270,6 @@ GMModel* GMLine3D::createModel()
 }
 
 //////////////////////////////////////////////////////////////////////////
-GM_PRIVATE_OBJECT_ALIGNED(GMPrimitiveLine2D)
-{
-	GMPrimitiveManager* manager;
-	GMPoint p1, p2;
-	GMVec4 color;
-};
-
 GM_PRIVATE_CLASS(GMPrimitiveLine2D);
 class GMPrimitiveLine2D : public GMObject, public IPrimitive
 {
@@ -295,13 +302,6 @@ void GMPrimitiveLine2D::drawPrimitive()
 	line2D->setColor(d->color);
 	line2D->draw();
 }
-
-GM_PRIVATE_OBJECT_ALIGNED(GMPrimitiveLine3D)
-{
-	GMPrimitiveManager* manager;
-	GMVec3 p1, p2;
-	GMVec4 color;
-};
 
 class GMPrimitiveLine3D : public GMObject, public IPrimitive
 {

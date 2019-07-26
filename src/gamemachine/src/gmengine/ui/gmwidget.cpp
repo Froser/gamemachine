@@ -108,6 +108,33 @@ GMElementBlendColor::GMElementBlendColor()
 	GM_CREATE_DATA();
 }
 
+GMElementBlendColor::~GMElementBlendColor()
+{
+
+}
+
+GMElementBlendColor::GMElementBlendColor(const GMElementBlendColor& rhs)
+{
+	*this = rhs;
+}
+
+GMElementBlendColor::GMElementBlendColor(GMElementBlendColor&& rhs) GM_NOEXCEPT
+{
+	*this = std::move(rhs);
+}
+
+GMElementBlendColor& GMElementBlendColor::operator=(const GMElementBlendColor& rhs)
+{
+	GM_COPY(rhs);
+	return *this;
+}
+
+GMElementBlendColor& GMElementBlendColor::operator=(GMElementBlendColor&& rhs) GM_NOEXCEPT
+{
+	GM_MOVE(rhs);
+	return *this;
+}
+
 void GMElementBlendColor::init(const GMVec4& defaultColor, const GMVec4& disabledColor, const GMVec4& hiddenColor)
 {
 	D(d);
@@ -1609,82 +1636,82 @@ GMSystemMouseEvent* GMWidget::adjustMouseEvent(GMSystemMouseEvent* event, const 
 	return event;
 }
 
-IWindow* GMWidget::getParentWindow()
+IWindow* GMWidget::getParentWindow() GM_NOEXCEPT
 {
 	D(d);
 	return d->parentWindow;
 }
 
-void GMWidget::setParentWindow(IWindow* window)
+void GMWidget::setParentWindow(IWindow* window) GM_NOEXCEPT
 {
 	D(d);
 	d->parentWindow = window;
 }
 
-GMWidget* GMWidget::getNextCanvas()
+GMWidget* GMWidget::getNextCanvas() GM_NOEXCEPT
 {
 	D(d);
 	return d->nextWidget;
 }
 
-GMWidget* GMWidget::getPrevCanvas()
+GMWidget* GMWidget::getPrevCanvas() GM_NOEXCEPT
 {
 	D(d);
 	return d->prevWidget;
 }
 
-const Vector<GMControl*>& GMWidget::getControls()
+const Vector<GMControl*>& GMWidget::getControls() GM_NOEXCEPT
 {
 	D(d);
 	return d->controls;
 }
 
-bool GMWidget::canKeyboardInput()
+bool GMWidget::canKeyboardInput() GM_NOEXCEPT
 {
 	D(d);
 	return d->keyboardInput;
 }
 
-void GMWidget::setKeyboardInput(bool keyboardInput)
+void GMWidget::setKeyboardInput(bool keyboardInput) GM_NOEXCEPT
 {
 	D(d);
 	d->keyboardInput = keyboardInput;
 }
 
-void GMWidget::setPosition(GMint32 x, GMint32 y)
+void GMWidget::setPosition(GMint32 x, GMint32 y) GM_NOEXCEPT
 {
 	D(d);
 	d->x = x;
 	d->y = y;
 }
 
-void GMWidget::setBorderMargin(GMint32 left, GMint32 top)
+void GMWidget::setBorderMargin(GMint32 left, GMint32 top) GM_NOEXCEPT
 {
 	D(d);
 	d->borderMarginLeft = left;
 	d->borderMarginTop = top;
 }
 
-GMint32 GMWidget::getTitleHeight()
+GMint32 GMWidget::getTitleHeight() GM_NOEXCEPT
 {
 	D(d);
 	return d->titleHeight;
 }
 
-GMWidgetResourceManager* GMWidget::getManager()
+GMWidgetResourceManager* GMWidget::getManager() GM_NOEXCEPT
 {
 	D(d);
 	return d->manager;
 }
 
-GMRect GMWidget::getSize()
+GMRect GMWidget::getSize() GM_NOEXCEPT
 {
 	D(d);
 	GMRect rc = { 0, 0, d->width, d->height };
 	return rc;
 }
 
-void GMWidget::resetControlMouseOver()
+void GMWidget::resetControlMouseOver() GM_NOEXCEPT
 {
 	D(d);
 	d->controlMouseOver = nullptr;

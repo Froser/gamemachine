@@ -28,6 +28,8 @@ struct __PopGuard							\
 		return lr;							\
 	}
 
+BEGIN_NS
+
 namespace
 {
 	class Runtimes
@@ -58,7 +60,7 @@ namespace
 	};
 
 	template <typename T>
-	void pushVector(const T& v, GMLuaCoreState* l)
+	void __pushVector(const T& v, GMLuaCoreState* l)
 	{
 		GM_CHECK_LUA_STACK_BALANCE_(l, 1);
 		lua_newtable(l);
@@ -74,7 +76,7 @@ namespace
 	}
 
 	template <typename T>
-	bool popVector(T& v, GMint32 index, GMLuaCoreState* l)
+	bool __popVector(T& v, GMint32 index, GMLuaCoreState* l)
 	{
 		GM_CHECK_LUA_STACK_BALANCE_(l, 0);
 		GMFloat4 f4(0, 0, 0, 0);
@@ -103,14 +105,14 @@ namespace
 	}
 
 	template <typename T>
-	bool popVector(T& v, GMLuaCoreState* l)
+	bool __popVector(T& v, GMLuaCoreState* l)
 	{
 		GM_CHECK_LUA_STACK_BALANCE_(l, 0);
 		GMint32 index = lua_gettop(l);
-		return popVector(v, index, l);
+		return __popVector(v, index, l);
 	}
 
-	bool popMatrix(GMMat4& v, GMint32 index, GMLuaCoreState* l)
+	bool __popMatrix(GMMat4& v, GMint32 index, GMLuaCoreState* l)
 	{
 		GM_CHECK_LUA_STACK_BALANCE_(l, 0);
 		GMVec4 v4[GMMat4::length()];
@@ -123,7 +125,7 @@ namespace
 				return false;
 
 			GMint32 key = lua_tointeger(l, -2);
-			bool isVector = popVector(v4[key - 1], l);
+			bool isVector = __popVector(v4[key - 1], l);
 			if (!isVector)
 				return false;
 
@@ -192,8 +194,17 @@ void GMLuaFunctionRegister::newLibrary(GMLuaCoreState *l, const GMLuaReg* functi
 #pragma warning(pop)
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMLua)
+{
+	GMLuaCoreState* luaState = nullptr;
+	GMLuaRuntime luaRuntime;
+	bool isWeakLuaStatePtr = false;
+	bool libraryLoaded = false;
+};
+
 GMLua::GMLua()
 {
+	GM_CREATE_DATA();
 	D(d);
 	d->luaState = luaL_newstate();
 	d->isWeakLuaStatePtr = false;
@@ -201,6 +212,7 @@ GMLua::GMLua()
 
 GMLua::GMLua(lua_State* l)
 {
+	GM_CREATE_DATA();
 	D(d);
 	d->luaState = l;
 	d->isWeakLuaStatePtr = true;
@@ -335,6 +347,12 @@ void GMLua::freeReference(GMLuaReference ref)
 {
 	D(d);
 	luaL_unref(L, LUA_REGISTRYINDEX, ref);
+}
+
+GMLuaCoreState* GMLua::getLuaCoreState() GM_NOEXCEPT
+{
+	D(d);
+	return d->luaState;
 }
 
 GMLuaRuntime* GMLua::getRuntime(GMLuaCoreState* s)
@@ -550,37 +568,37 @@ bool GMLua::popTable(GMObject& obj, GMint32 index)
 bool GMLua::popVector(GMVec2& v)
 {
 	D(d);
-	return ::popVector(v, d->luaState);
+	return __popVector(v, d->luaState);
 }
 
 void GMLua::pushVector(const GMVec2& v)
 {
 	D(d);
-	::pushVector(v, d->luaState);
+	__pushVector(v, d->luaState);
 }
 
 bool GMLua::popVector(GMVec3& v)
 {
 	D(d);
-	return ::popVector(v, d->luaState);
+	return __popVector(v, d->luaState);
 }
 
 void GMLua::pushVector(const GMVec3& v)
 {
 	D(d);
-	::pushVector(v, d->luaState);
+	__pushVector(v, d->luaState);
 }
 
 bool GMLua::popVector(GMVec4& v)
 {
 	D(d);
-	return ::popVector(v, d->luaState);
+	return __popVector(v, d->luaState);
 }
 
 void GMLua::pushVector(const GMVec4& v)
 {
 	D(d);
-	::pushVector(v, d->luaState);
+	__pushVector(v, d->luaState);
 }
 
 void GMLua::pushMatrix(const GMMat4& v)
@@ -601,7 +619,7 @@ bool GMLua::popMatrix(GMMat4& v)
 {
 	D(d);
 	GM_CHECK_LUA_STACK_BALANCE(0);
-	return ::popMatrix(v, lua_gettop(L), L);
+	return __popMatrix(v, lua_gettop(L), L);
 }
 
 void GMLua::push(const GMVariant& var)
@@ -788,3 +806,5 @@ GMLuaReference gm::GMLua::popFunction(bool* valid)
 	}
 	return 0;
 }
+
+END_NS

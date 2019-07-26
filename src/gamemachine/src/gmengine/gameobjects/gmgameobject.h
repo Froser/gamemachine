@@ -41,6 +41,7 @@ public:
 
 public:
 	void setAsset(GMSceneAsset asset);
+	GMAsset getAsset();
 	GMScene* getScene();
 	const GMScene* getScene() const;
 	void setWorld(GMGameWorld* world);

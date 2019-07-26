@@ -12,6 +12,8 @@
 #include <gmengine/particle/cocos2d/gmparticleeffects_cocos2d.h>
 #include "wrapper/dx11wrapper.h"
 
+BEGIN_NS
+
 namespace
 {
 	GMString getFileContent(const GMString& path)
@@ -67,3 +69,5 @@ void GMShaderHelper::loadExtensionShaders(const IRenderContext* context)
 		DirectX11LoadExtensionShaders(context);
 	}
 }
+
+END_NS

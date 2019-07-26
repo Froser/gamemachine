@@ -4,13 +4,68 @@
 #include <gmlua.h>
 BEGIN_NS
 
-#define LUA_PROXY(className) className* __handler = nullptr; GMString __name = #className;
-
 namespace luaapi
 {
-	GM_PRIVATE_OBJECT(GMObjectProxy)
+	GM_PRIVATE_CLASS(GMObjectProxy);
+	class GMObjectProxy : public GMObject
+	{
+		GM_DECLARE_PRIVATE(GMObjectProxy)
+
+	public: 
+		GMObjectProxy(GMLuaCoreState* l, GMObject* handler = nullptr);
+		~GMObjectProxy();
+
+		GMLuaCoreState* getLuaCoreState() const;
+		void setObjectName(const GMString& name);
+		GMObject* get() const;
+		GMObject* operator->() const;
+		void set(GMObject* handler);
+		void setAutoRelease(bool);
+
+	public:
+		operator bool() const
+		{
+			return !!get();
+		}
+
+	protected:
+		virtual bool registerMeta() override;
+	};
+
+	//////////////////////////////////////////////////////////////////////////
+	GM_PRIVATE_CLASS(GMAnyProxy);
+	class GMAnyProxy : public GMObject
+	{
+		GM_DECLARE_PRIVATE(GMAnyProxy)
+
+	public:
+		GMAnyProxy(GMLuaCoreState* l, IDestroyObject* handler = nullptr);
+		~GMAnyProxy();
+
+		void setObjectName(const GMString& name);
+		GMLuaCoreState* getLuaCoreState() const;
+		IDestroyObject* get() const;
+		IDestroyObject* operator->() const;
+		void set(IDestroyObject* handler);
+		void setAutoRelease(bool);
+
+	public:
+		operator bool() const
+		{
+			D(d);
+			return !!get();
+		}
+
+	protected:
+		virtual bool registerMeta() override;
+	};
+
+#define LUA_PROXY(className) className* __handler = nullptr; GMString __name = #className;
+
+	GM_PRIVATE_OBJECT_UNALIGNED(GMObjectProxy)
 	{
 		LUA_PROXY(GMObject);
+		//GMObject* __handler = nullptr; GMString __name = "GMObject";
 
 		GMLuaCoreState* l = nullptr;
 		GM_LUA_PROXY_FUNC(__gc);
@@ -18,57 +73,7 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(emitSignal);
 	};
 
-	class GMObjectProxy : public GMObject
-	{
-		GM_DECLARE_PRIVATE(GMObjectProxy)
-
-	public: 
-		GMObjectProxy(GMLuaCoreState* l, GMObject* handler = nullptr);
-
-		GMLuaCoreState* getLuaCoreState() const
-		{
-			D(d);
-			return d->l;
-		}
-
-		void setObjectName(const GMString& name)
-		{
-			D(d);
-			d->__name = name;
-		}
-
-		GMObject* get() const
-		{
-			D(d);
-			return d->__handler;
-		}
-
-		GMObject* operator->() const
-		{
-			return get();
-		}
-
-		operator bool() const
-		{
-			D(d);
-			return !!d->__handler;
-		}
-
-		void set(GMObject* handler)
-		{
-			D(d);
-			d->__handler = handler;
-		}
-
-	public:
-		void setAutoRelease(bool);
-
-	protected:
-		virtual bool registerMeta() override;
-	};
-
-	//////////////////////////////////////////////////////////////////////////
-	GM_PRIVATE_OBJECT(GMAnyProxy)
+	GM_PRIVATE_OBJECT_UNALIGNED(GMAnyProxy)
 	{
 		LUA_PROXY(IDestroyObject);
 
@@ -76,57 +81,8 @@ namespace luaapi
 		GMLuaCoreState* l = nullptr;
 	};
 
-	class GMAnyProxy : public GMObject
-	{
-		GM_DECLARE_PRIVATE(GMAnyProxy)
-
-	public:
-		GMAnyProxy(GMLuaCoreState* l, IDestroyObject* handler = nullptr);
-
-		void setObjectName(const GMString& name)
-		{
-			D(d);
-			d->__name = name;
-		}
-
-		GMLuaCoreState* getLuaCoreState() const
-		{
-			D(d);
-			return d->l;
-		}
-
-		IDestroyObject* get() const
-		{
-			D(d);
-			return d->__handler;
-		}
-
-		IDestroyObject* operator->() const
-		{
-			return get();
-		}
-
-		operator bool() const
-		{
-			D(d);
-			return !!d->__handler;
-		}
-
-		void set(IDestroyObject* handler)
-		{
-			D(d);
-			d->__handler = handler;
-		}
-
-	public:
-		void setAutoRelease(bool);
-
-	protected:
-		virtual bool registerMeta() override;
-	};
-}
-
 #undef LUA_PROXY
+}
 
 END_NS
 #endif

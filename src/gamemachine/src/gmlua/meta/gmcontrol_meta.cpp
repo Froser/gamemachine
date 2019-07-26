@@ -2,9 +2,9 @@
 #include "gmcontrol_meta.h"
 #include "gmwidget_meta.h"
 
-using namespace luaapi;
+BEGIN_NS
 
-namespace
+namespace luaapi
 {
 	// {{BEGIN META FUNCTION}}
 	GM_LUA_FUNC(GMControlButton_createControl)
@@ -35,20 +35,20 @@ namespace
 		{ 0, 0 }
 	};
 
+	GM_LUA_REGISTER_IMPL(GMControlButton_Meta, "GMControlButton", g_meta_gmcontrolbutton);
+
+	//////////////////////////////////////////////////////////////////////////
+
+	bool GMControlProxy::registerMeta()
+	{
+		D(d);
+		return GMObjectProxy::registerMeta();
+	}
+
+	bool GMControlButtonProxy::registerMeta()
+	{
+		D(d);
+		return GMControlProxy::registerMeta();
+	}
 }
-
-GM_LUA_REGISTER_IMPL(GMControlButton_Meta, "GMControlButton", g_meta_gmcontrolbutton);
-
-//////////////////////////////////////////////////////////////////////////
-
-bool GMControlProxy::registerMeta()
-{
-	D(d);
-	return GMObjectProxy::registerMeta();
-}
-
-bool GMControlButtonProxy::registerMeta()
-{
-	D(d);
-	return GMControlProxy::registerMeta();
-}
+END_NS

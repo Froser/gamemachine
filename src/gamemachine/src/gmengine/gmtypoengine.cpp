@@ -2,6 +2,7 @@
 #include "gmtypoengine.h"
 #include "foundation/gamemachine.h"
 #include <regex>
+#include "gmtypoengine_p.h"
 
 BEGIN_NS
 
@@ -23,6 +24,12 @@ GMTypoIterator::GMTypoIterator(ITypoEngine* typo, GMsize_t index)
 	D(d);
 	d->typo = typo;
 	d->index = index;
+}
+
+
+GMTypoIterator::~GMTypoIterator()
+{
+
 }
 
 GMTypoResult GMTypoIterator::operator*()
@@ -233,28 +240,6 @@ bool GMTypoStateMachine::preciseParse(const GMString& name)
 }
 
 //////////////////////////////////////////////////////////////////////////
-GM_PRIVATE_OBJECT_UNALIGNED(GMTypoEngine)
-{
-	GMFontHandle font = 0;
-
-	GMTypoStateMachine* stateMachine = nullptr;
-	const IRenderContext* context = nullptr;
-	bool insetStateMachine = false;
-
-	GMGlyphManager* glyphManager = nullptr;
-	std::wstring literature;
-	GMTypoOptions options;
-	GMfloat lineHeight = 0;
-
-	// 绘制状态
-	GMint32 current_x = 0;
-	GMint32 current_y = 0;
-	GMint32 currentLineNo = 1;
-	GMFontSizePt fontSize = 12;
-	GMfloat color[3] = { 1.f, 1.f, 1.f };
-
-	Vector<GMTypoResult> results;
-};
 
 GMTypoEngine::GMTypoEngine(const IRenderContext* context)
 {
@@ -589,18 +574,6 @@ void GMTypoTextTransactionAtom::unexecute()
 	d->buffer->removeChars(d->cp, d->cp + d->addedContent.length());
 	d->buffer->insertString(d->cp, d->removedContent);
 }
-
-
-GM_PRIVATE_OBJECT_UNALIGNED(GMTypoTextBuffer)
-{
-	ITypoEngine* engine = nullptr;
-	GMString buffer;
-	GMRect rc;
-	bool newline = true;
-	bool dirty = false;
-	GMsize_t renderStart = 0;
-	GMsize_t renderEnd = 0;
-};
 
 GMTypoTextBuffer::GMTypoTextBuffer()
 {

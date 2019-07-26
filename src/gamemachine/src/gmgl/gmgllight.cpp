@@ -2,9 +2,36 @@
 #include "gmgllight.h"
 #include "gmgltechniques.h"
 #include "shader_constants.h"
+#include "gmengine/gmlight_p.h"
 
-template <GMuint32 i>
-struct String {};
+BEGIN_NS
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMGLLight)
+{
+	struct LightIndices
+	{
+		GMint32 Color;
+		GMint32 Position;
+		GMint32 Type;
+		GMint32 AttenuationConstant;
+		GMint32 AttenuationLinear;
+		GMint32 AttenuationExp;
+		GMint32 AmbientIntensity;
+		GMint32 DiffuseIntensity;
+		GMint32 SpecularIntensity;
+	};
+	Vector<Vector<LightIndices>> lightIndices;
+};
+
+GMGLLight::GMGLLight()
+{
+
+}
+
+GMGLLight::~GMGLLight()
+{
+
+}
 
 void GMGLLight::activateLight(GMuint32 index, ITechnique* technique)
 {
@@ -57,6 +84,26 @@ void GMGLLight::activateLight(GMuint32 index, ITechnique* technique)
 		db->attenuation.exp);
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED_FROM(GMGLDirectionalLight, GMDirectionalLight_t)
+{
+	struct LightIndices
+	{
+		GMint32 Direction;
+	};
+
+	Vector<Vector<LightIndices>> lightIndices;
+};
+
+GMGLDirectionalLight::GMGLDirectionalLight()
+{
+	GM_CREATE_DATA();
+}
+
+GMGLDirectionalLight::~GMGLDirectionalLight()
+{
+
+}
+
 bool GMGLDirectionalLight::setLightAttribute3(GMLightAttribute attr, GMfloat value[3])
 {
 	D(d);
@@ -93,6 +140,26 @@ void GMGLDirectionalLight::activateLight(GMuint32 index, ITechnique* technique)
 		d->direction);
 }
 
+GM_PRIVATE_OBJECT_UNALIGNED_FROM(GMGLSpotlight, GMSpotlight_t)
+{
+	struct LightIndices
+	{
+		GMint32 CutOff;
+	};
+
+	Vector<Vector<LightIndices>> lightIndices;
+};
+
+GMGLSpotlight::GMGLSpotlight()
+{
+	GM_CREATE_DATA();
+}
+
+GMGLSpotlight::~GMGLSpotlight()
+{
+
+}
+
 bool GMGLSpotlight::setLightAttribute(GMLightAttribute attr, GMfloat value)
 {
 	D(d);
@@ -125,3 +192,5 @@ void GMGLSpotlight::activateLight(GMuint32 index, ITechnique* technique)
 		getVariableIndex(shaderProgram, d->lightIndices[shaderLightIdx][index].CutOff, L"GM_lights[" + strIndex + L"].CutOff"),
 		Cos(Radians(d->cutOff)));
 }
+
+END_NS

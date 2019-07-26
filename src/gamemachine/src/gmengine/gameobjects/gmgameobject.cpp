@@ -92,6 +92,13 @@ void GMGameObject::setAsset(GMAsset asset)
 	d->asset = asset;
 }
 
+
+GMAsset GMGameObject::getAsset()
+{
+	D(d);
+	return d->asset;
+}
+
 GMScene* GMGameObject::getScene()
 {
 	D(d);

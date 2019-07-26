@@ -8,19 +8,16 @@ BEGIN_NS
 
 namespace luaapi
 {
-	GM_PRIVATE_OBJECT(GMGameObjectProxy)
-	{
-		GM_LUA_PROXY_FUNC(setAsset);
-		GM_LUA_PROXY_FUNC(setTranslation);
-		GM_LUA_PROXY_FUNC(setRotation);
-		GM_LUA_PROXY_FUNC(setScaling);
-		GM_LUA_PROXY_FUNC(update);
-	};
-
+	GM_PRIVATE_CLASS(GMGameObjectProxy);
 	class GMGameObjectProxy : public GMObjectProxy
 	{
 		GM_LUA_PROXY_OBJ(GMGameObject, GMObjectProxy)
-		GM_DECLARE_PRIVATE_AND_BASE(GMGameObjectProxy, GMObjectProxy)
+		GM_DECLARE_PRIVATE(GMGameObjectProxy)
+		GM_DECLARE_BASE(GMObjectProxy)
+
+	public:
+		GMGameObjectProxy(GMLuaCoreState* l, GMObject* handler = nullptr);
+		~GMGameObjectProxy();
 
 	protected:
 		virtual bool registerMeta() override;

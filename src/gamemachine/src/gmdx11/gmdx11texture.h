@@ -5,12 +5,6 @@
 #include <gmcom.h>
 BEGIN_NS
 
-struct GMDx11TextureSamplerVariable
-{
-	ID3DX11EffectShaderResourceVariable* shaderResource;
-	ID3DX11EffectSamplerVariable* sampler;
-};
-
 GM_PRIVATE_CLASS(GMDx11Texture);
 class GMDx11Texture : public ITexture
 {

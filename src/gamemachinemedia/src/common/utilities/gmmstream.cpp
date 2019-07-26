@@ -14,7 +14,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMMStream)
 
 GMMStream::GMMStream()
 {
-	GM_CREATE_DATA(GMMStream);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->ptr = 0;

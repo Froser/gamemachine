@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
 #include "check.h"
 #include "defines.h"
-#include "../../gamemachine.h"
-
+#include "foundation/gamemachine.h"
+#include "foundation/gamemachine_p.h"
 BEGIN_NS
 
 namespace

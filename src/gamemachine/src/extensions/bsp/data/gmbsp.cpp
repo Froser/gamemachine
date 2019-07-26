@@ -9,6 +9,8 @@
 #include "gmdata/gamepackage/gmgamepackage.h"
 #include <linearmath.h>
 
+BEGIN_NS
+
 namespace
 {
 	const char* getValue(const GMBSPEntity* entity, const char* key)
@@ -674,3 +676,5 @@ bool GMBSP::endOfScript(bool crossline)
 	gm_info(gm_dbg_wrap("returning to {0}"), d->script->filename );
 	return getToken(crossline);
 }
+
+END_NS

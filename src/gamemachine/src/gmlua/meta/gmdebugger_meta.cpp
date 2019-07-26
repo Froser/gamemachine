@@ -4,11 +4,11 @@
 #include <gmlua.h>
 #include "../gmlua_functions.h"
 
-using namespace gm::luaapi;
-
 #define NAME "GMDebugger"
 
-namespace
+BEGIN_NS
+
+namespace luaapi
 {
 	// {{BEGIN META FUNCTION}}
 	GM_LUA_FUNC(info)
@@ -57,6 +57,8 @@ namespace
 		// {{END META DECLARATIONS}}
 		{ 0, 0 }
 	};
+
+	GM_LUA_REGISTER_IMPL(GMDebugger_Meta, NAME, g_meta);
 }
 
-GM_LUA_REGISTER_IMPL(GMDebugger_Meta, NAME, g_meta);
+END_NS

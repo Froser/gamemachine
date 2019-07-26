@@ -2,6 +2,8 @@
 #include "gminput.h"
 #include <gamemachine.h>
 
+BEGIN_NS
+
 namespace
 {
 	GMWParam getWindowsKey(GMKey key)
@@ -336,44 +338,66 @@ namespace
 	}
 }
 
-namespace gm
+GM_PRIVATE_OBJECT_UNALIGNED(GMInput)
 {
-	class JoystickStateImpl : public IJoystickState
-	{
-	public:
-		JoystickStateImpl(GMInput* host) { m_host = host; }
-		virtual void vibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed) override;
-		virtual GMJoystickState state() override;
-	private:
-		GMInput* m_host = nullptr;
-	};
+	enum { MAX_KEYS = 256 };
+	bool detectingMode = false;
+	IWindow* window = nullptr;
 
-	class MouseStateImpl : public IMouseState
-	{
-	public:
-		MouseStateImpl(GMInput* host) { m_host = host; }
-		virtual GMMouseState state() override;
-		virtual void setDetectingMode(bool center) override;
-	private:
-		GMInput* m_host = nullptr;
-	};
+	// joystick (xinput)
+	GMXInputWrapper xinput;
+	GMJoystickState joystickState;
 
-	class KeyboardStateImpl : public IKeyboardState
-	{
-	public:
-		KeyboardStateImpl(GMInput* host) { m_host = host; }
-		virtual bool keydown(GMKey key) override;
-		virtual bool keyTriggered(GMKey key) override;
-	private:
-		GMInput* m_host = nullptr;
-	};
+	// keyboard
+	GMbyte keyState[256] = { 0 };
+	GMbyte lastKeyState[MAX_KEYS] = { 0 };
 
-	class IMStateImpl : public IIMState
-	{
-	public:
-		virtual void activate(GMKeyboardLayout layout);
-	};
-}
+	// mouse
+	GMMouseState mouseState;
+	GMWheelState wheelState;
+
+	// implements
+	IJoystickState* joystickImpl = nullptr;
+	IMouseState* mouseImpl = nullptr;
+	IKeyboardState* keyboardImpl = nullptr;
+	IIMState* imImpl = nullptr;
+};
+
+class JoystickStateImpl : public IJoystickState
+{
+public:
+	JoystickStateImpl(GMInput* host) { m_host = host; }
+	virtual void vibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed) override;
+	virtual GMJoystickState state() override;
+private:
+	GMInput* m_host = nullptr;
+};
+
+class MouseStateImpl : public IMouseState
+{
+public:
+	MouseStateImpl(GMInput* host) { m_host = host; }
+	virtual GMMouseState state() override;
+	virtual void setDetectingMode(bool center) override;
+private:
+	GMInput* m_host = nullptr;
+};
+
+class KeyboardStateImpl : public IKeyboardState
+{
+public:
+	KeyboardStateImpl(GMInput* host) { m_host = host; }
+	virtual bool keydown(GMKey key) override;
+	virtual bool keyTriggered(GMKey key) override;
+private:
+	GMInput* m_host = nullptr;
+};
+
+class IMStateImpl : public IIMState
+{
+public:
+	virtual void activate(GMKeyboardLayout layout);
+};
 
 GMXInputWrapper::GMXInputWrapper()
 	: m_xinputGetState(nullptr)
@@ -423,6 +447,8 @@ GMXInputWrapper::~GMXInputWrapper()
 
 GMInput::GMInput(IWindow* window)
 {
+	GM_CREATE_DATA();
+
 	D(d);
 	d->window = window;
 	d->joystickImpl = new JoystickStateImpl(this);
@@ -473,7 +499,7 @@ IMouseState& GMInput::getMouseState()
 	return *d->mouseImpl;
 }
 
-IIMState& gm::GMInput::getIMState()
+IIMState& GMInput::getIMState()
 {
 	D(d);
 	GM_ASSERT(d->imImpl);
@@ -514,10 +540,41 @@ void GMInput::handleSystemEvent(GMSystemEvent* event)
 	}
 }
 
+GMInput::Data& GMInput::dataRef()
+{
+	D(d);
+	return *d;
+}
+
+void GMInput::recordMouseDown(GMMouseButton button)
+{
+	D(d);
+	d->mouseState.downButton |= button;
+}
+
+void GMInput::recordMouseMove()
+{
+	D(d);
+	d->mouseState.moving = true;
+}
+
+void GMInput::recordWheel(bool wheeled, GMshort delta)
+{
+	D(d);
+	d->wheelState.wheeled = wheeled;
+	d->wheelState.delta = delta;
+}
+
+void GMInput::recordMouseUp(GMMouseButton button)
+{
+	D(d);
+	d->mouseState.upButton |= button;
+}
+
 //////////////////////////////////////////////////////////////////////////
 void MouseStateImpl::setDetectingMode(bool enable)
 {
-	D_OF(d, m_host);
+	GMInput::Data* d = &m_host->dataRef();
 	if (enable)
 	{
 		const GMRect& rect = d->window->getWindowRect();
@@ -534,7 +591,7 @@ void MouseStateImpl::setDetectingMode(bool enable)
 
 GMMouseState MouseStateImpl::state()
 {
-	D_OF(d, m_host);
+	GMInput::Data* d = &m_host->dataRef();
 	GMMouseState& state = d->mouseState;
 	state.wheeled = d->wheelState.wheeled;
 	state.wheeledDelta = static_cast<GMint32>(d->wheelState.delta);
@@ -576,7 +633,7 @@ GMMouseState MouseStateImpl::state()
 
 GMJoystickState JoystickStateImpl::state()
 {
-	D_OF(d, m_host);
+	GMInput::Data* d = &m_host->dataRef();
 	XINPUT_STATE state;
 	GMJoystickState result = { false };
 
@@ -597,21 +654,21 @@ GMJoystickState JoystickStateImpl::state()
 
 void JoystickStateImpl::vibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed)
 {
-	D_OF(d, m_host);
+	GMInput::Data* d = &m_host->dataRef();
 	XINPUT_VIBRATION v = { leftMotorSpeed, rightMotorSpeed };
 	d->xinput.XInputSetState(0, &v);
 }
 
 bool KeyboardStateImpl::keydown(GMKey key)
 {
-	D_OF(d, m_host);
+	GMInput::Data* d = &m_host->dataRef();
 	return !!(d->keyState[getWindowsKey(key)] & 0x80);
 }
 
 // 表示一个键是否按下一次，长按只算是一次
 bool KeyboardStateImpl::keyTriggered(GMKey key)
 {
-	D_OF(d, m_host);
+	GMInput::Data* d = &m_host->dataRef();
 	return !(d->lastKeyState[getWindowsKey(key)] & 0x80) && (keydown(key));
 }
 
@@ -620,3 +677,5 @@ void IMStateImpl::activate(GMKeyboardLayout layout)
 	std::wstring code = localeToCode(layout).toStdWString();
 	LoadKeyboardLayout(code.c_str(), KLF_ACTIVATE);
 }
+
+END_NS

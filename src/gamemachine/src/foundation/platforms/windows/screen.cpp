@@ -2,6 +2,8 @@
 #include "check.h"
 #include <gmtools.h>
 
+BEGIN_NS
+
 GMint32 GMScreen::horizontalResolutionDpi()
 {
 	static GMint32 dpi = -1;
@@ -25,3 +27,5 @@ GMint32 GMScreen::verticalResolutionDpi()
 	}
 	return dpi;
 }
+
+END_NS

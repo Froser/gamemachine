@@ -61,6 +61,7 @@ class GMGLGraphicEngine : public GMGraphicEngine
 
 public:
 	GMGLGraphicEngine(const IRenderContext* context);
+	~GMGLGraphicEngine();
 
 public:
 	virtual void init() override;

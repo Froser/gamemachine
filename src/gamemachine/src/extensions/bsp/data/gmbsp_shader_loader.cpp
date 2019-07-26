@@ -285,7 +285,7 @@ void GMBSPShaderLoader::parseEnd()
 
 void GMBSPShaderLoader::parse_surfaceparm(GMShader& shader, GMXMLElement* elem)
 {
-	shader.setSurfaceFlag(shader.getFlag() | parseSurfaceParm(elem->GetText()));
+	shader.setFlag(shader.getFlag() | parseSurfaceParm(elem->GetText()));
 }
 
 void GMBSPShaderLoader::parse_cull(GMShader& shader, GMXMLElement* elem)

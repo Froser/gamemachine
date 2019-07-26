@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <GL/glew.h>
+#include "gmdata/gmimage_p.h"
 
 extern "C"
 {

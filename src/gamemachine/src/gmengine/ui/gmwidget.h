@@ -53,6 +53,10 @@ class GMElementBlendColor
 public:
 	GMElementBlendColor();
 	~GMElementBlendColor();
+	GMElementBlendColor(const GMElementBlendColor&);
+	GMElementBlendColor(GMElementBlendColor&&) GM_NOEXCEPT;
+	GMElementBlendColor& operator=(const GMElementBlendColor&);
+	GMElementBlendColor& operator=(GMElementBlendColor&&) GM_NOEXCEPT;
 
 public:
 	void init(const GMVec4& defaultColor, const GMVec4& disabledColor = GMVec4(.5f, .5f, .5f, .78f), const GMVec4& hiddenColor = GMVec4(0));

@@ -1,8 +1,11 @@
 ﻿#include "stdafx.h"
 #include "gmengine/ui/gmwindow.h"
+#include "gmengine/ui/gmwindow_p.h"
 #include <gmdx11helper.h>
 #include "foundation/gamemachine.h"
 #include "gmdx11/gmdx11graphic_engine.h"
+
+BEGIN_NS
 
 namespace
 {
@@ -42,11 +45,11 @@ GMComPtr<ID3D11DeviceContext> GM_PRIVATE_NAME(GMWindow_Dx11)::deviceContext;
 
 class GMWindow_Dx11 : public GMWindow
 {
-	GM_DECLARE_PRIVATE_NGO(GMWindow_Dx11)
-	typedef GMWindow Base;
+	GM_DECLARE_PRIVATE(GMWindow_Dx11)
+	GM_DECLARE_BASE(GMWindow)
 
 public:
-	GMWindow_Dx11() = default;
+	GMWindow_Dx11();
 	~GMWindow_Dx11();
 
 public:
@@ -58,6 +61,11 @@ public:
 protected:
 	virtual void onWindowCreated(const GMWindowDesc& attrs) override;
 };
+
+GMWindow_Dx11::GMWindow_Dx11()
+{
+	GM_CREATE_DATA();
+}
 
 GMWindow_Dx11::~GMWindow_Dx11()
 {
@@ -350,3 +358,5 @@ bool GMWindowFactory::createWindowWithDx11(GMInstance instance, IWindow* parent,
 		return true;
 	return false;
 }
+
+END_NS

@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmimagereader_tga.h"
 #include "foundation/utilities/tools.h"
+#include "gmdata/gmimage_p.h"
 
 BEGIN_NS
 

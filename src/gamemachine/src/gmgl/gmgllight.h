@@ -4,27 +4,15 @@
 #include <gmlight.h>
 BEGIN_NS
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMGLLight)
-{
-	struct LightIndices
-	{
-		GMint32 Color;
-		GMint32 Position;
-		GMint32 Type;
-		GMint32 AttenuationConstant;
-		GMint32 AttenuationLinear;
-		GMint32 AttenuationExp;
-		GMint32 AmbientIntensity;
-		GMint32 DiffuseIntensity;
-		GMint32 SpecularIntensity;
-	};
-	Vector<Vector<LightIndices>> lightIndices;
-};
-
+GM_PRIVATE_CLASS(GMGLLight);
 class GMGLLight : public GMLight
 {
-	GM_DECLARE_PRIVATE_NGO(GMGLLight)
-	typedef GMLight Base;
+	GM_DECLARE_PRIVATE(GMGLLight)
+	GM_DECLARE_BASE(GMLight)
+
+public:
+	GMGLLight();
+	~GMGLLight();
 
 public:
 	virtual void activateLight(GMuint32, ITechnique*) override;
@@ -44,22 +32,17 @@ public:
 	}
 };
 
-GM_PRIVATE_OBJECT_UNALIGNED_FROM(GMGLDirectionalLight, GMDirectionalLight_t)
-{
-	struct LightIndices
-	{
-		GMint32 Direction;
-	};
-
-	Vector<Vector<LightIndices>> lightIndices;
-};
-
+GM_PRIVATE_CLASS(GMGLDirectionalLight);
 class GMGLDirectionalLight : public GMGLLight
 {
-	GM_DECLARE_PRIVATE_NGO(GMGLDirectionalLight)
-	typedef GMGLLight Base;
+	GM_DECLARE_PRIVATE(GMGLDirectionalLight)
+	GM_DECLARE_BASE(GMGLLight)
 
 	enum { DirectionalLight = 1 };
+
+public:
+	GMGLDirectionalLight();
+	~GMGLDirectionalLight();
 
 public:
 	virtual int getLightType() override
@@ -71,22 +54,17 @@ public:
 	virtual void activateLight(GMuint32, ITechnique*) override;
 };
 
-GM_PRIVATE_OBJECT_UNALIGNED_FROM(GMGLSpotlight, GMSpotlight_t)
-{
-	struct LightIndices
-	{
-		GMint32 CutOff;
-	};
-
-	Vector<Vector<LightIndices>> lightIndices;
-};
-
+GM_PRIVATE_CLASS(GMGLSpotlight);
 class GMGLSpotlight : public GMGLDirectionalLight
 {
-	GM_DECLARE_PRIVATE_NGO(GMGLSpotlight)
-	typedef GMGLDirectionalLight Base;
+	GM_DECLARE_PRIVATE(GMGLSpotlight)
+	GM_DECLARE_BASE(GMGLDirectionalLight)
 
 	enum { Spotlight = 2 };
+
+public:
+	GMGLSpotlight();
+	~GMGLSpotlight();
 
 public:
 	virtual int getLightType() override

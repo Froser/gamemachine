@@ -77,6 +77,7 @@ set(SOURCES
 		gmengine/gmdemogameworld.h
 		gmengine/gmdemogameworld.cpp
 		gmengine/gmtypoengine.h
+		gmengine/gmtypoengine_p.h
 		gmengine/gmtypoengine.cpp
 		gmengine/gmgbuffer.h
 		gmengine/gmgbuffer_p.h
@@ -186,6 +187,7 @@ set(SOURCES
 		foundation/gmbuffer.h
 		foundation/gmbuffer.cpp
 		foundation/gamemachine.h
+		foundation/gamemachine_p.h
 		foundation/gamemachine.cpp
 		foundation/interfaces.h
 		foundation/gmvariant.h

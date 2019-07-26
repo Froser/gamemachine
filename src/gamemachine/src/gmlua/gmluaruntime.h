@@ -3,16 +3,14 @@
 #include <gmcommon.h>
 BEGIN_NS
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMLuaRuntime)
-{
-	Set<IDestroyObject*> autoReleasePool;
-};
-
+GM_PRIVATE_CLASS(GMLuaRuntime);
 class GMLuaRuntime
 {
-	GM_DECLARE_PRIVATE_NGO(GMLuaRuntime)
+	GM_DECLARE_PRIVATE(GMLuaRuntime)
+	GM_DISABLE_COPY_ASSIGN(GMLuaRuntime)
 
 public:
+	GMLuaRuntime();
 	~GMLuaRuntime();
 
 public:

@@ -7,15 +7,16 @@ BEGIN_NS
 
 namespace luaapi
 {
-	GM_PRIVATE_OBJECT(GMModelProxy)
-	{
-		GM_LUA_PROXY_FUNC(__index);
-	};
-
+	GM_PRIVATE_CLASS(GMModelProxy);
 	class GMModelProxy : public GMAnyProxy
 	{
 		GM_LUA_PROXY_OBJ(GMModel, GMAnyProxy)
-		GM_DECLARE_PRIVATE_AND_BASE(GMModelProxy, GMAnyProxy)
+		GM_DECLARE_PRIVATE(GMModelProxy)
+		GM_DECLARE_BASE(GMAnyProxy)
+
+	public:
+		GMModelProxy(GMLuaCoreState* l, IDestroyObject* handler = nullptr);
+		~GMModelProxy();
 
 	protected:
 		virtual bool registerMeta() override;

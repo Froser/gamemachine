@@ -13,9 +13,9 @@
 
 #define NAME "GMShaderHelper"
 
-using namespace gm::luaapi;
+BEGIN_NS
 
-namespace
+namespace luaapi
 {
 	// {{BEGIN META FUNCTION}}
 	GM_LUA_FUNC(loadShaderOpenGL)
@@ -83,6 +83,8 @@ namespace
 		// {{END META DECLARATIONS}}
 		{ 0, 0 }
 	};
+
+	GM_LUA_REGISTER_IMPL(GMShaderHelper_Meta, NAME, g_meta);
 }
 
-GM_LUA_REGISTER_IMPL(GMShaderHelper_Meta, NAME, g_meta);
+END_NS

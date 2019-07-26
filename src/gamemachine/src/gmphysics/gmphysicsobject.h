@@ -56,6 +56,7 @@ class GM_EXPORT GMPhysicsObject : public GMObject
 
 public:
 	GMPhysicsObject();
+	~GMPhysicsObject();
 
 public:
 	//! 获取物理对象的运动状态。
