@@ -5,7 +5,7 @@
 #include <gmdemogameworld.h>
 #include "demonstration_world.h"
 
-GM_PRIVATE_OBJECT(Demo_Sound)
+GM_PRIVATE_OBJECT_UNALIGNED(Demo_Sound)
 {
 	gm::IAudioFile* wavFile = nullptr;
 	gm::IAudioFile* mp3File = nullptr;
@@ -15,10 +15,11 @@ GM_PRIVATE_OBJECT(Demo_Sound)
 
 class Demo_Sound : public DemoHandler
 {
-	GM_DECLARE_PRIVATE_AND_BASE(Demo_Sound, DemoHandler)
+	GM_DECLARE_PRIVATE(Demo_Sound)
+	GM_DECLARE_BASE(DemoHandler)
 
 public:
-	using Base::Base;
+	Demo_Sound(DemonstrationWorld* parentDemonstrationWorld);
 	~Demo_Sound();
 
 	virtual void onActivate() override;

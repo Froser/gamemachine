@@ -4,7 +4,7 @@
 #include <gmdemogameworld.h>
 #include "demonstration_world.h"
 
-GM_PRIVATE_OBJECT(Demo_Sponza)
+GM_PRIVATE_OBJECT_UNALIGNED(Demo_Sponza)
 {
 	gm::GMGameObject* sponza = nullptr;
 	gm::GMGameObject* skyObject = nullptr;
@@ -16,10 +16,11 @@ GM_PRIVATE_OBJECT(Demo_Sponza)
 
 class Demo_Sponza : public DemoHandler
 {
-	GM_DECLARE_PRIVATE_AND_BASE(Demo_Sponza, DemoHandler)
+	GM_DECLARE_PRIVATE(Demo_Sponza)
+	GM_DECLARE_BASE(DemoHandler)
 
 public:
-	using Base::Base;
+	Demo_Sponza(DemonstrationWorld* parentDemonstrationWorld);
 
 public:
 	virtual void init() override;

@@ -4,7 +4,7 @@
 #include <gmdemogameworld.h>
 #include "demonstration_world.h"
 
-GM_PRIVATE_OBJECT(Demo_Terrain)
+GM_PRIVATE_OBJECT_UNALIGNED(Demo_Terrain)
 {
 	gm::GMAsset terrainScene;
 	gm::GMGameObject* terrain = nullptr;
@@ -15,10 +15,11 @@ GM_PRIVATE_OBJECT(Demo_Terrain)
 
 class Demo_Terrain : public DemoHandler
 {
-	GM_DECLARE_PRIVATE_AND_BASE(Demo_Terrain, DemoHandler)
+	GM_DECLARE_PRIVATE(Demo_Terrain)
+	GM_DECLARE_BASE(DemoHandler)
 
 public:
-	using Base::Base;
+	Demo_Terrain(DemonstrationWorld* parentDemonstrationWorld);
 
 public:
 	virtual void init() override;

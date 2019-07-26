@@ -9,39 +9,37 @@
 #include "extensions/objects/gmwavegameobject.h"
 #include "extensions/objects/gmwavegameobject_p.h"
 
-BEGIN_NS
-
 namespace
 {
-	GMString getFileContent(const GMString& path)
+	gm::GMString getFileContent(const gm::GMString& path)
 	{
-		GMBuffer buffer;
-		GMString filename;
-		GM.getGamePackageManager()->readFile(GMPackageIndex::Shaders, path, &buffer, &filename);
+		gm::GMBuffer buffer;
+		gm::GMString filename;
+		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, path, &buffer, &filename);
 		buffer.convertToStringBuffer();
-		return GMString((const char*)buffer.getData());
+		return gm::GMString((const char*)buffer.getData());
 	}
 }
 
-IFactory* gmdx11_createDirectX11Factory()
+gm::IFactory* gmdx11_createDirectX11Factory()
 {
-	return new GMDx11Factory();
+	return new gm::GMDx11Factory();
 }
 
-void gmdx11_loadShader(const IRenderContext* context, const GMString& fileName)
+void gmdx11_loadShader(const gm::IRenderContext* context, const gm::GMString& fileName)
 {
-	GMDx11Helper::loadShader(context, fileName, L"main.gfx");
-	GMGameObject::setDefaultCullShaderCode(getFileContent(L"dx11/compute/frustumcull.hlsl"));
+	gm::GMDx11Helper::loadShader(context, fileName, L"main.gfx");
+	gm::GMGameObject::setDefaultCullShaderCode(getFileContent(L"dx11/compute/frustumcull.hlsl"));
 }
 
-void gmdx11_loadExtensionShaders(const IRenderContext*)
+void gmdx11_loadExtensionShaders(const gm::IRenderContext*)
 {
-	GMGravityParticleEffect_Cocos2D::setDefaultCodeAndEntry(getFileContent(L"dx11/compute/particle_cocos2d.hlsl"), L"gravity_main");
-	GMRadialParticleEffect_Cocos2D::setDefaultCodeAndEntry(getFileContent(L"dx11/compute/particle_cocos2d.hlsl"), L"radial_main");
-	GMParticleModel_Cocos2D::setDefaultCode(getFileContent(L"dx11/compute/particle_transfer_cocos2d.hlsl"));
+	gm::GMGravityParticleEffect_Cocos2D::setDefaultCodeAndEntry(getFileContent(L"dx11/compute/particle_cocos2d.hlsl"), L"gravity_main");
+	gm::GMRadialParticleEffect_Cocos2D::setDefaultCodeAndEntry(getFileContent(L"dx11/compute/particle_cocos2d.hlsl"), L"radial_main");
+	gm::GMParticleModel_Cocos2D::setDefaultCode(getFileContent(L"dx11/compute/particle_transfer_cocos2d.hlsl"));
 }
 
-void gmdx11_ext_renderWaveObjectShader(GMWaveGameObject* waveObject, IShaderProgram* shaderProgram)
+void gmdx11_ext_renderWaveObjectShader(gm::GMWaveGameObject* waveObject, gm::IShaderProgram* shaderProgram)
 {
 	auto& d = waveObject->dataRef();
 	enum
@@ -56,13 +54,13 @@ void gmdx11_ext_renderWaveObjectShader(GMWaveGameObject* waveObject, IShaderProg
 		d.globalIndices[0].waveCount = shaderProgram->getIndex(WAVE_COUNT);
 		d.globalIndices[0].duration = shaderProgram->getIndex(WAVE_DURATION);
 	});
-	GMint32 waveCount = gm_sizet_to_int(d.waveDescriptions.size());
+	gm::GMint32 waveCount = gm::gm_sizet_to_int(d.waveDescriptions.size());
 	shaderProgram->setInt(d.globalIndices[0].waveCount, waveCount);
 	shaderProgram->setFloat(d.globalIndices[0].duration, d.duration);
 
-	GMComPtr<ID3DX11Effect> effect;
-	shaderProgram->getInterface(GameMachineInterfaceID::D3D11Effect, (void**)&effect);
-	for (GMint32 i = 0; i < waveCount; ++i)
+	gm::GMComPtr<ID3DX11Effect> effect;
+	shaderProgram->getInterface(gm::GameMachineInterfaceID::D3D11Effect, (void**)&effect);
+	for (gm::GMint32 i = 0; i < waveCount; ++i)
 	{
 		GM_ASSERT(effect);
 		auto descriptions = effect->GetVariableByName(WAVE_DESCRIPTION);
@@ -76,5 +74,3 @@ void gmdx11_ext_renderWaveObjectShader(GMWaveGameObject* waveObject, IShaderProg
 		GM_DX_HR(description->GetMemberByName(WAVELENGTH)->AsScalar()->SetFloat(d.waveDescriptions[i].waveLength));
 	}
 }
-
-END_NS

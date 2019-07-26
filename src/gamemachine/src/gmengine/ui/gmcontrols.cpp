@@ -598,6 +598,8 @@ GMControlBorder* GMControlBorder::createControl(
 	return borderControl;
 }
 
+GM_DEFINE_PROPERTY(GMControlBorder, GMRect, Corner, corner);
+GM_DEFINE_PROPERTY(GMControlBorder, GMStyle, BorderStyle, borderStyle);
 GMControlBorder::GMControlBorder(GMWidget* widget) : Base(widget)
 {
 	GM_CREATE_DATA();

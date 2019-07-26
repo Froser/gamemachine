@@ -15,6 +15,13 @@ false				\
 ));					\
 connect(*button, GM_SIGNAL(gm::GMControlButton, click), [=](gm::GMObject* sender, gm::GMObject* receiver) { setEffect(effect); });
 
+
+Demo_Effects::Demo_Effects(DemonstrationWorld* parentDemonstrationWorld)
+	: Base(parentDemonstrationWorld)
+{
+	GM_CREATE_DATA();
+}
+
 void Demo_Effects::init()
 {
 	D_BASE(d, Base);

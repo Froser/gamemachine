@@ -213,6 +213,8 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMAnimationKeyframe)
 	GMInterpolationFunctors functors;
 };
 
+GM_DEFINE_PROPERTY(GMAnimationKeyframe, GMfloat, Time, time);
+GM_DEFINE_PROPERTY(GMAnimationKeyframe, GMInterpolationFunctors, Functors, functors);
 GMAnimationKeyframe::GMAnimationKeyframe(GMfloat timePoint)
 {
 	GM_CREATE_DATA();

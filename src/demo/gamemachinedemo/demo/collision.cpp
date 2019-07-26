@@ -27,6 +27,12 @@ void Demo_Collision::createPhysicsShapeAsset(REF gm::GMPhysicsShapeAsset& asset)
 	gm::GMPhysicsShapeHelper::createCubeShape(GMVec3(.1f, .1f, .1f), asset);
 }
 
+Demo_Collision::Demo_Collision(DemonstrationWorld* parentDemonstrationWorld)
+	: Base(parentDemonstrationWorld)
+{
+	GM_CREATE_DATA();
+}
+
 void Demo_Collision::init()
 {
 	D(d);
@@ -140,7 +146,7 @@ void Demo_Collision::event(gm::GameMachineHandlerEvent evt)
 void Demo_Collision::setLookAt()
 {
 	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
-	camera.setPerspective(Radian(75.f), 1.333f, .1f, 3200);
+	camera.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
 
 	gm::GMCameraLookAt lookAt;
 	lookAt.lookDirection = Normalize(GMVec3(.5f, -.3f, 1));

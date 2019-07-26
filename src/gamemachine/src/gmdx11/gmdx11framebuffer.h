@@ -89,8 +89,8 @@ public:
 
 public:
 	ID3D11ShaderResourceView* getShadowMapShaderResourceView();
-	inline GMint32 getShadowMapWidth() GM_NOEXCEPT;
-	inline GMint32 getShadowMapHeight() GM_NOEXCEPT;
+	GMint32 getShadowMapWidth() GM_NOEXCEPT;
+	GMint32 getShadowMapHeight() GM_NOEXCEPT;
 };
 
 END_NS

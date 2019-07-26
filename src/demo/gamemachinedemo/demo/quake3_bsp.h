@@ -5,8 +5,12 @@
 #include <gmdemogameworld.h>
 #include "demonstration_world.h"
 
-class GMBSPGameWorld;
-GM_PRIVATE_OBJECT(Demo_Quake3_BSP)
+namespace gm
+{
+	class GMBSPGameWorld;
+}
+
+GM_PRIVATE_OBJECT_UNALIGNED(Demo_Quake3_BSP)
 {
 	gm::GMBSPGameWorld* world = nullptr;
 	gm::GMSpriteGameObject* sprite = nullptr;
@@ -15,10 +19,11 @@ GM_PRIVATE_OBJECT(Demo_Quake3_BSP)
 
 class Demo_Quake3_BSP : public DemoHandler
 {
-	GM_DECLARE_PRIVATE_AND_BASE(Demo_Quake3_BSP, DemoHandler)
+	GM_DECLARE_PRIVATE(Demo_Quake3_BSP)
+	GM_DECLARE_BASE(DemoHandler)
 
 public:
-	using Base::Base;
+	Demo_Quake3_BSP(DemonstrationWorld* parentDemonstrationWorld);
 
 public:
 	virtual void init() override;

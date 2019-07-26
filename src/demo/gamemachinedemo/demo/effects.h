@@ -6,17 +6,18 @@
 #include "demonstration_world.h"
 #include "texture.h"
 
-GM_PRIVATE_OBJECT(Demo_Effects)
+GM_PRIVATE_OBJECT_UNALIGNED(Demo_Effects)
 {
 	gm::GMFilterMode::Mode mode = gm::GMFilterMode::None;
 };
 
 class Demo_Effects : public Demo_Texture
 {
-	GM_DECLARE_PRIVATE_AND_BASE(Demo_Effects, Demo_Texture)
+	GM_DECLARE_PRIVATE(Demo_Effects)
+	GM_DECLARE_BASE(Demo_Texture)
 
 public:
-	using Base::Base;
+	Demo_Effects(DemonstrationWorld* parentDemonstrationWorld);
 
 	virtual void init() override;
 	virtual void onActivate() override;

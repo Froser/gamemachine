@@ -13,11 +13,11 @@ GM_PRIVATE_OBJECT_UNALIGNED(Demo_Async)
 
 class Demo_Async : public DemoHandler
 {
-	GM_DECLARE_PRIVATE_NGO(Demo_Async)
-	typedef DemoHandler Base;
+	GM_DECLARE_PRIVATE(Demo_Async)
+	GM_DECLARE_BASE(DemoHandler)
 
 public:
-	using DemoHandler::DemoHandler;
+	Demo_Async(DemonstrationWorld* parentDemonstrationWorld);
 
 public:
 	virtual void init() override;

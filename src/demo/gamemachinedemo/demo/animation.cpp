@@ -4,6 +4,12 @@
 #include <gmwidget.h>
 #include <gmmodelreader.h>
 
+Demo_MD5Mesh::Demo_MD5Mesh(DemonstrationWorld* parentDemonstrationWorld)
+	: Base(parentDemonstrationWorld)
+{
+	GM_CREATE_DATA();
+}
+
 void Demo_MD5Mesh::init()
 {
 	D(d);

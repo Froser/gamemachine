@@ -31,6 +31,13 @@ void Demo_CSM::setLookAt()
 	d->lookAtRotation = Identity<GMQuat>();
 }
 
+
+Demo_CSM::Demo_CSM(DemonstrationWorld* parentDemonstrationWorld)
+	: Base(parentDemonstrationWorld)
+{
+	GM_CREATE_DATA();
+}
+
 void Demo_CSM::init()
 {
 	D(d);

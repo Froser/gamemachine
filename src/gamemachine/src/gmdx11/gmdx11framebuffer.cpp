@@ -554,13 +554,13 @@ ID3D11ShaderResourceView* GMDx11ShadowFramebuffers::getShadowMapShaderResourceVi
 	return d->depthShaderResourceView;
 }
 
-inline GMint32 GMDx11ShadowFramebuffers::getShadowMapWidth() GM_NOEXCEPT
+GMint32 GMDx11ShadowFramebuffers::getShadowMapWidth() GM_NOEXCEPT
 {
 	D(d);
 	return d->width;
 }
 
-inline GMint32 GMDx11ShadowFramebuffers::getShadowMapHeight() GM_NOEXCEPT
+GMint32 GMDx11ShadowFramebuffers::getShadowMapHeight() GM_NOEXCEPT
 {
 	D(d);
 	return d->height;

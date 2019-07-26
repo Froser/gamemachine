@@ -90,6 +90,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMRenderTechnique)
 	GMRenderTechniques* parent = nullptr;
 };
 
+GM_DEFINE_PROPERTY(GMRenderTechnique, GMShaderType, ShaderType, shaderType)
 GMRenderTechnique::GMRenderTechnique(GMShaderType shaderType)
 {
 	GM_CREATE_DATA();
@@ -171,6 +172,17 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMRenderTechniques)
 	Vector<GMRenderTechnique> techniques;
 };
 
+GM_DEFINE_PROPERTY(GMRenderTechniques, GMRenderTechniqueID, Id, id)
+GMRenderTechniques::GMRenderTechniques()
+{
+	GM_CREATE_DATA();
+}
+
+GMRenderTechniques::~GMRenderTechniques()
+{
+
+}
+
 GMRenderTechniques::GMRenderTechniques(const GMRenderTechniques& rhs)
 {
 	*this = rhs;
@@ -179,11 +191,6 @@ GMRenderTechniques::GMRenderTechniques(const GMRenderTechniques& rhs)
 GMRenderTechniques::GMRenderTechniques(GMRenderTechniques&& rhs) GM_NOEXCEPT
 {
 	*this = std::move(rhs);
-}
-
-GMRenderTechniques::~GMRenderTechniques()
-{
-
 }
 
 GMRenderTechniques& GMRenderTechniques::operator=(const GMRenderTechniques& rhs)

@@ -5,7 +5,7 @@
 #include "demonstration_world.h"
 #include <extensions/objects/gmwavegameobject.h>
 
-GM_PRIVATE_OBJECT(Demo_Wave)
+GM_PRIVATE_OBJECT_UNALIGNED(Demo_Wave)
 {
 	gm::GMWaveGameObject* wave = nullptr;
 	gm::GMGameObject* skyObject = nullptr;
@@ -17,10 +17,11 @@ GM_PRIVATE_OBJECT(Demo_Wave)
 
 class Demo_Wave : public DemoHandler
 {
-	GM_DECLARE_PRIVATE_AND_BASE(Demo_Wave, DemoHandler)
+	GM_DECLARE_PRIVATE(Demo_Wave)
+	GM_DECLARE_BASE(DemoHandler)
 
 public:
-	using Base::Base;
+	Demo_Wave(DemonstrationWorld* parentDemonstrationWorld);
 
 public:
 	virtual void init() override;
@@ -46,11 +47,6 @@ protected:
 		static gm::GMString desc = L"绘制一个水波。晃动鼠标以调整视角。R键显示鼠标。";
 		return desc;
 	}
-};
-
-GM_PRIVATE_OBJECT(Demo_CleanWater)
-{
-	gm::GMGameObject* ground = nullptr;
 };
 
 #endif

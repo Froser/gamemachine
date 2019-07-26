@@ -14,6 +14,12 @@ GM_PRIVATE_OBJECT_ALIGNED(GMMaterial)
 	HashMap<GMString, GMVariant, GMStringHashFunctor> customMaterials;
 };
 
+GM_DEFINE_PROPERTY(GMMaterial, GMfloat, Shininess, shininess)
+GM_DEFINE_PROPERTY(GMMaterial, GMfloat, Refractivity, refractivity)
+GM_DEFINE_PROPERTY(GMMaterial, GMVec3, Ambient, ambient)
+GM_DEFINE_PROPERTY(GMMaterial, GMVec3, Specular, specular)
+GM_DEFINE_PROPERTY(GMMaterial, GMVec3, Diffuse, diffuse)
+GM_DEFINE_PROPERTY(GMMaterial, GMVec3, F0, f0)
 GMMaterial::GMMaterial()
 {
 	GM_CREATE_DATA();

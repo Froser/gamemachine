@@ -64,6 +64,12 @@ namespace
 
 }
 
+Demo_Wave::Demo_Wave(DemonstrationWorld* parentDemonstrationWorld)
+	: Base(parentDemonstrationWorld)
+{
+	GM_CREATE_DATA();
+}
+
 void Demo_Wave::init()
 {
 	Base::init();
@@ -247,7 +253,7 @@ void Demo_Wave::event(gm::GameMachineHandlerEvent evt)
 			gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputManager();
 			gm::IMouseState& mouseState = inputManager->getMouseState();
 			auto ms = mouseState.state();
-			d->cameraUtility.update(Radian(-ms.deltaX * mouseSensitivity), Radian(-ms.deltaY * mouseSensitivity));
+			d->cameraUtility.update(Radians(-ms.deltaX * mouseSensitivity), Radians(-ms.deltaY * mouseSensitivity));
 
 			gm::IKeyboardState& kbState = inputManager->getKeyboardState();
 			if (kbState.keyTriggered(gm::GM_ASCIIToKey('R')))
@@ -276,7 +282,7 @@ void Demo_Wave::event(gm::GameMachineHandlerEvent evt)
 void Demo_Wave::setLookAt()
 {
 	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
-	camera.setPerspective(Radian(75.f), 1.333f, .1f, 3200);
+	camera.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
 
 	gm::GMCameraLookAt lookAt;
 	lookAt.lookDirection = Normalize(GMVec3(0, -.5f, 1));

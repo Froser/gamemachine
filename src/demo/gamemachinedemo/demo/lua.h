@@ -7,7 +7,7 @@
 #include "demonstration_world.h"
 #include <gmcontroltextedit.h>
 
-GM_PRIVATE_OBJECT(Demo_Lua)
+GM_PRIVATE_OBJECT_UNALIGNED(Demo_Lua)
 {
 	gm::GMControlTextArea* textCode = nullptr;
 	gm::GMControlLabel* lbState = nullptr;
@@ -16,10 +16,11 @@ GM_PRIVATE_OBJECT(Demo_Lua)
 
 class Demo_Lua : public DemoHandler
 {
-	GM_DECLARE_PRIVATE_AND_BASE(Demo_Lua, DemoHandler);
+	GM_DECLARE_PRIVATE(Demo_Lua);
+	GM_DECLARE_BASE(DemoHandler)
 
 public:
-	using Base::Base;
+	Demo_Lua(DemonstrationWorld* parentDemonstrationWorld);
 
 public:
 	virtual void init() override;

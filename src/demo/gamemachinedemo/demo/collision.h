@@ -11,7 +11,7 @@ namespace gm
 	class GMPoint2PointConstraint;
 }
 
-GM_PRIVATE_OBJECT(Demo_Collision)
+GM_PRIVATE_OBJECT_ALIGNED(Demo_Collision)
 {
 	gm::GMGameObject* ground = nullptr;
 	gm::GMPhysicsObject* firstPhyObj = nullptr;
@@ -31,10 +31,11 @@ GM_PRIVATE_OBJECT(Demo_Collision)
 
 class Demo_Collision : public DemoHandler
 {
-	GM_DECLARE_PRIVATE_AND_BASE(Demo_Collision, DemoHandler)
+	GM_DECLARE_PRIVATE(Demo_Collision)
+	GM_DECLARE_BASE(DemoHandler)
 
 public:
-	using Base::Base;
+	Demo_Collision(DemonstrationWorld* parentDemonstrationWorld);
 
 public:
 	virtual void init() override;

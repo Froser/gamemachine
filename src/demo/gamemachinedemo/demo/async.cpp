@@ -3,6 +3,13 @@
 #include <gmm.h>
 #include <gmmodelreader.h>
 
+
+Demo_Async::Demo_Async(DemonstrationWorld* parentDemonstrationWorld)
+	: Base(parentDemonstrationWorld)
+{
+	GM_CREATE_DATA();
+}
+
 void Demo_Async::init()
 {
 	D(d);

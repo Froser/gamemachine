@@ -5,6 +5,12 @@
 #include <gmwidget.h>
 #include <gmcontrols.h>
 
+Demo_Sound::Demo_Sound(DemonstrationWorld* parentDemonstrationWorld)
+	: Base(parentDemonstrationWorld)
+{
+	GM_CREATE_DATA();
+}
+
 Demo_Sound::~Demo_Sound()
 {
 	D(d);

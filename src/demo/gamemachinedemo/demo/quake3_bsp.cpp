@@ -26,7 +26,7 @@ void Demo_Quake3_BSP::setLookAt()
 {
 	// 设置一个默认视角
 	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
-	camera.setPerspective(Radian(75.f), 1.333f, .1f, 3200);
+	camera.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
 	getDemonstrationWorld()->getContext()->getEngine()->getCamera().updateViewMatrix();
 }
 
@@ -46,6 +46,12 @@ void Demo_Quake3_BSP::setMouseTrace(bool enabled)
 
 	// 鼠标跟踪开启时，detecting mode也开启，每一帧将返回窗口中心，以获取鼠标移动偏量
 	mouseState.setDetectingMode(d->mouseTrace);
+}
+
+Demo_Quake3_BSP::Demo_Quake3_BSP(DemonstrationWorld* parentDemonstrationWorld)
+	: Base(parentDemonstrationWorld)
+{
+	GM_CREATE_DATA();
 }
 
 void Demo_Quake3_BSP::init()
@@ -216,10 +222,10 @@ void Demo_Quake3_BSP::event(gm::GameMachineHandlerEvent evt)
 
 			joystickPitch = state.thumbRY * joystickSensitivity * rate;
 		}
-		d->sprite->look(Radian(joystickPitch), Radian(joystickYaw));
+		d->sprite->look(Radians(joystickPitch), Radians(joystickYaw));
 
 		gm::GMMouseState ms = mouseState.state();
-		d->sprite->look(Radian(-ms.deltaY * mouseSensitivity), Radian(-ms.deltaX * mouseSensitivity));
+		d->sprite->look(Radians(-ms.deltaY * mouseSensitivity), Radians(-ms.deltaX * mouseSensitivity));
 		
 		if (kbState.keyTriggered(gm::GM_ASCIIToKey('R')))
 			setMouseTrace(!d->mouseTrace);

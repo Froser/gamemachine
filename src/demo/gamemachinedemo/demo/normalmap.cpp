@@ -3,6 +3,12 @@
 #include <linearmath.h>
 #include <gmcontrols.h>
 
+Demo_NormalMap::Demo_NormalMap(DemonstrationWorld* parentDemonstrationWorld)
+	: Base(parentDemonstrationWorld)
+{
+	GM_CREATE_DATA();
+}
+
 void Demo_NormalMap::init()
 {
 	D(d);

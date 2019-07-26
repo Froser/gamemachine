@@ -46,6 +46,11 @@ GMImageBuffer::GMImageBuffer(GMImageFormat format, GMuint32 width, GMuint32 heig
 	generateData();
 }
 
+GMImageBuffer::~GMImageBuffer()
+{
+
+}
+
 void GMImageBuffer::generateData()
 {
 	D(d);

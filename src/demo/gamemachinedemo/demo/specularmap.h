@@ -5,7 +5,7 @@
 #include <gmdemogameworld.h>
 #include "demonstration_world.h"
 
-GM_PRIVATE_OBJECT(Demo_SpecularMap)
+GM_PRIVATE_OBJECT_ALIGNED(Demo_SpecularMap)
 {
 	gm::GMGameObject* gameObject = nullptr;
 	gm::GMGameObject* gameObject2 = nullptr;
@@ -18,10 +18,11 @@ GM_PRIVATE_OBJECT(Demo_SpecularMap)
 
 class Demo_SpecularMap : public DemoHandler
 {
-	GM_DECLARE_PRIVATE_AND_BASE(Demo_SpecularMap, DemoHandler)
+	GM_DECLARE_PRIVATE(Demo_SpecularMap)
+	GM_DECLARE_BASE(DemoHandler)
 
 public:
-	using Base::Base;
+	Demo_SpecularMap(DemonstrationWorld* parentDemonstrationWorld);
 
 public:
 	virtual void init() override;

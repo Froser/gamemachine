@@ -48,15 +48,18 @@ namespace luaapi
 	}
 	// {{END META FUNCTION}}
 
-	GMLuaReg g_meta[] = {
-		// {{BEGIN META DECLARATIONS}}
-		GM_LUA_DECLARATIONS(info),
-		GM_LUA_DECLARATIONS(error),
-		GM_LUA_DECLARATIONS(warning),
-		GM_LUA_DECLARATIONS(debug),
-		// {{END META DECLARATIONS}}
-		{ 0, 0 }
-	};
+	namespace
+	{
+		GMLuaReg g_meta[] = {
+			// {{BEGIN META DECLARATIONS}}
+			GM_LUA_DECLARATIONS(info),
+			GM_LUA_DECLARATIONS(error),
+			GM_LUA_DECLARATIONS(warning),
+			GM_LUA_DECLARATIONS(debug),
+			// {{END META DECLARATIONS}}
+			{ 0, 0 }
+		};
+	}
 
 	GM_LUA_REGISTER_IMPL(GMDebugger_Meta, NAME, g_meta);
 }

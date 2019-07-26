@@ -11,17 +11,18 @@ namespace gm
 	class GMGameObject;
 }
 
-GM_PRIVATE_OBJECT(Demo_MD5Mesh)
+GM_PRIVATE_OBJECT_UNALIGNED(Demo_MD5Mesh)
 {
 	gm::GMGameObject* object = nullptr;
 };
 
 class Demo_MD5Mesh : public DemoHandler
 {
-	GM_DECLARE_PRIVATE_AND_BASE(Demo_MD5Mesh, DemoHandler)
+	GM_DECLARE_PRIVATE(Demo_MD5Mesh)
+	GM_DECLARE_BASE(DemoHandler)
 
 public:
-	using Base::Base;
+	Demo_MD5Mesh(DemonstrationWorld* parentDemonstrationWorld);
 
 	virtual void init() override;
 	virtual void event(gm::GameMachineHandlerEvent evt) override;

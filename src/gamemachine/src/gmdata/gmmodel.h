@@ -361,18 +361,11 @@ public:
 	GMScene();
 	void addModelAsset(GMModelAsset model);
 	void swap(GMScene* scene);
-
-public:
-	inline bool isEmpty() GM_NOEXCEPT;
-
+	bool isEmpty() GM_NOEXCEPT;
 	GMSkeletalAnimations* getAnimations() GM_NOEXCEPT;
-
 	void setAnimations(AUTORELEASE GMSkeletalAnimations* animations);
-
 	void setRootNode(GMNode* root);
-
 	bool hasAnimation() GM_NOEXCEPT;
-
 	GMNode* getRootNode() GM_NOEXCEPT;
 
 public:

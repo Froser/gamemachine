@@ -48,6 +48,13 @@ void Demo_Particle2D::init()
 	d->particleSystemManager->addParticleSystem(psLeaves);
 }
 
+
+Demo_Particle2D::Demo_Particle2D(DemonstrationWorld* parentDemonstrationWorld)
+	: Base(parentDemonstrationWorld)
+{
+	GM_CREATE_DATA();
+}
+
 void Demo_Particle2D::setLookAt()
 {
 	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
@@ -119,11 +126,18 @@ void Demo_ParticleBillboard::init()
 	}
 }
 
+
+Demo_ParticleBillboard::Demo_ParticleBillboard(DemonstrationWorld* parentDemonstrationWorld)
+	: Base(parentDemonstrationWorld)
+{
+	GM_CREATE_DATA();
+}
+
 void Demo_ParticleBillboard::setLookAt()
 {
 	D(d);
 	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
-	camera.setPerspective(Radian(75.f), 1.333f, .1f, 3200);
+	camera.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
 
 	gm::GMCameraLookAt lookAt;
 	camera.lookAt(s_lookAt);
@@ -178,6 +192,6 @@ void Demo_ParticleBillboard::handleMouseEvent()
 		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputManager();
 		gm::IMouseState& mouseState = inputManager->getMouseState();
 		auto ms = mouseState.state();
-		d->cameraUtility.update(Radian(-ms.deltaX * mouseSensitivity), Radian(-ms.deltaY * mouseSensitivity));
+		d->cameraUtility.update(Radians(-ms.deltaX * mouseSensitivity), Radians(-ms.deltaY * mouseSensitivity));
 	}
 }

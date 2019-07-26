@@ -7,7 +7,7 @@
 #include "texture.h"
 #include <gmparticle.h>
 
-GM_PRIVATE_OBJECT(Demo_Particle2D)
+GM_PRIVATE_OBJECT_UNALIGNED(Demo_Particle2D)
 {
 	gm::GMFilterMode::Mode mode = gm::GMFilterMode::None;
 	gm::GMOwnedPtr<gm::IParticleSystemManager> particleSystemManager;
@@ -15,10 +15,11 @@ GM_PRIVATE_OBJECT(Demo_Particle2D)
 
 class Demo_Particle2D : public DemoHandler
 {
-	GM_DECLARE_PRIVATE_AND_BASE(Demo_Particle2D, DemoHandler)
+	GM_DECLARE_PRIVATE(Demo_Particle2D)
+	GM_DECLARE_BASE(DemoHandler)
 
 public:
-	using Base::Base;
+	Demo_Particle2D(DemonstrationWorld* parentDemonstrationWorld);
 	virtual void setLookAt() override;
 	virtual void init() override;
 	virtual void event(gm::GameMachineHandlerEvent evt) override;
@@ -31,8 +32,7 @@ protected:
 	}
 };
 
-
-GM_PRIVATE_OBJECT(Demo_ParticleBillboard)
+GM_PRIVATE_OBJECT_UNALIGNED(Demo_ParticleBillboard)
 {
 	gm::GMFilterMode::Mode mode = gm::GMFilterMode::None;
 	gm::GMOwnedPtr<gm::IParticleSystemManager> particleSystemManager;
@@ -42,10 +42,12 @@ GM_PRIVATE_OBJECT(Demo_ParticleBillboard)
 
 class Demo_ParticleBillboard : public DemoHandler
 {
-	GM_DECLARE_PRIVATE_AND_BASE(Demo_ParticleBillboard, DemoHandler)
+	GM_DECLARE_PRIVATE(Demo_ParticleBillboard)
+	GM_DECLARE_BASE(DemoHandler)
 
 public:
-	using Base::Base;
+	Demo_ParticleBillboard(DemonstrationWorld* parentDemonstrationWorld);
+
 	virtual void setLookAt() override;
 	virtual void init() override;
 	virtual void event(gm::GameMachineHandlerEvent evt) override;

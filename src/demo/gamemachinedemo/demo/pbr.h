@@ -5,7 +5,7 @@
 #include <gmdemogameworld.h>
 #include "demonstration_world.h"
 
-GM_PRIVATE_OBJECT(Demo_PBR)
+GM_PRIVATE_OBJECT_ALIGNED(Demo_PBR)
 {
 	gm::GMGameObject* gameObject = nullptr;
 	gm::GMint32 mouseDownX;
@@ -19,10 +19,11 @@ GM_PRIVATE_OBJECT(Demo_PBR)
 
 class Demo_PBR : public DemoHandler
 {
-	GM_DECLARE_PRIVATE_AND_BASE(Demo_PBR, DemoHandler)
+	GM_DECLARE_PRIVATE(Demo_PBR)
+	GM_DECLARE_BASE(DemoHandler)
 
 public:
-	using Base::Base;
+	Demo_PBR(DemonstrationWorld* parentDemonstrationWorld);
 
 public:
 	virtual void init() override;

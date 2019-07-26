@@ -4,6 +4,13 @@
 #include <gmwidget.h>
 #include <gmcontrolbutton.h>
 
+
+Demo_Lua::Demo_Lua(DemonstrationWorld* parentDemonstrationWorld)
+	: Base(parentDemonstrationWorld)
+{
+	GM_CREATE_DATA();
+}
+
 void Demo_Lua::init()
 {
 	D(d);

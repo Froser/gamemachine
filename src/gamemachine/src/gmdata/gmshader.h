@@ -112,7 +112,7 @@ enum class GMIlluminationModel
 
 // 光照参数
 GM_PRIVATE_CLASS(GMMaterial);
-class GMMaterial : public IDestroyObject
+class GM_EXPORT GMMaterial : public IDestroyObject
 {
 	GM_DECLARE_PRIVATE(GMMaterial)
 	GM_DECLARE_PROPERTY(GMfloat, Shininess)

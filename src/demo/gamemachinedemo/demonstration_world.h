@@ -17,7 +17,9 @@ namespace gm
 }
 
 class DemonstrationWorld;
-GM_PRIVATE_OBJECT(DemoHandler)
+
+
+GM_PRIVATE_OBJECT_UNALIGNED(DemoHandler)
 {
 	gm::GMRenderConfig renderConfig;
 	gm::GMDebugConfig debugConfig;
@@ -43,7 +45,7 @@ class DemoHandler : public gm::GMObject
 
 public:
 	DemoHandler(DemonstrationWorld* parentDemonstrationWorld);
-	~DemoHandler() = default;
+	~DemoHandler();
 
 public:
 	virtual void init();
@@ -63,24 +65,9 @@ protected:
 	void backToEntrance();
 	bool isActivating();
 	gm::GMint32 getClientAreaTop();
-
-	inline gm::GMOwnedPtr<gm::GMGameWorld>& getDemoWorldReference()
-	{
-		D(d);
-		return d->demoWorld;
-	}
-
-	inline DemonstrationWorld* getDemonstrationWorld()
-	{
-		D(d);
-		return d->parentDemonstrationWorld;
-	}
-
-	inline const GMVec4& getLabelFontColor()
-	{
-		static GMVec4 c(1, 1, 1, 1);
-		return c;
-	}
+	gm::GMOwnedPtr<gm::GMGameWorld>& getDemoWorldReference();
+	DemonstrationWorld* getDemonstrationWorld();
+	const GMVec4& getLabelFontColor();
 
 private:
 	void switchNormal();
@@ -89,7 +76,8 @@ private:
 typedef Pair<gm::GMString, DemoHandler*> GameHandlerItem;
 typedef Vector<GameHandlerItem> DemoHandlers;
 
-GM_PRIVATE_OBJECT(DemonstrationWorld)
+
+GM_PRIVATE_OBJECT_UNALIGNED(DemonstrationWorld)
 {
 	DemoHandlers demos;
 	DemoHandler* currentDemo = nullptr;
@@ -107,18 +95,19 @@ GM_PRIVATE_OBJECT(DemonstrationWorld)
 
 class DemonstrationWorld : public gm::GMGameWorld
 {
-	GM_DECLARE_PRIVATE_AND_BASE(DemonstrationWorld, gm::GMGameWorld)
+	GM_DECLARE_PRIVATE(DemonstrationWorld)
+	GM_DECLARE_BASE(gm::GMGameWorld)
 
 public:
 	DemonstrationWorld(const gm::IRenderContext*, gm::IWindow*);
 	~DemonstrationWorld();
 
 public:
-	inline DemoHandler* getCurrentDemo() { D(d); return d->currentDemo; }
-	void setCurrentDemo(DemoHandler* demo) { D(d); d->currentDemo = demo; }
-	void setCurrentDemo(gm::GMint32 index) { D(d); d->currentDemo = d->demos[0].second; }
-	inline gm::GMWidget* getMainWidget() { D(d); return d->mainWidget; }
-	inline gm::GMWidget* getBillboardWidget() { D(d); return d->billboard; }
+	DemoHandler* getCurrentDemo();
+	void setCurrentDemo(DemoHandler* demo);
+	void setCurrentDemo(gm::GMint32 index);
+	gm::GMWidget* getMainWidget();
+	gm::GMWidget* getBillboardWidget();
 
 public:
 	void addDemo(const gm::GMString& name, AUTORELEASE DemoHandler* demo);
@@ -130,35 +119,11 @@ public:
 	void invokeThreadFunctions();
 
 public:
-	gm::IWindow* getMainWindow()
-	{
-		D(d);
-		return d->mainWindow;
-	}
-
-	gm::GMWidgetResourceManager* getManager()
-	{
-		D(d);
-		return d->manager;
-	}
-
-	gm::GMUIConfiguration* getUIConfiguration()
-	{
-		D(d);
-		return d->configuration.get();
-	}
-
-	gm::GMPrimitiveManager* getPrimitiveManager()
-	{
-		D(d);
-		return getContext()->getEngine()->getPrimitiveManager();
-	}
-
-	gm::GMAnimation& getLogoAnimation() GM_NOEXCEPT
-	{
-		D(d);
-		return d->logoAnimation;
-	}
+	gm::IWindow* getMainWindow();
+	gm::GMWidgetResourceManager* getManager();
+	gm::GMUIConfiguration* getUIConfiguration();
+	gm::GMPrimitiveManager* getPrimitiveManager();
+	gm::GMAnimation& getLogoAnimation();
 
 private:
 	void initObjects();
@@ -174,14 +139,14 @@ GM_PRIVATE_OBJECT_UNALIGNED(DemostrationEntrance)
 
 class DemostrationEntrance : public gm::IGameHandler, public gm::IShaderLoadCallback
 {
-	GM_DECLARE_PRIVATE_NGO(DemostrationEntrance)
+	GM_DECLARE_PRIVATE(DemostrationEntrance)
 
 public:
 	DemostrationEntrance(gm::IWindow*);
 	~DemostrationEntrance();
 
 public:
-	inline DemonstrationWorld* getWorld() { D(d); return d->world; }
+	DemonstrationWorld* getWorld();
 
 	// IShaderLoadCallback
 private:

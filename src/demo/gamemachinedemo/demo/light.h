@@ -82,9 +82,11 @@ GM_PRIVATE_OBJECT_UNALIGNED(Demo_Light_Directional_Normalmap)
 
 class Demo_Light_Directional_Normalmap : public Demo_Light_Point_NormalMap
 {
-	GM_DECLARE_PRIVATE_NGO(Demo_Light_Directional_Normalmap)
-	typedef Demo_Light_Point_NormalMap Base;
-	using Base::Base;
+	GM_DECLARE_PRIVATE(Demo_Light_Directional_Normalmap)
+	GM_DECLARE_BASE(Demo_Light_Point_NormalMap)
+
+public:
+	Demo_Light_Directional_Normalmap(DemonstrationWorld* parentDemonstrationWorld);
 
 protected:
 	const gm::GMString& getDescription() const

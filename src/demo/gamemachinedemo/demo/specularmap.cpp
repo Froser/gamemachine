@@ -20,9 +20,16 @@ void Demo_SpecularMap::setLookAt()
 {
 	D(d);
 	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
-	camera.setPerspective(Radian(75.f), 1.333f, .1f, 3200);
+	camera.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
 	camera.lookAt(s_lookAt);
 	d->lookAtRotation = Identity<GMQuat>();
+}
+
+
+Demo_SpecularMap::Demo_SpecularMap(DemonstrationWorld* parentDemonstrationWorld)
+	: Base(parentDemonstrationWorld)
+{
+	GM_CREATE_DATA();
 }
 
 void Demo_SpecularMap::init()

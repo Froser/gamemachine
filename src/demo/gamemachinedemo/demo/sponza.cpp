@@ -125,6 +125,12 @@ namespace
 	};
 }
 
+Demo_Sponza::Demo_Sponza(DemonstrationWorld* parentDemonstrationWorld)
+	: Base(parentDemonstrationWorld)
+{
+	GM_CREATE_DATA();
+}
+
 void Demo_Sponza::init()
 {
 	Base::init();
@@ -238,7 +244,7 @@ void Demo_Sponza::event(gm::GameMachineHandlerEvent evt)
 			gm::IMouseState& mouseState = inputManager->getMouseState();
 			auto ms = mouseState.state();
 			if (d->sprite)
-				d->sprite->look(Radian(-ms.deltaY * mouseSensitivity), Radian(-ms.deltaX * mouseSensitivity));
+				d->sprite->look(Radians(-ms.deltaY * mouseSensitivity), Radians(-ms.deltaX * mouseSensitivity));
 
 			gm::IKeyboardState& kbState = inputManager->getKeyboardState();
 			if (kbState.keyTriggered(gm::GM_ASCIIToKey('R')))
@@ -299,7 +305,7 @@ void Demo_Sponza::event(gm::GameMachineHandlerEvent evt)
 void Demo_Sponza::setLookAt()
 {
 	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
-	camera.setPerspective(Radian(75.f), 1.333f, .1f, 3200);
+	camera.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
 
 	gm::GMCameraLookAt lookAt;
 	lookAt.lookDirection = Normalize(GMVec3(0, 0, 1));

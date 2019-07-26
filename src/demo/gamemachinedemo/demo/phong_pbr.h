@@ -5,7 +5,7 @@
 #include <gmdemogameworld.h>
 #include "demonstration_world.h"
 
-GM_PRIVATE_OBJECT(Demo_Phong_PBR)
+GM_PRIVATE_OBJECT_ALIGNED(Demo_Phong_PBR)
 {
 	gm::GMGameObject* gameObject = nullptr;
 	gm::GMGameObject* gameObject_Phong = nullptr;
@@ -20,10 +20,11 @@ GM_PRIVATE_OBJECT(Demo_Phong_PBR)
 
 class Demo_Phong_PBR : public DemoHandler
 {
-	GM_DECLARE_PRIVATE_AND_BASE(Demo_Phong_PBR, DemoHandler)
+	GM_DECLARE_PRIVATE(Demo_Phong_PBR)
+	GM_DECLARE_BASE(DemoHandler)
 
 public:
-	using Base::Base;
+	Demo_Phong_PBR(DemonstrationWorld* parentDemonstrationWorld);
 
 public:
 	virtual void init() override;

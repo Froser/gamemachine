@@ -68,6 +68,7 @@ public:
 public:
 	Data& getData();
 	const Data& getData() const;
+
 	virtual void dispose();
 
 public:

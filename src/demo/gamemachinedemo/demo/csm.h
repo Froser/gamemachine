@@ -11,7 +11,7 @@ enum View
 	ShadowCameraView,
 };
 
-GM_PRIVATE_OBJECT(Demo_CSM)
+GM_PRIVATE_OBJECT_ALIGNED(Demo_CSM)
 {
 	gm::GMGameObject* gameObject = nullptr;
 	gm::GMGameObject* gameObject2 = nullptr;
@@ -28,10 +28,11 @@ GM_PRIVATE_OBJECT(Demo_CSM)
 
 class Demo_CSM : public DemoHandler
 {
-	GM_DECLARE_PRIVATE_AND_BASE(Demo_CSM, DemoHandler)
+	GM_DECLARE_PRIVATE(Demo_CSM)
+	GM_DECLARE_BASE(DemoHandler)
 
 public:
-	using Base::Base;
+	Demo_CSM(DemonstrationWorld* parentDemonstrationWorld);
 
 public:
 	virtual void init() override;

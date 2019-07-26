@@ -22,7 +22,8 @@ const GMImage::Data& GMImage::getData() const
 
 GMImage::Data& GMImage::getData()
 {
-	D(d); return *d;
+	D(d);
+	return *d;
 }
 
 void GMImage::dispose()

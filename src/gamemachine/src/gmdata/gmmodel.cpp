@@ -676,6 +676,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMSkeletalAnimations)
 	AlignedVector<GMNodeAnimation> animations;
 };
 
+GM_DEFINE_PROPERTY(GMSkeletalAnimations, AlignedVector<GMNodeAnimation>, Animations, animations)
 GMSkeletalAnimations::GMSkeletalAnimations()
 {
 	GM_CREATE_DATA();

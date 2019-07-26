@@ -5,7 +5,7 @@
 #include <gmdemogameworld.h>
 #include "demonstration_world.h"
 
-GM_PRIVATE_OBJECT(Demo_Model)
+GM_PRIVATE_OBJECT_ALIGNED(Demo_Model)
 {
 	gm::GMGameObject* gameObject = nullptr;
 	gm::GMGameObject* gameObject2 = nullptr;
@@ -20,10 +20,11 @@ GM_PRIVATE_OBJECT(Demo_Model)
 
 class Demo_Model : public DemoHandler
 {
-	GM_DECLARE_PRIVATE_AND_BASE(Demo_Model, DemoHandler)
+	GM_DECLARE_PRIVATE(Demo_Model)
+	GM_DECLARE_BASE(DemoHandler)
 
 public:
-	using Base::Base;
+	Demo_Model(DemonstrationWorld* parentDemonstrationWorld);
 
 public:
 	virtual void init() override;

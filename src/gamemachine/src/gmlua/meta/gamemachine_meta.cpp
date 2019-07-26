@@ -94,16 +94,19 @@ namespace luaapi
 
 	// {{END META FUNCTION}}
 
-	GMLuaReg g_meta[] = {
-		// {{BEGIN META DECLARATIONS}}
-		GM_LUA_DECLARATIONS(exit),
-		GM_LUA_DECLARATIONS(getRunningStates),
-		GM_LUA_DECLARATIONS(getGamePackageManager),
-		GM_LUA_DECLARATIONS(addWindow),
-		GM_LUA_DECLARATIONS(startGameMachine),
-		// {{END META DECLARATIONS}}
-		{ 0, 0 }
-	};
+	namespace
+	{
+		GMLuaReg g_meta[] = {
+			// {{BEGIN META DECLARATIONS}}
+			GM_LUA_DECLARATIONS(exit),
+			GM_LUA_DECLARATIONS(getRunningStates),
+			GM_LUA_DECLARATIONS(getGamePackageManager),
+			GM_LUA_DECLARATIONS(addWindow),
+			GM_LUA_DECLARATIONS(startGameMachine),
+			// {{END META DECLARATIONS}}
+			{ 0, 0 }
+		};
+	}
 
 	GM_LUA_REGISTER_IMPL(GameMachine_Meta, NAME, g_meta);
 }

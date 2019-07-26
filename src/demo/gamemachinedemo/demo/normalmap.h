@@ -5,7 +5,7 @@
 #include <gmdemogameworld.h>
 #include "demonstration_world.h"
 
-GM_PRIVATE_OBJECT(Demo_NormalMap)
+GM_PRIVATE_OBJECT_UNALIGNED(Demo_NormalMap)
 {
 	gm::GMGameObject* gameObject = nullptr;
 	gm::GMAnimation animation;
@@ -13,12 +13,13 @@ GM_PRIVATE_OBJECT(Demo_NormalMap)
 
 class Demo_NormalMap : public DemoHandler
 {
-	GM_DECLARE_PRIVATE_AND_BASE(Demo_NormalMap, DemoHandler)
+	GM_DECLARE_PRIVATE(Demo_NormalMap)
+	GM_DECLARE_BASE(DemoHandler)
 
 	GM_DECLARE_SIGNAL(rotateStateChanged);
 
 public:
-	using Base::Base;
+	Demo_NormalMap(DemonstrationWorld* parentDemonstrationWorld);
 
 public:
 	virtual void init() override;

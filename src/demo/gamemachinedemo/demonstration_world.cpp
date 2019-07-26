@@ -92,11 +92,17 @@ namespace
 
 DemoHandler::DemoHandler(DemonstrationWorld* parentDemonstrationWorld)
 {
+	GM_CREATE_DATA();
 	D(d);
 	d->parentDemonstrationWorld = parentDemonstrationWorld;
 	d->renderConfig = parentDemonstrationWorld->getContext()->getEngine()->getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
 	d->debugConfig = parentDemonstrationWorld->getContext()->getEngine()->getConfigs().getConfig(gm::GMConfigs::Debug).asDebugConfig();
 	d->engine = parentDemonstrationWorld->getContext()->getEngine();
+}
+
+DemoHandler::~DemoHandler()
+{
+
 }
 
 void DemoHandler::init()
@@ -452,9 +458,28 @@ gm::GMint32 DemoHandler::getClientAreaTop()
 	return d->nextControlTop;
 }
 
+gm::GMOwnedPtr<gm::GMGameWorld>& DemoHandler::getDemoWorldReference()
+{
+	D(d);
+	return d->demoWorld;
+}
+
+DemonstrationWorld* DemoHandler::getDemonstrationWorld()
+{
+	D(d);
+	return d->parentDemonstrationWorld;
+}
+
+const GMVec4& DemoHandler::getLabelFontColor()
+{
+	static GMVec4 c(1, 1, 1, 1);
+	return c;
+}
+
 DemonstrationWorld::DemonstrationWorld(const gm::IRenderContext* context, gm::IWindow* window)
 	: Base(context)
 {
+	GM_CREATE_DATA();
 	D(d);
 	d->mainWindow = window;
 	d->configuration.reset(new gm::GMUIConfiguration(context));
@@ -472,6 +497,36 @@ DemonstrationWorld::~DemonstrationWorld()
 	GM_delete(d->mainWidget);
 	GM_delete(d->billboard);
 	GM_delete(d->manager);
+}
+
+DemoHandler* DemonstrationWorld::getCurrentDemo()
+{
+	D(d);
+	return d->currentDemo;
+}
+
+void DemonstrationWorld::setCurrentDemo(DemoHandler* demo)
+{
+	D(d);
+	d->currentDemo = demo;
+}
+
+void DemonstrationWorld::setCurrentDemo(gm::GMint32 index)
+{
+	D(d);
+	d->currentDemo = d->demos[0].second;
+}
+
+gm::GMWidget* DemonstrationWorld::getMainWidget()
+{
+	D(d);
+	return d->mainWidget;
+}
+
+gm::GMWidget* DemonstrationWorld::getBillboardWidget()
+{
+	D(d);
+	return d->billboard;
 }
 
 void DemonstrationWorld::addDemo(const gm::GMString& name, AUTORELEASE DemoHandler* demo)
@@ -700,6 +755,36 @@ void DemonstrationWorld::invokeThreadFunctions()
 	}
 }
 
+gm::IWindow* DemonstrationWorld::getMainWindow()
+{
+	D(d);
+	return d->mainWindow;
+}
+
+gm::GMWidgetResourceManager* DemonstrationWorld::getManager()
+{
+	D(d);
+	return d->manager;
+}
+
+gm::GMUIConfiguration* DemonstrationWorld::getUIConfiguration()
+{
+	D(d);
+	return d->configuration.get();
+}
+
+gm::GMPrimitiveManager* DemonstrationWorld::getPrimitiveManager()
+{
+	D(d);
+	return getContext()->getEngine()->getPrimitiveManager();
+}
+
+gm::GMAnimation& DemonstrationWorld::getLogoAnimation()
+{
+	D(d);
+	return d->logoAnimation;
+}
+
 //////////////////////////////////////////////////////////////////////////
 void DemostrationEntrance::init(const gm::IRenderContext* context)
 {
@@ -797,6 +882,7 @@ void DemostrationEntrance::event(gm::GameMachineHandlerEvent evt)
 
 DemostrationEntrance::DemostrationEntrance(gm::IWindow* window)
 {
+	GM_CREATE_DATA();
 	D(d);
 	d->mainWindow = window;
 }
@@ -805,6 +891,12 @@ DemostrationEntrance::~DemostrationEntrance()
 {
 	D(d);
 	gm::GM_delete(d->world);
+}
+
+DemonstrationWorld* DemostrationEntrance::getWorld()
+{
+	D(d);
+	return d->world;
 }
 
 void DemostrationEntrance::onLoadShaders(const gm::IRenderContext* context)

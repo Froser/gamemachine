@@ -128,6 +128,12 @@ namespace luaapi
 
 	}
 
+	IGraphicEngineProxy::IGraphicEngineProxy(GMLuaCoreState* l, IDestroyObject* handler /*= nullptr*/)
+		: Base(l, handler)
+	{
+		GM_CREATE_DATA();
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 
 #define CAMERA_NAME "GMCamera"
