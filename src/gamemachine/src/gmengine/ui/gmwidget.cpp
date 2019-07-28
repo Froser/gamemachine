@@ -172,7 +172,7 @@ const GMVec4& GMElementBlendColor::getCurrent()
 	return d->current;
 }
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMStyle)
+GM_PRIVATE_OBJECT_ALIGNED(GMStyle)
 {
 	GMlong texture;
 	GMFontHandle font = 0;

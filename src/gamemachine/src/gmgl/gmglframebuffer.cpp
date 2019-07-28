@@ -434,7 +434,7 @@ void GMGLShadowMapTexture::init()
 }
 
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMGLShadowFramebuffers)
+GM_PRIVATE_OBJECT_ALIGNED(GMGLShadowFramebuffers)
 {
 	GMint32 width = 0;
 	GMint32 height = 0;

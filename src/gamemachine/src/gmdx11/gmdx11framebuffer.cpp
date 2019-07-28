@@ -418,7 +418,7 @@ IFramebuffers* GMDx11Framebuffers::createDefaultFramebuffers(const IRenderContex
 	return new GMDx11DefaultFramebuffers(context);
 }
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMDx11ShadowFramebuffers)
+GM_PRIVATE_OBJECT_ALIGNED(GMDx11ShadowFramebuffers)
 {
 	GMComPtr<ID3D11ShaderResourceView> depthShaderResourceView;
 	GMint32 width = 0;

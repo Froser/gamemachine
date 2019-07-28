@@ -65,6 +65,7 @@ public:
 	GMParticleRadiusMode(GMParticleRadiusMode&&) GM_NOEXCEPT;
 	GMParticleRadiusMode& operator=(const GMParticleRadiusMode& rhs);
 	GMParticleRadiusMode& operator=(GMParticleRadiusMode&& rhs) GM_NOEXCEPT;
+	~GMParticleRadiusMode();
 };
 
 GM_PRIVATE_CLASS(GMParticleDescription_Cocos2D);

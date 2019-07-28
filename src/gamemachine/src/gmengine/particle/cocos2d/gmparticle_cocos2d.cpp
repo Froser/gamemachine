@@ -711,6 +711,11 @@ GMParticleRadiusMode::GMParticleRadiusMode(GMParticleRadiusMode&& rhs) GM_NOEXCE
 	*this = std::move(rhs);
 }
 
+GMParticleRadiusMode::~GMParticleRadiusMode()
+{
+
+}
+
 GMParticleRadiusMode& GMParticleRadiusMode::operator=(const GMParticleRadiusMode& rhs)
 {
 	GM_COPY(rhs);
@@ -725,7 +730,7 @@ GMParticleRadiusMode& GMParticleRadiusMode::operator=(GMParticleRadiusMode&& rhs
 
 //////////////////////////////////////////////////////////////////////////
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMParticleDescription_Cocos2D)
+GM_PRIVATE_OBJECT_ALIGNED(GMParticleDescription_Cocos2D)
 {
 	GMVec3 emitterPosition = Zero<GMVec3>(); //<! 发射器位置
 	GMVec3 emitterPositionV = Zero<GMVec3>();

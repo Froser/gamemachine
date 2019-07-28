@@ -39,9 +39,9 @@ GM_ALIGNED_16(struct) GMObjectPrivateAlignedBase
 */
 
 // 获取私有成员
-#define D(d) auto d = data()
-#define D_BASE(d, base) auto d = base::data()
-#define D_OF(d, ptr) auto d = (ptr)->data()
+#define D(d) auto d = data(); GM_ASSERT(d)
+#define D_BASE(d, base) auto d = base::data(); GM_ASSERT(d)
+#define D_OF(d, ptr) auto d = (ptr)->data(); GM_ASSERT(d)
 
 // 为一个对象定义private部分
 #define GM_PRIVATE_NAME(name) name##Private
@@ -53,7 +53,7 @@ GM_ALIGNED_16(struct) GMObjectPrivateAlignedBase
 #define GM_PRIVATE_OBJECT_UNALIGNED(name) struct GM_PRIVATE_NAME(name)
 #define GM_PRIVATE_OBJECT_UNALIGNED_FROM(name, extends) struct GM_PRIVATE_NAME(name) : public GM_PRIVATE_NAME(extends)
 
-#define GM_CREATE_DATA();
+#define GM_CREATE_DATA() { _gm_data.reset(new Data()); }
 
 //////////////////////////////////////////////////////////////////////////
 #define GM_DECLARE_INLINE_GETTER_ACCESSOR(name, memberName, accessor) \
@@ -135,7 +135,8 @@ GM_ALIGNED_16(struct) GMObjectPrivateAlignedBase
 #define friend_methods(clsName) private
 
 #define GM_COPY(rhs) \
-	{ D(d); \
+	{ GM_CREATE_DATA(); \
+	D(d); \
 	D_OF(d_rhs, &rhs); \
 	*d = *d_rhs ; }
 

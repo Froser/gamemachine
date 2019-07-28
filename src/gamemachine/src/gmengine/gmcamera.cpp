@@ -235,6 +235,7 @@ GM_DEFINE_GETTER(GMCamera, GMFrustum, Frustum, frustum)
 
 GMCamera::GMCamera()
 {
+	GM_CREATE_DATA();
 	D(d);
 	d->frustum.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
 	d->lookAt.position = GMVec3(0);
