@@ -37,6 +37,7 @@ public:
 public:
 	GMTextureSampler();
 	GMTextureSampler& operator=(const GMTextureSampler& rhs);
+	~GMTextureSampler();
 
 public:
 	GMS_TextureTransform& getTextureTransform(GMsize_t index);
@@ -90,12 +91,13 @@ struct GMTextureRegisterQuery<GMTextureType::BeginOfEnum>
 };
 
 GM_PRIVATE_CLASS(GMTextureList);
-class GMTextureList
+class GM_EXPORT GMTextureList
 {
 	GM_DECLARE_PRIVATE(GMTextureList)
 
 public:
 	GMTextureList();
+	~GMTextureList();
 
 public:
 	GMTextureSampler& getTextureSampler(GMTextureType type);
@@ -128,6 +130,7 @@ public:
 	GMMaterial(GMMaterial&&) GM_NOEXCEPT;
 	GMMaterial& operator=(const GMMaterial& rhs);
 	GMMaterial& operator=(GMMaterial&& rhs) GM_NOEXCEPT;
+	~GMMaterial();
 
 public:
 	const GMVariant& getCustomMaterial(const GMString& name) const;
@@ -135,7 +138,7 @@ public:
 };
 
 GM_PRIVATE_CLASS(GMShader);
-class GMShader : public IDestroyObject
+class GM_EXPORT GMShader : public IDestroyObject
 {
 	GM_DECLARE_PRIVATE(GMShader)
 	GM_FRIEND_CLASS(GMGameObject)

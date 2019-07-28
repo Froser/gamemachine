@@ -68,6 +68,7 @@ class GM_EXPORT GMWaveGameObject : public GMGameObject
 
 private:
 	GMWaveGameObject();
+	~GMWaveGameObject();
 
 public:
 	static void initShader(const IRenderContext* context);

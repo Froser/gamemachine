@@ -260,6 +260,11 @@ GMGameObjectKeyframe::GMGameObjectKeyframe(
 	setRotation(rotation);
 }
 
+GMGameObjectKeyframe::~GMGameObjectKeyframe()
+{
+
+}
+
 void GMGameObjectKeyframe::reset(IDestroyObject* object)
 {
 	D(d);
@@ -357,6 +362,11 @@ GMCameraKeyframe::GMCameraKeyframe(GMCameraKeyframeComponent component, const GM
 	else
 		gm_warning(gm_dbg_wrap("Wrong component type. This keyframe won't work or work abnormally."));
 	d->component = component;
+}
+
+GMCameraKeyframe::~GMCameraKeyframe()
+{
+
 }
 
 void GMCameraKeyframe::reset(IDestroyObject* object)
@@ -462,6 +472,11 @@ GMLightKeyframe::GMLightKeyframe(
 	setCutOff(cutOff);
 	d->component = component;
 	d->context = context;
+}
+
+GMLightKeyframe::~GMLightKeyframe()
+{
+
 }
 
 void GMLightKeyframe::reset(IDestroyObject* object)

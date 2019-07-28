@@ -220,6 +220,8 @@ public:
 		bool isDefault
 	);
 
+	~GMControlButton();
+
 protected:
 	GMControlButton(GMWidget* widget);
 

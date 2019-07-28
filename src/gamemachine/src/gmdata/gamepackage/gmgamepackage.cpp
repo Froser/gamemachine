@@ -10,6 +10,11 @@ GMGamePackage::GMGamePackage()
 	GM_CREATE_DATA();
 }
 
+GMGamePackage::~GMGamePackage()
+{
+
+}
+
 GMGamePackage::Data* GMGamePackage::gamePackageData()
 {
 	D(d);

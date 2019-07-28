@@ -374,6 +374,11 @@ GMControlButton* GMControlButton::createControl(
 	return buttonControl;
 }
 
+GMControlButton::~GMControlButton()
+{
+
+}
+
 GMControlButton::GMControlButton(GMWidget* widget) : Base(widget)
 {
 	D(d);

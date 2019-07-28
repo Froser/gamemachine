@@ -23,7 +23,7 @@ namespace
 	{
 		GMString result;
 		result.reserve(in.length());
-		for (GMint32 i = 0; i < in.length(); ++i)
+		for (GMsize_t i = 0; i < in.length(); ++i)
 		{
 			result += toLower(in[i]);
 		}

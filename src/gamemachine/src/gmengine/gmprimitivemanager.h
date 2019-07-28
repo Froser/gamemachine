@@ -47,6 +47,7 @@ class GM_EXPORT GMPrimitiveManager : public GMObject
 
 public:
 	GMPrimitiveManager(const IRenderContext* context);
+	~GMPrimitiveManager();
 
 public:
 	GMPrimitiveID addLine(const GMPoint& p1, const GMPoint& p2, const GMVec4& color);

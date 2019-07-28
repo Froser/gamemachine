@@ -38,6 +38,7 @@ class GM_EXPORT GMSpriteGameObject : public GMGameObject
 public:
 	GMSpriteGameObject(GMfloat radius, const GMCamera& camera);
 	GMSpriteGameObject(GMfloat radius, const GMVec3& position = Zero<GMVec3>());
+	~GMSpriteGameObject();
 
 public:
 	virtual void update(GMDuration dt) override;

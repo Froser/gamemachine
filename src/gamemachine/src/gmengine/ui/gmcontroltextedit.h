@@ -128,6 +128,8 @@ public:
 		bool hasScrollBar
 	);
 
+	~GMControlTextArea();
+
 protected:
 	GMControlTextArea(GMWidget* widget);
 

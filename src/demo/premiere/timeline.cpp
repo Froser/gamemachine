@@ -1186,7 +1186,7 @@ void Timeline::interpolateObject(GMXMLElement* e, GMGameObject* obj, GMfloat tim
 		component |= GMGameObjectKeyframeComponent::Rotate;
 		GMVec3 axis(x, y, z);
 		if (!FuzzyCompare(Length(axis), 0.f))
-			rotation = Rotate(Radian(degree), axis);
+			rotation = Rotate(Radians(degree), axis);
 		else
 			gm_warning(gm_dbg_wrap("Wrong rotation axis"));
 	}
@@ -1644,9 +1644,9 @@ GMint32 Timeline::parseCameraAction(GMXMLElement* e, CameraParams& cp, GMCameraL
 		GMfloat fovy, aspect, n, f;
 		fovyStr = e->Attribute("fovy");
 		if (fovyStr.isEmpty())
-			fovy = Radian(75.f);
+			fovy = Radians(75.f);
 		else
-			fovy = Radian(parseFloat(fovyStr));
+			fovy = Radians(parseFloat(fovyStr));
 
 		aspectStr = e->Attribute("aspect");
 		if (aspectStr.isEmpty())
@@ -1890,7 +1890,7 @@ void Timeline::parseTransform(GMGameObject* o, GMXMLElement* e)
 		scanner.nextFloat(degree);
 		GMVec3 axis(x, y, z);
 		if (!FuzzyCompare(Length(axis), 0.f))
-			o->setRotation(Rotate(Radian(degree), axis));
+			o->setRotation(Rotate(Radians(degree), axis));
 		else
 			gm_warning(gm_dbg_wrap("Wrong rotation axis"));
 	}

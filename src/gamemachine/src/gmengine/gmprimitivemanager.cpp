@@ -357,6 +357,11 @@ GMPrimitiveManager::GMPrimitiveManager(const IRenderContext* context)
 	d->line3D->setContext(context);
 }
 
+GMPrimitiveManager::~GMPrimitiveManager()
+{
+
+}
+
 GMPrimitiveID GMPrimitiveManager::allocId()
 {
 	D(d);

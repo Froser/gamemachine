@@ -27,6 +27,9 @@ class GM_EXPORT GMDebugger
 public:
 	static GMDebugger& instance();
 
+public:
+	~GMDebugger();
+
 private:
 	GMDebugger();
 

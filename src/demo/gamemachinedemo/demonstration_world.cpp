@@ -206,7 +206,7 @@ void DemoHandler::event(gm::GameMachineHandlerEvent evt)
 		if (kbState.keyTriggered(gm::GMKey_Escape))
 			backToEntrance();
 
-		if (kbState.keyTriggered(gm::GM_ASCIIToKey('I')))
+		if (kbState.keyTriggered(GM_ASCIIToKey('I')))
 			d->debugConfig.set(gm::GMDebugConfigs::RunProfile_Bool, !d->debugConfig.get(gm::GMDebugConfigs::RunProfile_Bool).toBool());
 
 		break;

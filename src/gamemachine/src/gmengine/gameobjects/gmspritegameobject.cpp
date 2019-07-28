@@ -36,6 +36,11 @@ GMSpriteGameObject::GMSpriteGameObject(GMfloat radius, const GMCamera& camera)
 	d->cameraUtility.setCamera(&d->camera);
 }
 
+GMSpriteGameObject::~GMSpriteGameObject()
+{
+
+}
+
 void GMSpriteGameObject::action(GMMovement movement, const GMVec3& direction, const GMVec3& rate)
 {
 	D(d);

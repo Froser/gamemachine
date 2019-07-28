@@ -651,6 +651,11 @@ GMCubeMapGameObject::GMCubeMapGameObject(GMTextureAsset texture)
 	createCubeMap(texture);
 }
 
+GMCubeMapGameObject::~GMCubeMapGameObject()
+{
+
+}
+
 void GMCubeMapGameObject::deactivate()
 {
 	D(d);

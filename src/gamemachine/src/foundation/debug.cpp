@@ -41,6 +41,10 @@ GMDebugger::GMDebugger()
 	GM_CREATE_DATA();
 }
 
+GMDebugger::~GMDebugger()
+{
+}
+
 void GMDebugger::setDebugOutput(IDebugOutput* output)
 {
 	if (instance().data())

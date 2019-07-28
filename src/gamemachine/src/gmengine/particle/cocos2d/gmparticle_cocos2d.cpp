@@ -663,6 +663,11 @@ GMParticleGravityMode::GMParticleGravityMode(GMParticleGravityMode&& rhs) GM_NOE
 	*this = std::move(rhs);
 }
 
+GMParticleGravityMode::~GMParticleGravityMode()
+{
+
+}
+
 GMParticleGravityMode& GMParticleGravityMode::operator=(const GMParticleGravityMode& rhs)
 {
 	GM_COPY(rhs);
@@ -802,6 +807,11 @@ GMParticleDescription_Cocos2D::GMParticleDescription_Cocos2D(const GMParticleDes
 GMParticleDescription_Cocos2D::GMParticleDescription_Cocos2D(GMParticleDescription_Cocos2D&& rhs) GM_NOEXCEPT
 {
 	*this = std::move(rhs);
+}
+
+GMParticleDescription_Cocos2D::~GMParticleDescription_Cocos2D()
+{
+
 }
 
 GMParticleDescription_Cocos2D& GMParticleDescription_Cocos2D::operator=(const GMParticleDescription_Cocos2D& rhs)

@@ -186,6 +186,11 @@ GMWaveGameObject::GMWaveGameObject()
 	GM_CREATE_DATA();
 }
 
+GMWaveGameObject::~GMWaveGameObject()
+{
+
+}
+
 void GMWaveGameObject::initShader(const IRenderContext* context)
 {
 	IGraphicEngine* engine = context->getEngine();

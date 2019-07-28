@@ -45,6 +45,7 @@ public:
 	GMParticleGravityMode(GMParticleGravityMode&&) GM_NOEXCEPT;
 	GMParticleGravityMode& operator=(const GMParticleGravityMode& rhs);
 	GMParticleGravityMode& operator=(GMParticleGravityMode&& rhs) GM_NOEXCEPT;
+	~GMParticleGravityMode();
 };
 
 GM_PRIVATE_CLASS(GMParticleRadiusMode);
@@ -73,7 +74,7 @@ GM_PRIVATE_CLASS(GMParticleDescription_Cocos2D);
   发射的0度角对应GameMachine坐标系(0, 1, 0)。
   所有Angle的单位为角度，而非弧度。
 */
-class GMParticleDescription_Cocos2D
+class GM_EXPORT GMParticleDescription_Cocos2D
 {
 	GM_DECLARE_PRIVATE(GMParticleDescription_Cocos2D)
 
@@ -113,6 +114,7 @@ public:
 	GMParticleDescription_Cocos2D(GMParticleDescription_Cocos2D&&) GM_NOEXCEPT;
 	GMParticleDescription_Cocos2D& operator=(const GMParticleDescription_Cocos2D& rhs);
 	GMParticleDescription_Cocos2D& operator=(GMParticleDescription_Cocos2D&& rhs) GM_NOEXCEPT;
+	~GMParticleDescription_Cocos2D();
 };
 
 GM_PRIVATE_CLASS(GMParticle_Cocos2D);
@@ -144,7 +146,7 @@ public:
 };
 
 GM_PRIVATE_CLASS(GMParticleEmitter_Cocos2D);
-class GMParticleEmitter_Cocos2D : public IParticleEmitter
+class GM_EXPORT GMParticleEmitter_Cocos2D : public IParticleEmitter
 {
 	GM_DECLARE_PRIVATE(GMParticleEmitter_Cocos2D)
 	GM_DECLARE_PROPERTY(GMVec3, EmitPosition)

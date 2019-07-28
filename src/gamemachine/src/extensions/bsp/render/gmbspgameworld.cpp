@@ -76,6 +76,11 @@ GMBSPSkyGameObject::GMBSPSkyGameObject(const GMShader& shader, const GMVec3& min
 	setAsset(GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, obj)));
 }
 
+GMBSPSkyGameObject::~GMBSPSkyGameObject()
+{
+
+}
+
 void GMBSPSkyGameObject::createSkyBox(OUT GMModel** obj)
 {
 	D(d);
@@ -211,6 +216,11 @@ GMBSPGameWorld::GMBSPGameWorld(const IRenderContext* context)
 	d->bspRenderConfigWrapper = d->bspRenderConfig.as<GMBSPRenderConfig>();
 	d->bspRenderConfigWrapper.set(GMBSPRenderConfigs::CalculateFace_Bool, true);
 	d->bspRenderConfigWrapper.set(GMBSPRenderConfigs::DrawSkyOnly_Bool, false);
+}
+
+GMBSPGameWorld::~GMBSPGameWorld()
+{
+
 }
 
 void GMBSPGameWorld::loadBSP(const GMString& mapName)

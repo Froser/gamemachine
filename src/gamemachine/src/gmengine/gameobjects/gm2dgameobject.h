@@ -18,6 +18,7 @@ class GM_EXPORT GM2DGameObjectBase : public GMGameObject
 
 public:
 	GM2DGameObjectBase(const GMRect& renderRc);
+	~GM2DGameObjectBase();
 
 public:
 	virtual bool canDeferredRendering();
@@ -33,10 +34,10 @@ protected:
 	virtual void initShader(GMShader& shader);
 
 protected:
-	inline const GMRect& getRenderRect() GM_NOEXCEPT;
-	inline void markDirty() GM_NOEXCEPT;
-	inline void cleanDirty() GM_NOEXCEPT;
-	inline bool isDirty() GM_NOEXCEPT;
+	const GMRect& getRenderRect() GM_NOEXCEPT;
+	void markDirty() GM_NOEXCEPT;
+	void cleanDirty() GM_NOEXCEPT;
+	bool isDirty() GM_NOEXCEPT;
 
 protected:
 	static GMRectF toViewportRect(const GMRect& rc, const GMRect& renderRc);

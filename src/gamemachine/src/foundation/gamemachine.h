@@ -9,8 +9,6 @@
 #include <gmthread.h>
 #include <gmmessage.h>
 
-BEGIN_NS
-
 extern "C"
 {
 	enum class GMCapability
@@ -19,8 +17,10 @@ extern "C"
 		SupportDirectX11,
 	};
 
-	bool GMQueryCapability(GMCapability);
+	GM_EXPORT bool GMQueryCapability(GMCapability);
 }
+
+BEGIN_NS
 
 //! 机器的大小端模式的枚举值。
 /*!
@@ -121,6 +121,8 @@ public:
 	{
 		MAX_KEY_STATE_BITS = 512,
 	};
+
+	~GameMachine();
 
 protected:
 	//! GameMachine构造函数

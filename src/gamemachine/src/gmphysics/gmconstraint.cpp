@@ -64,6 +64,11 @@ GMPoint2PointConstraint::GMPoint2PointConstraint(GMRigidPhysicsObject* bodyA, GM
 	db->constraint = d->constraint;
 }
 
+GMPoint2PointConstraint::~GMPoint2PointConstraint()
+{
+
+}
+
 void GMPoint2PointConstraint::setPivotA(const GMVec3& pivot)
 {
 	D(d);

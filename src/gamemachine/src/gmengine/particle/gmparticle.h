@@ -40,6 +40,7 @@ class GM_EXPORT GMParticleSystemManager : public GMObject, public IParticleSyste
 
 public:
 	GMParticleSystemManager(const IRenderContext* context);
+	~GMParticleSystemManager();
 
 public:
 	virtual void addParticleSystem(AUTORELEASE IParticleSystem* ps) override;

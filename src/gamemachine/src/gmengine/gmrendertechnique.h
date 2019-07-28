@@ -20,6 +20,7 @@ public:
 
 public:
 	GMRenderTechniqueManager(const IRenderContext* context);
+	~GMRenderTechniqueManager();
 
 public:
 	GMRenderTechniqueID addRenderTechniques(GMRenderTechniques renderTechniques);

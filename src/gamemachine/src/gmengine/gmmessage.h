@@ -1,6 +1,7 @@
 ﻿#ifndef __GMMESSAGE_H__
 #define __GMMESSAGE_H__
 #include <gmcommon.h>
+
 BEGIN_NS
 
 enum class GameMachineMessageType
@@ -192,9 +193,6 @@ enum GMKey
 	GMKey_ASCII, // 键盘上的KeyCode从此开始，如'A'就是 GMKey_ASCII + 'A'
 };
 
-extern "C" GMKey GM_ASCIIToKey(GMbyte key);
-extern "C" GMbyte GM_KeyToASCII(GMKey key);
-
 enum GMFunctionCharacter
 {
 	GMFunctionCharacter_Ctrl_At,			//NUL
@@ -341,4 +339,8 @@ public:
 };
 
 END_NS
+
+extern "C" GM_EXPORT gm::GMKey GM_ASCIIToKey(gm::GMbyte key);
+extern "C" GM_EXPORT gm::GMbyte GM_KeyToASCII(gm::GMKey key);
+
 #endif

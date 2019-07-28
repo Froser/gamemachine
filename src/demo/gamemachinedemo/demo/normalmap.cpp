@@ -150,12 +150,12 @@ void Demo_NormalMap::event(gm::GameMachineHandlerEvent evt)
 	{
 		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputManager();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
-		if (kbState.keyTriggered(gm::GM_ASCIIToKey('0')))
+		if (kbState.keyTriggered(GM_ASCIIToKey('0')))
 			db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, 0);
 
 		for (gm::GMint32 i = 0; i < 8; ++i)
 		{
-			if (kbState.keyTriggered(gm::GM_ASCIIToKey('1' + (gm::GMint32)i)))
+			if (kbState.keyTriggered(GM_ASCIIToKey('1' + (gm::GMint32)i)))
 				db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, (gm::GMint32)i + 1);
 		}
 		break;

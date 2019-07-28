@@ -56,6 +56,8 @@ class GM_EXPORT GMGamePackage : public GMObject
 public:
 	GMGamePackage();
 
+	~GMGamePackage();
+
 	//! 获取资源包管理器私有成员。
 	/*!
 	  不建议IGamePackageHandler派生类以外的类使用此方法。

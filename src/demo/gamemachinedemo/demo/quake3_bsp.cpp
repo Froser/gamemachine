@@ -174,13 +174,13 @@ void Demo_Quake3_BSP::event(gm::GameMachineHandlerEvent evt)
 		gm::GMJoystickState state = joyState.state();
 		GMVec3 direction(0);
 
-		if (kbState.keydown(gm::GM_ASCIIToKey('A')))
+		if (kbState.keydown(GM_ASCIIToKey('A')))
 			d->sprite->action(gm::GMMovement::Move, GMVec3(-1, 0, 0));
-		if (kbState.keydown(gm::GM_ASCIIToKey('D')))
+		if (kbState.keydown(GM_ASCIIToKey('D')))
 			d->sprite->action(gm::GMMovement::Move, GMVec3(1, 0, 0));
-		if (kbState.keydown(gm::GM_ASCIIToKey('S')))
+		if (kbState.keydown(GM_ASCIIToKey('S')))
 			d->sprite->action(gm::GMMovement::Move, GMVec3(0, 0, -1));
-		if (kbState.keydown(gm::GM_ASCIIToKey('W')))
+		if (kbState.keydown(GM_ASCIIToKey('W')))
 			d->sprite->action(gm::GMMovement::Move, GMVec3(0, 0, 1));
 
 		if (state.thumbLX > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
@@ -195,12 +195,12 @@ void Demo_Quake3_BSP::event(gm::GameMachineHandlerEvent evt)
 		if (kbState.keyTriggered(gm::GMKey_Space) || state.buttons & XINPUT_GAMEPAD_RIGHT_SHOULDER || state.buttons & XINPUT_GAMEPAD_LEFT_SHOULDER)
 			d->sprite->action(gm::GMMovement::Jump);
 
-		if (kbState.keyTriggered(gm::GM_ASCIIToKey('V')))
+		if (kbState.keyTriggered(GM_ASCIIToKey('V')))
 			joyState.vibrate(30000, 30000);
-		else if (kbState.keydown(gm::GM_ASCIIToKey('C')))
+		else if (kbState.keydown(GM_ASCIIToKey('C')))
 			joyState.vibrate(0, 0);
 
-		if (kbState.keyTriggered(gm::GM_ASCIIToKey('I')))
+		if (kbState.keyTriggered(GM_ASCIIToKey('I')))
 			db->debugConfig.set(gm::GMDebugConfigs::RunProfile_Bool, !db->debugConfig.get(gm::GMDebugConfigs::RunProfile_Bool).toBool());
 
 		gm::GMfloat joystickPitch = 0, joystickYaw = 0;
@@ -227,15 +227,15 @@ void Demo_Quake3_BSP::event(gm::GameMachineHandlerEvent evt)
 		gm::GMMouseState ms = mouseState.state();
 		d->sprite->look(Radians(-ms.deltaY * mouseSensitivity), Radians(-ms.deltaX * mouseSensitivity));
 		
-		if (kbState.keyTriggered(gm::GM_ASCIIToKey('R')))
+		if (kbState.keyTriggered(GM_ASCIIToKey('R')))
 			setMouseTrace(!d->mouseTrace);
 
-		if (kbState.keyTriggered(gm::GM_ASCIIToKey('0')))
+		if (kbState.keyTriggered(GM_ASCIIToKey('0')))
 			db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, 0);
 
 		for (gm::GMint32 i = 0; i < 8; ++i)
 		{
-			if (kbState.keyTriggered(gm::GM_ASCIIToKey('1' + (gm::GMint32)i)))
+			if (kbState.keyTriggered(GM_ASCIIToKey('1' + (gm::GMint32)i)))
 				db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, (gm::GMint32)i + 1);
 		}
 		break;

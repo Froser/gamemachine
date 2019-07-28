@@ -16,6 +16,11 @@ GMParticleSystemManager::GMParticleSystemManager(const IRenderContext* context)
 	d->context = context;
 }
 
+GMParticleSystemManager::~GMParticleSystemManager()
+{
+
+}
+
 void GMParticleSystemManager::addParticleSystem(AUTORELEASE IParticleSystem* ps)
 {
 	D(d);

@@ -45,6 +45,7 @@ class GM_EXPORT GMPoint2PointConstraint : public GMConstraint
 public:
 	GMPoint2PointConstraint(GMRigidPhysicsObject* body, const GMVec3& pivotA);
 	GMPoint2PointConstraint(GMRigidPhysicsObject* bodyA, GMRigidPhysicsObject* bodyB, const GMVec3& pivotA, const GMVec3& pivotB);
+	~GMPoint2PointConstraint();
 
 public:
 	void setPivotA(const GMVec3& pivot);

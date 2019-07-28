@@ -359,6 +359,7 @@ public:
 
 public:
 	GMScene();
+	~GMScene();
 	void addModelAsset(GMModelAsset model);
 	void swap(GMScene* scene);
 	bool isEmpty() GM_NOEXCEPT;
@@ -387,6 +388,7 @@ class GM_EXPORT GMPart
 
 public:
 	GMPart(GMModel* parent);
+	~GMPart();
 
 public:
 	//! 计算网格的切线空间。

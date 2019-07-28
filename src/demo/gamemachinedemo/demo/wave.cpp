@@ -256,7 +256,7 @@ void Demo_Wave::event(gm::GameMachineHandlerEvent evt)
 			d->cameraUtility.update(Radians(-ms.deltaX * mouseSensitivity), Radians(-ms.deltaY * mouseSensitivity));
 
 			gm::IKeyboardState& kbState = inputManager->getKeyboardState();
-			if (kbState.keyTriggered(gm::GM_ASCIIToKey('R')))
+			if (kbState.keyTriggered(GM_ASCIIToKey('R')))
 				setMouseTrace(!d->mouseTrace);
 		}
 		break;

@@ -2,12 +2,13 @@
 #include "dx11wrapper.h"
 #include "foundation/utilities/tools.h"
 
+namespace gm {}
+using namespace gm;
+
 #if GM_USE_DX11
 #include <gmdx11/gmdx11factory.h>
 #include "gmdx11/main.h"
 #endif
-
-BEGIN_NS
 
 #if GM_WINDOWS
 typedef IFactory* (*CREATE_PROC)();
@@ -133,5 +134,3 @@ extern "C"
 #endif
 	}
 }
-
-END_NS

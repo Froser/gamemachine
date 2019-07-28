@@ -19,7 +19,7 @@ static GMRenderEnvironment GMCreateFactory(GMRenderEnvironment prefer, GMRenderE
 	{
 		// 希望创建一个DirectX11 (prefer == gm::GMCapability::SupportDirectX11)
 #if GM_USE_DLL || GM_USE_DX11 // 使用GameMachine.dll或者本身支持DirectX11才能创建DirectX
-		if (gm::GMQueryCapability(gm::GMCapability::SupportDirectX11))
+		if (GMQueryCapability(GMCapability::SupportDirectX11))
 		{
 			bool bCreated = CreateDirectX11Factory(ppFactory);
 			GM_ASSERT(bCreated);

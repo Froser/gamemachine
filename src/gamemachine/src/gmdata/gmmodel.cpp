@@ -32,6 +32,11 @@ GMScene::GMScene()
 	GM_CREATE_DATA();
 }
 
+GMScene::~GMScene()
+{
+
+}
+
 void GMScene::addModelAsset(GMModelAsset model)
 {
 	D(d);
@@ -418,6 +423,11 @@ GMPart::GMPart(GMModel* parent)
 {
 	GM_CREATE_DATA();
 	parent->addPart(this);
+}
+
+GMPart::~GMPart()
+{
+
 }
 
 void GMPart::clear()

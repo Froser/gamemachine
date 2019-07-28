@@ -124,6 +124,7 @@ class GM_EXPORT GMCubeMapGameObject : public GMGameObject
 
 public:
 	GMCubeMapGameObject(GMTextureAsset texture);
+	~GMCubeMapGameObject();
 
 public:
 	//! 将立方体贴图从渲染中移除

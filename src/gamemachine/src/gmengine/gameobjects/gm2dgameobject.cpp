@@ -63,6 +63,11 @@ GM2DGameObjectBase::GM2DGameObjectBase(const GMRect& renderRc)
 	d->renderRc = renderRc;
 }
 
+GM2DGameObjectBase::~GM2DGameObjectBase()
+{
+
+}
+
 bool GM2DGameObjectBase::canDeferredRendering()
 {
 	return false;

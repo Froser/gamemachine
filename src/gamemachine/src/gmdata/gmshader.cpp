@@ -47,6 +47,11 @@ GMMaterial& GMMaterial::operator=(GMMaterial&& rhs) GM_NOEXCEPT
 	return *this;
 }
 
+GMMaterial::~GMMaterial()
+{
+
+}
+
 const GMVariant& GMMaterial::getCustomMaterial(const GMString& name) const
 {
 	D(d);
@@ -79,6 +84,11 @@ GM_DEFINE_PROPERTY(GMTextureSampler, GMS_Wrap, WrapS, wrapS);
 GM_DEFINE_PROPERTY(GMTextureSampler, GMS_Wrap, WrapT, wrapT);
 
 GMTextureSampler::GMTextureSampler()
+{
+
+}
+
+GMTextureSampler::~GMTextureSampler()
 {
 
 }
@@ -181,6 +191,11 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMTextureList)
 GMTextureList::GMTextureList()
 {
 	GM_CREATE_DATA();
+}
+
+GMTextureList::~GMTextureList()
+{
+
 }
 
 GMTextureList& GMTextureList::operator=(const GMTextureList& rhs)

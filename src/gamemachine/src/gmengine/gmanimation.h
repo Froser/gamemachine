@@ -170,15 +170,27 @@ class GM_EXPORT GMAnimation : public GMObject
 public:
 	template <typename... Objects>
 	GMAnimation(Objects... targetGameObjects)
+		: GMAnimation()
 	{
 		setTargetObjects(targetGameObjects...);
 	}
 
 #if GM_MSVC
-	GMAnimation(void);
+	template <>
+	GMAnimation() { GM_CREATE_DATA(); }
 #elif GM_GCC
-	GMAnimation();
+	GMAnimation() { GM_CREATE_DATA(); }
 #endif
+
+	GMAnimation(const GMAnimation& rhs)
+	{
+		GM_COPY(rhs);
+	}
+
+	GMAnimation(GMAnimation&& rhs) GM_NOEXCEPT
+	{
+		GM_MOVE(rhs);
+	}
 
 	~GMAnimation();
 
@@ -244,6 +256,8 @@ public:
 		GMfloat timePoint
 	);
 
+	~GMGameObjectKeyframe();
+
 public:
 	virtual void reset(IDestroyObject* object) override;
 	virtual void beginFrame(IDestroyObject* object, GMfloat timeStart) override;
@@ -274,6 +288,8 @@ public:
 		const GMVec3& lookAtDirectionOrFocusAt,
 		GMfloat timePoint
 	);
+
+	~GMCameraKeyframe();
 
 public:
 	virtual void reset(IDestroyObject* object) override;
@@ -317,6 +333,8 @@ public:
 		GMfloat cutOff,
 		GMfloat timePoint
 	);
+
+	~GMLightKeyframe();
 
 public:
 	virtual void reset(IDestroyObject* object) override;

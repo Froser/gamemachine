@@ -1300,6 +1300,7 @@ GMControlTextArea* GMControlTextArea::createControl(
 }
 
 GM_DEFINE_PROPERTY(GMControlTextArea, GMint32, ScrollBarSize, scrollBarSize)
+
 GMControlTextArea::GMControlTextArea(GMWidget* widget)
 	: Base(widget)
 {
@@ -1310,6 +1311,11 @@ GMControlTextArea::GMControlTextArea(GMWidget* widget)
 	db->buffer.reset(d->buffer);
 	setLineHeight(16);
 	createBufferTypoEngineIfNotExist();
+}
+
+GMControlTextArea::~GMControlTextArea()
+{
+
 }
 
 void GMControlTextArea::render(GMDuration elapsed)

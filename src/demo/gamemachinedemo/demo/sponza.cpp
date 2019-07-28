@@ -247,7 +247,7 @@ void Demo_Sponza::event(gm::GameMachineHandlerEvent evt)
 				d->sprite->look(Radians(-ms.deltaY * mouseSensitivity), Radians(-ms.deltaX * mouseSensitivity));
 
 			gm::IKeyboardState& kbState = inputManager->getKeyboardState();
-			if (kbState.keyTriggered(gm::GM_ASCIIToKey('R')))
+			if (kbState.keyTriggered(GM_ASCIIToKey('R')))
 				setMouseTrace(!d->mouseTrace);
 		}
 
@@ -263,13 +263,13 @@ void Demo_Sponza::event(gm::GameMachineHandlerEvent evt)
 		GMVec3 direction(0);
 		if (d->sprite)
 		{
-			if (kbState.keydown(gm::GM_ASCIIToKey('A')))
+			if (kbState.keydown(GM_ASCIIToKey('A')))
 				d->sprite->action(gm::GMMovement::Move, GMVec3(-1, 0, 0));
-			if (kbState.keydown(gm::GM_ASCIIToKey('D')))
+			if (kbState.keydown(GM_ASCIIToKey('D')))
 				d->sprite->action(gm::GMMovement::Move, GMVec3(1, 0, 0));
-			if (kbState.keydown(gm::GM_ASCIIToKey('S')))
+			if (kbState.keydown(GM_ASCIIToKey('S')))
 				d->sprite->action(gm::GMMovement::Move, GMVec3(0, 0, -1));
-			if (kbState.keydown(gm::GM_ASCIIToKey('W')))
+			if (kbState.keydown(GM_ASCIIToKey('W')))
 				d->sprite->action(gm::GMMovement::Move, GMVec3(0, 0, 1));
 
 			if (state.thumbLX > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)

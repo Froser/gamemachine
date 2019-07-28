@@ -25,6 +25,7 @@ class GM_EXPORT GMBSPSkyGameObject : public GMGameObject
 
 public:
 	GMBSPSkyGameObject(const GMShader& shader, const GMVec3& min, const GMVec3& max);
+	~GMBSPSkyGameObject();
 
 private:
 	void createSkyBox(OUT GMModel** obj);
@@ -39,6 +40,7 @@ class GM_EXPORT GMBSPGameWorld : public GMGameWorld
 
 public:
 	GMBSPGameWorld(const IRenderContext* context);
+	~GMBSPGameWorld();
 
 public:
 	void loadBSP(const GMString& mapName);

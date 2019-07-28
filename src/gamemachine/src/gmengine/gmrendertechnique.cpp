@@ -50,6 +50,11 @@ GMRenderTechniqueManager::GMRenderTechniqueManager(const IRenderContext* context
 	d->context = context;
 }
 
+GMRenderTechniqueManager::~GMRenderTechniqueManager()
+{
+
+}
+
 IShaderProgram* GMRenderTechniqueManager::getShaderProgram(GMRenderTechniqueID id)
 {
 	D(d);

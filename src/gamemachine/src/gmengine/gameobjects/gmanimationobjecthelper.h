@@ -55,7 +55,7 @@ public:
 	GMsize_t getAnimationIndexByName(const GMString& name);
 
 public:
-	inline bool isPlaying() GM_NOEXCEPT;
+	bool isPlaying() GM_NOEXCEPT;
 };
 
 END_NS

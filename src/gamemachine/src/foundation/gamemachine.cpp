@@ -8,8 +8,6 @@
 #include "wrapper/dx11wrapper.h"
 #include "gamemachine_p.h"
 
-BEGIN_NS
-
 extern "C"
 {
 	GM_EXPORT bool GMQueryCapability(GMCapability cp)
@@ -37,6 +35,8 @@ extern "C"
 	}
 }
 
+BEGIN_NS
+
 namespace
 {
 	static GMMessage s_frameUpdateMsg(GameMachineMessageType::FrameUpdate);
@@ -47,6 +47,11 @@ GameMachine& GameMachine::instance()
 {
 	static GameMachine s_instance;
 	return s_instance;
+}
+
+GameMachine::~GameMachine()
+{
+
 }
 
 GameMachine::GameMachine()
