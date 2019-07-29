@@ -381,6 +381,7 @@ GMControlButton::~GMControlButton()
 
 GMControlButton::GMControlButton(GMWidget* widget) : Base(widget)
 {
+	GM_CREATE_DATA();
 	D(d);
 	d->fillBorder = gm_makeOwnedPtr<GMControlButtonBorder>(widget);
 	d->foreBorder = gm_makeOwnedPtr<GMControlButtonBorder>(widget);

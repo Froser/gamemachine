@@ -72,6 +72,7 @@ private:
 
 GMMAudioStaticSource::GMMAudioStaticSource(gm::IAudioFile* f)
 {
+	GM_CREATE_DATA();
 	D(d);
 	d->file = f;
 	alGenSources(1, &d->sourceId);
@@ -182,6 +183,7 @@ class GMMAudioStreamPlayThread : public gm::GMThread
 public:
 	GMMAudioStreamPlayThread(GMMAudioStreamSource* src)
 	{
+		GM_CREATE_DATA();
 		D(d);
 		d->source = src;
 	}
@@ -286,6 +288,7 @@ public:
 
 GMMAudioStreamSource::GMMAudioStreamSource(gm::IAudioFile* file)
 {
+	GM_CREATE_DATA();
 	D(d);
 	d->file = file;
 	gm::IAudioStream* stream = d->file->getStream();
@@ -370,6 +373,7 @@ void GMMAudioStreamSource::rewind()
 //////////////////////////////////////////////////////////////////////////
 GMMAudioPlayer::GMMAudioPlayer()
 {
+	GM_CREATE_DATA();
 	openDevice(0);
 }
 

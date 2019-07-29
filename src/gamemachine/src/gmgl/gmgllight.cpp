@@ -25,7 +25,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLLight)
 
 GMGLLight::GMGLLight()
 {
-
+	GM_CREATE_DATA();
 }
 
 GMGLLight::~GMGLLight()

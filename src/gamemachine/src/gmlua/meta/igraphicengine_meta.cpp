@@ -153,6 +153,16 @@ namespace luaapi
 		return l;
 	}
 
+	GMCameraLookAtProxy::GMCameraLookAtProxy()
+	{
+		GM_CREATE_DATA();
+	}
+
+	GMCameraLookAtProxy::~GMCameraLookAtProxy()
+	{
+
+	}
+
 	/*
 	 * lookAt([self], GMCameraLookAt)
 	 */

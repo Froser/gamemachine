@@ -85,7 +85,7 @@ GM_DEFINE_PROPERTY(GMTextureSampler, GMS_Wrap, WrapT, wrapT);
 
 GMTextureSampler::GMTextureSampler()
 {
-
+	GM_CREATE_DATA();
 }
 
 GMTextureSampler::~GMTextureSampler()
@@ -200,6 +200,7 @@ GMTextureList::~GMTextureList()
 
 GMTextureList& GMTextureList::operator=(const GMTextureList& rhs)
 {
+	GM_CREATE_DATA();
 	D(d);
 	D_OF(rhs_d, &rhs);
 

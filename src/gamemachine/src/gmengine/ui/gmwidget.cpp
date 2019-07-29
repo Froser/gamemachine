@@ -494,6 +494,7 @@ GM_DEFINE_PROPERTY(GMWidget, GMint32, ScrollOffsetY, scrollOffsetY)
 GM_DEFINE_PROPERTY(GMWidget, GMint32, VerticalScrollbarWidth, verticalScrollbarWidth)
 GMWidget::GMWidget(GMWidgetResourceManager* manager)
 {
+	GM_CREATE_DATA();
 	D(d);
 	d->manager = manager;
 	d->nextWidget = d->prevWidget = this;

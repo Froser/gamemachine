@@ -44,6 +44,7 @@ public:
 	GMDx11DefaultFramebuffers(const IRenderContext* context)
 		: Base(context)
 	{
+		GM_CREATE_DATA();
 		D(d);
 		D_BASE(db, Base);
 		db->context->getEngine()->getInterface(GameMachineInterfaceID::D3D11DepthStencilView, (void**)&db->depthStencilView);

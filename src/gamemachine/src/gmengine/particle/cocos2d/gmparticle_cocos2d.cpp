@@ -189,6 +189,11 @@ public:
 		GM_META(textureFileName)
 		return true;
 	}
+
+	GMCocos2DParticleDescriptionProxy()
+	{
+		GM_CREATE_DATA();
+	}
 };
 
 GM_PRIVATE_OBJECT_UNALIGNED(GMParticleSystem_Cocos2D)

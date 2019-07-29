@@ -29,6 +29,9 @@ namespace luaapi
 		GM_DECLARE_PRIVATE(GMCameraLookAtProxy)
 
 	public:
+		GMCameraLookAtProxy();
+		~GMCameraLookAtProxy();
+
 		virtual bool registerMeta() override;
 
 	public:

@@ -36,7 +36,6 @@ GMAsset::GMAsset(GMAssetType type, void* asset)
 
 GMAsset::~GMAsset()
 {
-	D(d);
 	release();
 }
 
@@ -76,16 +75,10 @@ GMAsset::GMAsset(GMAsset&& asset) GM_NOEXCEPT
 
 GMAsset& GMAsset::operator=(const GMAsset& asset)
 {
-	D(d);
-	D_OF(d_asset, &asset);
-	GM_ASSERT(d_asset->ref);
-
 	if (this != &asset)
 		release();
 
-	d->type = d_asset->type;
-	d->asset = d_asset->asset;
-	d->ref = d_asset->ref;
+	GM_COPY(asset);
 	addRef();
 
 	return *this;
@@ -93,15 +86,7 @@ GMAsset& GMAsset::operator=(const GMAsset& asset)
 
 GMAsset& GMAsset::operator=(GMAsset&& asset) GM_NOEXCEPT
 {
-	D(d);
-	D_OF(d_asset, &asset);
-	if (this != &asset)
-	{
-		using namespace std;
-		swap(d->ref, d_asset->ref);
-		swap(d->type, d_asset->type);
-		swap(d->asset, d_asset->asset);
-	}
+	GM_MOVE(asset);
 	return *this;
 }
 
@@ -117,6 +102,9 @@ void GMAsset::addRef()
 
 void GMAsset::release()
 {
+	if (!_gm_data)
+		return;
+
 	D(d);
 	if (isEmpty())
 		return;

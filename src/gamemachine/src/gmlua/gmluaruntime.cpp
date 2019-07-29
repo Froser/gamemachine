@@ -12,7 +12,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMLuaRuntime)
 
 GMLuaRuntime::GMLuaRuntime()
 {
-
+	GM_CREATE_DATA();
 }
 
 GMLuaRuntime::~GMLuaRuntime()

@@ -33,6 +33,7 @@ namespace luaapi
 
 	GMObjectProxy::GMObjectProxy(GMLuaCoreState* l, GMObject* handler /*= nullptr*/)
 	{
+		GM_CREATE_DATA();
 		D(d);
 		d->l = l;
 		set(handler);
@@ -190,6 +191,7 @@ namespace luaapi
 	//////////////////////////////////////////////////////////////////////////
 	GMAnyProxy::GMAnyProxy(GMLuaCoreState* l, IDestroyObject* handler /*= nullptr*/)
 	{
+		GM_CREATE_DATA();
 		D(d);
 		d->l = l;
 		set(handler);
