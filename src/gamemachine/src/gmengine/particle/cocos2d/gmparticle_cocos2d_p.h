@@ -4,22 +4,7 @@
 #include <linearmath.h>
 BEGIN_NS
 
-struct GMParticle_Cocos2D_GravityModeData
-{
-	GMVec3 initialVelocity;
-	GMfloat radialAcceleration;
-	GMfloat tangentialAcceleration;
-};
-
-struct GMParticle_Cocos2D_RadiusModeData
-{
-	GMfloat angle;
-	GMfloat degressPerSecond;
-	GMfloat radius;
-	GMfloat deltaRadius;
-};
-
-GM_PRIVATE_OBJECT_ALIGNED(GMParticle_Cocos2D)
+GM_ALIGNED_16(struct) GM_PRIVATE_NAME(GMParticle_Cocos2D)
 {
 	GMVec4 color = Zero<GMVec4>();
 	GMVec4 deltaColor = Zero<GMVec4>();

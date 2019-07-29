@@ -4,12 +4,26 @@
 #include <gmgameobject.h>
 #include "../gmparticle.h"
 #include "gmparticlemodel_cocos2d.h"
-#include "gmparticle_cocos2d_p.h"
 BEGIN_NS
 
 class GMParticleSystem_Cocos2D;
 class GMParticleEmitter_Cocos2D;
 class GMParticleEffect_Cocos2D;
+
+struct GMParticle_Cocos2D_GravityModeData
+{
+	GMVec3 initialVelocity;
+	GMfloat radialAcceleration;
+	GMfloat tangentialAcceleration;
+};
+
+struct GMParticle_Cocos2D_RadiusModeData
+{
+	GMfloat angle;
+	GMfloat degressPerSecond;
+	GMfloat radius;
+	GMfloat deltaRadius;
+};
 
 enum class GMParticleModelType
 {
@@ -143,6 +157,7 @@ public:
 	GMParticle_Cocos2D(GMParticle_Cocos2D&&) GM_NOEXCEPT;
 	GMParticle_Cocos2D& operator=(const GMParticle_Cocos2D& rhs);
 	GMParticle_Cocos2D& operator=(GMParticle_Cocos2D&& rhs) GM_NOEXCEPT;
+	~GMParticle_Cocos2D();
 	const Data& dataRef();
 };
 

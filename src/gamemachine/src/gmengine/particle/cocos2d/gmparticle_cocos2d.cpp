@@ -7,6 +7,7 @@
 #include "foundation/gamemachine.h"
 #include <zlib.h>
 #include "foundation/gmasync.h"
+#include "gmparticle_cocos2d_p.h"
 
 BEGIN_NS
 
@@ -546,7 +547,7 @@ void GMParticleEmitter_Cocos2D::addParticle()
 	{
 		GMParticle_Cocos2D particle;
 		d->effect->initParticle(&particle);
-		d->particles.push_back(particle);
+		d->particles.push_back(std::move(particle));
 	}
 }
 
@@ -863,6 +864,12 @@ GMParticle_Cocos2D::GMParticle_Cocos2D(const GMParticle_Cocos2D& rhs)
 GMParticle_Cocos2D::GMParticle_Cocos2D(GMParticle_Cocos2D&& rhs) GM_NOEXCEPT
 {
 	*this = std::move(rhs);
+}
+
+
+GMParticle_Cocos2D::~GMParticle_Cocos2D()
+{
+
 }
 
 const GMParticle_Cocos2D::Data& GMParticle_Cocos2D::dataRef()

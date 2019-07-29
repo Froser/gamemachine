@@ -20,7 +20,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMDx11GlyphManager)
 GMDx11GlyphManager::GMDx11GlyphManager(const IRenderContext* context)
 	: Base(context)
 {
-
+	GM_CREATE_DATA();
 }
 
 GMDx11GlyphManager::~GMDx11GlyphManager()
