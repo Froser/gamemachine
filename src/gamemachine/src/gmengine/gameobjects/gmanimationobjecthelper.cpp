@@ -3,6 +3,7 @@
 #include "foundation/gmasync.h"
 #include "foundation/gamemachine.h"
 #include "gmengine/gmgameworld.h"
+#include <algorithm>
 
 BEGIN_NS
 

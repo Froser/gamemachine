@@ -6,7 +6,6 @@
 #include <gmlight.h>
 #include <gmmodelreader.h>
 #include <gmutilities.h>
-#include <gmgraphicengine.h>
 #include <gmparticle.h>
 #include <gmm.h>
 #include "helper.h"
@@ -696,7 +695,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 
 			GMGameObject* obj = new GMGameObject(scene);
 			GM_ASSERT(obj->getModel());
-			obj->getModel()->getShader().setCull(GMS_Cull::None);
+			obj->getModel()->getShader().setCull(GMS_Cull::NoCull);
 			m_objects[id] = AutoReleasePtr<GMGameObject>(obj);
 
 			GMString type = e->Attribute("type");

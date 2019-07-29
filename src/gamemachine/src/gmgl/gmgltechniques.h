@@ -26,6 +26,7 @@ class GMGLTechnique : public GMObject, public ITechnique
 
 public:
 	GMGLTechnique(const IRenderContext* context);
+	~GMGLTechnique();
 
 	virtual void draw(GMModel* model) override;
 	virtual IShaderProgram* getShaderProgram() = 0;
@@ -130,6 +131,7 @@ class GMGLTechnique_Filter : public GMGLTechnique
 
 public:
 	GMGLTechnique_Filter(const IRenderContext* context);
+	~GMGLTechnique_Filter();
 
 private:
 	virtual void beforeDraw(GMModel* model) override;
@@ -156,6 +158,7 @@ class GMGLTechnique_LightPass : public GMGLTechnique
 
 public:
 	GMGLTechnique_LightPass(const IRenderContext* context);
+	~GMGLTechnique_LightPass();
 
 protected:
 	virtual IShaderProgram* getShaderProgram() override;

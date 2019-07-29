@@ -202,7 +202,7 @@ GM_ALIGNED_STRUCT(BSPLightVolumes)
 
 GM_PRIVATE_OBJECT_UNALIGNED(GMBSP)
 {
-	GM_FRIEND_CLASS(GMBSP);
+	friend class GMBSP;
 
 	BSPLightVolumes lightVols;
 	AlignedVector<BSPPlane> planes;

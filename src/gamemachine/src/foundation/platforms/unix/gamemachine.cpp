@@ -4,7 +4,9 @@
 #include <locale.h>
 #include <X11/Xlib.h>
 #include "window/gmxrendercontext.h"
+#include "foundation/gamemachine_p.h"
 
+BEGIN_NS
 namespace
 {
 	void getSystemInfo(GMSystemInfo& si)
@@ -314,3 +316,4 @@ void GameMachine::initSystemInfo()
 		}
 	}
 }
+END_NS

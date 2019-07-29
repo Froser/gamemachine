@@ -3,6 +3,8 @@
 #include "../../utilities/tools.h"
 #include <pthread.h>
 
+BEGIN_NS
+
 GM_PRIVATE_OBJECT_UNALIGNED(GMEvent)
 {
 	void* handle = nullptr;
@@ -18,7 +20,7 @@ struct GMEventHandleStruct
 
 GMEvent::GMEvent(bool manualReset, bool initialState)
 {
-	GM_CREATE_DATA(GMEvent);
+	GM_CREATE_DATA();
 
 	D(d);
 	GMEventHandleStruct* handle = new GMEventHandleStruct();
@@ -81,3 +83,5 @@ GMManualResetEvent::GMManualResetEvent(bool initialState)
 	: GMEvent(true, initialState)
 {
 }
+
+END_NS

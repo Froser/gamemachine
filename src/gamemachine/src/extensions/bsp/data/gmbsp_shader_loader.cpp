@@ -292,7 +292,7 @@ void GMBSPShaderLoader::parse_cull(GMShader& shader, GMXMLElement* elem)
 {
 	const char* text = elem->GetText();
 	if (GMString::stringEquals(text, "none"))
-		shader.setCull(GMS_Cull::None);
+		shader.setCull(GMS_Cull::NoCull);
 	else if (GMString::stringEquals(text, "cull"))
 		shader.setCull(GMS_Cull::Cull);
 	else
@@ -566,7 +566,7 @@ void GMBSPShaderLoader::createSky(GMShader& shader)
 		GMShader skyShader = shader;
 
 		skyShader.setVisible(true);
-		skyShader.setCull(GMS_Cull::None);
+		skyShader.setCull(GMS_Cull::NoCull);
 		skyShader.setBlend(false);
 
 		GMBSPSkyGameObject* sky = new GMBSPSkyGameObject(skyShader, MakeVector3(d->bspRender->boundMin), MakeVector3(d->bspRender->boundMax));

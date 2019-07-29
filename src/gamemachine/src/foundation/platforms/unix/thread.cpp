@@ -6,6 +6,16 @@
 
 BEGIN_NS
 
+GM_PRIVATE_OBJECT_UNALIGNED(GMThread)
+{
+	IThreadCallback* callback = nullptr;
+	GMThreadHandle handle = 0;
+	ThreadState state;
+	ThreadPriority priority = ThreadPriority::Normal;
+	GMThreadAttr attr;
+	bool done = false;
+};
+
 namespace
 {
 	void* threadProc(void* param)
@@ -24,19 +34,9 @@ namespace
 	}
 }
 
-GM_PRIVATE_OBJECT_UNALIGNED(GMThread)
-{
-	IThreadCallback* callback = nullptr;
-	GMThreadHandle handle = 0;
-	ThreadState state;
-	ThreadPriority priority = ThreadPriority::Normal;
-	GMThreadAttr attr;
-	bool done = false;
-};
-
 GMThread::GMThread()
 {
-	GM_CREATE_DATA(GMThread);
+	GM_CREATE_DATA();
 
 	D(d);
 	d->state = ThreadState::NotRunning;
@@ -125,7 +125,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMMutex)
 
 GMMutex::GMMutex()
 {
-	GM_CREATE_DATA(GMMutex);
+	GM_CREATE_DATA();
 	D(d);
 	pthread_mutex_init(&d->mutex, NULL);
 }

@@ -11,40 +11,18 @@ class JoystickStateImpl;
 class MouseStateImpl;
 class KeyboardStateImpl;
 
-GM_PRIVATE_OBJECT(GMInput)
-{
-	enum { MAX_KEYS = 256 };
-	bool detectingMode = false;
-	IWindow* window = nullptr;
-
-	GMJoystickState joystickState;
-
-	// keyboard
-	GMbyte keyState[256] = {0};
-	GMbyte lastKeyState[MAX_KEYS] = {0};
-
-	// mouse
-	GMMouseState mouseState;
-	GMWheelState wheelState;
-
-	// implements
-	IJoystickState* joystickImpl = nullptr;
-	IMouseState* mouseImpl = nullptr;
-	IKeyboardState* keyboardImpl = nullptr;
-	IIMState* imImpl = nullptr;
-};
-
-class GMInput :
-	public GMObject,
-	public IInput
+GM_PRIVATE_CLASS(GMInput);
+class GMInput : public IInput
 {
 	GM_DECLARE_PRIVATE(GMInput)
+	GM_DISABLE_COPY_ASSIGN(GMInput)
+	GM_FRIEND_CLASS(JoystickStateImpl)
+	GM_FRIEND_CLASS(MouseStateImpl)
+	GM_FRIEND_CLASS(KeyboardStateImpl)
 
 public:
 	GMInput(IWindow* window);
 	~GMInput();
-
-public:
 
 	// IInput
 public:
@@ -57,30 +35,10 @@ public:
 	virtual void handleSystemEvent(GMSystemEvent* event) override;
 
 private:
-	void recordMouseDown(GMMouseButton button)
-	{
-		D(d);
-		d->mouseState.downButton |= button;
-	}
-
-	void recordMouseUp(GMMouseButton button)
-	{
-		D(d);
-		d->mouseState.upButton |= button;
-	}
-
-	void recordWheel(bool wheeled, GMshort delta)
-	{
-		D(d);
-		d->wheelState.wheeled = wheeled;
-		d->wheelState.delta = delta;
-	}
-
-	void recordMouseMove()
-	{
-		D(d);
-		d->mouseState.moving = true;
-	}
+	void recordMouseDown(GMMouseButton button);
+	void recordMouseUp(GMMouseButton button);
+	void recordWheel(bool wheeled, GMshort delta);
+	void recordMouseMove();
 };
 
 END_NS

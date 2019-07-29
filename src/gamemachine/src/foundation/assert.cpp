@@ -24,5 +24,5 @@ void Assert::gm_assert(const char *assertion, const char *file, int line)
 		_CrtDbgBreak();
 #endif
 }
-END_NS
 #endif
+END_NS

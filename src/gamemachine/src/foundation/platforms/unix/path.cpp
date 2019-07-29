@@ -3,6 +3,8 @@
 #include <gmtools.h>
 #include <unistd.h>
 
+BEGIN_NS
+
 namespace
 {
 	int GetModuleFileName( char* sFileName, int nSize)
@@ -87,7 +89,7 @@ GMString GMPath::getCurrentPath()
 {
 	const int MAX = 255;
 	char fn[MAX];
-	::GetModuleFileName(fn, MAX);
+	GetModuleFileName(fn, MAX);
 	return directoryName(fn);
 }
 
@@ -109,3 +111,5 @@ GMString GMPath::getSpecialFolderPath(SpecialFolder sf)
 		return GMString();
 	}
 }
+
+END_NS

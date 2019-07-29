@@ -17,7 +17,7 @@ class GM_EXPORT GMParticleModel_Cocos2D : public IDestroyObject
 public:
 	enum BufferFlags
 	{
-		None = 0x00, // 考虑粒子的所有坐标分量
+		ConsiderAll = 0x00, // 考虑粒子的所有坐标分量
 		IgnorePosZ = 0x01, // 计算粒子时不考虑粒子z坐标
 	};
 

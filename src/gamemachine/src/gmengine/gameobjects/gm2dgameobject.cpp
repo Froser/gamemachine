@@ -104,7 +104,7 @@ void GM2DGameObjectBase::initShader(GMShader& shader)
 	frame.setMagFilter(GMS_TextureFilter::Linear);
 	frame.addFrame(glyphManager->glyphTexture());
 	shader.setNoDepthTest(true);
-	shader.setCull(GMS_Cull::None);
+	shader.setCull(GMS_Cull::NoCull);
 	shader.setBlend(true);
 	shader.setBlendFactorSource(GMS_BlendFunc::SourceAlpha);
 	shader.setBlendFactorDest(GMS_BlendFunc::OneMinusSourceAlpha);

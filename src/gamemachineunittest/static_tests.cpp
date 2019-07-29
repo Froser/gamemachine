@@ -1,5 +1,4 @@
 ﻿#include <stdafx.h>
-#include "cases/objectmove.h"
 #include <gmlua.h>
 
 void static_test()

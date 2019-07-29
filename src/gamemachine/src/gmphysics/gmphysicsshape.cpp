@@ -83,7 +83,7 @@ namespace
 			collisionShape2TriangleMesh(shape, origin, vertexPositions, vertexNormals, indices);
 
 			GMPart* body = new GMPart(out);
-			out->getShader().setCull(GMS_Cull::None);
+			out->getShader().setCull(GMS_Cull::NoCull);
 			GMint32 faceCount = indices.size() / 3;
 			for (GMint32 i = 0; i < faceCount; ++i)
 			{

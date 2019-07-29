@@ -63,7 +63,7 @@ GMGameObject* GMParticleModel_Cocos2D::createGameObject(
 	D(d);
 	GMGameObject* object = new GMGameObject();
 	d->particleModel = new GMModel();
-	d->particleModel->getShader().setCull(GMS_Cull::None);
+	d->particleModel->getShader().setCull(GMS_Cull::NoCull);
 	d->particleModel->getShader().setBlend(true);
 	d->particleModel->getShader().setNoDepthTest(true);
 	d->particleModel->getShader().setBlendFactorSource(GMS_BlendFunc::SourceAlpha);
@@ -256,7 +256,7 @@ void GMParticleModel_Cocos2D::GPUUpdate(IComputeShaderProgram* shaderProgram, vo
 		d->particleSizeChanged = false;
 	}
 
-	GMComputeBufferHandle futureResult = prepareBuffers(shaderProgram, GMParticleModel_Cocos2D::None);
+	GMComputeBufferHandle futureResult = prepareBuffers(shaderProgram, GMParticleModel_Cocos2D::ConsiderAll);
 	if (futureResult)
 	{
 		shaderProgram->dispatch(sz, 1, 1);
@@ -501,7 +501,7 @@ GMString GMParticleModel_3D::getCode()
 
 GMComputeBufferHandle GMParticleModel_3D::prepareBuffers(IComputeShaderProgram* shaderProgram, const IRenderContext* context, BufferFlags)
 {
-	return GMParticleModel_Cocos2D::prepareBuffers(shaderProgram, GMParticleModel_Cocos2D::None);
+	return GMParticleModel_Cocos2D::prepareBuffers(shaderProgram, GMParticleModel_Cocos2D::ConsiderAll);
 }
 
 END_NS

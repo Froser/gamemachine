@@ -198,7 +198,7 @@ void GMPrimitive3DObject::initShader(GMShader& shader)
 	frame.setMagFilter(GMS_TextureFilter::Linear);
 	frame.addFrame(glyphManager->glyphTexture());
 	shader.setNoDepthTest(true);
-	shader.setCull(GMS_Cull::None);
+	shader.setCull(GMS_Cull::NoCull);
 }
 
 class GMLine3D : public GMPrimitive3DObject

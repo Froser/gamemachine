@@ -6,6 +6,9 @@
 #include "gmxrendercontext.h"
 #include "gmwindowhelper.h"
 #include <gamemachine.h>
+#include "gmengine/ui/gmwindow_p.h"
+
+BEGIN_NS
 
 namespace
 {
@@ -100,3 +103,5 @@ GMWindowProcHandler GMWindow::getProcHandler()
 void GMWindow::setMultithreadRenderingFlag(GMMultithreadRenderingFlag)
 {
 }
+
+END_NS

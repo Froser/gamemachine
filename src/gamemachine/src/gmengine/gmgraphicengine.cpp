@@ -10,6 +10,7 @@
 #include "gmprimitivemanager.h"
 #include "gmcsmhelper.h"
 #include "gmcomputeshadermanager.h"
+#include <algorithm>
 
 BEGIN_NS
 

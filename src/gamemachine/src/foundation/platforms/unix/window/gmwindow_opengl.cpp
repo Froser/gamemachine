@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "gmengine/ui/gmwindow.h"
+#include "gmengine/ui/gmwindow_p.h"
 #include <GL/glew.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -18,6 +19,8 @@
 #ifndef HOST_NAME_MAX
 #define HOST_NAME_MAX 255
 #endif
+
+BEGIN_NS
 
 namespace
 {
@@ -83,6 +86,7 @@ namespace
 	}
 }
 
+class GMWindow_OpenGL;
 GM_PRIVATE_OBJECT_UNALIGNED(GMWindow_OpenGL)
 {
 	GMWindow_OpenGL* parent = nullptr;
@@ -93,8 +97,8 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMWindow_OpenGL)
 
 class GMWindow_OpenGL : public GMWindow
 {
-	GM_DECLARE_PRIVATE_NGO(GMWindow_OpenGL)
-	typedef GMWindow Base;
+	GM_DECLARE_PRIVATE(GMWindow_OpenGL)
+	GM_DECLARE_BASE(GMWindow)
 
 public:
 	GMWindow_OpenGL(IWindow* parent);
@@ -116,6 +120,7 @@ private:
 
 GMWindow_OpenGL::GMWindow_OpenGL(IWindow* parent)
 {
+	GM_CREATE_DATA();
 	D(d);
 	if (parent)
 	{
@@ -342,7 +347,7 @@ const IRenderContext* GMWindow_OpenGL::getContext()
 void GMWindow_OpenGL::dispose()
 {
 	D(d);
-	gm::GMWindowHandle wnd = getWindowHandle();
+	GMWindowHandle wnd = getWindowHandle();
 	const GMXRenderContext* context = gm_cast<const GMXRenderContext*>(getContext());
 	if (!d->parent && context && context->getGlxContext())
 	{
@@ -398,3 +403,5 @@ bool GMWindowFactory::destroyTempWindow(GMWindowHandle tmpWnd, GMDeviceContextHa
 {
 
 }
+
+END_NS

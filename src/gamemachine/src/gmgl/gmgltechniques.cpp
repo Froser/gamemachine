@@ -255,6 +255,11 @@ GMGLTechnique::GMGLTechnique(const IRenderContext* context)
 	});
 }
 
+GMGLTechnique::~GMGLTechnique()
+{
+
+}
+
 void GMGLTechnique::draw(GMModel* model)
 {
 	D(d);
@@ -1009,6 +1014,11 @@ GMGLTechnique_Filter::GMGLTechnique_Filter(const IRenderContext* context)
 	GM_CREATE_DATA();
 }
 
+GMGLTechnique_Filter::~GMGLTechnique_Filter()
+{
+	
+}
+
 //////////////////////////////////////////////////////////////////////////
 void GMGLTechnique_Filter::beforeDraw(GMModel* model)
 {
@@ -1094,6 +1104,11 @@ GMGLTechnique_LightPass::GMGLTechnique_LightPass(const IRenderContext* context)
 	: Base(context)
 {
 	GM_CREATE_DATA();
+}
+
+GMGLTechnique_LightPass::~GMGLTechnique_LightPass()
+{
+
 }
 
 IShaderProgram* GMGLTechnique_LightPass::getShaderProgram()

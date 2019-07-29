@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmwindowhelper.h"
 
+BEGIN_NS
 GMRect GMWindowHelper::getWindowRect(Display* display, Window window, Window parentWindow)
 {
 	GMRect rc;
@@ -19,3 +20,4 @@ GMRect GMWindowHelper::getWindowRect(Display* display, Window window, Window par
 	rc.height = winAttributes.height;
 	return rc;
 }
+END_NS

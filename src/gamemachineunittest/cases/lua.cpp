@@ -8,7 +8,7 @@
 
 namespace
 {
-	GM_PRIVATE_OBJECT(LuaObject)
+	GM_PRIVATE_OBJECT_ALIGNED(LuaObject)
 	{
 		gm::GMint32 i;
 		gm::GMfloat f;
@@ -23,18 +23,25 @@ namespace
 	class LuaObject : public gm::GMObject
 	{
 		GM_DECLARE_PRIVATE(LuaObject)
-		GM_DECLARE_PROPERTY(i, i)
-		GM_DECLARE_PROPERTY(f, f)
-		GM_DECLARE_PROPERTY(b, b)
-		GM_DECLARE_PROPERTY(str, str)
-		GM_DECLARE_PROPERTY(v2, v2)
-		GM_DECLARE_PROPERTY(v3, v3)
-		GM_DECLARE_PROPERTY(v4, v4)
-		GM_DECLARE_PROPERTY(m, m)
+		GM_DECLARE_EMBEDDED_PROPERTY(i, i)
+		GM_DECLARE_EMBEDDED_PROPERTY(f, f)
+		GM_DECLARE_EMBEDDED_PROPERTY(b, b)
+		GM_DECLARE_EMBEDDED_PROPERTY(str, str)
+		GM_DECLARE_EMBEDDED_PROPERTY(v2, v2)
+		GM_DECLARE_EMBEDDED_PROPERTY(v3, v3)
+		GM_DECLARE_EMBEDDED_PROPERTY(v4, v4)
+		GM_DECLARE_EMBEDDED_PROPERTY(m, m)
 
 	public:
+		LuaObject();
+
 		virtual bool registerMeta() override;
 	};
+
+	LuaObject::LuaObject()
+	{
+		GM_CREATE_DATA();
+	}
 
 	bool LuaObject::registerMeta()
 	{

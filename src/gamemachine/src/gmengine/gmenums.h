@@ -45,7 +45,7 @@ enum class GMS_BlendOp
 enum class GMS_Cull
 {
 	Cull = 0, //!< 绘制时进行面剔除
-	None, //!< 绘制时禁用面剔除
+	NoCull, //!< 绘制时禁用面剔除
 };
 
 //! 多边形正方向枚举

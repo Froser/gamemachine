@@ -3,6 +3,7 @@
 #include <gamemachine.h>
 #include "gmxrendercontext.h"
 
+BEGIN_NS
 namespace
 {
 	void setCursorPos(Display* display, Window root, GMint32 x, GMint32 y)
@@ -12,47 +13,69 @@ namespace
 	}
 }
 
-namespace gm
+class JoystickStateImpl : public IJoystickState
 {
-	class JoystickStateImpl : public IJoystickState
-	{
-	public:
-		JoystickStateImpl(GMInput* host) { m_host = host; }
-		virtual void vibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed) override;
-		virtual GMJoystickState state() override;
-	private:
-		GMInput* m_host = nullptr;
-	};
+public:
+	JoystickStateImpl(GMInput* host) { m_host = host; }
+	virtual void vibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed) override;
+	virtual GMJoystickState state() override;
+private:
+	GMInput* m_host = nullptr;
+};
 
-	class MouseStateImpl : public IMouseState
-	{
-	public:
-		MouseStateImpl(GMInput* host) { m_host = host; }
-		virtual GMMouseState state() override;
-		virtual void setDetectingMode(bool center) override;
-	private:
-		GMInput* m_host = nullptr;
-	};
+class MouseStateImpl : public IMouseState
+{
+public:
+	MouseStateImpl(GMInput* host) { m_host = host; }
+	virtual GMMouseState state() override;
+	virtual void setDetectingMode(bool center) override;
+private:
+	GMInput* m_host = nullptr;
+};
 
-	class KeyboardStateImpl : public IKeyboardState
-	{
-	public:
-		KeyboardStateImpl(GMInput* host) { m_host = host; }
-		virtual bool keydown(GMKey key) override;
-		virtual bool keyTriggered(GMKey key) override;
-	private:
-		GMInput* m_host = nullptr;
-	};
+class KeyboardStateImpl : public IKeyboardState
+{
+public:
+	KeyboardStateImpl(GMInput* host) { m_host = host; }
+	virtual bool keydown(GMKey key) override;
+	virtual bool keyTriggered(GMKey key) override;
+private:
+	GMInput* m_host = nullptr;
+};
 
-	class IMStateImpl : public IIMState
-	{
-	public:
-		virtual void activate(GMKeyboardLayout layout) { /*TODO*/ }
-	};
-}
+class IMStateImpl : public IIMState
+{
+public:
+	virtual void activate(GMKeyboardLayout layout) { /*TODO*/ }
+};
+
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMInput)
+{
+	enum { MAX_KEYS = 256 };
+	bool detectingMode = false;
+	IWindow* window = nullptr;
+
+	GMJoystickState joystickState;
+
+	// keyboard
+	GMbyte keyState[256] = {0};
+	GMbyte lastKeyState[MAX_KEYS] = {0};
+
+	// mouse
+	GMMouseState mouseState;
+	GMWheelState wheelState;
+
+	// implements
+	IJoystickState* joystickImpl = nullptr;
+	IMouseState* mouseImpl = nullptr;
+	IKeyboardState* keyboardImpl = nullptr;
+	IIMState* imImpl = nullptr;
+};
 
 GMInput::GMInput(IWindow* window)
 {
+	GM_CREATE_DATA();
 	D(d);
 	d->window = window;
 	d->joystickImpl = new JoystickStateImpl(this);
@@ -142,6 +165,30 @@ void GMInput::handleSystemEvent(GMSystemEvent* event)
 	}
 }
 
+void GMInput::recordMouseDown(GMMouseButton button)
+{
+	D(d);
+	d->mouseState.downButton |= button;
+}
+
+void GMInput::recordMouseUp(GMMouseButton button)
+{
+	D(d);
+	d->mouseState.upButton |= button;
+}
+
+void GMInput::recordWheel(bool wheeled, GMshort delta)
+{
+	D(d);
+	d->wheelState.wheeled = wheeled;
+	d->wheelState.delta = delta;
+}
+
+void GMInput::recordMouseMove()
+{
+	D(d);
+	d->mouseState.moving = true;
+}
 //////////////////////////////////////////////////////////////////////////
 void MouseStateImpl::setDetectingMode(bool enable)
 {
@@ -233,3 +280,5 @@ bool KeyboardStateImpl::keyTriggered(GMKey key)
 {
 	return false;
 }
+
+END_NS

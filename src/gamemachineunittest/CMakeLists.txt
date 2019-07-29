@@ -25,8 +25,6 @@ set(SOURCES
 		static_tests.cpp
 		main.cpp
 
-		cases/objectmove.h
-		cases/objectmove.cpp
 		cases/hook.h
 		cases/hook.cpp
 		cases/string.h

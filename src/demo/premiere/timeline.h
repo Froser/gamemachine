@@ -5,6 +5,7 @@
 #include <gmxml.h>
 #include <gmanimation.h>
 #include <extensions/objects/gmwavegameobject.h>
+#include <gmgraphicengine.h>
 
 using namespace gm;
 
@@ -140,14 +141,14 @@ struct AlignCache : AlignedVector<T>
 {
 	GMsize_t put(const T& value)
 	{
-		push_back(value);
-		return size() - 1;
+		this->push_back(value);
+		return this->size() - 1;
 	}
 
 	GMsize_t put(T&& value)
 	{
-		push_back(std::move(value));
-		return size() - 1;
+		this->push_back(std::move(value));
+		return this->size() - 1;
 	}
 };
 

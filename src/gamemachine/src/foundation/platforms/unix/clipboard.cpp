@@ -3,6 +3,8 @@
 #include "foundation/utilities/tools.h"
 #include "foundation/assert.h"
 
+BEGIN_NS
+
 namespace
 {
 	struct GMClipboardData
@@ -20,3 +22,5 @@ GMBuffer GMClipboard::getData(GMClipboardMIME mime)
 {
 	return s_clipboardData.data[static_cast<GMsize_t>(mime)];
 }
+
+END_NS

@@ -2,8 +2,27 @@
 #include "gmxrendercontext.h"
 #include <GL/glx.h>
 #include <X11/Xlib.h>
-#include <X11/Xatom.h>
 #include <gmwindow.h>
+
+BEGIN_NS
+
+GM_PRIVATE_OBJECT_UNALIGNED(GMXRenderContext)
+{
+	IWindow* window = nullptr;
+	GMint32 screen;
+	GMint32 screenWidth, screenHeight, screenWidthMM, screenHeightMM;
+	Window rootWindow;
+	GLXContext glxContext;
+	GMint32 connection = 0;
+	Atom aDeleteWindow = None;
+	Atom aState = None;
+	Atom aStateFullScreen = None;
+	Atom aNetWMPid = None;
+	Atom aClientMachine = None;
+	bool netWMSupported;
+	XIM im;
+	XIC ic;
+};
 
 // Implement GMRenderContext
 IWindow* GMRenderContext::getWindow() const
@@ -20,8 +39,18 @@ IGraphicEngine* GMRenderContext::getEngine() const
 Display* GMXRenderContext::s_display = nullptr;
 GMint32 GMXRenderContext::s_instanceCount = 0;
 
+GM_DEFINE_PROPERTY(GMXRenderContext, GLXContext, GlxContext, glxContext)
+GM_DEFINE_PROPERTY(GMXRenderContext, GMint32, ScreenWidth, screenWidth)
+GM_DEFINE_PROPERTY(GMXRenderContext, GMint32, ScreenHeight, screenHeight)
+GM_DEFINE_GETTER(GMXRenderContext, bool, NetWMSupported, netWMSupported)
+GM_DEFINE_GETTER(GMXRenderContext, Atom, AtomDeleteWindow, aDeleteWindow)
+GM_DEFINE_GETTER(GMXRenderContext, Atom, AtomNetWMPid, aNetWMPid)
+GM_DEFINE_GETTER(GMXRenderContext, Atom, AtomClientMachine, aClientMachine)
+GM_DEFINE_GETTER(GMXRenderContext, XIC, IC, ic)
+
 GMXRenderContext::GMXRenderContext(IWindow* window, const char* displayName)
 {
+	GM_CREATE_DATA();
 	initX(window, displayName);
 	++s_instanceCount;
 }
@@ -192,3 +221,22 @@ bool GMXRenderContext::isHintPresent(Window window, Atom property, Atom hint)
 	XFree(atoms);
 	return supported;
 }
+
+Display* GMXRenderContext::getDisplay() const GM_NOEXCEPT
+{
+	return const_cast<Display*>(s_display);
+}
+
+GMint32 GMXRenderContext::getScreen() const GM_NOEXCEPT
+{
+	D(d);
+	return d->screen;
+}
+
+Window GMXRenderContext::getRootWindow() const GM_NOEXCEPT
+{
+	D(d);
+	return d->rootWindow;
+}
+
+END_NS
