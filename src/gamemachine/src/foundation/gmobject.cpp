@@ -130,13 +130,13 @@ const GMMeta* GMObject::meta() const
 
 void GMObject::connect(GMObject& sender, GMSignal sig, const GMEventCallback& callback)
 {
-	D_OF(d, &sender)
+	D_OF(d, &sender);
 	d->addConnection(std::move(sig), *this, callback);
 }
 
 void GMObject::disconnect(GMObject& sender, GMSignal sig)
 {
-	D_OF(d, &sender)
+	D_OF(d, &sender);
 	d->removeSignalAndConnection(std::move(sig), *this);
 }
 
