@@ -148,6 +148,65 @@ IFramebuffers* GMFramebuffersStack::peek()
 	return d->framebuffers.top();
 }
 
+void GMGraphicEnginePrivate::setCascadeCamera(GMCascadeLevel level, const GMCamera& camera)
+{
+	shadowCameraVPmatrices[level] = camera.getViewMatrix() * camera.getProjectionMatrix();
+}
+
+void GMGraphicEnginePrivate::deleteLights()
+{
+	for (auto light : lights)
+	{
+		light->destroy();
+	}
+
+	lights.clear();
+}
+
+void GMGraphicEnginePrivate::dispose()
+{
+	deleteLights();
+	GMComputeShaderManager::instance().disposeShaderPrograms(context);
+	if (filterFramebuffers)
+		filterFramebuffers->destroy();
+	if (filterQuad)
+		filterQuad->destroy();
+	if (gBuffer)
+		gBuffer->destroy();
+	if (shadowDepthFramebuffers)
+		shadowDepthFramebuffers->destroy();
+	if (defaultFramebuffers)
+		defaultFramebuffers->destroy();
+	if (glyphManager)
+		glyphManager->destroy();
+}
+
+IGBuffer* GMGraphicEnginePrivate::createGBuffer()
+{
+	IGBuffer* gBuffer = nullptr;
+	GM.getFactory()->createGBuffer(context, &gBuffer);
+	GM_ASSERT(gBuffer);
+	return gBuffer;
+}
+
+GMGameObject* GMGraphicEngine::getFilterQuad()
+{
+	D(d);
+	return d->filterQuad;
+}
+
+IShaderLoadCallback* GMGraphicEngine::getShaderLoadCallback()
+{
+	D(d);
+	return d->shaderLoadCallback;
+}
+
+const Vector<ILight*>& GMGraphicEngine::getLights()
+{
+	D(d);
+	return d->lights;
+}
+
 GMGraphicEngine::GMGraphicEngine(const IRenderContext* context)
 {
 	GM_CREATE_DATA();
@@ -172,7 +231,11 @@ GMGraphicEngine::GMGraphicEngine(const IRenderContext* context)
 
 GMGraphicEngine::~GMGraphicEngine()
 {
-	dispose();
+	if (GM_HAS_DATA())
+	{
+		D(d);
+		d->dispose();
+	}
 }
 
 void GMGraphicEngine::init()
@@ -186,7 +249,7 @@ IGBuffer* GMGraphicEngine::getGBuffer()
 	D(d);
 	if (!d->gBuffer)
 	{
-		d->gBuffer = createGBuffer();
+		d->gBuffer = d->createGBuffer();
 		d->gBuffer->init();
 	}
 	return d->gBuffer;
@@ -389,6 +452,7 @@ void GMGraphicEngine::createShadowFramebuffers(OUT IFramebuffers** framebuffers)
 
 void GMGraphicEngine::resetCSM()
 {
+	D(d);
 	ICSMFramebuffers* csm = getCSMFramebuffers();
 	const GMShadowSourceDesc& shadowSourceDesc = getShadowSourceDesc();
 	if (shadowSourceDesc.cascades > 1)
@@ -400,13 +464,13 @@ void GMGraphicEngine::resetCSM()
 			// 我们需要计算出此层的投影和frustum
 			GMCamera shadowCamera = shadowSourceDesc.camera;
 			GMCSMHelper::setOrthoCamera(csm, getCamera(), shadowSourceDesc, shadowCamera);
-			setCascadeCamera(i, shadowCamera);
+			d->setCascadeCamera(i, shadowCamera);
 		}
 	}
 	else
 	{
 		// 如果只有一层，则不使用CSM
-		setCascadeCamera(0, shadowSourceDesc.camera);
+		d->setCascadeCamera(0, shadowSourceDesc.camera);
 	}
 }
 
@@ -533,79 +597,16 @@ void GMGraphicEngine::drawFilterFramebuffer()
 	getFilterQuad()->draw();
 }
 
-void GMGraphicEngine::setCascadeCamera(GMCascadeLevel level, const GMCamera& camera)
-{
-	D(d);
-	d->shadowCameraVPmatrices[level] = camera.getViewMatrix() * camera.getProjectionMatrix();
-}
-
-void GMGraphicEngine::deleteLights()
-{
-	D(d);
-	for (auto light : d->lights)
-	{
-		light->destroy();
-	}
-
-	d->lights.clear();
-}
-
 const GMMat4& GMGraphicEngine::getCascadeCameraVPMatrix(GMCascadeLevel level)
 {
 	D(d);
 	return d->shadowCameraVPmatrices[level];
 }
 
-GMGameObject* GMGraphicEngine::getFilterQuad()
-{
-	D(d);
-	return d->filterQuad;
-}
-
 GMFramebuffersStack& GMGraphicEngine::getFramebuffersStack()
 {
 	D(d);
 	return d->framebufferStack;
-}
-
-IShaderLoadCallback* GMGraphicEngine::getShaderLoadCallback()
-{
-	D(d);
-	return d->shaderLoadCallback;
-}
-
-const Vector<ILight*>& GMGraphicEngine::getLights()
-{
-	D(d);
-	return d->lights;
-}
-
-void GMGraphicEngine::dispose()
-{
-	D(d);
-	deleteLights();
-	GMComputeShaderManager::instance().disposeShaderPrograms(d->context);
-	if (d->filterFramebuffers)
-		d->filterFramebuffers->destroy();
-	if (d->filterQuad)
-		d->filterQuad->destroy();
-	if (d->gBuffer)
-		d->gBuffer->destroy();
-	if (d->shadowDepthFramebuffers)
-		d->shadowDepthFramebuffers->destroy();
-	if (d->defaultFramebuffers)
-		d->defaultFramebuffers->destroy();
-	if (d->glyphManager)
-		d->glyphManager->destroy();
-}
-
-IGBuffer* GMGraphicEngine::createGBuffer()
-{
-	D(d);
-	IGBuffer* gBuffer = nullptr;
-	GM.getFactory()->createGBuffer(d->context, &gBuffer);
-	GM_ASSERT(gBuffer);
-	return gBuffer;
 }
 
 void GMGraphicEngine::setShadowSource(const GMShadowSourceDesc& desc)
@@ -743,7 +744,8 @@ bool GMGraphicEngine::removeLight(GMLightIndex index)
 
 void GMGraphicEngine::removeLights()
 {
-	deleteLights();
+	D(d);
+	d->deleteLights();
 	update(GMUpdateDataType::LightChanged);
 }
 

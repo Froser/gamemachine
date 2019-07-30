@@ -31,6 +31,12 @@ GM_PRIVATE_OBJECT_ALIGNED(GMGraphicEngine)
 	IFramebuffers* shadowDepthFramebuffers = nullptr;
 	GMMat4 shadowCameraVPmatrices[GMMaxCascades];
 	bool isDrawingShadow = false;
+
+	// methods
+	void dispose();
+	IGBuffer* createGBuffer();
+	void setCascadeCamera(GMCascadeLevel level, const GMCamera& camera);
+	void deleteLights();
 };
 
 END_NS

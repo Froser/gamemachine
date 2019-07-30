@@ -268,21 +268,6 @@ public:
 	  \sa startGameMachine(), startGameMachineWithoutMessageLoop()
 	*/
 	void finalize();
-
-private:
-	void initSystemInfo();
-	void runEventLoop();
-	template <typename T, typename U> void registerManager(T* newObject, OUT U** manager);
-	bool handleMessage(const GMMessage& msg);
-	void updateGameMachine();
-	void setRenderEnvironment(GMRenderEnvironment renv);
-	bool checkCrashDown();
-	void beginHandlerEvents(IWindow* window);
-	void endHandlerEvents(IWindow* window);
-	void eachHandler(std::function<void(IWindow*, IGameHandler*)> action);
-	void beforeStartGameMachine();
-	void initHandlers();
-	void invokeCallables();
 };
 
 END_NS

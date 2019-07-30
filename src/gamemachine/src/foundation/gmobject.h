@@ -24,6 +24,7 @@ GM_ALIGNED_16(struct) GMObjectPrivateAlignedBase
 #define GM_DECLARE_PRIVATE(className)														\
 	public:																					\
 		typedef className##Private Data;													\
+		friend struct className##Private;													\
 	protected:																				\
 		gm::GMOwnedPtr<Data> _gm_data;														\
 		inline Data* data() const {															\
@@ -54,6 +55,7 @@ GM_ALIGNED_16(struct) GMObjectPrivateAlignedBase
 #define GM_PRIVATE_OBJECT_UNALIGNED_FROM(name, extends) struct GM_PRIVATE_NAME(name) : public GM_PRIVATE_NAME(extends)
 
 #define GM_CREATE_DATA() { _gm_data.reset(new Data()); }
+#define GM_SET_PD() _gm_data->public_pointer = this;
 
 //////////////////////////////////////////////////////////////////////////
 #define GM_DECLARE_INLINE_GETTER_ACCESSOR(name, memberName, accessor) \
@@ -132,7 +134,7 @@ GM_ALIGNED_16(struct) GMObjectPrivateAlignedBase
 
 #define GM_DECLARE_POINTER(name) class name; typedef name *name##Ptr;
 
-#define friend_methods(clsName) private
+#define friend_methods(clsName) protected
 
 #define GM_COPY(rhs) \
 	{ GM_CREATE_DATA(); \
@@ -274,13 +276,30 @@ using GMSlots = HashMap<GMSignal, Vector<GMCallbackTarget>, GMStringHashFunctor>
 #define GM_END_META_MAP \
 	return true; }
 
+#define GM_HAS_DATA() (!!_gm_data)
+
+#define GM_DECLARE_PUBLIC(clsName) \
+	void* public_pointer = nullptr; \
+	clsName* pd_func() { return static_cast<clsName*>(public_pointer); }
+#define P_D(d) auto d = pd_func(); GM_ASSERT(d)
+
+class GMObject;
 GM_PRIVATE_OBJECT_ALIGNED(GMObject)
 {
+	GM_DECLARE_PUBLIC(GMObject)
+
 	bool metaRegistered = false;
 	GMMeta meta;
 	GMSlots objSlots;
 	GMThreadId tid = 0;
 	GMConnectionTargets connectionTargets;
+	GMObjectPrivate& dataOf(GMObject&);
+	void addConnection(GMSignal sig, GMObject& receiver, GMEventCallback callback);
+	void removeSignalAndConnection(GMSignal sig, GMObject& receiver);
+	void removeSignal(GMSignal sig, GMObject& receiver);
+	void releaseConnections();
+	void addConnection(GMObject* host, GMSignal sig);
+	void removeConnection(GMObject* host, GMSignal sig);
 };
 // 所有GM对象的基类，如果可以用SSE指令，那么它是16字节对齐的
 
@@ -355,14 +374,6 @@ public:
 	  \param tid 将要移交到的线程。
 	*/
 	void moveToThread(GMThreadId tid) GM_NOEXCEPT;
-
-private:
-	void addConnection(GMSignal sig, GMObject& receiver, GMEventCallback callback);
-	void removeSignalAndConnection(GMSignal sig, GMObject& receiver);
-	void removeSignal(GMSignal sig, GMObject& receiver);
-	void releaseConnections();
-	void addConnection(GMObject* host, GMSignal sig);
-	void removeConnection(GMObject* host, GMSignal sig);
 
 protected:
 	virtual bool registerMeta() { return false; }

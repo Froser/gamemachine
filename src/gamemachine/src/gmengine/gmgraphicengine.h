@@ -304,12 +304,6 @@ protected:
 	IShaderLoadCallback* getShaderLoadCallback();
 	const Vector<ILight*>& getLights();
 
-private:
-	void dispose();
-	IGBuffer* createGBuffer();
-	void setCascadeCamera(GMCascadeLevel level, const GMCamera& camera);
-	void deleteLights();
-
 public:
 	static constexpr const GMsize_t getMaxLightCount()
 	{

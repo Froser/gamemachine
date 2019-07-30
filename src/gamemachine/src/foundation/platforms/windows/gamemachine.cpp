@@ -211,9 +211,9 @@ namespace
 	}
 }
 
-void GameMachine::runEventLoop()
+void GameMachinePrivate::runEventLoop()
 {
-	D(d);
+	P_D(pd);
 	MSG msg;
 	msg.message = WM_NULL;
 	PeekMessage(&msg, NULL, 0U, 0U, PM_NOREMOVE);
@@ -229,18 +229,52 @@ void GameMachine::runEventLoop()
 		}
 		else
 		{
-			if (d->runningMode == GMGameMachineRunningMode::GameMode)
+			if (runningMode == GMGameMachineRunningMode::GameMode)
 			{
-				if (!renderFrame())
+				if (!pd->renderFrame())
 					break;
 			}
 		}
 
 		// Application模式下，虽然不进行渲染，但是还是有消息处理
-		if (!handleMessages())
+		if (!pd->handleMessages())
 			break;
 	}
-	finalize();
+	pd->finalize();
+}
+
+void GameMachinePrivate::initSystemInfo()
+{
+	static bool inited = false;
+	if (!inited)
+	{
+		states.systemInfo.endiannessMode = getMachineEndianness();
+		
+		SYSTEM_INFO sysInfo;
+		::GetSystemInfo(&sysInfo);
+		states.systemInfo.numberOfProcessors = sysInfo.dwNumberOfProcessors;
+
+		switch (sysInfo.wProcessorArchitecture)
+		{
+		case PROCESSOR_ARCHITECTURE_AMD64:
+			states.systemInfo.processorArchitecture = GMProcessorArchitecture::AMD64;
+			break;
+		case PROCESSOR_ARCHITECTURE_ARM:
+			states.systemInfo.processorArchitecture = GMProcessorArchitecture::ARM;
+			break;
+		case PROCESSOR_ARCHITECTURE_IA64:
+			states.systemInfo.processorArchitecture = GMProcessorArchitecture::IA64;
+			break;
+		case PROCESSOR_ARCHITECTURE_INTEL:
+			states.systemInfo.processorArchitecture = GMProcessorArchitecture::Intel;
+			break;
+		case PROCESSOR_ARCHITECTURE_UNKNOWN:
+		default:
+			states.systemInfo.processorArchitecture = GMProcessorArchitecture::Unknown;
+			break;
+		}
+		inited = true;
+	}
 }
 
 void GameMachine::translateSystemEvent(GMuint32 uMsg, GMWParam wParam, GMLParam lParam, OUT GMSystemEvent** event)
@@ -263,7 +297,7 @@ void GameMachine::translateSystemEvent(GMuint32 uMsg, GMWParam wParam, GMLParam 
 	case WM_SETCURSOR:
 		newSystemEvent = new GMSystemEvent(GMSystemEventType::SetCursor);
 		break;
-	// Keyboard:
+		// Keyboard:
 	case WM_KEYDOWN:
 	case WM_SYSKEYDOWN:
 	{
@@ -377,41 +411,6 @@ void GameMachine::translateSystemEvent(GMuint32 uMsg, GMWParam wParam, GMLParam 
 	}
 
 	*event = newSystemEvent;
-}
-
-void GameMachine::initSystemInfo()
-{
-	D(d);
-	static bool inited = false;
-	if (!inited)
-	{
-		d->states.systemInfo.endiannessMode = getMachineEndianness();
-		
-		SYSTEM_INFO sysInfo;
-		::GetSystemInfo(&sysInfo);
-		d->states.systemInfo.numberOfProcessors = sysInfo.dwNumberOfProcessors;
-
-		switch (sysInfo.wProcessorArchitecture)
-		{
-		case PROCESSOR_ARCHITECTURE_AMD64:
-			d->states.systemInfo.processorArchitecture = GMProcessorArchitecture::AMD64;
-			break;
-		case PROCESSOR_ARCHITECTURE_ARM:
-			d->states.systemInfo.processorArchitecture = GMProcessorArchitecture::ARM;
-			break;
-		case PROCESSOR_ARCHITECTURE_IA64:
-			d->states.systemInfo.processorArchitecture = GMProcessorArchitecture::IA64;
-			break;
-		case PROCESSOR_ARCHITECTURE_INTEL:
-			d->states.systemInfo.processorArchitecture = GMProcessorArchitecture::Intel;
-			break;
-		case PROCESSOR_ARCHITECTURE_UNKNOWN:
-		default:
-			d->states.systemInfo.processorArchitecture = GMProcessorArchitecture::Unknown;
-			break;
-		}
-		inited = true;
-	}
 }
 
 END_NS

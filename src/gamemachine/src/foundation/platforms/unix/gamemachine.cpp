@@ -185,40 +185,6 @@ namespace
 	}
 }
 
-void GameMachine::runEventLoop()
-{
-	D(d);
-	const GMXRenderContext* context = nullptr;
-	if (d->windows.size() > 0)
-	{
-		IWindow* window = *d->windows.begin();
-		context = gm_cast<const GMXRenderContext*>(window->getContext());
-	}
-
-	XEvent e;
-	while (1)
-	{
-		if (context)
-		{
-			Display* display = context->getDisplay();
-			while (XPending(display))
-			{
-				XNextEvent(display, &e);
-				IWindow* window = findWindow(d->windows, e.xany.window);
-				if (window)
-				{
-					GMXEventContext c = { &e, window };
-					window->getProcHandler()(window->getWindowHandle(), 0, 0, reinterpret_cast<GMLParam>(&c));
-				}
-			}
-		}
-
-		if (!renderFrame())
-			break;
-	}
-	finalize();
-}
-
 void GameMachine::translateSystemEvent(GMuint32 uMsg, GMWParam wParam, GMLParam lParam, OUT GMSystemEvent** event)
 {
 	GM_ASSERT(event);
@@ -298,14 +264,54 @@ void GameMachine::translateSystemEvent(GMuint32 uMsg, GMWParam wParam, GMLParam 
 	*event = newSystemEvent;
 }
 
+void GameMachinePrivate::runEventLoop()
+{
+	P_D(pd);
+	const GMXRenderContext* context = nullptr;
+	if (windows.size() > 0)
+	{
+		IWindow* window = *windows.begin();
+		context = gm_cast<const GMXRenderContext*>(window->getContext());
+	}
+
+	XEvent e;
+	while (1)
+	{
+		if (context)
+		{
+			Display* display = context->getDisplay();
+			while (XPending(display))
+			{
+				XNextEvent(display, &e);
+				IWindow* window = findWindow(windows, e.xany.window);
+				if (window)
+				{
+					GMXEventContext c = { &e, window };
+					window->getProcHandler()(window->getWindowHandle(), 0, 0, reinterpret_cast<GMLParam>(&c));
+				}
+			}
+		}
+
+		if (runningMode == GMGameMachineRunningMode::GameMode)
+		{
+			if (!pd->renderFrame())
+				break;
+		}
+
+		// Application模式下，虽然不进行渲染，但是还是有消息处理
+		if (!pd->handleMessages())
+			break;
+	}
+	pd->finalize();
+}
+
 void GameMachine::initSystemInfo()
 {
-	D(d);
 	static bool inited = false;
 	if (!inited)
 	{
-		d->states.systemInfo.endiannessMode = getMachineEndianness();
-		getSystemInfo(d->states.systemInfo);
+		states.systemInfo.endiannessMode = getMachineEndianness();
+		getSystemInfo(states.systemInfo);
 		inited = true;
 
 		// set locale

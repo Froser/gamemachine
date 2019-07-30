@@ -43,6 +43,190 @@ namespace
 	GMMutex s_callableLock;
 }
 
+
+void GameMachinePrivate::setRenderEnvironment(GMRenderEnvironment renv)
+{
+	switch (renv)
+	{
+	case GMRenderEnvironment::OpenGL:
+		if (GMQueryCapability(GMCapability::SupportOpenGL))
+		{
+			states.renderEnvironment = renv;
+			return;
+		}
+	case GMRenderEnvironment::DirectX11:
+		if (GMQueryCapability(GMCapability::SupportDirectX11))
+		{
+			states.renderEnvironment = renv;
+			return;
+		}
+		break;
+	default:
+		break;
+	}
+	GM_ASSERT(!"Wrong render environment");
+	states.renderEnvironment = GMRenderEnvironment::OpenGL;
+}
+
+bool GameMachinePrivate::checkCrashDown()
+{
+	if (states.crashDown)
+	{
+		// 宕机的情况下，只更新下面的状态
+		handleMessage(s_frameUpdateMsg);
+		clock.update();
+		return true;
+	}
+	return false;
+}
+
+void GameMachinePrivate::beginHandlerEvents(IWindow* window)
+{
+	auto action = [](auto window, auto handler) {
+		window->getContext()->switchToContext();
+		if (handler)
+		{
+			handler->event(GameMachineHandlerEvent::FrameStart);
+			if (window->isWindowActivate())
+				handler->event(GameMachineHandlerEvent::Activate);
+			else
+				handler->event(GameMachineHandlerEvent::Deactivate);
+
+			handler->event(GameMachineHandlerEvent::Update);
+			handler->event(GameMachineHandlerEvent::Render);
+		}
+		window->msgProc(s_frameUpdateMsg);
+	};
+
+	if (window)
+		action(window, window->getHandler());
+	else
+		eachHandler(action);
+}
+
+void GameMachinePrivate::endHandlerEvents(IWindow* window)
+{
+	auto action = [](auto, auto handler) {
+		if (handler)
+			handler->event(GameMachineHandlerEvent::FrameEnd);
+	};
+
+	if (window)
+		action(window, window->getHandler());
+	else
+		eachHandler(action);
+}
+
+bool GameMachinePrivate::handleMessage(const GMMessage& msg)
+{
+	P_D(pd);
+	switch (msg.msgType)
+	{
+	case GameMachineMessageType::QuitGameMachine:
+		return false;
+	case GameMachineMessageType::CrashDown:
+	{
+		states.crashDown = true;
+		break;
+	}
+	case GameMachineMessageType::DeleteLater:
+	{
+		GMObject* obj = static_cast<GMObject*>(msg.object);
+		obj->destroy();
+		break;
+	}
+	case GameMachineMessageType::DeleteWindowLater:
+	{
+		IWindow* window = static_cast<IWindow*>(msg.object);
+		if (window)
+		{
+			windows.erase(window);
+			window->destroy();
+			if (windows.empty())
+				pd->exit();
+		}
+		break;
+	}
+	default:
+		break;
+	}
+
+	for (decltype(auto) window : windows)
+	{
+		window->msgProc(msg);
+		window->getContext()->getEngine()->msgProc(msg);
+	}
+	return true;
+}
+
+void GameMachinePrivate::updateGameMachine()
+{
+	states.elapsedTime = clock.getTime();
+	states.fps = clock.getFps();
+	invokeCallables();
+}
+
+void GameMachinePrivate::eachHandler(std::function<void(IWindow*, IGameHandler*)> action)
+{
+	for (decltype(auto) window : windows)
+	{
+		action(window, window->getHandler());
+	}
+}
+
+void GameMachinePrivate::beforeStartGameMachine()
+{
+	P_D(pd);
+	updateGameMachine();
+	pd->handleMessages();
+	initHandlers();
+	gamemachinestarted = true;
+}
+
+void GameMachinePrivate::initHandlers()
+{
+	P_D(pd);
+	eachHandler([](auto window, auto)
+	{
+		window->getContext()->getEngine()->init();
+	});
+
+	// 初始化gameHandler
+	if (!states.crashDown)
+	{
+		eachHandler([](auto window, auto handler)
+		{
+			if (handler)
+				handler->start();
+		});
+	}
+	else
+	{
+		if (!gamemachinestarted)
+			pd->finalize();
+	}
+}
+
+void GameMachinePrivate::invokeCallables()
+{
+	GMMutexLock lock(&s_callableLock);
+	lock->lock();
+
+	while (!callableQueue.empty())
+	{
+		GMCallable callable = callableQueue.front();
+		if (callable)
+			callable();
+		callableQueue.pop();
+	}
+}
+
+IDestroyObject* GameMachinePrivate::registerManager(IDestroyObject* object)
+{
+	managerQueue.push_back(object);
+	return object;
+}
+
 GameMachine& GameMachine::instance()
 {
 	static GameMachine s_instance;
@@ -57,8 +241,10 @@ GameMachine::~GameMachine()
 GameMachine::GameMachine()
 {
 	GM_CREATE_DATA();
+	GM_SET_PD();
+	D(d);
 	GMDebugger::instance();
-	updateGameMachine();
+	d->updateGameMachine();
 }
 
 void GameMachine::init(
@@ -66,20 +252,20 @@ void GameMachine::init(
 )
 {
 	D(d);
-	initSystemInfo();
+	d->initSystemInfo();
 
 	d->runningMode = desc.runningMode;
-	setRenderEnvironment(desc.renderEnvironment);
-	registerManager(desc.factory, &d->factory);
-	registerManager(new GMGamePackage(), &d->gamePackageManager);
+	d->setRenderEnvironment(desc.renderEnvironment);
+	d->factory = gm_cast<IFactory*>(d->registerManager(desc.factory));
+	d->gamePackageManager = gm_cast<GMGamePackage*>(d->registerManager(new GMGamePackage()));
 
 	if (desc.runningMode != GMGameMachineRunningMode::ComputeOnly)
 	{
 		d->clock.begin();
 		handleMessages();
-		updateGameMachine();
+		d->updateGameMachine();
 
-		eachHandler([=](auto window, auto handler) {
+		d->eachHandler([=](auto window, auto handler) {
 			if (handler)
 				handler->init(window->getContext());
 		});
@@ -121,17 +307,19 @@ GMMessage GameMachine::peekMessage()
 
 void GameMachine::startGameMachine()
 {
+	D(d);
 	// 做一些开始之前的工作
-	beforeStartGameMachine();
+	d->beforeStartGameMachine();
 
 	// 消息循环
-	runEventLoop();
+	d->runEventLoop();
 }
 
 void GameMachine::startGameMachineWithoutMessageLoop()
 {
+	D(d);
 	// 做一些开始之前的工作
-	beforeStartGameMachine();
+	d->beforeStartGameMachine();
 
 	// 不进行消息循环
 	return;
@@ -179,20 +367,20 @@ bool GameMachine::renderFrame(IWindow* window)
 	frameCounter.begin();
 
 	// 检查是否崩溃
-	if (checkCrashDown())
+	if (d->checkCrashDown())
 		return false;
 
 	// 调用Handler
-	beginHandlerEvents(window);
+	d->beginHandlerEvents(window);
 
 	// 更新时钟
 	d->clock.update();
 
 	// 更新状态
-	updateGameMachine();
+	d->updateGameMachine();
 
 	// 本帧结束
-	endHandlerEvents(window);
+	d->endHandlerEvents(window);
 
 #if GM_DEBUG
 	// Debug模式下超过一定时间，认为是在调试
@@ -213,7 +401,8 @@ bool GameMachine::renderFrame(IWindow* window)
 
 bool GameMachine::sendMessage(const GMMessage& msg)
 {
-	return handleMessage(msg);
+	D(d);
+	return d->handleMessage(msg);
 }
 
 void GameMachine::invokeInMainThread(GMCallable callable)
@@ -229,82 +418,6 @@ void GameMachine::exit()
 	postMessage({ GameMachineMessageType::QuitGameMachine });
 }
 
-void GameMachine::setRenderEnvironment(GMRenderEnvironment renv)
-{
-	D(d);
-	switch (renv)
-	{
-	case GMRenderEnvironment::OpenGL:
-		if (GMQueryCapability(GMCapability::SupportOpenGL))
-		{
-			d->states.renderEnvironment = renv;
-			return;
-		}
-	case GMRenderEnvironment::DirectX11:
-		if (GMQueryCapability(GMCapability::SupportDirectX11))
-		{
-			d->states.renderEnvironment = renv;
-			return;
-		}
-		break;
-	default:
-		break;
-	}
-	GM_ASSERT(!"Wrong render environment");
-	d->states.renderEnvironment = GMRenderEnvironment::OpenGL;
-}
-
-bool GameMachine::checkCrashDown()
-{
-	D(d);
-	if (d->states.crashDown)
-	{
-		// 宕机的情况下，只更新下面的状态
-		handleMessage(s_frameUpdateMsg);
-		d->clock.update();
-		return true;
-	}
-	return false;
-}
-
-void GameMachine::beginHandlerEvents(IWindow* window)
-{
-	D(d);
-	auto action = [](auto window, auto handler) {
-		window->getContext()->switchToContext();
-		if (handler)
-		{
-			handler->event(GameMachineHandlerEvent::FrameStart);
-			if (window->isWindowActivate())
-				handler->event(GameMachineHandlerEvent::Activate);
-			else
-				handler->event(GameMachineHandlerEvent::Deactivate);
-
-			handler->event(GameMachineHandlerEvent::Update);
-			handler->event(GameMachineHandlerEvent::Render);
-		}
-		window->msgProc(s_frameUpdateMsg);
-	};
-
-	if (window)
-		action(window, window->getHandler());
-	else
-		eachHandler(action);
-}
-
-void GameMachine::endHandlerEvents(IWindow* window)
-{
-	auto action = [](auto, auto handler) {
-		if (handler)
-			handler->event(GameMachineHandlerEvent::FrameEnd);
-	};
-
-	if (window)
-		action(window, window->getHandler());
-	else
-		eachHandler(action);
-}
-
 bool GameMachine::handleMessages()
 {
 	D(d);
@@ -313,7 +426,7 @@ bool GameMachine::handleMessages()
 	{
 		msg = d->messageQueue.front();
 
-		if (!handleMessage(msg))
+		if (!d->handleMessage(msg))
 		{
 			d->messageQueue.pop();
 			return false;
@@ -328,57 +441,6 @@ void GameMachine::setGameMachineRunningStates(const GMGameMachineRunningStates& 
 {
 	D(d);
 	d->states = states;
-}
-
-bool GameMachine::handleMessage(const GMMessage& msg)
-{
-	D(d);
-	switch (msg.msgType)
-	{
-	case GameMachineMessageType::QuitGameMachine:
-		return false;
-	case GameMachineMessageType::CrashDown:
-	{
-		d->states.crashDown = true;
-		break;
-	}
-	case GameMachineMessageType::DeleteLater:
-	{
-		GMObject* obj = static_cast<GMObject*>(msg.object);
-		obj->destroy();
-		break;
-	}
-	case GameMachineMessageType::DeleteWindowLater:
-	{
-		IWindow* window = static_cast<IWindow*>(msg.object);
-		if (window)
-		{
-			d->windows.erase(window);
-			window->destroy();
-			if (d->windows.empty())
-				exit();
-		}
-		break;
-	}
-	default:
-		break;
-	}
-
-	for (decltype(auto) window : d->windows)
-	{
-		window->msgProc(msg);
-		window->getContext()->getEngine()->msgProc(msg);
-	}
-	return true;
-}
-
-template <typename T, typename U>
-void GameMachine::registerManager(T* newObject, OUT U** manager)
-{
-	D(d);
-	if (*manager != newObject)
-		*manager = newObject;
-	d->managerQueue.push_back(*manager);
 }
 
 void GameMachine::finalize()
@@ -399,71 +461,6 @@ void GameMachine::finalize()
 	for (auto window : d->windows)
 	{
 		GM_delete(window);
-	}
-}
-
-void GameMachine::updateGameMachine()
-{
-	D(d);
-	d->states.elapsedTime = d->clock.getTime();
-	d->states.fps = d->clock.getFps();
-	invokeCallables();
-}
-
-void GameMachine::eachHandler(std::function<void(IWindow*, IGameHandler*)> action)
-{
-	D(d);
-	for (decltype(auto) window : d->windows)
-	{
-		action(window, window->getHandler());
-	}
-}
-
-void GameMachine::beforeStartGameMachine()
-{
-	D(d);
-	updateGameMachine();
-	handleMessages();
-	initHandlers();
-	d->gamemachinestarted = true;
-}
-
-void GameMachine::initHandlers()
-{
-	D(d);
-	eachHandler([](auto window, auto)
-	{
-		window->getContext()->getEngine()->init();
-	});
-
-	// 初始化gameHandler
-	if (!d->states.crashDown)
-	{
-		eachHandler([](auto window, auto handler)
-		{
-			if (handler)
-				handler->start();
-		});
-	}
-	else
-	{
-		if (!d->gamemachinestarted)
-			finalize();
-	}
-}
-
-void GameMachine::invokeCallables()
-{
-	D(d);
-	GMMutexLock lock(&s_callableLock);
-	lock->lock();
-
-	while (!d->callableQueue.empty())
-	{
-		GMCallable callable = d->callableQueue.front();
-		if (callable)
-			callable();
-		d->callableQueue.pop();
 	}
 }
 

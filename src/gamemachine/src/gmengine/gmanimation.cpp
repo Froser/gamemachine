@@ -80,7 +80,7 @@ void GMInterpolationFunctors::binarySearch(const AlignedVector<GMVec2>& points, 
 
 GMAnimation::~GMAnimation()
 {
-	if (_gm_data)
+	if (GM_HAS_DATA())
 	{
 		D(d);
 		for (auto kf : d->keyframes)

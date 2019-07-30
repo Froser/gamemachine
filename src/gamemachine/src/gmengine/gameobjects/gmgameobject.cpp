@@ -13,6 +13,8 @@ BEGIN_NS
 
 namespace
 {
+	static GMString s_defaultComputeShaderCode;
+
 	void calculateAABB(bool indexMode, GMPart* part, REF GMVec3& min, REF GMVec3& max)
 	{
 		if (!indexMode)
@@ -47,7 +49,37 @@ namespace
 	}
 }
 
-GMString GMGameObject::s_defaultComputeShaderCode;
+void GMGameObjectPrivate::setAutoUpdateTransformMatrix(bool autoUpdateTransformMatrix) GM_NOEXCEPT
+{
+	autoUpdateTransformMatrix = autoUpdateTransformMatrix;
+}
+
+void GMGameObjectPrivate::releaseAllBufferHandle()
+{
+	auto& instance = GMComputeShaderManager::instance();
+	instance.releaseHandle(cullAABBsBuffer);
+	cullAABBsBuffer = 0;
+
+	instance.releaseHandle(cullGPUResultBuffer);
+	cullGPUResultBuffer = 0;
+
+	instance.releaseHandle(cullCPUResultBuffer);
+	cullCPUResultBuffer = 0;
+
+	instance.releaseHandle(cullFrustumBuffer);
+	cullFrustumBuffer = 0;
+
+	instance.releaseHandle(cullAABBsSRV);
+	cullAABBsSRV = 0;
+
+	instance.releaseHandle(cullResultUAV);
+	cullResultUAV = 0;
+}
+
+void GMGameObjectPrivate::updateTransformMatrix()
+{
+	transforms.transformMatrix = transforms.scaling * QuatToMatrix(transforms.rotation) * transforms.translation;
+}
 
 GM_DEFINE_PROPERTY(GMGameObject, GMGameObjectRenderPriority, RenderPriority, renderPriority)
 
@@ -62,15 +94,19 @@ GMGameObject::GMGameObject()
 GMGameObject::GMGameObject(GMAsset asset)
 	: GMGameObject()
 {
+	D(d);
 	setAsset(asset);
-	updateTransformMatrix();
+	d->updateTransformMatrix();
 }
 
 GMGameObject::~GMGameObject()
 {
-	D(d);
-	releaseAllBufferHandle();
-	GM_delete(d->helper);
+	if (GM_HAS_DATA())
+	{
+		D(d);
+		d->releaseAllBufferHandle();
+		GM_delete(d->helper);
+	}
 }
 
 void GMGameObject::setAsset(GMAsset asset)
@@ -157,7 +193,6 @@ void GMGameObject::foreachModel(std::function<void(GMModel*)> cb)
 		}
 	}
 }
-
 
 void GMGameObject::setCullComputeShaderProgram(IComputeShaderProgram* shaderProgram)
 {
@@ -303,18 +338,12 @@ GMsize_t GMGameObject::getAnimationIndexByName(const GMString& name)
 	return -1;
 }
 
-void GMGameObject::updateTransformMatrix()
-{
-	D(d);
-	d->transforms.transformMatrix = d->transforms.scaling * QuatToMatrix(d->transforms.rotation) * d->transforms.translation;
-}
-
 void GMGameObject::setScaling(const GMMat4& scaling)
 {
 	D(d);
 	d->transforms.scaling = scaling;
 	if (d->autoUpdateTransformMatrix)
-		updateTransformMatrix();
+		d->updateTransformMatrix();
 }
 
 void GMGameObject::setTranslation(const GMMat4& translation)
@@ -322,7 +351,7 @@ void GMGameObject::setTranslation(const GMMat4& translation)
 	D(d);
 	d->transforms.translation = translation;
 	if (d->autoUpdateTransformMatrix)
-		updateTransformMatrix();
+		d->updateTransformMatrix();
 }
 
 void GMGameObject::setRotation(const GMQuat& rotation)
@@ -330,18 +359,20 @@ void GMGameObject::setRotation(const GMQuat& rotation)
 	D(d);
 	d->transforms.rotation = rotation;
 	if (d->autoUpdateTransformMatrix)
-		updateTransformMatrix();
+		d->updateTransformMatrix();
 }
 
 void GMGameObject::beginUpdateTransform()
 {
-	setAutoUpdateTransformMatrix(false);
+	D(d);
+	d->setAutoUpdateTransformMatrix(false);
 }
 
 void GMGameObject::endUpdateTransform()
 {
-	setAutoUpdateTransformMatrix(true);
-	updateTransformMatrix();
+	D(d);
+	d->setAutoUpdateTransformMatrix(true);
+	d->updateTransformMatrix();
 }
 
 
@@ -420,35 +451,6 @@ void GMGameObject::setVisible(bool visible) const GM_NOEXCEPT
 {
 	D(d);
 	d->attributes.visible = visible;
-}
-
-void GMGameObject::setAutoUpdateTransformMatrix(bool autoUpdateTransformMatrix) GM_NOEXCEPT
-{
-	D(d);
-	d->autoUpdateTransformMatrix = autoUpdateTransformMatrix;
-}
-
-void GMGameObject::releaseAllBufferHandle()
-{
-	D(d);
-	auto& instance = GMComputeShaderManager::instance();
-	instance.releaseHandle(d->cullAABBsBuffer);
-	d->cullAABBsBuffer = 0;
-
-	instance.releaseHandle(d->cullGPUResultBuffer);
-	d->cullGPUResultBuffer = 0;
-
-	instance.releaseHandle(d->cullCPUResultBuffer);
-	d->cullCPUResultBuffer = 0;
-
-	instance.releaseHandle(d->cullFrustumBuffer);
-	d->cullFrustumBuffer = 0;
-
-	instance.releaseHandle(d->cullAABBsSRV);
-	d->cullAABBsSRV = 0;
-
-	instance.releaseHandle(d->cullResultUAV);
-	d->cullResultUAV = 0;
 }
 
 void GMGameObject::setDefaultCullShaderCode(const GMString& code)
@@ -559,7 +561,7 @@ void GMGameObject::cull()
 		{
 			if (sizeChanged)
 			{
-				releaseAllBufferHandle();
+				d->releaseAllBufferHandle();
 
 				typedef std::remove_reference_t<decltype(d->cullAABB[0])> AABB;
 				if (cullShaderProgram->createBuffer(sizeof(AABB), gm_sizet_to_uint(d->cullSize), d->cullAABB.data(), GMComputeBufferType::Structured, &d->cullAABBsBuffer) &&
@@ -640,31 +642,14 @@ void GMGameObject::cull()
 
 GM_PRIVATE_OBJECT_ALIGNED(GMCubeMapGameObject)
 {
+	GM_DECLARE_PUBLIC(GMCubeMapGameObject)
 	GMVec3 min;
 	GMVec3 max;
 	GMShader shader;
+	void createCubeMap(GMTextureAsset texture);
 };
 
-GMCubeMapGameObject::GMCubeMapGameObject(GMTextureAsset texture)
-{
-	GM_CREATE_DATA();
-	createCubeMap(texture);
-}
-
-GMCubeMapGameObject::~GMCubeMapGameObject()
-{
-
-}
-
-void GMCubeMapGameObject::deactivate()
-{
-	D(d);
-	GMGameWorld* world = getWorld();
-	if (world)
-		world->getContext()->getEngine()->update(GMUpdateDataType::TurnOffCubeMap);
-}
-
-void GMCubeMapGameObject::createCubeMap(GMTextureAsset texture)
+void GMCubeMapGameObjectPrivate::createCubeMap(GMTextureAsset texture)
 {
 	GMfloat vertices[] = {
 		-1.0f,  1.0f, -1.0f,
@@ -728,7 +713,7 @@ void GMCubeMapGameObject::createCubeMap(GMTextureAsset texture)
 	GMPart* part = new GMPart(model);
 	for (GMuint32 i = 0; i < 12; i++)
 	{
-		GMVertex V0 = { { vertices[i * 9 + 0], vertices[i * 9 + 1], vertices[i * 9 + 2] }, { vertices[i * 9 + 0], vertices[i * 9 + 1], vertices[i * 9 + 2] } };
+		GMVertex V0 = { { vertices[i * 9 + 0], vertices[i * 9 + 1], vertices[i * 9 + 2] },{ vertices[i * 9 + 0], vertices[i * 9 + 1], vertices[i * 9 + 2] } };
 		GMVertex V1 = { { vertices[i * 9 + 3], vertices[i * 9 + 4], vertices[i * 9 + 5] },{ vertices[i * 9 + 3], vertices[i * 9 + 4], vertices[i * 9 + 5] } };
 		GMVertex V2 = { { vertices[i * 9 + 6], vertices[i * 9 + 7], vertices[i * 9 + 8] },{ vertices[i * 9 + 6], vertices[i * 9 + 7], vertices[i * 9 + 8] } };
 		part->vertex(V0);
@@ -736,7 +721,29 @@ void GMCubeMapGameObject::createCubeMap(GMTextureAsset texture)
 		part->vertex(V2);
 	}
 
-	setAsset(GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, model)));
+	P_D(pd);
+	pd->setAsset(GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, model)));
+}
+
+GMCubeMapGameObject::GMCubeMapGameObject(GMTextureAsset texture)
+{
+	GM_CREATE_DATA();
+	GM_SET_PD();
+	D(d);
+	d->createCubeMap(texture);
+}
+
+GMCubeMapGameObject::~GMCubeMapGameObject()
+{
+
+}
+
+void GMCubeMapGameObject::deactivate()
+{
+	D(d);
+	GMGameWorld* world = getWorld();
+	if (world)
+		world->getContext()->getEngine()->update(GMUpdateDataType::TurnOffCubeMap);
 }
 
 bool GMCubeMapGameObject::canDeferredRendering()

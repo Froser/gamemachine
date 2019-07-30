@@ -27,6 +27,7 @@ class GM_EXPORT GMGameObject : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMGameObject)
 	GM_DECLARE_PROPERTY(GMGameObjectRenderPriority, RenderPriority)
+	GM_FRIEND_CLASS(GMGameWorld)
 
 public:
 	enum
@@ -49,39 +50,10 @@ public:
 	void setPhysicsObject(AUTORELEASE GMPhysicsObject* phyObj);
 	void foreachModel(std::function<void(GMModel*)>);
 	void setCullComputeShaderProgram(IComputeShaderProgram* shaderProgram);
-
-public:
-	virtual GMModel* getModel();
-	virtual void onAppendingObjectToWorld();
-	virtual void onRemovingObjectFromWorld() {}
-	virtual void draw();
-	virtual void update(GMDuration dt);
-	virtual bool canDeferredRendering();
-	virtual const IRenderContext* getContext();
-	virtual void onRenderShader(GMModel*, IShaderProgram* shaderProgram) const {}
-
-	// 动画控制
-public:
-	virtual void play();
-	virtual void reset(bool update);
-	virtual void pause();
-	virtual bool isPlaying();
-
-public:
 	GMsize_t getAnimationCount();
 	void setAnimation(GMsize_t index);
 	Vector<GMString> getAnimationNames();
 	GMsize_t getAnimationIndexByName(const GMString& name);
-
-protected:
-	virtual void drawModel(const IRenderContext* context, GMModel* model);
-	virtual void endDraw();
-	virtual void makeAABB();
-	virtual IComputeShaderProgram* getCullShaderProgram();
-	virtual void cull();
-
-public:
-	void updateTransformMatrix();
 	void setScaling(const GMMat4& scaling);
 	void setTranslation(const GMMat4& translation);
 	void setRotation(const GMQuat& rotation);
@@ -89,7 +61,6 @@ public:
 	void endUpdateTransform();
 	void setCullOption(GMGameObjectCullOption option, GMCamera* camera = nullptr);
 	GMAnimationType getAnimationType() const;
-
 	bool getVisible() const GM_NOEXCEPT;
 	const GMMat4& getTransform() const GM_NOEXCEPT;
 	const GMMat4& getScaling() const GM_NOEXCEPT;
@@ -99,9 +70,30 @@ public:
 	void setContext(const IRenderContext* context);
 	void setVisible(bool visible) const GM_NOEXCEPT;
 
-private:
-	void setAutoUpdateTransformMatrix(bool autoUpdateTransformMatrix) GM_NOEXCEPT;
-	void releaseAllBufferHandle();
+public:
+	virtual GMModel* getModel();
+	virtual void draw();
+	virtual void update(GMDuration dt);
+	virtual bool canDeferredRendering();
+	virtual const IRenderContext* getContext();
+	virtual void onRenderShader(GMModel*, IShaderProgram* shaderProgram) const {}
+
+	// 动画控制
+	virtual void play();
+	virtual void reset(bool update);
+	virtual void pause();
+	virtual bool isPlaying();
+
+friend_methods(GMGameWorld):
+	virtual void onAppendingObjectToWorld();
+	virtual void onRemovingObjectFromWorld() {}
+
+protected:
+	virtual void drawModel(const IRenderContext* context, GMModel* model);
+	virtual void endDraw();
+	virtual void makeAABB();
+	virtual IComputeShaderProgram* getCullShaderProgram();
+	virtual void cull();
 
 public:
 	//! 设置默认的裁剪程序。如果没有设置，那么GMGameObject将会采用CPU裁剪。
@@ -110,9 +102,6 @@ public:
 	  着色器的入口一定要为main。<BR>
 	*/
 	static void setDefaultCullShaderCode(const GMString& code);
-
-private:
-	static GMString s_defaultComputeShaderCode;
 };
 
 // GMSkyObject
@@ -133,9 +122,6 @@ public:
 	  在立方体贴图对象被析构的时候，也会先调用此方法清除渲染环境中的立方体贴图。
 	*/
 	void deactivate();
-
-private:
-	void createCubeMap(GMTextureAsset texture);
 
 public:
 	virtual bool canDeferredRendering() override;
