@@ -132,33 +132,47 @@ public:
 	~GMParticleDescription_Cocos2D();
 };
 
-GM_PRIVATE_CLASS(GMParticle_Cocos2D);
+GM_ALIGNED_16(struct) GMParticle_Cocos2DData
+{
+	GMVec4 color = Zero<GMVec4>();
+	GMVec4 deltaColor = Zero<GMVec4>();
+	GMVec3 position = Zero<GMVec3>(); //xyz
+	GMVec3 startPosition = Zero<GMVec3>(); //xyz
+	GMVec3 changePosition = Zero<GMVec3>(); //xyz
+	GMVec3 velocity = Zero<GMVec3>(); //xyz
+	GMfloat size = 0;
+	GMfloat currentSize = 0;
+	GMfloat deltaSize = 0;
+	GMfloat rotation = 0;
+	GMfloat deltaRotation = 0;
+	GMDuration remainingLife = 0;
+
+	GMParticle_Cocos2D_GravityModeData gravityModeData;
+	GMParticle_Cocos2D_RadiusModeData radiusModeData;
+};
+
 class GMParticle_Cocos2D
 {
-	GM_DECLARE_PRIVATE(GMParticle_Cocos2D)
-	GM_DECLARE_PROPERTY(GMVec3, Position)
-	GM_DECLARE_PROPERTY(GMVec3, StartPosition)
-	GM_DECLARE_PROPERTY(GMVec3, ChangePosition)
-	GM_DECLARE_PROPERTY(GMVec3, Velocity)
-	GM_DECLARE_PROPERTY(GMVec4, Color)
-	GM_DECLARE_PROPERTY(GMVec4, DeltaColor)
-	GM_DECLARE_PROPERTY(GMfloat, Size)
-	GM_DECLARE_PROPERTY(GMfloat, CurrentSize)
-	GM_DECLARE_PROPERTY(GMfloat, DeltaSize)
-	GM_DECLARE_PROPERTY(GMfloat, Rotation)
-	GM_DECLARE_PROPERTY(GMfloat, DeltaRotation)
-	GM_DECLARE_PROPERTY(GMDuration, RemainingLife)
-	GM_DECLARE_PROPERTY(GMParticle_Cocos2D_GravityModeData, GravityModeData)
-	GM_DECLARE_PROPERTY(GMParticle_Cocos2D_RadiusModeData, RadiusModeData)
+	GM_DECLARE_INLINE_PROPERTY(Position, data.position)
+	GM_DECLARE_INLINE_PROPERTY(StartPosition, data.startPosition)
+	GM_DECLARE_INLINE_PROPERTY(ChangePosition, data.changePosition)
+	GM_DECLARE_INLINE_PROPERTY(Velocity, data.velocity)
+	GM_DECLARE_INLINE_PROPERTY(Color, data.color)
+	GM_DECLARE_INLINE_PROPERTY(DeltaColor, data.deltaColor)
+	GM_DECLARE_INLINE_PROPERTY(Size, data.size)
+	GM_DECLARE_INLINE_PROPERTY(CurrentSize, data.currentSize)
+	GM_DECLARE_INLINE_PROPERTY(DeltaSize, data.deltaSize)
+	GM_DECLARE_INLINE_PROPERTY(Rotation, data.rotation)
+	GM_DECLARE_INLINE_PROPERTY(DeltaRotation, data.deltaRotation)
+	GM_DECLARE_INLINE_PROPERTY(RemainingLife, data.remainingLife)
+	GM_DECLARE_INLINE_PROPERTY(GravityModeData, data.gravityModeData)
+	GM_DECLARE_INLINE_PROPERTY(RadiusModeData, data.radiusModeData)
 
 public:
-	GMParticle_Cocos2D();
-	GMParticle_Cocos2D(const GMParticle_Cocos2D&);
-	GMParticle_Cocos2D(GMParticle_Cocos2D&&) GM_NOEXCEPT;
-	GMParticle_Cocos2D& operator=(const GMParticle_Cocos2D& rhs);
-	GMParticle_Cocos2D& operator=(GMParticle_Cocos2D&& rhs) GM_NOEXCEPT;
-	~GMParticle_Cocos2D();
-	const Data& dataRef();
+	const GMParticle_Cocos2DData& dataRef() { return data; }
+
+protected:
+	GMParticle_Cocos2DData data;
 };
 
 GM_PRIVATE_CLASS(GMParticleEmitter_Cocos2D);

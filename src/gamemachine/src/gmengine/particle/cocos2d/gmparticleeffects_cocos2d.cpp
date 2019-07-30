@@ -3,7 +3,6 @@
 #include "foundation/gmasync.h"
 #include "foundation/gamemachine.h"
 #include <gmengine/gmcomputeshadermanager.h>
-#include "gmparticle_cocos2d_p.h"
 
 BEGIN_NS
 
@@ -238,9 +237,8 @@ bool GMParticleEffect_Cocos2D::GPUUpdate(GMDuration dt)
 		GMComputeBufferHandle resultHandle = canReadFromGPU ? progParticlesResult : particleCpuResult;
 		if (!canReadFromGPU)
 			shaderProgram->copyBuffer(resultHandle, progParticlesResult);
-		typedef GM_PRIVATE_NAME(GMParticle_Cocos2D) ParticleData;
-		const ParticleData* resultPtr = static_cast<ParticleData*>(shaderProgram->mapBuffer(resultHandle));
-		memcpy_s(particles.data(), sizeof(ParticleData) * particles.size(), resultPtr, sizeof(particles[0].dataRef()) * particles.size());
+		const GMParticle_Cocos2DData* resultPtr = static_cast<GMParticle_Cocos2DData*>(shaderProgram->mapBuffer(resultHandle));
+		memcpy_s(particles.data(), sizeof(GMParticle_Cocos2DData) * particles.size(), resultPtr, sizeof(particles[0].dataRef()) * particles.size());
 
 		// 将存活的粒子放入临时容器，最后交换
 		Vector<GMParticle_Cocos2D> tmp;

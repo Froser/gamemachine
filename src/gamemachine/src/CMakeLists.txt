@@ -100,7 +100,6 @@ set(SOURCES
 		gmengine/particle/gmparticle.cpp
 		gmengine/particle/cocos2d/gmparticle_cocos2d.h
 		gmengine/particle/cocos2d/gmparticle_cocos2d.cpp
-		gmengine/particle/cocos2d/gmparticle_cocos2d_p.h
 		gmengine/particle/cocos2d/gmparticleeffects_cocos2d.h
 		gmengine/particle/cocos2d/gmparticleeffects_cocos2d.cpp
 		gmengine/particle/cocos2d/gmparticlemodel_cocos2d.h

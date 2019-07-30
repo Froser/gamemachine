@@ -166,7 +166,7 @@ namespace core
 		if (props.viewCamera.ortho)
 			camera.setOrtho(-1, 1, -1, 1, .1f, 2000); //TODO ，near和far需要从全局拿
 		else
-			camera.setPerspective(Radian(75.f), aspect, .1f, 2000);
+			camera.setPerspective(Radians(75.f), aspect, .1f, 2000);
 
 		GMCameraLookAt lookAt = GMCameraLookAt::makeLookAt(
 			GMVec3(props.viewCamera.posX, props.viewCamera.posY, props.viewCamera.posZ),

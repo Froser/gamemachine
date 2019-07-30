@@ -6,11 +6,14 @@
 
 namespace gm
 {
+	GM_PRIVATE_CLASS(GameMachineWidget);
 	class GM_QT_EXPORT GameMachineWidget : public QWidget
 	{
 		Q_OBJECT
+		GM_DECLARE_PRIVATE(GameMachineWidget)
 
-		using QWidget::QWidget;
+	public:
+		explicit GameMachineWidget(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 
 	public:
 		~GameMachineWidget();
@@ -25,10 +28,6 @@ namespace gm
 		virtual bool event(QEvent* e) override;
 		virtual QPaintEngine* paintEngine() const override;
 		virtual void paintEvent(QPaintEvent *event) override;
-
-	private:
-		const IRenderContext* m_context = nullptr;
-		bool m_gamemachineSet = false;
 	};
 }
 

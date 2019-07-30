@@ -18,7 +18,7 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(getGlyphManager);
 	};
 
-	GM_PRIVATE_OBJECT_UNALIGNED(GMCameraLookAtProxy)
+	GM_PRIVATE_OBJECT_ALIGNED(GMCameraLookAtProxy)
 	{
 		GMVec3 lookAt;
 		GMVec3 position;

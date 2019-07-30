@@ -130,7 +130,7 @@ namespace
 	void FlowHandler::start()
 	{
 		gm::GMCamera& camera = m_context->getEngine()->getCamera();
-		camera.setPerspective(Radian(75.f), 1.333f, .1f, 3200);
+		camera.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
 
 		gm::GMCameraLookAt lookAt;
 		lookAt.lookDirection = { 0, -.5f, 1 };
@@ -312,7 +312,7 @@ namespace
 	{
 		if (m_obj)
 		{
-			m_obj->setRotation(Rotate(Radian(degree), GMVec3(0, 1, 0)));
+			m_obj->setRotation(Rotate(Radians(degree), GMVec3(0, 1, 0)));
 		}
 	}
 
@@ -411,7 +411,7 @@ int WINAPI wWinMain(
 	else
 	{
 #if GM_USE_DX11
-		if (gm::GMQueryCapability(gm::GMCapability::SupportDirectX11))
+		if (GMQueryCapability(GMCapability::SupportDirectX11))
 			pFactory = new gm::GMDx11Factory();
 		else
 			pFactory = new gm::GMGLFactory();

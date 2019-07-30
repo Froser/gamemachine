@@ -31,9 +31,22 @@ namespace
 
 namespace gm
 {
+	GM_PRIVATE_OBJECT_UNALIGNED(GameMachineWidget)
+	{
+		const IRenderContext* context = nullptr;
+		bool gamemachineSet = false;
+	};
+
+	GameMachineWidget::GameMachineWidget(QWidget* parent /*= nullptr*/, Qt::WindowFlags f /*= Qt::WindowFlags()*/)
+		: QWidget(parent, f)
+	{
+		GM_CREATE_DATA();
+	}
+
 	GameMachineWidget::~GameMachineWidget()
 	{
-		if (m_gamemachineSet)
+		D(d);
+		if (d->gamemachineSet)
 		{
 			if (!--getGameMachineRefCount())
 				GM.finalize();
@@ -42,6 +55,7 @@ namespace gm
 
 	void GameMachineWidget::setGameMachine(const GMGameMachineDesc& desc, float renderWidth, float renderHeight, IGameHandler* handler)
 	{
+		D(d);
 		if (!g_isGameMachineInited)
 		{
 			GMGameMachineDesc tmpDesc = desc;
@@ -58,13 +72,14 @@ namespace gm
 		setAttribute(Qt::WA_NativeWindow, true);
 		GM.handleMessages();
 
-		m_gamemachineSet = true;
+		d->gamemachineSet = true;
 		++getGameMachineRefCount();
 	}
 
 	void GameMachineWidget::setRenderContext(const IRenderContext* context)
 	{
-		m_context = context;
+		D(d);
+		d->context = context;
 	}
 
 	bool GameMachineWidget::event(QEvent* e)
@@ -84,7 +99,8 @@ namespace gm
 
 	void GameMachineWidget::paintEvent(QPaintEvent *event)
 	{
-		if (m_context)
-			GM.renderFrame(m_context->getWindow());
+		D(d);
+		if (d->context)
+			GM.renderFrame(d->context->getWindow());
 	}
 }

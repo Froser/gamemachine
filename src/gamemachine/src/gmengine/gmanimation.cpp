@@ -80,10 +80,13 @@ void GMInterpolationFunctors::binarySearch(const AlignedVector<GMVec2>& points, 
 
 GMAnimation::~GMAnimation()
 {
-	D(d);
-	for (auto kf : d->keyframes)
+	if (_gm_data)
 	{
-		GM_delete(kf);
+		D(d);
+		for (auto kf : d->keyframes)
+		{
+			GM_delete(kf);
+		}
 	}
 }
 

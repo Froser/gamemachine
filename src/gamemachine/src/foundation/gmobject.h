@@ -289,11 +289,6 @@ struct GMMessage;
 /*!
   GMObject类型只有一个指向数据成员的指针，没有其它数据成员。其数据成员指针指向一个堆上分配的数据。由于只保存一个
 指向数据的指针，因此GMObject及GMObject的所有派生类禁止赋值和拷贝。<BR>
-如果为一个GMObject的直接子类定义其包含的数据，可使用GM_PRIVATE_OBJECT宏来定义数据结构，并在子类中使用
-GM_DECLARE_PRIVATE(子类名)来将子类的数据指针成员添加到子类中。<BR>
-如果某个子类不是GMObject的直接子类，则用GM_DECLARE_PRIVATE_AND_BASE(子类名，父类名)来将数据指针添加到子类中。<BR>
-使用GM_ALLOW_COPY_MOVE宏来允许对象之间相互拷贝，它会生成一套左值和右值拷贝、赋值函数。<BR>
-另外，GMObject的数据将会在GMObject构造时被新建，在GMObject析构时被释放。
 */
 class GM_EXPORT GMObject : public IDestroyObject
 {

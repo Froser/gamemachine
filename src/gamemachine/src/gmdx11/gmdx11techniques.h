@@ -23,7 +23,7 @@ struct GMTextureAttributeBank
 };
 
 GM_PRIVATE_CLASS(GMDx11Technique);
-class GMDx11Technique : public GMObject, public ITechnique
+class GM_EXPORT GMDx11Technique : public GMObject, public ITechnique
 {
 	GM_DECLARE_PRIVATE(GMDx11Technique)
 	GM_DISABLE_COPY_ASSIGN(GMDx11Technique)

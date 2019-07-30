@@ -7,7 +7,6 @@
 #include "foundation/gamemachine.h"
 #include <zlib.h>
 #include "foundation/gmasync.h"
-#include "gmparticle_cocos2d_p.h"
 
 BEGIN_NS
 
@@ -832,59 +831,6 @@ GMParticleDescription_Cocos2D& GMParticleDescription_Cocos2D::operator=(const GM
 }
 
 GMParticleDescription_Cocos2D& GMParticleDescription_Cocos2D::operator=(GMParticleDescription_Cocos2D&& rhs) GM_NOEXCEPT
-{
-	GM_MOVE(rhs);
-	return *this;
-}
-
-GM_DEFINE_PROPERTY(GMParticle_Cocos2D, GMVec3, Position, position)
-GM_DEFINE_PROPERTY(GMParticle_Cocos2D, GMVec3, StartPosition, startPosition)
-GM_DEFINE_PROPERTY(GMParticle_Cocos2D, GMVec3, ChangePosition, changePosition)
-GM_DEFINE_PROPERTY(GMParticle_Cocos2D, GMVec3, Velocity, velocity)
-GM_DEFINE_PROPERTY(GMParticle_Cocos2D, GMVec4, Color, color)
-GM_DEFINE_PROPERTY(GMParticle_Cocos2D, GMVec4, DeltaColor, deltaColor)
-GM_DEFINE_PROPERTY(GMParticle_Cocos2D, GMfloat, Size, size)
-GM_DEFINE_PROPERTY(GMParticle_Cocos2D, GMfloat, CurrentSize, currentSize)
-GM_DEFINE_PROPERTY(GMParticle_Cocos2D, GMfloat, DeltaSize, deltaSize)
-GM_DEFINE_PROPERTY(GMParticle_Cocos2D, GMfloat, Rotation, rotation)
-GM_DEFINE_PROPERTY(GMParticle_Cocos2D, GMfloat, DeltaRotation, deltaRotation)
-GM_DEFINE_PROPERTY(GMParticle_Cocos2D, GMDuration, RemainingLife, remainingLife)
-GM_DEFINE_PROPERTY(GMParticle_Cocos2D, GMParticle_Cocos2D_GravityModeData, GravityModeData, gravityModeData)
-GM_DEFINE_PROPERTY(GMParticle_Cocos2D, GMParticle_Cocos2D_RadiusModeData, RadiusModeData, radiusModeData)
-GMParticle_Cocos2D::GMParticle_Cocos2D()
-{
-	GM_CREATE_DATA();
-}
-
-GMParticle_Cocos2D::GMParticle_Cocos2D(const GMParticle_Cocos2D& rhs)
-{
-	*this = rhs;
-}
-
-GMParticle_Cocos2D::GMParticle_Cocos2D(GMParticle_Cocos2D&& rhs) GM_NOEXCEPT
-{
-	*this = std::move(rhs);
-}
-
-
-GMParticle_Cocos2D::~GMParticle_Cocos2D()
-{
-
-}
-
-const GMParticle_Cocos2D::Data& GMParticle_Cocos2D::dataRef()
-{
-	D(d);
-	return *d;
-}
-
-GMParticle_Cocos2D& GMParticle_Cocos2D::operator=(const GMParticle_Cocos2D& rhs)
-{
-	GM_COPY(rhs);
-	return *this;
-}
-
-GMParticle_Cocos2D& GMParticle_Cocos2D::operator=(GMParticle_Cocos2D&& rhs) GM_NOEXCEPT
 {
 	GM_MOVE(rhs);
 	return *this;
