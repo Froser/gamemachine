@@ -9,9 +9,9 @@ BEGIN_NS
 
 namespace luaapi
 {
+	GM_LUA_PRIVATE_CLASS_FROM(GMMouseStateProxy, GMMouseState)
 	class GMMouseStateProxy : public GMObject
 	{
-		typedef GMMouseState GM_PRIVATE_NAME(GMMouseStateProxy);
 		GM_DECLARE_PRIVATE(GMMouseStateProxy)
 
 	public:
@@ -39,7 +39,7 @@ namespace luaapi
 		}
 	};
 
-	struct GMJoystickState_
+	GM_PRIVATE_OBJECT_UNALIGNED(GMJoystickStateProxy)
 	{
 		bool valid;
 		GMint32 buttons;
@@ -53,7 +53,6 @@ namespace luaapi
 
 	class GMJoystickStateProxy : public GMObject
 	{
-		typedef GMJoystickState_ GM_PRIVATE_NAME(GMJoystickStateProxy);
 		GM_DECLARE_PRIVATE(GMJoystickStateProxy)
 
 	public:

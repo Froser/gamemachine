@@ -22,9 +22,9 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(addWidget);
 	};
 
+	GM_LUA_PRIVATE_CLASS_FROM(GMWindowDescProxy, GMWindowDesc)
 	class GMWindowDescProxy : public GMObject
 	{
-		typedef GMWindowDesc GM_PRIVATE_NAME(GMWindowDescProxy);
 		GM_DECLARE_PRIVATE(GMWindowDescProxy);
 
 	public:

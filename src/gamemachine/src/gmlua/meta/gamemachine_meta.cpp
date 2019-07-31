@@ -12,17 +12,7 @@ BEGIN_NS
 
 namespace luaapi
 {
-	struct GMGameMachineRunningStatesProxyPrivate : public GMGameMachineRunningStates
-	{
-		GMGameMachineRunningStatesProxyPrivate() { }
-
-		GMGameMachineRunningStatesProxyPrivate& operator=(const GMGameMachineRunningStates& rhs)
-		{
-			memcpy_s(this, sizeof(GMGameMachineRunningStatesProxyPrivate), &rhs, sizeof(GMGameMachineRunningStates));
-			return *this;
-		}
-	};
-
+	GM_LUA_PRIVATE_CLASS_FROM(GMGameMachineRunningStatesProxy, GMGameMachineRunningStates)
 	class GMGameMachineRunningStatesProxy : public GMObject
 	{
 		GM_DECLARE_PRIVATE(GMGameMachineRunningStatesProxy)

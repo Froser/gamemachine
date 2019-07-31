@@ -212,12 +212,6 @@ public:
 	*/
 	void setGameMachineRunningStates(const GMGameMachineRunningStates& states);
 
-	//! 将系统事件翻译成GameMachine事件。
-	/*!
-	  翻译后的事件将是平台无关的。
-	*/
-	void translateSystemEvent(GMuint32 uMsg, GMWParam wParam, GMLParam lParam, OUT GMSystemEvent** event);
-
 	//! 为GameMachine注册个窗口。
 	/*!
 	  添加到GameMachine后的窗口将响应程序的消息循环和各种事件。

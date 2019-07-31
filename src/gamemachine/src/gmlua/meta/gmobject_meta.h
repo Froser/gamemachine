@@ -4,6 +4,17 @@
 #include <gmlua.h>
 BEGIN_NS
 
+#define GM_LUA_PRIVATE_CLASS_FROM(clsName, baseName) \
+struct GM_PRIVATE_NAME(clsName) : public baseName \
+{ \
+	GM_PRIVATE_NAME(clsName)() { } \
+	GM_PRIVATE_NAME(clsName)& operator=(const baseName& rhs) \
+	{ \
+		memcpy_s(this, sizeof(GM_PRIVATE_NAME(clsName)), &rhs, sizeof(baseName)); \
+		return *this; \
+	} \
+};
+
 namespace luaapi
 {
 	GM_PRIVATE_CLASS(GMObjectProxy);
