@@ -1,0 +1,19 @@
+in vec4 _position;
+in vec4 _normal;
+
+uniform mat4 GM_ViewMatrix;
+uniform mat4 GM_WorldMatrix;
+vec3 lightDirection_N = normalize(vec3(2, 1, 1));
+vec3 lightColor = vec3(0, .5, .5);
+vec3 ambient() { return lightColor; }
+vec3 diffuse() {
+   vec3 eyeDirection_world = (GM_WorldMatrix * _position).xyz;
+   vec3 eyeDirection_world_N = normalize(eyeDirection_world);
+   vec3 lightPosition_world = (vec4(lightDirection_N, 1)).xyz;
+   vec3 lightDirection_world_N = normalize(lightPosition_world + eyeDirection_world);
+   return max(dot(lightDirection_world_N, _normal.xyz) * lightColor, 0);
+}
+
+void main() {
+   gl_FragColor = vec4(ambient() + diffuse(), 1);
+}

@@ -49,6 +49,8 @@ set(SOURCES
 		gmdata/gamepackage/gmgamepackage.cpp
 		gmdata/gamepackage/gmgamepackagehandler.h
 		gmdata/gamepackage/gmgamepackagehandler.cpp
+		gmdata/gmeffectreader/gmeffectreader.h
+		gmdata/gmeffectreader/gmeffectreader.cpp
 		gmdata/xml/tinyxml2/tinyxml2.h
 		gmdata/xml/tinyxml2/tinyxml2.cpp
 		gmdata/xml/gmxml.h
@@ -114,6 +116,8 @@ set(SOURCES
 		gmengine/gameobjects/gm2dgameobject.cpp
 		gmengine/gameobjects/gmanimationobjecthelper.h
 		gmengine/gameobjects/gmanimationobjecthelper.cpp
+		gmengine/gameobjects/gmeffectgameobject.h
+		gmengine/gameobjects/gmeffectgameobject.cpp
 		gmengine/ui/gmwidget.h
 		gmengine/ui/gmwidget_p.h
 		gmengine/ui/gmwidget.cpp

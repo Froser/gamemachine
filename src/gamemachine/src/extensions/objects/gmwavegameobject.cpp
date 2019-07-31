@@ -328,7 +328,7 @@ GMWaveGameObject* GMWaveGameObject::create(const GMWaveGameObjectDescription& de
 	return ret;
 }
 
-bool gm::GMWaveGameObject::canDeferredRendering()
+bool GMWaveGameObject::canDeferredRendering()
 {
 	return false;
 }

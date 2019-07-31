@@ -161,6 +161,8 @@ GMString GMDefaultGamePackageHandler::pathRoot(GMPackageIndex index)
 		return packagePath() + L"/scripts/";
 	case GMPackageIndex::Fonts:
 		return packagePath() + L"/fonts/";
+	case GMPackageIndex::Effects:
+		return packagePath() + L"/effects/";
 	case GMPackageIndex::Prefetch:
 		return packagePath() + L"/prefetch/";
 	default:
@@ -421,6 +423,8 @@ GMString GMZipGamePackageHandler::pathRoot(GMPackageIndex index)
 		return L"scripts/";
 	case GMPackageIndex::Fonts:
 		return L"fonts/";
+	case GMPackageIndex::Effects:
+		return L"effects/";
 	case GMPackageIndex::Prefetch:
 		return L"prefetch/";
 	default:

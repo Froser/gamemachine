@@ -28,6 +28,7 @@ enum class GMPackageIndex
 	Particle, //!< 粒子文件类型，存放在"资源包/particles"下
 	Scripts, //!< 脚本类型，存放在"资源包/scripts"下
 	Fonts, //!< 字体文件，存放在"资源包/fonts"下
+	Effects, //!< 特效文件，存放在"资源包/effects"下
 	Prefetch, //!< 预读数据，如预编译着色器等，存放在"资源包/prefetch"
 };
 

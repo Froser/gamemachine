@@ -22,14 +22,14 @@ using namespace gm;
 
 namespace
 {
-	gm::GMRenderEnvironment s_env;
+	GMRenderEnvironment s_env;
 
-	void SetRenderEnv(gm::GMRenderEnvironment env)
+	void SetRenderEnv(GMRenderEnvironment env)
 	{
 		s_env = env;
 	}
 
-	gm::GMRenderEnvironment GetRenderEnv()
+	GMRenderEnvironment GetRenderEnv()
 	{
 		return s_env;
 	}
@@ -129,10 +129,10 @@ namespace
 
 	void FlowHandler::start()
 	{
-		gm::GMCamera& camera = m_context->getEngine()->getCamera();
+		GMCamera& camera = m_context->getEngine()->getCamera();
 		camera.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
 
-		gm::GMCameraLookAt lookAt;
+		GMCameraLookAt lookAt;
 		lookAt.lookDirection = { 0, -.5f, 1 };
 		lookAt.position = { 0, .5f, -1 };
 		camera.lookAt(lookAt);
@@ -287,13 +287,13 @@ namespace
 		{
 			GMGLShaderProgram* program = new GMGLShaderProgram(context);
 			GMGLShaderInfo shadersInfo[] = {
-				{ GMGLShaderInfo::toGLShaderType(gm::GMShaderType::Vertex), s_gl_vs, "" },
-				{ GMGLShaderInfo::toGLShaderType(gm::GMShaderType::Pixel), s_gl_fs, "" },
+				{ GMGLShaderInfo::toGLShaderType(GMShaderType::Vertex), s_gl_vs, "" },
+				{ GMGLShaderInfo::toGLShaderType(GMShaderType::Pixel), s_gl_fs, "" },
 			};
 			program->attachShader(shadersInfo[0]);
 			program->attachShader(shadersInfo[1]);
 			program->load();
-			context->getEngine()->setInterface(gm::GameMachineInterfaceID::GLForwardShaderProgram, program);
+			context->getEngine()->setInterface(GameMachineInterfaceID::GLForwardShaderProgram, program);
 		}
 		else
 		{
@@ -390,10 +390,10 @@ int WINAPI wWinMain(
 {
 	// 这个例子中，我们不使用游戏模式，而将它作为一个窗口，并将它嵌入一个程序
 	LPWSTR cmdLine = GetCommandLineW();
-	gm::GMsize_t sz = gm::GMString::countOfCharacters(cmdLine);
-	gm::GMRenderEnvironment env = gm::GMRenderEnvironment::DirectX11;
-	if (sz > 7 && gm::GMString(cmdLine + sz - 7) == "-opengl")
-		env = gm::GMRenderEnvironment::OpenGL;
+	GMsize_t sz = GMString::countOfCharacters(cmdLine);
+	GMRenderEnvironment env = GMRenderEnvironment::DirectX11;
+	if (sz > 7 && GMString(cmdLine + sz - 7) == "-opengl")
+		env = GMRenderEnvironment::OpenGL;
 	SetRenderEnv(env);
 
 	HWND hDlg = CreateMainDialog(hInstance);
@@ -404,20 +404,20 @@ int WINAPI wWinMain(
 	g_hDlg = hDlg;
 
 	IFactory* pFactory = nullptr;
-	if (GetRenderEnv() == gm::GMRenderEnvironment::OpenGL)
+	if (GetRenderEnv() == GMRenderEnvironment::OpenGL)
 	{
-		pFactory = new gm::GMGLFactory();
+		pFactory = new GMGLFactory();
 	}
 	else
 	{
 #if GM_USE_DX11
 		if (GMQueryCapability(GMCapability::SupportDirectX11))
-			pFactory = new gm::GMDx11Factory();
+			pFactory = new GMDx11Factory();
 		else
-			pFactory = new gm::GMGLFactory();
+			pFactory = new GMGLFactory();
 #else
-		SetRenderEnv(gm::GMRenderEnvironment::OpenGL);
-		pFactory = new gm::GMGLFactory();
+		SetRenderEnv(GMRenderEnvironment::OpenGL);
+		pFactory = new GMGLFactory();
 #endif
 	}
 

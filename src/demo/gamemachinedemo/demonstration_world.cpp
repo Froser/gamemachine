@@ -9,6 +9,7 @@
 #include <gmmodelreader.h>
 #include <gmtools.h>
 #include <gmshaderhelper.h>
+#include <gmeffectreader.h>
 
 #include "demo/texture.h"
 #include "demo/normalmap.h"
@@ -33,6 +34,7 @@
 #include "demo/customshader.h"
 #include "demo/customlight.h"
 #include "demo/wave.h"
+#include "demo/effectreader.h"
 #include "demo/sponza.h"
 
 extern gm::GMRenderEnvironment GetRenderEnv();
@@ -83,6 +85,7 @@ namespace
 			world->addDemo(L"自定义着色器: 实现聚光灯效果。", new Demo_CustomLight(world));
 #endif
 		world->addDemo(L"LUA: 执行Lua脚本。", new Demo_Lua(world));
+		world->addDemo(L"Effect Loader: 读取一个效果。", new Demo_EffectReader(world));
 		if (GM.getGamePackageManager()->exists(gm::GMPackageIndex::Models, "sponza"))
 			world->addDemo(L"场景渲染: 渲染Sponza场景。", new Demo_Sponza(world));
 
@@ -529,6 +532,18 @@ gm::GMWidget* DemonstrationWorld::getBillboardWidget()
 	return d->billboard;
 }
 
+void DemonstrationWorld::setEffectObjectFactory(gm::IEffectObjectFactory* f)
+{
+	D(d);
+	d->effectObjFactory.reset(f);
+}
+
+gm::IEffectObjectFactory* DemonstrationWorld::getEffectObjectFactory()
+{
+	D(d);
+	return d->effectObjFactory.get();
+}
+
 void DemonstrationWorld::addDemo(const gm::GMString& name, AUTORELEASE DemoHandler* demo)
 {
 	D(d);
@@ -905,6 +920,12 @@ void DemostrationEntrance::onLoadShaders(const gm::IRenderContext* context)
 	Demo_CustomGeometryShader::initCustomShader(context);
 	Demo_CustomAndDefaultShader::initCustomShader(context);
 	Demo_CustomLight::initCustomShader(context);
+
+	// 读取Effects
+	gm::IEffectObjectFactory* factory = nullptr;
+	gm::GMEffectReader::loadEffect(L"phong", context, &factory);
+	GM_ASSERT(factory);
+	getWorld()->setEffectObjectFactory(factory);
 
 	// 使用预设的着色器程序
 	gm::GMShaderHelper::loadExtensionShaders(context);

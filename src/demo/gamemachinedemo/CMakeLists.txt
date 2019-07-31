@@ -71,6 +71,8 @@ set(SOURCES
 		demo/assimp.cpp
 		demo/customlight.h
 		demo/customlight.cpp
+		demo/effectreader.h
+		demo/effectreader.cpp
 		demo/sponza.h
 		demo/sponza.cpp
 	)

@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<GameMachineEffect version="1.0">
+    <shader>
+        <vs><file target="opengl">gl.vs</file></vs>
+        <ps><file target="opengl">gl.ps</file></ps>
+    </shader>
+</GameMachineEffect>

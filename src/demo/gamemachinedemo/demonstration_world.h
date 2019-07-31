@@ -9,6 +9,7 @@
 #include <gmuiconfiguration.h>
 #include <gmprimitivemanager.h>
 #include <gmlight.h>
+#include <gmeffectreader.h>
 
 namespace gm
 {
@@ -91,6 +92,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(DemonstrationWorld)
 	gm::GMAnimation logoAnimation;
 	gm::GMFuture<void> logoLoadedFuture;
 	Stack<std::function<void()>> funcQueue;
+	gm::GMOwnedPtr<gm::IEffectObjectFactory> effectObjFactory;
 };
 
 class DemonstrationWorld : public gm::GMGameWorld
@@ -108,6 +110,8 @@ public:
 	void setCurrentDemo(gm::GMint32 index);
 	gm::GMWidget* getMainWidget();
 	gm::GMWidget* getBillboardWidget();
+	void setEffectObjectFactory(AUTORELEASE gm::IEffectObjectFactory*);
+	gm::IEffectObjectFactory* getEffectObjectFactory();
 
 public:
 	void addDemo(const gm::GMString& name, AUTORELEASE DemoHandler* demo);

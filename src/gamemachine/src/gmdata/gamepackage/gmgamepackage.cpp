@@ -53,10 +53,16 @@ void GMGamePackage::loadPackage(const GMString& path)
 bool GMGamePackage::readFile(GMPackageIndex index, const GMString& filename, REF GMBuffer* buffer, REF GMString* fullFilename)
 {
 	D(d);
-	GMString p = pathOf(index, filename);
-	if (fullFilename)
-		*fullFilename = p;
-	return readFileFromPath(p, buffer);
+	if (d->handler)
+	{
+		GMString p = pathOf(index, filename);
+		if (fullFilename)
+			*fullFilename = p;
+		return readFileFromPath(p, buffer);
+	}
+
+	gm_warning(gm_dbg_wrap("Game Package is not ready. Please call 'loadPackage' first."));
+	return false;
 }
 
 GMString GMGamePackage::pathOf(GMPackageIndex index, const GMString& filename)
