@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<timeline>
+    <assets>
+        <texture id="tex_box_diffuse" file="box/box_diffuse.png" />
+        <texture id="tex_box_normal" file="box/box_normal.png" />
+        <texture id="tex_box_specular" file="box/box_specular.png" />
+    </assets>
+    <objects>
+        <cube
+            id="obj_box01"
+            size="5 5 5" 
+            ambient="tex_box_diffuse"
+            diffuse="tex_box_diffuse"
+            normal="tex_box_normal"
+            specular="tex_box_specular"
+            translate="0 5 0"
+            />
+        <light id="light_phy_global" type="point" position="500 300 -500" ambient=".5 .5 .5" diffuse=".8 .8 .8" specular="1 1 1"/>
+        <physics id="phy_world" />
+    </objects>
+    <actions>
+        <action type="camera" view="perspective" fovy="60" near=".1f" far="3200" time="+0"/>
+        <action type="camera" focus="0 0 0" position="0 0 -40" time="+0"/>
+        <action type="addObject" object="light_phy_global" time="+0"/>
+        <action type="addObject" object="obj_box01" time="+0"/>
+
+        <checkpoint type="save"/>
+        <component file="component_fade_in.xml">
+            <slot name="duration">1.5</slot>
+        </component>
+        <checkpoint type="load"/>
+
+<!--
+        <checkpoint type="time" time="-1.5" />
+        <component file="component_fade_out.xml" >
+            <slot name="duration">1.5</slot>
+        </component>
+-->
+        <action type="removeObject" object="obj_box01" time="+10"/>
+    </actions>
+</timeline>

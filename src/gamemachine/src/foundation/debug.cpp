@@ -111,6 +111,7 @@ void GMDebugger::print(
 		{
 			OutputDebugStringW(buffer);
 		}
+		OutputDebugStringW(L"\n");
 #else
 		std::cout << s.toStdString() << std::endl;
 #endif

@@ -228,7 +228,6 @@ IParticleSystemManager* GMGameWorld::getParticleSystemManager()
 void GMGameWorld::setPhysicsWorld(AUTORELEASE GMPhysicsWorld* w)
 {
 	D(d);
-	GM_ASSERT(!d->physicsWorld);
 	d->physicsWorld.reset(w);
 }
 

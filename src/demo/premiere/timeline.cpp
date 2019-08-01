@@ -707,49 +707,30 @@ void Timeline::parseObjects(GMXMLElement* e)
 					gm_warning(gm_dbg_wrap("Cannot recognize type '{0}' of object '{1}"), type, id);
 			}
 
-			GMString colorStr = e->Attribute("color");
-			if (!colorStr.isEmpty())
-			{
-				Scanner scanner(colorStr, *this);
-				Array<GMfloat, 4> color;
-				scanner.nextFloat(color[0]);
-				scanner.nextFloat(color[1]);
-				scanner.nextFloat(color[2]);
-				scanner.nextFloat(color[3]);
+			parsePrimitiveAttributes(obj, e);
+			parseTextures(obj, e);
+			parseMaterial(obj, e);
+			parseTransform(obj, e);
+			parseBlend(obj, e);
+		}
+		else if (name == L"cube")
+		{
+			if (objectExists(id))
+				return;
 
-				obj->foreachModel([this, color](GMModel* model) {
-					model->setUsageHint(GMUsageHint::DynamicDraw);
+			GMString sizeStr = e->Attribute("size");
+			Scanner scanner(sizeStr, *this);
+			GMfloat x, y, z;
+			scanner.nextFloat(x);
+			scanner.nextFloat(y);
+			scanner.nextFloat(z);
 
-					// 保存副本
-					GMVertices vertices;
-					vertices.reserve(model->getVerticesCount());
-					for (auto& part : model->getParts())
-					{
-						for (auto& vertex : part->vertices())
-						{
-							vertices.push_back(vertex);
-						}
-					}
-					m_verticesCache[model] = std::move(vertices);
-					setColorForModel(model, &color[0]);
-				});
-			}
+			GMSceneAsset scene;
+			GMPrimitiveCreator::createCube(GMVec3(x * .5f, y * .5f, z * .5f), scene);
 
-			GMString colorOpStr = e->Attribute("colorOp");
-			GMS_VertexColorOp op = GMS_VertexColorOp::DoNotUseVertexColor;
-			if (colorOpStr == "replace")
-				op = GMS_VertexColorOp::Replace;
-			else if (colorOpStr == "add")
-				op = GMS_VertexColorOp::Add;
-			else if (colorOpStr == "multiply")
-				op = GMS_VertexColorOp::Multiply;
-			if (op != GMS_VertexColorOp::DoNotUseVertexColor)
-			{
-				obj->foreachModel([op](GMModel* model) {
-					model->getShader().setVertexColorOp(op);
-				});
-			}
-
+			GMGameObject* obj = new GMGameObject(scene);
+			m_objects[id] = AutoReleasePtr<GMGameObject>(obj);
+			parsePrimitiveAttributes(obj, e);
 			parseTextures(obj, e);
 			parseMaterial(obj, e);
 			parseTransform(obj, e);
@@ -991,6 +972,10 @@ void Timeline::parseObjects(GMXMLElement* e)
 		else if (name == L"particles")
 		{
 			parseParticlesObject(e);
+		}
+		else if (name == L"physics")
+		{
+			m_physicsWorld[id] = AutoReleasePtr<GMDiscreteDynamicsWorld>(new GMDiscreteDynamicsWorld(m_world));
 		}
 		e = e->NextSiblingElement();
 	}
@@ -2032,6 +2017,52 @@ void Timeline::parseBlend(GMGameObject* o, GMXMLElement* e)
 
 			if (!dest.isNull)
 				shader.setBlendFactorDest(dest);
+		});
+	}
+}
+
+void Timeline::parsePrimitiveAttributes(GMGameObject* obj, GMXMLElement* e)
+{
+	GMString colorStr = e->Attribute("color");
+	if (!colorStr.isEmpty())
+	{
+		Scanner scanner(colorStr, *this);
+		Array<GMfloat, 4> color;
+		scanner.nextFloat(color[0]);
+		scanner.nextFloat(color[1]);
+		scanner.nextFloat(color[2]);
+		scanner.nextFloat(color[3]);
+
+		obj->foreachModel([this, color](GMModel* model) {
+			model->setUsageHint(GMUsageHint::DynamicDraw);
+
+			// 保存副本
+			GMVertices vertices;
+			vertices.reserve(model->getVerticesCount());
+			for (auto& part : model->getParts())
+			{
+				for (auto& vertex : part->vertices())
+				{
+					vertices.push_back(vertex);
+				}
+			}
+			m_verticesCache[model] = std::move(vertices);
+			setColorForModel(model, &color[0]);
+		});
+	}
+
+	GMString colorOpStr = e->Attribute("colorOp");
+	GMS_VertexColorOp op = GMS_VertexColorOp::DoNotUseVertexColor;
+	if (colorOpStr == "replace")
+		op = GMS_VertexColorOp::Replace;
+	else if (colorOpStr == "add")
+		op = GMS_VertexColorOp::Add;
+	else if (colorOpStr == "multiply")
+		op = GMS_VertexColorOp::Multiply;
+	if (op != GMS_VertexColorOp::DoNotUseVertexColor)
+	{
+		obj->foreachModel([op](GMModel* model) {
+			model->getShader().setVertexColorOp(op);
 		});
 	}
 }

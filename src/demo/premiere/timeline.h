@@ -6,6 +6,7 @@
 #include <gmanimation.h>
 #include <extensions/objects/gmwavegameobject.h>
 #include <gmgraphicengine.h>
+#include <gmdiscretedynamicsworld.h>
 
 using namespace gm;
 
@@ -254,6 +255,7 @@ private:
 	void parseTextures(GMGameObject*, GMXMLElement*);
 	void parseMaterial(GMGameObject*, GMXMLElement*);
 	void parseBlend(GMGameObject*, GMXMLElement*);
+	void parsePrimitiveAttributes(GMGameObject*, GMXMLElement*);
 	ShaderCallback parseTexture(GMXMLElement*, const char* type, GMTextureType textureType);
 	ShaderCallback parseTextureTransform(GMXMLElement*, const char* type, GMTextureType textureType, GMS_TextureTransformType transformType);
 	ShaderCallback parseTexturePBR(GMXMLElement*);
@@ -292,6 +294,7 @@ private:
 	HashMap<GMString, AutoReleasePtr<IAudioFile>, GMStringHashFunctor> m_audioFiles;
 	HashMap<GMString, AutoReleasePtr<IAudioSource>, GMStringHashFunctor> m_audioSources;
 	HashMap<GMString, AutoReleasePtr<IParticleSystem>, GMStringHashFunctor> m_particleSystems;
+	HashMap<GMString, AutoReleasePtr<GMDiscreteDynamicsWorld>, GMStringHashFunctor> m_physicsWorld;
 	HashMap<GMString, GMShadowSourceDesc, GMStringHashFunctor> m_shadows;
 	HashMap<GMString, GMString, GMStringHashFunctor> m_defines;
 	HashMap<GMString, GMString, GMStringHashFunctor> m_presetConstants;
