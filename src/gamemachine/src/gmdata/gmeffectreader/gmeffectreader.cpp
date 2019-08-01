@@ -68,6 +68,7 @@ GMRenderTechniqueID GMEffectReader_1_0::parseShader(GMXMLElement* shader)
 		GMShaderType shaderType = GMShaderType::Vertex;
 		while (proc)
 		{
+			bool valid = true;
 			GMString name = proc->Name();
 			if (name == "vs")
 				shaderType = GMShaderType::Vertex;
@@ -104,13 +105,15 @@ GMRenderTechniqueID GMEffectReader_1_0::parseShader(GMXMLElement* shader)
 				else
 				{
 					gm_warning(gm_dbg_wrap("Cannot open file '{0}'. "), fileName);
+					valid = false;
 				}
 
 				file = file->NextSiblingElement();
 			}
 
+			if (valid)
+				techs.addRenderTechnique(tech);
 			proc = proc->NextSiblingElement();
-			techs.addRenderTechnique(tech);
 		}
 	}
 
@@ -162,7 +165,7 @@ bool GMEffectReader::loadEffect(const GMString& effectName, const IRenderContext
 		}
 		else
 		{
-			gm_warning(gm_dbg_wrap("Empty effect file or file doesn't exist."));
+			gm_warning(gm_dbg_wrap("Effect File format error at line {0}"), GMString(doc.ErrorLineNum()));
 		}
 	}
 	else

@@ -6,7 +6,7 @@
 #include <cwchar>
 #include <chrono>
 #include <ctime>
-
+#include <sstream>
 #if !GM_WINDOWS
 #include <iostream>
 #endif
@@ -103,7 +103,14 @@ void GMDebugger::print(
 	else
 	{
 #if GM_WINDOWS
-		OutputDebugStringW(s.toStdWString().c_str());
+		constexpr GMsize_t BUFLEN = 1024;
+		GMwchar buffer[BUFLEN];
+		std::wstring content = s.toStdWString();
+		std::wstringstream ss(content);
+		while (ss.getline(buffer, BUFLEN, '\n'))
+		{
+			OutputDebugStringW(buffer);
+		}
 #else
 		std::cout << s.toStdString() << std::endl;
 #endif

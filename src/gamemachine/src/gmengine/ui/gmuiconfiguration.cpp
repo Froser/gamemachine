@@ -22,9 +22,9 @@ class GMUIParser<0> : public IGMUIParser
 	virtual bool Parse(GMUIConfiguration& configuration, GMXMLElement* root) override;
 };
 
-static IGMUIParser* getParser(GMint32 version)
+static IGMUIParser* getParser(GMfloat version)
 {
-	if (version == 0)
+	if (version == 1.0f)
 	{
 		static GMUIParser<0> parser;
 		return &parser;
@@ -212,7 +212,7 @@ bool GMUIConfiguration::import(const GMBuffer& buffer)
 	}
 
 	bool parseVersion;
-	GMint32 version = GMString::parseInt(root->Attribute("version"), &parseVersion);
+	GMfloat version = GMString::parseFloat(root->Attribute("version"), &parseVersion);
 	if (!parseVersion)
 	{
 		gm_error(gm_dbg_wrap("Wrong ui version."));

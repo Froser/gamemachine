@@ -5,10 +5,16 @@
 #include <gmdemogameworld.h>
 #include "demonstration_world.h"
 
+namespace gm
+{
+	class GMEffectGameObject;
+}
+
 GM_PRIVATE_OBJECT_ALIGNED(Demo_EffectReader)
 {
 	gm::GMSceneAsset cubeScene;
-	gm::GMGameObject* obj = nullptr;
+	gm::GMEffectGameObject* obj = nullptr;
+	gm::GMfloat degree = 0;
 };
 
 class Demo_EffectReader : public DemoHandler
@@ -21,6 +27,7 @@ public:
 
 public:
 	virtual void init() override;
+	virtual void setLookAt() override;
 	virtual void event(gm::GameMachineHandlerEvent evt) override;
 
 protected:

@@ -90,7 +90,11 @@ void GMDx11EffectShaderProgram::setVec4(GMint32 index, const GMFloat4& vector)
 void GMDx11EffectShaderProgram::setVec3(GMint32 index, const GMfloat value[3])
 {
 	D(d);
-	GM_ASSERT(false); //not supported
+	if (index < 0)
+		return;
+
+	ID3DX11EffectVectorVariable* var = getVectorVariable(index);
+	GM_DX_HR(var->SetFloatVector(ValuePointer(GMVec4(value[0], value[1], value[2], 0))));
 }
 
 void GMDx11EffectShaderProgram::setInt(GMint32 index, GMint32 value)

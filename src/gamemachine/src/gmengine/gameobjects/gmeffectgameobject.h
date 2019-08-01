@@ -15,8 +15,15 @@ public:
 	GMEffectGameObject(GMRenderTechniqueID, GMAsset);
 	~GMEffectGameObject();
 
+public:
+	void setUniform(const GMString& name, GMVariant value);
+	GMVariant getUniform(const GMString& name);
+
 protected:
-	virtual void onAppendingObjectToWorld();
+	virtual void onAppendingObjectToWorld() override;
+
+public:
+	virtual void onRenderShader(GMModel*, IShaderProgram* shaderProgram) const override;
 };
 
 END_NS
