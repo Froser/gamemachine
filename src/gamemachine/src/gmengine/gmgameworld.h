@@ -40,6 +40,7 @@ public:
 
 public:
 	GMPhysicsWorld* getPhysicsWorld();
+	void setPhysicsWorld(AUTORELEASE GMPhysicsWorld* w);
 
 public:
 	virtual void renderScene();
@@ -58,14 +59,6 @@ public:
 
 protected:
 	GMRenderList& getRenderList();
-
-private:
-	void updateGameObjects(GMDuration dt, GMPhysicsWorld* phyw, const Set<GMOwnedPtr<GMGameObject>>& gameObjects);
-
-	// GMPhysicsWorld
-private:
-	void setPhysicsWorld(AUTORELEASE GMPhysicsWorld* w);
-	void addToContainerByPriority(GMGameObjectContainer&, GMGameObject*, GMGameObjectRenderPriority = GMGameObjectRenderPriority::Normal);
 };
 
 END_NS

@@ -11,9 +11,8 @@ GMPhysicsWorld::GMPhysicsWorld(GMGameWorld* world)
 {
 	GM_CREATE_DATA();
 
-	D(d);
-	d->world = world;
-	d->world->setPhysicsWorld(this);
+	if (world)
+		world->setPhysicsWorld(this);
 }
 
 GMPhysicsWorld::~GMPhysicsWorld()

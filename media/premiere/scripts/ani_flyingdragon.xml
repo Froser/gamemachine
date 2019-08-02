@@ -36,7 +36,7 @@
         <light id="light_flyingdragon_global" type="point" position="500 300 -500" ambient="1 1 1" diffuse="12 12 12" specular="1 1 1"/>
         <object id="obj_flyingdragon" asset="model_flyingdragon" scale=".05 .05 .05" translate="0 100 0"/>
         <cubemap id="obj_yellowsky" asset="tex_yellowsky" scale="2500 2500 2500" translate="0 -400 0" />
-        <shadow id="shadow_flyingdragon" cascades="1" position="1000 1000 -1000" focus="0 100 0" width="$screen_width" height="$screen_height" view="perspective" fovy="45" near=".1f" far="5000" bias="0.0000005" time="+0"/>
+        <shadow id="shadow_flyingdragon" cascades="1" position="1000 1000 -1000" focus="0 100 0" width="$screen_width" height="$screen_height" view="perspective" fovy="45" near=".1f" far="5000" bias="0.0000005"/>
     </objects>
     <actions>
         <action type="camera" focus="0 200 0" position="50 200 150" time="+0"/>

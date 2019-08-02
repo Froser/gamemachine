@@ -12,6 +12,7 @@ class GM_EXPORT GMPhysicsWorld : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMPhysicsWorld)
 	GM_DECLARE_PROPERTY(bool, Enabled)
+	GM_FRIEND_CLASS(GMGameWorld)
 
 public:
 	GMPhysicsWorld(GMGameWorld* world);

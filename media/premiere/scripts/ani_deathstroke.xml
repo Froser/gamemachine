@@ -31,6 +31,7 @@
         <include file="ani_fireworks.xml" />
 
         <action type="addObject" object="shadow_deathstroke" time="+0"/>
+        <action type="camera" view="perspective" fovy="60" near=".1f" far="3200" time="+0"/>
         <action type="camera" direction="0 0 1" position="0 30 0" time="+0"/>
         <action type="addObject" object="obj_metalplate" time="+0"/>
         <action type="addObject" object="light_deathstroke" time="+0" />

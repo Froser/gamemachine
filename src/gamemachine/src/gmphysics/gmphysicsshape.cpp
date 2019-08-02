@@ -214,16 +214,16 @@ void GMPhysicsShapeHelper::createSphereShape(GMfloat radius, REF GMPhysicsShapeA
 }
 
 bool GMPhysicsShapeHelper::createConvexShapeFromTriangleModel(
-	GMModelAsset model,
+	GMSceneAsset sceneAsset,
 	REF GMPhysicsShapeAsset& physicsShape,
 	bool optimizeConvex,
 	const GMVec3& scaling
 )
 {
-	if (model.isEmpty())
+	if (sceneAsset.isEmpty())
 		return false;
 
-	GMScene* scene = model.getScene();
+	GMScene* scene = sceneAsset.getScene();
 	if (!scene)
 	{
 		gm_warning(gm_dbg_wrap("not a valid models asset."));

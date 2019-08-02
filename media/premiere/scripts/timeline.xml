@@ -47,12 +47,14 @@
 <!--
         <include file="ani_logo.xml" />
         <include file="ani_dragon.xml" />
+        <include file="ani_physics.xml" />
         <include file="ani_deathstroke.xml" />
         <include file="ani_wave.xml" />
         <include file="ani_flyingdragon.xml" />
         <include file="ani_bsp.xml" />-->
-        
-        <include file="ani_physics.xml" />
+
+                <include file="ani_physics.xml" />
+        <include file="ani_deathstroke.xml" />
 
     </actions>
 </timeline>

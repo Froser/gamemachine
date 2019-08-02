@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <time.h>
 #include "foundation/gamemachine.h"
+#include "gmphysics/gmphysicsworld_p.h"
 
 BEGIN_NS
 
@@ -37,6 +38,35 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGameWorld)
 	GMMutex addObjectMutex;
 	GMOwnedPtr<IParticleSystemManager> particleSystemMgr;
 };
+
+namespace
+{
+	void updateGameObjects(GMDuration dt, GMPhysicsWorld* phyw, const Set<GMOwnedPtr<GMGameObject>>& gameObjects)
+	{
+		for (decltype(auto) gameObject : gameObjects)
+		{
+			gameObject->update(dt);
+			if (phyw)
+				phyw->update(dt, gameObject.get());
+		}
+	}
+
+	void addToContainerByPriority(GMGameObjectContainer& c, GMGameObject* o, GMGameObjectRenderPriority hint = GMGameObjectRenderPriority::Normal)
+	{
+		if (hint == GMGameObjectRenderPriority::High)
+		{
+			c.push_front(o);
+		}
+		else
+		{
+			GMGameObjectRenderPriority priority = o->getRenderPriority();
+			if (priority == GMGameObjectRenderPriority::High)
+				c.push_front(o);
+			else
+				c.push_back(o);
+		}
+	}
+}
 
 GM_DEFINE_PROPERTY(GMGameWorld, GMRenderPreference, RenderPreference, renderPreference)
 GMGameWorld::GMGameWorld(const IRenderContext* context)
@@ -161,16 +191,6 @@ GMRenderList& GMGameWorld::getRenderList()
 	return d->renderList;
 }
 
-void GMGameWorld::updateGameObjects(GMDuration dt, GMPhysicsWorld* phyw, const Set<GMOwnedPtr<GMGameObject>>& gameObjects)
-{
-	for (decltype(auto) gameObject : gameObjects)
-	{
-		gameObject->update(dt);
-		if (phyw)
-			phyw->update(dt, gameObject.get());
-	}
-}
-
 void GMGameWorld::addToRenderList(GMGameObject* object)
 {
 	D(d);
@@ -227,23 +247,16 @@ IParticleSystemManager* GMGameWorld::getParticleSystemManager()
 
 void GMGameWorld::setPhysicsWorld(AUTORELEASE GMPhysicsWorld* w)
 {
-	D(d);
-	d->physicsWorld.reset(w);
-}
-
-void GMGameWorld::addToContainerByPriority(GMGameObjectContainer& c, GMGameObject* o, GMGameObjectRenderPriority hint)
-{
-	if (hint == GMGameObjectRenderPriority::High)
 	{
-		c.push_front(o);
+		D(d);
+		d->physicsWorld.reset(w);
 	}
-	else
+
+	if (w)
 	{
-		GMGameObjectRenderPriority priority = o->getRenderPriority();
-		if (priority == GMGameObjectRenderPriority::High)
-			c.push_front(o);
-		else
-			c.push_back(o);
+		D_OF(d, w);
+		if (d->world != this)
+			d->world = this;
 	}
 }
 

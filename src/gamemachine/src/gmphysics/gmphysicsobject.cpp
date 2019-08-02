@@ -163,14 +163,27 @@ void GMRigidPhysicsObject::setShape(GMAsset shape)
 	GM_ASSERT(d->shape.isEmpty());
 	d->shape = shape;
 
-	const GMMat4& translation = db->gameObject->getTranslation();
-	btTransform trans;
-	trans.setFromOpenGLMatrix(ValuePointer(translation));
-	initRigidBody(
-		d->mass,
-		trans,
-		GMVec3(1, 0, 0)
-	);
+	if (!db->gameObject)
+	{
+		GM_ASSERT(false);
+		gm_error(gm_dbg_wrap("You must call GMGameObject::setPhysicsObject(this) first before you call setShape."));
+		initRigidBody(
+			d->mass,
+			btTransform(),
+			GMVec3(1, 0, 0)
+		);
+	}
+	else
+	{
+		const GMMat4& transform = db->gameObject->getTransform();
+		btTransform trans;
+		trans.setFromOpenGLMatrix(ValuePointer(transform));
+		initRigidBody(
+			d->mass,
+			trans,
+			GMVec3(1, 0, 0)
+		);
+	}
 }
 
 void GMRigidPhysicsObject::setMass(GMfloat mass)

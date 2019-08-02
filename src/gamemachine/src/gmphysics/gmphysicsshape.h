@@ -34,7 +34,7 @@ struct GM_EXPORT GMPhysicsShapeHelper
 	static void createConeShape(GMfloat radius, GMfloat height, REF GMPhysicsShapeAsset& physicsShape);
 	static void createSphereShape(GMfloat radius, REF GMPhysicsShapeAsset& physicsShape);
 	static bool createConvexShapeFromTriangleModel(
-		GMModelAsset model,
+		GMSceneAsset scene,
 		REF GMPhysicsShapeAsset& physicsShape,
 		bool optimizeConvex = false,
 		const GMVec3& scaling = GMVec3(1, 1, 1)

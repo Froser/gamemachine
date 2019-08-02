@@ -9,6 +9,7 @@
 #include <gmparticle.h>
 #include <gmm.h>
 #include "helper.h"
+#include <gmphysicsshape.h>
 
 #define NoCameraComponent 0
 #define PositionComponent 0x01
@@ -125,7 +126,7 @@ namespace
 		if (str == L"false")
 			return false;
 
-		gm_warning(gm_dbg_wrap("Unrecognized boolean string '{0}', treat as false."), str);
+		gm_warning(gm_dbg_wrap("Unrecognized boolean string '{0}', treats as false."), str);
 		return false;
 	}
 
@@ -153,7 +154,7 @@ namespace
 		else if (str == L"OneMinusDestColor")
 			result = GMS_BlendFunc::OneMinusDestColor;
 		else
-			gm_warning(gm_dbg_wrap("Unrecognized blend function string '{0}', treat as One."), str);
+			gm_warning(gm_dbg_wrap("Unrecognized blend function string '{0}', treats as One."), str);
 		return result;
 	}
 }
@@ -659,6 +660,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 			parseMaterial(obj, e);
 			parseTransform(obj, e);
 			parseBlend(obj, e);
+			parsePhysics(obj, e);
 		}
 		else if (name == L"bsp")
 		{
@@ -690,8 +692,17 @@ void Timeline::parseObjects(GMXMLElement* e)
 			length = parseFloat(lengthStr);
 			width = parseFloat(widthStr);
 			
+			GMString sliceStr = e->Attribute("slice");
+			GMint32 sliceX = 1, sliceY = 1;
+			if (!sliceStr.isEmpty())
+			{
+				Scanner scanner(sliceStr, *this);
+				scanner.nextInt(sliceX);
+				scanner.nextInt(sliceY);
+			}
+
 			GMSceneAsset scene;
-			GMPrimitiveCreator::createQuadrangle(GMVec2(length / 2, width / 2), 0, scene);
+			GMPrimitiveCreator::createQuadrangle(GMVec2(length / 2, width / 2), 0, scene, sliceX, sliceY);
 
 			GMGameObject* obj = new GMGameObject(scene);
 			GM_ASSERT(obj->getModel());
@@ -712,6 +723,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 			parseMaterial(obj, e);
 			parseTransform(obj, e);
 			parseBlend(obj, e);
+			parsePhysics(obj, e);
 		}
 		else if (name == L"cube")
 		{
@@ -725,8 +737,17 @@ void Timeline::parseObjects(GMXMLElement* e)
 			scanner.nextFloat(y);
 			scanner.nextFloat(z);
 
+			GMString sliceStr = e->Attribute("slice");
+			GMint32 sliceX = 1, sliceY = 1;
+			if (!sliceStr.isEmpty())
+			{
+				Scanner scanner(sliceStr, *this);
+				scanner.nextInt(sliceX);
+				scanner.nextInt(sliceY);
+			}
+
 			GMSceneAsset scene;
-			GMPrimitiveCreator::createCube(GMVec3(x * .5f, y * .5f, z * .5f), scene);
+			GMPrimitiveCreator::createCube(GMVec3(x * .5f, y * .5f, z * .5f), scene, sliceX, sliceY);
 
 			GMGameObject* obj = new GMGameObject(scene);
 			m_objects[id] = AutoReleasePtr<GMGameObject>(obj);
@@ -735,6 +756,7 @@ void Timeline::parseObjects(GMXMLElement* e)
 			parseMaterial(obj, e);
 			parseTransform(obj, e);
 			parseBlend(obj, e);
+			parsePhysics(obj, e);
 		}
 		else if (name == L"wave")
 		{
@@ -975,7 +997,9 @@ void Timeline::parseObjects(GMXMLElement* e)
 		}
 		else if (name == L"physics")
 		{
-			m_physicsWorld[id] = AutoReleasePtr<GMDiscreteDynamicsWorld>(new GMDiscreteDynamicsWorld(m_world));
+			GMDiscreteDynamicsWorld* ddw = new GMDiscreteDynamicsWorld(nullptr);
+			m_physicsWorld[id] = AutoReleasePtr<GMPhysicsWorld>(ddw);
+			parsePhysics(ddw, e);
 		}
 		e = e->NextSiblingElement();
 	}
@@ -1322,6 +1346,8 @@ void Timeline::parseActions(GMXMLElement* e)
 					addObject(asset_cast<IParticleSystem>(targetObject), e, action);
 				else if (assetType == AssetType::Shadow)
 					addObject(asset_cast<GMShadowSourceDesc>(targetObject), e, action);
+				else if (assetType == AssetType::PhysicsWorld)
+					addObject(asset_cast<GMPhysicsWorld>(targetObject), e, action);
 				else
 					gm_warning(gm_dbg_wrap("Cannot find object: {0}"), object);
 
@@ -1426,6 +1452,14 @@ void Timeline::parseActions(GMXMLElement* e)
 					m_context->getEngine()->setShadowSource(desc);
 				};
 				bindAction(action);
+			}
+			else if (type == L"removePhysics")
+			{
+				action.action = [this]() {
+					m_world->setPhysicsWorld(nullptr);
+				};
+				bindAction(action);
+
 			}
 			else if (type == L"play")
 			{
@@ -2067,6 +2101,53 @@ void Timeline::parsePrimitiveAttributes(GMGameObject* obj, GMXMLElement* e)
 	}
 }
 
+void Timeline::parsePhysics(GMGameObject* obj, GMXMLElement* e)
+{
+	if (obj)
+	{
+		GMString isPhysicsStr = e->Attribute("physics");
+		if (!isPhysicsStr.isEmpty())
+		{
+			bool isPhysics = toBool(isPhysicsStr);
+			GMSceneAsset scene = obj->getAsset();
+			if (isPhysics)
+			{
+				GMRigidPhysicsObject* pobj = new GMRigidPhysicsObject();
+				GMPhysicsShapeAsset phyAsset;
+				GMPhysicsShapeHelper::createConvexShapeFromTriangleModel(scene, phyAsset, false);
+
+				parsePhysicsAttributes(pobj, e);
+				obj->setPhysicsObject(pobj);
+				pobj->setShape(phyAsset);
+			}
+		}
+	}
+}
+
+void Timeline::parsePhysics(GMDiscreteDynamicsWorld* ddw, GMXMLElement* e)
+{
+	GMString gravityStr = e->Attribute("gravity");
+	if (!gravityStr.isEmpty())
+	{
+		Scanner scanner(gravityStr, *this);
+		GMfloat x, y, z;
+		scanner.nextFloat(x);
+		scanner.nextFloat(y);
+		scanner.nextFloat(z);
+		GMVec3 gravity = GMVec3(x, y, z);
+		ddw->setGravity(gravity);
+	}
+}
+
+void Timeline::parsePhysicsAttributes(GMRigidPhysicsObject* pobj, GMXMLElement* e)
+{
+	{
+		GMString massStr = e->Attribute("mass");
+		if (!massStr.isEmpty())
+			pobj->setMass(GMString::parseFloat(massStr));
+	}
+}
+
 Timeline::ShaderCallback Timeline::parseTexture(GMXMLElement* e, const char* type, GMTextureType textureType)
 {
 	GMString tex = e->Attribute(type);
@@ -2267,6 +2348,11 @@ void Timeline::addObject(AutoReleasePtr<GMGameObject>* object, GMXMLElement*, Ac
 		GMGameObject* obj = object->release();
 		m_world->addObjectAndInit(obj);
 		m_world->addToRenderList(obj);
+
+		GMDiscreteDynamicsWorld* ddw = dynamic_cast<GMDiscreteDynamicsWorld*>(m_world->getPhysicsWorld());
+		GMRigidPhysicsObject* rigidObj = dynamic_cast<GMRigidPhysicsObject*>(obj->getPhysicsObject());
+		if (ddw && rigidObj)
+			ddw->addRigidObject(rigidObj);
 	};
 }
 
@@ -2281,6 +2367,13 @@ void Timeline::addObject(AutoReleasePtr<IParticleSystem>* particles, GMXMLElemen
 {
 	action.action = [this, particles]() {
 		m_world->getParticleSystemManager()->addParticleSystem(particles->release());
+	};
+}
+
+void Timeline::addObject(AutoReleasePtr<GMPhysicsWorld>* p, GMXMLElement* e, Action& action)
+{
+	action.action = [this, p]() {
+		m_world->setPhysicsWorld(p->release());
 	};
 }
 
@@ -2478,6 +2571,8 @@ AssetType Timeline::getAssetType(const GMString& objectName, OUT void** out)
 			if (getAssetAndType<AssetType::Particles>(m_particleSystems, objectName, result, out))
 				break;
 			if (getAssetAndType<AssetType::Shadow>(m_shadows, objectName, result, out))
+				break;
+			if (getAssetAndType<AssetType::PhysicsWorld>(m_physicsWorld, objectName, result, out))
 				break;
 		} while (false);
 	}

@@ -14,7 +14,7 @@
     </assets>
     <objects>
         <light id="light_dragon_global" type="point" position="20 20 -20" ambient="0 0 0" diffuse="0 0 0" />
-        <shadow id="shadow_dragon" cascades="1" position="30 30 -30" focus="0 0 0" width="$screen_width" height="$screen_height" view="perspective" fovy="45" near=".1f" far="1600" bias="0.000125" time="+0"/>
+        <shadow id="shadow_dragon" cascades="1" position="30 30 -30" focus="0 0 0" width="$screen_width" height="$screen_height" view="perspective" fovy="45" near=".1f" far="1600" bias="0.000125"/>
         <cubemap id="obj_sky" asset="tex_sky" scale="1500 1500 1500" translate="0 10 0" />
         <object id="obj_dragon" asset="model_dragon" scale="1.2 1.2 1.2" ks=".5 .5 .5" />
     </objects>
@@ -24,6 +24,7 @@
         <action type="addObject" object="obj_dragon" time="+0"/>
         <action type="addObject" object="obj_sky" time="+0"/>
         <action type="addObject" object="shadow_dragon" time="+0"/>
+        <action type="camera" view="perspective" fovy="60" near=".1f" far="3200" time="+0"/>
         <action type="camera" focus="0 0 0" position="0 30 -30" time="+0"/>
 
         <checkpoint type="save"/>

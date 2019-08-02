@@ -71,7 +71,7 @@ GMfloat* GMPrimitiveCreator::origin()
 	return o;
 }
 
-void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, REF GMSceneAsset& scene)
+void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, REF GMSceneAsset& scene, GMint32 textureSliceX, GMint32 textureSliceY)
 {
 	static const GMVec3 s_vertices[8] = {
 		GMVec3(-1, -1, -1),
@@ -93,24 +93,38 @@ void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, REF GMSceneAsset&
 		vertices_vec[i].loadFloat4(vertices[i]);
 	}
 
+	GMfloat u_max = textureSliceX;
+	GMfloat v_max = textureSliceY;
+
 	/*
 	采用
 	1 3
 	0 2
 	顶点顺序来绘制每一个面
 	*/
-
 	GMModel* m = new GMModel();
 	m->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
 	m->setType(GMModelType::Model3D);
 	GMPart* face = new GMPart(m);
+
+	if (textureSliceX != 1 || textureSliceY != 1)
+	{
+		GM_FOREACH_ENUM_CLASS(textureType, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
+		{
+			GMTextureSampler& sampler = m->getShader().getTextureList().getTextureSampler(textureType);
+			if (textureSliceX != 1)
+				sampler.setWrapS(GMS_Wrap::Repeat);
+			if (textureSliceY != 1)
+				sampler.setWrapT(GMS_Wrap::Repeat);
+		}
+	}
 
 	//Front
 	{
 		GMVertex V0 = {
 			{ vertices[0][0], vertices[0][1], vertices[0][2] }, //position
 			{ 0, 0, -1.f }, //normal
-			{ 0, 1 }, //texcoord
+			{ 0, v_max }, //texcoord
 		},
 		V1 = {
 			{ vertices[1][0], vertices[1][1], vertices[1][2] }, //position
@@ -120,12 +134,12 @@ void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, REF GMSceneAsset&
 		V2 = {
 			{ vertices[2][0], vertices[2][1], vertices[2][2] }, //position
 			{ 0, 0, -1.f }, //normal
-			{ 1, 1 }, //texcoord
+			{ u_max, v_max }, //texcoord
 		},
 		V3 = {
 			{ vertices[3][0], vertices[3][1], vertices[3][2] }, //position
 			{ 0, 0, -1.f }, //normal
-			{ 1, 0 }, //texcoord
+			{ u_max, 0 }, //texcoord
 		};
 		face->vertex(V0);
 		face->vertex(V1);
@@ -140,7 +154,7 @@ void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, REF GMSceneAsset&
 		GMVertex V0 = {
 			{ vertices[6][0], vertices[6][1], vertices[6][2] }, //position
 			{ 0, 0, 1.f }, //normal
-			{ 0, 1 }, //texcoord
+			{ 0, v_max }, //texcoord
 		},
 		V1 = {
 			{ vertices[7][0], vertices[7][1], vertices[7][2] }, //position
@@ -150,12 +164,12 @@ void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, REF GMSceneAsset&
 		V2 = {
 			{ vertices[4][0], vertices[4][1], vertices[4][2] }, //position
 			{ 0, 0, 1.f }, //normal
-			{ 1, 1 }, //texcoord
+			{ u_max, v_max }, //texcoord
 		},
 		V3 = {
 			{ vertices[5][0], vertices[5][1], vertices[5][2] }, //position
 			{ 0, 0, 1.f }, //normal
-			{ 1, 0 }, //texcoord
+			{ u_max, 0 }, //texcoord
 		};
 		face->vertex(V0);
 		face->vertex(V1);
@@ -170,7 +184,7 @@ void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, REF GMSceneAsset&
 		GMVertex V0 = {
 			{ vertices[4][0], vertices[4][1], vertices[4][2] }, //position
 			{ -1.f, 0, 0 }, //normal
-			{ 0, 1 }, //texcoord
+			{ 0, v_max }, //texcoord
 		},
 		V1 = {
 			{ vertices[5][0], vertices[5][1], vertices[5][2] }, //position
@@ -180,12 +194,12 @@ void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, REF GMSceneAsset&
 		V2 = {
 			{ vertices[0][0], vertices[0][1], vertices[0][2] }, //position
 			{ -1.f, 0, 0 }, //normal
-			{ 1, 1 }, //texcoord
+			{ u_max, v_max }, //texcoord
 		},
 		V3 = {
 			{ vertices[1][0], vertices[1][1], vertices[1][2] }, //position
 			{ -1.f, 0, 0 }, //normal
-			{ 1, 0 }, //texcoord
+			{ u_max, 0 }, //texcoord
 		};
 		face->vertex(V0);
 		face->vertex(V1);
@@ -200,7 +214,7 @@ void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, REF GMSceneAsset&
 		GMVertex V0 = {
 			{ vertices[2][0], vertices[2][1], vertices[2][2] }, //position
 			{ 1.f, 0, 0 }, //normal
-			{ 0, 1 }, //texcoord
+			{ 0, v_max }, //texcoord
 		},
 		V1 = {
 			{ vertices[3][0], vertices[3][1], vertices[3][2] }, //position
@@ -210,12 +224,12 @@ void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, REF GMSceneAsset&
 		V2 = {
 			{ vertices[6][0], vertices[6][1], vertices[6][2] }, //position
 			{ 1.f, 0, 0 }, //normal
-			{ 1, 1 }, //texcoord
+			{ u_max, v_max }, //texcoord
 		},
 		V3 = {
 			{ vertices[7][0], vertices[7][1], vertices[7][2] }, //position
 			{ 1.f, 0, 0 }, //normal
-			{ 1, 0 }, //texcoord
+			{ u_max, 0 }, //texcoord
 		};
 		face->vertex(V0);
 		face->vertex(V1);
@@ -230,7 +244,7 @@ void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, REF GMSceneAsset&
 		GMVertex V0 = {
 			{ vertices[4][0], vertices[4][1], vertices[4][2] }, //position
 			{ 0, -1.f, 0 }, //normal
-			{ 0, 1 }, //texcoord
+			{ 0, v_max }, //texcoord
 		},
 		V1 = {
 			{ vertices[0][0], vertices[0][1], vertices[0][2] }, //position
@@ -240,12 +254,12 @@ void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, REF GMSceneAsset&
 		V2 = {
 			{ vertices[6][0], vertices[6][1], vertices[6][2] }, //position
 			{ 0, -1.f, 0 }, //normal
-			{ 1, 1 }, //texcoord
+			{ u_max, v_max }, //texcoord
 		},
 		V3 = {
 			{ vertices[2][0], vertices[2][1], vertices[2][2] }, //position
 			{ 0, -1.f, 0 }, //normal
-			{ 1, 0 }, //texcoord
+			{ u_max, 0 }, //texcoord
 		};
 		face->vertex(V0);
 		face->vertex(V1);
@@ -260,7 +274,7 @@ void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, REF GMSceneAsset&
 		GMVertex V0 = {
 			{ vertices[1][0], vertices[1][1], vertices[1][2] }, //position
 			{ 0, 1.f, 0 }, //normal
-			{ 0, 1 }, //texcoord
+			{ 0, v_max }, //texcoord
 		},
 		V1 = {
 			{ vertices[5][0], vertices[5][1], vertices[5][2] }, //position
@@ -270,12 +284,12 @@ void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, REF GMSceneAsset&
 		V2 = {
 			{ vertices[3][0], vertices[3][1], vertices[3][2] }, //position
 			{ 0, 1.f, 0 }, //normal
-			{ 1, 1 }, //texcoord
+			{ u_max, v_max }, //texcoord
 		},
 		V3 = {
 			{ vertices[7][0], vertices[7][1], vertices[7][2] }, //position
 			{ 0, 1.f, 0 }, //normal
-			{ 1, 0 }, //texcoord
+			{ u_max, 0 }, //texcoord
 		};
 		face->vertex(V0);
 		face->vertex(V1);
@@ -288,14 +302,17 @@ void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, REF GMSceneAsset&
 	scene = GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, m));
 }
 
-void GMPrimitiveCreator::createQuadrangle(const GMVec2& halfExtents, GMfloat z, REF GMSceneAsset& scene)
+void GMPrimitiveCreator::createQuadrangle(const GMVec2& halfExtents, GMfloat z, REF GMSceneAsset& scene, GMint32 textureSliceX, GMint32 textureSliceY)
 {
-	constexpr GMfloat texcoord[4][2] =
+	GMfloat u_max = textureSliceX;
+	GMfloat v_max = textureSliceY;
+
+	GMfloat texcoord[4][2] =
 	{
-		{ 0, 1 },
+		{ 0, v_max },
 		{ 0, 0 },
-		{ 1, 1 },
-		{ 1, 0 },
+		{ u_max, v_max },
+		{ u_max, 0 },
 	};
 
 	// 排列方式：
@@ -312,6 +329,18 @@ void GMPrimitiveCreator::createQuadrangle(const GMVec2& halfExtents, GMfloat z, 
 	GMModel* m = new GMModel();
 	m->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
 	GMPart* part = new GMPart(m);
+
+	if (textureSliceX != 1 || textureSliceY != 1)
+	{
+		GM_FOREACH_ENUM_CLASS(textureType, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
+		{
+			GMTextureSampler& sampler = m->getShader().getTextureList().getTextureSampler(textureType);
+			if (textureSliceX != 1)
+				sampler.setWrapS(GMS_Wrap::Repeat);
+			if (textureSliceY != 1)
+				sampler.setWrapT(GMS_Wrap::Repeat);
+		}
+	}
 
 	GMVertex V1 = {
 		{ s_vertices[0][0], s_vertices[0][1], s_vertices[0][2] }, //position

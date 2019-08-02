@@ -4,25 +4,160 @@
         <texture id="tex_box_diffuse" file="box/box_diffuse.png" />
         <texture id="tex_box_normal" file="box/box_normal.png" />
         <texture id="tex_box_specular" file="box/box_specular.png" />
+        <texture id="tex_bricks_diffuse" file="bricks/bricks.jpg" />
+        <texture id="tex_bricks_normal" file="bricks/bricks_normal.jpg" />
     </assets>
     <objects>
         <cube
-            id="obj_box01"
+            id="obj_phy_ground"
+            ambient="tex_bricks_diffuse"
+            diffuse="tex_bricks_diffuse"
+            normal="tex_bricks_normal"
+            size="150 5 150" 
+            translate="0 -10 0"
+            physics="true"
+            slice="3 3"
+            />
+        <cube
+            id="obj_phy_box01"
             size="5 5 5" 
             ambient="tex_box_diffuse"
             diffuse="tex_box_diffuse"
             normal="tex_box_normal"
             specular="tex_box_specular"
-            translate="0 5 0"
+            translate="0 55 0"
+            rotate="1 .5 .5 30"
+            physics="true"
+            mass="1.0"
             />
-        <light id="light_phy_global" type="point" position="500 300 -500" ambient=".5 .5 .5" diffuse=".8 .8 .8" specular="1 1 1"/>
+        <cube
+            id="obj_phy_box02"
+            size="5 5 5" 
+            ambient="tex_box_diffuse"
+            diffuse="tex_box_diffuse"
+            normal="tex_box_normal"
+            specular="tex_box_specular"
+            translate="0 65 2.4"
+            rotate="1 .5 .5 -30"
+            physics="true"
+            mass="1.0"
+            />
+        <cube
+            id="obj_phy_box03"
+            size="5 5 5" 
+            ambient="tex_box_diffuse"
+            diffuse="tex_box_diffuse"
+            normal="tex_box_normal"
+            specular="tex_box_specular"
+            translate="-5 60 2.4"
+            rotate="0 .5 .5 -30"
+            physics="true"
+            mass="1.0"
+            />
+        <cube
+            id="obj_phy_small_box01"
+            size="3 3 3" 
+            ambient="tex_box_diffuse"
+            diffuse="tex_box_diffuse"
+            normal="tex_box_normal"
+            specular="tex_box_specular"
+            translate="1.5 55 -.5"
+            rotate="0 1 0 -30"
+            physics="true"
+            mass=".5"
+            />
+        <cube
+            id="obj_phy_small_box02"
+            size="3 3 3" 
+            ambient="tex_box_diffuse"
+            diffuse="tex_box_diffuse"
+            normal="tex_box_normal"
+            specular="tex_box_specular"
+            translate="0 57 -.25"
+            rotate="0 1 0 -15"
+            physics="true"
+            mass=".5"
+            />
+        <cube
+            id="obj_phy_small_box03"
+            size="3 3 3" 
+            ambient="tex_box_diffuse"
+            diffuse="tex_box_diffuse"
+            normal="tex_box_normal"
+            specular="tex_box_specular"
+            translate="1.34 55 -.67"
+            rotate="1 1 0 -15"
+            physics="true"
+            mass=".5"
+            />
+        <cube
+            id="obj_phy_small_box04"
+            size="3 3 3" 
+            ambient="tex_box_diffuse"
+            diffuse="tex_box_diffuse"
+            normal="tex_box_normal"
+            specular="tex_box_specular"
+            translate="-.34 62 .3"
+            rotate="1 1 0 15"
+            physics="true"
+            mass=".5"
+            />
+        <cube
+            id="obj_phy_small_box05"
+            size="3 3 3" 
+            ambient="tex_box_diffuse"
+            diffuse="tex_box_diffuse"
+            normal="tex_box_normal"
+            specular="tex_box_specular"
+            translate="1.2 64 .13"
+            rotate="1 1 1 -20"
+            physics="true"
+            mass=".5"
+            />
+        <cube
+            id="obj_phy_small_box06"
+            size="3 3 3" 
+            ambient="tex_box_diffuse"
+            diffuse="tex_box_diffuse"
+            normal="tex_box_normal"
+            specular="tex_box_specular"
+            translate="-1.2 60 .25"
+            rotate="1 1 -1 12"
+            physics="true"
+            mass=".5"
+            />
+
+        <cube
+            id="obj_phy_small_box07"
+            size="3 3 3" 
+            ambient="tex_box_diffuse"
+            diffuse="tex_box_diffuse"
+            normal="tex_box_normal"
+            specular="tex_box_specular"
+            translate="0 60 .25"
+            rotate="1 1 -1 5"
+            physics="true"
+            mass=".5"
+            />
+
+        <cube
+            id="obj_phy_huge"
+            size="15 15 15" 
+            ambient="tex_box_diffuse"
+            diffuse="tex_box_diffuse"
+            normal="tex_box_normal"
+            specular="tex_box_specular"
+            translate="5 80 0"
+            physics="true"
+            mass="25"
+            />
+        <light id="light_phy_global" type="point" position="500 300 -500" ambient=".5 .5 .5" diffuse=".8 .8 .8" specular=".7 .7 .7"/>
         <physics id="phy_world" />
+        <shadow id="shadow_physics" cascades="1" position="50 100 -50" focus="0 5 0" width="$screen_width" height="$screen_height" view="perspective" fovy="45" near=".1f" far="5000" bias="0.00005"/>
     </objects>
     <actions>
         <action type="camera" view="perspective" fovy="60" near=".1f" far="3200" time="+0"/>
-        <action type="camera" focus="0 0 0" position="0 0 -40" time="+0"/>
-        <action type="addObject" object="light_phy_global" time="+0"/>
-        <action type="addObject" object="obj_box01" time="+0"/>
+        <action type="camera" focus="0 0 0" position="25 30 -40" time="+0"/>
 
         <checkpoint type="save"/>
         <component file="component_fade_in.xml">
@@ -30,12 +165,47 @@
         </component>
         <checkpoint type="load"/>
 
-<!--
-        <checkpoint type="time" time="-1.5" />
+        <checkpoint type="save"/>
+        <action type="animate" action="play" object="$camera" time="+0"/>
+        <action type="animate" function="cubic-bezier" control=".2 0 .7 1" object="$camera" position="65 30 10" focus="0 0 0" endtime="5" />
+        <action type="animate" action="stop" object="$camera" time="+5"/>
+        <checkpoint type="load"/>
+
+        <action type="addObject" object="shadow_physics" time="+0"/>
+        <action type="addObject" object="phy_world" time="+0"/>
+        <action type="addObject" object="light_phy_global" time="+0"/>
+        <action type="addObject" object="obj_phy_ground" time="+0"/>
+        <action type="addObject" object="obj_phy_box01" time="+0"/>
+        <action type="addObject" object="obj_phy_box02" time="+.5"/>
+        <action type="addObject" object="obj_phy_box03" time="+.5"/>
+        <action type="addObject" object="obj_phy_small_box01" time="+.2"/>
+        <action type="addObject" object="obj_phy_small_box02" time="+.2"/>
+        <action type="addObject" object="obj_phy_small_box03" time="+.2"/>
+        <action type="addObject" object="obj_phy_small_box04" time="+.2"/>
+        <action type="addObject" object="obj_phy_small_box05" time="+.2"/>
+        <action type="addObject" object="obj_phy_small_box06" time="+.2"/>
+        <action type="addObject" object="obj_phy_small_box07" time="+.2"/>
+        <action type="addObject" object="obj_phy_huge" time="+1"/>
+
+        <checkpoint type="time" time="+0" />
         <component file="component_fade_out.xml" >
             <slot name="duration">1.5</slot>
         </component>
--->
-        <action type="removeObject" object="obj_box01" time="+10"/>
+
+        <action type="removeObject" object="light_phy_global" time="+0"/>
+        <action type="removeObject" object="obj_phy_ground" time="+0"/>
+        <action type="removeObject" object="obj_phy_box01" time="+0"/>
+        <action type="removeObject" object="obj_phy_box02" time="+0"/>
+        <action type="removeObject" object="obj_phy_box03" time="+0"/>
+        <action type="removeObject" object="obj_phy_small_box01" time="+0"/>
+        <action type="removeObject" object="obj_phy_small_box02" time="+0"/>
+        <action type="removeObject" object="obj_phy_small_box03" time="+0"/>
+        <action type="removeObject" object="obj_phy_small_box04" time="+0"/>
+        <action type="removeObject" object="obj_phy_small_box05" time="+0"/>
+        <action type="removeObject" object="obj_phy_small_box06" time="+0"/>
+        <action type="removeObject" object="obj_phy_small_box07" time="+0"/>
+        <action type="removeObject" object="obj_phy_huge" time="+0"/>
+        <action type="removePhysics" time="+0"/>
+        <action type="removeShadow" time="+0"/>
     </actions>
 </timeline>

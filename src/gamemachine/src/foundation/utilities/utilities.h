@@ -47,8 +47,8 @@ struct GM_EXPORT GMPrimitiveCreator
 	static const GMVec2& one2();
 	static GMfloat* origin();
 
-	static void createCube(const GMVec3& halfExtents, REF GMSceneAsset& scene);
-	static void createQuadrangle(const GMVec2& halfExtents, GMfloat z, REF GMSceneAsset& scene);
+	static void createCube(const GMVec3& halfExtents, REF GMSceneAsset& scene, GMint32 textureSliceX = 1, GMint32 textureSliceY = 1);
+	static void createQuadrangle(const GMVec2& halfExtents, GMfloat z, REF GMSceneAsset& scene, GMint32 textureSliceX = 1, GMint32 textureSliceY = 1);
 	static void createSphere(GMfloat radius, GMint32 segmentsX, GMint32 segmentsY, REF GMSceneAsset& scene);
 	static void createTerrain(
 		const GMTerrainDescription& desc,

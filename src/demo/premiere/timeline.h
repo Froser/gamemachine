@@ -103,6 +103,7 @@ enum class AssetType
 	AudioSource,
 	Particles,
 	Shadow,
+	PhysicsWorld,
 };
 
 inline bool operator<(const Action& lhs, const Action& rhs) GM_NOEXCEPT
@@ -256,6 +257,9 @@ private:
 	void parseMaterial(GMGameObject*, GMXMLElement*);
 	void parseBlend(GMGameObject*, GMXMLElement*);
 	void parsePrimitiveAttributes(GMGameObject*, GMXMLElement*);
+	void parsePhysics(GMDiscreteDynamicsWorld*, GMXMLElement*);
+	void parsePhysics(GMGameObject*, GMXMLElement*);
+	void parsePhysicsAttributes(GMRigidPhysicsObject*, GMXMLElement*);
 	ShaderCallback parseTexture(GMXMLElement*, const char* type, GMTextureType textureType);
 	ShaderCallback parseTextureTransform(GMXMLElement*, const char* type, GMTextureType textureType, GMS_TextureTransformType transformType);
 	ShaderCallback parseTexturePBR(GMXMLElement*);
@@ -266,6 +270,7 @@ private:
 	void addObject(AutoReleasePtr<GMGameObject>*, GMXMLElement*, Action&);
 	void addObject(AutoReleasePtr<ILight>*, GMXMLElement*, Action&);
 	void addObject(AutoReleasePtr<IParticleSystem>*, GMXMLElement*, Action&);
+	void addObject(AutoReleasePtr<GMPhysicsWorld>*, GMXMLElement*, Action&);
 	void addObject(GMShadowSourceDesc*, GMXMLElement*, Action&);
 	void removeObject(ILight*, GMXMLElement*, Action&);
 	void removeObject(GMGameObject*, GMXMLElement*, Action&, bool);
@@ -294,7 +299,7 @@ private:
 	HashMap<GMString, AutoReleasePtr<IAudioFile>, GMStringHashFunctor> m_audioFiles;
 	HashMap<GMString, AutoReleasePtr<IAudioSource>, GMStringHashFunctor> m_audioSources;
 	HashMap<GMString, AutoReleasePtr<IParticleSystem>, GMStringHashFunctor> m_particleSystems;
-	HashMap<GMString, AutoReleasePtr<GMDiscreteDynamicsWorld>, GMStringHashFunctor> m_physicsWorld;
+	HashMap<GMString, AutoReleasePtr<GMPhysicsWorld>, GMStringHashFunctor> m_physicsWorld;
 	HashMap<GMString, GMShadowSourceDesc, GMStringHashFunctor> m_shadows;
 	HashMap<GMString, GMString, GMStringHashFunctor> m_defines;
 	HashMap<GMString, GMString, GMStringHashFunctor> m_presetConstants;
