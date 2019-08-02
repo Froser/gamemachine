@@ -6,7 +6,7 @@ BEGIN_NS
 
 //! 读取一个特效模型的类。
 GM_PRIVATE_CLASS(GMEffectGameObject);
-class GMEffectGameObject : public GMGameObject
+class GM_EXPORT GMEffectGameObject : public GMGameObject
 {
 	GM_DECLARE_PRIVATE(GMEffectGameObject);
 	GM_DECLARE_BASE(GMGameObject);

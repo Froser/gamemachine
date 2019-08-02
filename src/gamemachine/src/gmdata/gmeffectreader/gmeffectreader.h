@@ -10,7 +10,7 @@ GM_INTERFACE(IEffectObjectFactory)
 };
 
 //! 读取一个特效模型的类。
-struct GMEffectReader
+struct GM_EXPORT GMEffectReader
 {
 	static bool loadEffect(const GMString& effectName, const IRenderContext* context, IEffectObjectFactory**);
 };
