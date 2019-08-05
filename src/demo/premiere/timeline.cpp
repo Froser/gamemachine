@@ -1849,21 +1849,56 @@ void Timeline::parseCocos2DParticleAttributes(IParticleSystem* ps, GMXMLElement*
 
 void Timeline::parseScreen(GMXMLElement* e)
 {
-	// 一共有两种类型的元素，text和image，它们居中对齐，且有一个包围盒来计算几何大小。
+	GMString id = e->Attribute("id");
+	bool hasChild = false;
+
 	ScreenObject* obj = new ScreenObject(m_context);
+	GMString spacingStr = e->Attribute("spacing");
+	if (!spacingStr.isEmpty())
+	{
+		obj->setSpacing(GMString::parseFloat(spacingStr));
+	}
+
+	GMString speedStr = e->Attribute("speed");
+	if (!speedStr.isEmpty())
+	{
+		obj->setSpeed(GMString::parseFloat(speedStr));
+	}
+
+	// 一共有两种类型的元素，text和image，它们居中对齐，且有一个包围盒来计算几何大小。
 	e = e->FirstChildElement();
 	while (e)
 	{
 		GMString tag = e->Name();
 		if (tag == L"text")
 		{
+			hasChild = true;
+
 			// addText
+			ScreenObject::TextOptions options = {
+				m_context->getEngine()->getGlyphManager()->getDefaultFontEN(),
+				32,
+				GMVec4(1, 1, 1, 1)
+			};
+
+			obj->addText(e->GetText(), options);
 		}
 		else if (tag == L"image")
 		{
+			hasChild = true;
+
 			// addImage
 		}
 		e = e->NextSiblingElement();
+	}
+
+	if (hasChild)
+	{
+		m_objects[id] = AutoReleasePtr<GMGameObject>(obj);
+	}
+	else
+	{
+		obj->destroy();
 	}
 }
 

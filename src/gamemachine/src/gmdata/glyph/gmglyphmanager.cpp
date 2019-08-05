@@ -39,31 +39,44 @@ namespace
 	}
 }
 
+// 用于管理字形的类
+typedef void* GMFontFace;
+
+struct GMFontMeta
+{
+	GMString fontPath;
+	GMFontFace face;
+	GMBuffer buffer;
+};
+
+typedef HashMap<GMFontHandle, HashMap<GMint32, HashMap<GMwchar, GMGlyphInfo> > > CharList;
+
 GM_PRIVATE_OBJECT_UNALIGNED(GMGlyphManager)
 {
+	GM_DECLARE_PUBLIC(GMGlyphManager)
+
 	const IRenderContext* context = nullptr;
 	CharList chars;
 	GMint32 cursor_u, cursor_v;
 	GMfloat maxHeight;
-	Vector<GMFont> fonts;
+	Vector<GMFontMeta> fonts;
 
 	GMFontHandle defaultCN = GMInvalidFontHandle;
 	GMFontHandle defaultEN = GMInvalidFontHandle;
+
+	const GMGlyphInfo& createChar(GMwchar c, GMFontSizePt fontSize, GMFontHandle font);
+	GMFontMeta* getFont(GMFontHandle);
+	GMGlyphInfo& insertChar(GMFontSizePt fontSize, GMFontHandle font, GMwchar ch, const GMGlyphInfo& glyph);
+	const GMGlyphInfo& getCharInner(GMwchar c, GMFontSizePt fontSize, GMFontHandle font, GMFontHandle candidate);
 };
 
-const GMGlyphInfo& GMGlyphManager::getChar(GMwchar c, GMint32 fontSize, GMFontHandle font)
+const GMGlyphInfo& GMGlyphManagerPrivate::getCharInner(GMwchar c, GMFontSizePt fontSize, GMFontHandle font, GMFontHandle candidate)
 {
-	return getCharInner(c, fontSize, font, 0);
-}
-
-const GMGlyphInfo& GMGlyphManager::getCharInner(GMwchar c, GMFontSizePt fontSize, GMFontHandle font, GMFontHandle candidate)
-{
-	D(d);
 	static const GMGlyphInfo err = { false };
-	if (font >= d->fonts.size())
+	if (font >= fonts.size())
 		return err;
 
-	auto& charsWithSize = d->chars[font][fontSize];
+	auto& charsWithSize = chars[font][fontSize];
 	auto iter = charsWithSize.find(c);
 	if (iter != charsWithSize.end())
 		return (*iter).second;
@@ -77,6 +90,104 @@ const GMGlyphInfo& GMGlyphManager::getCharInner(GMwchar c, GMFontSizePt fontSize
 	return glyph;
 }
 
+GMGlyphInfo& GMGlyphManagerPrivate::insertChar(GMint32 fontSize, GMFontHandle font, GMwchar ch, const GMGlyphInfo& glyph)
+{
+	auto result = chars[font][fontSize].insert({ ch, glyph });
+	GM_ASSERT(result.second);
+	return (*(result.first)).second;
+}
+
+const GMGlyphInfo& GMGlyphManagerPrivate::createChar(GMwchar c, GMFontSizePt fontSize, GMFontHandle font)
+{
+	static GMGlyphInfo errGlyph = { false };
+	FT_Glyph glyph;
+	FT_Error error;
+	FT_UInt charIndex;
+	GMFontMeta* f = getFont(font);
+	if (!f)
+		return errGlyph;
+
+	FT_Face face = (FT_Face)f->face;
+	error = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
+	GM_ASSERT(error == FT_Err_Ok);
+
+	error = FT_Set_Char_Size(face, 0, fontSize << 6, GMScreen::horizontalResolutionDpi(), GMScreen::verticalResolutionDpi());
+	GM_ASSERT(error == FT_Err_Ok);
+
+	charIndex = FT_Get_Char_Index(face, c);
+	if (charIndex == 0)
+		return errGlyph;
+
+	error = FT_Load_Glyph(face, charIndex, FT_LOAD_DEFAULT);
+	GM_ASSERT(error == FT_Err_Ok);
+
+	error = FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
+	GM_ASSERT(error == FT_Err_Ok);
+
+	error = FT_Get_Glyph(face->glyph, &glyph);
+	GM_ASSERT(error == FT_Err_Ok);
+
+	error = FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, 0, 1);
+	GM_ASSERT(error == FT_Err_Ok);
+	FT_BitmapGlyph bitmapGlyph = (FT_BitmapGlyph)glyph;
+
+	// 创建结构
+	if (cursor_u + bitmapGlyph->bitmap.width > GMGlyphManager::CANVAS_WIDTH)
+	{
+		cursor_v += maxHeight + 1;
+		maxHeight = 0;
+		cursor_u = 0;
+		if (cursor_v + bitmapGlyph->bitmap.rows > GMGlyphManager::CANVAS_HEIGHT)
+		{
+			gm_error(gm_dbg_wrap("no texture space for glyph!"));
+			GM_ASSERT(false);
+			// 释放资源
+			FT_Done_Glyph(glyph);
+			return errGlyph;
+		}
+	}
+
+	GMGlyphInfo glyphInfo = { 0 };
+	glyphInfo.valid = true;
+	glyphInfo.x = cursor_u;
+	glyphInfo.y = cursor_v;
+	glyphInfo.width = face->glyph->metrics.width >> 6;
+	glyphInfo.height = face->glyph->metrics.height >> 6;
+	glyphInfo.bearingX = face->glyph->metrics.horiBearingX >> 6;
+	glyphInfo.bearingY = face->glyph->metrics.horiBearingY >> 6;
+	glyphInfo.advance = face->glyph->metrics.horiAdvance >> 6;
+
+	if (maxHeight < glyphInfo.height)
+		maxHeight = glyphInfo.height;
+	cursor_u += bitmapGlyph->bitmap.width + 1;
+
+	// 创建纹理
+	P_D(pd);
+	GMGlyphBitmap bitmap = {
+		bitmapGlyph->bitmap.buffer,
+		bitmapGlyph->bitmap.width,
+		bitmapGlyph->bitmap.rows
+	};
+	pd->updateTexture(bitmap, glyphInfo);
+
+	// 释放资源
+	FT_Done_Glyph(glyph);
+
+	return insertChar(fontSize, font, c, glyphInfo);
+}
+
+GMFontMeta* GMGlyphManagerPrivate::getFont(GMFontHandle handle)
+{
+	if (handle >= fonts.size())
+		return nullptr;
+	return &fonts[handle];
+}
+
+const GMGlyphInfo& GMGlyphManager::getChar(GMwchar c, GMint32 fontSize, GMFontHandle font)
+{
+	D(d);
+	return d->getCharInner(c, fontSize, font, 0);
+}
 
 const IRenderContext* GMGlyphManager::getContext()
 {
@@ -100,7 +211,7 @@ GMFontHandle GMGlyphManager::addFontByFullName(const GMString& fontFullName)
 			return gm_sizet_to_uint(i);
 	}
 
-	GMFont font;
+	GMFontMeta font;
 	FT_Face face;
 	FT_Error err = loadFace(fontFullName, &face);
 	if (err == FT_Err_Ok)
@@ -117,7 +228,7 @@ GMFontHandle GMGlyphManager::addFontByFullName(const GMString& fontFullName)
 GMFontHandle GMGlyphManager::addFontByMemory(GMBuffer&& buffer)
 {
 	D(d);
-	GMFont font;
+	GMFontMeta font;
 	FT_Face face;
 	FT_Error err = loadFace(buffer, &face);
 
@@ -161,18 +272,10 @@ void GMGlyphManager::setDefaultFontCN(GMFontHandle fontHandle)
 		d->defaultCN = 0;
 }
 
-GMGlyphInfo& GMGlyphManager::insertChar(GMint32 fontSize, GMFontHandle font, GMwchar ch, const GMGlyphInfo& glyph)
-{
-	D(d);
-	auto result = d->chars[font][fontSize].insert({ ch, glyph });
-	GM_ASSERT(result.second);
-	return (*(result.first)).second;
-}
-
 GMGlyphManager::GMGlyphManager(const IRenderContext* context)
 {
 	GM_CREATE_DATA();
-
+	GM_SET_PD();
 	D(d);
 	d->context = context;
 }
@@ -185,93 +288,6 @@ GMGlyphManager::~GMGlyphManager()
 		FT_Done_Face((FT_Face) font.face);
 		font.face = nullptr;
 	}
-}
-
-const GMGlyphInfo& GMGlyphManager::createChar(GMwchar c, GMFontSizePt fontSize, GMFontHandle font)
-{
-	D(d);
-	static GMGlyphInfo errGlyph = { false };
-	FT_Glyph glyph;
-	FT_Error error;
-	FT_UInt charIndex;
-	GMFont* f = getFont(font);
-	if (!f)
-		return errGlyph;
-
-	FT_Face face = (FT_Face) f->face;
-	error = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
-	GM_ASSERT(error == FT_Err_Ok);
-
-	error = FT_Set_Char_Size(face, 0, fontSize << 6, GMScreen::horizontalResolutionDpi(), GMScreen::verticalResolutionDpi());
-	GM_ASSERT(error == FT_Err_Ok);
-
-	charIndex = FT_Get_Char_Index(face, c);
-	if (charIndex == 0)
-		return errGlyph;
-
-	error = FT_Load_Glyph(face, charIndex, FT_LOAD_DEFAULT);
-	GM_ASSERT(error == FT_Err_Ok);
-
-	error = FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
-	GM_ASSERT(error == FT_Err_Ok);
-
-	error = FT_Get_Glyph(face->glyph, &glyph);
-	GM_ASSERT(error == FT_Err_Ok);
-
-	error = FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, 0, 1);
-	GM_ASSERT(error == FT_Err_Ok);
-	FT_BitmapGlyph bitmapGlyph = (FT_BitmapGlyph)glyph;
-
-	// 创建结构
-	if (d->cursor_u + bitmapGlyph->bitmap.width > CANVAS_WIDTH)
-	{
-		d->cursor_v += d->maxHeight + 1;
-		d->maxHeight = 0;
-		d->cursor_u = 0;
-		if (d->cursor_v + bitmapGlyph->bitmap.rows > CANVAS_HEIGHT)
-		{
-			gm_error(gm_dbg_wrap("no texture space for glyph!"));
-			GM_ASSERT(false);
-			// 释放资源
-			FT_Done_Glyph(glyph);
-			return errGlyph;
-		}
-	}
-
-	GMGlyphInfo glyphInfo = { 0 };
-	glyphInfo.valid = true;
-	glyphInfo.x = d->cursor_u;
-	glyphInfo.y = d->cursor_v;
-	glyphInfo.width = face->glyph->metrics.width >> 6;
-	glyphInfo.height = face->glyph->metrics.height >> 6;
-	glyphInfo.bearingX = face->glyph->metrics.horiBearingX >> 6;
-	glyphInfo.bearingY = face->glyph->metrics.horiBearingY >> 6;
-	glyphInfo.advance = face->glyph->metrics.horiAdvance >> 6;
-
-	if (d->maxHeight < glyphInfo.height)
-		d->maxHeight = glyphInfo.height;
-	d->cursor_u += bitmapGlyph->bitmap.width + 1;
-
-	// 创建纹理
-	GMGlyphBitmap bitmap = {
-		bitmapGlyph->bitmap.buffer,
-		bitmapGlyph->bitmap.width,
-		bitmapGlyph->bitmap.rows
-	};
-	updateTexture(bitmap, glyphInfo);
-
-	// 释放资源
-	FT_Done_Glyph(glyph);
-
-	return insertChar(fontSize, font, c, glyphInfo);
-}
-
-GMFont* GMGlyphManager::getFont(GMFontHandle handle)
-{
-	D(d);
-	if (handle >= d->fonts.size())
-		return nullptr;
-	return &d->fonts[handle];
 }
 
 END_NS

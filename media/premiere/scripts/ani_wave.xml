@@ -69,6 +69,12 @@
         <action type="addObject" object="obj_rock02" time="+0"/>
         <action type="addObject" object="obj_rock03" time="+0"/>
         <action type="play" object="obj_wave" time="+0"/>
+        
+        <checkpoint type="save"/>
+        <component file="component_fade_in.xml">
+            <slot name="duration">1.5</slot>
+        </component>
+        <checkpoint type="load"/>
 
         <checkpoint type="time" time="+0.5"/>
         <checkpoint type="save"/>

@@ -87,14 +87,40 @@ private:
 class ScreenObject : public GMGameObject
 {
 public:
+	GM_ALIGNED_16(struct) TextOptions
+	{
+		GMFontHandle font;
+		GMFontSizePt fontSize;
+		GMVec4 fontColor;
+	};
+
+public:
 	ScreenObject(const IRenderContext* context);
 
 public:
-	void addText(const GMString& text);
+	virtual void draw() override;
+	virtual void update(GMDuration dt) override;
+	virtual void play() override;
+	virtual void pause() override;
+	virtual void reset(bool) override;
+	virtual void onAppendingObjectToWorld() override;
+
+public:
+	void setSpacing(GMint32);
+	void setSpeed(GMint32);
+	void addText(const GMString& text, const TextOptions& options);
 	void addImage(GMAsset asset);
 
 private:
-	Vector<GMGameObject> m_objects;
+	GMOwnedPtr<GMGameWorld> m_world;
+	Vector<GMGameObject*> m_objects;
 	const IRenderContext* m_context;
+	GMint32 m_spacing;
+	GMint32 m_baseline;
+	GMint32 m_maxWidth;
+
+	bool m_playing;
+	GMfloat m_rollingSpeed;
+	GMfloat m_positionY;
 };
 #endif

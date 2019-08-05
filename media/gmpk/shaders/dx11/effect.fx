@@ -1005,8 +1005,11 @@ float4 PS_2D(PS_INPUT input) : SV_TARGET
         return float4(0, 0, 0, 0);
 
     float4 color = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    color += GM_AmbientTextureAttribute.Sample(GM_AmbientTexture, GM_AmbientSampler, input.Texcoord);
-    color += GM_DiffuseTextureAttribute.Sample(GM_DiffuseTexture, GM_DiffuseSampler, input.Texcoord);
+    if (GM_AmbientTextureAttribute.Enabled)
+        color += GM_AmbientTextureAttribute.Sample(GM_AmbientTexture, GM_AmbientSampler, input.Texcoord);
+
+    if (GM_DiffuseTextureAttribute.Enabled)
+        color += GM_DiffuseTextureAttribute.Sample(GM_DiffuseTexture, GM_DiffuseSampler, input.Texcoord);
 
     if (GM_ColorVertexOp == GM_VertexColorOp_NoColor)
         return color;
@@ -1022,7 +1025,8 @@ float4 PS_2D(PS_INPUT input) : SV_TARGET
 VS_OUTPUT VS_Text(VS_INPUT input)
 {
     VS_OUTPUT output;
-    output.Position.xy = input.Position.xy;
+    output.Position = GM_ToFloat4(input.Position);
+    output.Position = mul(output.Position, GM_WorldMatrix);
     output.Position.z = 0;
     output.Position.w = 1;
     output.Normal = input.Normal;

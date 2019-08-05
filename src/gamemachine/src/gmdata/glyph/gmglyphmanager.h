@@ -5,8 +5,6 @@
 #include <gmassets.h>
 
 BEGIN_NS
-
-// 用于管理字形的类
 struct GMGlyphInfo
 {
 	bool valid;
@@ -22,17 +20,6 @@ struct GMGlyphBitmap
 	GMuint32 width;
 	GMuint32 rows;
 };
-
-typedef void* GMFontFace;
-
-struct GMFont
-{
-	GMString fontPath;
-	GMFontFace face;
-	GMBuffer buffer;
-};
-
-typedef HashMap<GMFontHandle, HashMap<GMint32, HashMap<GMwchar, GMGlyphInfo> > > CharList;
 
 GM_PRIVATE_CLASS(GMGlyphManager);
 class GM_EXPORT GMGlyphManager : public GMObject
@@ -68,12 +55,6 @@ public:
 
 private:
 	virtual void updateTexture(const GMGlyphBitmap& bitmapGlyph, const GMGlyphInfo& glyphInfo) = 0;
-
-private:
-	const GMGlyphInfo& createChar(GMwchar c, GMFontSizePt fontSize, GMFontHandle font);
-	GMFont* getFont(GMFontHandle);
-	GMGlyphInfo& insertChar(GMFontSizePt fontSize, GMFontHandle font, GMwchar ch, const GMGlyphInfo& glyph);
-	const GMGlyphInfo& getCharInner(GMwchar c, GMFontSizePt fontSize, GMFontHandle font, GMFontHandle candidate);
 
 protected:
 	const IRenderContext* getContext();

@@ -52,6 +52,9 @@ public:
 	}
 	GMTypoIterator& operator ++();
 
+	GMTypoIterator operator +(GMsize_t);
+	GMTypoIterator operator -(GMsize_t);
+
 	void setOffset(GMsize_t cp);
 };
 

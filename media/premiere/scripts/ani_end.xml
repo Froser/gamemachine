@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <timeline version="1.0">
-	<object>
-		<screen>
+	<objects>
+		<screen id="obj_ending" spacing="15" speed="-5">
 			<text>GameMachine</text>
+			<text>GameMachine World</text>
 		</screen>
-	</object>
+	</objects>
+ 	<actions>
+ 		<action type="camera" view="ortho" left="0" top="0" right="$screen_width" bottom="$screen_height" time="+0" near="0" far="100"/>
+
+		<action type="addObject" object="obj_ending" time="+0" />
+		<action type="play" object="obj_ending" time="+0" />
+ 	</actions>
 </timeline>

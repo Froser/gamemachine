@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "helper.h"
 #include <extensions/bsp/gmbspfactory.h>
+#include <gmfontmetrics.h>
 
 GMRect Helper::getMiddleRectOfWindow(const GMRect& rc, IWindow* window)
 {
@@ -172,18 +173,97 @@ void BSPGameObject::onAppendingObjectToWorld()
 ScreenObject::ScreenObject(const IRenderContext* context)
 	: GMGameObject()
 	, m_context(context)
+	, m_spacing(5)
+	, m_baseline(0)
+	, m_maxWidth(0)
+	, m_playing(false)
+	, m_rollingSpeed(2)
+	, m_positionY(0.f)
 {
-
+	m_world.reset(new GMGameWorld(context));
 }
 
-void ScreenObject::addText(const GMString& text)
+void ScreenObject::draw()
 {
-	//GMFontMetrics fontMetrices;
-	GMTextGameObject* obj = new GMTextGameObject(GMRect());
-	obj->setContext(m_context);
+	m_world->renderScene();
+}
+
+void ScreenObject::setSpacing(GMint32 s)
+{
+	m_spacing = s;
+}
+
+void ScreenObject::setSpeed(GMint32 speed)
+{
+	GMRect renderRC = m_context->getWindow()->getRenderRect();
+	m_rollingSpeed = (speed / (2.f * renderRC.height));
+}
+
+void ScreenObject::addText(const GMString& text, const TextOptions& options)
+{
+	GM.invokeInMainThread([this, text, options]() {
+		GMFontMetrics::FontAttributes attributes;
+		attributes.font = options.font;
+		attributes.fontSize = options.fontSize;
+
+		GMRect renderRC = m_context->getWindow()->getRenderRect();
+		GMFontMetrics fontMetrices(attributes, m_context);
+		GMRect metrices = fontMetrices.boundingRect(text);
+		metrices.y += m_baseline;
+		metrices.x = (renderRC.width - metrices.width) / 2.f;
+
+		GMTextGameObject* obj = new GMTextGameObject(renderRC);
+		obj->setGeometry(metrices);
+		obj->setText(text);
+		obj->setFont(options.font);
+		obj->setFontSize(options.fontSize);
+		obj->setColorType(GMTextColorType::Plain);
+		obj->setColor(options.fontColor);
+		obj->setContext(m_context);
+		m_world->addObjectAndInit(obj);
+		m_world->addToRenderList(obj);
+		m_baseline += metrices.height + m_spacing;
+		m_maxWidth = Max(m_maxWidth, metrices.width);
+		m_objects.push_back(obj);
+	});
 }
 
 void ScreenObject::addImage(GMAsset asset)
+{
+
+}
+
+void ScreenObject::update(GMDuration dt)
+{
+	if (m_playing)
+	{
+		m_positionY += m_rollingSpeed * dt; // 向上为正
+
+		for (auto object : m_objects)
+		{
+			GMFloat4 translation;
+			GetTranslationFromMatrix(object->getTranslation(), translation);
+			object->setTranslation(Translate(GMVec3(0, translation[1] + m_positionY, 0)));
+		}
+	}
+}
+
+void ScreenObject::play()
+{
+	m_playing = true;
+}
+
+void ScreenObject::pause()
+{
+	m_playing = false;
+}
+
+void ScreenObject::reset(bool)
+{
+	// not support. do nothing
+}
+
+void ScreenObject::onAppendingObjectToWorld()
 {
 
 }

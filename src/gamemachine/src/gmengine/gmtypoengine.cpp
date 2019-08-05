@@ -70,6 +70,22 @@ GMTypoIterator& GMTypoIterator::operator ++()
 	return *this;
 }
 
+GMTypoIterator GMTypoIterator::operator +(GMsize_t offset)
+{
+	GMTypoIterator iter = *this;
+	D_OF(d, &iter);
+	d->index += offset;
+	return iter;
+}
+
+GMTypoIterator GMTypoIterator::operator -(GMsize_t offset)
+{
+	GMTypoIterator iter = *this;
+	D_OF(d, &iter);
+	d->index -= offset;
+	return iter;
+}
+
 bool GMTypoIterator::operator==(const GMTypoIterator& rhs)
 {
 	D(d);
@@ -312,11 +328,10 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 	// lineHeight为0表示自动获取行高，获取第1个字符的高度
 	if (d->lineHeight == 0)
 	{
-		GMGlyphManager* glyphManager = d->context->getEngine()->getGlyphManager();
 		const GMwchar* p = wstr.c_str();
 		while (*p)
 		{
-			const GMGlyphInfo& glyph = glyphManager->getChar(*p, d->fontSize, d->font);
+			const GMGlyphInfo& glyph = d->glyphManager->getChar(*p, d->fontSize, d->font);
 			d->lineHeight = glyph.height;
 			break;
 		}

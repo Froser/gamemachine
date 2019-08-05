@@ -99,12 +99,6 @@ public:
 	virtual GMModel* getModel() override;
 	virtual void onAppendingObjectToWorld() override;
 	virtual void draw() override;
-
-private:
-	void update();
-	GMScene* createScene();
-	GMModel* createModel();
-	void updateVertices(GMScene* scene);
 };
 
 GM_PRIVATE_CLASS(GMSprite2DGameObject);

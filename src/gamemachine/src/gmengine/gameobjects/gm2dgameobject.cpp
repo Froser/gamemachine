@@ -136,6 +136,8 @@ bool GM2DGameObjectBase::isDirty() GM_NOEXCEPT
 
 GM_PRIVATE_OBJECT_UNALIGNED(GMTextGameObject)
 {
+	GM_DECLARE_PUBLIC(GMTextGameObject)
+
 	GMString text;
 	GMint32 lineSpacing = 0;
 	bool center = false;
@@ -148,22 +150,212 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMTextGameObject)
 	GMScene* scene = nullptr;
 	GMTextColorType colorType = GMTextColorType::ByScript;
 	GMFloat4 color = GMFloat4(1, 1, 1, 1);
-	GMint32 fontSize = 12;
+	GMFontSizePt fontSize = 12;
 	Vector<GMVertex> vericesCache;
 	GMTypoTextBuffer* textBuffer = nullptr;
 	GMTextDrawMode drawMode = GMTextDrawMode::Immediate;
+
+	void update();
+	GMScene* createScene();
+	GMModel* createModel();
+	void updateVertices(GMScene* scene);
 };
+
+void GMTextGameObjectPrivate::update()
+{
+	P_D(pd);
+	// 如果不存在model，创建一个新model
+	// 如果需要的空间更大，也重新创建一个model
+	if (!scene || length < text.length())
+	{
+		scene = createScene();
+		length = text.length();
+		pd->markDirty();
+	}
+
+	// 如果字符被更改，则更新其缓存
+	if (pd->isDirty())
+	{
+		updateVertices(scene);
+		pd->cleanDirty();
+	}
+}
+
+GMScene* GMTextGameObjectPrivate::createScene()
+{
+	P_D(pd);
+	GMModel* model = createModel();
+	pd->initShader(model->getShader());
+
+	GMPart* part = new GMPart(model);
+	GMsize_t len = text.length() * 6; //每个字符，用6个顶点来渲染
+	for (GMsize_t i = 0; i < len; ++i)
+	{
+		part->vertex(GMVertex());
+	}
+
+	pd->getContext()->getEngine()->createModelDataProxy(pd->getContext(), model);
+	return pd->getScene();
+}
+
+void GMTextGameObjectPrivate::updateVertices(GMScene* scene)
+{
+	P_D(pd);
+	if (!typoEngine)
+		typoEngine = new GMTypoEngine(pd->getContext());
+
+	GMModel* model = scene->getModels()[0].getModel();
+	constexpr GMfloat Z = 0;
+	const GMRect& rect = pd->getRenderRect();
+	GMRectF coord = pd->toViewportRect(pd->getGeometry(), rect);
+
+	Vector<GMVertex>& vertices = vericesCache;
+	BEGIN_GLYPH_XY(rect.width, rect.height)
+	GMTypoIterator iter;
+
+	GMTypoOptions options;
+	if (drawMode == GMTextDrawMode::Immediate)
+	{
+		// 使用排版引擎进行排版
+		options.useCache = false;
+		options.newline = newline;
+		options.center = center;
+		options.lineSpacing = lineSpacing;
+		options.typoArea.width = coord.width * rect.width * .5f;
+		options.typoArea.height = coord.height * rect.height * .5f;
+		options.plainText = colorType == GMTextColorType::Plain;
+
+		typoEngine->setFont(font);
+		typoEngine->setLineHeight(0);
+		typoEngine->setFontSize(fontSize);
+		iter = typoEngine->begin(text, options);
+	}
+	else
+	{
+		// 使用已有的typoEngine来排版，这样就不用重头开始排版了
+		// 我们不会更改typoEngine的值，但是还是要const_cast一下，不然编译器会不高兴
+		typoEngine = const_cast<ITypoEngine*>(textBuffer->getTypoEngine());
+		options.plainText = textBuffer->isPlainText();
+		options.useCache = true;
+		options.renderStart = textBuffer->getRenderStart();
+		options.renderEnd = textBuffer->getRenderEnd();
+		typoEngine->setFontSize(fontSize);
+		iter = typoEngine->begin(text, options);
+	}
+
+	GM_ASSERT(typoEngine);
+	const GMfloat *pResultColor = ValuePointer(color);
+
+	auto lineHeight = typoEngine->getResults().lineHeight;
+	auto end = typoEngine->end();
+	for (; iter != end; ++iter)
+	{
+		const GMTypoResult& typoResult = *iter;
+		if (!typoResult.valid || typoResult.newLineOrEOFSeparator)
+			continue;
+
+		const GMGlyphInfo& glyph = *typoResult.glyph;
+		if (!options.plainText)
+		{
+			//富文本的情况，使用推导出来的颜色
+			pResultColor = typoResult.color;
+		}
+
+		if (glyph.width > 0 && glyph.height > 0)
+		{
+			// 如果width和height为0，视为空格，只占用空间而已
+			// 否则：按照TriangleList创建顶点：0 2 1, 1 2 3
+			// 0 2
+			// 1 3
+			// 让所有字体origin开始的x轴平齐
+
+			// 采用左上角为原点的Texcoord坐标系
+
+			GMVertex V0 = {
+				{ coord.x + X(typoResult.x), coord.y - Y(typoResult.y + lineHeight - glyph.bearingY), Z },
+				{ 0 },
+				{ UV_X(glyph.x), UV_Y(glyph.y) },
+				{ 0 },
+				{ 0 },
+				{ 0 },
+				{ pResultColor[0], pResultColor[1], pResultColor[2], pResultColor[3] }
+			};
+			GMVertex V1 = {
+				{ coord.x + X(typoResult.x), coord.y - Y(typoResult.y + lineHeight - (glyph.bearingY - glyph.height)), Z },
+				{ 0 },
+				{ UV_X(glyph.x), UV_Y(glyph.y + glyph.height) },
+				{ 0 },
+				{ 0 },
+				{ 0 },
+				{ pResultColor[0], pResultColor[1], pResultColor[2], pResultColor[3] }
+			};
+			GMVertex V2 = {
+				{ coord.x + X(typoResult.x + typoResult.width), coord.y - Y(typoResult.y + lineHeight - glyph.bearingY), Z },
+				{ 0 },
+				{ UV_X(glyph.x + glyph.width), UV_Y(glyph.y) },
+				{ 0 },
+				{ 0 },
+				{ 0 },
+				{ pResultColor[0], pResultColor[1], pResultColor[2], pResultColor[3] }
+			};
+			GMVertex V3 = {
+				{ coord.x + X(typoResult.x + typoResult.width), coord.y - Y(typoResult.y + lineHeight - (glyph.bearingY - glyph.height)), Z },
+				{ 0 },
+				{ UV_X(glyph.x + glyph.width), UV_Y(glyph.y + glyph.height) },
+				{ 0 },
+				{ 0 },
+				{ 0 },
+				{ pResultColor[0], pResultColor[1], pResultColor[2], pResultColor[3] }
+			};
+
+			vertices.push_back(V0);
+			vertices.push_back(V2);
+			vertices.push_back(V1);
+			vertices.push_back(V1);
+			vertices.push_back(V2);
+			vertices.push_back(V3);
+		}
+	}
+	END_GLYPH_XY()
+
+	// 已经得到所有顶点，更新到GPU
+	GM_ASSERT(vertices.size() <= text.length() * 6);
+	GMsize_t vertexCount = vertices.size();
+	model->setVerticesCount(vertexCount);
+
+	GMsize_t sz = vertexCount * sizeof(GMVertex);
+	GMModelDataProxy* proxy = model->getModelDataProxy();
+	proxy->beginUpdateBuffer();
+	void* ptr = proxy->getBuffer();
+	memcpy_s(ptr, sz, vertices.data(), sz);
+	proxy->endUpdateBuffer();
+	vertices.clear();
+}
+
+
+GMModel* GMTextGameObjectPrivate::createModel()
+{
+	P_D(pd);
+	GMModel* model = new GMModel();
+	pd->setAsset(GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, model)));
+	model->setType(GMModelType::Text);
+	model->setUsageHint(GMUsageHint::DynamicDraw);
+	model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
+	return model;
+}
 
 GMTextGameObject::GMTextGameObject(const GMRect& renderRc)
 	: GM2DGameObjectBase(renderRc)
 {
 	GM_CREATE_DATA();
+	GM_SET_PD();
 }
 
 GMTextGameObject::GMTextGameObject(const GMRect& renderRc, ITypoEngine* typo)
 	: GM2DGameObjectBase(renderRc)
 {
 	GM_CREATE_DATA();
+	GM_SET_PD();
 	D(d);
 	d->typoEngine = typo;
 	d->insetTypoEngine = false;
@@ -310,9 +502,8 @@ ITypoEngine* GMTextGameObject::getTypoEngine() GM_NOEXCEPT
 GMModel* GMTextGameObject::getModel()
 {
 	D(d);
-	D_BASE(db, GMGameObject);
-	if (db->asset.isEmpty())
-		createModel();
+	if (getAsset().isEmpty())
+		d->createModel();
 
 	return GMGameObject::getModel();
 }
@@ -320,204 +511,18 @@ GMModel* GMTextGameObject::getModel()
 void GMTextGameObject::onAppendingObjectToWorld()
 {
 	D(d);
-	update();
+	d->update();
 	GMGameObject::onAppendingObjectToWorld();
 }
 
 void GMTextGameObject::draw()
 {
 	D(d);
-	update();
+	d->update();
 
 	GMModel* model = d->scene->getModels()[0].getModel();
 	drawModel(getContext(), model);
 	endDraw();
-}
-
-void GMTextGameObject::update()
-{
-	D(d);
-	// 如果不存在model，创建一个新model
-	// 如果需要的空间更大，也重新创建一个model
-	if (!d->scene || d->length < d->text.length())
-	{
-		d->scene = createScene();
-		d->length = d->text.length();
-		markDirty();
-	}
-
-	// 如果字符被更改，则更新其缓存
-	if (isDirty())
-	{
-		updateVertices(d->scene);
-		cleanDirty();
-	}
-}
-
-GMScene* GMTextGameObject::createScene()
-{
-	D(d);
-	D_BASE(db, GMGameObject);
-	GMModel* model = createModel();
-	initShader(model->getShader());
-
-	GMPart* part = new GMPart(model);
-	GMsize_t len = d->text.length() * 6; //每个字符，用6个顶点来渲染
-	for (GMsize_t i = 0; i < len; ++i)
-	{
-		part->vertex(GMVertex());
-	}
-
-	getContext()->getEngine()->createModelDataProxy(getContext(), model);
-	return db->asset.getScene();
-}
-
-void GMTextGameObject::updateVertices(GMScene* scene)
-{
-	D(d);
-	if (!d->typoEngine)
-		d->typoEngine = new GMTypoEngine(getContext());
-
-	GMModel* model = scene->getModels()[0].getModel();
-	constexpr GMfloat Z = 0;
-	const GMRect& rect = getRenderRect();
-	GMRectF coord = toViewportRect(getGeometry(), rect);
-
-	Vector<GMVertex>& vertices = d->vericesCache;
-	BEGIN_GLYPH_XY(rect.width, rect.height)
-		ITypoEngine* typoEngine = nullptr;
-		GMTypoIterator iter;
-
-		GMTypoOptions options;
-		if (d->drawMode == GMTextDrawMode::Immediate)
-		{
-			// 使用排版引擎进行排版
-			options.useCache = false;
-			options.newline = d->newline;
-			options.center = d->center;
-			options.lineSpacing = d->lineSpacing;
-			options.typoArea.width = coord.width * rect.width * .5f;
-			options.typoArea.height = coord.height * rect.height * .5f;
-			options.plainText = d->colorType == GMTextColorType::Plain;
-
-			typoEngine = d->typoEngine;
-			typoEngine->setFont(d->font);
-			typoEngine->setLineHeight(0);
-			typoEngine->setFontSize(d->fontSize);
-			iter = typoEngine->begin(d->text, options);
-		}
-		else
-		{
-			// 使用已有的typoEngine来排版，这样就不用调用begin了
-			// 我们不会更改typoEngine的值，但是还是要const_cast一下，不然编译器会不高兴
-			typoEngine = const_cast<ITypoEngine*>(d->textBuffer->getTypoEngine());
-			options.plainText = d->textBuffer->isPlainText();
-			options.useCache = true;
-			options.renderStart = d->textBuffer->getRenderStart();
-			options.renderEnd = d->textBuffer->getRenderEnd();
-			typoEngine->setFontSize(d->fontSize);
-			iter = typoEngine->begin(d->text, options);
-		}
-
-		GM_ASSERT(typoEngine);
-		const GMfloat *pResultColor = ValuePointer(d->color);
-
-		auto lineHeight = typoEngine->getResults().lineHeight;
-		auto end = typoEngine->end();
-		for (; iter != end; ++iter)
-		{
-			const GMTypoResult& typoResult = *iter;
-			if (!typoResult.valid || typoResult.newLineOrEOFSeparator)
-				continue;
-
-			const GMGlyphInfo& glyph = *typoResult.glyph;
-			if (!options.plainText)
-			{
-				//富文本的情况，使用推导出来的颜色
-				pResultColor = typoResult.color;
-			}
-
-			if (glyph.width > 0 && glyph.height > 0)
-			{
-				// 如果width和height为0，视为空格，只占用空间而已
-				// 否则：按照TriangleList创建顶点：0 2 1, 1 2 3
-				// 0 2
-				// 1 3
-				// 让所有字体origin开始的x轴平齐
-
-				// 采用左上角为原点的Texcoord坐标系
-
-				GMVertex V0 = {
-					{ coord.x + X(typoResult.x), coord.y  - Y(typoResult.y + lineHeight - glyph.bearingY), Z },
-					{ 0 },
-					{ UV_X(glyph.x), UV_Y(glyph.y) },
-					{ 0 },
-					{ 0 },
-					{ 0 },
-					{ pResultColor[0], pResultColor[1], pResultColor[2], pResultColor[3] }
-				};
-				GMVertex V1 = {
-					{ coord.x + X(typoResult.x), coord.y  - Y(typoResult.y + lineHeight - (glyph.bearingY - glyph.height)), Z },
-					{ 0 },
-					{ UV_X(glyph.x), UV_Y(glyph.y + glyph.height) },
-					{ 0 },
-					{ 0 },
-					{ 0 },
-					{ pResultColor[0], pResultColor[1], pResultColor[2], pResultColor[3] }
-				};
-				GMVertex V2 = {
-					{ coord.x + X(typoResult.x + typoResult.width), coord.y - Y(typoResult.y + lineHeight - glyph.bearingY), Z },
-					{ 0 },
-					{ UV_X(glyph.x + glyph.width), UV_Y(glyph.y) },
-					{ 0 },
-					{ 0 },
-					{ 0 },
-					{ pResultColor[0], pResultColor[1], pResultColor[2], pResultColor[3] }
-				};
-				GMVertex V3 = {
-					{ coord.x + X(typoResult.x + typoResult.width), coord.y - Y(typoResult.y + lineHeight - (glyph.bearingY - glyph.height)), Z },
-					{ 0 },
-					{ UV_X(glyph.x + glyph.width), UV_Y(glyph.y + glyph.height) },
-					{ 0 },
-					{ 0 },
-					{ 0 },
-					{ pResultColor[0], pResultColor[1], pResultColor[2], pResultColor[3] }
-				};
-
-				vertices.push_back(V0);
-				vertices.push_back(V2);
-				vertices.push_back(V1);
-				vertices.push_back(V1);
-				vertices.push_back(V2);
-				vertices.push_back(V3);
-			}
-		}
-	END_GLYPH_XY()
-
-	// 已经得到所有顶点，更新到GPU
-	GM_ASSERT(vertices.size() <= d->text.length() * 6);
-	GMsize_t vertexCount = vertices.size();
-	model->setVerticesCount(vertexCount);
-
-	GMsize_t sz = vertexCount * sizeof(GMVertex);
-	GMModelDataProxy* proxy = model->getModelDataProxy();
-	proxy->beginUpdateBuffer();
-	void* ptr = proxy->getBuffer();
-	memcpy_s(ptr, sz, vertices.data(), sz);
-	proxy->endUpdateBuffer();
-	vertices.clear();
-}
-
-
-GMModel* GMTextGameObject::createModel()
-{
-	D_BASE(db, GMGameObject);
-	GMModel* model = new GMModel();
-	db->asset = GMScene::createSceneFromSingleModel(GMAsset(GMAssetType::Model, model));
-	model->setType(GMModelType::Text);
-	model->setUsageHint(GMUsageHint::DynamicDraw);
-	model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
-	return model;
 }
 
 GMSprite2DGameObject::GMSprite2DGameObject(const GMRect& renderRc)
