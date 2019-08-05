@@ -260,7 +260,7 @@ endfunction(CheckCompileLinkOption)
 
 function(AddCompileOption opt)
 
-    if ("${COMMAND_OUTPUT}" NOT STREQUAL "")
+    if (${COMMAND_OUTPUT} NOT STREQUAL "")
       list(APPEND CRYPTOPP_COMPILE_OPTIONS "${opt}")
     endif ()
 

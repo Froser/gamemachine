@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 prefix=C:/Program Files/Project
 exec_prefix=${prefix}
 libdir=C:/Program Files/Project/lib
@@ -9,3 +10,16 @@ Version: 2.1.0
 Cflags: -I${includedir} 
 Libs: -L${libdir} -lglew32
 Requires: glu
+=======
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=/usr/local/lib
+includedir=${prefix}/include
+
+Name: glew
+Description: The OpenGL Extension Wrangler library
+Version: 2.1.0
+Cflags: -I${includedir} 
+Libs: -L${libdir} -lGLEW
+Requires: glu
+>>>>>>> Fixed cmake error in Raspbian
