@@ -168,3 +168,22 @@ void BSPGameObject::onAppendingObjectToWorld()
 	camera.lookAt(m_lookAtCache);
 	GMGameObject::onAppendingObjectToWorld();
 }
+
+ScreenObject::ScreenObject(const IRenderContext* context)
+	: GMGameObject()
+	, m_context(context)
+{
+
+}
+
+void ScreenObject::addText(const GMString& text)
+{
+	//GMFontMetrics fontMetrices;
+	GMTextGameObject* obj = new GMTextGameObject(GMRect());
+	obj->setContext(m_context);
+}
+
+void ScreenObject::addImage(GMAsset asset)
+{
+
+}

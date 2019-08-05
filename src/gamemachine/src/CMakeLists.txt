@@ -98,6 +98,8 @@ set(SOURCES
 		gmengine/gmshaderhelper.cpp
 		gmengine/gmcomputeshadermanager.h
 		gmengine/gmcomputeshadermanager.cpp
+		gmengine/gmfontmetrics.h
+		gmengine/gmfontmetrics.cpp
 		gmengine/particle/gmparticle.h
 		gmengine/particle/gmparticle.cpp
 		gmengine/particle/cocos2d/gmparticle_cocos2d.h

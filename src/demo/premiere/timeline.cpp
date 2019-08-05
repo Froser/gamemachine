@@ -1001,6 +1001,11 @@ void Timeline::parseObjects(GMXMLElement* e)
 			m_physicsWorld[id] = AutoReleasePtr<GMPhysicsWorld>(ddw);
 			parsePhysics(ddw, e);
 		}
+		else if (name == L"screen")
+		{
+			// 类似于电影尾声那样的滚屏
+			parseScreen(e);
+		}
 		e = e->NextSiblingElement();
 	}
 }
@@ -1839,6 +1844,26 @@ void Timeline::parseCocos2DParticleAttributes(IParticleSystem* ps, GMXMLElement*
 		scanner.nextFloat(y);
 		scanner.nextFloat(z);
 		emitter->setEmitPosition(GMVec3(x, y, z));
+	}
+}
+
+void Timeline::parseScreen(GMXMLElement* e)
+{
+	// 一共有两种类型的元素，text和image，它们居中对齐，且有一个包围盒来计算几何大小。
+	ScreenObject* obj = new ScreenObject(m_context);
+	e = e->FirstChildElement();
+	while (e)
+	{
+		GMString tag = e->Name();
+		if (tag == L"text")
+		{
+			// addText
+		}
+		else if (tag == L"image")
+		{
+			// addImage
+		}
+		e = e->NextSiblingElement();
 	}
 }
 

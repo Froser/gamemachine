@@ -83,4 +83,18 @@ private:
 	GMOwnedPtr<BSPGameWorld> m_world;
 	GMCameraLookAt m_lookAtCache;
 };
+
+class ScreenObject : public GMGameObject
+{
+public:
+	ScreenObject(const IRenderContext* context);
+
+public:
+	void addText(const GMString& text);
+	void addImage(GMAsset asset);
+
+private:
+	Vector<GMGameObject> m_objects;
+	const IRenderContext* m_context;
+};
 #endif

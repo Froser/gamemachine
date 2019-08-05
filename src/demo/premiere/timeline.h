@@ -245,6 +245,7 @@ private:
 	void parseParticlesAsset(GMXMLElement*);
 	void parseParticlesObject(GMXMLElement*);
 	void parseCocos2DParticleAttributes(IParticleSystem*, GMXMLElement*);
+	void parseScreen(GMXMLElement*);
 	void interpolateCamera(GMXMLElement*, GMfloat);
 	void interpolateLight(GMXMLElement*, ILight*, GMfloat);
 	void interpolateObject(GMXMLElement*, GMGameObject*, GMfloat);
