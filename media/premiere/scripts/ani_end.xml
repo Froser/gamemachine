@@ -13,15 +13,13 @@
         <buffer id="img_bulletphysics" file="textures/images/bulletphysics.png" />
         <buffer id="img_lua" file="textures/images/lua.png" />
         <buffer id="img_freetype" file="textures/images/freetype.png" />
+        <buffer id="img_zlib" file="textures/images/zlib.png" />
+        <buffer id="img_libpng" file="textures/images/libpng.png" />
     </assets>
 	<objects>
 		<screen id="obj_ending" spacing="20" speed="500">
 			<text size="$h1">GameMachine</text>
 			<text>图形引擎</text>
-			<space value="$default_spacing" />
-			<fontSize value="$h2" />
-			<text>Created By Froser</text>
-			<text>开发人：于益偲</text>
 			<space value="$default_spacing" />
 			<space value="$default_spacing" />
 			<text>部分技术清单</text>
@@ -54,6 +52,7 @@
 			<text>Lua支持</text>
 			<text>水波模拟</text>
 			<text>Height Map</text>
+			<text>UI框架</text>
 
 			<space value="$default_spacing" />
 			<setspacing value="30" />
@@ -63,20 +62,42 @@
 			<image buffer="img_glm" />
 			<image buffer="img_bulletphysics" />
 			<image buffer="img_lua" />
-			<image buffer="img_zlib" />
 			<image buffer="img_freetype" />
-			<text>zlib</text>
+			<image buffer="img_zlib" />
+			<image buffer="img_libpng" />
 			<text>Assimp</text>
 			<text>libjpeg</text>
-			<text>libpng</text>
 			<text>libtiff</text>
 			<text>glew</text>
 			<text>libmad</text>
+
+			<space value="$default_spacing" />
+			<space value="$default_spacing" />
+			<text size="$h1">GameMachine概述</text>
+			<font value="consola"/>
+			<space value="$default_spacing" />
+			<text>GameMachine是一款跨平台的独立开源图形引擎。</text>
+			<text>GameMachine可以用于制作三维渲染程序，也可以用于制作游戏。</text>
+			<text>它可以运行在Windows以及有X11环境的Linux系统上，</text>
+			<text>也可以在特定系统上选择支持的渲染底层API来进行渲染。</text>
+			<text>目前底层渲染API支持OpenGL和DirectX 11，未来也会支持DirectX 12以及Vulkan。</text>
+			<text>如果你在寻找一个简单易上手的图形引擎，那么GameMachine是一个不错的选择。</text>
+			<space value="500" />
+			<font value="EN" />
+			<text size="$h1">GameMachine</text>
+			<text size="$h2">Made By Froser</text>
+			<text>于益偲</text>
+			<space value="500" />
+			<text size="$h1">Thanks for watching</text>
 		</screen>
 	</objects>
  	<actions>
  		<action type="camera" view="ortho" left="0" top="0" right="$screen_width" bottom="$screen_height" time="+0" near="0" far="100"/>
-
+        <checkpoint type="save"/>
+        <component file="component_fade_in.xml">
+            <slot name="duration">.1</slot>
+        </component>
+        <checkpoint type="load"/>
 		<action type="addObject" object="obj_ending" time="+0" />
 		<action type="play" object="obj_ending" time="+0" />
  	</actions>

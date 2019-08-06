@@ -95,7 +95,8 @@ void ProceduresPrivate::showLogo(GMDuration dt)
 		m_title->setColor(GMVec4(1, 1, 1, 0));
 		m_title->setText("GameMachine Presents");
 		m_title->setFont(context->getEngine()->getGlyphManager()->getDefaultFontEN());
-		GMRect rc = { 0, 0, 612, 32 };
+		m_title->setCenter(true);
+		GMRect rc = { 0, 0, m_procedures.m_handler->getWindow()->getRenderRect().width, 32 };
 		rc = Helper::getMiddleRectOfWindow(rc, window);
 		rc.y -= 40;
 		m_title->setGeometry(rc);
@@ -122,10 +123,11 @@ void ProceduresPrivate::showLogo(GMDuration dt)
 		m_title->getShader().setBlendFactorDest(GMS_BlendFunc::OneMinusSourceAlpha);
 		m_title->setColorType(GMTextColorType::Plain);
 		m_title->setFontSize(32);
+		m_title->setCenter(true);
 		m_title->setColor(GMVec4(1, 1, 1, 0));
-		m_title->setText("Produced by Froser");
+		m_title->setText("Prepare For Music");
 		m_title->setFont(context->getEngine()->getGlyphManager()->getDefaultFontEN());
-		GMRect rc = { 0, 0, 500, 32 };
+		GMRect rc = { 0, 0, m_procedures.m_handler->getWindow()->getRenderRect().width, 32 };
 		rc = Helper::getMiddleRectOfWindow(rc, window);
 		rc.y -= 40;
 		m_title->setGeometry(rc);

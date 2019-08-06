@@ -5,7 +5,7 @@
         <screen_height>$GM_screenHeight</screen_height>
     </defines>
     <assets>
-        <audio id="audio_bgm" file="Thomas Greenberg - Curly Wurly.mp3" />
+        <audio id="audio_bgm" file="Eptic _ Habstrakt - Ninja Challenge (Dodge & Fuski Remix).mp3" />
         <texture id="tex_mud_diffuse" file="mud/albedo.jpg" />
         <texture id="tex_mud_normal" file="mud/normal.jpg" />
 

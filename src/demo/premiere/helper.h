@@ -123,5 +123,6 @@ private:
 	bool m_playing;
 	GMfloat m_rollingSpeed;
 	GMfloat m_positionY;
+	GMfloat m_finalPosition;
 };
 #endif

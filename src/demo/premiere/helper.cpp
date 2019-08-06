@@ -181,6 +181,7 @@ ScreenObject::ScreenObject(const IRenderContext* context)
 	, m_playing(false)
 	, m_rollingSpeed(2)
 	, m_positionY(BOTTOM_POS)
+	, m_finalPosition(0.f)
 {
 	m_world.reset(new GMGameWorld(context));
 }
@@ -283,6 +284,10 @@ void ScreenObject::update(GMDuration dt)
 		{
 			object->setTranslation(Translate(GMVec3(0, m_positionY, 0)));
 		}
+
+		// 最后将停留在中间
+		if (m_positionY >= m_finalPosition)
+			pause();
 	}
 }
 
@@ -308,4 +313,7 @@ void ScreenObject::onAppendingObjectToWorld()
 	{
 		object->setTranslation(Translate(GMVec3(0, m_positionY, 0)));
 	}
+
+	GMRect renderRC = m_context->getWindow()->getRenderRect();
+	m_finalPosition = (GMfloat)m_baseline / renderRC.height * 2.f - 1;
 }

@@ -3,6 +3,6 @@
 	<windowName>GameMachine Premiere</windowName>
 	<windowWidth>1280</windowWidth>
 	<windowHeight>1024</windowHeight>
-	<font lang="EN">suigener.ttf</font>
+	<font name="EN" lang="EN">suigener.ttf</font>
 	<font name="consola">consola.ttf</font>
 </config>
