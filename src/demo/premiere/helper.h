@@ -87,11 +87,11 @@ private:
 class ScreenObject : public GMGameObject
 {
 public:
-	GM_ALIGNED_16(struct) TextOptions
+	struct TextOptions
 	{
 		GMFontHandle font;
 		GMFontSizePt fontSize;
-		GMVec4 fontColor;
+		GMFloat4 fontColor;
 	};
 
 public:

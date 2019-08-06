@@ -1881,7 +1881,7 @@ void Timeline::parseScreen(GMXMLElement* e)
 			ScreenObject::TextOptions options = {
 				font,
 				fontSize,
-				GMVec4(1, 1, 1, 1)
+				GMFloat4(1, 1, 1, 1)
 			};
 
 			// size

@@ -222,7 +222,9 @@ void ScreenObject::addText(const GMString& text, const TextOptions& options)
 		obj->setFont(options.font);
 		obj->setFontSize(options.fontSize);
 		obj->setColorType(GMTextColorType::Plain);
-		obj->setColor(options.fontColor);
+		GMVec4 color;
+		color.setFloat4(options.fontColor);
+		obj->setColor(color);
 		m_world->addObjectAndInit(obj);
 		m_world->addToRenderList(obj);
 		m_baseline += metrices.height + m_spacing;
