@@ -170,15 +170,17 @@ void BSPGameObject::onAppendingObjectToWorld()
 	GMGameObject::onAppendingObjectToWorld();
 }
 
+constexpr GMfloat BOTTOM_POS = -2.f;
+
 ScreenObject::ScreenObject(const IRenderContext* context)
 	: GMGameObject()
 	, m_context(context)
-	, m_spacing(5)
+	, m_spacing(20)
 	, m_baseline(0)
 	, m_maxWidth(0)
 	, m_playing(false)
 	, m_rollingSpeed(2)
-	, m_positionY(0.f)
+	, m_positionY(BOTTOM_POS)
 {
 	m_world.reset(new GMGameWorld(context));
 }
@@ -210,16 +212,17 @@ void ScreenObject::addText(const GMString& text, const TextOptions& options)
 		GMFontMetrics fontMetrices(attributes, m_context);
 		GMRect metrices = fontMetrices.boundingRect(text);
 		metrices.y += m_baseline;
-		metrices.x = (renderRC.width - metrices.width) / 2.f;
+		metrices.x = 0;
+		metrices.width = renderRC.width;
 
 		GMTextGameObject* obj = new GMTextGameObject(renderRC);
+		obj->setCenter(true);
 		obj->setGeometry(metrices);
 		obj->setText(text);
 		obj->setFont(options.font);
 		obj->setFontSize(options.fontSize);
 		obj->setColorType(GMTextColorType::Plain);
 		obj->setColor(options.fontColor);
-		obj->setContext(m_context);
 		m_world->addObjectAndInit(obj);
 		m_world->addToRenderList(obj);
 		m_baseline += metrices.height + m_spacing;
@@ -228,9 +231,44 @@ void ScreenObject::addText(const GMString& text, const TextOptions& options)
 	});
 }
 
-void ScreenObject::addImage(GMAsset asset)
+void ScreenObject::addImage(const GMBuffer& buffer)
 {
+	GM.invokeInMainThread([this, buffer]() {
+		GMImage* image = nullptr;
+		if (GMImageReader::load(buffer.getData(), buffer.getSize(), &image))
+		{
+			GMTextureAsset asset;
+			GM.getFactory()->createTexture(m_context, image, asset);
 
+			GMRect renderRC = m_context->getWindow()->getRenderRect();
+			GMSprite2DGameObject* obj = new GMSprite2DGameObject(renderRC);
+			obj->setTexture(asset);
+			obj->setTextureSize(image->getWidth(), image->getHeight());
+			GMRect textureRect = { 0, 0, image->getWidth(), image->getHeight() };
+			obj->setTextureRect(textureRect);
+
+			GMRect metrices = textureRect;
+			metrices.y += m_baseline;
+			metrices.x = (renderRC.width - metrices.width) * .5f;
+			obj->setGeometry(metrices);
+
+			m_baseline += metrices.height + m_spacing;
+			m_world->addObjectAndInit(obj);
+			m_world->addToRenderList(obj);
+			m_objects.push_back(obj);
+		}
+		else
+		{
+			gm_warning(gm_dbg_wrap("Cannot open image from buffer."));
+		}
+	});
+}
+
+void ScreenObject::addSpacing(GMint32 spacing)
+{
+	GM.invokeInMainThread([this, spacing]() {
+		m_baseline += spacing;
+	});
 }
 
 void ScreenObject::update(GMDuration dt)
@@ -241,9 +279,7 @@ void ScreenObject::update(GMDuration dt)
 
 		for (auto object : m_objects)
 		{
-			GMFloat4 translation;
-			GetTranslationFromMatrix(object->getTranslation(), translation);
-			object->setTranslation(Translate(GMVec3(0, translation[1] + m_positionY, 0)));
+			object->setTranslation(Translate(GMVec3(0, m_positionY, 0)));
 		}
 	}
 }
@@ -265,5 +301,9 @@ void ScreenObject::reset(bool)
 
 void ScreenObject::onAppendingObjectToWorld()
 {
-
+	// 初始位置
+	for (auto object : m_objects)
+	{
+		object->setTranslation(Translate(GMVec3(0, m_positionY, 0)));
+	}
 }

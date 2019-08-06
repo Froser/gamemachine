@@ -6,6 +6,8 @@ BEGIN_NS
 
 GM_PRIVATE_OBJECT_UNALIGNED(GMSprite2DGameObject)
 {
+	GM_DECLARE_PUBLIC(GMSprite2DGameObject)
+
 	GMScene* scene = nullptr;
 	GMAsset texture;
 	GMRect textureRc;
@@ -14,6 +16,8 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMSprite2DGameObject)
 	GMfloat depth = 0;
 	bool needUpdateTexture = false;
 	GMFloat4 color = GMFloat4(1, 1, 1, 1);
+
+	void update();
 };
 
 END_NS

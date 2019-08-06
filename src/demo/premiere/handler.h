@@ -14,6 +14,8 @@ struct Config
 	GMint32 samples = 0;
 	GMString fontCN = L"simhei.ttf";
 	GMString fontEN = L"suigener.ttf";
+	HashMap<GMString, GMString, GMStringHashFunctor> fonts;
+	HashMap<GMString, GMFontHandle, GMStringHashFunctor> fontHandles;
 };
 
 class Handler : public IGameHandler, public IShaderLoadCallback
@@ -25,9 +27,13 @@ public:
 public:
 	GMGameWorld* getWorld();
 	IWindow* getWindow();
+	GMFontHandle getFontHandleByName(const GMString&);
 
 public:
 	GMfloat getTick();
+
+public:
+	static Handler* instance();
 
 	// IShaderLoadCallback
 private:
@@ -49,5 +55,7 @@ private:
 	GMClock m_clock;
 	Config m_config;
 };
+
+#define HandlerInstance (Handler::instance())
 
 #endif

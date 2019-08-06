@@ -109,7 +109,8 @@ public:
 	void setSpacing(GMint32);
 	void setSpeed(GMint32);
 	void addText(const GMString& text, const TextOptions& options);
-	void addImage(GMAsset asset);
+	void addImage(const GMBuffer& buffer);
+	void addSpacing(GMint32);
 
 private:
 	GMOwnedPtr<GMGameWorld> m_world;

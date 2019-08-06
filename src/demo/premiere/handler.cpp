@@ -3,15 +3,22 @@
 #include "procedures.h"
 #include <gmshaderhelper.h>
 
+namespace
+{
+	Handler* s_handler;
+}
+
 Handler::Handler(IWindow* window, Config&& c) GM_NOEXCEPT
 	: m_mainWindow(window)
 	, m_world(nullptr)
 	, m_config(std::move(c))
 {
+	s_handler = this;
 }
 
 Handler::~Handler()
 {
+	s_handler = nullptr;
 }
 
 GMGameWorld* Handler::getWorld()
@@ -24,9 +31,19 @@ IWindow* Handler::getWindow()
 	return m_mainWindow;
 }
 
+GMFontHandle Handler::getFontHandleByName(const GMString& name)
+{
+	return m_config.fontHandles[name];
+}
+
 GMfloat Handler::getTick()
 {
 	return m_clock.elapsedFromStart();
+}
+
+Handler* Handler::instance()
+{
+	return s_handler;
 }
 
 void Handler::onLoadShaders(const IRenderContext* context)
@@ -54,6 +71,15 @@ void Handler::init(const IRenderContext* context)
 		pk->readFile(GMPackageIndex::Fonts, m_config.fontEN, &buf);
 		GMFontHandle font = glyphManager->addFontByMemory(std::move(buf));
 		glyphManager->setDefaultFontEN(font);
+	}
+
+	for (const auto& fontPair : m_config.fonts)
+	{
+		GMBuffer buf;
+		GMGlyphManager* glyphManager = context->getEngine()->getGlyphManager();
+		pk->readFile(GMPackageIndex::Fonts, fontPair.second, &buf);
+		GMFontHandle fontHandle = glyphManager->addFontByMemory(std::move(buf));
+		m_config.fontHandles[fontPair.first] = fontHandle;
 	}
 
 	context->getEngine()->setShaderLoadCallback(this);

@@ -126,9 +126,6 @@ public:
 	void setTextureSize(GMint32 width, GMint32 height);
 	void setTextureRect(const GMRect& rect);
 
-private:
-	void update();
-
 protected:
 	virtual void updateVertices(GMScene* scene);
 	virtual void updateTexture(GMScene* scene);

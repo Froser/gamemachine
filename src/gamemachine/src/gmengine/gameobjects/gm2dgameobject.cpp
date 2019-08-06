@@ -525,10 +525,33 @@ void GMTextGameObject::draw()
 	endDraw();
 }
 
+void GMSprite2DGameObjectPrivate::update()
+{
+	P_D(pd);
+	if (!scene)
+	{
+		scene = pd->createScene();
+		pd->markDirty();
+	}
+
+	if (needUpdateTexture)
+	{
+		pd->updateTexture(scene);
+		needUpdateTexture = false;
+	}
+
+	if (pd->isDirty())
+	{
+		pd->updateVertices(scene);
+		pd->cleanDirty();
+	}
+}
+
 GMSprite2DGameObject::GMSprite2DGameObject(const GMRect& renderRc)
 	: Base(renderRc)
 {
 	GM_CREATE_DATA();
+	GM_SET_PD();
 }
 
 GMSprite2DGameObject::~GMSprite2DGameObject()
@@ -539,7 +562,7 @@ GMSprite2DGameObject::~GMSprite2DGameObject()
 void GMSprite2DGameObject::draw()
 {
 	D(d);
-	update();
+	d->update();
 	GMModel* model = d->scene->getModels()[0].getModel();
 	drawModel(getContext(), model);
 	endDraw();
@@ -598,28 +621,6 @@ void GMSprite2DGameObject::setColor(const GMVec4& color)
 	{
 		markDirty();
 		d->color = colorCache;
-	}
-}
-
-void GMSprite2DGameObject::update()
-{
-	D(d);
-	if (!d->scene)
-	{
-		d->scene = createScene();
-		markDirty();
-	}
-
-	if (d->needUpdateTexture)
-	{
-		updateTexture(d->scene);
-		d->needUpdateTexture = false;
-	}
-
-	if (isDirty())
-	{
-		updateVertices(d->scene);
-		cleanDirty();
 	}
 }
 

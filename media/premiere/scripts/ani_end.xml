@@ -1,9 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <timeline version="1.0">
+    <defines>
+        <default_spacing>50</default_spacing>
+        <h1>48</h1>
+        <h2>24</h2>
+        <p>18</p>
+    </defines>
+    <assets>
+        <buffer id="img_opengl" file="textures/images/opengl.png" />
+        <buffer id="img_directx11" file="textures/images/directx11.png" />
+        <buffer id="img_glm" file="textures/images/glm.png" />
+        <buffer id="img_bulletphysics" file="textures/images/bulletphysics.png" />
+        <buffer id="img_lua" file="textures/images/lua.png" />
+        <buffer id="img_freetype" file="textures/images/freetype.png" />
+    </assets>
 	<objects>
-		<screen id="obj_ending" spacing="15" speed="-5">
-			<text>GameMachine</text>
-			<text>GameMachine World</text>
+		<screen id="obj_ending" spacing="20" speed="500">
+			<text size="$h1">GameMachine</text>
+			<text>图形引擎</text>
+			<space value="$default_spacing" />
+			<fontSize value="$h2" />
+			<text>Created By Froser</text>
+			<text>开发人：于益偲</text>
+			<space value="$default_spacing" />
+			<space value="$default_spacing" />
+			<text>部分技术清单</text>
+			<font value="consola"/>
+			<space value="25" />
+			<fontSize value="$p" />
+			<text>OpenGL渲染</text>
+			<text>DirectX11渲染</text>
+			<text>支持SIMD加速的线性代数库</text>
+			<text>GPGPU及硬件加速</text>
+			<text>Linux支持</text>
+			<text>Zip解析</text>
+			<text>XML解析</text>
+			<text>图片解析</text>
+			<text>音频解析</text>
+			<text>法线贴图</text>
+			<text>高光贴图</text>
+			<text>Phong光照</text>
+			<text>PBR</text>
+			<text>TrueType字体绘制</text>
+			<text>Cocos2D粒子动画</text>
+			<text>骨骼动画</text>
+			<text>Billboard</text>
+			<text>音频流</text>
+			<text>多光源及延迟渲染</text>
+			<text>天空盒</text>
+			<text>物理引擎</text>
+			<text>PCF Cascaded Shadow Maps</text>
+			<text>Quake 3 BSP解析</text>
+			<text>Lua支持</text>
+			<text>水波模拟</text>
+			<text>Height Map</text>
+
+			<space value="$default_spacing" />
+			<setspacing value="30" />
+			<text size="$h2">第三方支持</text>
+			<image buffer="img_opengl" />
+			<image buffer="img_directx11" />
+			<image buffer="img_glm" />
+			<image buffer="img_bulletphysics" />
+			<image buffer="img_lua" />
+			<image buffer="img_zlib" />
+			<image buffer="img_freetype" />
+			<text>zlib</text>
+			<text>Assimp</text>
+			<text>libjpeg</text>
+			<text>libpng</text>
+			<text>libtiff</text>
+			<text>glew</text>
+			<text>libmad</text>
 		</screen>
 	</objects>
  	<actions>

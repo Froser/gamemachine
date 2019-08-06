@@ -10,6 +10,7 @@
 #include <gmm.h>
 #include "helper.h"
 #include <gmphysicsshape.h>
+#include "handler.h"
 
 #define NoCameraComponent 0
 #define PositionComponent 0x01
@@ -1856,14 +1857,17 @@ void Timeline::parseScreen(GMXMLElement* e)
 	GMString spacingStr = e->Attribute("spacing");
 	if (!spacingStr.isEmpty())
 	{
-		obj->setSpacing(GMString::parseFloat(spacingStr));
+		obj->setSpacing(parseFloat(spacingStr));
 	}
 
 	GMString speedStr = e->Attribute("speed");
 	if (!speedStr.isEmpty())
 	{
-		obj->setSpeed(GMString::parseFloat(speedStr));
+		obj->setSpeed(parseFloat(speedStr));
 	}
+
+	GMFontHandle font = m_context->getEngine()->getGlyphManager()->getDefaultFontEN();
+	GMFontSizePt fontSize = 32;
 
 	// 一共有两种类型的元素，text和image，它们居中对齐，且有一个包围盒来计算几何大小。
 	e = e->FirstChildElement();
@@ -1874,12 +1878,18 @@ void Timeline::parseScreen(GMXMLElement* e)
 		{
 			hasChild = true;
 
-			// addText
 			ScreenObject::TextOptions options = {
-				m_context->getEngine()->getGlyphManager()->getDefaultFontEN(),
-				32,
+				font,
+				fontSize,
 				GMVec4(1, 1, 1, 1)
 			};
+
+			// size
+			GMString sizeStr = e->Attribute("size");
+			if (!sizeStr.isEmpty())
+			{
+				options.fontSize = parseFloat(sizeStr);
+			}
 
 			obj->addText(e->GetText(), options);
 		}
@@ -1887,7 +1897,50 @@ void Timeline::parseScreen(GMXMLElement* e)
 		{
 			hasChild = true;
 
+			GMString assetName = e->Attribute("buffer");
+			GMBuffer buffer = findBuffer(assetName);
+
 			// addImage
+			if (buffer.getSize() > 0)
+				obj->addImage(buffer);
+			else
+				gm_warning(gm_dbg_wrap("Cannot find buffer asset '{0}'"), assetName);
+		}
+		else if (tag == L"space")
+		{
+			GMString spacingStr = e->Attribute("value");
+			if (!spacingStr.isEmpty())
+				obj->addSpacing(parseFloat(spacingStr));
+			else
+				gm_warning(gm_dbg_wrap("Invalid spacing value."));
+		}
+		else if (tag == L"font")
+		{
+			GMString fontName = e->Attribute("value");
+			if (!fontName.isEmpty())
+			{
+				GMFontHandle fontCandidate = HandlerInstance->getFontHandleByName(fontName);
+				if (fontCandidate)
+					font = fontCandidate;
+				else
+					gm_warning(gm_dbg_wrap("Cannot find font '{0}'."), fontName);
+			}
+		}
+		else if (tag == L"fontSize")
+		{
+			GMString fontSizeStr = e->Attribute("value");
+			if (!fontSizeStr.isEmpty())
+			{
+				fontSize = parseFloat(fontSizeStr);
+			}
+		}
+		else if (tag == L"setspacing")
+		{
+			GMString setSpacingValueStr = e->Attribute("value");
+			if (!setSpacingValueStr.isEmpty())
+			{
+				obj->setSpacing(parseInt(setSpacingValueStr));
+			}
 		}
 		e = e->NextSiblingElement();
 	}
@@ -2204,7 +2257,7 @@ void Timeline::parsePhysicsAttributes(GMRigidPhysicsObject* pobj, GMXMLElement* 
 	{
 		GMString massStr = e->Attribute("mass");
 		if (!massStr.isEmpty())
-			pobj->setMass(GMString::parseFloat(massStr));
+			pobj->setMass(parseFloat(massStr));
 	}
 }
 

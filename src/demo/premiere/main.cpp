@@ -57,10 +57,16 @@ namespace
 						else if (tag == "font")
 						{
 							GMString lang = e->Attribute("lang");
-							if (lang == "CN")
+							if (lang == L"CN")
 								config.fontCN = text;
-							else
+							else if (lang == L"EN")
 								config.fontEN = text;
+
+							GMString name= e->Attribute("name");
+							if (!name.isEmpty())
+							{
+								config.fonts[name] = e->GetText();
+							}
 						}
 
 						e = e->NextSiblingElement();
