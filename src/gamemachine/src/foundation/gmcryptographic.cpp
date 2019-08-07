@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
-#define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1
 #include "gmcryptographic.h"
-#include <md5.h>
+#include "cryptographic/md5.h"
 
 BEGIN_NS
 
@@ -9,9 +8,11 @@ void GMCryptographic::hash(const GMBuffer& in, Alogrithm method, GMBuffer& out)
 {
 	GM_ASSERT(method == MD5);
 
-	CryptoPP::Weak1::MD5 hash;
-	out.resize(CryptoPP::Weak1::MD5::DIGESTSIZE);
-	hash.CalculateDigest(out.getData(), in.getData(), in.getSize());
+	out.resize(16);
+	MD5_CTX ctx;
+	MD5_Init(&ctx);
+	MD5_Update(&ctx, in.getData(), in.getSize());
+	MD5_Final(out.getData(), &ctx);
 }
 
 END_NS

@@ -208,6 +208,8 @@ set(SOURCES
 		foundation/gmasync.cpp
 		foundation/gmcryptographic.h
 		foundation/gmcryptographic.cpp
+		foundation/cryptographic/md5.h
+		foundation/cryptographic/md5.c
 
 		gmlua/gmlua.h
 		gmlua/gmlua.cpp
