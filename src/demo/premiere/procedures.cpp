@@ -103,8 +103,8 @@ void ProceduresPrivate::showLogo(GMDuration dt)
 
 		m_titleAnimation.setTargetObjects(m_title);
 		m_titleAnimation.addKeyFrame(new FontColorAnimationKeyframe(m_title, GMVec4(1, 1, 1, 1), 1));
-		m_titleAnimation.addKeyFrame(new FontColorAnimationKeyframe(m_title, GMVec4(1, 1, 1, 1), 2));
-		m_titleAnimation.addKeyFrame(new FontColorAnimationKeyframe(m_title, GMVec4(1, 1, 1, 0), 3));
+		m_titleAnimation.addKeyFrame(new FontColorAnimationKeyframe(m_title, GMVec4(1, 1, 1, 1), 3));
+		m_titleAnimation.addKeyFrame(new FontColorAnimationKeyframe(m_title, GMVec4(1, 1, 1, 0), 4));
 		m_titleAnimation.reset();
 		m_titleAnimation.play();
 

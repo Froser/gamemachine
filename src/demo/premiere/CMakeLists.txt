@@ -11,7 +11,7 @@ include_directories(
 		./
 	)
 
-IF(WIN32)
+if(WIN32)
 	link_libraries(
 			glu32.lib
 			opengl32.lib
@@ -32,6 +32,14 @@ set(SOURCES
 		helper.h
 		helper.cpp
 	)
+
+if (MSVC)
+	set(RESOURCES
+		resource.h
+		Resource.rc
+	)
+	list (APPEND SOURCES ${RESOURCES})
+endif(MSVC)
 
 gm_source_group_by_dir(SOURCES)
 

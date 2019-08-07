@@ -11,7 +11,7 @@ void GMCryptographic::hash(const GMBuffer& in, Alogrithm method, GMBuffer& out)
 	out.resize(16);
 	MD5_CTX ctx;
 	MD5_Init(&ctx);
-	MD5_Update(&ctx, in.getData(), in.getSize());
+	MD5_Update(&ctx, in.getData(), (GMulong) in.getSize());
 	MD5_Final(out.getData(), &ctx);
 }
 
