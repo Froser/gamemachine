@@ -69,7 +69,9 @@ GMXRenderContext::~GMXRenderContext()
 void GMXRenderContext::switchToContext() const
 {
 	D(d);
-	glXMakeContextCurrent(getDisplay(), d->window->getWindowHandle(), d->window->getWindowHandle(), getGlxContext());
+	bool result = glXMakeContextCurrent(getDisplay(), d->window->getWindowHandle(), d->window->getWindowHandle(), getGlxContext());
+	if (!result)
+		gm_error(gm_dbg_wrap("Failed to switch glx context."));
 }
 
 void GMXRenderContext::initX(IWindow* window, const char* displayName)

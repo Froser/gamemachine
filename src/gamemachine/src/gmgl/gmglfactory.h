@@ -24,6 +24,7 @@ public:
 	virtual void createShaderPrograms(const IRenderContext* context, const GMRenderTechniqueManager& manager, REF Vector<IShaderProgram*>* out) override;
 	virtual bool createComputeShaderProgram(const IRenderContext* context, OUT IComputeShaderProgram** out) override;
 	virtual void createComputeContext(OUT const IRenderContext** out) override;
+	virtual IEngineCapability& getEngineCapability() override;
 };
 
 END_NS

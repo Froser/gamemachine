@@ -15,8 +15,10 @@ extern "C"
 	{
 		SupportOpenGL,
 		SupportDirectX11,
+		SupportGeometryShader,
+		SupportDeferredRendering,
+		SupportCalculateShader,
 	};
-
 	GM_EXPORT bool GMQueryCapability(GMCapability);
 }
 

@@ -9,6 +9,7 @@
 #include <GL/glx.h>
 #include "gmxrendercontext.h"
 #include "gmgl/gmglgraphic_engine.h"
+#include <gmglhelper.h>
 
 #define ATTRIB(a) attributes[where++]=(a)
 #define ATTRIB_VAL(a, v) { ATTRIB(a); ATTRIB(v); }
@@ -146,7 +147,7 @@ void GMWindow_OpenGL::onWindowCreated(const GMWindowDesc& wndAttrs)
 		gm_error(gm_dbg_wrap("Window Attribute is not supported."));
 		return;
 	}
-	
+
 	XVisualInfo* visualInfo = nullptr;
 	visualInfo = glXGetVisualFromFBConfig(context->getDisplay(), d->fbConfig);
 	GM_ASSERT(visualInfo);
@@ -275,6 +276,7 @@ void GMWindow_OpenGL::onWindowCreated(const GMWindowDesc& wndAttrs)
 
 	createGraphicEngine();
 	glewInit();
+	GMGLHelper::initOpenGL();
 }
 
 GLXContext GMWindow_OpenGL::createNewContext()
@@ -300,15 +302,18 @@ GLXContext GMWindow_OpenGL::createNewContext()
 	GMint32 where = 0;
 	GMint32 contextFlags;
 #if GM_DEBUG
-	contextFlags = GLX_CONTEXT_DEBUG_BIT_ARB | GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB;
+       contextFlags = GLX_CONTEXT_DEBUG_BIT_ARB | GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB;
 #else
-	contextFlags = GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB;
+       contextFlags = GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB;
 #endif
 
-	// OpenGL 3.3
-	ATTRIB_VAL(GLX_CONTEXT_MAJOR_VERSION_ARB, 3);
-	ATTRIB_VAL(GLX_CONTEXT_MINOR_VERSION_ARB, 3);
-	ATTRIB_VAL(GLX_CONTEXT_FLAGS_ARB, contextFlags);
+#if !GM_RASPBIAN
+       // OpenGL 3.3
+       ATTRIB_VAL(GLX_CONTEXT_MAJOR_VERSION_ARB, 3);
+       ATTRIB_VAL(GLX_CONTEXT_MINOR_VERSION_ARB, 3);
+       ATTRIB_VAL(GLX_CONTEXT_FLAGS_ARB, contextFlags);
+#endif
+
 	ATTRIB(None);
 
 	GLXContext xcontext = createContextAttribs(display, d->fbConfig, share_list, true, attributes);
@@ -339,7 +344,7 @@ const IRenderContext* GMWindow_OpenGL::getContext()
 		GMXRenderContext* context = new GMXRenderContext(this);
 		d->context.reset(context);
 		context->setWindow(this);
-		
+
 	}
 	return d->context.get();
 }
@@ -401,7 +406,7 @@ bool GMWindowFactory::createTempWindow(GMbyte colorDepth, GMbyte alphaBits, GMby
 
 bool GMWindowFactory::destroyTempWindow(GMWindowHandle tmpWnd, GMDeviceContextHandle tmpDC, GMOpenGLRenderContextHandle tmpRC)
 {
-
+	return false;
 }
 
 END_NS

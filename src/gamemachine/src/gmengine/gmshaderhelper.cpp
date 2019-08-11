@@ -1,11 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmshaderhelper.h"
 #include <gamemachine.h>
-
-#if GM_USE_DX11
-#include <gmdx11helper.h>
-#endif
-
 #include <gmglhelper.h>
 #include <extensions/objects/gmwavegameobject.h>
 #include <gmengine/particle/cocos2d/gmparticlemodel_cocos2d.h>
@@ -31,23 +26,30 @@ void GMShaderHelper::loadShader(const IRenderContext* context)
 	auto& env = GM.getRunningStates().renderEnvironment;
 	if (env == GMRenderEnvironment::OpenGL)
 	{
-		GMGLHelper::loadShader(
-			context,
-			L"gl/main.vert",
-			L"gl/main.frag",
-			L"gl/deferred/geometry_pass_main.vert",
-			L"gl/deferred/geometry_pass_main.frag",
-			L"gl/deferred/light_pass_main.vert",
-			L"gl/deferred/light_pass_main.frag",
-			L"gl/filters/filters.vert",
-			L"gl/filters/filters.frag"
-		);
+        GMGLHelper::loadShader(
+            context,
+            L"gl/main.vert",
+            L"gl/main.frag",
+            L"gl/deferred/geometry_pass_main.vert",
+            L"gl/deferred/geometry_pass_main.frag",
+            L"gl/deferred/light_pass_main.vert",
+            L"gl/deferred/light_pass_main.frag",
+            L"gl/filters/filters.vert",
+            L"gl/filters/filters.frag"
+        );
 
-		GMGameObject::setDefaultCullShaderCode(getFileContent(L"gl/compute/frustumcull.glsl"));
+        if (GMQueryCapability(GMCapability::SupportCalculateShader))
+		{
+			GMGameObject::setDefaultCullShaderCode(getFileContent(L"gl/compute/frustumcull.glsl"));
+		}
 	}
 	else
 	{
 		DirectX11LoadShader(context, L"dx11/effect.fx");
+		if (GMQueryCapability(GMCapability::SupportCalculateShader))
+		{
+			GMGameObject::setDefaultCullShaderCode(getFileContent(L"dx11/compute/frustumcull.hlsl"));
+		}
 	}
 }
 
@@ -60,9 +62,12 @@ void GMShaderHelper::loadExtensionShaders(const IRenderContext* context)
 	auto& env = GM.getRunningStates().renderEnvironment;
 	if (env == GMRenderEnvironment::OpenGL)
 	{
-		GMGravityParticleEffect_Cocos2D::setDefaultCodeAndEntry(getFileContent(L"gl/compute/particle_gravity_cocos2d.glsl"), L"main");
-		GMRadialParticleEffect_Cocos2D::setDefaultCodeAndEntry(getFileContent(L"gl/compute/particle_radial_cocos2d.glsl"), L"main");
-		GMParticleModel_Cocos2D::setDefaultCode(getFileContent(L"gl/compute/particle_transfer_cocos2d.glsl"));
+		if (GMQueryCapability(GMCapability::SupportCalculateShader))
+		{
+			GMGravityParticleEffect_Cocos2D::setDefaultCodeAndEntry(getFileContent(L"gl/compute/particle_gravity_cocos2d.glsl"), L"main");
+			GMRadialParticleEffect_Cocos2D::setDefaultCodeAndEntry(getFileContent(L"gl/compute/particle_radial_cocos2d.glsl"), L"main");
+			GMParticleModel_Cocos2D::setDefaultCode(getFileContent(L"gl/compute/particle_transfer_cocos2d.glsl"));
+		}
 	}
 	else
 	{

@@ -4,6 +4,17 @@
 BEGIN_NS
 
 struct GMGLShaderInfo;
+constexpr GMint32 MAX_NUM_SHADING_LANGUAGE_VERSIONS = 32;
+
+struct GMGLInfo
+{
+	GMString vendor;
+	GMString renderer;
+	GMString version;
+	GMString shadingLanguageVersions;
+	GMString extensions;
+};
+
 struct GM_EXPORT GMGLHelper
 {
 	struct GMGLShaderContent
@@ -37,6 +48,14 @@ struct GM_EXPORT GMGLHelper
 	);
 
 	static const GMGLShaderInfo& getDefaultShaderCode(GMShaderType);
+
+	static void initOpenGL();
+
+	static const GMGLInfo& getOpenGLInfo();
+
+	static bool isOpenGLShaderLanguageES();
+
+	static bool isSupportGeometryShader();
 };
 
 END_NS

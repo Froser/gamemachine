@@ -814,7 +814,7 @@ void DemostrationEntrance::init(const gm::IRenderContext* context)
 #	endif
 #else
 #	ifdef GM_DEBUG
-	pk->loadPackage("/home/froser/Documents/gmpk");
+	pk->loadPackage("/home/pi/Documents/gmpk");
 #	else
 	pk->loadPackage((gm::GMPath::getCurrentPath() + L"gm.pk0"));
 #	endif

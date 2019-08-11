@@ -867,6 +867,12 @@ GM_INTERFACE_FROM(IWindow, IQueriable)
 	virtual GMWindowProcHandler getProcHandler() = 0;
 };
 
+GM_INTERFACE(IEngineCapability)
+{
+	virtual bool isSupportGeometryShader() = 0;
+	virtual bool isSupportDeferredRendering() = 0;
+};
+
 GM_INTERFACE(IFactory)
 {
 	virtual void createWindow(GMInstance instance, IWindow* parent, OUT IWindow** window) = 0;
@@ -883,6 +889,7 @@ GM_INTERFACE(IFactory)
 	virtual void createShaderPrograms(const IRenderContext* context, const GMRenderTechniqueManager& manager, REF Vector<IShaderProgram*>* out) = 0;
 	virtual bool createComputeShaderProgram(const IRenderContext* context, OUT IComputeShaderProgram** out) = 0;
 	virtual void createComputeContext(OUT const IRenderContext** out) = 0;
+	virtual IEngineCapability& getEngineCapability() = 0;
 };
 
 typedef WAVEFORMATEX GMWaveFormatEx;

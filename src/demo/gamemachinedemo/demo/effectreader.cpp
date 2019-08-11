@@ -30,6 +30,7 @@ void Demo_EffectReader::init()
 	gm::GMPrimitiveCreator::createCube(GMVec3(.2f, .2f, .2f), d->cubeScene);
 	d->obj = db->parentDemonstrationWorld->getEffectObjectFactory()->createGameObject(d->cubeScene);
 	asDemoGameWorld(getDemoWorldReference())->addObject("box", d->obj);
+	d->obj->setUniform(L"lightColor", GMVec3(.7f, 0, 0));
 
 	gm::GMWidget* widget = createDefaultWidget();
 	auto top = getClientAreaTop();

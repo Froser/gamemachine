@@ -125,14 +125,28 @@ void GMGLFactory::createShaderPrograms(const IRenderContext* context, const GMRe
 
 bool GMGLFactory::createComputeShaderProgram(const IRenderContext* context, OUT IComputeShaderProgram** out)
 {
-	static GMint32 s_glVersion[2];
+	static bool s_canCreateComputeShader;
 	static std::once_flag s_flag;
-	std::call_once(s_flag, [](GMint32* version) {
-		glGetIntegerv(GL_MAJOR_VERSION, &version[0]);
-		glGetIntegerv(GL_MINOR_VERSION, &version[1]);
-	}, s_glVersion);
+	std::call_once(s_flag, [](bool& result) {
+		// 事实上，OpenGL ES 3.1开始支持了计算着色器。不过我们先屏蔽它
+		if (GMGLHelper::isOpenGLShaderLanguageES())
+		{
+			result = false;
+		}
+		else
+		{
+			GMint32 version[2];
+			glGetIntegerv(GL_MAJOR_VERSION, &version[0]);
+			glGetIntegerv(GL_MINOR_VERSION, &version[1]);
 
-	if (s_glVersion[0] < 4 || (s_glVersion[0] == 4 && s_glVersion[1] < 3))
+			if (version[0] < 4 || (version[0] == 4 && version[1] < 3))
+				result = false;
+			else
+				result = true;
+		}
+	}, s_canCreateComputeShader);
+
+	if (!s_canCreateComputeShader)
 		return false;
 
 	if (out)
@@ -192,6 +206,26 @@ void GMGLFactory::createComputeContext(OUT const IRenderContext** out)
 		ctx->setEngine(new ComputeEngine(ctx));
 		*out = ctx;
 	}
+}
+
+class EngineCapabilityImpl : public IEngineCapability
+{
+public:
+	virtual bool isSupportGeometryShader()
+	{
+		return GMGLHelper::isSupportGeometryShader();
+	}
+
+	virtual bool isSupportDeferredRendering()
+	{
+		return !GMGLHelper::isOpenGLShaderLanguageES();
+	}
+};
+
+IEngineCapability& GMGLFactory::getEngineCapability()
+{
+	static EngineCapabilityImpl s_impl;
+	return s_impl;
 }
 
 END_NS

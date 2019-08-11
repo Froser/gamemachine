@@ -139,6 +139,10 @@ macro(gm_begin_project)
 		message("GameMachine: Windows system detected.")
 		add_definitions(-DGM_WINDOWS)
 	endif(WIN32)
+	if(GM_RASPBIAN)
+        message("GameMachine: Respbian detected.")
+		add_definitions(-DGM_RASPBIAN)
+	endif(GM_RASPBIAN)
 	if(UNIX)
 		message("GameMachine: Unix-Like system (except APPLE) detected.")
 		add_definitions(-DGM_UNIX)
@@ -164,7 +168,7 @@ macro(gm_begin_project)
 				shlwapi.lib
 			)
 	endif()
-	
+
 endmacro(gm_begin_project)
 
 macro(gm_link_gamemachine_libraries libraryName ACCESS)
@@ -197,6 +201,7 @@ option(GM_BUILD_DOCS "Build GameMachine documentation" ON)
 option(GM_BUILD_DEMO "Build GameMachine Demos" ON)
 option(GM_BUILD_UNITTEST "Build GameMachine Unit Tests" ON)
 option(GM_DETECT_MEMORY_LEAK "Detect memory leaking" OFF)
+option(GM_RASPBIAN "You have to check this if you compile the code in Raspbian" OFF)
 
 if(WIN32)
 	find_package( DirectX )

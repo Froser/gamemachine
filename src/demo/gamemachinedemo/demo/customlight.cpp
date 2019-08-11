@@ -156,7 +156,7 @@ void Demo_CustomLight::init()
 	GMVec2 extents = GMVec2(1.f, .5f);
 	gm::GMSceneAsset asset;
 	gm::GMPrimitiveCreator::createQuadrangle(extents, 0, asset);
-	
+
 	gm::GMModel* model = asset.getScene()->getModels()[0].getModel();
 	model->setTechniqueId(s_techid);
 	model->setType(gm::GMModelType::Custom);
@@ -249,7 +249,12 @@ void Demo_CustomLight::initCustomShader(const gm::IRenderContext* context)
 	gm::GMRenderTechnique vertexTech(gm::GMShaderType::Vertex);
 	vertexTech.setCode(
 		gm::GMRenderEnvironment::OpenGL,
-		L"#version 330 core\n"
+		L"#version @@@GMGL_SHADER_VERSION@@@\n"
+		L"#if GL_ES\n"
+		L"precision mediump int;\n"
+		L"precision mediump float;\n"
+		L"precision mediump sampler2DShadow;\n"
+		L"#endif\n"
 		L"layout(location = 0) in vec3 position;\n"
 		L"layout(location = 1) in vec3 normal;\n"
 		L"layout(location = 2) in vec2 uv;\n"
@@ -278,11 +283,17 @@ void Demo_CustomLight::initCustomShader(const gm::IRenderContext* context)
 	gm::GMRenderTechnique pixelTech(gm::GMShaderType::Pixel);
 	pixelTech.setCode(
 		gm::GMRenderEnvironment::OpenGL,
-		L"#version 330 core\n"
+		L"#version @@@GMGL_SHADER_VERSION@@@\n"
+		L"#if GL_ES\n"
+		L"precision mediump int;\n"
+		L"precision mediump float;\n"
+		L"precision mediump sampler2DShadow;\n"
+		L"#endif\n"
+		L"out vec4 fragColor;\n"
 		L"in vec3 _worldPosition;\n"
 		L"in vec2 _uv;\n"
 		L"uniform vec4 GM_ViewPosition;\n"
-		L"uniform int GM_LightCount = 0;\n"
+		L"uniform int GM_LightCount;\n"
 		L"struct GMTexture\n"
 		L"{\n"
 		L"	sampler2D Texture;\n"
@@ -320,7 +331,7 @@ void Demo_CustomLight::initCustomShader(const gm::IRenderContext* context)
 		L"	{\n"
 		L"		totalLight += calcSpotlight(lights[i]);\n"
 		L"	}\n"
-		L"	gl_FragColor = texture(GM_DiffuseTextureAttribute.Texture, _uv) * totalLight;\n"
+		L"	fragColor = texture(GM_DiffuseTextureAttribute.Texture, _uv) * totalLight;\n"
 		L"}"
 	);
 	pixelTech.setCode(

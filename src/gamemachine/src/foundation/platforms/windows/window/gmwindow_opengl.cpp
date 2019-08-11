@@ -7,6 +7,7 @@
 #include "gmgl/gmglgraphic_engine.h"
 #include "foundation/gmthread.h"
 #include "foundation/utilities/tools.h"
+#include <gmglhelper.h>
 
 #define EXIT __exit
 #define RUN_AND_CHECK(i) if (!(i)) { GM_ASSERT(false); goto EXIT; }
@@ -215,6 +216,7 @@ void GMWindow_OpenGL::onWindowCreated(const GMWindowDesc& wndAttrs)
 	HGLRC tmpRC = NULL;
 	RUN_AND_CHECK(GMWindowFactory::createTempWindow(colorDepth, alphaBits, d->depthBits, d->stencilBits, tmpWnd, tmpDC, tmpRC));
 	RUN_AND_CHECK(GLEW_OK == glewInit());
+	GMGLHelper::initOpenGL();
 
 	// 开始创建真正的Window
 	GMWindowHandle wnd = getWindowHandle();

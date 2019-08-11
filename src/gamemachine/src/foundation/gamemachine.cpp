@@ -30,6 +30,30 @@ extern "C"
 #endif
 		}
 
+		if (cp == GMCapability::SupportCalculateShader)
+		{
+			gm::IFactory* factory = GM.getFactory();
+			if (!factory)
+			{
+				gm_error(gm_dbg_wrap("You have to set IFactory to GameMachine before you detect GMCapability::SupportCalculateShader."));
+				return false;
+			}
+
+			return factory->createComputeShaderProgram(nullptr, nullptr);
+		}
+
+		if (cp == GMCapability::SupportGeometryShader)
+		{
+			gm::IFactory* factory = GM.getFactory();
+			return factory->getEngineCapability().isSupportGeometryShader();
+		}
+
+		if (cp == GMCapability::SupportDeferredRendering)
+		{
+			gm::IFactory* factory = GM.getFactory();
+			return factory->getEngineCapability().isSupportDeferredRendering();
+		}
+
 		GM_ASSERT(false); // wrong capability type
 		return false;
 	}

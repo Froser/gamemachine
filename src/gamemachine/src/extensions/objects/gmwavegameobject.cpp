@@ -198,13 +198,13 @@ void GMWaveGameObject::initShader(const IRenderContext* context)
 	GMRenderTechnique vertexTech(GMShaderType::Vertex);
 	vertexTech.setCode(
 		GMRenderEnvironment::OpenGL,
-		L"#version 330\n"
+		L"#version @@@GMGL_SHADER_VERSION@@@\n"
 		L"#include \"foundation/foundation.h\"\n"
 		L"#include \"foundation/vert_header.h\"\n"
 		GM_STRINGIFY_L(
-			out vec4 _model3d_position_world;
-			out vec3 _cubemap_uv;
-			
+			out vec4 _model3d_position_world;\n
+			out vec3 _cubemap_uv;\n
+
 			struct GMExt_Wave_WaveDescription
 			{
 				float Steepness;
@@ -212,43 +212,43 @@ void GMWaveGameObject::initShader(const IRenderContext* context)
 				vec3 Direction;
 				float Speed;
 				float WaveLength;
-			};
-			
-			const int GM_MaxWaves = 10;
-			uniform GMExt_Wave_WaveDescription GM_Ext_Wave_WaveDescriptions[GM_MaxWaves];
-			uniform int GM_Ext_Wave_WaveCount = 1;
-			uniform float GM_Ext_Wave_Duration = 0;
+			};\n
+
+			const int GM_MaxWaves = 10;\n
+			uniform GMExt_Wave_WaveDescription GM_Ext_Wave_WaveDescriptions[GM_MaxWaves];\n
+			uniform int GM_Ext_Wave_WaveCount;\n
+			uniform float GM_Ext_Wave_Duration;\n
 			\n
-			void main()
-			{
-				init_layouts();
-				vec4 p = vec4(position.x, 0, position.z, 1);
-				vec3 n = vec3(0, 1, 0);
-				vec3 t = vec3(0, 0, 1);
-				for (int i = 0; i < GM_Ext_Wave_WaveCount; ++i)
-				{
-					float wi = 2.f / GM_Ext_Wave_WaveDescriptions[i].WaveLength;
-					float phi = GM_Ext_Wave_WaveDescriptions[i].Speed * wi;
-					float rad = wi * dot(GM_Ext_Wave_WaveDescriptions[i].Direction.xz, position.xz) + phi * GM_Ext_Wave_Duration;
-					float Qi = GM_Ext_Wave_WaveDescriptions[i].Steepness / (GM_Ext_Wave_WaveDescriptions[i].Amplitude * wi * GM_Ext_Wave_WaveCount);
-					float C = cos(rad);
-					float S = sin(rad);
+			void main()\n
+			{\n
+				init_layouts();\n
+				vec4 p = vec4(position.x, 0.f, position.z, 1.f);\n
+				vec3 n = vec3(0.f, 1.f, 0.f);\n
+				vec3 t = vec3(0.f, 0.f, 1.f);\n
+				for (int i = 0; i < GM_Ext_Wave_WaveCount; ++i)\n
+				{\n
+					float wi = 2.f / GM_Ext_Wave_WaveDescriptions[i].WaveLength;\n
+					float phi = GM_Ext_Wave_WaveDescriptions[i].Speed * wi;\n
+					float rad = wi * dot(GM_Ext_Wave_WaveDescriptions[i].Direction.xz, position.xz) + phi * GM_Ext_Wave_Duration;\n
+					float Qi = GM_Ext_Wave_WaveDescriptions[i].Steepness / (GM_Ext_Wave_WaveDescriptions[i].Amplitude * wi * float(GM_Ext_Wave_WaveCount));\n
+					float C = cos(rad);\n
+					float S = sin(rad);\n
 					p += vec4(Qi * GM_Ext_Wave_WaveDescriptions[i].Amplitude * GM_Ext_Wave_WaveDescriptions[i].Direction.x * position.x * C,
 							  GM_Ext_Wave_WaveDescriptions[i].Amplitude * S,
-							  Qi * GM_Ext_Wave_WaveDescriptions[i].Amplitude * GM_Ext_Wave_WaveDescriptions[i].Direction.z * position.z * C, 0);
-					float wa = wi * GM_Ext_Wave_WaveDescriptions[i].Amplitude;
-					n.xz -= GM_Ext_Wave_WaveDescriptions[i].Direction.xz * C;
-					n.y -= Qi * wa * S;
-					t.x -= Qi * GM_Ext_Wave_WaveDescriptions[i].Direction.x * GM_Ext_Wave_WaveDescriptions[i].Direction.y * wa * S;
-					t.y -= Qi * GM_Ext_Wave_WaveDescriptions[i].Direction.y * GM_Ext_Wave_WaveDescriptions[i].Direction.y * wa * S;
-					t.z += GM_Ext_Wave_WaveDescriptions[i].Direction.y * wa * C;
+							  Qi * GM_Ext_Wave_WaveDescriptions[i].Amplitude * GM_Ext_Wave_WaveDescriptions[i].Direction.z * position.z * C, 0.f);\n
+					float wa = wi * GM_Ext_Wave_WaveDescriptions[i].Amplitude;\n
+					n.xz -= GM_Ext_Wave_WaveDescriptions[i].Direction.xz * C;\n
+					n.y -= Qi * wa * S;\n
+					t.x -= Qi * GM_Ext_Wave_WaveDescriptions[i].Direction.x * GM_Ext_Wave_WaveDescriptions[i].Direction.y * wa * S;\n
+					t.y -= Qi * GM_Ext_Wave_WaveDescriptions[i].Direction.y * GM_Ext_Wave_WaveDescriptions[i].Direction.y * wa * S;\n
+					t.z += GM_Ext_Wave_WaveDescriptions[i].Direction.y * wa * C;\n
 				}
-				_model3d_position_world = GM_WorldMatrix * p;
-				gl_Position = (GM_ProjectionMatrix * GM_ViewMatrix * _model3d_position_world);
-				_normal = vec4(normalize(n), 1);
-				_tangent = vec4(normalize(t), 1);
-				_bitangent = vec4(cross(_normal.xyz, _tangent.xyz), 1);
-			}
+				_model3d_position_world = GM_WorldMatrix * p;\n
+				gl_Position = (GM_ProjectionMatrix * GM_ViewMatrix * _model3d_position_world);\n
+				_normal = vec4(normalize(n), 1.f);\n
+				_tangent = vec4(normalize(t), 1.f);\n
+				_bitangent = vec4(cross(_normal.xyz, _tangent.xyz), 1.f);\n
+			}\n
 		)
 	);
 
@@ -263,12 +263,12 @@ void GMWaveGameObject::initShader(const IRenderContext* context)
 				float Speed;\n
 				float WaveLength;\n
 			};\n
-			
+
 			static const int GM_MaxWaves = 10;\n
 			GMExt_Wave_WaveDescription GM_Ext_Wave_WaveDescriptions[GM_MaxWaves];\n
 			int GM_Ext_Wave_WaveCount;\n
 			float GM_Ext_Wave_Duration;\n
-			
+
 			VS_OUTPUT VS_GerstnerWave( VS_INPUT input )\n
 			{\n
 				VS_OUTPUT output;\n

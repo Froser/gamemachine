@@ -340,4 +340,24 @@ void GMDx11Factory::createComputeContext(OUT const IRenderContext** out)
 	}
 }
 
+class EngineCapabilityImpl : public IEngineCapability
+{
+public:
+	virtual bool isSupportGeometryShader()
+	{
+		return true;
+	}
+
+	virtual bool isSupportDeferredRendering()
+	{
+		return true;
+	}
+};
+
+IEngineCapability& GMDx11Factory::getEngineCapability()
+{
+	static EngineCapabilityImpl s_impl;
+	return s_impl;
+}
+
 END_NS

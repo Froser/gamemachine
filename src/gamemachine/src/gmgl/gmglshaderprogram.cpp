@@ -6,6 +6,7 @@
 #include <regex>
 #include "foundation/gamemachine.h"
 #include <linearmath.h>
+#include "gmglhelper.h"
 
 #pragma warning (disable: 4302)
 #pragma warning (disable: 4311)
@@ -149,7 +150,7 @@ void GMGLShaderProgram::useProgram()
 {
 	D(d);
 	glUseProgram(d->shaderProgram);
-	
+
 	GMGLGraphicEngine* engine = gm_cast<GMGLGraphicEngine*>(d->context->getEngine());
 	engine->shaderProgramChanged(this);
 }
@@ -309,12 +310,14 @@ bool GMGLShaderProgram::load()
 GMuint32 GMGLShaderProgram::getProgram()
 {
 	D(d);
+	GM_ASSERT(d->shaderProgram);
 	return d->shaderProgram;
 }
 
 void GMGLShaderProgram::setProgram(GMuint32 program)
 {
 	D(d);
+	GM_ASSERT(program);
 	d->shaderProgram = program;
 }
 
@@ -348,6 +351,8 @@ GMString GMGLShaderProgram::expandSource(const GMString& filename, const GMStrin
 			expandInclude(filename, n, line);
 		else if (matchMacro(line, "alias", n))
 			expandAlias(n, line);
+        else if (matchMacro(line, "version", n))
+            expandShaderVersion(line);
 		expanded += replaceLine(line);
 		if (!iter.hasNextLine())
 			break;
@@ -389,7 +394,9 @@ void GMGLShaderProgram::expandInclude(const GMString& workingDir, const GMString
 	if (GM.getGamePackageManager()->readFileFromPath(include, &buf))
 	{
 		buf.convertToStringBuffer();
-		source = expandSource(include, GMString((char*)buf.getData())) + GM_CRLF;
+		GMString expanded = L"// GameMachine include file: " + dir + f + GM_CRLF;
+		expanded += GMString((char*)buf.getData());
+		source = expandSource(include, expanded) + GM_CRLF;
 	}
 	else
 	{
@@ -411,6 +418,27 @@ void GMGLShaderProgram::expandAlias(const GMString& alias, IN OUT GMString& sour
 		d->aliasMap.insert({ "${" + replacement + "}", a });
 	}
 	source = L"";
+}
+
+void GMGLShaderProgram::expandShaderVersion(REF GMString& result)
+{
+#define VERSION_MAGIC L"@@@GMGL_SHADER_VERSION@@@"
+    static GMString s_shaderVersion;
+    static std::once_flag s_flag;
+    std::call_once(s_flag, [](GMString& version){
+        if (GMGLHelper::isOpenGLShaderLanguageES())
+        {
+            // 至少需要3.00 ES
+            version = "300 es";
+        }
+        else
+        {
+            // 着色器版本至少需要3.3
+            version = "330";
+        }
+    }, s_shaderVersion);
+    result = result.replace(VERSION_MAGIC, s_shaderVersion);
+#undef VERSION_MAGIC
 }
 
 GMString& GMGLShaderProgram::replaceLine(IN OUT GMString& line)

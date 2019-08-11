@@ -50,6 +50,7 @@ private:
 	bool matchMacro(const GMString& source, const GMString& macro, REF GMString& result);
 	void expandInclude(const GMString& workingDir, const GMString& fn, IN OUT GMString& source);
 	void expandAlias(const GMString& alias, IN OUT GMString& source);
+	void expandShaderVersion(REF GMString& result);
 	GMString& replaceLine(IN OUT GMString& line);
 	bool setSubrotinue(const GMString& interfaceName, const GMString& implement, GMuint32 shaderType);
 	bool verify();

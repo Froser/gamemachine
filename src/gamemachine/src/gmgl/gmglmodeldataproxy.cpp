@@ -72,14 +72,17 @@ void GMGLModelDataProxy::transfer()
 	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Bitangent),	GMVertex::BitangentDimension,	GL_FLOAT, GL_FALSE, sizeof(GMVertex), BIT32_OFFSET(11));
 	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Lightmap),	GMVertex::LightmapDimension,	GL_FLOAT, GL_FALSE, sizeof(GMVertex), BIT32_OFFSET(14));
 	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Color),		GMVertex::ColorDimension,		GL_FLOAT, GL_FALSE, sizeof(GMVertex), BIT32_OFFSET(16));
-	glVertexAttribIPointer(gmVertexIndex(GMVertexDataType::BoneIds),	GMVertex::BoneIDsDimension,		GL_INT,				sizeof(GMVertex), BIT32_OFFSET(20));
+	if (glVertexAttribIPointer)
+		glVertexAttribIPointer(gmVertexIndex(GMVertexDataType::BoneIds),GMVertex::BoneIDsDimension,		GL_INT,				sizeof(GMVertex), BIT32_OFFSET(20));
+	else // 可能某些ES版本不支持
+		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::BoneIds),	GMVertex::BoneIDsDimension,		GL_INT,   GL_FALSE,	sizeof(GMVertex), BIT32_OFFSET(20));
 	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Weights),		GMVertex::WeightsDimension,		GL_FLOAT, GL_FALSE, sizeof(GMVertex), BIT32_OFFSET(24));
 
 	GM_FOREACH_ENUM_CLASS(type, GMVertexDataType::Position, GMVertexDataType::EndOfVertexDataType)
 	{
 		glEnableVertexAttribArray(gmVertexIndex(type));
 	}
-	
+
 	if (model->getDrawMode() == GMModelDrawMode::Index)
 	{
 		Vector<GMuint32> packedIndices;

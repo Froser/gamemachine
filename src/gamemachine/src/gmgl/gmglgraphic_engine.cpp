@@ -423,10 +423,10 @@ void GMGLGraphicEngine::getGLErrors(GMuint32* errors, GMsize_t* count)
 			break;
 		}
 	}
-	
+
 	if (errors)
 		*errors++ = GL_NO_ERROR;
-	
+
 	if (count)
 		*count = cnt;
 }

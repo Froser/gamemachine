@@ -197,7 +197,7 @@ void GMGameWorld::addToRenderList(GMGameObject* object)
 	GMMutexLock mutexGuard(&d->renderListMutex);
 	mutexGuard->lock();
 
-	if (object->canDeferredRendering())
+	if (GMQueryCapability(GMCapability::SupportDeferredRendering) && object->canDeferredRendering())
 	{
 		addToContainerByPriority(d->renderList.deferred, object);
 	}

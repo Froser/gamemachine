@@ -1,11 +1,13 @@
 ﻿#include "stdafx.h"
 #include "gmglhelper.h"
 #include "gmglshaderprogram.h"
+#include <GL/glew.h>
 
 BEGIN_NS
 
 namespace
 {
+	GMGLInfo s_glinfo;
 	GMGLShaderInfo s_defaultVS;
 	GMGLShaderInfo s_defaultPS;
 }
@@ -66,23 +68,36 @@ bool GMGLHelper::loadShader(
 		filter->attachShader(shadersInfo[1]);
 	}
 
-	bool result = forward->load() && deferredGeometry->load() && deferredLight->load() && filter->load();
-	if (!result)
+    bool result = forward->load();
+    if (!result)
 		return result;
-	
+
 	result = context->getEngine()->setInterface(gm::GameMachineInterfaceID::GLForwardShaderProgram, forward);
 	if (!result)
 		return result;
 
-	result = context->getEngine()->setInterface(gm::GameMachineInterfaceID::GLDeferredShaderGeometryProgram, deferredGeometry);
-	if (!result)
-		return result;
-
-	result = context->getEngine()->setInterface(gm::GameMachineInterfaceID::GLDeferredShaderLightProgram, deferredLight);
-	if (!result)
+	result = filter->load();
+    if (!result)
 		return result;
 
 	result = context->getEngine()->setInterface(gm::GameMachineInterfaceID::GLFiltersShaderProgram, filter);
+	if (!result)
+		return result;
+
+	if (!isOpenGLShaderLanguageES())
+	{
+        result = deferredGeometry->load() && deferredLight->load();
+        if (!result)
+            return result;
+
+        result = context->getEngine()->setInterface(gm::GameMachineInterfaceID::GLDeferredShaderGeometryProgram, deferredGeometry);
+        if (!result)
+            return result;
+
+        result = context->getEngine()->setInterface(gm::GameMachineInterfaceID::GLDeferredShaderLightProgram, deferredLight);
+        if (!result)
+            return result;
+    }
 	return result;
 }
 
@@ -191,6 +206,52 @@ const GMGLShaderInfo& GMGLHelper::getDefaultShaderCode(GMShaderType type)
 		gm_warning(gm_dbg_wrap("Code is empty. Please call loadShader first."));
 
 	return *result;
+}
+
+void GMGLHelper::initOpenGL()
+{
+	static std::once_flag flag;
+	std::call_once(flag, [](GMGLInfo& info){
+		if (const char* lpcszName = (const char*) glGetString(GL_VENDOR))
+			info.vendor = lpcszName;
+		if (const char* lpcszName = (const char*) glGetString(GL_RENDERER))
+			info.renderer = lpcszName;
+		if (const char* lpcszName = (const char*) glGetString(GL_VERSION))
+			info.version = lpcszName;
+		if (const char* lpcszName = (const char*) glGetString(GL_EXTENSIONS))
+			info.extensions = lpcszName;
+		if (const char* lpcszName = (const char*) glGetString(GL_SHADING_LANGUAGE_VERSION))
+			info.shadingLanguageVersions = lpcszName;
+	}, s_glinfo);
+}
+
+const GMGLInfo& getOpenGLInfo()
+{
+	return s_glinfo;
+}
+
+bool GMGLHelper::isOpenGLShaderLanguageES()
+{
+	static std::once_flag flag;
+	static bool s_result;
+	std::call_once(flag, [](bool& result){
+#if GM_RASPBIAN
+		result = true;
+#else
+		std::wstring shaderLanguages = s_glinfo.shadingLanguageVersions.toStdWString();
+		result = shaderLanguages.find(L"ES") != std::wstring::npos;
+#endif
+	}, s_result);
+	return s_result;
+}
+
+bool GMGLHelper::isSupportGeometryShader()
+{
+#if GM_RASPBIAN
+	return false;
+#else
+	return true;
+#endif
 }
 
 END_NS

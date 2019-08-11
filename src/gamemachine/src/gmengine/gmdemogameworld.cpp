@@ -45,7 +45,7 @@ bool GMDemoGameWorld::removeObject(const GMString& name)
 	{
 		d->renderList.erase(name);
 		d->renderListInv.erase(object);
-		if (object->canDeferredRendering())
+		if (GMQueryCapability(GMCapability::SupportDeferredRendering) && object->canDeferredRendering())
 			getRenderList().deferred.remove(object);
 		else
 			getRenderList().forward.remove(object);
