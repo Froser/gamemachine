@@ -25,8 +25,6 @@ bool GMGLHelper::loadShader(
 )
 {
 	GMGLShaderProgram* forward = new GMGLShaderProgram(context);
-	GMGLShaderProgram* deferredGeometry = new GMGLShaderProgram(context);
-	GMGLShaderProgram* deferredLight = new GMGLShaderProgram(context);
 	GMGLShaderProgram* filter = new GMGLShaderProgram(context);
 
 	{
@@ -39,24 +37,6 @@ bool GMGLHelper::loadShader(
 
 		s_defaultVS = shadersInfo[0];
 		s_defaultPS = shadersInfo[1];
-	}
-
-	{
-		GMGLShaderInfo shadersInfo[] = {
-			{ GMGLShaderInfo::toGLShaderType(gm::GMShaderType::Vertex), (const char*)deferredGeometryVertex.code.toStdString().c_str(), deferredGeometryVertex.path },
-			{ GMGLShaderInfo::toGLShaderType(gm::GMShaderType::Pixel), (const char*)deferredGeometryPixel.code.toStdString().c_str(), deferredGeometryPixel.path },
-		};
-		deferredGeometry->attachShader(shadersInfo[0]);
-		deferredGeometry->attachShader(shadersInfo[1]);
-	}
-
-	{
-		GMGLShaderInfo shadersInfo[] = {
-			{ GMGLShaderInfo::toGLShaderType(gm::GMShaderType::Vertex), (const char*)deferredLightVertex.code.toStdString().c_str(), deferredLightVertex.path },
-			{ GMGLShaderInfo::toGLShaderType(gm::GMShaderType::Pixel), (const char*)deferredLightPixel.code.toStdString().c_str(), deferredLightPixel.path },
-		};
-		deferredLight->attachShader(shadersInfo[0]);
-		deferredLight->attachShader(shadersInfo[1]);
 	}
 
 	{
@@ -76,27 +56,55 @@ bool GMGLHelper::loadShader(
 	if (!result)
 		return result;
 
-	result = filter->load();
+	//result = filter->load();
     if (!result)
 		return result;
 
-	result = context->getEngine()->setInterface(gm::GameMachineInterfaceID::GLFiltersShaderProgram, filter);
+	//result = context->getEngine()->setInterface(gm::GameMachineInterfaceID::GLFiltersShaderProgram, filter);
 	if (!result)
 		return result;
 
 	if (!isOpenGLShaderLanguageES())
 	{
-        result = deferredGeometry->load() && deferredLight->load();
-        if (!result)
-            return result;
+		if (!deferredGeometryVertex.code.isEmpty())
+		{
+			GMGLShaderProgram* deferredGeometry = new GMGLShaderProgram(context);
+			GMGLShaderInfo shadersInfo[] = {
+				{ GMGLShaderInfo::toGLShaderType(gm::GMShaderType::Vertex), (const char*)deferredGeometryVertex.code.toStdString().c_str(), deferredGeometryVertex.path },
+				{ GMGLShaderInfo::toGLShaderType(gm::GMShaderType::Pixel), (const char*)deferredGeometryPixel.code.toStdString().c_str(), deferredGeometryPixel.path },
+			};
+			deferredGeometry->attachShader(shadersInfo[0]);
+			deferredGeometry->attachShader(shadersInfo[1]);
 
-        result = context->getEngine()->setInterface(gm::GameMachineInterfaceID::GLDeferredShaderGeometryProgram, deferredGeometry);
-        if (!result)
-            return result;
 
-        result = context->getEngine()->setInterface(gm::GameMachineInterfaceID::GLDeferredShaderLightProgram, deferredLight);
-        if (!result)
-            return result;
+			result = deferredGeometry->load();
+			if (!result)
+				return result;
+
+			result = context->getEngine()->setInterface(gm::GameMachineInterfaceID::GLDeferredShaderGeometryProgram, deferredGeometry);
+			if (!result)
+				return result;
+		}
+
+		if (!deferredLightVertex.code.isEmpty())
+		{
+			GMGLShaderProgram* deferredLight = new GMGLShaderProgram(context);
+			GMGLShaderInfo shadersInfo[] = {
+				{ GMGLShaderInfo::toGLShaderType(gm::GMShaderType::Vertex), (const char*)deferredLightVertex.code.toStdString().c_str(), deferredLightVertex.path },
+				{ GMGLShaderInfo::toGLShaderType(gm::GMShaderType::Pixel), (const char*)deferredLightPixel.code.toStdString().c_str(), deferredLightPixel.path },
+			};
+			deferredLight->attachShader(shadersInfo[0]);
+			deferredLight->attachShader(shadersInfo[1]);
+
+
+			result = deferredLight->load();
+			if (!result)
+				return result;
+
+			result = context->getEngine()->setInterface(gm::GameMachineInterfaceID::GLDeferredShaderLightProgram, deferredLight);
+			if (!result)
+				return result;
+		}
     }
 	return result;
 }
@@ -138,28 +146,36 @@ bool GMGLHelper::loadShader(
 
 	{
 		gm::GMBuffer vertBuf, pixBuf;
-		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, deferredGeometryVertexFilePath, &vertBuf, &vertPath);
-		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, deferredGeometryPixelFilePath, &pixBuf, &pixPath);
-		vertBuf.convertToStringBuffer();
-		pixBuf.convertToStringBuffer();
+		if (GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, deferredGeometryVertexFilePath, &vertBuf, &vertPath))
+		{
+			vertBuf.convertToStringBuffer();
+			deferredGeometryVertex.code = GMString(reinterpret_cast<const char*>(vertBuf.getData()));
+			deferredGeometryVertex.path = vertPath;
+		}
 
-		deferredGeometryVertex.code = GMString(reinterpret_cast<const char*>(vertBuf.getData()));
-		deferredGeometryVertex.path = vertPath;
-		deferredGeometryPixel.code = GMString(reinterpret_cast<const char*>(pixBuf.getData()));
-		deferredGeometryPixel.path = pixPath;
+		if (GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, deferredGeometryPixelFilePath, &pixBuf, &pixPath))
+		{
+			pixBuf.convertToStringBuffer();
+			deferredGeometryPixel.code = GMString(reinterpret_cast<const char*>(pixBuf.getData()));
+			deferredGeometryPixel.path = pixPath;
+		}
 	}
 
 	{
 		gm::GMBuffer vertBuf, pixBuf;
-		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, deferredLightVertexFilePath, &vertBuf, &vertPath);
-		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, deferredLightPixelFilePath, &pixBuf, &pixPath);
-		vertBuf.convertToStringBuffer();
-		pixBuf.convertToStringBuffer();
+		if (GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, deferredLightVertexFilePath, &vertBuf, &vertPath))
+		{
+			vertBuf.convertToStringBuffer();
+			deferredLightVertex.code = GMString(reinterpret_cast<const char*>(vertBuf.getData()));
+			deferredLightVertex.path = vertPath;
+		}
 
-		deferredLightVertex.code = GMString(reinterpret_cast<const char*>(vertBuf.getData()));
-		deferredLightVertex.path = vertPath;
-		deferredLightPixel.code = GMString(reinterpret_cast<const char*>(pixBuf.getData()));
-		deferredLightPixel.path = pixPath;
+		if (GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, deferredLightPixelFilePath, &pixBuf, &pixPath))
+		{
+			pixBuf.convertToStringBuffer();
+			deferredLightPixel.code = GMString(reinterpret_cast<const char*>(pixBuf.getData()));
+			deferredLightPixel.path = pixPath;
+		}
 	}
 
 	{

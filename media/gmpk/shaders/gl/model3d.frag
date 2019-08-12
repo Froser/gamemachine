@@ -11,7 +11,7 @@ vec4 normalToTexture(vec3 normal_N)
 {
     // 先反转z，按照大家的习惯来展现法线颜色
     normal_N = vec3(normal_N.xy, -normal_N.z);
-    return vec4( (normal_N + 1) * .5f, 1);
+    return vec4( (normal_N + 1.f) * .5f, 1.f);
 }
 
 void GM_Model3D()

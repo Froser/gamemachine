@@ -1,4 +1,10 @@
-#version 330
+#version @@@GMGL_SHADER_VERSION@@@
+#if GL_ES
+precision mediump int;
+precision mediump float;
+precision mediump sampler2DShadow;
+#endif
+
 in vec2 _texCoords;
 out vec4 frag_color;
 uniform sampler2D GM_framebuffer;
@@ -33,8 +39,8 @@ uniform vec3 GM_BlendFactor;
 
 vec3 kernel(float kernels[9], sampler2D t, vec2 uv)
 {
-    float X = GM_KernelDeltaX / GM_ScreenInfo.GM_ScreenWidth;
-    float Y = GM_KernelDeltaY / GM_ScreenInfo.GM_ScreenHeight;
+    float X = GM_KernelDeltaX / float(GM_ScreenInfo.GM_ScreenWidth);
+    float Y = GM_KernelDeltaY / float(GM_ScreenInfo.GM_ScreenHeight);
 
     vec2 offsets[9] = vec2[](
         vec2(-X, -Y),
@@ -67,9 +73,9 @@ vec3 GM_InversionFilter(sampler2D t, vec2 uv)
 vec3 GM_SharpenFilter(sampler2D t, vec2 uv)
 {
     float kernels[9] = float[](
-        -1, -1, -1,
-        -1,  9, -1,
-        -1, -1, -1
+        -1.f, -1.f, -1.f,
+        -1.f,  9.f, -1.f,
+        -1.f, -1.f, -1.f
     );
     return kernel(kernels, t, uv);
 }
@@ -77,9 +83,9 @@ vec3 GM_SharpenFilter(sampler2D t, vec2 uv)
 vec3 GM_BlurFilter(sampler2D t, vec2 uv)
 {
     float kernels[9] = float[](
-        1.0 / 16, 2.0 / 16, 1.0 / 16,
-        2.0 / 16, 4.0 / 16, 2.0 / 16,
-        1.0 / 16, 2.0 / 16, 1.0 / 16  
+        1.f / 16.f, 2.f / 16.f, 1.f / 16.f,
+        2.f / 16.f, 4.f / 16.f, 2.f / 16.f,
+        1.f / 16.f, 2.f / 16.f, 1.f / 16.f 
     );
     return kernel(kernels, t, uv);
 }
@@ -87,16 +93,16 @@ vec3 GM_BlurFilter(sampler2D t, vec2 uv)
 vec3 GM_GrayscaleFilter(sampler2D t, vec2 uv)
 {
     vec3 fragColor = texture(t, uv).rgb;
-    float average = 0.2126 * fragColor.r + 0.7152 * fragColor.g + 0.0722 * fragColor.b;
+    float average = 0.2126f * fragColor.r + 0.7152f * fragColor.g + 0.0722f * fragColor.b;
     return vec3(average, average, average);
 }
 
 vec3 GM_EdgeDetectFilter(sampler2D t, vec2 uv)
 {
     float kernels[9] = float[](
-        1, 1, 1,
-        1, -8, 1,
-        1, 1, 1
+        1.f, 1.f, 1.f,
+        1.f, -8.f, 1.f,
+        1.f, 1.f, 1.f
     );
     return kernel(kernels, t, uv);
 }
@@ -141,11 +147,11 @@ vec3 GM_InvokeFilter(sampler2D t, vec2 texcoords)
         case GM_FilterType_BlendFilter:
             return GM_BlendFilter(t, texcoords);
     }
-    return vec3(0, 0, 0);
+    return vec3(0.f, 0.f, 0.f);
 }
 
 void main()
 {
-    frag_color = vec4(max(GM_InvokeFilter(GM_framebuffer, _texCoords), vec3(0, 0, 0)), 1);
+    frag_color = vec4(max(GM_InvokeFilter(GM_framebuffer, _texCoords), vec3(0.f, 0.f, 0.f)), 1.f);
     frag_color = calculateWithToneMapping(frag_color);
 }

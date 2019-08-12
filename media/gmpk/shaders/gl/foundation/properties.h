@@ -3,7 +3,7 @@ uniform vec4 GM_ViewPosition;
 
 // 阴影纹理
 uniform sampler2DShadow GM_shadow_texture;
-uniform int GM_shadow_texture_switch = 0;
+uniform int GM_shadow_texture_switch;
 
 struct GMTexture
 {

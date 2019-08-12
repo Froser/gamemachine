@@ -55,6 +55,7 @@ void GMShaderHelper::loadShader(const IRenderContext* context)
 
 void GMShaderHelper::loadExtensionShaders(const IRenderContext* context)
 {
+return;
 	// Wave
 	GMWaveGameObject::initShader(context);
 

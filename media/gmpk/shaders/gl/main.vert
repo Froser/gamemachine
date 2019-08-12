@@ -1,4 +1,9 @@
-#version 330
+#version @@@GMGL_SHADER_VERSION@@@
+
+#unused GM_GammaCorrection
+#unused GM_Gamma
+#unused GM_GammaInv
+
 #include "foundation/foundation.h"
 #include "foundation/vert_header.h"
 

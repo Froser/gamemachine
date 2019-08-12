@@ -1,3 +1,9 @@
+#if GL_ES
+precision mediump int;
+precision mediump float;
+precision mediump sampler2DShadow;
+#endif
+
 // 基本参数
 uniform mat4 GM_ViewMatrix;
 uniform mat4 GM_WorldMatrix;
@@ -10,7 +16,12 @@ uniform mat4 GM_Bones[GM_MaxBones];
 const int GM_NoAnimation = 0;
 const int GM_SkeletalAnimation = 1;
 const int GM_AffineAnimation = 2;
+
+#if GL_ES
+uniform int GM_UseAnimation;
+#else
 uniform int GM_UseAnimation = GM_NoAnimation;
+#endif
 
 // 类型变量
 uniform int GM_shader_type;

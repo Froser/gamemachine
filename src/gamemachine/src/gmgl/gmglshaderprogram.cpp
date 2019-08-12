@@ -130,6 +130,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLShaderProgram)
 	GMuint32 shaderProgram = 0;
 	GMuint32 techniqueIndex = 0;
 	HashMap<GMString, GMString, GMStringHashFunctor> aliasMap;
+	Set<GMString> unusedVariableNames;
 };
 
 GMGLShaderProgram::GMGLShaderProgram(const IRenderContext* context)
@@ -163,7 +164,17 @@ void GMGLShaderProgram::attachShader(const GMGLShaderInfo& shaderCfgs)
 
 GMint32 GMGLShaderProgram::getIndex(const GMString& name)
 {
-	return glGetUniformLocation(getProgram(), name.toStdString().c_str());
+	GMint32 id = glGetUniformLocation(getProgram(), name.toStdString().c_str());
+	if (id == -1)
+	{
+		D(d);
+		if (d->unusedVariableNames.find(name) == d->unusedVariableNames.end())
+		{
+			gm_warning(gm_dbg_wrap("Cannot get location of string '{0}' in glsl. "
+			"If you don't need this variable in your shader, just use '#unused YOUR_VARIABLE_NAME' to suppress this warning."), name);
+		}
+	}
+	return id;
 }
 
 void GMGLShaderProgram::setMatrix4(GMint32 index, const GMMat4& value)
@@ -353,7 +364,9 @@ GMString GMGLShaderProgram::expandSource(const GMString& filename, const GMStrin
 			expandAlias(n, line);
         else if (matchMacro(line, "version", n))
             expandShaderVersion(line);
-		expanded += replaceLine(line);
+		else if (matchMacro(line, "unused", n))
+			expandUnused(line, n);
+		expanded += replaceAlias(line);
 		if (!iter.hasNextLine())
 			break;
 		++iter;
@@ -420,7 +433,7 @@ void GMGLShaderProgram::expandAlias(const GMString& alias, IN OUT GMString& sour
 	source = L"";
 }
 
-void GMGLShaderProgram::expandShaderVersion(REF GMString& result)
+void GMGLShaderProgram::expandShaderVersion(REF GMString& line)
 {
 #define VERSION_MAGIC L"@@@GMGL_SHADER_VERSION@@@"
     static GMString s_shaderVersion;
@@ -437,11 +450,18 @@ void GMGLShaderProgram::expandShaderVersion(REF GMString& result)
             version = "330";
         }
     }, s_shaderVersion);
-    result = result.replace(VERSION_MAGIC, s_shaderVersion);
+    line = line.replace(VERSION_MAGIC, s_shaderVersion);
 #undef VERSION_MAGIC
 }
 
-GMString& GMGLShaderProgram::replaceLine(IN OUT GMString& line)
+void GMGLShaderProgram::expandUnused(REF GMString& line, const GMString& token)
+{
+	D(d);
+	d->unusedVariableNames.insert(token);
+	line = GMString();
+}
+
+GMString& GMGLShaderProgram::replaceAlias(IN OUT GMString& line)
 {
 	D(d);
 	for (auto& alias : d->aliasMap)

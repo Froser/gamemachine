@@ -27,7 +27,7 @@ struct GM_light_t
 };
 
 uniform GM_light_t GM_lights[MAX_LIGHT_COUNT];
-uniform int GM_LightCount = 0;
+uniform int GM_LightCount;
 
 const int GM_IlluminationModel_None = 0;
 const int GM_IlluminationModel_Phong = 1;
@@ -65,20 +65,20 @@ vec3 GM_ReinhardToneMapping(vec3 color)
 // Phong光照实现
 vec3 GMLight_PointLightAmbient(GM_light_t light)
 {
-    return max(light.Color * light.AmbientIntensity, 0);
+    return max(light.Color * light.AmbientIntensity, 0.f);
 }
 
 vec3 GMLight_PointLightDiffuse(GM_light_t light, vec3 lightDirection_N, vec3 normal_N)
 {
     float diffuseFactor = dot(lightDirection_N, normal_N);
-    return max(diffuseFactor * light.Color * light.DiffuseIntensity, 0);
+    return max(diffuseFactor * light.Color * light.DiffuseIntensity, 0.f);
 }
 
 vec3 GMLight_PointLightSpecular(GM_light_t light, vec3 lightDirection_N, vec3 eyeDirection_N, vec3 normal_N, float shininess)
 {
     vec3 R = normalize(reflect(-lightDirection_N, normal_N));
-    float theta = max(dot(eyeDirection_N, R), 0);
-    float specularFactor = (theta == 0 && shininess == 0) ? 0 : pow(theta, shininess);
+    float theta = max(dot(eyeDirection_N, R), 0.f);
+    float specularFactor = (theta == 0.f && shininess == 0.f) ? 0.f : pow(theta, shininess);
     return specularFactor * light.Color * light.SpecularIntensity;
 }
 
@@ -215,10 +215,10 @@ float GM_CalculateShadow_Multisampling(vec3 projCoords, int cascade, float bias)
 {
     int samples = 0;
     int bound = GM_ShadowInfo.PCFRows - 1;
-    float result = 0;
-    float closestDepth = 0;
-    float di = 1.f / GM_ShadowInfo.ShadowMapWidth;
-    float dj = 1.f / GM_ShadowInfo.ShadowMapHeight;
+    float result = 0.f;
+    float closestDepth = 0.f;
+    float di = 1.f / float(GM_ShadowInfo.ShadowMapWidth);
+    float dj = 1.f / float(GM_ShadowInfo.ShadowMapHeight);
     if (GM_ShadowInfo.CascadedShadowLevel == 1)
     {
         float x = projCoords.x, y = projCoords.y;
@@ -226,8 +226,8 @@ float GM_CalculateShadow_Multisampling(vec3 projCoords, int cascade, float bias)
         {
             for (int j = -bound; j <= bound; ++j)
             {
-                float distance_i = i * di, distance_j = j * dj;
-                if ((x + distance_i >= 0 && y + distance_j >= 0) && (x + distance_i <= 1 && y + distance_j <= 1) )
+                float distance_i = float(i) * di, distance_j = float(j) * dj;
+                if ( (x + distance_i >= 0.f && y + distance_j >= 0.f) && (x + distance_i <= 1.f && y + distance_j <= 1.f) )
                 {
                     closestDepth = texture(GM_ShadowInfo.GM_ShadowMap, vec2(x + distance_i, y + distance_j)).r;
                     result += ((projCoords.z - bias) > closestDepth) ? 0.f : 1.f;
@@ -235,21 +235,21 @@ float GM_CalculateShadow_Multisampling(vec3 projCoords, int cascade, float bias)
                 }
             }
         }
-        result /= samples;
+        result /= float(samples);
         return result;
     }
     else
     {
         // 每一份Shadow Map的缩放。例如，假设Cascade Level = 3，那么第一幅Shadow Map采样范围就是0~0.333。
-        float projRatio = 1.f / GM_ShadowInfo.CascadedShadowLevel;
-        vec2 projCoordsInCSM = vec2(projRatio * (projCoords.x + cascade), projCoords.y);
+        float projRatio = 1.f / float(GM_ShadowInfo.CascadedShadowLevel);
+        vec2 projCoordsInCSM = vec2(projRatio * (projCoords.x + float(cascade)), projCoords.y);
         float x = projCoordsInCSM.x, y = projCoordsInCSM.y;
         for (int i = -bound; i <= bound; ++i)
         {
             for (int j = -bound; j <= bound; ++j)
             {
-                float distance_i = i * di, distance_j = j * dj;
-                if ((x + distance_i >= 0 && y + distance_j >= 0) && (x + distance_i <= GM_ShadowInfo.ShadowMapWidth && y + distance_j <= GM_ShadowInfo.ShadowMapHeight) )
+                float distance_i = float(i) * di, distance_j = float(j) * dj;
+                if ( (x + distance_i >= 0.f && y + distance_j >= 0.f) && (x + distance_i <= float(GM_ShadowInfo.ShadowMapWidth) && y + distance_j <= float(GM_ShadowInfo.ShadowMapHeight)) )
                 {
                     closestDepth = texture(GM_ShadowInfo.GM_ShadowMap, vec2(x + distance_i, y + distance_j)).r;
                     result += ((projCoords.z - bias) > closestDepth) ? 0.f : 1.f;
@@ -257,7 +257,7 @@ float GM_CalculateShadow_Multisampling(vec3 projCoords, int cascade, float bias)
                 }
             }
         }
-        result /= samples;
+        result /= float(samples);
         return result;
     }
 }
@@ -289,8 +289,8 @@ float GM_CalculateShadow(PS_3D_INPUT vertex)
 
     projCoords = projCoords * 0.5f + 0.5f;
 
-    if (projCoords.x > 1 || projCoords.x < 0 ||
-    projCoords.y > 1 || projCoords.y < 0 )
+    if (projCoords.x > 1.f || projCoords.x < 0.f ||
+    projCoords.y > 1.f || projCoords.y < 0.f )
     {
         return 1.f;
     }
@@ -312,8 +312,8 @@ float GM_CalculateShadow(PS_3D_INPUT vertex)
         else
         {
             // 每一份Shadow Map的缩放。例如，假设Cascade Level = 3，那么第一幅Shadow Map采样范围就是0~0.333。
-            float projRatio = 1.f / GM_ShadowInfo.CascadedShadowLevel;
-            vec2 projCoordsInCSM = vec2(projRatio * (projCoords.x + cascade), projCoords.y);
+            float projRatio = 1.f / float(GM_ShadowInfo.CascadedShadowLevel);
+            vec2 projCoordsInCSM = vec2(projRatio * (projCoords.x + float(cascade)), projCoords.y);
             closestDepth = texture(GM_ShadowInfo.GM_ShadowMap, projCoordsInCSM.xy).r;
         }
     }
@@ -488,14 +488,14 @@ vec4 GM_CookTorranceBRDF_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
             float G = GM_GeometrySmith(normal_World_N, viewDirection_N, L_N, roughness);
             vec3 F = GM_FresnelSchlick(max(dot(H_N, viewDirection_N), 0.0f), F0);
             vec3 nominator = NDF * G * F;
-            float denominator = 4 * max(dot(normal_World_N, viewDirection_N), 0.0) * max(dot(normal_World_N, L_N), 0.0) + 0.001; // 0.001 防止除0
+            float denominator = 4.f * max(dot(normal_World_N, viewDirection_N), 0.f) * max(dot(normal_World_N, L_N), 0.f) + 0.001f; // 0.001 防止除0
             vec3 specular = nominator / denominator;
 
             vec3 Ks = F;
             vec3 Kd = vec3(1, 1, 1) - Ks;
             Kd *= 1.0f - metallic;
 
-            float cosTheta = max(dot(normal_World_N, L_N), 0);
+            float cosTheta = max(dot(normal_World_N, L_N), 0.f);
             Lo += (Kd * vertex.AlbedoTexture / PI + specular) * radiance * cosTheta;
         }
     }

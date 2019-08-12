@@ -1,4 +1,4 @@
-#version 330
+#version @@@GMGL_SHADER_VERSION@@@
 #include "../foundation/foundation.h"
 #include "../foundation/properties.h"
 #include "../foundation/light.h"

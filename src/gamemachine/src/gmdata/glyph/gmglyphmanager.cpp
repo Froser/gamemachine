@@ -4,6 +4,8 @@
 #include "ft2build.h"
 #include "freetype/freetype.h"
 #include "freetype/ftglyph.h"
+#include "foundation/gamemachine.h"
+#include "gmdata/gamepackage/gmgamepackage.h"
 
 BEGIN_NS
 
@@ -197,8 +199,18 @@ const IRenderContext* GMGlyphManager::getContext()
 
 GMFontHandle GMGlyphManager::addFontByFileName(const GMString& fontFileName)
 {
-	static GMString fontPath = GMPath::getSpecialFolderPath(GMPath::Fonts);
-	return addFontByFullName(GMPath::fullname(fontPath, fontFileName));
+	GMFontHandle font = GMInvalidFontHandle;
+	GMGamePackage* package = GM.getGamePackageManager();
+	GMString packageFontPath = package->pathOf(GMPackageIndex::Fonts, fontFileName);
+	font = addFontByFullName(packageFontPath);
+	if (font == GMInvalidFontHandle)
+	{
+		static GMString fontPath = GMPath::getSpecialFolderPath(GMPath::Fonts);
+		font == addFontByFullName(GMPath::fullname(fontPath, fontFileName));
+		if (font == GMInvalidFontHandle)
+			gm_error(gm_dbg_wrap("load font failed."));
+	}
+	return font;
 }
 
 GMFontHandle GMGlyphManager::addFontByFullName(const GMString& fontFullName)
@@ -221,7 +233,6 @@ GMFontHandle GMGlyphManager::addFontByFullName(const GMString& fontFullName)
 		d->fonts.push_back(font);
 		return gm_sizet_to_uint(d->fonts.size() - 1);
 	}
-	gm_error(gm_dbg_wrap("load font failed."));
 	return GMInvalidFontHandle;
 }
 

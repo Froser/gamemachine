@@ -193,6 +193,7 @@ GMWaveGameObject::~GMWaveGameObject()
 
 void GMWaveGameObject::initShader(const IRenderContext* context)
 {
+return;
 	IGraphicEngine* engine = context->getEngine();
 	GMRenderTechniques techs;
 	GMRenderTechnique vertexTech(GMShaderType::Vertex);

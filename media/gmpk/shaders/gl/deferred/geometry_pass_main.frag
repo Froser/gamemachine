@@ -1,4 +1,4 @@
-#version 330 core
+#version @@@GMGL_SHADER_VERSION@@@
 
 #include "../foundation/foundation.h"
 #include "../foundation/properties.h"
@@ -25,7 +25,7 @@ layout (location = 7) out vec4 deferred_geometry_pass_slot_7;
 
 vec4 normalToTexture(vec3 normal)
 {
-    return vec4((normal + 1) * .5f, 1);
+    return vec4((normal + 1.f) * .5f, 1.f);
 }
 in vec4 _deferred_geometry_pass_position_world;
 
@@ -55,12 +55,12 @@ void GM_GeometryPass()
     // normal的齐次向量最后一位必须位0，因为法线变换不考虑平移
     vec3 normal_World_N = normalize( mat3(GM_InverseTransposeModelMatrix) * _normal.xyz);
     ${deferred_geometry_pass_gNormal_IlluminationModel} = normalToTexture ( normal_World_N );
-    ${deferred_geometry_pass_gNormal_IlluminationModel}.a = GM_IlluminationModel;
+    ${deferred_geometry_pass_gNormal_IlluminationModel}.a = float(GM_IlluminationModel);
 
     if (GM_NormalMapTextureAttribute.Enabled == 1)
     {
         ${deferred_geometry_pass_gNormalMap_bNormalMap} = GM_SampleTextures(GM_NormalMapTextureAttribute, _uv);
-        ${deferred_geometry_pass_gNormalMap_bNormalMap}.a = 1;
+        ${deferred_geometry_pass_gNormalMap_bNormalMap}.a = 1.f;
         if (GM_IsTangentSpaceInvalid(_tangent.xyz, _bitangent.xyz))
         {
             GMTangentSpace tangentSpace = GM_CalculateTangentSpaceRuntime(

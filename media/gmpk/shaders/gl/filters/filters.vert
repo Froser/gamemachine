@@ -1,4 +1,10 @@
-#version 330
+#version @@@GMGL_SHADER_VERSION@@@
+#if GL_ES
+precision mediump int;
+precision mediump float;
+precision mediump sampler2DShadow;
+#endif
+
 #include "../foundation/vert_header.h"
 
 out vec2 _texCoords;
