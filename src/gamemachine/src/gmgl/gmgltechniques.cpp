@@ -829,15 +829,12 @@ void GMGLTechnique_3D::beforeDraw(GMModel* model)
 
 	// 应用Shader
 	prepareShaderAttributes(model);
-	
+
 	// 设置光照模型
 	GMIlluminationModel illuminationModel = prepareIlluminationModel(model);
 
 	// 纹理
 	prepareTextures(model, illuminationModel);
-
-	// 调试绘制
-	drawDebug();
 }
 
 void GMGLTechnique_3D::afterDraw(GMModel* model)
@@ -900,15 +897,6 @@ void GMGLTechnique_3D::prepareTextures(GMModel* model, GMIlluminationModel illum
 	}
 }
 
-void GMGLTechnique_3D::drawDebug()
-{
-	D(d);
-	D_BASE(db, Base);
-	static const GMString s_GMSHADER_DEBUG_DRAW_NORMAL = GMSHADER_DEBUG_DRAW_NORMAL;
-	auto shaderProgram = getShaderProgram();
-	shaderProgram->setInt(getVariableIndex(shaderProgram, d->drawDebugNormalIndex, s_GMSHADER_DEBUG_DRAW_NORMAL), db->debugConfig.get(GMDebugConfigs::DrawPolygonNormalMode).toInt());
-}
-
 GMTextureAsset GMGLTechnique_3D::getWhiteTexture()
 {
 	D(d);
@@ -922,6 +910,8 @@ GMTextureAsset GMGLTechnique_3D::getWhiteTexture()
 void GMGLTechnique_2D::beforeDraw(GMModel* model)
 {
 	D_BASE(d, Base);
+	GMIlluminationModel illuminationModel = prepareIlluminationModel(model);
+
 	// 应用Shader
 	prepareShaderAttributes(model);
 
@@ -968,8 +958,8 @@ void GMGLTechnique_CubeMap::beforeDraw(GMModel* model)
 {
 	D(d);
 	D_BASE(db, Base);
+	GMIlluminationModel illuminationModel = prepareIlluminationModel(model);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
 	prepareShaderAttributes(model);
 	prepareTextures(model);
 }
@@ -1016,7 +1006,7 @@ GMGLTechnique_Filter::GMGLTechnique_Filter(const IRenderContext* context)
 
 GMGLTechnique_Filter::~GMGLTechnique_Filter()
 {
-	
+
 }
 
 //////////////////////////////////////////////////////////////////////////

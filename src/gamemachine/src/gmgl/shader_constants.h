@@ -10,12 +10,6 @@ BEGIN_NS
 
 #define		GMSHADER(memberName)				"GM_" memberName
 
-//位置
-#define		GMSHADER_SHADOW_MATRIX				GMSHADER("shadow_matrix")
-
-//绘制调试
-#define		GMSHADER_DEBUG_DRAW_NORMAL			GMSHADER("debug_draw_normal")
-
 //特效
 #define		GMSHADER_FRAMEBUFFER				GMSHADER("framebuffer")
 

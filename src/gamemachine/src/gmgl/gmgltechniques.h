@@ -88,7 +88,6 @@ public:
 protected:
 	void prepareMaterial(const GMShader& shader);
 	void prepareTextures(GMModel* model, GMIlluminationModel illuminationModel);
-	void drawDebug();
 
 private:
 	GMTextureAsset getWhiteTexture();
