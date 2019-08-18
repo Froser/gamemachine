@@ -389,6 +389,7 @@ vec4 GM_Phong_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
             refractionLight += spotFactor * GM_CalculateRefractionByNormalWorld(vertex.WorldPos, vertex.Normal_World_N, vertex.Refractivity);
             
 #if GM_RASPBERRYPI
+            // Raspberry Pi在这里直接算出结果
             vec3 ambientColor = GM_AmbientTextureAttribute.Enabled != 0 ? (GM_SampleTextures(GM_AmbientTextureAttribute, _uv).rgb *
                                 GM_SampleTextures(GM_LightmapTextureAttribute, _lightmapuv).rgb * GM_Material.Ka) : GM_Material.Ka;
             vec3 diffuseColor = GM_DiffuseTextureAttribute.Enabled != 0 ? (GM_SampleTextures(GM_DiffuseTextureAttribute, _uv).rgb * GM_Material.Kd) : GM_Material.Kd;
@@ -542,7 +543,7 @@ vec4 PS_3D_CalculateColor(PS_3D_INPUT vertex)
             discard;
         case GM_IlluminationModel_Phong:
             return csmIndicator + GM_Phong_CalculateColor(vertex, factor_Shadow);
-#if !GM_RASPBERRYPI
+#if !GM_RASPBERRYPI // Respberry Pi不支持PBR
         case GM_IlluminationModel_CookTorranceBRDF:
             return csmIndicator + GM_CookTorranceBRDF_CalculateColor(vertex, factor_Shadow);
 #endif

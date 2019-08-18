@@ -27,6 +27,7 @@ Respberry Pi将禁止以下特性：
 * PBR
 * 延迟渲染
 * Geometry Shader
+Respberry Pi仅支持单光源。
 
 ### 构建类别：
 * GameMachine库会提供静态版本(如lib)和动态版本(如dll)

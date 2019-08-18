@@ -12,6 +12,8 @@ BEGIN_NS
 
 namespace
 {
+	constexpr GMshort MOUSE_DELTA = 120;
+
 	GMMouseButton translateButton(GMuint32 state)
 	{
 		GMMouseButton button = GMMouseButton_None;
@@ -144,6 +146,13 @@ namespace
 
 		switch (xevent->type)
 		{
+			case ClientMessage:
+			{
+				const GMXRenderContext* context = gm_cast<const GMXRenderContext*>(window->getContext());
+				if ((Atom)xevent->xclient.data.l[0] == context->getAtomDeleteWindow())
+					newSystemEvent = new GMSystemEvent(GMSystemEventType::WindowAboutToClose);
+				break;
+			}
 			case KeymapNotify:
 				XRefreshKeyboardMapping(&xevent->xmapping);
 				gm_debug("XRefreshKeyboardMapping");
@@ -186,8 +195,29 @@ namespace
 				else if (xevent->xbutton.button == Button3)
 					triggeredButton = GMMouseButton_Right;
 
-				GM_ASSERT(type != GMSystemEventType::Unknown);
-				newSystemEvent = new GMSystemMouseEvent(type, mousePoint, triggeredButton, translateButton(xevent->xbutton.state), translateModifier(xevent->xbutton.state));
+				switch (xevent->xbutton.button)
+				{
+					case Button1:
+					case Button2:
+					case Button3:
+					{
+						GM_ASSERT(type != GMSystemEventType::Unknown);
+						newSystemEvent = new GMSystemMouseEvent(type, mousePoint, triggeredButton, translateButton(xevent->xbutton.state), translateModifier(xevent->xbutton.state));
+						break;
+					}
+					case Button4:
+					case Button5:
+					{
+						newSystemEvent = new GMSystemMouseWheelEvent(
+							mousePoint,
+							GMMouseButton_None,
+							GMMouseButton_None,
+							translateModifier(xevent->xbutton.state),
+							xevent->xbutton.button == Button4 ? MOUSE_DELTA : -MOUSE_DELTA
+						);
+						break;
+					}
+				}
 				break;
 			}
 			case MotionNotify:
@@ -220,6 +250,12 @@ namespace
 		GMScopedPtr<GMSystemEvent> guard(sysEvent);
 		GMLResult lRes = 0;
 		window->handleSystemEvent(sysEvent, lRes);
+		if (sysEvent->getType() == GMSystemEventType::WindowAboutToClose && !lRes) // lRes为0表示保持原样
+		{
+			GMSystemEvent* destroyEvent = new GMSystemEvent(GMSystemEventType::WindowAboutToDestroy);
+			GMScopedPtr<GMSystemEvent> g(destroyEvent);
+			lRes = window->handleSystemEvent(destroyEvent, lRes);
+		}
 		return lRes;
 	}
 }

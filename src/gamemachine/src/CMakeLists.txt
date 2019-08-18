@@ -359,24 +359,24 @@ set(WIN32_DX11_SOURCES
 		gmdx11/effects/binary/SOParser.h
 	)
 
-set(UNIX_SOURCES
-		foundation/platforms/unix/check.h
-		foundation/platforms/unix/thread.cpp
-		foundation/platforms/unix/timer.cpp
-		foundation/platforms/unix/gamemachine.cpp
-		foundation/platforms/unix/screen.cpp
-		foundation/platforms/unix/path.cpp
-		foundation/platforms/unix/clipboard.cpp
-		foundation/platforms/unix/utils.cpp
-		foundation/platforms/unix/event.cpp
-		foundation/platforms/unix/window/gmwindow.cpp
-		foundation/platforms/unix/window/gmwindow_opengl.cpp
-		foundation/platforms/unix/window/gminput.h
-		foundation/platforms/unix/window/gminput.cpp
-		foundation/platforms/unix/window/gmxrendercontext.h
-		foundation/platforms/unix/window/gmxrendercontext.cpp
-		foundation/platforms/unix/window/gmwindowhelper.h
-		foundation/platforms/unix/window/gmwindowhelper.cpp
+set(X11_SOURCES
+		foundation/platforms/x11/check.h
+		foundation/platforms/x11/thread.cpp
+		foundation/platforms/x11/timer.cpp
+		foundation/platforms/x11/gamemachine.cpp
+		foundation/platforms/x11/screen.cpp
+		foundation/platforms/x11/path.cpp
+		foundation/platforms/x11/clipboard.cpp
+		foundation/platforms/x11/utils.cpp
+		foundation/platforms/x11/event.cpp
+		foundation/platforms/x11/window/gmwindow.cpp
+		foundation/platforms/x11/window/gmwindow_opengl.cpp
+		foundation/platforms/x11/window/gminput.h
+		foundation/platforms/x11/window/gminput.cpp
+		foundation/platforms/x11/window/gmxrendercontext.h
+		foundation/platforms/x11/window/gmxrendercontext.cpp
+		foundation/platforms/x11/window/gmwindowhelper.h
+		foundation/platforms/x11/window/gmwindowhelper.cpp
 	)
 
 if(WIN32)
@@ -384,7 +384,7 @@ if(WIN32)
 endif(WIN32)
 
 if(UNIX)
-	list(APPEND SOURCES ${UNIX_SOURCES})
+	list(APPEND SOURCES ${X11_SOURCES})
 endif(UNIX)
 
 if(GM_USE_DX11)

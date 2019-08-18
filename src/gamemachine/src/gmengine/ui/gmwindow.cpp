@@ -154,10 +154,10 @@ void GMWindow::msgProc(const GMMessage& message)
 	{
 		if (message.object == static_cast<IWindow*>(this))
 		{
-			// 移除HWND
+			// 移除内核Window
 			onWindowDestroyed();
 
-			// 窗口(HWND)已经被Destory，因此HWND设置为0
+			// 内核窗口已经被Destory，因此Handle设置为0
 			setWindowHandle(0, false);
 
 			// 删除GM的IWindow对象
