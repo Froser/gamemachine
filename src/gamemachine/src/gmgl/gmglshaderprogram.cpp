@@ -257,7 +257,15 @@ bool GMGLShaderProgram::load()
 			return false;
 		}
 
-		glShaderSource(shader, 1, &source, NULL);
+		const GLchar* version = !GMGLHelper::isOpenGLShaderLanguageES() ? "#version 430\n" : "#version 300 es\n";
+
+#if GM_RASPBERRYPI
+		const GLchar* const sources[] = { version, "#define GM_RASPBERRYPI 1\n", source };
+		glShaderSource(shader, 3, sources, NULL);
+#else
+		const GLchar* const sources[] = { version, source };
+		glShaderSource(shader, 2, sources, NULL);
+#endif
 		glCompileShader(shader);
 
 		GLint compiled;
@@ -270,7 +278,13 @@ bool GMGLShaderProgram::load()
 			GLchar* log = new GLchar[len + 1];
 			glGetShaderInfoLog(shader, len, &len, log);
 
-			GMStringReader reader(entry.source);
+			GMString combinedSource;
+			for (const GLchar* const src : sources)
+			{
+				combinedSource += src;
+			}
+
+			GMStringReader reader(combinedSource);
 			std::string report;
 			GMint32 ln = 0;
 			auto iter = reader.lineBegin();
@@ -362,8 +376,6 @@ GMString GMGLShaderProgram::expandSource(const GMString& filename, const GMStrin
 			expandInclude(filename, n, line);
 		else if (matchMacro(line, "alias", n))
 			expandAlias(n, line);
-        else if (matchMacro(line, "version", n))
-            expandShaderVersion(line);
 		else if (matchMacro(line, "unused", n))
 			expandUnused(line, n);
 		expanded += replaceAlias(line);
@@ -431,27 +443,6 @@ void GMGLShaderProgram::expandAlias(const GMString& alias, IN OUT GMString& sour
 		d->aliasMap.insert({ "${" + replacement + "}", a });
 	}
 	source = L"";
-}
-
-void GMGLShaderProgram::expandShaderVersion(REF GMString& line)
-{
-#define VERSION_MAGIC L"@@@GMGL_SHADER_VERSION@@@"
-    static GMString s_shaderVersion;
-    static std::once_flag s_flag;
-    std::call_once(s_flag, [](GMString& version){
-        if (GMGLHelper::isOpenGLShaderLanguageES())
-        {
-            // 至少需要3.00 ES
-            version = "300 es";
-        }
-        else
-        {
-            // 着色器版本至少需要3.3
-            version = "330";
-        }
-    }, s_shaderVersion);
-    line = line.replace(VERSION_MAGIC, s_shaderVersion);
-#undef VERSION_MAGIC
 }
 
 void GMGLShaderProgram::expandUnused(REF GMString& line, const GMString& token)

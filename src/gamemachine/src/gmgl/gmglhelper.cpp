@@ -251,7 +251,7 @@ bool GMGLHelper::isOpenGLShaderLanguageES()
 	static std::once_flag flag;
 	static bool s_result;
 	std::call_once(flag, [](bool& result){
-#if GM_RASPBIAN
+#if GM_RASPBERRYPI
 		result = true;
 #else
 		std::wstring shaderLanguages = s_glinfo.shadingLanguageVersions.toStdWString();
@@ -263,7 +263,7 @@ bool GMGLHelper::isOpenGLShaderLanguageES()
 
 bool GMGLHelper::isSupportGeometryShader()
 {
-#if GM_RASPBIAN
+#if GM_RASPBERRYPI
 	return false;
 #else
 	return true;

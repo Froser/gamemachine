@@ -27,7 +27,7 @@ vec4 GM_SampleTextures(GMTexture tex, vec2 uv)
 {
     return tex.Enabled == 1
             ? vec4(texture(tex.Texture, uv * vec2(tex.ScaleX, tex.ScaleY) + vec2(tex.OffsetX, tex.OffsetY)))
-            : vec4(0);
+            : vec4(0.f, 0.f, 0.f, 0.f);
 }
 
 struct GMMaterial

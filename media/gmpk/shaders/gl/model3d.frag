@@ -33,6 +33,7 @@ void GM_Model3D()
     vec3 normal_World_N = normalEyeTransform * _normal.xyz;
     vertex.Normal_Eye_N = normalize( normal_World_N );
 
+#if !GM_RASPBERRYPI
     GMTangentSpace tangentSpace;
     if (GM_IsTangentSpaceInvalid(_tangent.xyz, _bitangent.xyz))
     {
@@ -48,47 +49,59 @@ void GM_Model3D()
             vertex.Normal_Eye_N
         ));
         tangentSpace.TBN = TBN;
-        tangentSpace.Normal_Tangent_N = GM_SampleTextures(GM_NormalMapTextureAttribute, _uv).rgb * 2.0 - 1.0;
+        tangentSpace.Normal_Tangent_N = GM_SampleTextures(GM_NormalMapTextureAttribute, _uv).rgb * 2.f - 1.f;
     }
 
     vertex.HasNormalMap = GM_NormalMapTextureAttribute.Enabled != 0;
+#else
+    vertex.HasNormalMap = false;
+#endif
 
     /// Start Debug Option
     if (GM_Debug_Normal == GM_Debug_Normal_WorldSpace)
     {
+#if !GM_RASPBERRYPI
         if (vertex.HasNormalMap)
             _frag_color = normalToTexture(normalize(mat3(GM_InverseViewMatrix) * transpose(tangentSpace.TBN) * tangentSpace.Normal_Tangent_N));
         else
+#endif
             _frag_color = normalToTexture(vertex.Normal_World_N.xyz);
         return;
     }
     else if (GM_Debug_Normal == GM_Debug_Normal_EyeSpace)
     {
+#if !GM_RASPBERRYPI
         if (vertex.HasNormalMap)
             _frag_color = normalToTexture(normalize(transpose(tangentSpace.TBN) * tangentSpace.Normal_Tangent_N));
         else
+#endif
             _frag_color = normalToTexture(vertex.Normal_Eye_N.xyz);
         return;
     }
     /// End Debug Option
 
+#if !GM_RASPBERRYPI
     vertex.TangentSpace = tangentSpace;
+#endif
+
     vertex.IlluminationModel = GM_IlluminationModel;
     if (GM_IlluminationModel == GM_IlluminationModel_Phong)
     {
         vertex.Shininess = GM_Material.Shininess;
         vertex.Refractivity = GM_Material.Refractivity;
-        vertex.AmbientLightmapTexture = GM_SampleTextures(GM_AmbientTextureAttribute, _uv).rgb
-             * GM_SampleTextures(GM_LightmapTextureAttribute, _lightmapuv).rgb * GM_Material.Ka;
+        vertex.AmbientLightmapTexture = GM_SampleTextures(GM_AmbientTextureAttribute, _uv).rgb * GM_SampleTextures(GM_LightmapTextureAttribute, _lightmapuv).rgb * GM_Material.Ka;
         vertex.DiffuseTexture = GM_SampleTextures(GM_DiffuseTextureAttribute, _uv).rgb * GM_Material.Kd;
         vertex.SpecularTexture = GM_SampleTextures(GM_SpecularTextureAttribute, _uv).rrr * GM_Material.Ks;
     }
+#if !GM_RASPBERRYPI
     else if (GM_IlluminationModel == GM_IlluminationModel_CookTorranceBRDF)
     {
         vertex.AlbedoTexture = pow(GM_SampleTextures(GM_AlbedoTextureAttribute, _uv).rgb, vec3(GM_Gamma));
         vertex.MetallicRoughnessAOTexture = GM_SampleTextures(GM_MetallicRoughnessAOTextureAttribute, _uv).rgb;
         vertex.F0 = GM_Material.F0;
     }
+#endif
+
     _frag_color = PS_3D_CalculateColor(vertex);
 
     if (GM_ColorVertexOp == GM_VertexColorOp_Multiply)

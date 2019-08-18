@@ -1,4 +1,3 @@
-#version @@@GMGL_SHADER_VERSION@@@
 #if GL_ES
 precision mediump int;
 precision mediump float;

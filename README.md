@@ -19,6 +19,15 @@ GameMachine是一款小巧的图形渲染引擎。
 * sudo apt-get install language-pack-zh-hans
 * **当安装完以上依赖后，使用CMake构建，即可完成编译。
 
+在Respberry Pi下的构建方法：
+* 除了按照Linux上述方法安装依赖之外，还需要在CMake中指定GM_RESPBERRYPI=TRUE。
+
+Respberry Pi将禁止以下特性：
+* 法线贴图
+* PBR
+* 延迟渲染
+* Geometry Shader
+
 ### 构建类别：
 * GameMachine库会提供静态版本(如lib)和动态版本(如dll)
 * 在CMake中指定GM_USE_DX11，将会构造出带DirectX11的GameMachine版本。此时请确保机器装有DirectX11 SDK。带DirectX11的GameMachine将采用带SIMD实现的线性代数库。

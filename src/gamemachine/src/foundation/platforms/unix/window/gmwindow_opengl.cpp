@@ -307,7 +307,7 @@ GLXContext GMWindow_OpenGL::createNewContext()
        contextFlags = GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB;
 #endif
 
-#if !GM_RASPBIAN
+#if !GM_RASPBERRYPI
        // OpenGL 3.3
        ATTRIB_VAL(GLX_CONTEXT_MAJOR_VERSION_ARB, 3);
        ATTRIB_VAL(GLX_CONTEXT_MINOR_VERSION_ARB, 3);

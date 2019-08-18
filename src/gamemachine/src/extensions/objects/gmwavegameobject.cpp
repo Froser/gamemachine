@@ -199,7 +199,6 @@ return;
 	GMRenderTechnique vertexTech(GMShaderType::Vertex);
 	vertexTech.setCode(
 		GMRenderEnvironment::OpenGL,
-		L"#version @@@GMGL_SHADER_VERSION@@@\n"
 		L"#include \"foundation/foundation.h\"\n"
 		L"#include \"foundation/vert_header.h\"\n"
 		GM_STRINGIFY_L(

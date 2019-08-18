@@ -102,7 +102,6 @@ void Demo_CustomGeometryShader::initCustomShader(const gm::IRenderContext* conte
 		gm::GMRenderTechnique vertexTech(gm::GMShaderType::Vertex);
 		vertexTech.setCode(
 			gm::GMRenderEnvironment::OpenGL,
-			L"#version @@@GMGL_SHADER_VERSION@@@\n"
 			L"#if GL_ES\n"
 			L"precision mediump int;\n"
 			L"precision mediump float;\n"
@@ -137,7 +136,6 @@ void Demo_CustomGeometryShader::initCustomShader(const gm::IRenderContext* conte
 		gm::GMRenderTechnique geometryTech(gm::GMShaderType::Geometry);
 		geometryTech.setCode(
 			gm::GMRenderEnvironment::OpenGL,
-			L"#version @@@GMGL_SHADER_VERSION@@@\n										"
 			L"#if GL_ES\n																"
 			L"precision mediump int;\n													"
 			L"precision mediump float;\n												"
@@ -185,7 +183,6 @@ void Demo_CustomGeometryShader::initCustomShader(const gm::IRenderContext* conte
 		gm::GMRenderTechnique pixelTech(gm::GMShaderType::Pixel);
 		pixelTech.setCode(
 			gm::GMRenderEnvironment::OpenGL,
-			L"#version @@@GMGL_SHADER_VERSION@@@\n"
 			L"#if GL_ES\n"
 			L"precision mediump int;\n"
 			L"precision mediump float;\n"
@@ -233,7 +230,6 @@ return;
 	gm::GMRenderTechnique vertexTech(gm::GMShaderType::Vertex);
 	vertexTech.setCode(
 		gm::GMRenderEnvironment::OpenGL,
-		L"#version @@@GMGL_SHADER_VERSION@@@\n"
 		L"\n"
 		L"#include \"foundation/foundation.h\"\n"
 		L"#include \"foundation/vert_header.h\"\n"

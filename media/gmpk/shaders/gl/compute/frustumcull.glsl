@@ -1,6 +1,4 @@
 // Compute Shader For Frustum Cull
-#version 430 core
-
 struct vertices_t
 {
     vec4 vertices[8];

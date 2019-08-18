@@ -159,7 +159,7 @@ GMTangentSpace GM_CalculateTangentSpaceRuntime(
     )
 {
     GMTangentSpace tangentSpace;
-    tangentSpace.Normal_Tangent_N = GM_SampleTextures(normalMap, texcoord).xyz * 2.0 - 1.0;
+    tangentSpace.Normal_Tangent_N = GM_SampleTextures(normalMap, texcoord).xyz * 2.f - 1.f;
 
     vec3 Q1  = dFdx(worldPos);
     vec3 Q2  = dFdy(worldPos);
@@ -352,27 +352,33 @@ vec4 GM_ViewCascade()
 
 vec4 GM_Phong_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
 {
-    vec3 ambientLight = vec3(0, 0, 0);
-    vec3 diffuseLight = vec3(0, 0, 0);
-    vec3 specularLight = vec3(0, 0, 0);
-    vertex.AmbientLightmapTexture = max(vertex.AmbientLightmapTexture, vec3(0, 0, 0));
-    vertex.DiffuseTexture = max(vertex.DiffuseTexture, vec3(0, 0, 0));
+    vec3 ambientLight = vec3(0.f, 0.f, 0.f);
+    vec3 diffuseLight = vec3(0.f, 0.f, 0.f);
+    vec3 specularLight = vec3(0.f, 0.f, 0.f);
+    vertex.AmbientLightmapTexture = max(vertex.AmbientLightmapTexture, vec3(0.f, 0.f, 0.f));
+    vertex.DiffuseTexture = max(vertex.DiffuseTexture, vec3(0.f, 0.f, 0.f));
     vertex.SpecularTexture = max(vertex.SpecularTexture, vec3(0, 0, 0));
 
-    vec3 refractionLight = vec3(0, 0, 0);
+    vec3 refractionLight = vec3(0.f, 0.f, 0.f);
     vec3 eyeDirection_eye = -(GM_ViewMatrix * vec4(vertex.WorldPos, 1)).xyz;
     vec3 eyeDirection_eye_N = normalize(eyeDirection_eye);
 
     // 计算漫反射和高光部分
+#if !GM_RASPBERRYPI
     if (!vertex.HasNormalMap)
+#endif
     {
+#if !GM_RASPBERRYPI
         for (int i = 0; i < GM_LightCount; i++)
+#else
+        int i = 0;
+#endif
         {
             float distance = length(vertex.WorldPos - GM_lights[i].Position);
             float attenuation = GM_lights[i].Attenuation.Constant + 
                                 GM_lights[i].Attenuation.Linear * distance +
                                 GM_lights[i].Attenuation.Exp * distance * distance;
-
+            
             vec3 lightDirection_World_N = normalize(vertex.WorldPos - GM_lights[i].Position);
             vec3 spotFactor = GMLight_Factor(GM_lights[i], lightDirection_World_N);
 
@@ -381,8 +387,17 @@ vec4 GM_Phong_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
             diffuseLight += spotFactor * GMLight_Diffuse(GM_lights[i], lightDirection_eye_N, vertex.Normal_Eye_N) / attenuation;
             specularLight += spotFactor * GMLight_Specular(GM_lights[i], lightDirection_eye_N, eyeDirection_eye_N, vertex.Normal_Eye_N, vertex.Shininess) / attenuation;
             refractionLight += spotFactor * GM_CalculateRefractionByNormalWorld(vertex.WorldPos, vertex.Normal_World_N, vertex.Refractivity);
+            
+#if GM_RASPBERRYPI
+            vec3 ambientColor = GM_AmbientTextureAttribute.Enabled != 0 ? (GM_SampleTextures(GM_AmbientTextureAttribute, _uv).rgb *
+                                GM_SampleTextures(GM_LightmapTextureAttribute, _lightmapuv).rgb * GM_Material.Ka) : GM_Material.Ka;
+            vec3 diffuseColor = GM_DiffuseTextureAttribute.Enabled != 0 ? (GM_SampleTextures(GM_DiffuseTextureAttribute, _uv).rgb * GM_Material.Kd) : GM_Material.Kd;
+            vec3 specularColor = GM_SpecularTextureAttribute.Enabled != 0 ? (GM_SampleTextures(GM_SpecularTextureAttribute, _uv).rgb * GM_Material.Ks) : GM_Material.Ks;
+            return vec4(ambientColor * ambientLight + diffuseColor * diffuseLight /*+ specularColor * specularLight*/, 1.f);
+#endif
         }
     }
+#if !GM_RASPBERRYPI
     else
     {
         for (int i = 0; i < GM_LightCount; i++)
@@ -401,18 +416,22 @@ vec4 GM_Phong_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
             vec3 eyeDirection_tangent_N = normalize(vertex.TangentSpace.TBN * eyeDirection_eye_N);
 
             ambientLight += spotFactor * GMLight_Ambient(GM_lights[i]) / attenuation;
+            diffuseLight += vertex.TangentSpace.Normal_Tangent_N.xyz;
             diffuseLight += spotFactor * GMLight_Diffuse(GM_lights[i], lightDirection_tangent_N, vertex.TangentSpace.Normal_Tangent_N) / attenuation;
             specularLight += spotFactor * GMLight_Specular(GM_lights[i], lightDirection_tangent_N, eyeDirection_tangent_N, vertex.TangentSpace.Normal_Tangent_N, vertex.Shininess) / attenuation;
             refractionLight += spotFactor * GM_CalculateRefractionByNormalTangent(vertex.WorldPos, vertex.TangentSpace, vertex.Refractivity);
         }
     }
+
     vec3 finalColor =   vertex.AmbientLightmapTexture * GM_CalculateGammaCorrectionIfNecessary(ambientLight) +
-                        vertex.DiffuseTexture * GM_CalculateGammaCorrectionIfNecessary(diffuseLight) * shadowFactor +
+                        vertex.DiffuseTexture * GM_CalculateGammaCorrectionIfNecessary(diffuseLight) * shadowFactor ;
                         specularLight * GM_CalculateGammaCorrectionIfNecessary(vertex.SpecularTexture) * shadowFactor +
                         refractionLight;
     return vec4(finalColor, 1);
+#endif
 }
 
+#if !GM_RASPBERRYPI
 // Cook Torrance BRDF
 const float PI = 3.1415927f;
 float GM_DistributionGGX(vec3 N, vec3 H, float roughness)
@@ -505,19 +524,28 @@ vec4 GM_CookTorranceBRDF_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
     color = GM_CalculateGammaCorrection(color);
     return vec4(color, 1);
 }
+#endif
 
 vec4 PS_3D_CalculateColor(PS_3D_INPUT vertex)
 {
+#if !GM_RASPBERRYPI
     float factor_Shadow = GM_CalculateShadow(vertex);
     vec4 csmIndicator = GM_ViewCascade();
+#else
+    float factor_Shadow = 1.f;
+    vec4 csmIndicator = vec4(0.f, 0.f, 0.f, 0.f);
+#endif
+    
     switch (vertex.IlluminationModel)
     {
         case GM_IlluminationModel_None:
             discard;
         case GM_IlluminationModel_Phong:
             return csmIndicator + GM_Phong_CalculateColor(vertex, factor_Shadow);
+#if !GM_RASPBERRYPI
         case GM_IlluminationModel_CookTorranceBRDF:
             return csmIndicator + GM_CookTorranceBRDF_CalculateColor(vertex, factor_Shadow);
+#endif
     }
     return vec4(0, 0, 0, 0);
 }

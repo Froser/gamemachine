@@ -249,7 +249,6 @@ void Demo_CustomLight::initCustomShader(const gm::IRenderContext* context)
 	gm::GMRenderTechnique vertexTech(gm::GMShaderType::Vertex);
 	vertexTech.setCode(
 		gm::GMRenderEnvironment::OpenGL,
-		L"#version @@@GMGL_SHADER_VERSION@@@\n"
 		L"#if GL_ES\n"
 		L"precision mediump int;\n"
 		L"precision mediump float;\n"
@@ -283,7 +282,6 @@ void Demo_CustomLight::initCustomShader(const gm::IRenderContext* context)
 	gm::GMRenderTechnique pixelTech(gm::GMShaderType::Pixel);
 	pixelTech.setCode(
 		gm::GMRenderEnvironment::OpenGL,
-		L"#version @@@GMGL_SHADER_VERSION@@@\n"
 		L"#if GL_ES\n"
 		L"precision mediump int;\n"
 		L"precision mediump float;\n"
