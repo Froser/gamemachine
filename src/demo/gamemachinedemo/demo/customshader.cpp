@@ -224,7 +224,6 @@ gm::GMRenderTechniqueID Demo_CustomAndDefaultShader::techId()
 
 void Demo_CustomAndDefaultShader::initCustomShader(const gm::IRenderContext* context)
 {
-return;
 	gm::IGraphicEngine* engine = context->getEngine();
 	gm::GMRenderTechniques techs;
 	gm::GMRenderTechnique vertexTech(gm::GMShaderType::Vertex);

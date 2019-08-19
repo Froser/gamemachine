@@ -51,8 +51,6 @@ struct GM_EXPORT GMGLHelper
 
 	static void initOpenGL();
 
-	static const GMGLInfo& getOpenGLInfo();
-
 	static bool isOpenGLShaderLanguageES();
 
 	static bool isSupportGeometryShader();

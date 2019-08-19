@@ -257,7 +257,7 @@ bool GMGLShaderProgram::load()
 			return false;
 		}
 
-		const GLchar* version = !GMGLHelper::isOpenGLShaderLanguageES() ? "#version 430\n" : "#version 300 es\n";
+		const GLchar* version = !GMGLHelper::isOpenGLShaderLanguageES() ? "#version 330\n" : "#version 300 es\n";
 
 #if GM_RASPBERRYPI
 		const GLchar* const sources[] = { version, "#define GM_RASPBERRYPI 1\n", source };

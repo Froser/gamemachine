@@ -206,7 +206,7 @@ GMFontHandle GMGlyphManager::addFontByFileName(const GMString& fontFileName)
 	if (font == GMInvalidFontHandle)
 	{
 		static GMString fontPath = GMPath::getSpecialFolderPath(GMPath::Fonts);
-		font == addFontByFullName(GMPath::fullname(fontPath, fontFileName));
+		font = addFontByFullName(GMPath::fullname(fontPath, fontFileName));
 		if (font == GMInvalidFontHandle)
 			gm_error(gm_dbg_wrap("load font failed."));
 	}

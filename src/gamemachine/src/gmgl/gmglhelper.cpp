@@ -48,19 +48,15 @@ bool GMGLHelper::loadShader(
 		filter->attachShader(shadersInfo[1]);
 	}
 
-    bool result = forward->load();
-    if (!result)
+	bool result = forward->load();
+	if (!result)
 		return result;
 
 	result = context->getEngine()->setInterface(gm::GameMachineInterfaceID::GLForwardShaderProgram, forward);
 	if (!result)
 		return result;
 
-	//result = filter->load();
-    if (!result)
-		return result;
-
-	//result = context->getEngine()->setInterface(gm::GameMachineInterfaceID::GLFiltersShaderProgram, filter);
+	result = context->getEngine()->setInterface(gm::GameMachineInterfaceID::GLFiltersShaderProgram, filter);
 	if (!result)
 		return result;
 
@@ -75,7 +71,6 @@ bool GMGLHelper::loadShader(
 			};
 			deferredGeometry->attachShader(shadersInfo[0]);
 			deferredGeometry->attachShader(shadersInfo[1]);
-
 
 			result = deferredGeometry->load();
 			if (!result)
@@ -105,7 +100,7 @@ bool GMGLHelper::loadShader(
 			if (!result)
 				return result;
 		}
-    }
+	}
 	return result;
 }
 

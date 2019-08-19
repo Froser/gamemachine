@@ -26,19 +26,19 @@ void GMShaderHelper::loadShader(const IRenderContext* context)
 	auto& env = GM.getRunningStates().renderEnvironment;
 	if (env == GMRenderEnvironment::OpenGL)
 	{
-        GMGLHelper::loadShader(
-            context,
-            L"gl/main.vert",
-            L"gl/main.frag",
-            L"gl/deferred/geometry_pass_main.vert",
-            L"gl/deferred/geometry_pass_main.frag",
-            L"gl/deferred/light_pass_main.vert",
-            L"gl/deferred/light_pass_main.frag",
-            L"gl/filters/filters.vert",
-            L"gl/filters/filters.frag"
-        );
+		GMGLHelper::loadShader(
+			context,
+			L"gl/main.vert",
+			L"gl/main.frag",
+			L"gl/deferred/geometry_pass_main.vert",
+			L"gl/deferred/geometry_pass_main.frag",
+			L"gl/deferred/light_pass_main.vert",
+			L"gl/deferred/light_pass_main.frag",
+			L"gl/filters/filters.vert",
+			L"gl/filters/filters.frag"
+		);
 
-        if (GMQueryCapability(GMCapability::SupportCalculateShader))
+		if (GMQueryCapability(GMCapability::SupportCalculateShader))
 		{
 			GMGameObject::setDefaultCullShaderCode(getFileContent(L"gl/compute/frustumcull.glsl"));
 		}
@@ -55,7 +55,6 @@ void GMShaderHelper::loadShader(const IRenderContext* context)
 
 void GMShaderHelper::loadExtensionShaders(const IRenderContext* context)
 {
-return;
 	// Wave
 	GMWaveGameObject::initShader(context);
 

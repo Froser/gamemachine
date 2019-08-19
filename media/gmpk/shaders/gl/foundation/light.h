@@ -417,7 +417,6 @@ vec4 GM_Phong_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
             vec3 eyeDirection_tangent_N = normalize(vertex.TangentSpace.TBN * eyeDirection_eye_N);
 
             ambientLight += spotFactor * GMLight_Ambient(GM_lights[i]) / attenuation;
-            diffuseLight += vertex.TangentSpace.Normal_Tangent_N.xyz;
             diffuseLight += spotFactor * GMLight_Diffuse(GM_lights[i], lightDirection_tangent_N, vertex.TangentSpace.Normal_Tangent_N) / attenuation;
             specularLight += spotFactor * GMLight_Specular(GM_lights[i], lightDirection_tangent_N, eyeDirection_tangent_N, vertex.TangentSpace.Normal_Tangent_N, vertex.Shininess) / attenuation;
             refractionLight += spotFactor * GM_CalculateRefractionByNormalTangent(vertex.WorldPos, vertex.TangentSpace, vertex.Refractivity);
@@ -425,7 +424,7 @@ vec4 GM_Phong_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
     }
 
     vec3 finalColor =   vertex.AmbientLightmapTexture * GM_CalculateGammaCorrectionIfNecessary(ambientLight) +
-                        vertex.DiffuseTexture * GM_CalculateGammaCorrectionIfNecessary(diffuseLight) * shadowFactor ;
+                        vertex.DiffuseTexture * GM_CalculateGammaCorrectionIfNecessary(diffuseLight) * shadowFactor +
                         specularLight * GM_CalculateGammaCorrectionIfNecessary(vertex.SpecularTexture) * shadowFactor +
                         refractionLight;
     return vec4(finalColor, 1);
