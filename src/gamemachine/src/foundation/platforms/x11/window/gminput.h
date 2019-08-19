@@ -34,6 +34,9 @@ public:
 	virtual IIMState& getIMState() override;
 	virtual void handleSystemEvent(GMSystemEvent* event) override;
 
+public:
+	Data& dataRef();
+
 private:
 	void recordMouseDown(GMMouseButton button);
 	void recordMouseUp(GMMouseButton button);

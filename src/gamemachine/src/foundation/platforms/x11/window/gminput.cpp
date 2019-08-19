@@ -52,14 +52,14 @@ public:
 
 GM_PRIVATE_OBJECT_UNALIGNED(GMInput)
 {
-	enum { MAX_KEYS = 256 };
+	enum { MAX_KEYS = 32 };
 	bool detectingMode = false;
 	IWindow* window = nullptr;
 
 	GMJoystickState joystickState;
 
 	// keyboard
-	GMbyte keyState[256] = {0};
+	GMbyte keyState[MAX_KEYS] = {0};
 	GMbyte lastKeyState[MAX_KEYS] = {0};
 
 	// mouse
@@ -71,7 +71,16 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMInput)
 	IMouseState* mouseImpl = nullptr;
 	IKeyboardState* keyboardImpl = nullptr;
 	IIMState* imImpl = nullptr;
+
+	void updateKeymap(GMbyte*);
 };
+
+void GMInputPrivate::updateKeymap(GMbyte* map)
+{
+	const GMXRenderContext* context = gm_cast<const GMXRenderContext*>(window->getContext());
+	Display* display = context->getDisplay();
+	XQueryKeymap(display, reinterpret_cast<char*>(map));
+}
 
 GMInput::GMInput(IWindow* window)
 {
@@ -97,6 +106,7 @@ void GMInput::update()
 {
 	D(d);
 	// restore
+	d->updateKeymap(d->lastKeyState);
 	d->wheelState.wheeled = false;
 	d->wheelState.delta = 0;
 	d->mouseState.downButton = d->mouseState.upButton = GMMouseButton_None;
@@ -106,6 +116,7 @@ void GMInput::update()
 IKeyboardState& GMInput::getKeyboardState()
 {
 	D(d);
+	d->updateKeymap(d->keyState);
 	GM_ASSERT(d->keyboardImpl);
 	return *d->keyboardImpl;
 }
@@ -165,6 +176,12 @@ void GMInput::handleSystemEvent(GMSystemEvent* event)
 	}
 }
 
+GMInput::Data& GMInput::dataRef()
+{
+	D(d);
+	return *d;
+}
+
 void GMInput::recordMouseDown(GMMouseButton button)
 {
 	D(d);
@@ -207,7 +224,7 @@ GMMouseState MouseStateImpl::state()
 	GMMouseState& state = d->mouseState;
 	state.wheeled = d->wheelState.wheeled;
 	state.wheeledDelta = static_cast<GMint32>(d->wheelState.delta);
-	
+
 	const GMXRenderContext* context = gm_cast<const GMXRenderContext*>(d->window->getContext());
 	Display* display = context->getDisplay();
 	Window window = context->getWindow()->getWindowHandle();
@@ -217,8 +234,8 @@ GMMouseState MouseStateImpl::state()
 	GMint32 x, y;
 	GMuint32 mask;
 	if (XQueryPointer(
-		display, 
-		window, 
+		display,
+		window,
 		&rw, &cw, //root, child
 		&rx, &ry, //root x, y
 		&x, &y,
@@ -244,8 +261,8 @@ GMMouseState MouseStateImpl::state()
 			const GMint32 centerX = rect.x + rect.width / 2;
 			const GMint32 centerY = rect.y + rect.height / 2;
 			setCursorPos(display, context->getRootWindow(), centerX, centerY);
-			state.deltaX = x - centerX;
-			state.deltaY = y - centerY;
+			state.deltaX = rx - centerX;
+			state.deltaY = ry - centerY;
 		}
 		else
 		{
@@ -271,7 +288,8 @@ void JoystickStateImpl::vibrate(GMushort leftMotorSpeed, GMushort rightMotorSpee
 
 bool KeyboardStateImpl::keydown(GMKey key)
 {
-	//TODO
+	GMInput::Data* d = &m_host->dataRef();
+	// todo
 	return false;
 }
 

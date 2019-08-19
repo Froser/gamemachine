@@ -148,7 +148,7 @@ namespace
 			keyMap[GMKey_Pa1] = VK_PA1;
 			keyMap[GMKey_Oem_Clear] = VK_OEM_CLEAR;
 		}, s_keyMap);
-		
+
 		auto iter = s_keyMap.find(key);
 		if (iter != s_keyMap.end())
 			return iter->second;
@@ -349,7 +349,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMInput)
 	GMJoystickState joystickState;
 
 	// keyboard
-	GMbyte keyState[256] = { 0 };
+	GMbyte keyState[MAX_KEYS] = { 0 };
 	GMbyte lastKeyState[MAX_KEYS] = { 0 };
 
 	// mouse

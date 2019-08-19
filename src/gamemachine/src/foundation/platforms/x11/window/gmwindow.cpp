@@ -115,6 +115,7 @@ namespace
 				//TODO Key Begin, Key Alt
 			}
 		}
+		return GMKey_Unknown;
 	}
 
 	void sendCharEvents(GMWindow* window, GMKey key, GMModifier m, XKeyEvent* xkey)
