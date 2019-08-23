@@ -56,6 +56,10 @@ bool GMGLHelper::loadShader(
 	if (!result)
 		return result;
 
+	result = filter->load();
+	if (!result)
+		return result;
+
 	result = context->getEngine()->setInterface(gm::GameMachineInterfaceID::GLFiltersShaderProgram, filter);
 	if (!result)
 		return result;
