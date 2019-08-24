@@ -355,9 +355,11 @@ vec4 GM_Phong_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
     vec3 ambientLight = vec3(0.f, 0.f, 0.f);
     vec3 diffuseLight = vec3(0.f, 0.f, 0.f);
     vec3 specularLight = vec3(0.f, 0.f, 0.f);
+#if !GM_RASPBERRYPI
     vertex.AmbientLightmapTexture = max(vertex.AmbientLightmapTexture, vec3(0.f, 0.f, 0.f));
     vertex.DiffuseTexture = max(vertex.DiffuseTexture, vec3(0.f, 0.f, 0.f));
     vertex.SpecularTexture = max(vertex.SpecularTexture, vec3(0, 0, 0));
+#endif
 
     vec3 refractionLight = vec3(0.f, 0.f, 0.f);
     vec3 eyeDirection_eye = -(GM_ViewMatrix * vec4(vertex.WorldPos, 1)).xyz;
@@ -383,7 +385,11 @@ vec4 GM_Phong_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
             vec3 spotFactor = GMLight_Factor(GM_lights[i], lightDirection_World_N);
 
             vec3 lightDirection_eye_N = GMLight_GetDirection_eye_N(GM_lights[i], eyeDirection_eye);
+#if !GM_RASPBERRYPI
             ambientLight += spotFactor * GMLight_Ambient(GM_lights[i]) / attenuation;
+#else
+            // ambientLight在这里会导致段错误
+#endif
             diffuseLight += spotFactor * GMLight_Diffuse(GM_lights[i], lightDirection_eye_N, vertex.Normal_Eye_N) / attenuation;
             specularLight += spotFactor * GMLight_Specular(GM_lights[i], lightDirection_eye_N, eyeDirection_eye_N, vertex.Normal_Eye_N, vertex.Shininess) / attenuation;
             refractionLight += spotFactor * GM_CalculateRefractionByNormalWorld(vertex.WorldPos, vertex.Normal_World_N, vertex.Refractivity);
@@ -394,7 +400,7 @@ vec4 GM_Phong_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
                                 GM_SampleTextures(GM_LightmapTextureAttribute, _lightmapuv).rgb * GM_Material.Ka) : GM_Material.Ka;
             vec3 diffuseColor = GM_DiffuseTextureAttribute.Enabled != 0 ? (GM_SampleTextures(GM_DiffuseTextureAttribute, _uv).rgb * GM_Material.Kd) : GM_Material.Kd;
             vec3 specularColor = GM_SpecularTextureAttribute.Enabled != 0 ? (GM_SampleTextures(GM_SpecularTextureAttribute, _uv).rgb * GM_Material.Ks) : GM_Material.Ks;
-            return vec4(ambientColor * ambientLight + diffuseColor * diffuseLight /*+ specularColor * specularLight*/, 1.f);
+            return vec4(ambientColor * ambientLight + diffuseColor * diffuseLight + specularColor * specularLight, 1.f);
 #endif
         }
     }

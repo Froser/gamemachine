@@ -235,6 +235,11 @@ namespace
 				newSystemEvent = new GMSystemMouseEvent(type, mousePoint, triggeredButton, translateButton(xevent->xbutton.state), translateModifier(xevent->xbutton.state));
 				break;
 			}
+			case ResizeRequest:
+			{
+				newSystemEvent = new GMSystemEvent(GMSystemEventType::WindowSizeChanged);
+				break;
+			}
 			default:
 				newSystemEvent = new GMSystemEvent(); // Create an empty event
 		}
