@@ -25,6 +25,7 @@ namespace luaapi
 			static const GMString s_invoker = NAME ".loadShaderOpenGL";
 			GM_LUA_CHECK_ARG_COUNT(L, 9, NAME ".loadShaderOpenGL");
 			IRenderContextProxy context(L);
+			/*
 			GMString filtersPixelFilePath = GMArgumentHelper::popArgumentAsString(L, s_invoker);
 			GMString filtersVertexFilePath = GMArgumentHelper::popArgumentAsString(L, s_invoker);
 			GMString deferredLightPixelFilePath = GMArgumentHelper::popArgumentAsString(L, s_invoker);
@@ -45,7 +46,8 @@ namespace luaapi
 				deferredLightPixelFilePath,
 				filtersVertexFilePath,
 				filtersPixelFilePath
-			);
+			);*/
+			GM_ASSERT(false); // 应该改为读取manifest
 
 			return GMReturnValues();
 		}
