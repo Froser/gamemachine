@@ -79,7 +79,10 @@ GMRenderTechniqueID GMEffectReader_1_0::parseShader(GMXMLElement* shader)
 			else
 				gm_warning(gm_dbg_wrap("Cannot recognize shader name '{0}'. Use Vertex Shader(VS) instead."), name);
 
-			GMRenderTechnique tech(shaderType);
+			GMString noincludesStr = proc->Attribute("noincludes");
+			bool noincludes = (noincludesStr == L"true");
+
+			GMRenderTechnique tech(shaderType, noincludes);
 			GMXMLElement* file = proc->FirstChildElement(); //file结点
 			while (file)
 			{

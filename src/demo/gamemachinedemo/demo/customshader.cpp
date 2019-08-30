@@ -99,7 +99,7 @@ void Demo_CustomGeometryShader::initCustomShader(const gm::IRenderContext* conte
 	{
 		gm::IGraphicEngine* engine = context->getEngine();
 		gm::GMRenderTechniques techs;
-		gm::GMRenderTechnique vertexTech(gm::GMShaderType::Vertex);
+		gm::GMRenderTechnique vertexTech(gm::GMShaderType::Vertex, true);
 		vertexTech.setCode(
 			gm::GMRenderEnvironment::OpenGL,
 			L"#if GL_ES\n"
@@ -180,7 +180,7 @@ void Demo_CustomGeometryShader::initCustomShader(const gm::IRenderContext* conte
 		);
 		techs.addRenderTechnique(geometryTech);
 
-		gm::GMRenderTechnique pixelTech(gm::GMShaderType::Pixel);
+		gm::GMRenderTechnique pixelTech(gm::GMShaderType::Pixel, true);
 		pixelTech.setCode(
 			gm::GMRenderEnvironment::OpenGL,
 			L"#if GL_ES\n"
@@ -230,8 +230,6 @@ void Demo_CustomAndDefaultShader::initCustomShader(const gm::IRenderContext* con
 	vertexTech.setCode(
 		gm::GMRenderEnvironment::OpenGL,
 		L"\n"
-		L"#include \"foundation/foundation.h\"\n"
-		L"#include \"foundation/vert_header.h\"\n"
 		L"out vec4 _model3d_position_world;"
 		L"out vec3 _cubemap_uv;"
 		L""

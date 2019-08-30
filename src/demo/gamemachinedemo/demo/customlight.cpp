@@ -246,7 +246,7 @@ void Demo_CustomLight::initCustomShader(const gm::IRenderContext* context)
 {
 	gm::IGraphicEngine* engine = context->getEngine();
 	gm::GMRenderTechniques techs;
-	gm::GMRenderTechnique vertexTech(gm::GMShaderType::Vertex);
+	gm::GMRenderTechnique vertexTech(gm::GMShaderType::Vertex, true);
 	vertexTech.setCode(
 		gm::GMRenderEnvironment::OpenGL,
 		L"#if GL_ES\n"
@@ -279,7 +279,7 @@ void Demo_CustomLight::initCustomShader(const gm::IRenderContext* context)
 	);
 	techs.addRenderTechnique(vertexTech);
 
-	gm::GMRenderTechnique pixelTech(gm::GMShaderType::Pixel);
+	gm::GMRenderTechnique pixelTech(gm::GMShaderType::Pixel, true);
 	pixelTech.setCode(
 		gm::GMRenderEnvironment::OpenGL,
 		L"#if GL_ES\n"

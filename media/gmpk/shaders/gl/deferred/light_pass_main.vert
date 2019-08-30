@@ -1,6 +1,3 @@
-#include "../foundation/foundation.h"
-#include "../foundation/vert_header.h"
-
 void main()
 {
     init_layouts();

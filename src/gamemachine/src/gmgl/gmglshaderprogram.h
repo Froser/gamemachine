@@ -30,6 +30,7 @@ public:
 	bool load();
 	GMuint32 getProgram();
 	void attachShader(const GMGLShaderInfo& shaderCfgs);
+	void setDefinesMap(GMShaderType t, const HashMap<GMString, GMString, GMStringHashFunctor>& definesMap);
 
 public:
 	virtual void useProgram();

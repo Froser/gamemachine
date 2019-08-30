@@ -1,6 +1,7 @@
 ﻿#ifndef __GMGLHELPER_H__
 #define __GMGLHELPER_H__
 #include <gmcommon.h>
+#include <gmxml.h>
 BEGIN_NS
 
 struct GMGLShaderInfo;
@@ -47,7 +48,13 @@ struct GM_EXPORT GMGLHelper
 		const GMString& filtersPixelFilePath
 	);
 
+	static bool loadShader(const IRenderContext* context, const GMString& manifest);
+
 	static const GMGLShaderInfo& getDefaultShaderCode(GMShaderType);
+
+	static Vector<GMGLShaderInfo> getDefaultShaderCodes(GMShaderType);
+
+	static Vector<GMGLShaderInfo> getDefaultShaderIncludes(GMShaderType);
 
 	static void initOpenGL();
 

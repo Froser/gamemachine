@@ -467,9 +467,9 @@ inline void GM_ZeroMemory(void* dest, GMsize_t size)
 #define GM_array_size(i) ( sizeof((i)) / sizeof((i)[0]) )
 
 #if GM_WINDOWS
-#	define GM_CRLF L"\r\n"
+#	define GM_NEXTLINE L"\r\n"
 #else
-#	define GM_CRLF L"\n"
+#	define GM_NEXTLINE L"\n"
 #endif
 
 END_NS

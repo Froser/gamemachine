@@ -26,17 +26,10 @@ void GMShaderHelper::loadShader(const IRenderContext* context)
 	auto& env = GM.getRunningStates().renderEnvironment;
 	if (env == GMRenderEnvironment::OpenGL)
 	{
-		GMGLHelper::loadShader(
-			context,
-			L"gl/main.vert",
-			L"gl/main.frag",
-			L"gl/deferred/geometry_pass_main.vert",
-			L"gl/deferred/geometry_pass_main.frag",
-			L"gl/deferred/light_pass_main.vert",
-			L"gl/deferred/light_pass_main.frag",
-			L"gl/filters/filters.vert",
-			L"gl/filters/filters.frag"
-		);
+		GMBuffer buffer;
+		GM.getGamePackageManager()->readFile(GMPackageIndex::Shaders, "gl/manifest.xml", &buffer, nullptr);
+		buffer.convertToStringBuffer();
+		GMGLHelper::loadShader(context, GMString((const char*)buffer.getData()));
 
 		if (GMQueryCapability(GMCapability::SupportCalculateShader))
 		{

@@ -92,14 +92,18 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMRenderTechnique)
 	GMString code[static_cast<GMsize_t>(GMRenderEnvironment::EndOfRenderEnvironment)];
 	GMString path[static_cast<GMsize_t>(GMRenderEnvironment::EndOfRenderEnvironment)];
 	GMString prefetch[static_cast<GMsize_t>(GMRenderEnvironment::EndOfRenderEnvironment)];
+	bool noIncludes = false;
 	GMRenderTechniques* parent = nullptr;
 };
 
 GM_DEFINE_PROPERTY(GMRenderTechnique, GMShaderType, ShaderType, shaderType)
-GMRenderTechnique::GMRenderTechnique(GMShaderType shaderType)
+GMRenderTechnique::GMRenderTechnique(GMShaderType shaderType, bool noIncludes)
 {
 	GM_CREATE_DATA();
 	setShaderType(shaderType);
+
+	D(d);
+	d->noIncludes = noIncludes;
 }
 
 GMRenderTechnique::~GMRenderTechnique()
@@ -145,6 +149,12 @@ const GMString& GMRenderTechnique::getPrefetch(GMRenderEnvironment type) const G
 {
 	D(d);
 	return d->prefetch[static_cast<GMsize_t>(type)];
+}
+
+bool GMRenderTechnique::isNoIncludes() const GM_NOEXCEPT
+{
+	D(d);
+	return d->noIncludes;
 }
 
 void GMRenderTechnique::setCode(GMRenderEnvironment type, GMString code)

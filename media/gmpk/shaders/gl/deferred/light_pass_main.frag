@@ -1,7 +1,3 @@
-#include "../foundation/foundation.h"
-#include "../foundation/properties.h"
-#include "../foundation/light.h"
-
 in vec2 _uv;
 out vec4 _frag_color;
 

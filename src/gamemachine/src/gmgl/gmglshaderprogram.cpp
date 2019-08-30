@@ -131,6 +131,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLShaderProgram)
 	GMuint32 techniqueIndex = 0;
 	HashMap<GMString, GMString, GMStringHashFunctor> aliasMap;
 	Set<GMString> unusedVariableNames;
+	Array<HashMap<GMString, GMString, GMStringHashFunctor>, (GMsize_t)GMShaderType::Geometry> definesMap;
 };
 
 GMGLShaderProgram::GMGLShaderProgram(const IRenderContext* context)
@@ -160,6 +161,14 @@ void GMGLShaderProgram::attachShader(const GMGLShaderInfo& shaderCfgs)
 {
 	D(d);
 	d->shaderInfos.push_back(shaderCfgs);
+}
+
+
+void GMGLShaderProgram::setDefinesMap(GMShaderType t, const HashMap<GMString, GMString, GMStringHashFunctor>& definesMap)
+{
+	D(d);
+	GMsize_t index = static_cast<GMsize_t>(t) - 1;
+	d->definesMap[index] = definesMap;
 }
 
 GMint32 GMGLShaderProgram::getIndex(const GMString& name)
@@ -243,33 +252,59 @@ bool GMGLShaderProgram::load()
 	GLuint program = glCreateProgram();
 	setProgram(program);
 
+	constexpr GMsize_t shaderTypes = static_cast<GMsize_t>(GMShaderType::Geometry);
+	Array<Vector<GMString>, shaderTypes> contents;
 	for (auto& entry : d->shaderInfos)
 	{
-		GLuint shader = glCreateShader(entry.type);
+		GMsize_t index = static_cast<GMsize_t>(entry.fromGLShaderType(entry.type)) - 1;
+		contents[index].push_back(entry.source + GM_NEXTLINE);
+	}
+
+	for (GMsize_t index = 0; index < shaderTypes; ++index)
+	{
+		if (contents[index].empty())
+			continue;
+
+		GLuint type = GMGLShaderInfo::toGLShaderType(static_cast<GMShaderType>(index + 1));
+		GLuint shader = glCreateShader(type);
 		d->shaders.push_back(shader);
 
-		expandSource(entry); // 展开glsl
-		const std::string& src = entry.source.toStdString();
-		const GLchar* source = src.c_str();
-		if (!source)
-		{
-			removeShaders();
-			return false;
-		}
+		//expandSource(entry); // 展开glsl
 
 		const GLchar* version = !GMGLHelper::isOpenGLShaderLanguageES() ? "#version 330\n" : "#version 300 es\n";
+		Vector<const GLchar*> sourcesVector = { version };
+		GMint32 fileOffset = 0;
 
 #if GM_RASPBERRYPI
-		const GLchar* const sources[] = { version, "#define GM_RASPBERRYPI 1\n", source };
-		glShaderSource(shader, 3, sources, NULL);
-#else
-		const GLchar* const sources[] = { version, source };
-		glShaderSource(shader, 2, sources, NULL);
+		sourcesVector.push_back("#define GM_RASPBERRYPI 1\n");
+		fileOffset = 1;
 #endif
+		GMString definesString;
+		for (auto& definesMap : d->definesMap[index])
+		{
+			definesString += "#define " + definesMap.first + " " + definesMap.second + GM_NEXTLINE;
+		}
+
+		Vector<std::string> codeCache;
+		if (!definesString.isEmpty())
+			codeCache.push_back(definesString.toStdString());
+
+		for (const auto& src : contents[index])
+		{
+			codeCache.push_back(src.toStdString());
+		}
+
+		for (const auto& src : codeCache)
+		{
+			sourcesVector.push_back(src.c_str());
+		}
+
+		glShaderSource(shader, gm_sizet_to_int(sourcesVector.size()), sourcesVector.data(), NULL);
 		glCompileShader(shader);
 
 		GLint compiled;
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
+
 		if (!compiled)
 		{
 			GLsizei len;
@@ -278,31 +313,40 @@ bool GMGLShaderProgram::load()
 			GLchar* log = new GLchar[len + 1];
 			glGetShaderInfoLog(shader, len, &len, log);
 
-			GMString combinedSource;
-			for (const GLchar* const src : sources)
+			GMint32 ln = 0, fn = fileOffset;
+			for (const GMString& src : contents[index])
 			{
-				combinedSource += src;
+				GMStringReader reader(src);
+				std::string line;
+				auto iter = reader.lineBegin();
+				do
+				{
+					line += std::to_string(++ln) + ":\t" + (*iter).toStdString();
+					iter++;
+				} while (iter.hasNextLine());
+				line += std::to_string(++ln) + ":\t" + (*iter).toStdString();
+				gm_error(gm_dbg_wrap("Shader source of file {0}: {1}{2}"), GMString(++fn), GMString(GM_NEXTLINE), line);
+				ln = 0;
 			}
-
-			GMStringReader reader(combinedSource);
-			std::string report;
-			GMint32 ln = 0;
-			auto iter = reader.lineBegin();
-			do
-			{
-				report += std::to_string(++ln) + ":\t" + (*iter).toStdString();
-				iter++;
-			} while (iter.hasNextLine());
-
-			gm_error(gm_dbg_wrap("Shader source: \n{0}"), report);
 			gm_error(gm_dbg_wrap("Shader compilation failed: {0}"), log);
-			gm_error(gm_dbg_wrap("filename: {0} {1}"), GM_CRLF, GMString(entry.filename));
 			GM_ASSERT(false);
 			GMMessage crashMsg(GameMachineMessageType::CrashDown);
 			GM.postMessage(crashMsg);
 			GM_delete_array(log);
 			removeShaders();
 			return false;
+		}
+		else
+		{
+#if GM_DEBUG
+			GLint ss;
+			glGetShaderiv(shader, GL_SHADER_SOURCE_LENGTH, &ss);
+			GLchar* _src = new GLchar[ss]; // 1MB source
+			GLsizei len;
+			glGetShaderSource(shader, ss, &len, _src);
+			gm_debug(gm_dbg_wrap("Source: {0}"), GMString(_src));
+			GM_delete_array(_src);
+#endif
 		}
 
 		glAttachShader(program, shader);
@@ -319,7 +363,7 @@ bool GMGLShaderProgram::load()
 
 		GLchar* log = new GLchar[len + 1];
 		glGetProgramInfoLog(program, len, &len, log);
-		gm_error(log);
+		gm_error(gm_dbg_wrap("{0}"), GMString(log));
 		GM_ASSERT(false);
 		GMMessage crashMsg(GameMachineMessageType::CrashDown);
 		GM.postMessage(crashMsg);
@@ -357,7 +401,7 @@ void GMGLShaderProgram::removeShaders()
 }
 
 void GMGLShaderProgram::expandSource(REF GMGLShaderInfo& shaderInfo)
- {
+{
 	D(d);
 	// 解析源码，展开gm特有的宏
 	shaderInfo.source = expandSource(shaderInfo.filename, shaderInfo.source);
@@ -419,9 +463,9 @@ void GMGLShaderProgram::expandInclude(const GMString& workingDir, const GMString
 	if (GM.getGamePackageManager()->readFileFromPath(include, &buf))
 	{
 		buf.convertToStringBuffer();
-		GMString expanded = L"// GameMachine include file: " + dir + f + GM_CRLF;
+		GMString expanded = L"// GameMachine include file: " + dir + f + GM_NEXTLINE;
 		expanded += GMString((char*)buf.getData());
-		source = expandSource(include, expanded) + GM_CRLF;
+		source = expandSource(include, expanded) + GM_NEXTLINE;
 	}
 	else
 	{
@@ -543,7 +587,7 @@ void GMGLComputeShaderProgram::load(const GMString& path, const GMString& source
 
 			gm_error(gm_dbg_wrap("Shader source: \n{0}"), report);
 			gm_error(gm_dbg_wrap("Shader compilation failed: {0}"), log);
-			gm_error(gm_dbg_wrap("filename: {0} {1}"), GM_CRLF, path);
+			gm_error(gm_dbg_wrap("filename: {0} {1}"), GM_NEXTLINE, path);
 			GM_ASSERT(false);
 			GMMessage crashMsg(GameMachineMessageType::CrashDown);
 			GM.postMessage(crashMsg);

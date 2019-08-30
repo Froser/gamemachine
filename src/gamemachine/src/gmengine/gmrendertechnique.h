@@ -43,7 +43,7 @@ class GM_EXPORT GMRenderTechnique
 	GM_FRIEND_CLASS(GMRenderTechniques)
 
 public:
-	GMRenderTechnique(GMShaderType shaderType);
+	GMRenderTechnique(GMShaderType shaderType, bool noIncludes = false);
 	GMRenderTechnique(const GMRenderTechnique& rhs);
 	GMRenderTechnique(GMRenderTechnique&& rhs) GM_NOEXCEPT;
 	GMRenderTechnique& operator=(const GMRenderTechnique& rhs);
@@ -54,6 +54,7 @@ public:
 	const GMString& getCode(GMRenderEnvironment type) const GM_NOEXCEPT;
 	const GMString& getPath(GMRenderEnvironment type) const GM_NOEXCEPT;
 	const GMString& getPrefetch(GMRenderEnvironment type) const GM_NOEXCEPT;
+	bool isNoIncludes() const GM_NOEXCEPT;
 
 public:
 	void setCode(GMRenderEnvironment type, GMString code);

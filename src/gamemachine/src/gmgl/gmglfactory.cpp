@@ -90,9 +90,16 @@ void GMGLFactory::createEmptyTexture(const IRenderContext* context, REF GMTextur
 
 void GMGLFactory::createShaderPrograms(const IRenderContext* context, const GMRenderTechniqueManager& manager, REF Vector<IShaderProgram*>* out)
 {
-	GMGLShaderInfo s_vs, s_ps;
-	s_vs = GMGLHelper::getDefaultShaderCode(GMShaderType::Vertex);
-	s_ps = GMGLHelper::getDefaultShaderCode(GMShaderType::Pixel);
+	static Vector<GMGLShaderInfo> s_vertexShaders, s_pixelShaders, s_vertexIncludes, s_pixelIncludes;
+	if (s_vertexShaders.empty())
+		s_vertexShaders = GMGLHelper::getDefaultShaderCodes(GMShaderType::Vertex);
+	if (s_pixelShaders.empty())
+		s_pixelShaders = GMGLHelper::getDefaultShaderCodes(GMShaderType::Pixel);
+	if (s_vertexIncludes.empty())
+		s_vertexIncludes = GMGLHelper::getDefaultShaderIncludes(GMShaderType::Vertex);
+	if (s_pixelIncludes.empty())
+		s_pixelIncludes = GMGLHelper::getDefaultShaderIncludes(GMShaderType::Pixel);
+
 	for (auto& renderTechniques : manager.getRenderTechniques())
 	{
 		const auto& techniques = renderTechniques.getTechniques();
@@ -105,17 +112,48 @@ void GMGLFactory::createShaderPrograms(const IRenderContext* context, const GMRe
 				hasVS = true;
 			else if (t == GMShaderType::Pixel)
 				hasPS = true;
-
-			GMGLShaderInfo shaderInfo = { GMGLShaderInfo::toGLShaderType(t), technique.getCode(GMRenderEnvironment::OpenGL), t == GMShaderType::Vertex ? s_vs.filename : s_ps.filename };
-			shaderProgram->attachShader(shaderInfo);
 		}
 
-		// 如果着色器程序没有VS或PS(FS)，则使用默认的
+		// 如果着色器程序没有VS或PS(FS)，则使用默认的，并且不使用includes
 		if (!hasVS)
-			shaderProgram->attachShader(s_vs);
+		{
+			for (const auto& s : s_vertexShaders)
+			{
+				shaderProgram->attachShader(s);
+			}
+		}
 
 		if (!hasPS)
-			shaderProgram->attachShader(s_ps);
+		{
+			for (const auto& s : s_pixelShaders)
+			{
+				shaderProgram->attachShader(s);
+			}
+		}
+
+		for (auto& technique : techniques)
+		{
+			GMShaderType t = technique.getShaderType();
+			GMGLShaderInfo shaderInfo = { GMGLShaderInfo::toGLShaderType(t), technique.getCode(GMRenderEnvironment::OpenGL), t == GMShaderType::Vertex ? "VS Memory" : "PS Memory" };
+			// 如果一个自定义着色器程序指定了不忽略include路径（这个也是默认行为），那么在这个着色器代码前将会指定插入manifest文件中shaders/includes所指定的文件。
+			// 但是，如果一个自定义着色器程序的某个着色器过程缺失，它将采用默认的着色器过程（来源于shaders/*[default=true]的结点），此时它便不会在这些默认着色器代码前插入shaders/includes所指定的文件。
+			bool ignoreIncludes = technique.isNoIncludes();
+			if (t == GMShaderType::Vertex && hasVS && !ignoreIncludes)
+			{
+				for (const auto& s : s_vertexIncludes)
+				{
+					shaderProgram->attachShader(s);
+				}
+			}
+			else if (t == GMShaderType::Pixel && hasPS && !ignoreIncludes)
+			{
+				for (const auto& s : s_pixelIncludes)
+				{
+					shaderProgram->attachShader(s);
+				}
+			}
+			shaderProgram->attachShader(shaderInfo);
+		}
 
 		shaderProgram->load();
 		if (out)
