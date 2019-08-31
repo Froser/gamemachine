@@ -8,6 +8,7 @@
 #include "gmengine/particle/cocos2d/gmparticlemodel_cocos2d.h"
 #include "extensions/objects/gmwavegameobject.h"
 #include "extensions/objects/gmwavegameobject_p.h"
+#include "gmdx11techniques.h"
 
 namespace
 {
@@ -73,4 +74,11 @@ void gmdx11_ext_renderWaveObjectShader(gm::GMWaveGameObject* waveObject, gm::ISh
 		GM_DX_HR(description->GetMemberByName(SPEED)->AsScalar()->SetFloat(d.waveDescriptions[i].speed));
 		GM_DX_HR(description->GetMemberByName(WAVELENGTH)->AsScalar()->SetFloat(d.waveDescriptions[i].waveLength));
 	}
+}
+
+ID3DX11Effect* gmdx11_getEffectFromTechnique(gm::ITechnique* technique)
+{
+	gm::GMDx11Technique* dxTechnique = gm::gm_cast<gm::GMDx11Technique*>(technique);
+	ID3DX11Effect* effect = dxTechnique->getEffect();
+	return effect;
 }

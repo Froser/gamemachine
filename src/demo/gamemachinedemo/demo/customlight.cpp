@@ -7,6 +7,7 @@
 #	include <gmdx11technique.h>
 #endif
 #include <gmlight.h>
+#include <dx11wrapper.h>
 
 namespace
 {
@@ -122,8 +123,7 @@ namespace
 	public:
 		virtual void activateLight(gm::GMuint32 index, gm::ITechnique* technique)
 		{
-			gm::GMDx11Technique* dxTechnique = gm::gm_cast<gm::GMDx11Technique*>(technique);
-			ID3DX11Effect* effect = dxTechnique->getEffect();
+			ID3DX11Effect* effect = DirectX11GetEffectFromTechnique(technique);
 			GM_ASSERT(effect);
 
 			auto lightAttributes = effect->GetVariableByName("lights");

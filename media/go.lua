@@ -68,8 +68,8 @@ handler.init = function(context)
 	local fontBufferEN = gamepackage:readFile(8, "times.ttf")
 	local handleCN = glyphManager:addFontByMemory(fontBufferCN)
 	local handleEN = glyphManager:addFontByMemory(fontBufferEN)
-	glyphManager:setDefaultFontCN(handleCN)
-	glyphManager:setDefaultFontEN(handleEN)
+	glyphManager:setCN(handleCN)
+	glyphManager:setEN(handleEN)
 
 	uiconfiguration = GMUIConfiguration.new(context) -- 创建UI资源
 	local skinBuffer = gamepackage:readFile(3, "skin.gmskin") -- 3: 纹理资源。读取皮肤
@@ -128,7 +128,7 @@ handler.start = function()
 		material.specular = { 0, 0, 0 }
 	end
 
-	local gameobject = GMGameObject.new()
+	local gameobject = GMSkeletalGameObject.new()
 	gameobject:setAsset(asset)
 	gameobject:setTranslation(translate(0, -.5, 0))
 	gameobject:setScaling(scale(.02, .02, .02))
@@ -159,10 +159,11 @@ end
 handler.onLoadShaders = function(context)
 	if (GM.getRunningStates().renderEnvironment == 1) then--opengl
 		GMDebugger.info('OpenGL detected.')
+		GMShaderHelper.loadShaderOpenGL(context, 'gl/manifest.xml')
 	else
 		GMDebugger.info('DirectX11 detected.')
+		GMShaderHelper.loadShaderDx11(context, 'dx11/effect.fx')
 	end
-	GMShaderHelper.loadShader(context)
 end
 
 -- 设置处理器

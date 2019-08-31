@@ -25,29 +25,13 @@ namespace luaapi
 			static const GMString s_invoker = NAME ".loadShaderOpenGL";
 			GM_LUA_CHECK_ARG_COUNT(L, 9, NAME ".loadShaderOpenGL");
 			IRenderContextProxy context(L);
-			/*
-			GMString filtersPixelFilePath = GMArgumentHelper::popArgumentAsString(L, s_invoker);
-			GMString filtersVertexFilePath = GMArgumentHelper::popArgumentAsString(L, s_invoker);
-			GMString deferredLightPixelFilePath = GMArgumentHelper::popArgumentAsString(L, s_invoker);
-			GMString deferredLightVertexFilePath = GMArgumentHelper::popArgumentAsString(L, s_invoker);
-			GMString deferredGeometryPixelFilePath = GMArgumentHelper::popArgumentAsString(L, s_invoker);
-			GMString deferredGeometryVertexFilePath = GMArgumentHelper::popArgumentAsString(L, s_invoker);
-			GMString forwardPixelFilePath = GMArgumentHelper::popArgumentAsString(L, s_invoker);
-			GMString forwardVertexFilePath = GMArgumentHelper::popArgumentAsString(L, s_invoker);
+			GMString manifestPath = GMArgumentHelper::popArgumentAsString(L, s_invoker);
 			GMArgumentHelper::popArgumentAsObject(L, context, s_invoker);
 
-			GMGLHelper::loadShader(
-				context.get(),
-				forwardVertexFilePath,
-				forwardPixelFilePath,
-				deferredGeometryVertexFilePath,
-				deferredGeometryPixelFilePath,
-				deferredLightVertexFilePath,
-				deferredLightPixelFilePath,
-				filtersVertexFilePath,
-				filtersPixelFilePath
-			);*/
-			GM_ASSERT(false); // 应该改为读取manifest
+			GMBuffer buffer;
+			GM.getGamePackageManager()->readFile(GMPackageIndex::Shaders, manifestPath, &buffer, nullptr);
+			buffer.convertToStringBuffer();
+			GMGLHelper::loadShader(context.get(), GMString((const char*)buffer.getData()));
 
 			return GMReturnValues();
 		}

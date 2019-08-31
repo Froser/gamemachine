@@ -3,8 +3,7 @@
 #endif
 
 #include <gamemachine.h>
-#include <gmgl.h>
-#include <gmglhelper.h>
+#include <gmshaderhelper.h>
 #include <gmdiscretedynamicsworld.h>
 #include <gmphysicsshape.h>
 #include <gmgraphicengine.h>
@@ -207,24 +206,7 @@ public:
 		/************************************************************************/
 		/* 从先前指定的游戏包中，读取着色器                                        */
 		/************************************************************************/
-		if (GM.getRunningStates().renderEnvironment == GMRenderEnvironment::OpenGL)
-		{
-			GMGLHelper::loadShader(
-				context,
-				L"gl/main.vert",
-				L"gl/main.frag",
-				L"gl/deferred/geometry_pass_main.vert",
-				L"gl/deferred/geometry_pass_main.frag",
-				L"gl/deferred/light_pass_main.vert",
-				L"gl/deferred/light_pass_main.frag",
-				L"gl/filters/filters.vert",
-				L"gl/filters/filters.frag"
-			);
-		}
-		else
-		{
-			DirectX11LoadShader(context, L"dx11/effect.fx");
-		}
+		GMShaderHelper::loadShader(context);
 	}
 
 private:

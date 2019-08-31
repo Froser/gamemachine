@@ -15,12 +15,14 @@ typedef IFactory* (*CREATE_PROC)();
 typedef void(*SHADER_LOAD_PROC)(const IRenderContext*, const GMString&);
 typedef void (*SHADER_EXT_LOAD_PROC)(const IRenderContext*);
 typedef void(*EXT_WAVE_OBJECT_SHADER_RENDER_PROC)(const gm::GMWaveGameObject* waveObject, IShaderProgram* shaderProgram);
+typedef ID3DX11Effect* (*GET_EFFECTS_PROC)(gm::ITechnique* technique);
 
 static HMODULE s_hDx11;
 static CREATE_PROC s_createProc;
 static SHADER_LOAD_PROC s_shaderProc;
 static SHADER_EXT_LOAD_PROC s_extensionShaderProc;
 static EXT_WAVE_OBJECT_SHADER_RENDER_PROC s_waveObjShaderRenderProc;
+static GET_EFFECTS_PROC s_getEffectsProc;
 #endif
 
 extern "C"
@@ -133,4 +135,30 @@ extern "C"
 		GM_ASSERT(false); //shouldn't be here
 #endif
 	}
+}
+
+GM_EXPORT ID3DX11Effect* DirectX11GetEffectFromTechnique(gm::ITechnique* technique)
+{
+#if GM_WINDOWS
+#if GM_USE_DX11
+	return gmdx11_getEffectFromTechnique(technique);
+#else
+	if (!s_getEffectsProc)
+	{
+		s_getEffectsProc = (GET_EFFECTS_PROC)GetProcAddress(s_hDx11, "gmdx11_getEffectFromTechnique");
+		if (!s_getEffectsProc)
+		{
+			gm_error(gm_dbg_wrap("Method not found."));
+			return nullptr;
+		}
+	}
+	if (s_getEffectsProc)
+		return s_getEffectsProc(technique);
+	gm_error(gm_dbg_wrap("Invoke method failed. This method shouldn't be invoked."));
+	return nullptr;
+#endif
+#else
+	GM_ASSERT(false); //shouldn't be here
+	return nullptr;
+#endif
 }
