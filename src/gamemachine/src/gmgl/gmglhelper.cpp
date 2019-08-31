@@ -12,7 +12,7 @@ namespace
 	GMGLInfo s_glinfo;
 	Vector<GMGLShaderInfo> s_defaultShaders;
 	Vector<GMGLShaderInfo> s_defaultIncludes;
-	
+
 	bool parseShaderType(const char* type, GMShaderType st, GMXMLElement* e, Vector<GMGLShaderInfo>& infos, DefinesMap& definesMap)
 	{
 		e = e->FirstChildElement(type);
@@ -108,42 +108,40 @@ bool parseShaderTag(const IRenderContext* context, const char* tag, GMXMLElement
 	{
 		if (GMString::stringEquals(condition, "except_raspberrypi"))
 			return true;
-#else
-	{
-#endif
-		bool isDefault = false;
-		const char* defaultStr = e->Attribute("default");
-		if (defaultStr && GMString::stringEquals(defaultStr, "true"))
-			isDefault = true;
-
-		DefinesMap vsdm, psdm, gsdm;
-		Vector<GMGLShaderInfo> shaderInfos;
-		bool r = parseShaderType("vs", GMShaderType::Vertex, e, shaderInfos, vsdm);
-		if (!r) return r;
-		r = parseShaderType("ps", GMShaderType::Pixel, e, shaderInfos, psdm);
-		if (!r) return r;
-		r = parseShaderType("gs", GMShaderType::Geometry, e, shaderInfos, gsdm);
-		if (!r) return r;
-
-		if (isDefault)
-			s_defaultShaders = shaderInfos;
-
-		GMGLShaderProgram* prog = new GMGLShaderProgram(context);
-		prog->setDefinesMap(GMShaderType::Vertex, vsdm);
-		prog->setDefinesMap(GMShaderType::Pixel, psdm);
-		prog->setDefinesMap(GMShaderType::Geometry, gsdm);
-
-		for (auto& shaderInfo : shaderInfos)
-		{
-			prog->attachShader(shaderInfo);
-		}
-
-		r = prog->load();
-		if (!r) return r;
-
-		r = context->getEngine()->setInterface(interfaceID, prog);
-		if (!r) return r;
 	}
+#endif
+	bool isDefault = false;
+	const char* defaultStr = e->Attribute("default");
+	if (defaultStr && GMString::stringEquals(defaultStr, "true"))
+		isDefault = true;
+
+	DefinesMap vsdm, psdm, gsdm;
+	Vector<GMGLShaderInfo> shaderInfos;
+	bool r = parseShaderType("vs", GMShaderType::Vertex, e, shaderInfos, vsdm);
+	if (!r) return r;
+	r = parseShaderType("ps", GMShaderType::Pixel, e, shaderInfos, psdm);
+	if (!r) return r;
+	r = parseShaderType("gs", GMShaderType::Geometry, e, shaderInfos, gsdm);
+	if (!r) return r;
+
+	if (isDefault)
+		s_defaultShaders = shaderInfos;
+
+	GMGLShaderProgram* prog = new GMGLShaderProgram(context);
+	prog->setDefinesMap(GMShaderType::Vertex, vsdm);
+	prog->setDefinesMap(GMShaderType::Pixel, psdm);
+	prog->setDefinesMap(GMShaderType::Geometry, gsdm);
+
+	for (auto& shaderInfo : shaderInfos)
+	{
+		prog->attachShader(shaderInfo);
+	}
+
+	r = prog->load();
+	if (!r) return r;
+
+	r = context->getEngine()->setInterface(interfaceID, prog);
+	if (!r) return r;
 	return true;
 }
 
