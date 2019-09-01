@@ -28,7 +28,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->loadPackage(path);
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -46,9 +46,9 @@ namespace luaapi
 		{
 			GMBufferProxy buffer(L, new GMBuffer());
 			self->readFile(type, filename, buffer.get());
-			return GMReturnValues(L, buffer);
+			return gm::GMReturnValues(L, buffer);
 		}
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	bool GMGamePackageProxy::registerMeta()

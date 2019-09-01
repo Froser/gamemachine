@@ -44,7 +44,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->renderScene();
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -63,7 +63,7 @@ namespace luaapi
 			self->addObjectAndInit(gameobject.get());
 			gameobject.setAutoRelease(false);
 		}
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -79,7 +79,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->addToRenderList(gameobject.get());
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 	//////////////////////////////////////////////////////////////////////////
 	namespace

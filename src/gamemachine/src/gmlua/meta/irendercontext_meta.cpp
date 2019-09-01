@@ -63,9 +63,9 @@ namespace luaapi
 		{
 			IWindowProxy window(L);
 			window.set(self->getWindow());
-			return GMReturnValues(L, window);
+			return gm::GMReturnValues(L, window);
 		}
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -81,9 +81,9 @@ namespace luaapi
 		{
 			IGraphicEngineProxy engine(L);
 			engine.set(self->getEngine());
-			return GMReturnValues(L, engine);
+			return gm::GMReturnValues(L, engine);
 		}
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 }
 END_NS

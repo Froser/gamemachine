@@ -16,7 +16,7 @@ GM_LUA_FUNC(add)
 	GM_LUA_CHECK_ARG_COUNT(L, 2, "add");
 	GMfloat b = luaapi::GMArgumentHelper::popArgument(L, "add").toFloat();
 	GMfloat a = luaapi::GMArgumentHelper::popArgument(L, "add").toFloat();
-	return luaapi::GMReturnValues(L, a + b);
+	return GMReturnValues(L, a + b);
 }
 
 void GameMachineLua::registerFunctions(GMLua* L)

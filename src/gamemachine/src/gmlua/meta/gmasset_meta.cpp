@@ -29,9 +29,9 @@ namespace luaapi
 		{
 			GMSceneProxy scene(L);
 			scene.set(self->getScene());
-			return GMReturnValues(L, scene);
+			return gm::GMReturnValues(L, scene);
 		}
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -48,9 +48,9 @@ namespace luaapi
 			auto m = self->getModel();
 			GMModelProxy model(L);
 			model.set(m);
-			return GMReturnValues(L, model);
+			return gm::GMReturnValues(L, model);
 		}
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	bool GMAssetProxy::registerMeta()
@@ -118,7 +118,7 @@ namespace luaapi
 		}
 
 		GMLuaVector<GMAssetProxy> models(assets);
-		return GMReturnValues(L, models);
+		return gm::GMReturnValues(L, models);
 	}
 }
 END_NS

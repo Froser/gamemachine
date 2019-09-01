@@ -53,7 +53,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->setAsset(*asset.get());
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -68,7 +68,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->setTranslation(mat);
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -84,7 +84,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->setRotation(quat);
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 
@@ -100,7 +100,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->setScaling(mat);
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -115,7 +115,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->update(dt);
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 	namespace
 	{

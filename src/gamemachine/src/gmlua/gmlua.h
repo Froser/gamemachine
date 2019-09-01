@@ -103,7 +103,7 @@ class GM_EXPORT GMLua
 	GM_DECLARE_PRIVATE(GMLua)
 	GM_DISABLE_COPY_ASSIGN(GMLua)
 	friend struct luaapi::GMArgumentHelper;
-	friend struct luaapi::GMReturnValues;
+	friend struct GMReturnValues;
 
 public:
 	GMLua();
@@ -208,17 +208,9 @@ private:
 	  \sa GMObject::registerMeta()
 	*/
 	bool popTable(GMObject& obj, GMint32 index);
-
 	bool popVector(GMVec2& v);
-	void pushVector(const GMVec2& v);
-
 	bool popVector(GMVec3& v);
-	void pushVector(const GMVec3& v);
-
 	bool popVector(GMVec4& v);
-	void pushVector(const GMVec4& v);
-
-	void pushMatrix(const GMMat4& v);
 	bool popMatrix(GMMat4& v);
 
 	//! 返回Lua的栈顶的变量。
@@ -229,7 +221,6 @@ private:
 	GMVariant getTop();
 	GMVariant get(GMint32 index);
 	GMLuaReference popFunction(bool* valid = nullptr);
-	void push(const GMVariant& var);
 	void pop(GMint32 num);
 
 public:
@@ -278,7 +269,7 @@ private:
 	static const GMString s_invoker = FuncName;												\
 	GM_LUA_CHECK_ARG_COUNT(L, 0,FuncName);													\
 	Proxy proxy(L, new Real());																\
-	return gm::luaapi::GMReturnValues(L, GMVariant(proxy));									\
+	return gm::GMReturnValues(L, GMVariant(proxy));									\
 }
 
 #define GM_LUA_NEW_IMPL_ARG(New, FuncName, Proxy, Real, Arg0ProxyType) GM_LUA_FUNC(New)		\
@@ -288,7 +279,7 @@ private:
 	gm::luaapi::Arg0ProxyType arg0(L);														\
 	gm::luaapi::GMArgumentHelper::popArgumentAsObject(L, arg0, s_invoker);					\
 	Proxy proxy(L, new Real(arg0.get()));													\
-	return gm::luaapi::GMReturnValues(L, GMVariant(proxy));									\
+	return gm::GMReturnValues(L, GMVariant(proxy));									\
 }
 
 #define GM_LUA_PROXY_IMPL(Proxy, FuncName) gm::luaapi::GMFunctionReturn GM_PRIVATE_NAME(Proxy)::FuncName(GMLuaCoreState* L)
@@ -308,7 +299,7 @@ private:
 		static const GMString s_invoker = #proxyClass ".__index";											\
 		proxyClass self(L, nullptr);																		\
 		GMVariant key = gm::luaapi::GMArgumentHelper::peekArgument(L, 2, s_invoker); /*key*/				\
-		HashMap<GMString, std::function<gm::luaapi::GMReturnValues()>, GMStringHashFunctor> __s_indexMap;	\
+		HashMap<GMString, std::function<gm::GMReturnValues()>, GMStringHashFunctor> __s_indexMap;	\
 		if (__s_indexMap.empty())																			\
 		{
 
@@ -318,13 +309,13 @@ private:
 			gm::luaapi::GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/		\
 			targetProxy proxy(L, nullptr);														\
 			proxy.set(&self->get##name());														\
-			return gm::luaapi::GMReturnValues(L, proxy); }; }
+			return gm::GMReturnValues(L, proxy); }; }
 
 #define GM_LUA_PROPERTY_GETTER(name, memberName) \
 		{ __s_indexMap[#memberName] = [&]() {													\
 			GMArgumentHelper::popArgument(L, s_invoker); /*key*/								\
 			GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/					\
-			return gm::luaapi::GMReturnValues(L, (self->get##name())); }; }
+			return gm::GMReturnValues(L, (self->get##name())); }; }
 
 #define GM_LUA_PROPERTY_TYPE_INT toInt
 #define GM_LUA_PROPERTY_TYPE_INT64 toInt64
@@ -381,7 +372,7 @@ private:
 			{																																	\
 				gm_error(gm_dbg_wrap("wrong lua property type."));																				\
 			}																																	\
-			return gm::luaapi::GMReturnValues();																								\
+			return gm::GMReturnValues();																								\
 		}; }
 
 #define GM_LUA_END_PROPERTY() \
@@ -394,7 +385,10 @@ private:
 					return itemIter->second();													\
 		}																						\
 	}																							\
-	return gm::luaapi::GMReturnValues();
+	return gm::GMReturnValues();
 
 END_NS
+
+#include "gmlua_helper.h"
+
 #endif

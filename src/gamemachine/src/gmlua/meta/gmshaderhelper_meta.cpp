@@ -33,7 +33,7 @@ namespace luaapi
 			buffer.convertToStringBuffer();
 			GMGLHelper::loadShader(context.get(), GMString((const char*)buffer.getData()));
 
-			return GMReturnValues();
+			return gm::GMReturnValues();
 		}
 
 		GM_LUA_FUNC(loadShaderDx11)
@@ -48,7 +48,7 @@ namespace luaapi
 #else
 			DirectX11LoadShader(context.get(), path);
 #endif
-			return GMReturnValues();
+			return gm::GMReturnValues();
 		}
 
 		GM_LUA_FUNC(loadShader)
@@ -58,7 +58,7 @@ namespace luaapi
 			IRenderContextProxy context(L);
 			GMArgumentHelper::popArgumentAsObject(L, context, s_invoker);
 			GMShaderHelper::loadShader(context.get());
-			return GMReturnValues();
+			return gm::GMReturnValues();
 		}
 
 		// {{END META FUNCTION}}

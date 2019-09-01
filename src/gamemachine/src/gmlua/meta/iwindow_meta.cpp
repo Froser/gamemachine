@@ -90,7 +90,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->create(desc.get());
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -104,7 +104,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->centerWindow();
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -118,7 +118,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->showWindow();
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -139,7 +139,7 @@ namespace luaapi
 			self->setHandler(gameHandler.get());
 			self->getGraphicEngine()->setShaderLoadCallback(gameHandler.getShaderLoadCallback());
 		}
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -155,9 +155,9 @@ namespace luaapi
 		{
 			IInputProxy proxy(L);
 			proxy.set(self->getInputManager());
-			return GMReturnValues(L, proxy);
+			return gm::GMReturnValues(L, proxy);
 		}
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -173,7 +173,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->addWidget(widget.get());
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 }
 END_NS

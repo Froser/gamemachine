@@ -122,7 +122,7 @@ namespace
 
 		int dummyMultiResults(gm::GMLuaCoreState* l)
 		{
-			return gm::luaapi::GMReturnValues(
+			return gm::GMReturnValues(
 				l,
 				gm::GMVariant(1),
 				gm::GMVariant(true),

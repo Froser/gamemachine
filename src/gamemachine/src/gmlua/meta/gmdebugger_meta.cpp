@@ -17,7 +17,7 @@ namespace luaapi
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".info");
 		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, s_invoker);
 		gm_info(arg0);
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	GM_LUA_FUNC(error)
@@ -26,7 +26,7 @@ namespace luaapi
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".error");
 		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, s_invoker);
 		gm_error(arg0);
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	GM_LUA_FUNC(warning)
@@ -35,7 +35,7 @@ namespace luaapi
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".warning");
 		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, s_invoker);
 		gm_warning(arg0);
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	GM_LUA_FUNC(debug)
@@ -44,7 +44,7 @@ namespace luaapi
 		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".debug");
 		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, s_invoker);
 		gm_debug(arg0);
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 	// {{END META FUNCTION}}
 

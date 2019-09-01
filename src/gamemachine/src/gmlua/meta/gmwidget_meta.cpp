@@ -74,7 +74,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->import(*buffer.get());
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -90,7 +90,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->initResourceManager(resourceManager.get());
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -106,7 +106,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->registerWidget(widget.get());
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -121,9 +121,9 @@ namespace luaapi
 		if (self)
 		{
 			GMWidgetProxy widget(L, self->createWidget());
-			return GMReturnValues(L, widget);
+			return gm::GMReturnValues(L, widget);
 		}
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -142,7 +142,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->setPosition(x, y);
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -158,7 +158,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->setSize(width, height);
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -173,7 +173,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->setTitle(title);
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -192,7 +192,7 @@ namespace luaapi
 			self->addControl(control.get());
 			control.setAutoRelease(false); // 生命周期由GMWidget管理
 		}
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	//////////////////////////////////////////////////////////////////////////

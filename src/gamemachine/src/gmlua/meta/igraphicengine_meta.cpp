@@ -54,7 +54,7 @@ namespace luaapi
 			light.setAutoRelease(false);
 			self->addLight(light.get());
 		}
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -71,9 +71,9 @@ namespace luaapi
 			GMCamera& camera = self->getCamera();
 			GMCameraProxy proxy(L);
 			proxy.set(&camera);
-			return GMReturnValues(L, proxy);
+			return gm::GMReturnValues(L, proxy);
 		}
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -90,9 +90,9 @@ namespace luaapi
 			IFramebuffers* defaultFramebuffers = self->getDefaultFramebuffers();
 			IFramebuffersProxy proxy(L);
 			proxy.set(defaultFramebuffers);
-			return GMReturnValues(L, proxy);
+			return gm::GMReturnValues(L, proxy);
 		}
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -109,9 +109,9 @@ namespace luaapi
 			GMGlyphManager* glyphManager = self->getGlyphManager();
 			GMGlyphManagerProxy proxy(L);
 			proxy.set(glyphManager);
-			return GMReturnValues(L, proxy);
+			return gm::GMReturnValues(L, proxy);
 		}
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	bool IGraphicEngineProxy::registerMeta()
@@ -176,7 +176,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->lookAt(lookAt.toCameraLookAt());
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -194,7 +194,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->setPerspective(fovy, aspect, n, f);
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -214,7 +214,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->setOrtho(left, right, bottom, top, n, f);
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	bool GMCameraProxy::registerMeta()
@@ -248,7 +248,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->clear(type);
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	bool IFramebuffersProxy::registerMeta()

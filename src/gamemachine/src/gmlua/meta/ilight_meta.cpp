@@ -29,7 +29,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (v3.isVec3() && (type.isInt() || type.isInt64()))
 			self->setLightAttribute3(type.toInt(), ValuePointer(v3.toVec3()));
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -45,7 +45,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if ((f.isFloat() || f.isInt()) && (type.isInt() || type.isInt64()))
 			self->setLightAttribute(type.toInt(), f.isFloat() ? f.toFloat() : f.toInt());
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	bool ILightProxy::registerMeta()

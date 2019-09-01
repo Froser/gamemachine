@@ -55,14 +55,14 @@ namespace luaapi
 	{
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".exit");
 		GM.exit();
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	GM_LUA_FUNC(getRunningStates)
 	{
 		GMGameMachineRunningStatesProxy proxy;
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".getRunningStates");
-		return GMReturnValues (L, GMVariant(proxy));
+		return gm::GMReturnValues (L, GMVariant(proxy));
 	}
 
 	GM_LUA_FUNC(getGamePackageManager)
@@ -70,7 +70,7 @@ namespace luaapi
 		GMGamePackageProxy proxy(L);
 		proxy.set(GM.getGamePackageManager());
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".getGamePackageManager");
-		return GMReturnValues(L, GMVariant(proxy));
+		return gm::GMReturnValues(L, GMVariant(proxy));
 	}
 
 	GM_LUA_FUNC(addWindow)
@@ -81,14 +81,14 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, window, s_invoker);
 		window.setAutoRelease(false);
 		GM.addWindow(window.get());
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	GM_LUA_FUNC(startGameMachine)
 	{
 		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".startGameMachine");
 		GM.startGameMachine();
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	// {{END META FUNCTION}}

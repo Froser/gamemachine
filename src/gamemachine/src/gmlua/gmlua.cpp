@@ -60,22 +60,6 @@ namespace
 	};
 
 	template <typename T>
-	void __pushVector(const T& v, GMLuaCoreState* l)
-	{
-		GM_CHECK_LUA_STACK_BALANCE_(l, 1);
-		lua_newtable(l);
-		GMFloat4 f4;
-		v.loadFloat4(f4);
-		for (GMint32 i = 0; i < T::length(); i++)
-		{
-			lua_pushnumber(l, i);
-			lua_pushnumber(l, f4[i]);
-			GM_ASSERT(lua_istable(l, -3));
-			lua_settable(l, -3);
-		}
-	}
-
-	template <typename T>
 	bool __popVector(T& v, GMint32 index, GMLuaCoreState* l)
 	{
 		GM_CHECK_LUA_STACK_BALANCE_(l, 0);
@@ -266,7 +250,8 @@ GMLuaResult GMLua::runString(const GMString& string)
 void GMLua::setToGlobal(const char* name, const GMVariant& var)
 {
 	D(d);
-	push(var);
+	GMLuaArguments args(getLuaCoreState());
+	args.pushArgument(var);
 	lua_setglobal(L, name);
 }
 
@@ -378,9 +363,10 @@ GMLuaResult GMLua::pcall(const char* functionName, const std::initializer_list<G
 	if (functionName)
 		lua_getglobal(L, functionName);
 
+	GMLuaArguments a(getLuaCoreState());
 	for (const auto& var : args)
 	{
-		push(var);
+		a.pushArgument(var);
 	}
 
 	GMLuaResult lr = { (GMLuaStates)lua_pcall(L, gm_sizet_to_uint(args.size()), nRet, 0) };
@@ -571,22 +557,10 @@ bool GMLua::popVector(GMVec2& v)
 	return __popVector(v, d->luaState);
 }
 
-void GMLua::pushVector(const GMVec2& v)
-{
-	D(d);
-	__pushVector(v, d->luaState);
-}
-
 bool GMLua::popVector(GMVec3& v)
 {
 	D(d);
 	return __popVector(v, d->luaState);
-}
-
-void GMLua::pushVector(const GMVec3& v)
-{
-	D(d);
-	__pushVector(v, d->luaState);
 }
 
 bool GMLua::popVector(GMVec4& v)
@@ -595,84 +569,11 @@ bool GMLua::popVector(GMVec4& v)
 	return __popVector(v, d->luaState);
 }
 
-void GMLua::pushVector(const GMVec4& v)
-{
-	D(d);
-	__pushVector(v, d->luaState);
-}
-
-void GMLua::pushMatrix(const GMMat4& v)
-{
-	D(d);
-	GM_CHECK_LUA_STACK_BALANCE(1);
-	lua_newtable(L);
-	for (GMint32 i = 0; i < GMMat4::length(); i++)
-	{
-		lua_pushnumber(L, i);
-		pushVector(v[i]);
-		GM_ASSERT(lua_istable(L, -3));
-		lua_settable(L, -3);
-	}
-}
-
 bool GMLua::popMatrix(GMMat4& v)
 {
 	D(d);
 	GM_CHECK_LUA_STACK_BALANCE(0);
 	return __popMatrix(v, lua_gettop(L), L);
-}
-
-void GMLua::push(const GMVariant& var)
-{
-	D(d);
-	GM_CHECK_LUA_STACK_BALANCE(1);
-	if (var.isInt() || var.isInt64())
-	{
-		lua_pushinteger(L, var.toInt64());
-	}
-	else if (var.isUInt())
-	{
-		lua_pushinteger(L, var.toUInt());
-	}
-	else if (var.isFloat())
-	{
-		lua_pushnumber(L, var.toFloat());
-	}
-	else if (var.isBool())
-	{
-		lua_pushboolean(L, var.toBool());
-	}
-	else if (var.isString())
-	{
-		std::string str = var.toString().toStdString();
-		lua_pushstring(L, str.c_str());
-	}
-	else if (var.isObject())
-	{
-		pushNewTable(*var.toObject());
-	}
-	else if (var.isPointer())
-	{
-		GM_STATIC_ASSERT(sizeof(lua_Integer) >= sizeof(void*), "Pointer size incompatible.");
-		lua_pushinteger(L, (lua_Integer)var.toPointer());
-	}
-	else if (var.isVec2())
-	{
-		pushVector(var.toVec2());
-	}
-	else if (var.isVec3())
-	{
-		pushVector(var.toVec3());
-	}
-	else if (var.isVec4())
-	{
-		pushVector(var.toVec4());
-	}
-	else
-	{
-		gm_error(gm_dbg_wrap("GMLua (push): variant type not supported"));
-		GM_ASSERT(false);
-	}
 }
 
 void GMLua::pop(GMint32 num)
@@ -687,6 +588,7 @@ void GMLua::setTable(const char* key, const GMObjectMember& value)
 	GM_CHECK_LUA_STACK_BALANCE(0);
 	lua_pushstring(L, key);
 
+	GMLuaArguments args(getLuaCoreState());
 	switch (value.type)
 	{
 	case GMMetaMemberType::Int:
@@ -707,28 +609,28 @@ void GMLua::setTable(const char* key, const GMObjectMember& value)
 	case GMMetaMemberType::Vector2:
 	{
 		GMVec2& vec2 = *static_cast<GMVec2*>(value.ptr);
-		pushVector(vec2);
+		args.pushArgument(vec2);
 		GM_ASSERT(lua_istable(L, -1));
 		break;
 	}
 	case GMMetaMemberType::Vector3:
 	{
 		GMVec3& vec3 = *static_cast<GMVec3*>(value.ptr);
-		pushVector(vec3);
+		args.pushArgument(vec3);
 		GM_ASSERT(lua_istable(L, -1));
 		break;
 	}
 	case GMMetaMemberType::Vector4:
 	{
 		GMVec4& vec4 = *static_cast<GMVec4*>(value.ptr);
-		pushVector(vec4);
+		args.pushArgument(vec4);
 		GM_ASSERT(lua_istable(L, -1));
 		break;
 	}
 	case GMMetaMemberType::Matrix4x4:
 	{
 		GMMat4& mat = *static_cast<GMMat4*>(value.ptr);
-		pushMatrix(mat);
+		args.pushArgument(mat);
 		GM_ASSERT(lua_istable(L, -1));
 		break;
 	}

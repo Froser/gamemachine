@@ -34,47 +34,6 @@ namespace luaapi
 		static bool popArgumentAsObject(GMLuaCoreState* L, REF GMObject& obj, const GMString& invoker);
 	};
 
-	struct GM_EXPORT GMReturnValues
-	{
-	public:
-		template <typename... VariantType>
-		GMReturnValues(GMLuaCoreState* L, VariantType&&... args)
-			: m_size (sizeof...(args))
-			, m_L(L)
-		{
-			pushArgument((args)...);
-		}
-
-		GMReturnValues()
-			: m_size(0)
-		{}
-
-		GMReturnValues(const GMReturnValues& rhs)
-			: m_size(rhs.m_size)
-			, m_L(const_cast<GMReturnValues&>(rhs).m_L.getLuaCoreState())
-		{}
-
-		operator GMint32()
-		{
-			return gm_sizet_to_int(m_size);
-		}
-
-	private:
-		template <typename... VariantType>
-		void pushArgument(const GMVariant& arg, VariantType&&... args)
-		{
-			pushArgument(arg);
-			pushArgument(std::forward<VariantType>(args)...);
-		}
-
-		void pushArgument(const GMVariant& arg);
-
-	private:
-		GMsize_t m_size = 0;
-		GMLua m_L;
-	};
-
-
 	// Lua模板类，用于模拟一些容器
 	#define __META(memberName) \
 	{ \
@@ -112,7 +71,7 @@ namespace luaapi
 			GMLuaVector self;
 			GMArgumentHelper::popArgumentAsObject(l, self, s_invoker); //self
 			self.release();
-			return GMReturnValues();
+			return gm::GMReturnValues();
 		}
 
 		static GMFunctionReturn __index(GMLuaCoreState* l)
@@ -121,7 +80,7 @@ namespace luaapi
 			GMLuaVector self;
 			GMVariant i = GMArgumentHelper::popArgument(l, s_invoker); //i
 			GMArgumentHelper::popArgumentAsObject(l, self, s_invoker); //self
-			return GMReturnValues(l, (*(self.value))[i.toInt() - 1]);
+			return gm::GMReturnValues(l, (*(self.value))[i.toInt() - 1]);
 		}
 
 		static GMFunctionReturn size(GMLuaCoreState* l)
@@ -129,7 +88,7 @@ namespace luaapi
 			static const GMString s_invoker = "GMLuaVector.size";
 			GMLuaVector self;
 			GMArgumentHelper::popArgumentAsObject(l, self, s_invoker); //self
-			return GMReturnValues(l, gm_sizet_to_int(self.value->size()));
+			return gm::GMReturnValues(l, gm_sizet_to_int(self.value->size()));
 		}
 
 	private:

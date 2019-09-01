@@ -183,9 +183,9 @@ namespace luaapi
 		{
 			IKeyboardStateProxy proxy(L);
 			proxy.set(&self->getKeyboardState());
-			return GMReturnValues(L, proxy);
+			return gm::GMReturnValues(L, proxy);
 		}
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -201,9 +201,9 @@ namespace luaapi
 		{
 			IJoystickStateProxy proxy(L);
 			proxy.set(&self->getJoystickState());
-			return GMReturnValues(L, proxy);
+			return gm::GMReturnValues(L, proxy);
 		}
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -219,9 +219,9 @@ namespace luaapi
 		{
 			IMouseStateProxy proxy(L);
 			proxy.set(&self->getMouseState());
-			return GMReturnValues(L, proxy);
+			return gm::GMReturnValues(L, proxy);
 		}
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -234,8 +234,8 @@ namespace luaapi
 		IMouseStateProxy self(L);
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
-			return GMReturnValues(L, GMMouseStateProxy(self->state()));
-		return GMReturnValues();
+			return gm::GMReturnValues(L, GMMouseStateProxy(self->state()));
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -250,7 +250,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->setDetectingMode(b);
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -264,8 +264,8 @@ namespace luaapi
 		GMKey key = static_cast<GMKey>(GMArgumentHelper::popArgument(L, s_invoker).toInt()); //key
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
-			GMReturnValues(L, self->keydown(key));
-		return GMReturnValues();
+			gm::GMReturnValues(L, self->keydown(key));
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -279,8 +279,8 @@ namespace luaapi
 		GMKey key = static_cast<GMKey>(GMArgumentHelper::popArgument(L, s_invoker).toInt()); //key
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
-			return GMReturnValues(L, self->keyTriggered(key));
-		return GMReturnValues();
+			return gm::GMReturnValues(L, self->keyTriggered(key));
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -296,7 +296,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->vibrate(left, right);
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -309,8 +309,8 @@ namespace luaapi
 		IJoystickStateProxy self(L);
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
-			return GMReturnValues(L, GMJoystickStateProxy(self->state()));
-		return GMReturnValues();
+			return gm::GMReturnValues(L, GMJoystickStateProxy(self->state()));
+		return gm::GMReturnValues();
 	}
 }
 END_NS

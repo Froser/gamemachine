@@ -116,16 +116,4 @@ bool GMArgumentHelper::popArgumentAsObject(GMLuaCoreState* L, REF GMObject& obj,
 	return true;
 }
 
-void GMReturnValues::pushArgument(const GMVariant& arg)
-{
-	if (arg.isObject())
-	{
-		m_L.pushNewTable(*arg.toObject());
-	}
-	else
-	{
-		m_L.push(arg);
-	}
-}
-
 END_NS

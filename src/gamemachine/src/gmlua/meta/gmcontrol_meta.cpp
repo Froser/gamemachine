@@ -22,9 +22,9 @@ namespace luaapi
 		{
 			GMControlButton* c = GMControlButton::createControl(widget.get(), text, x, y, width, height, false);
 			GMControlButtonProxy control(L, c);
-			return GMReturnValues(L, control);
+			return gm::GMReturnValues(L, control);
 		}
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 	// {{END META FUNCTION}}
 

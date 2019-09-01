@@ -28,8 +28,8 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, buffer, s_invoker); //buffer
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
-			return GMReturnValues(L, self->addFontByMemory(std::move(*buffer.get())));
-		return GMReturnValues();
+			return gm::GMReturnValues(L, self->addFontByMemory(std::move(*buffer.get())));
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -44,7 +44,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->setDefaultFontEN(fontHandle);
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	/*
@@ -59,7 +59,7 @@ namespace luaapi
 		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->setDefaultFontCN(fontHandle);
-		return GMReturnValues();
+		return gm::GMReturnValues();
 	}
 
 	bool GMGlyphManagerProxy::registerMeta()

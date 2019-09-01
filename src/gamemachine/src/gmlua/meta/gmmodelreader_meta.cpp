@@ -76,7 +76,7 @@ namespace luaapi
 			GMSceneAsset asset;
 			GMModelReader::load(settings.toModelLoadSettings(), GMModelReader::Assimp, asset);
 			GMAssetProxy proxy(L, asset);
-			return GMReturnValues(L, proxy);
+			return gm::GMReturnValues(L, proxy);
 		}
 		// {{END META FUNCTION}}
 
