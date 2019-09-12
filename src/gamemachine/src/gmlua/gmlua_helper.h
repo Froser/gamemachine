@@ -9,11 +9,11 @@ class GM_EXPORT GMLuaArguments
 	GM_DECLARE_PRIVATE(GMLuaArguments);
 
 public:
-	GMLuaArguments(GMLuaCoreState* l, std::initializer_list<GMMetaMemberType> types = {});
+	GMLuaArguments(GMLuaCoreState* l, const GMString& invoker = L"", std::initializer_list<GMMetaMemberType> types = {});
 	~GMLuaArguments();
 
 	bool isValid();
-	GMVariant getArgument(GMint32 index, const GMString& invoker);
+	GMVariant getArgument(GMint32 index);
 	void pushArgument(const GMVariant& arg);
 };
 

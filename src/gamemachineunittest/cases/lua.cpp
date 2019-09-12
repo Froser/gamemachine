@@ -120,6 +120,26 @@ namespace
 			return 0;
 		}
 
+		// 参数列表：
+		// string, vec2, vec3, vec4, bool, float, matrix
+		int testScalar(gm::GMLuaCoreState* l)
+		{
+			gm::GMLuaArguments args(l, "testScalar",
+			{
+				gm::GMMetaMemberType::String,
+				gm::GMMetaMemberType::Vector2,
+				gm::GMMetaMemberType::Vector3,
+				gm::GMMetaMemberType::Vector4,
+				gm::GMMetaMemberType::Boolean,
+				gm::GMMetaMemberType::Float,
+				gm::GMMetaMemberType::Matrix4x4
+			});
+
+			// 在这里添加unittest
+
+			return 0;
+		}
+
 		int dummyMultiResults(gm::GMLuaCoreState* l)
 		{
 			return gm::GMReturnValues(
@@ -239,6 +259,7 @@ void cases::Lua::addToUnitTest(UnitTest& ut)
 		{
 			static gm::GMLuaReg r[] = {
 				{ "dummy", dummyCFunc },
+				{ "testScalar", testScalar },
 				{ "multi", dummyMultiResults },
 				{ 0 }
 			};

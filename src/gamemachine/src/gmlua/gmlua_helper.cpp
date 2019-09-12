@@ -23,8 +23,8 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMLuaArguments)
 	std::initializer_list<GMMetaMemberType> types;
 	GMint32 totalSize = 0;
 	Vector<GMint32> indices;
+	GMString invoker;
 
-	GMint32 typeSizeof(GMMetaMemberType type);
 	void calculateSize();
 	void pushVector(const GMVec2& v);
 	void pushVector(const GMVec3& v);
@@ -52,23 +52,6 @@ void __pushVector(const T& v, GMLuaCoreState* l)
 	}
 }
 
-GMint32 GMLuaArgumentsPrivate::typeSizeof(GMMetaMemberType type)
-{
-	switch (type)
-	{
-	case GMMetaMemberType::Vector2:
-		return 2;
-	case GMMetaMemberType::Vector3:
-		return 3;
-	case GMMetaMemberType::Vector4:
-		return 4;
-	case GMMetaMemberType::Matrix4x4:
-		return 16;
-	default:
-		return 1;
-	}
-}
-
 void GMLuaArgumentsPrivate::calculateSize()
 {
 	totalSize = 0;
@@ -76,7 +59,7 @@ void GMLuaArgumentsPrivate::calculateSize()
 	GMint32 idx = 0;
 	for (auto& type : types)
 	{
-		totalSize += typeSizeof(type);
+		++totalSize;
 		indices[idx++] = totalSize;
 	}
 }
@@ -186,7 +169,7 @@ GMint32 GMLuaArgumentsPrivate::getIndexInStack(GMint32 offset, GMint32 index, OU
 	GMint32 i = 0;
 	for (auto type : types)
 	{
-		result += typeSizeof(type);
+		++result;
 		if (++i >= index)
 		{
 			if (t)
@@ -239,13 +222,26 @@ void GMLuaArgumentsPrivate::checkType(const GMVariant& v, GMMetaMemberType mt, G
 	}
 }
 
-GMLuaArguments::GMLuaArguments(GMLuaCoreState* l, std::initializer_list<GMMetaMemberType> types)
+GMLuaArguments::GMLuaArguments(GMLuaCoreState* l, const GMString& invoker, std::initializer_list<GMMetaMemberType> types)
 {
 	GM_CREATE_DATA();
 	D(d);
 	d->types = types;
 	d->L = l;
 	d->calculateSize();
+	d->invoker = invoker;
+
+	GMsize_t sz = d->types.size();
+	if (sz > 0)
+	{
+		// 如果存在size，那么说明是准备获取参数，此时检查参数个数。
+		if (lua_gettop(l) < sz)
+		{
+			// 如果传的参数与实际接收的不一致，那么直接报错
+			std::string ivk = invoker.toStdString();
+			luaL_error(l, "Arguments count not match. The expected count is %i but current is %i.", static_cast<GMint32>(sz), lua_gettop(l));
+		}
+	}
 }
 
 GMLuaArguments::~GMLuaArguments()
@@ -259,7 +255,7 @@ bool GMLuaArguments::isValid()
 	return lua_gettop(d->L) == d->totalSize;
 }
 
-GMVariant GMLuaArguments::getArgument(GMint32 index, const GMString& invoker)
+GMVariant GMLuaArguments::getArgument(GMint32 index)
 {
 	D(d);
 	// 先从index中找到索引
@@ -273,7 +269,7 @@ GMVariant GMLuaArguments::getArgument(GMint32 index, const GMString& invoker)
 		// v = d->getObject(i);
 
 	// 检查这个类型是否与期望的一致
-	d->checkType(v, type, index, invoker);
+	d->checkType(v, type, index, d->invoker);
 	return v;
 }
 
