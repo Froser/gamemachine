@@ -87,7 +87,6 @@ void GMLuaArgumentsPrivate::pushVector(const GMVec4& v)
 
 void GMLuaArgumentsPrivate::push(const GMVariant& var)
 {
-	GM_CHECK_LUA_STACK_BALANCE(1);
 	if (var.isInt() || var.isInt64())
 	{
 		lua_pushinteger(L, var.toInt64());
@@ -144,7 +143,6 @@ void GMLuaArgumentsPrivate::push(const GMVariant& var)
 
 void GMLuaArgumentsPrivate::pushMatrix(const GMMat4& v)
 {
-	GM_CHECK_LUA_STACK_BALANCE(1);
 	lua_newtable(L);
 	for (GMint32 i = 0; i < GMMat4::length(); i++)
 	{
@@ -200,7 +198,7 @@ bool GMLuaArgumentsPrivate::getObject(GMint32 index, REF GMObject* objRef)
 		return false;
 	}
 	
-	bool completelyMatch = true;
+	bool found = false;
 
 	// 之后可能要用到的临时变量
 	GMfloat t[4];
@@ -220,16 +218,20 @@ bool GMLuaArgumentsPrivate::getObject(GMint32 index, REF GMObject* objRef)
 				{
 				case GMMetaMemberType::String:
 					*(static_cast<GMString*>(member.second.ptr)) = lua_tostring(L, -1);
+					found = true;
 					break;
 				case GMMetaMemberType::Float:
 					*(static_cast<GMfloat*>(member.second.ptr)) = lua_tonumber(L, -1);
+					found = true;
 					break;
 				case GMMetaMemberType::Boolean:
 					*(static_cast<bool*>(member.second.ptr)) = !!lua_toboolean(L, -1);
+					found = true;
 					break;
 				case GMMetaMemberType::Function:
 				{
 					*(static_cast<GMLuaReference*>(member.second.ptr)) = ref();
+					found = true;
 					break;
 				}
 				case GMMetaMemberType::Int:
@@ -245,9 +247,10 @@ bool GMLuaArgumentsPrivate::getObject(GMint32 index, REF GMObject* objRef)
 					GMVec2& v = *static_cast<GMVec2*>(member.second.ptr);
 					GMint32 top = lua_gettop(L);
 					if (getVec(top, t))
+					{
 						v = GMVec2(t[0], t[1]);
-					else
-						if (completelyMatch) completelyMatch = false;
+						found = true;
+					}
 					break;
 				}
 				case GMMetaMemberType::Vector3:
@@ -255,9 +258,10 @@ bool GMLuaArgumentsPrivate::getObject(GMint32 index, REF GMObject* objRef)
 					GMVec3& v = *static_cast<GMVec3*>(member.second.ptr);
 					GMint32 top = lua_gettop(L);
 					if (getVec(top, t))
+					{
 						v = GMVec3(t[0], t[1], t[2]);
-					else
-						if (completelyMatch) completelyMatch = false;
+						found = true;
+					}
 					break;
 				}
 				case GMMetaMemberType::Vector4:
@@ -265,9 +269,10 @@ bool GMLuaArgumentsPrivate::getObject(GMint32 index, REF GMObject* objRef)
 					GMVec4& v = *static_cast<GMVec4*>(member.second.ptr);
 					GMint32 top = lua_gettop(L);
 					if (getVec(top, t))
+					{
 						v = GMVec4(t[0], t[1], t[2], t[3]);
-					else
-						if (completelyMatch) completelyMatch = false;
+						found = true;
+					}
 					break;
 				}
 				case GMMetaMemberType::Matrix4x4:
@@ -275,16 +280,17 @@ bool GMLuaArgumentsPrivate::getObject(GMint32 index, REF GMObject* objRef)
 					GMMat4& mat = *static_cast<GMMat4*>(member.second.ptr);
 					GMint32 top = lua_gettop(L);
 					if (getMat4(top, f16.v_))
+					{
 						mat.setFloat16(f16);
-					else
-						if (completelyMatch) completelyMatch = false;
+						found = true;
+					}
 					break;
 				}
 				case GMMetaMemberType::Object:
 				{
-					bool match = getObject(lua_gettop(L), *static_cast<GMObject**>(member.second.ptr));
-					if (!match && completelyMatch)
-						completelyMatch = false;
+					bool b = getObject(lua_gettop(L), *static_cast<GMObject**>(member.second.ptr));
+					if (!b)
+						found = false;
 					break;
 				}
 				case GMMetaMemberType::Pointer:
@@ -292,6 +298,7 @@ bool GMLuaArgumentsPrivate::getObject(GMint32 index, REF GMObject* objRef)
 					GM_STATIC_ASSERT_SIZE(GMsize_t, sizeof(void*));
 					lua_Integer address = lua_tointeger(L, -1);
 					*(static_cast<GMsize_t*>(member.second.ptr)) = address;
+					found = true;
 					break;
 				}
 				default:
@@ -303,7 +310,7 @@ bool GMLuaArgumentsPrivate::getObject(GMint32 index, REF GMObject* objRef)
 		lua_pop(L, 1); // 移除value，使用key来进行下一个迭代
 	}
 
-	return completelyMatch;
+	return found;
 }
 
 GMint32 GMLuaArgumentsPrivate::getIndexInStack(GMint32 offset, GMint32 index, OUT GMMetaMemberType* t)
