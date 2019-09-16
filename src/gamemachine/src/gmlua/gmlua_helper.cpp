@@ -20,7 +20,7 @@ void GMReturnValues::pushArgument(const GMVariant& arg)
 GM_PRIVATE_OBJECT_UNALIGNED(GMLuaArguments)
 {
 	GMLuaCoreState* L;
-	std::initializer_list<GMMetaMemberType> types;
+	Vector<GMMetaMemberType> types;
 	GMint32 totalSize = 0;
 	Vector<GMint32> indices;
 	GMString invoker;
@@ -34,6 +34,10 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMLuaArguments)
 	GMVariant getScalar(GMint32 index);
 	GMint32 getIndexInStack(GMint32 offset, GMint32 index, OUT GMMetaMemberType* type = nullptr);
 	void checkType(const GMVariant& v, GMMetaMemberType mt, GMint32 index, const GMString& invoker);
+
+	//! 是否某个栈上的变量是一个向量，如果不是则范围0，如果是则返回向量的维度(2-4)。
+	GMint32 getVec(GMint32 index, GMfloat values[4]);
+	bool getMat4(GMint32 index, REF GMFloat4 (&values)[4]);
 };
 
 template <typename T>
@@ -159,25 +163,31 @@ GMVariant GMLuaArgumentsPrivate::getScalar(GMint32 index)
 		return GMString(lua_tostring(L, index));
 	if (lua_isboolean(L, index))
 		return lua_toboolean(L, index) ? true : false;
+
+	GMfloat values[4];
+	if (GMint32 v = getVec(index, values))
+	{
+		if (v == 2) return GMVec2(values[0], values[1]);
+		if (v == 3) return GMVec3(values[0], values[1], values[2]);
+		if (v == 4) return GMVec4(values[0], values[1], values[2], values[3]);
+	}
+
+	GMFloat16 f16;
+	if (getMat4(index, f16.v_))
+	{
+		GMMat4 m;
+		m.setFloat16(f16);
+		return m;
+	}
 	gm_error(gm_dbg_wrap("GMLua (pop): type not supported"));
 	return GMVariant();
 }
 
 GMint32 GMLuaArgumentsPrivate::getIndexInStack(GMint32 offset, GMint32 index, OUT GMMetaMemberType* t)
 {
-	GMint32 result = 0;
-	GMint32 i = 0;
-	for (auto type : types)
-	{
-		++result;
-		if (++i >= index)
-		{
-			if (t)
-				*t = type;
-			break;
-		}
-	}
-	return offset + result;
+	if (t)
+		*t = types[index];
+	return offset + index + 1;
 }
 
 void GMLuaArgumentsPrivate::checkType(const GMVariant& v, GMMetaMemberType mt, GMint32 index, const GMString& invoker)
@@ -220,6 +230,60 @@ void GMLuaArgumentsPrivate::checkType(const GMVariant& v, GMMetaMemberType mt, G
 	{
 		luaL_error(L, "Type is not match at index %i in %s", index, ivk.c_str());
 	}
+}
+
+GMint32 GMLuaArgumentsPrivate::getVec(GMint32 index, GMfloat values[4])
+{
+	if (lua_istable(L, index))
+	{
+		GM_ASSERT(values);
+		// 检查里面的index 0,1,2,3是否为数字
+		GMint32 i;
+		for (i = 1; i < 5; ++i)
+		{
+			GMint32 type = lua_geti(L, index, i);
+			GMint32 top = lua_gettop(L);
+			int ian = lua_isnumber(L, top);
+			if (!ian) // 如果不是数字，则直接返回
+			{
+				lua_pop(L, 1);
+				break;
+			}
+			values[i - 1] = lua_tonumber(L, top);
+			lua_pop(L, 1);
+		}
+
+		// vec2-vec4
+		GMint32 dimension = i - 1;
+		if (dimension < 2 || dimension > 4)
+			return 0;
+
+		return dimension; // 返回维度
+	}
+	return 0;
+}
+
+bool GMLuaArgumentsPrivate::getMat4(GMint32 index, REF GMFloat4(&values)[4])
+{
+	if (lua_istable(L, index))
+	{
+		// 检查里面的index 0,1,2,3是否为vec4
+		GMint32 i;
+		for (i = 1; i < 5; ++i)
+		{
+			GMfloat v[4];
+			lua_geti(L, lua_gettop(L), i); // 先装载这个vec object
+			if (4 != getVec(index + 1, v)) // vec object放在了下一个位置
+			{
+				lua_pop(L, 1);
+				return false; // 如果中途失败，values的值其实是写到一半，被破坏的。
+			}
+			lua_pop(L, 1);
+			values[i - 1] = GMFloat4(v[0], v[1], v[2], v[3]);
+		}
+		return true;
+	}
+	return false;
 }
 
 GMLuaArguments::GMLuaArguments(GMLuaCoreState* l, const GMString& invoker, std::initializer_list<GMMetaMemberType> types)
