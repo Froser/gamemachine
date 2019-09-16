@@ -32,6 +32,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMLuaArguments)
 	void pushMatrix(const GMMat4& v);
 	void push(const GMVariant& var);
 	GMVariant getScalar(GMint32 index);
+	bool getObject(GMint32 index, REF GMObject* objRef);
 	GMint32 getIndexInStack(GMint32 offset, GMint32 index, OUT GMMetaMemberType* type = nullptr);
 	void checkType(const GMVariant& v, GMMetaMemberType mt, GMint32 index, const GMString& invoker);
 
@@ -183,6 +184,132 @@ GMVariant GMLuaArgumentsPrivate::getScalar(GMint32 index)
 	return GMVariant();
 }
 
+bool GMLuaArgumentsPrivate::getObject(GMint32 index, REF GMObject* objRef)
+{
+	if (!objRef)
+		return false;
+
+	const GMMeta* meta = objRef->meta();
+	if (!meta)
+		return false;
+
+	if (!lua_istable(L, index))
+	{
+		luaL_error(L, "Lua object type is %s. Table type is expected.", lua_typename(L, lua_type(L, index)));
+		return false;
+	}
+	
+	bool completelyMatch = true;
+
+	// 之后可能要用到的临时变量
+	GMfloat t[4];
+	GMFloat16 f16;
+
+	// 开始遍历entries
+	lua_pushnil(L);
+	while (lua_next(L, index))
+	{
+		GM_ASSERT(lua_isstring(L, -2));
+		const char* key = lua_tostring(L, -2);
+		for (const auto member : *meta)
+		{
+			if (member.first == key)
+			{
+				switch (member.second.type)
+				{
+				case GMMetaMemberType::String:
+					*(static_cast<GMString*>(member.second.ptr)) = lua_tostring(L, -1);
+					break;
+				case GMMetaMemberType::Float:
+					*(static_cast<GMfloat*>(member.second.ptr)) = lua_tonumber(L, -1);
+					break;
+				case GMMetaMemberType::Boolean:
+					*(static_cast<bool*>(member.second.ptr)) = !!lua_toboolean(L, -1);
+					break;
+				case GMMetaMemberType::Int:
+				{
+					/*
+					if (lua_isfunction(L, -1))
+					{
+						int r = luaL_ref(L, LUA_REGISTRYINDEX);
+						*(static_cast<GMLuaReference*>(member.second.ptr)) = r;
+						lua_pushnil(L); // 最开始的POP_GUARD强行pop，所以我们这里push一个nil
+					}
+					else
+					*/
+					{
+						*(static_cast<GMint32*>(member.second.ptr)) = lua_tointeger(L, -1);
+					}
+					break;
+				}
+				case GMMetaMemberType::Vector2:
+				{
+					GMVec2& v = *static_cast<GMVec2*>(member.second.ptr);
+					GMint32 top = lua_gettop(L);
+					if (getVec(top, t))
+						v = GMVec2(t[0], t[1]);
+					else
+						if (completelyMatch) completelyMatch = false;
+					break;
+				}
+				case GMMetaMemberType::Vector3:
+				{
+					GMVec3& v = *static_cast<GMVec3*>(member.second.ptr);
+					GMint32 top = lua_gettop(L);
+					if (getVec(top, t))
+						v = GMVec3(t[0], t[1], t[2]);
+					else
+						if (completelyMatch) completelyMatch = false;
+					break;
+				}
+				case GMMetaMemberType::Vector4:
+				{
+					GMVec4& v = *static_cast<GMVec4*>(member.second.ptr);
+					GMint32 top = lua_gettop(L);
+					if (getVec(top, t))
+						v = GMVec4(t[0], t[1], t[2], t[3]);
+					else
+						if (completelyMatch) completelyMatch = false;
+					break;
+				}
+				case GMMetaMemberType::Matrix4x4:
+				{
+					GMMat4& mat = *static_cast<GMMat4*>(member.second.ptr);
+					GMint32 top = lua_gettop(L);
+					if (getMat4(top, f16.v_))
+						mat.setFloat16(f16);
+					else
+						if (completelyMatch) completelyMatch = false;
+					break;
+				}
+				case GMMetaMemberType::Object:
+				{
+					bool match = getObject(lua_gettop(L), *static_cast<GMObject**>(member.second.ptr));
+					if (!match && completelyMatch)
+						completelyMatch = false;
+					break;
+				}
+				case GMMetaMemberType::Pointer:
+				{
+					GM_STATIC_ASSERT_SIZE(GMsize_t, sizeof(void*));
+					lua_Integer address = lua_tointeger(L, -1);
+					*(static_cast<GMsize_t*>(member.second.ptr)) = address;
+					break;
+				}
+				case GMMetaMemberType::Function:
+					break;
+				default:
+					break;
+				}
+			}
+		}
+
+		lua_pop(L, 1); // 移除value，使用key来进行下一个迭代
+	}
+
+	return completelyMatch;
+}
+
 GMint32 GMLuaArgumentsPrivate::getIndexInStack(GMint32 offset, GMint32 index, OUT GMMetaMemberType* t)
 {
 	if (t)
@@ -228,7 +355,7 @@ void GMLuaArgumentsPrivate::checkType(const GMVariant& v, GMMetaMemberType mt, G
 	std::string ivk = invoker.toStdString();
 	if (!suc)
 	{
-		luaL_error(L, "Type is not match at index %i in %s", index, ivk.c_str());
+		luaL_error(L, "Type is not match at index %i in %s. The type of passed variable is %s.", index, ivk.c_str(), lua_typename(L, lua_type(L, index)));
 	}
 }
 
@@ -237,11 +364,12 @@ GMint32 GMLuaArgumentsPrivate::getVec(GMint32 index, GMfloat values[4])
 	if (lua_istable(L, index))
 	{
 		GM_ASSERT(values);
-		// 检查里面的index 0,1,2,3是否为数字
+		// 此时此stack已经是个表了
+		// 检查里面的索引 0,1,2,3是否为数字
 		GMint32 i;
 		for (i = 1; i < 5; ++i)
 		{
-			GMint32 type = lua_geti(L, index, i);
+			lua_geti(L, index, i);
 			GMint32 top = lua_gettop(L);
 			int ian = lua_isnumber(L, top);
 			if (!ian) // 如果不是数字，则直接返回
@@ -267,13 +395,15 @@ bool GMLuaArgumentsPrivate::getMat4(GMint32 index, REF GMFloat4(&values)[4])
 {
 	if (lua_istable(L, index))
 	{
-		// 检查里面的index 0,1,2,3是否为vec4
+		// 此时此stack已经是个表了
+		// 检查里面的索引 0,1,2,3是否为vec4
 		GMint32 i;
 		for (i = 1; i < 5; ++i)
 		{
 			GMfloat v[4];
-			lua_geti(L, lua_gettop(L), i); // 先装载这个vec object
-			if (4 != getVec(index + 1, v)) // vec object放在了下一个位置
+			lua_geti(L, index, i); // 先装载这个vec object，放在了栈顶
+			GMint32 top = lua_gettop(L);
+			if (4 != getVec(top, v)) // vec object放在了下一个位置
 			{
 				lua_pop(L, 1);
 				return false; // 如果中途失败，values的值其实是写到一半，被破坏的。
@@ -313,13 +443,7 @@ GMLuaArguments::~GMLuaArguments()
 
 }
 
-bool GMLuaArguments::isValid()
-{
-	D(d);
-	return lua_gettop(d->L) == d->totalSize;
-}
-
-GMVariant GMLuaArguments::getArgument(GMint32 index)
+GMVariant GMLuaArguments::getArgument(GMint32 index, REF GMObject* objRef)
 {
 	D(d);
 	// 先从index中找到索引
@@ -330,10 +454,19 @@ GMVariant GMLuaArguments::getArgument(GMint32 index)
 	if (type != GMMetaMemberType::Object)
 		v = d->getScalar(i);
 	else
-		// v = d->getObject(i);
+		v = d->getObject(i, objRef);
 
 	// 检查这个类型是否与期望的一致
-	d->checkType(v, type, index, d->invoker);
+	if (type != GMMetaMemberType::Object)
+	{
+		d->checkType(v, type, index, d->invoker);
+	}
+	else
+	{
+		if (!objRef)
+			luaL_error(d->L, "Type is not match. The expected type is object.");
+	}
+
 	return v;
 }
 

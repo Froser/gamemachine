@@ -8,6 +8,31 @@
 
 namespace
 {
+	GM_PRIVATE_OBJECT_ALIGNED(NestObject)
+	{
+		gm::GMString str;
+	};
+
+	class NestObject : public gm::GMObject
+	{
+		GM_DECLARE_PRIVATE(NestObject)
+		GM_DECLARE_EMBEDDED_PROPERTY(str, str)
+
+		NestObject();
+		virtual bool registerMeta() override;
+	};
+
+	NestObject::NestObject()
+	{
+		GM_CREATE_DATA();
+	}
+
+	bool NestObject::registerMeta()
+	{
+		GM_META(str);
+		return true;
+	}
+
 	GM_PRIVATE_OBJECT_ALIGNED(LuaObject)
 	{
 		gm::GMint32 i;
@@ -18,6 +43,7 @@ namespace
 		GMVec3 v3;
 		GMVec4 v4;
 		GMMat4 m;
+		NestObject* nest;
 	};
 
 	class LuaObject : public gm::GMObject
@@ -31,9 +57,11 @@ namespace
 		GM_DECLARE_EMBEDDED_PROPERTY(v3, v3)
 		GM_DECLARE_EMBEDDED_PROPERTY(v4, v4)
 		GM_DECLARE_EMBEDDED_PROPERTY(m, m)
+		GM_DECLARE_EMBEDDED_PROPERTY(nest, nest)
 
 	public:
 		LuaObject();
+		~LuaObject();
 
 		virtual bool registerMeta() override;
 	};
@@ -41,6 +69,14 @@ namespace
 	LuaObject::LuaObject()
 	{
 		GM_CREATE_DATA();
+		D(d);
+		d->nest = new NestObject;
+	}
+
+	LuaObject::~LuaObject()
+	{
+		D(d);
+		gm::GM_delete(d->nest);
 	}
 
 	bool LuaObject::registerMeta()
@@ -53,6 +89,7 @@ namespace
 		GM_META(v3);
 		GM_META(v4);
 		GM_META(m);
+		GM_META_WITH_TYPE(nest, gm::GMMetaMemberType::Object);
 		return true;
 	}
 
@@ -106,7 +143,7 @@ namespace
 	extern "C"
 	{
 		// 参数列表：
-		// string, vec2, vec3, vec4, bool, float, matrix
+		// string, vec2, vec3, vec4, bool, float, matrix, object
 		int testScalar(gm::GMLuaCoreState* l)
 		{
 			gm::GMLuaArguments args(l, "testScalar",
@@ -117,7 +154,8 @@ namespace
 				gm::GMMetaMemberType::Vector4,
 				gm::GMMetaMemberType::Boolean,
 				gm::GMMetaMemberType::Float,
-				gm::GMMetaMemberType::Matrix4x4
+				gm::GMMetaMemberType::Matrix4x4,
+				gm::GMMetaMemberType::Object
 			});
 
 			// 在这里添加unittest
@@ -128,6 +166,7 @@ namespace
 			g_b = args.getArgument(4).toBool();
 			g_f = args.getArgument(5).toFloat();
 			g_m = args.getArgument(6).toMat4();
+			args.getArgument(7, &g_o);
 
 			return 0;
 		}
@@ -265,12 +304,18 @@ void cases::Lua::addToUnitTest(UnitTest& ut)
 		DummyInterface d;
 		d.registerFunctions(&m_lua);
 		auto r = m_lua.runString(
-			"UnitTest.testScalar([[gamemachine]], {1, 2}, {3, 4, 5}, {6, 7, 8, 9}, true, 16.0, { {1, 2, 3, 4}, {1, 2, 3, 4}, {1, 2, 3, 4}, {1, 2, 3, 4} })");
+			"local o = {};"
+			"o.v4 = {1, 2, 3, 4};"
+			"o.str = [[hello gamemachine]];"
+			"o.nest = { str = [[nest string]] }"
+			"UnitTest.testScalar([[gamemachine]], {1, 2}, {3, 4, 5}, {6, 7, 8, 9}, true, 16.0, { {1, 2, 3, 4}, {1, 2, 3, 4}, {1, 2, 3, 4}, {1, 2, 3, 4} }, o)");
 		if (r.state != gm::GMLuaStates::Ok)
 			return false;
 
 		return g_s == "gamemachine" 
-			// && VECTOR4_EQUALS(g_o.getv4(), 1, 2, 3, 4)
+			&& VECTOR4_EQUALS(g_o.getv4(), 1, 2, 3, 4)
+			&& g_o.getstr() == "hello gamemachine"
+			&& g_o.getnest()->getstr() == "nest string"
 			&& VECTOR2_EQUALS(g_v2, 1, 2)
 			&& VECTOR3_EQUALS(g_v3, 3, 4, 5)
 			&& VECTOR4_EQUALS(g_v4, 6, 7, 8, 9)

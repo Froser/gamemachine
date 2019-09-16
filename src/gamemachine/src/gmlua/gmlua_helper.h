@@ -12,8 +12,14 @@ public:
 	GMLuaArguments(GMLuaCoreState* l, const GMString& invoker = L"", std::initializer_list<GMMetaMemberType> types = {});
 	~GMLuaArguments();
 
-	bool isValid();
-	GMVariant getArgument(GMint32 index);
+	//! 获取在某个位置的参数。
+	/*!
+	 获取某个位置的参数。如果参数类型与参数列表不一致，那么会产生lua错误。
+	 \param index 参数的索引。
+	 \param objRef 对象的引用。如果参数类型是个对象，那么它不得为空，否则会产生一个lua错误。
+	 \return 参数的值。如果得到的是一个对象，对象通过objRef返回，而函数返回值表示对象是否完全匹配此参数。
+	*/
+	GMVariant getArgument(GMint32 index, REF GMObject* objRef = nullptr);
 	void pushArgument(const GMVariant& arg);
 };
 
