@@ -44,6 +44,7 @@ namespace
 		GMVec4 v4;
 		GMMat4 m;
 		NestObject* nest;
+		gm::GMLuaReference func;
 	};
 
 	class LuaObject : public gm::GMObject
@@ -58,6 +59,7 @@ namespace
 		GM_DECLARE_EMBEDDED_PROPERTY(v4, v4)
 		GM_DECLARE_EMBEDDED_PROPERTY(m, m)
 		GM_DECLARE_EMBEDDED_PROPERTY(nest, nest)
+		GM_DECLARE_EMBEDDED_PROPERTY(func, func)
 
 	public:
 		LuaObject();
@@ -90,6 +92,7 @@ namespace
 		GM_META(v4);
 		GM_META(m);
 		GM_META_WITH_TYPE(nest, gm::GMMetaMemberType::Object);
+		GM_META_WITH_TYPE(func, gm::GMMetaMemberType::Function);
 		return true;
 	}
 
@@ -139,6 +142,7 @@ namespace
 	bool g_b;
 	gm::GMfloat g_f;
 	GMMat4 g_m;
+	bool g_callbackResult;
 
 	extern "C"
 	{
@@ -168,6 +172,12 @@ namespace
 			g_m = args.getArgument(6).toMat4();
 			args.getArgument(7, &g_o);
 
+			return 0;
+		}
+
+		int callback(gm::GMLuaCoreState* l)
+		{
+			g_callbackResult = true;
 			return 0;
 		}
 
@@ -292,6 +302,7 @@ void cases::Lua::addToUnitTest(UnitTest& ut)
 		{
 			static gm::GMLuaReg r[] = {
 				{ "testScalar", testScalar },
+				{ "callback", callback },
 				{ "multi", dummyMultiResults },
 				{ 0 }
 			};
@@ -307,10 +318,14 @@ void cases::Lua::addToUnitTest(UnitTest& ut)
 			"local o = {};"
 			"o.v4 = {1, 2, 3, 4};"
 			"o.str = [[hello gamemachine]];"
-			"o.nest = { str = [[nest string]] }"
+			"o.nest = { str = [[nest string]] };"
+			"o.func = function()\n UnitTest.callback()\n end\n"
 			"UnitTest.testScalar([[gamemachine]], {1, 2}, {3, 4, 5}, {6, 7, 8, 9}, true, 16.0, { {1, 2, 3, 4}, {1, 2, 3, 4}, {1, 2, 3, 4}, {1, 2, 3, 4} }, o)");
 		if (r.state != gm::GMLuaStates::Ok)
 			return false;
+
+		m_lua.protectedCall(g_o.getfunc());
+		m_lua.freeReference(g_o.getfunc());
 
 		return g_s == "gamemachine" 
 			&& VECTOR4_EQUALS(g_o.getv4(), 1, 2, 3, 4)
@@ -325,6 +340,7 @@ void cases::Lua::addToUnitTest(UnitTest& ut)
 			&& VECTOR4_EQUALS(g_m[1], 1, 2, 3, 4)
 			&& VECTOR4_EQUALS(g_m[2], 1, 2, 3, 4)
 			&& VECTOR4_EQUALS(g_m[3], 1, 2, 3, 4)
+			&& g_callbackResult
 			;
 	});
 

@@ -39,6 +39,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMLuaArguments)
 	//! 是否某个栈上的变量是一个向量，如果不是则范围0，如果是则返回向量的维度(2-4)。
 	GMint32 getVec(GMint32 index, GMfloat values[4]);
 	bool getMat4(GMint32 index, REF GMFloat4 (&values)[4]);
+	GMLuaReference ref();
 };
 
 template <typename T>
@@ -226,20 +227,17 @@ bool GMLuaArgumentsPrivate::getObject(GMint32 index, REF GMObject* objRef)
 				case GMMetaMemberType::Boolean:
 					*(static_cast<bool*>(member.second.ptr)) = !!lua_toboolean(L, -1);
 					break;
+				case GMMetaMemberType::Function:
+				{
+					*(static_cast<GMLuaReference*>(member.second.ptr)) = ref();
+					break;
+				}
 				case GMMetaMemberType::Int:
 				{
-					/*
 					if (lua_isfunction(L, -1))
-					{
-						int r = luaL_ref(L, LUA_REGISTRYINDEX);
-						*(static_cast<GMLuaReference*>(member.second.ptr)) = r;
-						lua_pushnil(L); // 最开始的POP_GUARD强行pop，所以我们这里push一个nil
-					}
+						*(static_cast<GMLuaReference*>(member.second.ptr)) = ref();
 					else
-					*/
-					{
 						*(static_cast<GMint32*>(member.second.ptr)) = lua_tointeger(L, -1);
-					}
 					break;
 				}
 				case GMMetaMemberType::Vector2:
@@ -296,8 +294,6 @@ bool GMLuaArgumentsPrivate::getObject(GMint32 index, REF GMObject* objRef)
 					*(static_cast<GMsize_t*>(member.second.ptr)) = address;
 					break;
 				}
-				case GMMetaMemberType::Function:
-					break;
 				default:
 					break;
 				}
@@ -414,6 +410,19 @@ bool GMLuaArgumentsPrivate::getMat4(GMint32 index, REF GMFloat4(&values)[4])
 		return true;
 	}
 	return false;
+}
+
+GMLuaReference GMLuaArgumentsPrivate::ref()
+{
+	if (lua_isfunction(L, -1))
+	{
+		GMLuaReference r = luaL_ref(L, LUA_REGISTRYINDEX);
+		lua_pushnil(L);
+		return r;
+	}
+
+	luaL_error(L, "Current top of the stack is not a function.");
+	return 0;
 }
 
 GMLuaArguments::GMLuaArguments(GMLuaCoreState* l, const GMString& invoker, std::initializer_list<GMMetaMemberType> types)
