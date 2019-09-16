@@ -128,9 +128,10 @@ namespace
 		"end";
 
 	const char* s_invoke3 =
-		"function dummy_function3(i)"
+		"function testSetTable(i)"
 		"  local tb = {};"
 		"  tb.str = i.str;"
+		"  tb.nest.str = i.str;"
 		"  return tb;"
 		"end";
 
@@ -272,7 +273,6 @@ void cases::Lua::addToUnitTest(UnitTest& ut)
 		return VECTOR4_EQUALS(ret.objectCast<LuaObject*>()->getv4(), 6, 7, 8, 14) && ret.objectCast<LuaObject*>()->geti() == 256;
 	});
 
-	/*
 	ut.addTestCase("GMLua: C/C++调用语句，调用Lua方法，传入对象，获取对象", [&]() {
 		gm::GMLuaResult lr = m_lua.runString(s_invoke3);
 		if (lr.state != gm::GMLuaStates::Ok)
@@ -283,12 +283,14 @@ void cases::Lua::addToUnitTest(UnitTest& ut)
 		LuaObject retObj;
 		gm::GMVariant ret = &retObj;
 
-		lr = m_lua.protectedCall("dummy_function3", { &arg }, &ret, 1);
+		lr = m_lua.protectedCall("testSetTable", { &arg }, &ret, 1);
 		if (lr.state != gm::GMLuaStates::Ok)
 			return false;
-		return ret.objectCast<LuaObject*>()->getstr() == "Howdy!" && ret.objectCast<LuaObject*>()->geti() == 0 && ret.objectCast<LuaObject*>()->getb() == false; //...未赋值的部分为默认值
+		return ret.objectCast<LuaObject*>()->getstr() == "Howdy!" && 
+			ret.objectCast<LuaObject*>()->getnest()->getstr() == "Howdy!" &&
+			ret.objectCast<LuaObject*>()->geti() == 0 && 
+			ret.objectCast<LuaObject*>()->getb() == false; //...未赋值的部分为默认值
 	});
-	*/
 
 	class DummyInterface : public gm::GMLuaFunctionRegister
 	{

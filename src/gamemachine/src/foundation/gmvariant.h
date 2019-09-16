@@ -7,6 +7,7 @@ BEGIN_NS
 
 class GMString;
 class GMObject;
+struct GMObjectMember;
 class GM_EXPORT GMVariant
 {
 public:
@@ -63,6 +64,7 @@ public:
 	GMVariant(GMObject&);
 	GMVariant(GMObject*);
 	GMVariant(void*);
+	GMVariant(const GMObjectMember&);
 	~GMVariant();
 
 	GMVariant(const GMVariant&);

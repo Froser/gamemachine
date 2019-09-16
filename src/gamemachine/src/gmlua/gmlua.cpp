@@ -363,14 +363,34 @@ GMLuaResult GMLua::pcall(const char* functionName, const std::initializer_list<G
 	if (functionName)
 		lua_getglobal(L, functionName);
 
+	GMint32 top = lua_gettop(getLuaCoreState()); // top 表示栈在传参之前的索引
 	GMLuaArguments a(getLuaCoreState());
 	for (const auto& var : args)
 	{
 		a.pushArgument(var);
 	}
+	GMint32 currentTop = lua_gettop(getLuaCoreState());
+
+	// 检查压栈数量是否正确
+	if (currentTop != top + gm_sizet_to_int(args.size()))
+	{
+		gm_error(gm_dbg_wrap("Invalid lua stack while calling pcall."));
+		GM_ASSERT(false);
+		return { GMLuaStates::RuntimeError, "Invalid lua stack while calling pcall." };
+	}
 
 	GMLuaResult lr = { (GMLuaStates)lua_pcall(L, gm_sizet_to_uint(args.size()), nRet, 0) };
 	CHECK(lr);
+
+	currentTop = lua_gettop(getLuaCoreState());
+	// 检查返回值是否正确
+	if (currentTop != top + nRet - 1) // 函数已经被弹出，因此要-1
+	{
+		gm_error(gm_dbg_wrap("Invalid return value count while calling pcall."));
+		GM_ASSERT(false);
+		return{ GMLuaStates::RuntimeError, "Invalid return value count while calling pcall." };
+	}
+
 	return lr;
 }
 

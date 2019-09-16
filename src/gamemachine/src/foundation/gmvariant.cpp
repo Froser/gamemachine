@@ -2,6 +2,7 @@
 #include "assert.h"
 #include "gmstring.h"
 #include "gmvariant.h"
+#include "gmobject.h"
 
 BEGIN_NS
 
@@ -212,6 +213,46 @@ GMVariant::GMVariant(void* p)
 	: m_type(Pointer)
 {
 	m_data.p = p;
+}
+
+GMVariant::GMVariant(const GMObjectMember& om)
+{
+	switch (om.type)
+	{
+	case GMMetaMemberType::Int:
+		*this = GMVariant(*static_cast<GMint32*>(om.ptr));
+		break;
+	case GMMetaMemberType::Float:
+		*this = GMVariant(*static_cast<GMfloat*>(om.ptr));
+		break;
+	case GMMetaMemberType::Vector2:
+		*this = GMVariant(*static_cast<GMVec2*>(om.ptr));
+		break;
+	case GMMetaMemberType::Vector3:
+		*this = GMVariant(*static_cast<GMVec3*>(om.ptr));
+		break;
+	case GMMetaMemberType::Vector4:
+		*this = GMVariant(*static_cast<GMVec4*>(om.ptr));
+		break;
+	case GMMetaMemberType::Matrix4x4:
+		*this = GMVariant(*static_cast<GMMat4*>(om.ptr));
+		break;
+	case GMMetaMemberType::String:
+		*this = GMVariant(*static_cast<GMString*>(om.ptr));
+		break;
+	case GMMetaMemberType::Boolean:
+		*this = GMVariant(*static_cast<bool*>(om.ptr));
+		break;
+	case GMMetaMemberType::Object:
+		*this = GMVariant(*static_cast<GMObject*>(om.ptr));
+		break;
+	case GMMetaMemberType::Pointer:
+	case GMMetaMemberType::Function:
+		*this = om.ptr;
+		break;
+	default:
+		break;
+	}
 }
 
 GMVariant::~GMVariant()

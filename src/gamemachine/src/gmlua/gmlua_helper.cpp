@@ -31,6 +31,8 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMLuaArguments)
 	void pushVector(const GMVec4& v);
 	void pushMatrix(const GMMat4& v);
 	void push(const GMVariant& var);
+	void pushObject(const GMObject& obj);
+	void setMembers(const GMObject& obj);
 	GMVariant getScalar(GMint32 index);
 	bool getObject(GMint32 index, REF GMObject* objRef);
 	GMint32 getIndexInStack(GMint32 offset, GMint32 index, OUT GMMetaMemberType* type = nullptr);
@@ -110,8 +112,11 @@ void GMLuaArgumentsPrivate::push(const GMVariant& var)
 	}
 	else if (var.isObject())
 	{
-		GM_ASSERT(false);
-		//pushNewTable(*var.toObject());
+		GMObject* obj = var.toObject();
+		if (obj)
+			pushObject(*obj);
+		else
+			lua_pushnil(L);
 	}
 	else if (var.isPointer())
 	{
@@ -138,6 +143,51 @@ void GMLuaArgumentsPrivate::push(const GMVariant& var)
 	{
 		gm_error(gm_dbg_wrap("GMLua (push): variant type not supported"));
 		GM_ASSERT(false);
+	}
+}
+
+void GMLuaArgumentsPrivate::pushObject(const GMObject& obj)
+{
+	lua_newtable(L);
+	setMembers(obj);
+}
+
+void GMLuaArgumentsPrivate::setMembers(const GMObject& obj)
+{
+	GM_ASSERT(lua_istable(L, -1));
+	auto meta = obj.meta();
+	if (meta)
+	{
+		for (const auto& member : *meta)
+		{
+			// 将非元表函数放入表格
+			if (!member.first.startsWith(L"__") || member.second.type != GMMetaMemberType::Function)
+			{
+				push(member.first); //key
+				if (member.second.type == GMMetaMemberType::Function)
+				{
+					lua_pushcfunction(L, (GMLuaCFunction)(member.second.ptr));
+				}
+				else if (member.second.type == GMMetaMemberType::Pointer)
+				{
+					GM_STATIC_ASSERT(sizeof(lua_Integer) >= sizeof(void*), "Pointer size incompatible.");
+					GM_STATIC_ASSERT_SIZE(GMsize_t, sizeof(void*));
+					lua_Integer address = lua_tointeger(L, -1);
+					lua_pushinteger(L, *static_cast<GMsize_t*>(member.second.ptr));
+				}
+				else if (member.second.type == GMMetaMemberType::Object)
+				{
+					push(*reinterpret_cast<GMObject**>(member.second.ptr));
+				}
+				else
+				{
+					push(member.second);
+				}
+
+				GM_ASSERT(lua_istable(L, -3));
+				lua_settable(L, -3);
+			}
+		}
 	}
 }
 
