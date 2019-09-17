@@ -127,7 +127,7 @@ namespace luaapi
 		IWindowProxy self(L);
 		IGameHandlerProxy gameHandler(L);
 		args.getArgument(0, &self);
-		args.getArgument(0, &gameHandler);
+		args.getArgument(0, &gameHandler); //TODO
 		if (self)
 		{
 			gameHandler.setAutoRelease(false);

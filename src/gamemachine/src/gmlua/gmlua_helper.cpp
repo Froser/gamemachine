@@ -365,34 +365,13 @@ bool GMLuaArgumentsPrivate::getObject(GMint32 index, REF GMObject* objRef)
 				break;
 			}
 			case GMMetaMemberType::Vector2:
-			{
-				GMVec2& v = *static_cast<GMVec2*>(memberIterator->second.ptr);
-				GMint32 top = lua_gettop(L);
-				if (getVec(top, t))
-				{
-					v = GMVec2(t[0], t[1]);
-					found = true;
-				}
-				break;
-			}
 			case GMMetaMemberType::Vector3:
-			{
-				GMVec3& v = *static_cast<GMVec3*>(memberIterator->second.ptr);
-				GMint32 top = lua_gettop(L);
-				if (getVec(top, t))
-				{
-					v = GMVec3(t[0], t[1], t[2]);
-					found = true;
-				}
-				break;
-			}
 			case GMMetaMemberType::Vector4:
 			{
-				GMVec4& v = *static_cast<GMVec4*>(memberIterator->second.ptr);
 				GMint32 top = lua_gettop(L);
-				if (getVec(top, t))
+				if (GMint32 d = getVec(top, t))
 				{
-					v = GMVec4(t[0], t[1], t[2], t[3]);
+					memcpy_s(memberIterator->second.ptr, sizeof(GMfloat) * d, t, sizeof(GMfloat) * d);
 					found = true;
 				}
 				break;
