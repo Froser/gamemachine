@@ -3,6 +3,24 @@
 
 BEGIN_NS
 
+namespace
+{
+	void getMetaTableAndName(const GMObject& obj, GMString& metatableName, const GMObject** metatable)
+	{
+		// 看看成员是否有__name，如果有，设置它为元表，否则，设置自己为元表
+		static const GMString s_metatableNameKw = L"__name";
+
+		auto meta = obj.meta();
+		for (const auto& member : *meta)
+		{
+			if (member.first == s_metatableNameKw)
+				metatableName = *static_cast<GMString*>(member.second.ptr);
+		}
+		if (metatable)
+			*metatable = &obj;
+	}
+}
+
 void GMReturnValues::pushArgument(const GMVariant& arg)
 {
 	if (arg.isObject())
@@ -33,6 +51,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMLuaArguments)
 	void push(const GMVariant& var);
 	void pushObject(const GMObject& obj);
 	void setMembers(const GMObject& obj);
+	void setMetaTables(const GMObject& obj);
 	GMVariant getScalar(GMint32 index);
 	bool getObject(GMint32 index, REF GMObject* objRef);
 	GMint32 getIndexInStack(GMint32 offset, GMint32 index, OUT GMMetaMemberType* type = nullptr);
@@ -43,6 +62,17 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMLuaArguments)
 	bool getMat4(GMint32 index, REF GMFloat4 (&values)[4]);
 	GMLuaReference ref();
 };
+
+template <typename T, GMsize_t sz>
+bool contains(const T(&arr)[sz], const T& t)
+{
+	for (GMsize_t i = 0; i < sz; ++i)
+	{
+		if (arr[i] == t)
+			return true;
+	}
+	return false;
+}
 
 template <typename T>
 void __pushVector(const T& v, GMLuaCoreState* l)
@@ -149,7 +179,44 @@ void GMLuaArgumentsPrivate::push(const GMVariant& var)
 void GMLuaArgumentsPrivate::pushObject(const GMObject& obj)
 {
 	lua_newtable(L);
+	setMetaTables(obj);
 	setMembers(obj);
+}
+
+void GMLuaArgumentsPrivate::setMetaTables(const GMObject& obj)
+{
+	static const GMString s_overrideList[] =
+	{
+		L"__index",
+		L"__newindex",
+		L"__gc",
+	};
+
+	auto tableIdx = lua_gettop(L);
+	GMString metatableName;
+	const GMObject* metaTable = nullptr;
+	getMetaTableAndName(obj, metatableName, &metaTable);
+	GM_ASSERT(metaTable);
+
+	luaL_newmetatable(L, metatableName.toStdString().c_str());
+	if (!metatableName.isEmpty())
+	{
+		// 存在meta数据
+		for (const auto& member : *metaTable->meta())
+		{
+			// 只为几个默认的meta写方法
+			if (contains(s_overrideList, member.first) &&
+				member.second.type == GMMetaMemberType::Function)
+			{
+				std::string name = member.first.toStdString();
+				lua_pushstring(L, name.c_str());
+				lua_pushcfunction(L, (GMLuaCFunction)(member.second.ptr));
+				lua_rawset(L, -3);
+			}
+		}
+	}
+
+	lua_setmetatable(L, tableIdx);
 }
 
 void GMLuaArgumentsPrivate::setMembers(const GMObject& obj)

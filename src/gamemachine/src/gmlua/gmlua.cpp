@@ -134,7 +134,7 @@ namespace
 
 	void getMetaTableAndName(const GMObject& obj, GMString& metatableName, const GMObject** metatable)
 	{
-		// 看看成员是否有GM_LUA_PROXY_METATABLE_NAME，如果有，设置它为元表，否则，设置自己为元表
+		// 看看成员是否有__name，如果有，设置它为元表，否则，设置自己为元表
 		static const GMString s_metatableNameKw = L"__name";
 
 		auto meta = obj.meta();
@@ -267,27 +267,14 @@ bool GMLua::setToGlobal(const char* name, GMObject& obj)
 	return true;
 }
 
-GMVariant GMLua::getFromGlobal(const char* name)
+GMVariant GMLua::getFromGlobal(const char* name, GMObject* obj)
 {
 	D(d);
-	POP_GUARD();
 	lua_getglobal(L, name);
-	return getTop();
-}
-
-bool GMLua::getFromGlobal(const char* name, GMObject& obj)
-{
-	D(d);
-	const GMMeta* meta = obj.meta();
-	if (!meta)
-		return false;
-
-	POP_GUARD();
-	lua_getglobal(L, name);
-	if (!lua_istable(L, 1))
-		return false;
-
-	return popTable(obj);
+	GMLuaArguments args(L);
+	GMVariant v = args.getArgument(0, obj);
+	lua_pop(L, 1);
+	return v;
 }
 
 GMLuaResult GMLua::protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args, GMVariant* returns, GMint32 nRet)
@@ -397,9 +384,8 @@ GMLuaResult GMLua::pcallreturn(GMLuaResult lr, GMVariant* returns, GMint32 nRet)
 		}
 	}
 
-	// 清理所有堆栈
-	lua_pop(l, lua_gettop(l));
-
+	// 清理堆栈
+	lua_pop(l, nRet);
 	return lr;
 }
 

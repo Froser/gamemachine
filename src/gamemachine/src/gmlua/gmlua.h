@@ -140,19 +140,13 @@ public:
 	//! 通过变量名获取一个全局变量。
 	/*!
 	  所获取的变量将会存入GMVariant结构。需要注意的是，它只能获取标量(int64, float, boolean, string)，无法获取向量、矩阵，认为它们在Lua中是以表的形式存在。<BR>
-	  如果要处理向量、矩阵，请使用getGlobal的另外一个版本。所获取的整形变量为int64类型，如果遇到无法获取的情况，将返回一个Unknown类型的GMVariant。
-	  \param name Lua全局对象名称。
-	*/
-	GMVariant getFromGlobal(const char* name);
-
-	//! 通过变量名获取一个全局变量。
-	/*!
-	  所获取的变量一定要是个表结构，它将寻找能够精确匹配上GMObject的Lua表对象，并将表中的值赋予GMObject。如果能精确匹配，返回true，否则返回false。
+	  如果要处理向量、矩阵，请使用getGlobal的另外一个版本。所获取的整形变量为int64类型，如果遇到无法获取的情况，将返回一个Unknown类型的GMVariant。<BR>
+	  如果obj不为空，则待获取的变量一定要是个表结构，它将寻找能够精确匹配上GMObject的Lua表对象，并将表中的值赋予GMObject。如果能精确匹配，返回为true的GMVariant，否则返回为false的GMVariant。
 	  \param name Lua全局对象名称。
 	  \param obj 需要赋值的对象。
-	  \return Lua中的全局对象是否能精确匹配GMObject。
+	  \return 返回全局对象或者是否匹配到对象。
 	*/
-	bool getFromGlobal(const char* name, GMObject& obj);
+	GMVariant getFromGlobal(const char* name, GMObject* obj = nullptr);
 
 	//! 通过函数名，在受保护模式下调用一个Lua函数。
 	/*!

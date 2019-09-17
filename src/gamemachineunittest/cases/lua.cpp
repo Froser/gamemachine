@@ -224,7 +224,7 @@ void cases::Lua::addToUnitTest(UnitTest& ut)
 	});
 
 	ut.addTestCase("GMLua: 获取全局变量并赋值给GMObject", [&]() {
-		m_lua.getFromGlobal("meta", *m_obj);
+		m_lua.getFromGlobal("meta", m_obj.get());
 		LuaObject* obj = gm::gm_cast<LuaObject*>(m_obj.get());
 
 		bool bScalar =
