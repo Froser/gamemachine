@@ -255,18 +255,6 @@ void GMLua::setToGlobal(const char* name, const GMVariant& var)
 	lua_setglobal(L, name);
 }
 
-bool GMLua::setToGlobal(const char* name, GMObject& obj)
-{
-	D(d);
-	const GMMeta* meta = obj.meta();
-	if (!meta)
-		return false;
-	
-	pushNewTable(obj);
-	lua_setglobal(L, name);
-	return true;
-}
-
 GMVariant GMLua::getFromGlobal(const char* name, GMObject* obj)
 {
 	D(d);

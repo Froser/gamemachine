@@ -129,14 +129,6 @@ public:
 	*/
 	void setToGlobal(const char* name, const GMVariant& var);
 
-	//! 将一个变量设置进Lua的全局环境。
-	/*!
-	  此变量在Lua中为一个表(table)类型，里面的键、值由GMObject中的元对象决定。
-	  \param name Lua全局环境的变量名。
-	  \param obj 待设置的变量。
-	*/
-	bool setToGlobal(const char* name, GMObject& obj);
-
 	//! 通过变量名获取一个全局变量。
 	/*!
 	  所获取的变量将会存入GMVariant结构。需要注意的是，它只能获取标量(int64, float, boolean, string)，无法获取向量、矩阵，认为它们在Lua中是以表的形式存在。<BR>
@@ -174,7 +166,7 @@ public:
 	*/
 	void freeReference(GMLuaReference ref);
 
-// 针对堆栈的操作，提供给友元
+// 针对堆栈的操作，提供给友元 Deprecating
 private:
 	//! 将一个对象的成员压入Lua的虚拟堆栈。
 	/*!
@@ -216,6 +208,7 @@ private:
 	GMVariant get(GMint32 index);
 	GMLuaReference popFunction(bool* valid = nullptr);
 	void pop(GMint32 num);
+	void setEachMetaMember(const GMObject& obj);
 
 public:
 	GMLuaCoreState* getLuaCoreState() GM_NOEXCEPT;
@@ -227,8 +220,6 @@ private:
 	void loadLibrary();
 	GMLuaResult pcall(const std::initializer_list<GMVariant>& args, GMint32 nRet);
 	GMLuaResult pcallreturn(GMLuaResult, GMVariant* returns, GMint32 nRet);
-
-	void setEachMetaMember(const GMObject& obj);
 	void setTable(const char* key, const GMObjectMember& value);
 	void setMetatable(const GMObject& obj);
 };
@@ -278,8 +269,8 @@ private:
 	return gm::GMReturnValues(L, GMVariant(proxy));									\
 }
 
-#define GM_LUA_PROXY_IMPL(Proxy, FuncName) gm::luaapi::GMFunctionReturn GM_PRIVATE_NAME(Proxy)::FuncName(GMLuaCoreState* L)
-#define GM_LUA_PROXY_FUNC(FuncName) GM_META_METHOD gm::luaapi::GMFunctionReturn FuncName(GMLuaCoreState*);
+#define GM_LUA_PROXY_IMPL(Proxy, FuncName) gm::GMint32 GM_PRIVATE_NAME(Proxy)::FuncName(GMLuaCoreState* L)
+#define GM_LUA_PROXY_FUNC(FuncName) GM_META_METHOD gm::GMint32 FuncName(GMLuaCoreState*);
 
 // lua类成员函数相关的宏
 // 以下宏需要手动引用gmlua_functions.h

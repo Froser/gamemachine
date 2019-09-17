@@ -327,100 +327,104 @@ bool GMLuaArgumentsPrivate::getObject(GMint32 index, REF GMObject* objRef)
 	{
 		GM_ASSERT(lua_isstring(L, -2));
 		const char* key = lua_tostring(L, -2);
-		for (const auto member : *meta)
+
+		auto memberIterator = (*meta).find(key);
+		if (memberIterator != (*meta).end())
 		{
-			if (member.first == key)
+			switch (memberIterator->second.type)
 			{
-				switch (member.second.type)
+			case GMMetaMemberType::String:
+			{
+				*(static_cast<GMString*>(memberIterator->second.ptr)) = lua_tostring(L, -1);
+				found = true;
+				break;
+			}
+			case GMMetaMemberType::Float:
+			{
+				*(static_cast<GMfloat*>(memberIterator->second.ptr)) = lua_tonumber(L, -1);
+				found = true;
+				break;
+			}
+			case GMMetaMemberType::Boolean:
+			{
+				*(static_cast<bool*>(memberIterator->second.ptr)) = !!lua_toboolean(L, -1);
+				found = true;
+				break;
+			}
+			case GMMetaMemberType::Function:
+			{
+				// Function表示lua object中的元方法。如果表示lua的function，那么用GMMetaMemberType::Int类型代替。
+				break;
+			}
+			case GMMetaMemberType::Int:
+			{
+				if (lua_isfunction(L, -1))
+					*(static_cast<GMLuaReference*>(memberIterator->second.ptr)) = ref();
+				else
+					*(static_cast<GMint32*>(memberIterator->second.ptr)) = lua_tointeger(L, -1);
+				break;
+			}
+			case GMMetaMemberType::Vector2:
+			{
+				GMVec2& v = *static_cast<GMVec2*>(memberIterator->second.ptr);
+				GMint32 top = lua_gettop(L);
+				if (getVec(top, t))
 				{
-				case GMMetaMemberType::String:
-					*(static_cast<GMString*>(member.second.ptr)) = lua_tostring(L, -1);
+					v = GMVec2(t[0], t[1]);
 					found = true;
-					break;
-				case GMMetaMemberType::Float:
-					*(static_cast<GMfloat*>(member.second.ptr)) = lua_tonumber(L, -1);
+				}
+				break;
+			}
+			case GMMetaMemberType::Vector3:
+			{
+				GMVec3& v = *static_cast<GMVec3*>(memberIterator->second.ptr);
+				GMint32 top = lua_gettop(L);
+				if (getVec(top, t))
+				{
+					v = GMVec3(t[0], t[1], t[2]);
 					found = true;
-					break;
-				case GMMetaMemberType::Boolean:
-					*(static_cast<bool*>(member.second.ptr)) = !!lua_toboolean(L, -1);
+				}
+				break;
+			}
+			case GMMetaMemberType::Vector4:
+			{
+				GMVec4& v = *static_cast<GMVec4*>(memberIterator->second.ptr);
+				GMint32 top = lua_gettop(L);
+				if (getVec(top, t))
+				{
+					v = GMVec4(t[0], t[1], t[2], t[3]);
 					found = true;
-					break;
-				case GMMetaMemberType::Function:
+				}
+				break;
+			}
+			case GMMetaMemberType::Matrix4x4:
+			{
+				GMMat4& mat = *static_cast<GMMat4*>(memberIterator->second.ptr);
+				GMint32 top = lua_gettop(L);
+				if (getMat4(top, f16.v_))
 				{
-					*(static_cast<GMLuaReference*>(member.second.ptr)) = ref();
+					mat.setFloat16(f16);
 					found = true;
-					break;
 				}
-				case GMMetaMemberType::Int:
-				{
-					if (lua_isfunction(L, -1))
-						*(static_cast<GMLuaReference*>(member.second.ptr)) = ref();
-					else
-						*(static_cast<GMint32*>(member.second.ptr)) = lua_tointeger(L, -1);
-					break;
-				}
-				case GMMetaMemberType::Vector2:
-				{
-					GMVec2& v = *static_cast<GMVec2*>(member.second.ptr);
-					GMint32 top = lua_gettop(L);
-					if (getVec(top, t))
-					{
-						v = GMVec2(t[0], t[1]);
-						found = true;
-					}
-					break;
-				}
-				case GMMetaMemberType::Vector3:
-				{
-					GMVec3& v = *static_cast<GMVec3*>(member.second.ptr);
-					GMint32 top = lua_gettop(L);
-					if (getVec(top, t))
-					{
-						v = GMVec3(t[0], t[1], t[2]);
-						found = true;
-					}
-					break;
-				}
-				case GMMetaMemberType::Vector4:
-				{
-					GMVec4& v = *static_cast<GMVec4*>(member.second.ptr);
-					GMint32 top = lua_gettop(L);
-					if (getVec(top, t))
-					{
-						v = GMVec4(t[0], t[1], t[2], t[3]);
-						found = true;
-					}
-					break;
-				}
-				case GMMetaMemberType::Matrix4x4:
-				{
-					GMMat4& mat = *static_cast<GMMat4*>(member.second.ptr);
-					GMint32 top = lua_gettop(L);
-					if (getMat4(top, f16.v_))
-					{
-						mat.setFloat16(f16);
-						found = true;
-					}
-					break;
-				}
-				case GMMetaMemberType::Object:
-				{
-					bool b = getObject(lua_gettop(L), *static_cast<GMObject**>(member.second.ptr));
-					if (!b)
-						found = false;
-					break;
-				}
-				case GMMetaMemberType::Pointer:
-				{
-					GM_STATIC_ASSERT_SIZE(GMsize_t, sizeof(void*));
-					lua_Integer address = lua_tointeger(L, -1);
-					*(static_cast<GMsize_t*>(member.second.ptr)) = address;
-					found = true;
-					break;
-				}
-				default:
-					break;
-				}
+				break;
+			}
+			case GMMetaMemberType::Object:
+			{
+				bool b = getObject(lua_gettop(L), *static_cast<GMObject**>(memberIterator->second.ptr));
+				if (!b)
+					found = false;
+				break;
+			}
+			case GMMetaMemberType::Pointer:
+			{
+				GM_STATIC_ASSERT_SIZE(GMsize_t, sizeof(void*));
+				lua_Integer address = lua_tointeger(L, -1);
+				*(static_cast<GMsize_t*>(memberIterator->second.ptr)) = address;
+				found = true;
+				break;
+			}
+			default:
+				break;
 			}
 		}
 

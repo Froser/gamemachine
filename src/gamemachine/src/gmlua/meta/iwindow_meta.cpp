@@ -82,12 +82,11 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(IWindowProxy, create)
 	{
-		static const GMString s_invoker = NAME ".create";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".create");
+		GMLuaArguments args(L, NAME ".create", { GMMetaMemberType::Object, GMMetaMemberType::Object } );
 		IWindowProxy self(L);
 		GMWindowDescProxy desc;
-		GMArgumentHelper::popArgumentAsObject(L, desc, s_invoker); //GMWindowDesc
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		args.getArgument(1, &desc);
 		if (self)
 			self->create(desc.get());
 		return gm::GMReturnValues();
@@ -98,10 +97,9 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(IWindowProxy, centerWindow)
 	{
-		static const GMString s_invoker = NAME ".centerWindow";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".centerWindow");
+		GMLuaArguments args(L, NAME ".centerWindow", { GMMetaMemberType::Object });
 		IWindowProxy self(L);
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
 		if (self)
 			self->centerWindow();
 		return gm::GMReturnValues();
@@ -112,10 +110,9 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(IWindowProxy, showWindow)
 	{
-		static const GMString s_invoker = NAME ".showWindow";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".showWindow");
+		GMLuaArguments args(L, NAME ".showWindow", { GMMetaMemberType::Object });
 		IWindowProxy self(L);
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
 		if (self)
 			self->showWindow();
 		return gm::GMReturnValues();
@@ -126,12 +123,11 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(IWindowProxy, setHandler)
 	{
-		static const GMString s_invoker = NAME ".setHandler";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setHandler");
+		GMLuaArguments args(L, NAME ".setHandler", { GMMetaMemberType::Object, GMMetaMemberType::Object });
 		IWindowProxy self(L);
 		IGameHandlerProxy gameHandler(L);
-		GMArgumentHelper::popArgumentAsObject(L, gameHandler, s_invoker); //IGameHandler
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		args.getArgument(0, &gameHandler);
 		if (self)
 		{
 			gameHandler.setAutoRelease(false);
@@ -147,10 +143,9 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(IWindowProxy, getInputManager)
 	{
-		static const GMString s_invoker = NAME ".getInputManager";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getInputManager");
+		GMLuaArguments args(L, NAME ".getInputManager", { GMMetaMemberType::Object });
 		IWindowProxy self(L);
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
 		if (self)
 		{
 			IInputProxy proxy(L);
@@ -165,12 +160,11 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(IWindowProxy, addWidget)
 	{
-		static const GMString s_invoker = NAME ".addWidget";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".addWidget");
+		GMLuaArguments args(L, NAME ".addWidget", { GMMetaMemberType::Object, GMMetaMemberType::Object });
 		IWindowProxy self(L);
 		GMWidgetProxy widget(L);
-		GMArgumentHelper::popArgumentAsObject(L, widget, s_invoker); //widget
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		args.getArgument(0, &widget);
 		if (self)
 			self->addWidget(widget.get());
 		return gm::GMReturnValues();

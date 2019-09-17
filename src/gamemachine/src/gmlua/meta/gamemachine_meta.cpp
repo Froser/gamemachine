@@ -53,7 +53,7 @@ namespace luaapi
 	// {{BEGIN META FUNCTION}}
 	GM_LUA_FUNC(exit)
 	{
-		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".exit");
+		GMLuaArguments(L, NAME ".exit");
 		GM.exit();
 		return gm::GMReturnValues();
 	}
@@ -61,7 +61,7 @@ namespace luaapi
 	GM_LUA_FUNC(getRunningStates)
 	{
 		GMGameMachineRunningStatesProxy proxy;
-		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".getRunningStates");
+		GMLuaArguments(L, NAME ".getRunningStates");
 		return gm::GMReturnValues (L, GMVariant(proxy));
 	}
 
@@ -69,7 +69,7 @@ namespace luaapi
 	{
 		GMGamePackageProxy proxy(L);
 		proxy.set(GM.getGamePackageManager());
-		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".getGamePackageManager");
+		GMLuaArguments(L, NAME ".getGamePackageManager");
 		return gm::GMReturnValues(L, GMVariant(proxy));
 	}
 
@@ -77,8 +77,8 @@ namespace luaapi
 	{
 		IWindowProxy window(L);
 		static const GMString s_invoker = NAME ".addWindow";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".addWindow");
-		GMArgumentHelper::popArgumentAsObject(L, window, s_invoker);
+		GMLuaArguments args(L, NAME ".addWindow", { gm::GMMetaMemberType::Object });
+		args.getArgument(0, &window);
 		window.setAutoRelease(false);
 		GM.addWindow(window.get());
 		return gm::GMReturnValues();

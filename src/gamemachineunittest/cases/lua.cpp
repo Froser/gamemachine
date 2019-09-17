@@ -92,7 +92,7 @@ namespace
 		GM_META(v4);
 		GM_META(m);
 		GM_META_WITH_TYPE(nest, gm::GMMetaMemberType::Object);
-		GM_META_WITH_TYPE(func, gm::GMMetaMemberType::Function);
+		GM_META(func);
 		return true;
 	}
 
