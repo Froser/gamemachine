@@ -231,7 +231,9 @@ public:
 
 private:
 	void loadLibrary();
-	GMLuaResult pcall(const char* functionName, const std::initializer_list<GMVariant>& args, GMint32 nRet);
+	GMLuaResult pcall(const std::initializer_list<GMVariant>& args, GMint32 nRet);
+	GMLuaResult pcallreturn(GMLuaResult, GMVariant* returns, GMint32 nRet);
+
 	void setEachMetaMember(const GMObject& obj);
 	void setTable(const char* key, const GMObjectMember& value);
 	void setMetatable(const GMObject& obj);

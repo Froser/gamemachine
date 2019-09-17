@@ -512,28 +512,43 @@ GMLuaArguments::~GMLuaArguments()
 GMVariant GMLuaArguments::getArgument(GMint32 index, REF GMObject* objRef)
 {
 	D(d);
-	// 先从index中找到索引
-	GMMetaMemberType type = GMMetaMemberType::Invalid;
-	GMint32 i = d->getIndexInStack(0, index, &type);
-	
-	GMVariant v;
-	if (type != GMMetaMemberType::Object)
-		v = d->getScalar(i);
-	else
-		v = d->getObject(i, objRef);
+	if (!d->types.empty()) // 如果types不为空，表示获取的是传入参数
+	{
+		// 先从index中找到索引
+		GMMetaMemberType type = GMMetaMemberType::Invalid;
+		GMint32 i = d->getIndexInStack(0, index, &type);
 
-	// 检查这个类型是否与期望的一致
-	if (type != GMMetaMemberType::Object)
-	{
-		d->checkType(v, type, index, d->invoker);
+		GMVariant v;
+		if (type != GMMetaMemberType::Object)
+			v = d->getScalar(i);
+		else
+			v = d->getObject(i, objRef);
+
+		// 检查这个类型是否与期望的一致
+		if (type != GMMetaMemberType::Object)
+		{
+			d->checkType(v, type, index, d->invoker);
+		}
+		else
+		{
+			if (!objRef)
+				luaL_error(d->L, "Type is not match. The expected type is object.");
+		}
+
+		return v;
 	}
-	else
+	else // 如果types为空，表示获取返回值
 	{
+		GMint32 i = d->getIndexInStack(0, index);
+
+		GMVariant v;
 		if (!objRef)
-			luaL_error(d->L, "Type is not match. The expected type is object.");
-	}
+			v = d->getScalar(i);
+		else
+			v = d->getObject(i, objRef);
 
-	return v;
+		return v;
+	}
 }
 
 void GMLuaArguments::pushArgument(const GMVariant& arg)

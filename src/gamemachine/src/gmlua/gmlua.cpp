@@ -293,39 +293,19 @@ bool GMLua::getFromGlobal(const char* name, GMObject& obj)
 GMLuaResult GMLua::protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args, GMVariant* returns, GMint32 nRet)
 {
 	D(d);
-	GMLuaResult lr = pcall(functionName, args, nRet);
+	GM_ASSERT(functionName);
+	lua_getglobal(L, functionName);
 
-	GM_CHECK_LUA_STACK_BALANCE(-nRet);
-	if (returns)
-	{
-		for (GMint32 i = 0; i < nRet; i++)
-		{
-			if (returns[i].isObject())
-			{
-				POP_GUARD();
-				popTable(*returns[i].toObject());
-			}
-			else
-			{
-				POP_GUARD();
-				returns[i] = getTop();
-			}
-		}
-	}
-
-	if (lr.state != GMLuaStates::Ok)
-	{
-		gm_warning(gm_dbg_wrap("{0}"), lr.message);
-	}
-
-	return lr;
+	GMLuaResult lr = pcall(args, nRet);
+	return pcallreturn(lr, returns, nRet);
 }
 
 GMLuaResult GMLua::protectedCall(GMLuaReference funcRef, const std::initializer_list<GMVariant>& args, GMVariant* returns, GMint32 nRet)
 {
 	D(d);
 	lua_rawgeti(L, LUA_REGISTRYINDEX, funcRef);
-	return protectedCall(nullptr, args, returns, nRet);
+	GMLuaResult lr = pcall(args, nRet);
+	return pcallreturn(lr, returns, nRet);
 }
 
 void GMLua::freeReference(GMLuaReference ref)
@@ -357,12 +337,9 @@ void GMLua::loadLibrary()
 	}
 }
 
-GMLuaResult GMLua::pcall(const char* functionName, const std::initializer_list<GMVariant>& args, GMint32 nRet)
+GMLuaResult GMLua::pcall(const std::initializer_list<GMVariant>& args, GMint32 nRet)
 {
 	D(d);
-	if (functionName)
-		lua_getglobal(L, functionName);
-
 	GMint32 top = lua_gettop(getLuaCoreState()); // top 表示栈在传参之前的索引
 	GMLuaArguments a(getLuaCoreState());
 	for (const auto& var : args)
@@ -376,7 +353,7 @@ GMLuaResult GMLua::pcall(const char* functionName, const std::initializer_list<G
 	{
 		gm_error(gm_dbg_wrap("Invalid lua stack while calling pcall."));
 		GM_ASSERT(false);
-		return { GMLuaStates::RuntimeError, "Invalid lua stack while calling pcall." };
+		return{ GMLuaStates::RuntimeError, "Invalid lua stack while calling pcall." };
 	}
 
 	GMLuaResult lr = { (GMLuaStates)lua_pcall(L, gm_sizet_to_uint(args.size()), nRet, 0) };
@@ -390,6 +367,38 @@ GMLuaResult GMLua::pcall(const char* functionName, const std::initializer_list<G
 		GM_ASSERT(false);
 		return{ GMLuaStates::RuntimeError, "Invalid return value count while calling pcall." };
 	}
+
+	return lr;
+}
+
+GMLuaResult GMLua::pcallreturn(GMLuaResult lr, GMVariant* returns, GMint32 nRet)
+{
+	GMLuaCoreState* l = getLuaCoreState();
+	if (lr.state != GMLuaStates::Ok)
+	{
+		luaL_error(l, "%s", lr.message.c_str());
+	}
+	else
+	{
+		GMLuaArguments results(getLuaCoreState());
+		if (returns)
+		{
+			for (GMint32 i = 0; i < nRet; i++)
+			{
+				if (returns[i].isObject())
+				{
+					results.getArgument(i, returns[i].toObject());
+				}
+				else
+				{
+					returns[i] = results.getArgument(i);
+				}
+			}
+		}
+	}
+
+	// 清理所有堆栈
+	lua_pop(l, lua_gettop(l));
 
 	return lr;
 }

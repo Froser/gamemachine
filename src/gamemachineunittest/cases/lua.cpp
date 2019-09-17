@@ -129,7 +129,7 @@ namespace
 
 	const char* s_invoke3 =
 		"function testSetTable(i)"
-		"  local tb = {};"
+		"  local tb = { nest = {} };"
 		"  tb.str = i.str;"
 		"  tb.nest.str = i.str;"
 		"  return tb;"
