@@ -253,20 +253,18 @@ private:
 #define GM_LUA_FUNC(FuncName) gm::luaapi::GMFunctionReturn FuncName(GMLuaCoreState* L)
 #define GM_LUA_DEFAULT_NEW_IMPL(New, FuncName, Proxy, Real) GM_LUA_FUNC(New)				\
 {																							\
-	static const GMString s_invoker = FuncName;												\
-	GM_LUA_CHECK_ARG_COUNT(L, 0,FuncName);													\
+	gm::GMLuaArguments(L, FuncName);														\
 	Proxy proxy(L, new Real());																\
-	return gm::GMReturnValues(L, GMVariant(proxy));									\
+	return gm::GMReturnValues(L, GMVariant(proxy));											\
 }
 
 #define GM_LUA_NEW_IMPL_ARG(New, FuncName, Proxy, Real, Arg0ProxyType) GM_LUA_FUNC(New)		\
 {																							\
-	static const GMString s_invoker = FuncName;												\
-	GM_LUA_CHECK_ARG_COUNT(L, 1, FuncName);													\
+	gm::GMLuaArguments args(L, FuncName, { GMMetaMemberType::Object } );					\
 	gm::luaapi::Arg0ProxyType arg0(L);														\
-	gm::luaapi::GMArgumentHelper::popArgumentAsObject(L, arg0, s_invoker);					\
+	args.getArgument(0, &arg0);																\
 	Proxy proxy(L, new Real(arg0.get()));													\
-	return gm::GMReturnValues(L, GMVariant(proxy));									\
+	return gm::GMReturnValues(L, GMVariant(proxy));											\
 }
 
 #define GM_LUA_PROXY_IMPL(Proxy, FuncName) gm::GMint32 GM_PRIVATE_NAME(Proxy)::FuncName(GMLuaCoreState* L)

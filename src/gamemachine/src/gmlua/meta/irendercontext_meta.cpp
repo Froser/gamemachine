@@ -55,10 +55,9 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(IRenderContextProxy, getWindow)
 	{
-		static const GMString s_invoker = NAME ".getWindow";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getWindow");
+		GMLuaArguments args(L, NAME ".getWindow", { GMMetaMemberType::Object });
 		IRenderContextProxy self(L);
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
 		if (self)
 		{
 			IWindowProxy window(L);
@@ -73,10 +72,9 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(IRenderContextProxy, getEngine)
 	{
-		static const GMString s_invoker = NAME ".getEngine";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getEngine");
+		GMLuaArguments args(L, NAME ".getEngine", { GMMetaMemberType::Object });
 		IRenderContextProxy self(L);
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
 		if (self)
 		{
 			IGraphicEngineProxy engine(L);

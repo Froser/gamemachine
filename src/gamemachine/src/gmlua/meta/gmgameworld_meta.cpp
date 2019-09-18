@@ -38,10 +38,9 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(GMGameWorldProxy, renderScene)
 	{
-		static const GMString s_invoker = NAME ".renderScene";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".renderScene");
+		GMLuaArguments args(L, NAME ".renderScene", { GMMetaMemberType::Object });
 		GMGameWorldProxy self(L);
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
 		if (self)
 			self->renderScene();
 		return gm::GMReturnValues();
@@ -52,12 +51,11 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(GMGameWorldProxy, addObjectAndInit)
 	{
-		static const GMString s_invoker = NAME ".addObjectAndInit";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".addObjectAndInit");
+		GMLuaArguments args(L, NAME ".addObjectAndInit", { GMMetaMemberType::Object, GMMetaMemberType::Object });
 		GMGameWorldProxy self(L);
 		GMGameObjectProxy gameobject(L);
-		GMArgumentHelper::popArgumentAsObject(L, gameobject, s_invoker); //GMObject
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		args.getArgument(1, &gameobject);
 		if (self)
 		{
 			self->addObjectAndInit(gameobject.get());
@@ -71,12 +69,11 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(GMGameWorldProxy, addToRenderList)
 	{
-		static const GMString s_invoker = NAME ".addToRenderList";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".addToRenderList");
+		GMLuaArguments args(L, NAME ".addToRenderList", { GMMetaMemberType::Object, GMMetaMemberType::Object });
 		GMGameWorldProxy self(L);
 		GMGameObjectProxy gameobject(L);
-		GMArgumentHelper::popArgumentAsObject(L, gameobject, s_invoker); //GMObject
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		args.getArgument(1, &gameobject);
 		if (self)
 			self->addToRenderList(gameobject.get());
 		return gm::GMReturnValues();

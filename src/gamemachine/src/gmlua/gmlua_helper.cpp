@@ -406,6 +406,11 @@ bool GMLuaArgumentsPrivate::getObject(GMint32 index, REF GMObject* objRef)
 				break;
 			}
 		}
+		else
+		{
+			// 从lua的table中找不到GMObject对应的meta，说明类型不匹配，直接抛出一个错误
+			luaL_error(L, "Cannot find the entry of object '%s'.", key);
+		}
 
 		lua_pop(L, 1); // 移除value，使用key来进行下一个迭代
 	}
