@@ -43,12 +43,11 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(IGraphicEngineProxy, addLight)
 	{
-		static const GMString s_invoker = NAME ".addLight";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".addLight");
+		GMLuaArguments args(L, NAME ".addLight", { GMMetaMemberType::Object, GMMetaMemberType::Object });
 		IGraphicEngineProxy self(L);
 		ILightProxy light(L);
-		GMArgumentHelper::popArgumentAsObject(L, light, s_invoker); //IGameHandler
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		args.getArgument(1, &light);
 		if (self)
 		{
 			light.setAutoRelease(false);
@@ -62,10 +61,9 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(IGraphicEngineProxy, getCamera)
 	{
-		static const GMString s_invoker = NAME ".getCamera";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getCamera");
+		GMLuaArguments args(L, NAME ".getCamera", { GMMetaMemberType::Object });
 		IGraphicEngineProxy self(L);
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
 		if (self)
 		{
 			GMCamera& camera = self->getCamera();
@@ -81,10 +79,9 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(IGraphicEngineProxy, getDefaultFramebuffers)
 	{
-		static const GMString s_invoker = NAME ".getDefaultFramebuffers";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getDefaultFramebuffers");
+		GMLuaArguments args(L, NAME ".getDefaultFramebuffers", { GMMetaMemberType::Object });
 		IGraphicEngineProxy self(L);
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
 		if (self)
 		{
 			IFramebuffers* defaultFramebuffers = self->getDefaultFramebuffers();
@@ -100,10 +97,9 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(IGraphicEngineProxy, getGlyphManager)
 	{
-		static const GMString s_invoker = NAME ".getGlyphManager";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getGlyphManager");
+		GMLuaArguments args(L, NAME ".getGlyphManager", { GMMetaMemberType::Object });
 		IGraphicEngineProxy self(L);
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
 		if (self)
 		{
 			GMGlyphManager* glyphManager = self->getGlyphManager();
@@ -135,8 +131,8 @@ namespace luaapi
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-
-#define CAMERA_NAME "GMCamera"
+#undef NAME
+#define NAME "GMCamera"
 
 	bool GMCameraLookAtProxy::registerMeta()
 	{
@@ -168,12 +164,11 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(GMCameraProxy, lookAt)
 	{
-		static const GMString s_invoker = CAMERA_NAME ".lookAt";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, CAMERA_NAME ".lookAt");
+		GMLuaArguments args(L, NAME ".lookAt", { GMMetaMemberType::Object, GMMetaMemberType::Object });
 		GMCameraProxy self(L);
 		GMCameraLookAtProxy lookAt;
-		GMArgumentHelper::popArgumentAsObject(L, lookAt, s_invoker); //IGameHandler
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		args.getArgument(1, &lookAt);
 		if (self)
 			self->lookAt(lookAt.toCameraLookAt());
 		return gm::GMReturnValues();
@@ -184,14 +179,14 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(GMCameraProxy, setPerspective)
 	{
-		static const GMString s_invoker = CAMERA_NAME ".setPerspective";
-		GM_LUA_CHECK_ARG_COUNT(L, 5, CAMERA_NAME ".setPerspective");
+		static const GMString s_invoker = NAME ".setPerspective";
+		GMLuaArguments args(L, NAME ".setPerspective", { GMMetaMemberType::Object, GMMetaMemberType::Float, GMMetaMemberType::Float, GMMetaMemberType::Float, GMMetaMemberType::Float });
 		GMCameraProxy self(L);
-		GMfloat f = GMArgumentHelper::popArgument(L, s_invoker).toFloat(); //far
-		GMfloat n = GMArgumentHelper::popArgument(L, s_invoker).toFloat(); //near
-		GMfloat aspect = GMArgumentHelper::popArgument(L, s_invoker).toFloat(); //aspect
-		GMfloat fovy = GMArgumentHelper::popArgument(L, s_invoker).toFloat(); //fovy
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		GMfloat fovy = args.getArgument(1).toFloat();
+		GMfloat aspect = args.getArgument(2).toFloat();
+		GMfloat n = args.getArgument(3).toFloat();
+		GMfloat f = args.getArgument(4).toFloat();
 		if (self)
 			self->setPerspective(fovy, aspect, n, f);
 		return gm::GMReturnValues();
@@ -202,16 +197,15 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(GMCameraProxy, setOrtho)
 	{
-		static const GMString s_invoker = CAMERA_NAME ".setPerspective";
-		GM_LUA_CHECK_ARG_COUNT(L, 7, CAMERA_NAME ".setPerspective");
+		GMLuaArguments args(L, NAME ".setOrtho", { GMMetaMemberType::Object, GMMetaMemberType::Float, GMMetaMemberType::Float, GMMetaMemberType::Float, GMMetaMemberType::Float, GMMetaMemberType::Float, GMMetaMemberType::Float });
 		GMCameraProxy self(L);
-		GMfloat f = GMArgumentHelper::popArgument(L, s_invoker).toFloat(); //far
-		GMfloat n = GMArgumentHelper::popArgument(L, s_invoker).toFloat(); //near
-		GMfloat top = GMArgumentHelper::popArgument(L, s_invoker).toFloat(); //top
-		GMfloat bottom = GMArgumentHelper::popArgument(L, s_invoker).toFloat(); //bottom
-		GMfloat right = GMArgumentHelper::popArgument(L, s_invoker).toFloat(); //right
-		GMfloat left = GMArgumentHelper::popArgument(L, s_invoker).toFloat(); //left
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		GMfloat left = args.getArgument(1).toFloat();
+		GMfloat right = args.getArgument(2).toFloat();
+		GMfloat bottom = args.getArgument(3).toFloat();
+		GMfloat top = args.getArgument(4).toFloat();
+		GMfloat n = args.getArgument(5).toFloat();
+		GMfloat f = args.getArgument(6).toFloat();
 		if (self)
 			self->setOrtho(left, right, bottom, top, n, f);
 		return gm::GMReturnValues();
@@ -231,21 +225,22 @@ namespace luaapi
 		GM_CREATE_DATA();
 	}
 
+#undef NAME
+
 	//////////////////////////////////////////////////////////////////////////
-#define IFRAMEBUFFERS_NAME "IFramebuffers"
+#define NAME "IFramebuffers"
 
 /*
 * clear([self], clearType)
 */
 	GM_LUA_PROXY_IMPL(IFramebuffersProxy, clear)
 	{
-		static const GMString s_invoker = IFRAMEBUFFERS_NAME ".clear";
-		GM_LUA_CHECK_ARG_COUNT_GT(L, 1, IFRAMEBUFFERS_NAME ".clear");
+		static const GMString s_invoker = NAME ".clear";
+		GM_LUA_CHECK_ARG_COUNT_GT(L, 1, NAME ".clear");
+		GMLuaArguments args(L, NAME ".clear", { GMMetaMemberType::Object, GMMetaMemberType::Int });
 		IFramebuffersProxy self(L);
-		GMFramebuffersClearType type = (GMArgumentHelper::getArgumentsCount(L) == 2) ?
-			(static_cast<GMFramebuffersClearType>(GMArgumentHelper::popArgument(L, s_invoker).toInt())) :
-			(GMFramebuffersClearType::All); // clearType
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		GMFramebuffersClearType type = static_cast<GMFramebuffersClearType>(args.getArgument(1).toInt());
 		if (self)
 			self->clear(type);
 		return gm::GMReturnValues();
@@ -264,4 +259,6 @@ namespace luaapi
 	}
 
 }
+#undef NAME
+
 END_NS
