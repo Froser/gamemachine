@@ -69,10 +69,10 @@ namespace luaapi
 		GM_LUA_FUNC(load)
 		{
 			static const GMString s_invoker = NAME ".load";
-			GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".load");
+			GMLuaArguments args(L, NAME ".load", { GMMetaMemberType::Object });
 			GMModelLoadSettingsProxy settings;
 			settings.setLuaCoreState(L);
-			GMArgumentHelper::popArgumentAsObject(L, settings, s_invoker);
+			args.getArgument(0, &settings);
 			GMSceneAsset asset;
 			GMModelReader::load(settings.toModelLoadSettings(), GMModelReader::Assimp, asset);
 			GMAssetProxy proxy(L, asset);

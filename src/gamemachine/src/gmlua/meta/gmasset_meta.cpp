@@ -4,7 +4,6 @@
 #include <gmlua.h>
 #include "gmmodel_meta.h"
 
-#define NAME "GMAsset"
 
 BEGIN_NS
 
@@ -16,15 +15,15 @@ namespace luaapi
 		GM_LUA_PROXY_FUNC(getModel);
 	};
 
+#define NAME "GMAsset"
 	/*
 	 * getScene([self])
 	 */
 	GM_LUA_PROXY_IMPL(GMAssetProxy, getScene)
 	{
-		static const GMString s_invoker = NAME ".getScene";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".getScene");
+		GMLuaArguments args(L, NAME ".getScene", { GMMetaMemberType::Object });
 		GMAssetProxy self(L);
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
 		if (self)
 		{
 			GMSceneProxy scene(L);
@@ -39,10 +38,9 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(GMAssetProxy, getModel)
 	{
-		static const GMString s_invoker = "GMScene.getModel";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, "GMScene.getModel");
+		GMLuaArguments args(L, NAME ".getModel", { GMMetaMemberType::Object });
 		GMAssetProxy self(L);
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
 		if (self)
 		{
 			auto m = self->getModel();
@@ -88,6 +86,8 @@ namespace luaapi
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+#undef NAME
+#define NAME "GMScene"
 	bool GMSceneProxy::registerMeta()
 	{
 		GM_META_FUNCTION(getModels);
@@ -105,10 +105,9 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(GMSceneProxy, getModels)
 	{
-		static const GMString s_invoker = "GMScene.getModels";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, "GMScene.getModels");
+		GMLuaArguments args(L, NAME ".getModels", { GMMetaMemberType::Object });
 		GMSceneProxy self(L);
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
 
 		auto& ms = self->getModels();
 		Vector<GMAssetProxy>* assets = new Vector<GMAssetProxy>();

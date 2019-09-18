@@ -164,7 +164,7 @@ namespace luaapi
 		IWindowProxy self(L);
 		GMWidgetProxy widget(L);
 		args.getArgument(0, &self);
-		args.getArgument(0, &widget);
+		args.getArgument(1, &widget);
 		if (self)
 			self->addWidget(widget.get());
 		return gm::GMReturnValues();

@@ -21,12 +21,11 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(GMGlyphManagerProxy, addFontByMemory)
 	{
-		static const GMString s_invoker = NAME ".addFontByMemory";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".addFontByMemory");
+		GMLuaArguments args(L, NAME ".addFontByMemory", { GMMetaMemberType::Object, GMMetaMemberType::Object } );
 		GMGlyphManagerProxy self(L);
 		GMBufferProxy buffer(L);
-		GMArgumentHelper::popArgumentAsObject(L, buffer, s_invoker); //buffer
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		args.getArgument(1, &buffer);
 		if (self)
 			return gm::GMReturnValues(L, self->addFontByMemory(std::move(*buffer.get())));
 		return gm::GMReturnValues();
@@ -37,11 +36,10 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(GMGlyphManagerProxy, setDefaultFontEN)
 	{
-		static const GMString s_invoker = NAME ".setDefaultFontEN";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setDefaultFontEN");
+		GMLuaArguments args(L, NAME ".setDefaultFontEN", { GMMetaMemberType::Object, GMMetaMemberType::Int });
 		GMGlyphManagerProxy self(L);
-		GMFontHandle fontHandle = static_cast<GMFontHandle>(GMArgumentHelper::popArgument(L, s_invoker).toInt()); //fontHandle
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		GMFontHandle fontHandle = static_cast<GMFontHandle>(args.getArgument(1).toInt()); //fontHandle
 		if (self)
 			self->setDefaultFontEN(fontHandle);
 		return gm::GMReturnValues();
@@ -52,11 +50,9 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(GMGlyphManagerProxy, setDefaultFontCN)
 	{
-		static const GMString s_invoker = NAME ".setDefaultFontCN";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setDefaultFontCN");
+		GMLuaArguments args(L, NAME ".setDefaultFontCN", { GMMetaMemberType::Object, GMMetaMemberType::Int });
 		GMGlyphManagerProxy self(L);
-		GMFontHandle fontHandle = static_cast<GMFontHandle>(GMArgumentHelper::popArgument(L, s_invoker).toInt()); //fontHandle
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		GMFontHandle fontHandle = static_cast<GMFontHandle>(args.getArgument(1).toInt()); //fontHandle
 		if (self)
 			self->setDefaultFontCN(fontHandle);
 		return gm::GMReturnValues();

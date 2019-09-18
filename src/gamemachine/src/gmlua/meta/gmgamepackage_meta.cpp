@@ -22,10 +22,10 @@ namespace luaapi
 	GM_LUA_PROXY_IMPL(GMGamePackageProxy, loadPackage)
 	{
 		static const GMString s_invoker(L"loadPackage");
-		GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".loadPackage");
+		GMLuaArguments args(L, NAME ".loadPackage", { GMMetaMemberType::Object, GMMetaMemberType::String } );
 		GMGamePackageProxy self(L);
-		GMString path = GMArgumentHelper::popArgumentAsString(L, s_invoker); // path
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		GMString path = args.getArgument(1).toString();
 		if (self)
 			self->loadPackage(path);
 		return gm::GMReturnValues();
@@ -37,11 +37,11 @@ namespace luaapi
 	GM_LUA_PROXY_IMPL(GMGamePackageProxy, readFile)
 	{
 		static const GMString s_invoker(NAME ".readFile");
-		GM_LUA_CHECK_ARG_COUNT(L, 3, NAME ".readFile");
+		GMLuaArguments args(L, NAME ".readFile", { GMMetaMemberType::Object, GMMetaMemberType::Int, GMMetaMemberType::String });
 		GMGamePackageProxy self(L);
-		GMString filename = GMArgumentHelper::popArgumentAsString(L, s_invoker); // filename
-		GMPackageIndex type = static_cast<GMPackageIndex>(GMArgumentHelper::popArgument(L, s_invoker).toInt());
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		GMPackageIndex type = static_cast<GMPackageIndex>(args.getArgument(1).toInt());
+		GMString filename = args.getArgument(2).toString();
 		if (self)
 		{
 			GMBufferProxy buffer(L, new GMBuffer());
@@ -54,8 +54,8 @@ namespace luaapi
 	bool GMGamePackageProxy::registerMeta()
 	{
 		GM_META_FUNCTION(loadPackage)
-			GM_META_FUNCTION(readFile)
-			return Base::registerMeta();
+		GM_META_FUNCTION(readFile)
+		return Base::registerMeta();
 	}
 
 	GMGamePackageProxy::GMGamePackageProxy(GMLuaCoreState* l, GMObject* handler /*= nullptr*/)

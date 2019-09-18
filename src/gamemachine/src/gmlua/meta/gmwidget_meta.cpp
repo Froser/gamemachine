@@ -61,17 +61,17 @@ namespace luaapi
 
 	//////////////////////////////////////////////////////////////////////////
 
+#define NAME "GMUIConfiguration"
 	/*
 	 * import([self], buffer)
 	 */
 	GM_LUA_PROXY_IMPL(GMUIConfigurationProxy, import)
 	{
-		static const GMString s_invoker = "GMUIConfiguration.import";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, "GMUIConfiguration.import");
+		GMLuaArguments args(L, NAME ".import", { GMMetaMemberType::Object, GMMetaMemberType::Object } );
 		GMUIConfigurationProxy self(L);
 		GMBufferProxy buffer(L);
-		GMArgumentHelper::popArgumentAsObject(L, buffer, s_invoker); //buffer
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		args.getArgument(1, &buffer);
 		if (self)
 			self->import(*buffer.get());
 		return gm::GMReturnValues();
@@ -82,12 +82,11 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(GMUIConfigurationProxy, initResourceManager)
 	{
-		static const GMString s_invoker = "GMUIConfiguration.initResourceManager";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, "GMUIConfiguration.initResourceManager");
+		GMLuaArguments args(L, NAME ".initResourceManager", { GMMetaMemberType::Object, GMMetaMemberType::Object });
 		GMUIConfigurationProxy self(L);
 		GMWidgetResourceManagerProxy resourceManager(L);
-		GMArgumentHelper::popArgumentAsObject(L, resourceManager, s_invoker); //resourceManager
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		args.getArgument(1, &resourceManager);
 		if (self)
 			self->initResourceManager(resourceManager.get());
 		return gm::GMReturnValues();
@@ -98,12 +97,11 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(GMWidgetResourceManagerProxy, registerWidget)
 	{
-		static const GMString s_invoker = "GMWidgetResourceManager.registerWidget";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, "GMWidgetResourceManager.registerWidget");
+		GMLuaArguments args(L, NAME ".registerWidget", { GMMetaMemberType::Object, GMMetaMemberType::Object });
 		GMWidgetResourceManagerProxy self(L);
 		GMWidgetProxy widget(L);
-		GMArgumentHelper::popArgumentAsObject(L, widget, s_invoker); //widget
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		args.getArgument(1, &widget);
 		if (self)
 			self->registerWidget(widget.get());
 		return gm::GMReturnValues();
@@ -114,10 +112,9 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(GMWidgetResourceManagerProxy, createWidget)
 	{
-		static const GMString s_invoker = "GMWidgetResourceManager.createWidget";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, "GMWidgetResourceManager.createWidget");
+		GMLuaArguments args(L, NAME ".createWidget", { GMMetaMemberType::Object });
 		GMWidgetResourceManagerProxy self(L);
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
 		if (self)
 		{
 			GMWidgetProxy widget(L, self->createWidget());
@@ -126,20 +123,21 @@ namespace luaapi
 		return gm::GMReturnValues();
 	}
 
+#undef NAME
 	//////////////////////////////////////////////////////////////////////////
 	// GMWidget
 	//////////////////////////////////////////////////////////////////////////
+#define NAME "GMWidget"
 	/*
 	 * setPosition([self], x, y)
 	 */
 	GM_LUA_PROXY_IMPL(GMWidgetProxy, setPosition)
 	{
-		static const GMString s_invoker = "GMWidget.setPosition";
-		GM_LUA_CHECK_ARG_COUNT(L, 3, "GMWidget.setPosition");
+		GMLuaArguments args(L, NAME ".setPosition", { GMMetaMemberType::Object, GMMetaMemberType::Int, GMMetaMemberType::Int });
 		GMWidgetProxy self(L);
-		GMint32 y = GMArgumentHelper::popArgument(L, s_invoker).toInt(); //y
-		GMint32 x = GMArgumentHelper::popArgument(L, s_invoker).toInt(); //x
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		GMint32 x = args.getArgument(1).toInt();
+		GMint32 y = args.getArgument(2).toInt();
 		if (self)
 			self->setPosition(x, y);
 		return gm::GMReturnValues();
@@ -150,12 +148,11 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(GMWidgetProxy, setSize)
 	{
-		static const GMString s_invoker = "GMWidget.setSize";
-		GM_LUA_CHECK_ARG_COUNT(L, 3, "GMWidget.setSize");
+		GMLuaArguments args(L, NAME ".setSize", { GMMetaMemberType::Object, GMMetaMemberType::Int, GMMetaMemberType::Int });
 		GMWidgetProxy self(L);
-		GMint32 height = GMArgumentHelper::popArgument(L, s_invoker).toInt(); //height
-		GMint32 width = GMArgumentHelper::popArgument(L, s_invoker).toInt(); //width
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		GMint32 width = args.getArgument(1).toInt();
+		GMint32 height = args.getArgument(2).toInt();
 		if (self)
 			self->setSize(width, height);
 		return gm::GMReturnValues();
@@ -166,11 +163,10 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(GMWidgetProxy, setTitle)
 	{
-		static const GMString s_invoker = "GMWidget.setTitle";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, "GMWidget.setTitle");
+		GMLuaArguments args(L, NAME ".setTitle", { GMMetaMemberType::Object, GMMetaMemberType::String });
 		GMWidgetProxy self(L);
-		GMString title = GMArgumentHelper::popArgumentAsString(L, s_invoker); //title
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		GMString title = args.getArgument(1).toString();
 		if (self)
 			self->setTitle(title);
 		return gm::GMReturnValues();
@@ -181,12 +177,11 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(GMWidgetProxy, addControl)
 	{
-		static const GMString s_invoker = "GMWidget.addControl";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, "GMWidget.addControl");
+		GMLuaArguments args(L, NAME ".addControl", { GMMetaMemberType::Object, GMMetaMemberType::Object });
 		GMWidgetProxy self(L);
 		GMControlProxy control(L);
-		GMArgumentHelper::popArgumentAsObject(L, control, s_invoker); //control
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		args.getArgument(1, &control);
 		if (self)
 		{
 			self->addControl(control.get());

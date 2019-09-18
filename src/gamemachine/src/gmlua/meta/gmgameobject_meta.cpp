@@ -46,11 +46,11 @@ namespace luaapi
 	GM_LUA_PROXY_IMPL(GMGameObjectProxy, setAsset)
 	{
 		static const GMString s_invoker = NAME ".setAsset";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setAsset");
+		GMLuaArguments args(L, NAME ".setAsset", { GMMetaMemberType::Object, GMMetaMemberType::Object });
 		GMGameObjectProxy self(L);
 		GMAssetProxy asset(L);
-		GMArgumentHelper::popArgumentAsObject(L, asset, s_invoker); //asset
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		args.getArgument(1, &asset);
 		if (self)
 			self->setAsset(*asset.get());
 		return gm::GMReturnValues();
@@ -61,11 +61,10 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(GMGameObjectProxy, setTranslation)
 	{
-		static const GMString s_invoker = NAME ".setTranslation";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setTranslation");
+		GMLuaArguments args(L, NAME ".setTranslation", { GMMetaMemberType::Object, GMMetaMemberType::Matrix4x4 });
 		GMGameObjectProxy self(L);
-		GMMat4 mat = GMArgumentHelper::popArgumentAsMat4(L, s_invoker).toMat4(); //matrix
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		GMMat4 mat = args.getArgument(1).toMat4();
 		if (self)
 			self->setTranslation(mat);
 		return gm::GMReturnValues();
@@ -76,12 +75,11 @@ namespace luaapi
 	*/
 	GM_LUA_PROXY_IMPL(GMGameObjectProxy, setRotation)
 	{
-		static const GMString s_invoker = NAME ".setRotation";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setRotation");
+		GMLuaArguments args(L, NAME ".setRotation", { GMMetaMemberType::Object, GMMetaMemberType::Vector4 });
 		GMGameObjectProxy self(L);
-		GMVec4 v = GMArgumentHelper::popArgumentAsVec4(L, s_invoker).toVec4(); //quat
+		args.getArgument(0, &self);
+		GMVec4 v = args.getArgument(1).toVec4();
 		GMQuat quat(v.getX(), v.getY(), v.getZ(), v.getW());
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
 		if (self)
 			self->setRotation(quat);
 		return gm::GMReturnValues();
@@ -93,11 +91,10 @@ namespace luaapi
 	*/
 	GM_LUA_PROXY_IMPL(GMGameObjectProxy, setScaling)
 	{
-		static const GMString s_invoker = NAME ".setScaling";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".setScaling");
+		GMLuaArguments args(L, NAME ".setScaling", { GMMetaMemberType::Object, GMMetaMemberType::Matrix4x4 });
 		GMGameObjectProxy self(L);
-		GMMat4 mat = GMArgumentHelper::popArgumentAsMat4(L, s_invoker).toMat4(); //matrix
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		GMMat4 mat = args.getArgument(1).toMat4();
 		if (self)
 			self->setScaling(mat);
 		return gm::GMReturnValues();
@@ -108,11 +105,10 @@ namespace luaapi
 	*/
 	GM_LUA_PROXY_IMPL(GMGameObjectProxy, update)
 	{
-		static const GMString s_invoker = NAME ".update";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".update");
+		GMLuaArguments args(L, NAME ".update", { GMMetaMemberType::Object, GMMetaMemberType::Float });
 		GMGameObjectProxy self(L);
-		GMfloat dt = GMArgumentHelper::popArgument(L, s_invoker).toFloat(); //dt
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		GMfloat dt = args.getArgument(1).toFloat();
 		if (self)
 			self->update(dt);
 		return gm::GMReturnValues();

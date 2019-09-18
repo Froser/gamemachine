@@ -23,15 +23,8 @@ namespace
 
 void GMReturnValues::pushArgument(const GMVariant& arg)
 {
-	if (arg.isObject())
-	{
-		m_L.pushNewTable(*arg.toObject());
-	}
-	else
-	{
-		GMLuaArguments args(m_L.getLuaCoreState());
-		args.pushArgument(arg);
-	}
+	GMLuaArguments args(m_L.getLuaCoreState());
+	args.pushArgument(arg);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -463,7 +456,7 @@ void GMLuaArgumentsPrivate::checkType(const GMVariant& v, GMMetaMemberType mt, G
 	std::string ivk = invoker.toStdString();
 	if (!suc)
 	{
-		luaL_error(L, "Type is not match at index %i in %s. The type of passed variable is %s.", index, ivk.c_str(), lua_typename(L, lua_type(L, index)));
+		luaL_error(L, "Type is not match at index %d in %s. The type of passed variable is %s.", index, ivk.c_str(), lua_typename(L, lua_type(L, index)));
 	}
 }
 

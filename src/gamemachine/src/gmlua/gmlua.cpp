@@ -351,7 +351,7 @@ GMLuaResult GMLua::pcallreturn(GMLuaResult lr, GMVariant* returns, GMint32 nRet)
 	GMLuaCoreState* l = getLuaCoreState();
 	if (lr.state != GMLuaStates::Ok)
 	{
-		luaL_error(l, "%s", lr.message.c_str());
+		luaL_error(l, "%s", lr.message.toStdString().c_str());
 	}
 	else
 	{

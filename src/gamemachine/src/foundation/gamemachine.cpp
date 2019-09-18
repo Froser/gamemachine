@@ -304,17 +304,20 @@ void GameMachine::init(
 
 GMGamePackage* GameMachine::getGamePackageManager()
 {
-	D(d); return d->gamePackageManager;
+	D(d);
+	return d->gamePackageManager;
 }
 
 IFactory* GameMachine::getFactory()
 {
-	D(d); return d->factory;
+	D(d);
+	return d->factory;
 }
 
 const GMGameMachineRunningStates& GameMachine::getRunningStates() const
 {
-	D(d); return d->states;
+	D(d);
+	return d->states;
 }
 
 void GameMachine::postMessage(GMMessage msg)

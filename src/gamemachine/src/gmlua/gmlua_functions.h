@@ -67,27 +67,27 @@ namespace luaapi
 
 		static GMFunctionReturn __gc(GMLuaCoreState* l)
 		{
-			static const GMString s_invoker = "GMLuaVector.__gc";
+			GMLuaArguments args(l, "GMLuaVector.__gc", { GMMetaMemberType::Object } );
 			GMLuaVector self;
-			GMArgumentHelper::popArgumentAsObject(l, self, s_invoker); //self
+			args.getArgument(0, &self);
 			self.release();
 			return gm::GMReturnValues();
 		}
 
 		static GMFunctionReturn __index(GMLuaCoreState* l)
 		{
-			static const GMString s_invoker = "GMLuaVector.__index";
+			GMLuaArguments args(l, "GMLuaVector.__index", { GMMetaMemberType::Object, GMMetaMemberType::Int });
 			GMLuaVector self;
-			GMVariant i = GMArgumentHelper::popArgument(l, s_invoker); //i
-			GMArgumentHelper::popArgumentAsObject(l, self, s_invoker); //self
-			return gm::GMReturnValues(l, (*(self.value))[i.toInt() - 1]);
+			args.getArgument(0, &self);
+			GMint32 i = args.getArgument(1).toInt();
+			return gm::GMReturnValues(l, (*(self.value))[i - 1]);
 		}
 
 		static GMFunctionReturn size(GMLuaCoreState* l)
 		{
-			static const GMString s_invoker = "GMLuaVector.size";
+			GMLuaArguments args(l, "GMLuaVector.size", { GMMetaMemberType::Object });
 			GMLuaVector self;
-			GMArgumentHelper::popArgumentAsObject(l, self, s_invoker); //self
+			args.getArgument(0, &self);
 			return gm::GMReturnValues(l, gm_sizet_to_int(self.value->size()));
 		}
 

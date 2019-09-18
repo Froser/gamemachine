@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
 	GMLuaResult result = lua.runFile(args[1].toStdString().c_str());
 	if (result.state != GMLuaStates::Ok)
 	{
-		gm_error("Syntax error: {0}", result.message);
+		gm_error("Error: {0}", result.message);
 		getchar();
 	}
 
