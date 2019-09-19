@@ -169,16 +169,16 @@ namespace luaapi
 		GM_CREATE_DATA();
 	}
 
+#define NAME "IInput"
 	//////////////////////////////////////////////////////////////////////////
 	/*
 	 * getKeyboardState([self])
 	 */
 	GM_LUA_PROXY_IMPL(IInputProxy, getKeyboardState)
 	{
-		static const GMString s_invoker = "IInput.getKeyboardState";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, "IInput.getKeyboardState");
+		GMLuaArguments args(L, NAME ".getKeyboardState", { GMMetaMemberType::Object } );
 		IInputProxy self(L);
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
 		if (self)
 		{
 			IKeyboardStateProxy proxy(L);
@@ -193,10 +193,9 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(IInputProxy, getJoystickState)
 	{
-		static const GMString s_invoker = "IInput.getJoystickState";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, "IInput.getJoystickState");
+		GMLuaArguments args(L, NAME ".getJoystickState", { GMMetaMemberType::Object });
 		IInputProxy self(L);
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
 		if (self)
 		{
 			IJoystickStateProxy proxy(L);
@@ -211,10 +210,9 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(IInputProxy, getMouseState)
 	{
-		static const GMString s_invoker = "IInput.getMouseState";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, "IInput.getMouseState");
+		GMLuaArguments args(L, NAME ".getMouseState", { GMMetaMemberType::Object });
 		IInputProxy self(L);
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
 		if (self)
 		{
 			IMouseStateProxy proxy(L);
@@ -224,15 +222,16 @@ namespace luaapi
 		return gm::GMReturnValues();
 	}
 
+#undef NAME
+#define NAME "IMouseState"
 	/*
 	 * mouseState([self])
 	 */
 	GM_LUA_PROXY_IMPL(IMouseStateProxy, state)
 	{
-		static const GMString s_invoker = "IMouseState.state";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, "IMouseState.state");
+		GMLuaArguments args(L, NAME ".state", { GMMetaMemberType::Object });
 		IMouseStateProxy self(L);
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
 		if (self)
 			return gm::GMReturnValues(L, GMMouseStateProxy(self->state()));
 		return gm::GMReturnValues();
@@ -243,26 +242,26 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(IMouseStateProxy, setDetectingMode)
 	{
-		static const GMString s_invoker = "IMouseState.setDetectingMode";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, "IMouseState.setDetectingMode");
+		GMLuaArguments args(L, NAME ".setDetectingMode", { GMMetaMemberType::Object, GMMetaMemberType::Boolean });
 		IMouseStateProxy self(L);
-		bool b = GMArgumentHelper::popArgument(L, s_invoker).toBool(); //bool
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		bool b = args.getArgument(1).toBool();
 		if (self)
 			self->setDetectingMode(b);
 		return gm::GMReturnValues();
 	}
 
+#undef NAME
+#define NAME "IKeyboardState"
 	/*
 	 * keydown([self], key)
 	 */
 	GM_LUA_PROXY_IMPL(IKeyboardStateProxy, keydown)
 	{
-		static const GMString s_invoker = "IKeyboardState.keydown";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, "IKeyboardState.keydown");
+		GMLuaArguments args(L, NAME ".keydown", { GMMetaMemberType::Object, GMMetaMemberType::Int });
 		IKeyboardStateProxy self(L);
-		GMKey key = static_cast<GMKey>(GMArgumentHelper::popArgument(L, s_invoker).toInt()); //key
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		GMKey key = static_cast<GMKey>(args.getArgument(1).toInt());
 		if (self)
 			gm::GMReturnValues(L, self->keydown(key));
 		return gm::GMReturnValues();
@@ -273,27 +272,27 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(IKeyboardStateProxy, keyTriggered)
 	{
-		static const GMString s_invoker = "IKeyboardState.keydown";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, "IKeyboardState.keydown");
+		GMLuaArguments args(L, NAME ".keydown", { GMMetaMemberType::Object, GMMetaMemberType::Int });
 		IKeyboardStateProxy self(L);
-		GMKey key = static_cast<GMKey>(GMArgumentHelper::popArgument(L, s_invoker).toInt()); //key
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		GMKey key = static_cast<GMKey>(args.getArgument(1).toInt());
 		if (self)
 			return gm::GMReturnValues(L, self->keyTriggered(key));
 		return gm::GMReturnValues();
 	}
 
+#undef NAME
+#define NAME "IJoystickState"
 	/*
 	 * joystickVibrate([self], leftMotorSpeed, rightMotorSpeed)
 	 */
 	GM_LUA_PROXY_IMPL(IJoystickStateProxy, vibrate)
 	{
-		static const GMString s_invoker = "IJoystickState.vibrate";
-		GM_LUA_CHECK_ARG_COUNT(L, 3, "IJoystickState.vibrate");
+		GMLuaArguments args(L, NAME ".vibrate", { GMMetaMemberType::Object, GMMetaMemberType::Int, GMMetaMemberType::Int });
 		IJoystickStateProxy self(L);
-		GMushort right = static_cast<GMushort>(GMArgumentHelper::popArgument(L, s_invoker).toInt()); //rightMotorSpeed
-		GMushort left = static_cast<GMushort>(GMArgumentHelper::popArgument(L, s_invoker).toInt()); //leftMotorSpeed
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		GMushort left = static_cast<GMushort>(args.getArgument(1).toInt());
+		GMushort right = static_cast<GMushort>(args.getArgument(2).toInt());
 		if (self)
 			self->vibrate(left, right);
 		return gm::GMReturnValues();
@@ -304,10 +303,9 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(IJoystickStateProxy, state)
 	{
-		static const GMString s_invoker = "IJoystickState.state";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, "IJoystickState.state");
+		GMLuaArguments args(L, NAME "IJoystickState.state", { GMMetaMemberType::Object });
 		IJoystickStateProxy self(L);
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
 		if (self)
 			return gm::GMReturnValues(L, GMJoystickStateProxy(self->state()));
 		return gm::GMReturnValues();

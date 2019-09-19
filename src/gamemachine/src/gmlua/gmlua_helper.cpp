@@ -47,13 +47,14 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMLuaArguments)
 	void setMetaTables(const GMObject& obj);
 	GMVariant getScalar(GMint32 index);
 	bool getObject(GMint32 index, REF GMObject* objRef);
+	bool getHandler(GMint32 index, REF GMObject* objRef);
 	GMint32 getIndexInStack(GMint32 offset, GMint32 index, OUT GMMetaMemberType* type = nullptr);
 	void checkType(const GMVariant& v, GMMetaMemberType mt, GMint32 index, const GMString& invoker);
 
 	//! 是否某个栈上的变量是一个向量，如果不是则范围0，如果是则返回向量的维度(2-4)。
 	GMint32 getVec(GMint32 index, GMfloat values[4]);
 	bool getMat4(GMint32 index, REF GMFloat4 (&values)[4]);
-	GMLuaReference ref();
+	GMLuaReference refTop();
 };
 
 template <typename T, GMsize_t sz>
@@ -112,7 +113,15 @@ void GMLuaArgumentsPrivate::pushVector(const GMVec4& v)
 
 void GMLuaArgumentsPrivate::push(const GMVariant& var)
 {
-	if (var.isInt() || var.isInt64())
+	if (var.isObject())
+	{
+		GMObject* obj = var.toObject();
+		if (obj)
+			pushObject(*obj);
+		else
+			lua_pushnil(L);
+	}
+	else if (var.isInt() || var.isInt64())
 	{
 		lua_pushinteger(L, var.toInt64());
 	}
@@ -132,14 +141,6 @@ void GMLuaArgumentsPrivate::push(const GMVariant& var)
 	{
 		std::string str = var.toString().toStdString();
 		lua_pushstring(L, str.c_str());
-	}
-	else if (var.isObject())
-	{
-		GMObject* obj = var.toObject();
-		if (obj)
-			pushObject(*obj);
-		else
-			lua_pushnil(L);
 	}
 	else if (var.isPointer())
 	{
@@ -273,6 +274,14 @@ GMVariant GMLuaArgumentsPrivate::getScalar(GMint32 index)
 		return GMString(lua_tostring(L, index));
 	if (lua_isboolean(L, index))
 		return lua_toboolean(L, index) ? true : false;
+	if (lua_isfunction(L, index))
+	{
+		lua_pushvalue(L, index);
+		// 复制当前的值到stack
+		GMLuaReference r = refTop();
+		lua_pop(L, 1);
+		return r;
+	}
 
 	GMfloat values[4];
 	if (GMint32 v = getVec(index, values))
@@ -352,7 +361,7 @@ bool GMLuaArgumentsPrivate::getObject(GMint32 index, REF GMObject* objRef)
 			case GMMetaMemberType::Int:
 			{
 				if (lua_isfunction(L, -1))
-					*(static_cast<GMLuaReference*>(memberIterator->second.ptr)) = ref();
+					*(static_cast<GMLuaReference*>(memberIterator->second.ptr)) = refTop();
 				else
 					*(static_cast<GMint32*>(memberIterator->second.ptr)) = lua_tointeger(L, -1);
 				break;
@@ -397,6 +406,63 @@ bool GMLuaArgumentsPrivate::getObject(GMint32 index, REF GMObject* objRef)
 			}
 			default:
 				break;
+			}
+		}
+		else
+		{
+			// 从lua的table中找不到GMObject对应的meta，说明类型不匹配，直接抛出一个错误
+			luaL_error(L, "Cannot find the entry of object '%s'.", key);
+		}
+
+		lua_pop(L, 1); // 移除value，使用key来进行下一个迭代
+	}
+
+	return found;
+}
+
+bool GMLuaArgumentsPrivate::getHandler(GMint32 index, REF GMObject* objRef)
+{
+	if (!objRef)
+		return false;
+
+	const GMMeta* meta = objRef->meta();
+	if (!meta)
+		return false;
+
+	if (!lua_istable(L, index))
+	{
+		luaL_error(L, "Lua object type is %s. Table type is expected.", lua_typename(L, lua_type(L, index)));
+		return false;
+	}
+
+	bool found = false;
+
+	// 开始遍历entries
+	lua_pushnil(L);
+	while (lua_next(L, index))
+	{
+		GM_ASSERT(lua_isstring(L, -2));
+		const char* key = lua_tostring(L, -2);
+		if (!GMString::stringEquals(key, "__handler"))
+		{
+			lua_pop(L, 1); // 移除value，使用key来进行下一个迭代
+			continue;
+		}
+
+		auto memberIterator = (*meta).find("__handler");
+		if (memberIterator != (*meta).end())
+		{
+			if (memberIterator->second.type == GMMetaMemberType::Pointer)
+			{
+				GM_STATIC_ASSERT_SIZE(GMsize_t, sizeof(void*));
+				lua_Integer address = lua_tointeger(L, -1);
+				*(static_cast<GMsize_t*>(memberIterator->second.ptr)) = address;
+				found = true;
+			}
+			else
+			{
+				// 找到的__handler不是一个指针类型
+				luaL_error(L, "__handler is not a pointer.");
 			}
 		}
 		else
@@ -517,7 +583,7 @@ bool GMLuaArgumentsPrivate::getMat4(GMint32 index, REF GMFloat4(&values)[4])
 	return false;
 }
 
-GMLuaReference GMLuaArgumentsPrivate::ref()
+GMLuaReference GMLuaArgumentsPrivate::refTop()
 {
 	if (lua_isfunction(L, -1))
 	{
@@ -547,7 +613,7 @@ GMLuaArguments::GMLuaArguments(GMLuaCoreState* l, const GMString& invoker, std::
 		{
 			// 如果传的参数与实际接收的不一致，那么直接报错
 			std::string ivk = invoker.toStdString();
-			luaL_error(l, "Arguments count not match. The expected count is %i but current is %i.", static_cast<GMint32>(sz), lua_gettop(l));
+			luaL_error(l, "Arguments count not match. The expected count is %d but current is %d.", static_cast<GMint32>(sz), lua_gettop(l));
 		}
 	}
 }
@@ -575,7 +641,7 @@ GMVariant GMLuaArguments::getArgument(GMint32 index, REF GMObject* objRef)
 		// 检查这个类型是否与期望的一致
 		if (type != GMMetaMemberType::Object)
 		{
-			d->checkType(v, type, index, d->invoker);
+			d->checkType(v, type, i, d->invoker);
 		}
 		else
 		{
@@ -603,6 +669,13 @@ void GMLuaArguments::pushArgument(const GMVariant& arg)
 {
 	D(d);
 	d->push(arg);
+}
+
+bool GMLuaArguments::getHandler(GMint32 index, REF GMObject* objRef)
+{
+	// 获取__handler变量
+	D(d);
+	return d->getHandler(d->getIndexInStack(0, index), objRef);
 }
 
 END_NS

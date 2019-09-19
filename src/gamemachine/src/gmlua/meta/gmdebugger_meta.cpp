@@ -13,36 +13,32 @@ namespace luaapi
 	// {{BEGIN META FUNCTION}}
 	GM_LUA_FUNC(info)
 	{
-		static const GMString s_invoker = NAME ".info";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".info");
-		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, s_invoker);
+		GMLuaArguments args(L, NAME ".info", { GMMetaMemberType::String });
+		GMString arg0 = args.getArgument(0).toString();
 		gm_info(arg0);
 		return gm::GMReturnValues();
 	}
 
 	GM_LUA_FUNC(error)
 	{
-		static const GMString s_invoker = NAME ".error";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".error");
-		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, s_invoker);
+		GMLuaArguments args(L, NAME ".error", { GMMetaMemberType::String });
+		GMString arg0 = args.getArgument(0).toString();
 		gm_error(arg0);
 		return gm::GMReturnValues();
 	}
 
 	GM_LUA_FUNC(warning)
 	{
-		static const GMString s_invoker = NAME ".warning";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".warning");
-		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, s_invoker);
+		GMLuaArguments args(L, NAME ".warning", { GMMetaMemberType::String });
+		GMString arg0 = args.getArgument(0).toString();
 		gm_warning(arg0);
 		return gm::GMReturnValues();
 	}
 
 	GM_LUA_FUNC(debug)
 	{
-		static const GMString s_invoker = NAME ".debug";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".debug");
-		const char* arg0 = GMArgumentHelper::popArgumentAsString(L, s_invoker);
+		GMLuaArguments args(L, NAME ".debug", { GMMetaMemberType::String });
+		GMString arg0 = args.getArgument(0).toString();
 		gm_debug(arg0);
 		return gm::GMReturnValues();
 	}

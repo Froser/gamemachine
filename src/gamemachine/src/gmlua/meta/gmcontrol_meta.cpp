@@ -9,15 +9,21 @@ namespace luaapi
 	// {{BEGIN META FUNCTION}}
 	GM_LUA_FUNC(GMControlButton_createControl)
 	{
-		static const GMString s_invoker = L"GMControlButton.createControl";
-		GM_LUA_CHECK_ARG_COUNT(L, 6, "GMControlButton.createControl");
+		GMLuaArguments args(L, "GMControlButton.createControl", {
+			GMMetaMemberType::Object,
+			GMMetaMemberType::String,
+			GMMetaMemberType::Int,
+			GMMetaMemberType::Int,
+			GMMetaMemberType::Int,
+			GMMetaMemberType::Int
+		});
 		GMWidgetProxy widget(L);
-		GMint32 height = GMArgumentHelper::popArgument(L, s_invoker).toInt(); // height
-		GMint32 width = GMArgumentHelper::popArgument(L, s_invoker).toInt(); // width
-		GMint32 y = GMArgumentHelper::popArgument(L, s_invoker).toInt(); // y
-		GMint32 x = GMArgumentHelper::popArgument(L, s_invoker).toInt(); // x
-		GMString text = GMArgumentHelper::popArgumentAsString(L, s_invoker); //text
-		GMArgumentHelper::popArgumentAsObject(L, widget, s_invoker); //widget
+		args.getArgument(0, &widget);
+		GMString text = args.getArgument(1).toString();
+		GMint32 x = args.getArgument(2).toInt();
+		GMint32 y = args.getArgument(3).toInt();
+		GMint32 width = args.getArgument(4).toInt();
+		GMint32 height = args.getArgument(5).toInt();
 		if (widget)
 		{
 			GMControlButton* c = GMControlButton::createControl(widget.get(), text, x, y, width, height, false);

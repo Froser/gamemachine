@@ -236,7 +236,6 @@ namespace luaapi
 	GM_LUA_PROXY_IMPL(IFramebuffersProxy, clear)
 	{
 		static const GMString s_invoker = NAME ".clear";
-		GM_LUA_CHECK_ARG_COUNT_GT(L, 1, NAME ".clear");
 		GMLuaArguments args(L, NAME ".clear", { GMMetaMemberType::Object, GMMetaMemberType::Int });
 		IFramebuffersProxy self(L);
 		args.getArgument(0, &self);

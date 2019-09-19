@@ -12,10 +12,9 @@ namespace luaapi
 	GMFunctionReturn gmlua_gc(GMLuaCoreState* L)
 	{
 		// 如果一个对象是自动释放的，当__gc被调用时，它将提前释放
-		static const GMString s_invoker = NAME ".__gc";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
+		GMLuaArguments args(L, NAME ".__gc", { GMMetaMemberType::Object } );
 		GMObjectProxy self(L);
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getHandler(0, &self);
 		if (self)
 		{
 			GMLuaRuntime* rt = GMLua::getRuntime(L);
@@ -144,8 +143,6 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(GMObjectProxy, __gc)
 	{
-		static const GMString s_invoker = NAME ".__gc";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
 		return gmlua_gc(L);
 	}
 
@@ -154,13 +151,12 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(GMObjectProxy, connect)
 	{
-		static const GMString s_invoker = NAME ".connect";
-		GM_LUA_CHECK_ARG_COUNT(L, 4, NAME ".connect");
+		GMLuaArguments args(L, NAME ".connect", { GMMetaMemberType::Object, GMMetaMemberType::Object, GMMetaMemberType::String, GMMetaMemberType::Int });
 		GMObjectProxy self(L), sender(L);
-		GMLuaReference callback = GMArgumentHelper::popArgument(L, s_invoker).toInt(); // callback
-		GMString signal = GMArgumentHelper::popArgumentAsString(L, s_invoker); //signal
-		GMArgumentHelper::popArgumentAsObject(L, sender, s_invoker); //sender
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		args.getArgument(0, &self);
+		args.getArgument(1, &sender);
+		GMString signal = args.getArgument(2).toString();
+		GMLuaReference callback = args.getArgument(3).toInt();
 		if (self)
 		{
 			self->connect(*sender.get(), signal, [L, callback](GMObject* s, GMObject* r) {
@@ -169,6 +165,7 @@ namespace luaapi
 				receiver.set(r);
 				GMLua l(L);
 				l.protectedCall(callback, { sender, receiver });
+				l.freeReference(callback);
 			});
 		}
 		return gm::GMReturnValues();
@@ -179,11 +176,10 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(GMObjectProxy, emitSignal)
 	{
-		static const GMString s_invoker = NAME ".emit";
-		GM_LUA_CHECK_ARG_COUNT(L, 2, NAME ".emit");
-		GMObjectProxy self(L), sender(L);
-		GMString signal = GMArgumentHelper::popArgumentAsString(L, s_invoker); //signal
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
+		GMLuaArguments args(L, NAME ".emit", { GMMetaMemberType::Object, GMMetaMemberType::String });
+		GMObjectProxy self(L);
+		args.getArgument(0, &self);
+		GMString signal = args.getArgument(1).toString();
 		if (self)
 			self->emitSignal(signal);
 		return gm::GMReturnValues();
@@ -233,7 +229,6 @@ namespace luaapi
 	GM_LUA_PROXY_IMPL(GMAnyProxy, __gc)
 	{
 		static const GMString s_invoker = NAME ".__gc";
-		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".__gc");
 		return gmlua_gc(L);
 	}
 }

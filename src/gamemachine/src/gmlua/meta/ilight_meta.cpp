@@ -21,14 +21,12 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(ILightProxy, setLightAttribute3)
 	{
-		static const GMString s_invoker = NAME ".setLightAttribute3";
-		GM_LUA_CHECK_ARG_COUNT(L, 3, NAME ".setLightAttribute3");
+		GMLuaArguments args(L, NAME ".setLightAttribute3", { GMMetaMemberType::Object, GMMetaMemberType::Int, GMMetaMemberType::Vector3 } );
 		ILightProxy self(L);
-		GMVariant v3 = GMArgumentHelper::popArgumentAsVec3(L, s_invoker); //float3
-		GMVariant type = GMArgumentHelper::popArgument(L, s_invoker); //type
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
-		if (v3.isVec3() && (type.isInt() || type.isInt64()))
-			self->setLightAttribute3(type.toInt(), ValuePointer(v3.toVec3()));
+		args.getArgument(0, &self);
+		GMint32 type = args.getArgument(1).toInt();
+		GMVec3 v3 = args.getArgument(2).toVec3();
+		self->setLightAttribute3(type, ValuePointer(v3));
 		return gm::GMReturnValues();
 	}
 
@@ -37,14 +35,12 @@ namespace luaapi
 	 */
 	GM_LUA_PROXY_IMPL(ILightProxy, setLightAttribute)
 	{
-		static const GMString s_invoker = NAME ".setLightAttribute";
-		GM_LUA_CHECK_ARG_COUNT(L, 3, NAME ".setLightAttribute");
+		GMLuaArguments args(L, NAME ".setLightAttribute", { GMMetaMemberType::Object, GMMetaMemberType::Int, GMMetaMemberType::Vector3 });
 		ILightProxy self(L);
-		GMVariant f = GMArgumentHelper::popArgumentAsVec3(L, s_invoker); //float
-		GMVariant type = GMArgumentHelper::popArgument(L, s_invoker); //type
-		GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); //self
-		if ((f.isFloat() || f.isInt()) && (type.isInt() || type.isInt64()))
-			self->setLightAttribute(type.toInt(), f.isFloat() ? f.toFloat() : f.toInt());
+		args.getArgument(0, &self);
+		GMint32 type = args.getArgument(1).toInt();
+		GMfloat f = args.getArgument(2).toFloat();
+		self->setLightAttribute(type, f);
 		return gm::GMReturnValues();
 	}
 

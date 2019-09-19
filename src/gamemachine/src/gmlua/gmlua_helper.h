@@ -22,6 +22,7 @@ public:
 	*/
 	GMVariant getArgument(GMint32 index, REF GMObject* objRef = nullptr);
 	void pushArgument(const GMVariant& arg);
+	bool getHandler(GMint32 index, REF GMObject* objRef);
 };
 
 struct GM_EXPORT GMReturnValues

@@ -76,8 +76,6 @@ namespace luaapi
 	GM_PRIVATE_OBJECT_UNALIGNED(GMObjectProxy)
 	{
 		LUA_PROXY(GMObject);
-		//GMObject* __handler = nullptr; GMString __name = "GMObject";
-
 		GMLuaCoreState* l = nullptr;
 		GM_LUA_PROXY_FUNC(__gc);
 		GM_LUA_PROXY_FUNC(connect);

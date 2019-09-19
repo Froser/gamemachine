@@ -16,7 +16,7 @@ namespace luaapi
 	bool GMModelProxy::registerMeta()
 	{
 		GM_META_FUNCTION(__index)
-			return Base::registerMeta();
+		return Base::registerMeta();
 	}
 
 	GMModelProxy::GMModelProxy(GMLuaCoreState* l, IDestroyObject* handler /*= nullptr*/)
