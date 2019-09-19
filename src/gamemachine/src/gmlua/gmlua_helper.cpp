@@ -71,7 +71,6 @@ bool contains(const T(&arr)[sz], const T& t)
 template <typename T>
 void __pushVector(const T& v, GMLuaCoreState* l)
 {
-	GM_CHECK_LUA_STACK_BALANCE_(l, 1);
 	lua_newtable(l);
 	GMFloat4 f4;
 	v.loadFloat4(f4);
@@ -165,7 +164,7 @@ void GMLuaArgumentsPrivate::push(const GMVariant& var)
 	}
 	else
 	{
-		gm_error(gm_dbg_wrap("GMLua (push): variant type not supported"));
+		luaL_error(L, "GMLua (push): variant type not supported");
 		GM_ASSERT(false);
 	}
 }
@@ -623,7 +622,7 @@ GMLuaArguments::~GMLuaArguments()
 
 }
 
-GMVariant GMLuaArguments::getArgument(GMint32 index, REF GMObject* objRef)
+GMVariant GMLuaArguments::getArgument(GMint32 index, REF GMObject* objRef) const
 {
 	D(d);
 	if (!d->types.empty()) // 如果types不为空，表示获取的是传入参数

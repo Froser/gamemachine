@@ -2,7 +2,6 @@
 #include "gamemachine_meta.h"
 #include <gamemachine.h>
 #include <gmlua.h>
-#include "../gmlua_functions.h"
 #include "iwindow_meta.h"
 #include "gmgamepackage_meta.h"
 
@@ -86,7 +85,6 @@ namespace luaapi
 
 	GM_LUA_FUNC(startGameMachine)
 	{
-		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".startGameMachine");
 		GM.startGameMachine();
 		return gm::GMReturnValues();
 	}

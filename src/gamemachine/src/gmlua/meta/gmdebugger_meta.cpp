@@ -2,7 +2,6 @@
 #include "gmdebugger_meta.h"
 #include <gamemachine.h>
 #include <gmlua.h>
-#include "../gmlua_functions.h"
 
 #define NAME "GMDebugger"
 

@@ -213,8 +213,6 @@ set(SOURCES
 
 		gmlua/gmlua.h
 		gmlua/gmlua.cpp
-		gmlua/gmlua_functions.h
-		gmlua/gmlua_functions.cpp
 		gmlua/gmlua_helper.h
 		gmlua/gmlua_helper.cpp
 		gmlua/gmluameta.h

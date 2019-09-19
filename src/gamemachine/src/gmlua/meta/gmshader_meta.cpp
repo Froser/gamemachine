@@ -67,12 +67,19 @@ namespace luaapi
 	GM_LUA_PROXY_IMPL(GMMaterialProxy, __newindex)
 	{
 		GM_LUA_BEGIN_PROPERTY(GMMaterialProxy)
-		GM_LUA_PROPERTY_SETTER(Shininess, shininess, GM_LUA_PROPERTY_TYPE_FLOAT)
-		GM_LUA_PROPERTY_SETTER(Refractivity, refractivity, GM_LUA_PROPERTY_TYPE_FLOAT)
-		GM_LUA_PROPERTY_SETTER(Ambient, ambient, GM_LUA_PROPERTY_TYPE_VEC3)
-		GM_LUA_PROPERTY_SETTER(Specular, specular, GM_LUA_PROPERTY_TYPE_VEC3)
-		GM_LUA_PROPERTY_SETTER(Diffuse, diffuse, GM_LUA_PROPERTY_TYPE_VEC3)
-		GM_LUA_PROPERTY_SETTER(F0, f0, GM_LUA_PROPERTY_TYPE_VEC3)
+
+			indexMap["shininess"] = [](GMLuaCoreState* L, ProxyClass& m, const GMLuaArguments& args) {
+				GMVariant value = args.getArgument(1);
+				m->setSpecular(value.toVec3());
+				return gm::GMReturnValues();
+			};
+
+			//GM_LUA_PROPERTY_SETTER(Shininess, shininess, GM_LUA_PROPERTY_TYPE_FLOAT)
+			//GM_LUA_PROPERTY_SETTER(Refractivity, refractivity, GM_LUA_PROPERTY_TYPE_FLOAT)
+			//GM_LUA_PROPERTY_SETTER(Ambient, ambient, GM_LUA_PROPERTY_TYPE_VEC3)
+			//GM_LUA_PROPERTY_SETTER(Specular, specular, GM_LUA_PROPERTY_TYPE_VEC3)
+			//GM_LUA_PROPERTY_SETTER(Diffuse, diffuse, GM_LUA_PROPERTY_TYPE_VEC3)
+			//GM_LUA_PROPERTY_SETTER(F0, f0, GM_LUA_PROPERTY_TYPE_VEC3)
 		GM_LUA_END_PROPERTY()
 	}
 

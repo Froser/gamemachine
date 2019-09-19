@@ -46,40 +46,6 @@ protected:
 	static void newLibrary(GMLuaCoreState *l, const GMLuaReg* functions);
 };
 
-// 检查栈是否平衡
-#if GM_DEBUG
-#	define GM_CHECK_LUA_STACK_BALANCE(offset) gm::GMLuaStackBalanceCheck __balanceGuard(L, offset);
-#	define GM_CHECK_LUA_STACK_BALANCE_(l, offset) gm::GMLuaStackBalanceCheck __balanceGuard(l, offset);
-
-class GMLuaStackBalanceCheck
-{
-public:
-	GMLuaStackBalanceCheck(GMLuaCoreState* l, GMint32 offset)
-		: m_L(l)
-		, m_offset(offset)
-	{
-		m_stack = lua_gettop(m_L);
-	}
-
-	~GMLuaStackBalanceCheck()
-	{
-#if GM_DEBUG
-		auto currentTop = lua_gettop(m_L);
-		GM_ASSERT(currentTop == m_stack + m_offset);
-#endif
-	}
-
-private:
-	GMint32 m_stack;
-	GMint32 m_offset;
-	GMLuaCoreState* m_L;
-};
-
-#else
-#	define GM_CHECK_LUA_STACK_BALANCE(offset)
-#	define GM_CHECK_LUA_STACK_BALANCE_(l, offset)
-#endif
-
 enum class GMLuaStates
 {
 	WrongType = -1,
@@ -166,51 +132,7 @@ public:
 	*/
 	void freeReference(GMLuaReference ref);
 
-// 针对堆栈的操作，提供给友元 Deprecating
-private:
-	//! 将一个对象的成员压入Lua的虚拟堆栈。
-	/*!
-	  在Lua C函数被调用时，使用此方法，将返回一个Lua table。
-	  \param obj 待传入的对象。此对象必须要注册元对象。
-	  \sa GMObject::registerMeta()
-	*/
-	void pushNewTable(const GMObject& obj, bool setMetatable = true);
-
-	//! 从Lua虚拟堆栈中取出一个Table，并赋值给指定对象。
-	/*!
-	  在Lua C函数被调用时，使用此方法，将从Lua虚拟堆栈中取出一个Table赋值给指定对象。如果操作的对象不是Table，则操作失败。
-	  \param obj 待接收的对象。此对象必须要注册元对象。
-	  \return 操作是否成功。
-	  \sa GMObject::registerMeta()
-	*/
-	bool popTable(GMObject& obj);
-
-	//! 从Lua虚拟堆栈的指定某一层堆栈中取出一个Table，并赋值给指定对象。
-	/*!
-	  在Lua C函数被调用时，使用此方法，将从Lua虚拟堆栈中取出一个Table赋值给指定对象。如果操作的对象不是Table，则操作失败。
-	  \param obj 待接收的对象。此对象必须要注册元对象。
-	  \param index 指定的堆栈索引。
-	  \return 操作是否成功。
-	  \sa GMObject::registerMeta()
-	*/
-	bool popTable(GMObject& obj, GMint32 index);
-	bool popVector(GMVec2& v);
-	bool popVector(GMVec3& v);
-	bool popVector(GMVec4& v);
-	bool popMatrix(GMMat4& v);
-
-	//! 返回Lua的栈顶的变量。
-	/*!
-	  在调用此方法前，必须确认Lua栈顶是非空的。它将返回Lua栈顶的值但不弹出它，并将其转化为一个GMVariant。需要注意的是，它并不能识别Vec2, Vec3, Vec4和Mat4，因为在Lua中，它们都是表(table)。
-	  \return Lua栈顶转化为GMVariant后的值。
-	*/
-	GMVariant getTop();
-	GMVariant get(GMint32 index);
-	GMLuaReference popFunction(bool* valid = nullptr);
-	void pop(GMint32 num);
-	void setEachMetaMember(const GMObject& obj);
-
-public:
+	//! 获取Lua状态机。
 	GMLuaCoreState* getLuaCoreState() GM_NOEXCEPT;
 
 public:
@@ -220,12 +142,9 @@ private:
 	void loadLibrary();
 	GMLuaResult pcall(const std::initializer_list<GMVariant>& args, GMint32 nRet);
 	GMLuaResult pcallreturn(GMLuaResult, GMVariant* returns, GMint32 nRet);
-	void setTable(const char* key, const GMObjectMember& value);
-	void setMetatable(const GMObject& obj);
 };
 
 #undef L
-#undef POP_GUARD
 
 #define GM_LUA_REGISTER(MetaName) \
 	class MetaName : public GMLuaFunctionRegister				\
@@ -280,27 +199,29 @@ private:
 
 // Lua indexer，用于模拟GMObject的属性
 #define GM_LUA_BEGIN_PROPERTY(proxyClass) \
-	{																										\
-		static const GMString s_invoker = #proxyClass ".__index";											\
-		proxyClass self(L, nullptr);																		\
-		GMVariant key = gm::luaapi::GMArgumentHelper::peekArgument(L, 2, s_invoker); /*key*/				\
-		HashMap<GMString, std::function<gm::GMReturnValues()>, GMStringHashFunctor> __s_indexMap;	\
-		if (__s_indexMap.empty())																			\
-		{
+	{																											\
+		using Callback = gm::GMReturnValues(GMLuaCoreState*, proxyClass&, const GMLuaArguments&);				\
+		using FunctionMap = HashMap<GMString, std::function<Callback>, GMStringHashFunctor>;					\
+		using ProxyClass = proxyClass;																			\
+		ProxyClass self(L, nullptr);																			\
+		GMLuaArguments args(L, #proxyClass ".__index", { GMMetaMemberType::Object, GMMetaMemberType::String });	\
+		args.getArgument(0, &self);																				\
+		GMString key = args.getArgument(1).toString();															\
+		static FunctionMap __s_indexMap;																		\
+		static std::once_flag __once_flag;																		\
+		std::call_once(__once_flag, [](FunctionMap& indexMap) {
 
-#define GM_LUA_PROPERTY_PROXY_GETTER(targetProxy, name, memberName) \
-		{ __s_indexMap[#memberName] = [&]() {													\
-			gm::luaapi::GMArgumentHelper::popArgument(L, s_invoker); /*key*/					\
-			gm::luaapi::GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/		\
-			targetProxy proxy(L, nullptr);														\
-			proxy.set(&self->get##name());														\
-			return gm::GMReturnValues(L, proxy); }; }
+#define GM_LUA_PROPERTY_PROXY_GETTER(targetProxy, name, key)										\
+			indexMap[#key] = [](GMLuaCoreState* L, ProxyClass& m, const GMLuaArguments& args) {		\
+				targetProxy proxy(L, nullptr);														\
+				proxy.set(&m->get##name());															\
+				return gm::GMReturnValues(L, proxy);												\
+			};
 
-#define GM_LUA_PROPERTY_GETTER(name, memberName) \
-		{ __s_indexMap[#memberName] = [&]() {													\
-			GMArgumentHelper::popArgument(L, s_invoker); /*key*/								\
-			GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/					\
-			return gm::GMReturnValues(L, (self->get##name())); }; }
+#define GM_LUA_PROPERTY_GETTER(name, key)	\
+			indexMap[#key] = [](GMLuaCoreState* L, ProxyClass& m, const GMLuaArguments& args) {		\
+				return gm::GMReturnValues(L, m->get##name());										\
+			};
 
 #define GM_LUA_PROPERTY_TYPE_INT toInt
 #define GM_LUA_PROPERTY_TYPE_INT64 toInt64
@@ -313,64 +234,25 @@ private:
 #define GM_LUA_PROPERTY_TYPE_NAME(X) GM_LUA_PROPERTY_TYPE_NAME_DUMMY(X)
 #define GM_LUA_PROPERTY_TYPE_NAME_DUMMY(X) #X
 
-#define GM_LUA_PROPERTY_SETTER(name, memberName, propertyType) \
-		{ __s_indexMap[#memberName] = [&]() {																									\
-			if (GMString::stringEquals(GM_LUA_PROPERTY_TYPE_NAME(propertyType), GM_LUA_PROPERTY_TYPE_NAME(GM_LUA_PROPERTY_TYPE_INT)) ||			\
-				GMString::stringEquals(GM_LUA_PROPERTY_TYPE_NAME(propertyType), GM_LUA_PROPERTY_TYPE_NAME(GM_LUA_PROPERTY_TYPE_INT64)) ||		\
-				GMString::stringEquals(GM_LUA_PROPERTY_TYPE_NAME(propertyType), GM_LUA_PROPERTY_TYPE_NAME(GM_LUA_PROPERTY_TYPE_UINT)) ||		\
-				GMString::stringEquals(GM_LUA_PROPERTY_TYPE_NAME(propertyType), GM_LUA_PROPERTY_TYPE_NAME(GM_LUA_PROPERTY_TYPE_FLOAT)))			\
-			{																																	\
-				auto value = gm::luaapi::GMArgumentHelper::popArgument(L, s_invoker); /*value*/													\
-				gm::luaapi::GMArgumentHelper::popArgument(L, s_invoker); /*key*/																\
-				gm::luaapi::GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/													\
-				if (self) self->set##name(value.propertyType());																				\
-			}																																	\
-			else if (GMString::stringEquals(GM_LUA_PROPERTY_TYPE_NAME(propertyType), GM_LUA_PROPERTY_TYPE_NAME(GM_LUA_PROPERTY_TYPE_VEC2)))		\
-			{																																	\
-				GMVariant value = gm::luaapi::GMArgumentHelper::popArgumentAsVec2(L, s_invoker); /*value*/										\
-				gm::luaapi::GMArgumentHelper::popArgument(L, s_invoker); /*key*/																\
-				gm::luaapi::GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/													\
-				if (self) self->set##name(value.propertyType());																				\
-			}																																	\
-			else if (GMString::stringEquals(GM_LUA_PROPERTY_TYPE_NAME(propertyType), GM_LUA_PROPERTY_TYPE_NAME(GM_LUA_PROPERTY_TYPE_VEC3)))		\
-			{																																	\
-				GMVariant value = gm::luaapi::GMArgumentHelper::popArgumentAsVec3(L, s_invoker); /*value*/										\
-				gm::luaapi::GMArgumentHelper::popArgument(L, s_invoker); /*key*/																\
-				gm::luaapi::GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/													\
-				if (self) self->set##name(value.propertyType());																				\
-			}																																	\
-			else if (GMString::stringEquals(GM_LUA_PROPERTY_TYPE_NAME(propertyType), GM_LUA_PROPERTY_TYPE_NAME(GM_LUA_PROPERTY_TYPE_VEC4)))		\
-			{																																	\
-				GMVariant value = gm::luaapi::GMArgumentHelper::popArgumentAsVec4(L, s_invoker); /*value*/										\
-				gm::luaapi::GMArgumentHelper::popArgument(L, s_invoker); /*key*/																\
-				gm::luaapi::GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/													\
-				if (self) self->set##name(value.propertyType());																				\
-			}																																	\
-			else if (GMString::stringEquals(GM_LUA_PROPERTY_TYPE_NAME(propertyType), GM_LUA_PROPERTY_TYPE_NAME(GM_LUA_PROPERTY_TYPE_MAT4)))		\
-			{																																	\
-				GMVariant value = gm::luaapi::GMArgumentHelper::popArgumentAsMat4(L, s_invoker); /*value*/										\
-				gm::luaapi::GMArgumentHelper::popArgument(L, s_invoker); /*key*/																\
-				gm::luaapi::GMArgumentHelper::popArgumentAsObject(L, self, s_invoker); /*self*/													\
-				if (self) self->set##name(value.propertyType());																				\
-			}																																	\
-			else																																\
-			{																																	\
-				gm_error(gm_dbg_wrap("wrong lua property type."));																				\
-			}																																	\
-			return gm::GMReturnValues();																								\
-		}; }
+#define GM_LUA_PROPERTY_SETTER(name, key, propertyType) \
+	indexMap[#key] = [](GMLuaCoreState* L, ProxyClass& m, const GMLuaArguments& args) {	\
+	GMVariant value = args.getArgument(1);												\
+	m->set##name(value.propertyType());													\
+	return gm::GMReturnValues();														\
+	};
 
-#define GM_LUA_END_PROPERTY() \
-		}																						\
-		if (key.isString())																		\
-		{																						\
-			auto itemIter = __s_indexMap.find(key.toString());									\
-			if (itemIter != __s_indexMap.end())													\
-				if (itemIter->second)															\
-					return itemIter->second();													\
-		}																						\
-	}																							\
-	return gm::GMReturnValues();
+#define GM_LUA_END_PROPERTY()						\
+		}, __s_indexMap);							\
+		auto iter = __s_indexMap.find(key);			\
+		if (iter != __s_indexMap.end())				\
+		{											\
+			return iter->second(L, self, args);		\
+		}											\
+		else										\
+		{											\
+			return gm::GMReturnValues();			\
+		}											\
+	}
 
 END_NS
 
