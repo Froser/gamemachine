@@ -25,7 +25,7 @@ namespace luaapi
 				GM_delete(self.get());
 			}
 		}
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 #define GM_LUA_PROXY_META GM_META_WITH_TYPE(__handler, GMMetaMemberType::Pointer); GM_META(__name);
@@ -168,7 +168,7 @@ namespace luaapi
 				l.freeReference(callback);
 			});
 		}
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -182,7 +182,7 @@ namespace luaapi
 		GMString signal = args.getArgument(1).toString();
 		if (self)
 			self->emitSignal(signal);
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 	//////////////////////////////////////////////////////////////////////////
 	GMAnyProxy::GMAnyProxy(GMLuaCoreState* l, IDestroyObject* handler /*= nullptr*/)

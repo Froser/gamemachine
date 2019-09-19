@@ -27,8 +27,8 @@ namespace luaapi
 		args.getArgument(0, &self);
 		args.getArgument(1, &buffer);
 		if (self)
-			return gm::GMReturnValues(L, self->addFontByMemory(std::move(*buffer.get())));
-		return gm::GMReturnValues();
+			return GMReturnValues(L, self->addFontByMemory(std::move(*buffer.get())));
+		return GMReturnValues();
 	}
 
 	/*
@@ -42,7 +42,7 @@ namespace luaapi
 		GMFontHandle fontHandle = static_cast<GMFontHandle>(args.getArgument(1).toInt()); //fontHandle
 		if (self)
 			self->setDefaultFontEN(fontHandle);
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -55,7 +55,7 @@ namespace luaapi
 		GMFontHandle fontHandle = static_cast<GMFontHandle>(args.getArgument(1).toInt()); //fontHandle
 		if (self)
 			self->setDefaultFontCN(fontHandle);
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	bool GMGlyphManagerProxy::registerMeta()

@@ -71,7 +71,7 @@ namespace luaapi
 			indexMap["shininess"] = [](GMLuaCoreState* L, ProxyClass& m, const GMLuaArguments& args) {
 				GMVariant value = args.getArgument(1);
 				m->setSpecular(value.toVec3());
-				return gm::GMReturnValues();
+				return GMReturnValues();
 			};
 
 			//GM_LUA_PROPERTY_SETTER(Shininess, shininess, GM_LUA_PROPERTY_TYPE_FLOAT)

@@ -89,7 +89,7 @@ namespace luaapi
 		args.getArgument(1, &desc);
 		if (self)
 			self->create(desc.get());
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -102,7 +102,7 @@ namespace luaapi
 		args.getArgument(0, &self);
 		if (self)
 			self->centerWindow();
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -115,7 +115,7 @@ namespace luaapi
 		args.getArgument(0, &self);
 		if (self)
 			self->showWindow();
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -135,7 +135,7 @@ namespace luaapi
 			self->setHandler(gameHandler.get());
 			self->getGraphicEngine()->setShaderLoadCallback(gameHandler.getShaderLoadCallback());
 		}
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -150,9 +150,9 @@ namespace luaapi
 		{
 			IInputProxy proxy(L);
 			proxy.set(self->getInputManager());
-			return gm::GMReturnValues(L, proxy);
+			return GMReturnValues(L, proxy);
 		}
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -167,7 +167,7 @@ namespace luaapi
 		args.getArgument(1, &widget);
 		if (self)
 			self->addWidget(widget.get());
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 }
 END_NS

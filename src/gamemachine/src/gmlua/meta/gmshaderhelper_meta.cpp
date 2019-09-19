@@ -26,7 +26,7 @@ namespace luaapi
 			IRenderContextProxy context(L);
 			args.getArgument(0, &context);
 			GMShaderHelper::loadShader(context.get());
-			return gm::GMReturnValues();
+			return GMReturnValues();
 		}
 
 		// {{END META FUNCTION}}

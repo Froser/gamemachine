@@ -28,7 +28,7 @@ namespace luaapi
 		GMString path = args.getArgument(1).toString();
 		if (self)
 			self->loadPackage(path);
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -46,9 +46,9 @@ namespace luaapi
 		{
 			GMBufferProxy buffer(L, new GMBuffer());
 			self->readFile(type, filename, buffer.get());
-			return gm::GMReturnValues(L, buffer);
+			return GMReturnValues(L, buffer);
 		}
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	bool GMGamePackageProxy::registerMeta()

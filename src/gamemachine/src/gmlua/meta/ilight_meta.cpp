@@ -27,7 +27,7 @@ namespace luaapi
 		GMint32 type = args.getArgument(1).toInt();
 		GMVec3 v3 = args.getArgument(2).toVec3();
 		self->setLightAttribute3(type, ValuePointer(v3));
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -41,7 +41,7 @@ namespace luaapi
 		GMint32 type = args.getArgument(1).toInt();
 		GMfloat f = args.getArgument(2).toFloat();
 		self->setLightAttribute(type, f);
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	bool ILightProxy::registerMeta()

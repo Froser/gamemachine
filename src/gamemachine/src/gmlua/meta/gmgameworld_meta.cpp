@@ -43,7 +43,7 @@ namespace luaapi
 		args.getArgument(0, &self);
 		if (self)
 			self->renderScene();
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -61,7 +61,7 @@ namespace luaapi
 			self->addObjectAndInit(gameobject.get());
 			gameobject.setAutoRelease(false);
 		}
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -76,7 +76,7 @@ namespace luaapi
 		args.getArgument(1, &gameobject);
 		if (self)
 			self->addToRenderList(gameobject.get());
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 	//////////////////////////////////////////////////////////////////////////
 	namespace

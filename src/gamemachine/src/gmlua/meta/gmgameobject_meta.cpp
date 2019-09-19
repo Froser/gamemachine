@@ -53,7 +53,7 @@ namespace luaapi
 		args.getArgument(1, &asset);
 		if (self)
 			self->setAsset(*asset.get());
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -67,7 +67,7 @@ namespace luaapi
 		GMMat4 mat = args.getArgument(1).toMat4();
 		if (self)
 			self->setTranslation(mat);
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -82,7 +82,7 @@ namespace luaapi
 		GMQuat quat(v.getX(), v.getY(), v.getZ(), v.getW());
 		if (self)
 			self->setRotation(quat);
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 
@@ -97,7 +97,7 @@ namespace luaapi
 		GMMat4 mat = args.getArgument(1).toMat4();
 		if (self)
 			self->setScaling(mat);
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -111,7 +111,7 @@ namespace luaapi
 		GMfloat dt = args.getArgument(1).toFloat();
 		if (self)
 			self->update(dt);
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 	namespace
 	{

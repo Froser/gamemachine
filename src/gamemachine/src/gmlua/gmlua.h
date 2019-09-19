@@ -12,29 +12,15 @@ extern "C"
 BEGIN_NS
 
 #define L (d->luaState)
-#define POP_GUARD() \
-struct __PopGuard							\
-{											\
-	__PopGuard(lua_State* __L) : m_L(__L) {}\
-	~__PopGuard() { lua_pop(m_L, 1); }		\
-	lua_State* m_L;							\
-} __guard(this->getLuaCoreState());
-
 #define GM_LUA_DECLARATIONS(name) { #name, name }
 
 typedef luaL_Reg GMLuaReg;
 typedef lua_State GMLuaCoreState;
 typedef lua_CFunction GMLuaCFunction;
 typedef int GMLuaReference;
+typedef int GMFunctionReturn;
 
 class GMLua;
-namespace luaapi
-{
-	typedef GMint32 GMFunctionReturn;
-	struct GMArgumentHelper;
-	struct GMReturnValues;
-}
-
 struct GM_EXPORT GMLuaFunctionRegister
 {
 	virtual void registerFunctions(GMLua*) = 0;
@@ -68,8 +54,6 @@ class GM_EXPORT GMLua
 {
 	GM_DECLARE_PRIVATE(GMLua)
 	GM_DISABLE_COPY_ASSIGN(GMLua)
-	friend struct luaapi::GMArgumentHelper;
-	friend struct GMReturnValues;
 
 public:
 	GMLua();
@@ -169,7 +153,7 @@ private:
 		return 1;												\
 	}
 
-#define GM_LUA_FUNC(FuncName) gm::luaapi::GMFunctionReturn FuncName(GMLuaCoreState* L)
+#define GM_LUA_FUNC(FuncName) gm::GMFunctionReturn FuncName(GMLuaCoreState* L)
 #define GM_LUA_DEFAULT_NEW_IMPL(New, FuncName, Proxy, Real) GM_LUA_FUNC(New)				\
 {																							\
 	gm::GMLuaArguments(L, FuncName);														\

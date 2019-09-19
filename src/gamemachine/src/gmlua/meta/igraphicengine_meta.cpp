@@ -53,7 +53,7 @@ namespace luaapi
 			light.setAutoRelease(false);
 			self->addLight(light.get());
 		}
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -69,9 +69,9 @@ namespace luaapi
 			GMCamera& camera = self->getCamera();
 			GMCameraProxy proxy(L);
 			proxy.set(&camera);
-			return gm::GMReturnValues(L, proxy);
+			return GMReturnValues(L, proxy);
 		}
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -87,9 +87,9 @@ namespace luaapi
 			IFramebuffers* defaultFramebuffers = self->getDefaultFramebuffers();
 			IFramebuffersProxy proxy(L);
 			proxy.set(defaultFramebuffers);
-			return gm::GMReturnValues(L, proxy);
+			return GMReturnValues(L, proxy);
 		}
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -105,9 +105,9 @@ namespace luaapi
 			GMGlyphManager* glyphManager = self->getGlyphManager();
 			GMGlyphManagerProxy proxy(L);
 			proxy.set(glyphManager);
-			return gm::GMReturnValues(L, proxy);
+			return GMReturnValues(L, proxy);
 		}
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	bool IGraphicEngineProxy::registerMeta()
@@ -171,7 +171,7 @@ namespace luaapi
 		args.getArgument(1, &lookAt);
 		if (self)
 			self->lookAt(lookAt.toCameraLookAt());
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -189,7 +189,7 @@ namespace luaapi
 		GMfloat f = args.getArgument(4).toFloat();
 		if (self)
 			self->setPerspective(fovy, aspect, n, f);
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -208,7 +208,7 @@ namespace luaapi
 		GMfloat f = args.getArgument(6).toFloat();
 		if (self)
 			self->setOrtho(left, right, bottom, top, n, f);
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	bool GMCameraProxy::registerMeta()
@@ -242,7 +242,7 @@ namespace luaapi
 		GMFramebuffersClearType type = static_cast<GMFramebuffersClearType>(args.getArgument(1).toInt());
 		if (self)
 			self->clear(type);
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	bool IFramebuffersProxy::registerMeta()

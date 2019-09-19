@@ -74,7 +74,7 @@ namespace luaapi
 		args.getArgument(1, &buffer);
 		if (self)
 			self->import(*buffer.get());
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -89,7 +89,7 @@ namespace luaapi
 		args.getArgument(1, &resourceManager);
 		if (self)
 			self->initResourceManager(resourceManager.get());
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -104,7 +104,7 @@ namespace luaapi
 		args.getArgument(1, &widget);
 		if (self)
 			self->registerWidget(widget.get());
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -118,9 +118,9 @@ namespace luaapi
 		if (self)
 		{
 			GMWidgetProxy widget(L, self->createWidget());
-			return gm::GMReturnValues(L, widget);
+			return GMReturnValues(L, widget);
 		}
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 #undef NAME
@@ -140,7 +140,7 @@ namespace luaapi
 		GMint32 y = args.getArgument(2).toInt();
 		if (self)
 			self->setPosition(x, y);
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -155,7 +155,7 @@ namespace luaapi
 		GMint32 height = args.getArgument(2).toInt();
 		if (self)
 			self->setSize(width, height);
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -169,7 +169,7 @@ namespace luaapi
 		GMString title = args.getArgument(1).toString();
 		if (self)
 			self->setTitle(title);
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -187,7 +187,7 @@ namespace luaapi
 			self->addControl(control.get());
 			control.setAutoRelease(false); // 生命周期由GMWidget管理
 		}
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	//////////////////////////////////////////////////////////////////////////

@@ -183,9 +183,9 @@ namespace luaapi
 		{
 			IKeyboardStateProxy proxy(L);
 			proxy.set(&self->getKeyboardState());
-			return gm::GMReturnValues(L, proxy);
+			return GMReturnValues(L, proxy);
 		}
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -200,9 +200,9 @@ namespace luaapi
 		{
 			IJoystickStateProxy proxy(L);
 			proxy.set(&self->getJoystickState());
-			return gm::GMReturnValues(L, proxy);
+			return GMReturnValues(L, proxy);
 		}
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -217,9 +217,9 @@ namespace luaapi
 		{
 			IMouseStateProxy proxy(L);
 			proxy.set(&self->getMouseState());
-			return gm::GMReturnValues(L, proxy);
+			return GMReturnValues(L, proxy);
 		}
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 #undef NAME
@@ -233,8 +233,8 @@ namespace luaapi
 		IMouseStateProxy self(L);
 		args.getArgument(0, &self);
 		if (self)
-			return gm::GMReturnValues(L, GMMouseStateProxy(self->state()));
-		return gm::GMReturnValues();
+			return GMReturnValues(L, GMMouseStateProxy(self->state()));
+		return GMReturnValues();
 	}
 
 	/*
@@ -248,7 +248,7 @@ namespace luaapi
 		bool b = args.getArgument(1).toBool();
 		if (self)
 			self->setDetectingMode(b);
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 #undef NAME
@@ -263,8 +263,8 @@ namespace luaapi
 		args.getArgument(0, &self);
 		GMKey key = static_cast<GMKey>(args.getArgument(1).toInt());
 		if (self)
-			gm::GMReturnValues(L, self->keydown(key));
-		return gm::GMReturnValues();
+			GMReturnValues(L, self->keydown(key));
+		return GMReturnValues();
 	}
 
 	/*
@@ -277,8 +277,8 @@ namespace luaapi
 		args.getArgument(0, &self);
 		GMKey key = static_cast<GMKey>(args.getArgument(1).toInt());
 		if (self)
-			return gm::GMReturnValues(L, self->keyTriggered(key));
-		return gm::GMReturnValues();
+			return GMReturnValues(L, self->keyTriggered(key));
+		return GMReturnValues();
 	}
 
 #undef NAME
@@ -295,7 +295,7 @@ namespace luaapi
 		GMushort right = static_cast<GMushort>(args.getArgument(2).toInt());
 		if (self)
 			self->vibrate(left, right);
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	/*
@@ -307,8 +307,8 @@ namespace luaapi
 		IJoystickStateProxy self(L);
 		args.getArgument(0, &self);
 		if (self)
-			return gm::GMReturnValues(L, GMJoystickStateProxy(self->state()));
-		return gm::GMReturnValues();
+			return GMReturnValues(L, GMJoystickStateProxy(self->state()));
+		return GMReturnValues();
 	}
 }
 END_NS

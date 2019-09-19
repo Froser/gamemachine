@@ -15,7 +15,7 @@ namespace luaapi
 		GMLuaArguments args(L, NAME ".info", { GMMetaMemberType::String });
 		GMString arg0 = args.getArgument(0).toString();
 		gm_info(arg0);
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	GM_LUA_FUNC(error)
@@ -23,7 +23,7 @@ namespace luaapi
 		GMLuaArguments args(L, NAME ".error", { GMMetaMemberType::String });
 		GMString arg0 = args.getArgument(0).toString();
 		gm_error(arg0);
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	GM_LUA_FUNC(warning)
@@ -31,7 +31,7 @@ namespace luaapi
 		GMLuaArguments args(L, NAME ".warning", { GMMetaMemberType::String });
 		GMString arg0 = args.getArgument(0).toString();
 		gm_warning(arg0);
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 
 	GM_LUA_FUNC(debug)
@@ -39,7 +39,7 @@ namespace luaapi
 		GMLuaArguments args(L, NAME ".debug", { GMMetaMemberType::String });
 		GMString arg0 = args.getArgument(0).toString();
 		gm_debug(arg0);
-		return gm::GMReturnValues();
+		return GMReturnValues();
 	}
 	// {{END META FUNCTION}}
 

@@ -21,7 +21,7 @@ namespace luaapi
 			GMLuaArguments(L, NAME ".createWindow");
 			IWindow* window = nullptr;
 			GM.getFactory()->createWindow(0, nullptr, &window);
-			return gm::GMReturnValues(L, IWindowProxy(L, window));
+			return GMReturnValues(L, IWindowProxy(L, window));
 		}
 
 		GM_LUA_FUNC(createLight)
@@ -31,7 +31,7 @@ namespace luaapi
 			ILight* light = nullptr;
 			GMLightType type = static_cast<GMLightType>(args.getArgument(0).toInt());
 			GM.getFactory()->createLight(type, &light);
-			return gm::GMReturnValues(L, ILightProxy(L, light));
+			return GMReturnValues(L, ILightProxy(L, light));
 		}
 		// {{END META FUNCTION}}
 
