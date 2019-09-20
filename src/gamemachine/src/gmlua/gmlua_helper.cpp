@@ -11,11 +11,9 @@ namespace
 		static const GMString s_metatableNameKw = L"__name";
 
 		auto meta = obj.meta();
-		for (const auto& member : *meta)
-		{
-			if (member.first == s_metatableNameKw)
-				metatableName = *static_cast<GMString*>(member.second.ptr);
-		}
+		auto iter = meta->find(L"__name");
+		if (iter != meta->end())
+			metatableName = *static_cast<GMString*>(iter->second.ptr);
 		if (metatable)
 			*metatable = &obj;
 	}
@@ -185,7 +183,6 @@ void GMLuaArgumentsPrivate::setMetaTables(const GMObject& obj)
 		L"__gc",
 	};
 
-	auto tableIdx = lua_gettop(L);
 	GMString metatableName;
 	const GMObject* metaTable = nullptr;
 	getMetaTableAndName(obj, metatableName, &metaTable);
@@ -208,8 +205,9 @@ void GMLuaArgumentsPrivate::setMetaTables(const GMObject& obj)
 			}
 		}
 	}
-
-	lua_setmetatable(L, tableIdx);
+	
+	GM_ASSERT(lua_istable(L, -2));
+	lua_setmetatable(L, -2);
 }
 
 void GMLuaArgumentsPrivate::setMembers(const GMObject& obj)

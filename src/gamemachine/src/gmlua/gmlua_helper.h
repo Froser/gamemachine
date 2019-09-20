@@ -104,7 +104,7 @@ namespace luaapi
 			GMLuaVector self;
 			args.getArgument(0, &self);
 			self.release();
-			return gm::GMReturnValues();
+			return GMReturnValues();
 		}
 
 		static GMFunctionReturn __index(GMLuaCoreState* l)
@@ -113,7 +113,7 @@ namespace luaapi
 			GMLuaVector self;
 			args.getArgument(0, &self);
 			GMint32 i = args.getArgument(1).toInt();
-			return gm::GMReturnValues(l, (*(self.value))[i - 1]);
+			return GMReturnValues(l, (*(self.value))[i - 1]);
 		}
 
 		static GMFunctionReturn size(GMLuaCoreState* l)
@@ -121,7 +121,7 @@ namespace luaapi
 			GMLuaArguments args(l, "GMLuaVector.size", { GMMetaMemberType::Object });
 			GMLuaVector self;
 			args.getArgument(0, &self);
-			return gm::GMReturnValues(l, gm_sizet_to_int(self.value->size()));
+			return GMReturnValues(l, gm_sizet_to_int(self.value->size()));
 		}
 
 	private:
