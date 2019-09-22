@@ -179,20 +179,21 @@ private:
 #define GM_LUA_PROXY_OBJ(realType, baseName) \
 	public:																			\
 		realType* get() const { return gm_cast<realType*>(baseName::get()); }		\
-		realType* operator->() const { return get(); }
+		realType* operator->() const { return get(); }								\
+		virtual const GMString& getObjectName() { static const GMString& s_name = L## #realType; return s_name; }
 
 // Lua indexer，用于模拟GMObject的属性
 #define GM_LUA_BEGIN_PROPERTY(proxyClass) \
-	{																											\
-		using Callback = gm::GMReturnValues(GMLuaCoreState*, proxyClass&, const GMLuaArguments&);				\
-		using FunctionMap = HashMap<GMString, std::function<Callback>, GMStringHashFunctor>;					\
-		using ProxyClass = proxyClass;																			\
-		ProxyClass self(L, nullptr);																			\
-		GMLuaArguments args(L, #proxyClass ".__index", { GMMetaMemberType::Object, GMMetaMemberType::String });	\
-		args.getArgument(0, &self);																				\
-		GMString key = args.getArgument(1).toString();															\
-		static FunctionMap __s_indexMap;																		\
-		static std::once_flag __once_flag;																		\
+	{																																	\
+		using Callback = gm::GMReturnValues(GMLuaCoreState*, proxyClass&, const GMLuaArguments&);										\
+		using FunctionMap = HashMap<GMString, std::function<Callback>, GMStringHashFunctor>;											\
+		using ProxyClass = proxyClass;																									\
+		ProxyClass self(L, nullptr);																									\
+		GMLuaArguments args(L, #proxyClass ".__index", { GMMetaMemberType::Object, GMMetaMemberType::String, GMLuaArgumentsAnyType });	\
+		args.getArgument(0, &self);																										\
+		GMString key = args.getArgument(1).toString();																					\
+		static FunctionMap __s_indexMap;																								\
+		static std::once_flag __once_flag;																								\
 		std::call_once(__once_flag, [](FunctionMap& indexMap) {
 
 #define GM_LUA_PROPERTY_PROXY_GETTER(targetProxy, name, key)										\
@@ -220,7 +221,8 @@ private:
 
 #define GM_LUA_PROPERTY_SETTER(name, key, propertyType) \
 	indexMap[#key] = [](GMLuaCoreState* L, ProxyClass& m, const GMLuaArguments& args) {	\
-	GMVariant value = args.getArgument(1);												\
+	GMVariant value = args.getArgument(2);												\
+	GM_ASSERT(m.get());																	\
 	m->set##name(value.propertyType());													\
 	return gm::GMReturnValues();														\
 	};

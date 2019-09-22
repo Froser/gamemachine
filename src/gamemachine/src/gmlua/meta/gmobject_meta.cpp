@@ -54,7 +54,14 @@ namespace luaapi
 		GM_META_FUNCTION(__gc);
 		GM_META_FUNCTION(connect);
 		GM_META_FUNCTION(emitSignal);
+		setObjectName(getObjectName());
 		return true;
+	}
+
+	const GMString& GMObjectProxy::getObjectName()
+	{
+		D(d);
+		return d->__name;
 	}
 
 	void GMObjectProxy::setAutoRelease(bool autorelease)
@@ -202,6 +209,7 @@ namespace luaapi
 		D(d);
 		GM_LUA_PROXY_META;
 		GM_META_FUNCTION(__gc);
+		setObjectName(getObjectName());
 		return true;
 	}
 
@@ -221,6 +229,12 @@ namespace luaapi
 			// 从托管池移除，自己管理生命周期。
 			GMLua::getRuntime(d->l)->detachObject(d->__handler);
 		}
+	}
+
+	const GMString& GMAnyProxy::getObjectName()
+	{
+		D(d);
+		return d->__name;
 	}
 
 	/*

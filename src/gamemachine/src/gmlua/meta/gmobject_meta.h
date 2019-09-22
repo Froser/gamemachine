@@ -41,6 +41,7 @@ namespace luaapi
 
 	protected:
 		virtual bool registerMeta() override;
+		virtual const GMString& getObjectName();
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -69,6 +70,7 @@ namespace luaapi
 
 	protected:
 		virtual bool registerMeta() override;
+		virtual const GMString& getObjectName();
 	};
 
 #define LUA_PROXY(className) className* __handler = nullptr; GMString __name = #className;

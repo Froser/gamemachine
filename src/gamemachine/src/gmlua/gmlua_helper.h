@@ -3,6 +3,9 @@
 #include <gmcommon.h>
 BEGIN_NS
 
+// GMLuaArgumentsAnyType表示可为空的任意类型
+#define GMLuaArgumentsAnyType static_cast<GMMetaMemberType>( static_cast<GMint32>(GMMetaMemberType::Invalid) - 1 )
+
 GM_PRIVATE_CLASS(GMLuaArguments);
 class GM_EXPORT GMLuaArguments
 {

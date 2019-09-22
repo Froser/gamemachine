@@ -30,11 +30,9 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMLuaArguments)
 {
 	GMLuaCoreState* L;
 	Vector<GMMetaMemberType> types;
-	GMint32 totalSize = 0;
-	Vector<GMint32> indices;
 	GMString invoker;
 
-	void calculateSize();
+	void checkSize();
 	void pushVector(const GMVec2& v);
 	void pushVector(const GMVec3& v);
 	void pushVector(const GMVec4& v);
@@ -81,15 +79,27 @@ void __pushVector(const T& v, GMLuaCoreState* l)
 	}
 }
 
-void GMLuaArgumentsPrivate::calculateSize()
+void GMLuaArgumentsPrivate::checkSize()
 {
-	totalSize = 0;
-	indices.resize(types.size());
-	GMint32 idx = 0;
-	for (auto& type : types)
+	GMsize_t sz = types.size();
+	// 置于末尾的 GMLuaArgumentsAnyType 忽略不计其数量
+	for (auto iter = types.rbegin(); iter != types.rend(); ++iter)
 	{
-		++totalSize;
-		indices[idx++] = totalSize;
+		if (*iter == GMLuaArgumentsAnyType)
+			--sz;
+		else
+			break;
+	}
+
+	if (sz > 0)
+	{
+		// 如果存在size，那么说明是准备获取参数，此时检查参数个数。
+		if (lua_gettop(L) < sz)
+		{
+			// 如果传的参数与实际接收的不一致，那么直接报错
+			std::string ivk = invoker.toStdString();
+			luaL_error(L, "Arguments count not match. The expected count is %d but current is %d.", static_cast<GMint32>(sz), lua_gettop(L));
+		}
 	}
 }
 
@@ -230,7 +240,6 @@ void GMLuaArgumentsPrivate::setMembers(const GMObject& obj)
 				{
 					GM_STATIC_ASSERT(sizeof(lua_Integer) >= sizeof(void*), "Pointer size incompatible.");
 					GM_STATIC_ASSERT_SIZE(GMsize_t, sizeof(void*));
-					lua_Integer address = lua_tointeger(L, -1);
 					lua_pushinteger(L, *static_cast<GMsize_t*>(member.second.ptr));
 				}
 				else if (member.second.type == GMMetaMemberType::Object)
@@ -483,6 +492,9 @@ GMint32 GMLuaArgumentsPrivate::getIndexInStack(GMint32 offset, GMint32 index, OU
 
 void GMLuaArgumentsPrivate::checkType(const GMVariant& v, GMMetaMemberType mt, GMint32 index, const GMString& invoker)
 {
+	if (mt == GMLuaArgumentsAnyType)
+		return;
+
 	bool suc = false;
 	switch (mt)
 	{
@@ -599,20 +611,9 @@ GMLuaArguments::GMLuaArguments(GMLuaCoreState* l, const GMString& invoker, std::
 	D(d);
 	d->types = types;
 	d->L = l;
-	d->calculateSize();
+	d->checkSize();
 	d->invoker = invoker;
-
-	GMsize_t sz = d->types.size();
-	if (sz > 0)
-	{
-		// 如果存在size，那么说明是准备获取参数，此时检查参数个数。
-		if (lua_gettop(l) < sz)
-		{
-			// 如果传的参数与实际接收的不一致，那么直接报错
-			std::string ivk = invoker.toStdString();
-			luaL_error(l, "Arguments count not match. The expected count is %d but current is %d.", static_cast<GMint32>(sz), lua_gettop(l));
-		}
-	}
+	d->checkSize();
 }
 
 GMLuaArguments::~GMLuaArguments()
