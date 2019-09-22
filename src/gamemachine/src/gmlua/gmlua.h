@@ -173,9 +173,6 @@ private:
 #define GM_LUA_PROXY_IMPL(Proxy, FuncName) gm::GMint32 GM_PRIVATE_NAME(Proxy)::FuncName(GMLuaCoreState* L)
 #define GM_LUA_PROXY_FUNC(FuncName) GM_META_METHOD gm::GMint32 FuncName(GMLuaCoreState*);
 
-// lua类成员函数相关的宏
-// 以下宏需要手动引用gmlua_functions.h
-
 #define GM_LUA_PROXY_OBJ(realType, baseName) \
 	public:																			\
 		realType* get() const { return gm_cast<realType*>(baseName::get()); }		\
@@ -222,7 +219,6 @@ private:
 #define GM_LUA_PROPERTY_SETTER(name, key, propertyType) \
 	indexMap[#key] = [](GMLuaCoreState* L, ProxyClass& m, const GMLuaArguments& args) {	\
 	GMVariant value = args.getArgument(2);												\
-	GM_ASSERT(m.get());																	\
 	m->set##name(value.propertyType());													\
 	return gm::GMReturnValues();														\
 	};
