@@ -180,8 +180,9 @@ void GMLuaArgumentsPrivate::push(const GMVariant& var)
 void GMLuaArgumentsPrivate::pushObject(const GMObject& obj)
 {
 	lua_newtable(L);
-	setMetaTables(obj);
+	// 先设置成员，然后再设置元表。因为如果先设置元表，会导致设置成员时调用元表函数，这不是我们所期望的。
 	setMembers(obj);
+	setMetaTables(obj);
 }
 
 void GMLuaArgumentsPrivate::setMetaTables(const GMObject& obj)
@@ -198,24 +199,25 @@ void GMLuaArgumentsPrivate::setMetaTables(const GMObject& obj)
 	getMetaTableAndName(obj, metatableName, &metaTable);
 	GM_ASSERT(metaTable);
 
-	luaL_newmetatable(L, metatableName.toStdString().c_str());
-	if (!metatableName.isEmpty())
+	if (luaL_newmetatable(L, metatableName.toStdString().c_str()))
 	{
-		// 存在meta数据
-		for (const auto& member : *metaTable->meta())
+		if (!metatableName.isEmpty())
 		{
-			// 只为几个默认的meta写方法
-			if (contains(s_overrideList, member.first) &&
-				member.second.type == GMMetaMemberType::Function)
+			// 存在meta数据
+			for (const auto& member : *metaTable->meta())
 			{
-				std::string name = member.first.toStdString();
-				lua_pushstring(L, name.c_str());
-				lua_pushcfunction(L, (GMLuaCFunction)(member.second.ptr));
-				lua_rawset(L, -3);
+				// 只为几个默认的meta写方法
+				if (contains(s_overrideList, member.first) &&
+					member.second.type == GMMetaMemberType::Function)
+				{
+					std::string name = member.first.toStdString();
+					lua_pushstring(L, name.c_str());
+					lua_pushcfunction(L, (GMLuaCFunction)(member.second.ptr));
+					lua_rawset(L, -3);
+				}
 			}
 		}
 	}
-	
 	GM_ASSERT(lua_istable(L, -2));
 	lua_setmetatable(L, -2);
 }
@@ -611,7 +613,6 @@ GMLuaArguments::GMLuaArguments(GMLuaCoreState* l, const GMString& invoker, std::
 	D(d);
 	d->types = types;
 	d->L = l;
-	d->checkSize();
 	d->invoker = invoker;
 	d->checkSize();
 }
