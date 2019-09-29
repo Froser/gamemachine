@@ -190,7 +190,7 @@ public:
 	}
 
 	// GMGameObject:
-private:
+friend_methods(GMGameObject):
 	void setCulled(bool culled);
 	bool isCulled();
 };

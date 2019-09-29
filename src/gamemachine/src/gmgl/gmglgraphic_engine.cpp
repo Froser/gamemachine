@@ -50,6 +50,7 @@ extern "C"
 
 GM_PRIVATE_OBJECT_UNALIGNED(GMGLGraphicEngine)
 {
+	GM_DECLARE_PUBLIC(GMGLGraphicEngine)
 	bool inited = false;
 	bool engineReady = false;
 
@@ -72,12 +73,15 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLGraphicEngine)
 	GMGLLightContext lightContext;
 
 	Vector<GMint32> lightCountIndices;
+
+	void installShaders();
 };
 
 GMGLGraphicEngine::GMGLGraphicEngine(const IRenderContext* context)
 	: GMGraphicEngine(context)
 {
 	GM_CREATE_DATA();
+	GM_SET_PD();
 }
 
 GMGLGraphicEngine::~GMGLGraphicEngine()
@@ -91,7 +95,7 @@ void GMGLGraphicEngine::init()
 	if (!d->inited)
 	{
 		Base::init();
-		installShaders();
+		d->installShaders();
 		glEnable(GL_MULTISAMPLE);
 
 		auto& runningState = GM.getRunningStates();
@@ -112,17 +116,18 @@ void GMGLGraphicEngine::init()
 	}
 }
 
-void GMGLGraphicEngine::installShaders()
+void GMGLGraphicEnginePrivate::installShaders()
 {
-	D_BASE(d, Base);
-	if (!getShaderLoadCallback())
+	P_D(pd);
+	auto pdb = pd->GMGraphicEngine::data();
+	if (!pd->getShaderLoadCallback())
 	{
 		gm_error(gm_dbg_wrap("An IShaderLoadCallback is missing."));
 		return;
 	}
 
-	getShaderLoadCallback()->onLoadShaders(d->context);
-	d->renderTechniqueManager->init();
+	pd->getShaderLoadCallback()->onLoadShaders(pdb->context);
+	pdb->renderTechniqueManager->init();
 }
 
 bool GMGLGraphicEngine::getInterface(GameMachineInterfaceID id, void** out)

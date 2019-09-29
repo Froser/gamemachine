@@ -341,6 +341,8 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMPrimitiveManager)
 	// 图元
 	GMOwnedPtr<GMSprite2DGameObject> line2D;
 	GMOwnedPtr<GMPrimitive3DObject> line3D;
+
+	GMPrimitiveID allocId();
 };
 
 GMPrimitiveManager::GMPrimitiveManager(const IRenderContext* context)
@@ -362,16 +364,15 @@ GMPrimitiveManager::~GMPrimitiveManager()
 
 }
 
-GMPrimitiveID GMPrimitiveManager::allocId()
+GMPrimitiveID GMPrimitiveManagerPrivate::allocId()
 {
-	D(d);
-	return d->current++;
+	return current++;
 }
 
 GMPrimitiveID GMPrimitiveManager::addLine(const GMPoint& p1, const GMPoint& p2, const GMVec4& color)
 {
 	D(d);
-	GMPrimitiveID id = allocId();
+	GMPrimitiveID id = d->allocId();
 	d->primitives[id].reset(new GMPrimitiveLine2D(*this, p1, p2, color));
 	return id;
 }
@@ -379,7 +380,7 @@ GMPrimitiveID GMPrimitiveManager::addLine(const GMPoint& p1, const GMPoint& p2, 
 GMPrimitiveID GMPrimitiveManager::addLine(const GMVec3& p1, const GMVec3& p2, const GMVec4& color)
 {
 	D(d);
-	GMPrimitiveID id = allocId();
+	GMPrimitiveID id = d->allocId();
 	d->primitives[id].reset(new GMPrimitiveLine3D(*this, p1, p2, color));
 	return id;
 }

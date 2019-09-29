@@ -43,19 +43,6 @@ public:
 	virtual void setBool(GMint32 index, bool value) override;
 	virtual bool setInterfaceInstance(const GMString& interfaceName, const GMString& instanceName, GMShaderType type) override;
 
-private:
-	void setProgram(GMuint32 program);
-	void removeShaders();
-	void expandSource(REF GMGLShaderInfo& shaderInfo);
-	GMString expandSource(const GMString& workingDir, const GMString& source);
-	bool matchMacro(const GMString& source, const GMString& macro, REF GMString& result);
-	void expandInclude(const GMString& workingDir, const GMString& fn, IN OUT GMString& source);
-	void expandAlias(const GMString& alias, IN OUT GMString& source);
-	void expandUnused(REF GMString& line, const GMString& token);
-	GMString& replaceAlias(IN OUT GMString& line);
-	bool setSubrotinue(const GMString& interfaceName, const GMString& implement, GMuint32 shaderType);
-	bool verify();
-
 public:
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
 	virtual bool setInterface(GameMachineInterfaceID id, void* in) override;

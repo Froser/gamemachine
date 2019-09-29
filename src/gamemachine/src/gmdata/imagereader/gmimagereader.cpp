@@ -9,6 +9,19 @@
 
 BEGIN_NS
 
+namespace
+{
+	GMImageReader::ImageType test(const GMbyte* data, GMsize_t size)
+	{
+		for (GMImageReader::ImageType i = GMImageReader::ImageType_Begin; i < GMImageReader::ImageType_End; i = (GMImageReader::ImageType)((GMuint32)i + 1))
+		{
+			if (GMImageReader::getReader(i)->test(data, size))
+				return i;
+		}
+		return GMImageReader::ImageType_End;
+	}
+}
+
 class GMImageReaderContainer
 {
 public:
@@ -59,16 +72,6 @@ IImageReader* GMImageReader::getReader(ImageType type)
 {
 	static GMImageReaderContainer readers;
 	return readers.getReader(type);
-}
-
-GMImageReader::ImageType GMImageReader::test(const GMbyte* data, GMsize_t size)
-{
-	for (ImageType i = ImageType_Begin; i < ImageType_End; i = (ImageType)((GMuint32)i + 1))
-	{
-		if (getReader(i)->test(data, size))
-			return i;
-	}
-	return ImageType_End;
 }
 
 END_NS

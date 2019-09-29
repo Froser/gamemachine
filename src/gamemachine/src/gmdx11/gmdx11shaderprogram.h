@@ -30,13 +30,6 @@ public:
 public:
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
 	virtual bool setInterface(GameMachineInterfaceID id, void* in) override;
-
-private:
-	ID3DX11EffectVectorVariable* getVectorVariable(GMint32 index);
-	ID3DX11EffectMatrixVariable* getMatrixVariable(GMint32 index);
-	ID3DX11EffectScalarVariable* getScalarVariable(GMint32 index);
-	ID3DX11EffectInterfaceVariable* getInterfaceVariable(GMint32 index);
-	ID3DX11EffectClassInstanceVariable* getInstanceVariable(GMint32 index);
 };
 
 GM_PRIVATE_CLASS(GMDx11ComputeShaderProgram);
@@ -70,9 +63,6 @@ public:
 public:
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
 	virtual bool setInterface(GameMachineInterfaceID id, void* in) override;
-
-private:
-	void cleanUp();
 };
 
 END_NS

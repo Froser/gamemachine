@@ -10,6 +10,7 @@ BEGIN_NS
 GMGBuffer::GMGBuffer(const IRenderContext* context)
 {
 	GM_CREATE_DATA();
+	GM_SET_PD();
 
 	D(d);
 	d->context = context;
@@ -23,19 +24,19 @@ GMGBuffer::~GMGBuffer()
 	d->geometryFramebuffers->destroy();
 }
 
-void GMGBuffer::createQuad()
+void GMGBufferPrivate::createQuad()
 {
-	D(d);
-	GM_ASSERT(!d->quad);
+	P_D(pd);
+	GM_ASSERT(!quad);
 	GMSceneAsset scene;
 	GMPrimitiveCreator::createQuadrangle(GMPrimitiveCreator::one2(), 0, scene);
 	GM_ASSERT(!scene.isEmpty());
 	GMModel* model = scene.getScene()->getModels()[0].getModel();
 	GM_ASSERT(model);
 	model->setType(GMModelType::LightPassQuad);
-	getContext()->getEngine()->createModelDataProxy(d->context, model);
-	d->quad = new GMGameObject(scene);
-	d->quad->setContext(d->context);
+	pd->getContext()->getEngine()->createModelDataProxy(context, model);
+	quad = new GMGameObject(scene);
+	quad->setContext(context);
 }
 
 void GMGBuffer::init()
@@ -45,7 +46,7 @@ void GMGBuffer::init()
 		d->geometryFramebuffers = createGeometryFramebuffers();
 
 	if (!d->quad)
-		createQuad();
+		d->createQuad();
 }
 
 void GMGBuffer::setGeometryPassingState(GMGeometryPassingState state)

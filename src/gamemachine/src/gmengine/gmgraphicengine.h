@@ -281,6 +281,9 @@ protected:
 	void clearFilterFramebuffer();
 	void unbindFilterFramebuffer();
 	void drawFilterFramebuffer();
+	GMGameObject* getFilterQuad();
+	IShaderLoadCallback* getShaderLoadCallback();
+	const Vector<ILight*>& getLights();
 
 public:
 	const GMFilterMode::Mode getCurrentFilterMode();
@@ -298,11 +301,6 @@ public:
 	bool isDrawingShadow();
 	const GMGlobalBlendStateDesc& getGlobalBlendState();
 	GMFramebuffersStack& getFramebuffersStack();
-
-protected:
-	GMGameObject* getFilterQuad();
-	IShaderLoadCallback* getShaderLoadCallback();
-	const Vector<ILight*>& getLights();
 
 public:
 	static constexpr const GMsize_t getMaxLightCount()

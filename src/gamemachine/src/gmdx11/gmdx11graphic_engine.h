@@ -54,9 +54,6 @@ public:
 	ID3D11DepthStencilView* getDepthStencilView();
 	ID3D11RenderTargetView* getRenderTargetView();
 	const GMVec2 getCurrentFilterKernelDelta();
-
-private:
-	void initShaders(const IRenderContext* context);
 };
 
 END_NS

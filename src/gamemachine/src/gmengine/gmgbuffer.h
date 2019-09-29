@@ -31,9 +31,6 @@ protected:
 protected:
 	virtual IFramebuffers* getGeometryFramebuffers();
 	virtual IFramebuffers* createGeometryFramebuffers() = 0;
-
-private:
-	void createQuad();
 };
 
 END_NS

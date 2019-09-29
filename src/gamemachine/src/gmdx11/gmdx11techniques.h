@@ -62,11 +62,6 @@ protected:
 	GMTextureAsset getTexture(GMTextureSampler& sampler);
 	void setGamma(IShaderProgram* shaderProgram);
 	GMDx11EffectVariableBank& getVarBank();
-
-private:
-	GMTextureAsset getWhiteTexture();
-
-protected:
 	GMDx11GraphicEngine* getEngine();
 	GMModel* getCurrentModel();
 	void updateBoneTransforms(IShaderProgram* shaderProgram, GMModel* model);

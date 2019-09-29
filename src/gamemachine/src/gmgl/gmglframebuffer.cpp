@@ -20,6 +20,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLFramebuffers)
 	GMFramebufferDesc desc;
 	GMfloat clearColor[4];
 	const IRenderContext* context = nullptr;
+	void createFramebuffers();
 };
 
 GM_PRIVATE_OBJECT_UNALIGNED(GMGLFramebufferTexture)
@@ -224,7 +225,7 @@ void GMGLFramebuffers::addFramebuffer(AUTORELEASE IFramebuffer* framebuffer)
 void GMGLFramebuffers::use()
 {
 	D(d);
-	createFramebuffers();
+	d->createFramebuffers();
 	glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
 	setViewport();
 }
@@ -232,7 +233,7 @@ void GMGLFramebuffers::use()
 void GMGLFramebuffers::bind()
 {
 	D(d);
-	createFramebuffers();
+	d->createFramebuffers();
 	if (d->framebuffersCreated)
 	{
 		use();
@@ -324,19 +325,18 @@ void GMGLFramebuffers::setViewport()
 	glViewport(0, 0, d->desc.rect.width, d->desc.rect.height);
 }
 
-void GMGLFramebuffers::createFramebuffers()
+void GMGLFramebuffersPrivate::createFramebuffers()
 {
-	D(d);
-	if (!d->framebuffersCreated)
+	if (!framebuffersCreated)
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 		Vector<GLuint> attachments;
-		GMsize_t sz = d->framebuffers.size();
+		GMsize_t sz = framebuffers.size();
 		for (GMsize_t i = 0; i < sz; i++)
 		{
 			GMuint32 _i = gm_sizet_to_uint(i);
 			attachments.push_back(GL_COLOR_ATTACHMENT0 + _i);
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _i, GL_TEXTURE_2D, d->framebuffers[_i]->getTextureId(), 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _i, GL_TEXTURE_2D, framebuffers[_i]->getTextureId(), 0);
 		}
 		glDrawBuffers((GLsizei)sz, attachments.data());
 
@@ -349,7 +349,7 @@ void GMGLFramebuffers::createFramebuffers()
 			return;
 		}
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		d->framebuffersCreated = true;
+		framebuffersCreated = true;
 	}
 }
 

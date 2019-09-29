@@ -43,15 +43,13 @@ public:
 	GMFontHandle addFontByFileName(const GMString& fontFileName);
 	GMFontHandle addFontByFullName(const GMString& fontFullName);
 	GMFontHandle addFontByMemory(GMBuffer&& buffer);
-
-public:
-	virtual GMTextureAsset glyphTexture() = 0;
-
-public:
 	void setDefaultFontCN(GMFontHandle fontHandle);
 	void setDefaultFontEN(GMFontHandle fontHandle);
 	GMFontHandle getDefaultFontCN();
 	GMFontHandle getDefaultFontEN();
+
+public:
+	virtual GMTextureAsset glyphTexture() = 0;
 
 private:
 	virtual void updateTexture(const GMGlyphBitmap& bitmapGlyph, const GMGlyphInfo& glyphInfo) = 0;

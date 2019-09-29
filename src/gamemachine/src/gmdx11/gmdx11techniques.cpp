@@ -378,6 +378,8 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMDx11Technique)
 	Map<ID3DX11EffectVariable*, GMTextureAttributeBank> textureVariables;
 	GMShaderVariablesIndices indexBank = { 0 };
 	GMint64 lastShadowVersion = { 0 };
+
+	GMTextureAsset getWhiteTexture();
 };
 
 GMDx11EffectVariableBank& GMDx11Technique::getVarBank()
@@ -388,12 +390,11 @@ GMDx11EffectVariableBank& GMDx11Technique::getVarBank()
 	return *d->bank;
 }
 
-GMTextureAsset GMDx11Technique::getWhiteTexture()
+GMTextureAsset GMDx11TechniquePrivate::getWhiteTexture()
 {
-	D(d);
-	if (d->whiteTexture.isEmpty())
-		d->whiteTexture = createWhiteTexture(d->context);
-	return d->whiteTexture;
+	if (whiteTexture.isEmpty())
+		whiteTexture = createWhiteTexture(context);
+	return whiteTexture;
 }
 
 void GMDx11Technique::updateBoneTransforms(IShaderProgram* shaderProgram, GMModel* model)
@@ -610,6 +611,7 @@ private:
 GMDx11Technique::GMDx11Technique(const IRenderContext* context)
 {
 	GM_CREATE_DATA();
+
 	D(d);
 	if (context)
 	{
@@ -830,7 +832,7 @@ void GMDx11Technique::prepareTextures(GMModel* model)
 				type == GMTextureType::Lightmap
 				))
 			{
-				GMTextureAsset whiteTexture = getWhiteTexture();
+				GMTextureAsset whiteTexture = d->getWhiteTexture();
 				applyTextureAttribute(model, whiteTexture, type);
 				whiteTexture.getTexture()->bindSampler(nullptr);
 				whiteTexture.getTexture()->useTexture((GMint32)type);

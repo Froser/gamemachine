@@ -124,6 +124,7 @@ GMShaderType GMGLShaderInfo::fromGLShaderType(GMuint32 type)
 
 GM_PRIVATE_OBJECT_UNALIGNED(GMGLShaderProgram)
 {
+	GM_DECLARE_PUBLIC(GMGLShaderProgram)
 	const IRenderContext* context = nullptr;
 	GMGLShaderInfos shaderInfos;
 	GMGLShaderIDList shaders;
@@ -132,11 +133,48 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMGLShaderProgram)
 	HashMap<GMString, GMString, GMStringHashFunctor> aliasMap;
 	Set<GMString> unusedVariableNames;
 	Array<HashMap<GMString, GMString, GMStringHashFunctor>, (GMsize_t)GMShaderType::Geometry> definesMap;
+
+	void setProgram(GMuint32 program);
+	void removeShaders();
+	bool setSubrotinue(const GMString& interfaceName, const GMString& implement, GMuint32 shaderType);
+	bool verify();
 };
+
+bool GMGLShaderProgramPrivate::setSubrotinue(const GMString& interfaceName, const GMString& implement, GMuint32 shaderType)
+{
+	GM_ASSERT(verify());
+	P_D(pd);
+	if (!techniqueIndex)
+		techniqueIndex = pd->getIndex(interfaceName);
+	pd->setInt(techniqueIndex, toTechniqueEntranceId(implement));
+	return true;
+}
+
+bool GMGLShaderProgramPrivate::verify()
+{
+	// Always valid
+	return true;
+}
+
+void GMGLShaderProgramPrivate::setProgram(GMuint32 program)
+{
+	GM_ASSERT(program);
+	shaderProgram = program;
+}
+
+void GMGLShaderProgramPrivate::removeShaders()
+{
+	GMGLShaderIDList& shadersInfo = shaders;
+	for (auto& shader : shadersInfo)
+	{
+		glDeleteShader(shader);
+	}
+}
 
 GMGLShaderProgram::GMGLShaderProgram(const IRenderContext* context)
 {
 	GM_CREATE_DATA();
+	GM_SET_PD();
 
 	D(d);
 	d->context = context;
@@ -188,31 +226,36 @@ GMint32 GMGLShaderProgram::getIndex(const GMString& name)
 
 void GMGLShaderProgram::setMatrix4(GMint32 index, const GMMat4& value)
 {
-	GM_ASSERT(verify());
+	D(d);
+	GM_ASSERT(d->verify());
 	glUniformMatrix4fv(index, 1, GL_FALSE, ValuePointer(value));
 }
 
 void GMGLShaderProgram::setVec4(GMint32 index, const GMFloat4& value)
 {
-	GM_ASSERT(verify());
+	D(d);
+	GM_ASSERT(d->verify());
 	glUniform4fv(index, 1, ValuePointer(value));
 }
 
 void GMGLShaderProgram::setVec3(GMint32 index, const GMfloat value[3])
 {
-	GM_ASSERT(verify());
+	D(d);
+	GM_ASSERT(d->verify());
 	glUniform3fv(index, 1, value);
 }
 
 void GMGLShaderProgram::setInt(GMint32 index, GMint32 value)
 {
-	GM_ASSERT(verify());
+	D(d);
+	GM_ASSERT(d->verify());
 	glUniform1i(index, value);
 }
 
 void GMGLShaderProgram::setFloat(GMint32 index, GMfloat value)
 {
-	GM_ASSERT(verify());
+	D(d);
+	GM_ASSERT(d->verify());
 	glUniform1f(index, value);
 }
 
@@ -223,24 +266,9 @@ void GMGLShaderProgram::setBool(GMint32 index, bool value)
 
 bool GMGLShaderProgram::setInterfaceInstance(const GMString& interfaceName, const GMString& instanceName, GMShaderType type)
 {
-	GLenum shaderType = GMGLShaderInfo::toGLShaderType(type);
-	return setSubrotinue(interfaceName, instanceName, shaderType);
-}
-
-bool GMGLShaderProgram::setSubrotinue(const GMString& interfaceName, const GMString& implement, GMuint32 shaderType)
-{
-	GM_ASSERT(verify());
 	D(d);
-	if (!d->techniqueIndex)
-		d->techniqueIndex = getIndex(interfaceName);
-	setInt(d->techniqueIndex, toTechniqueEntranceId(implement));
-	return true;
-}
-
-bool GMGLShaderProgram::verify()
-{
-	// Always valid
-	return true;
+	GLenum shaderType = GMGLShaderInfo::toGLShaderType(type);
+	return d->setSubrotinue(interfaceName, instanceName, shaderType);
 }
 
 bool GMGLShaderProgram::load()
@@ -250,7 +278,7 @@ bool GMGLShaderProgram::load()
 		return false;
 
 	GLuint program = glCreateProgram();
-	setProgram(program);
+	d->setProgram(program);
 
 	constexpr GMsize_t shaderTypes = static_cast<GMsize_t>(GMShaderType::Geometry);
 	Array<Vector<GMString>, shaderTypes> contents;
@@ -268,8 +296,6 @@ bool GMGLShaderProgram::load()
 		GLuint type = GMGLShaderInfo::toGLShaderType(static_cast<GMShaderType>(index + 1));
 		GLuint shader = glCreateShader(type);
 		d->shaders.push_back(shader);
-
-		//expandSource(entry); // 展开glsl
 
 		const GLchar* version = !GMGLHelper::isOpenGLShaderLanguageES() ? "#version 330\n" : "#version 300 es\n";
 		Vector<const GLchar*> sourcesVector = { version };
@@ -333,7 +359,7 @@ bool GMGLShaderProgram::load()
 			GMMessage crashMsg(GameMachineMessageType::CrashDown);
 			GM.postMessage(crashMsg);
 			GM_delete_array(log);
-			removeShaders();
+			d->removeShaders();
 			return false;
 		}
 		else
@@ -369,7 +395,7 @@ bool GMGLShaderProgram::load()
 		GM.postMessage(crashMsg);
 		GM_delete_array(log);
 
-		removeShaders();
+		d->removeShaders();
 		return false;
 	}
 
@@ -383,129 +409,6 @@ GMuint32 GMGLShaderProgram::getProgram()
 	return d->shaderProgram;
 }
 
-void GMGLShaderProgram::setProgram(GMuint32 program)
-{
-	D(d);
-	GM_ASSERT(program);
-	d->shaderProgram = program;
-}
-
-void GMGLShaderProgram::removeShaders()
-{
-	D(d);
-	GMGLShaderIDList& shadersInfo = d->shaders;
-	for (auto& shader : shadersInfo)
-	{
-		glDeleteShader(shader);
-	}
-}
-
-void GMGLShaderProgram::expandSource(REF GMGLShaderInfo& shaderInfo)
-{
-	D(d);
-	// 解析源码，展开gm特有的宏
-	shaderInfo.source = expandSource(shaderInfo.filename, shaderInfo.source);
-}
-
-GMString GMGLShaderProgram::expandSource(const GMString& filename, const GMString& source)
-{
-	GMStringReader reader(source);
-	GMString n, line;
-	GMString expanded;
-	auto iter = reader.lineBegin();
-	while (true)
-	{
-		line = *iter;
-		if (matchMacro(line, "include", n))
-			expandInclude(filename, n, line);
-		else if (matchMacro(line, "alias", n))
-			expandAlias(n, line);
-		else if (matchMacro(line, "unused", n))
-			expandUnused(line, n);
-		expanded += replaceAlias(line);
-		if (!iter.hasNextLine())
-			break;
-		++iter;
-	}
-	return expanded;
-}
-
-bool GMGLShaderProgram::matchMacro(const GMString& source, const GMString& macro, REF GMString& result)
-{
-	std::string s = source.toStdString();
-	std::string expr = "#(\\s*)" + macro.toStdString() + "(\\s+)(.*)";
-	std::smatch match;
-	if (std::regex_search(s, match, std::regex(expr.c_str())))
-	{
-		GM_ASSERT(match.size() >= 4);
-		result = match[3].str();
-		return true;
-	}
-	return false;
-}
-
-void GMGLShaderProgram::expandInclude(const GMString& workingDir, const GMString& fn, IN OUT GMString& source)
-{
-	std::string f;
-	std::string s = source.toStdString();
-	static std::string expr = "(\\s*)\"(.+)\"";
-	std::smatch match;
-	if (std::regex_search(s, match, std::regex(expr.c_str())))
-	{
-		if (match.size() != 3)
-			return;
-		f = match[2].str();
-	}
-
-	GMString dir = GMPath::directoryName(workingDir);
-	GMString include = dir + f;
-	GMBuffer buf;
-	if (GM.getGamePackageManager()->readFileFromPath(include, &buf))
-	{
-		buf.convertToStringBuffer();
-		GMString expanded = L"// GameMachine include file: " + dir + f + GM_NEXTLINE;
-		expanded += GMString((char*)buf.getData());
-		source = expandSource(include, expanded) + GM_NEXTLINE;
-	}
-	else
-	{
-		gm_warning(gm_dbg_wrap("GMGLShaderProgram::expandInclude: GL shader '{0}' not found, use empty file instead!"), include);
-	}
-}
-
-void GMGLShaderProgram::expandAlias(const GMString& alias, IN OUT GMString& source)
-{
-	D(d);
-	std::string s = alias.toStdString();
-	static std::string expr = "(\\s*)(\\S+)(\\s+)(.+)";
-	std::smatch match;
-	if (std::regex_search(s, match, std::regex(expr.c_str())))
-	{
-		GM_ASSERT(match.size() == 5);
-		std::string replacement = match[2].str();
-		std::string a = match[4].str();
-		d->aliasMap.insert({ "${" + replacement + "}", a });
-	}
-	source = L"";
-}
-
-void GMGLShaderProgram::expandUnused(REF GMString& line, const GMString& token)
-{
-	D(d);
-	d->unusedVariableNames.insert(token);
-	line = GMString();
-}
-
-GMString& GMGLShaderProgram::replaceAlias(IN OUT GMString& line)
-{
-	D(d);
-	for (auto& alias : d->aliasMap)
-	{
-		line = line.replace(alias.first, alias.second);
-	}
-	return line;
-}
-
 bool GMGLShaderProgram::setInterface(GameMachineInterfaceID id, void* in)
 {
 	return false;
@@ -515,7 +418,6 @@ bool GMGLShaderProgram::getInterface(GameMachineInterfaceID id, void** out)
 {
 	return false;
 }
-
 
 GM_PRIVATE_OBJECT_UNALIGNED(GMGLComputeShaderProgram)
 {

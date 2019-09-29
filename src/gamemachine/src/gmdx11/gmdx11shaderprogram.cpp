@@ -30,6 +30,12 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMDx11EffectShaderProgram)
 	GMComPtr<ID3DX11Effect> effect;
 	Vector<ID3DX11EffectVariable*> variables;
 	GMAtomic<GMint32> nextVariableIndex;
+
+	ID3DX11EffectVectorVariable* getVectorVariable(GMint32 index);
+	ID3DX11EffectMatrixVariable* getMatrixVariable(GMint32 index);
+	ID3DX11EffectScalarVariable* getScalarVariable(GMint32 index);
+	ID3DX11EffectInterfaceVariable* getInterfaceVariable(GMint32 index);
+	ID3DX11EffectClassInstanceVariable* getInstanceVariable(GMint32 index);
 };
 
 GMDx11EffectShaderProgram::GMDx11EffectShaderProgram(GMComPtr<ID3DX11Effect> effect)
@@ -73,7 +79,7 @@ void GMDx11EffectShaderProgram::setMatrix4(GMint32 index, const GMMat4& value)
 	if (index < 0)
 		return;
 
-	ID3DX11EffectMatrixVariable* var = getMatrixVariable(index);
+	ID3DX11EffectMatrixVariable* var = d->getMatrixVariable(index);
 	GM_DX_HR(var->SetMatrix(ValuePointer(value)));
 }
 
@@ -83,7 +89,7 @@ void GMDx11EffectShaderProgram::setVec4(GMint32 index, const GMFloat4& vector)
 	if (index < 0)
 		return;
 
-	ID3DX11EffectVectorVariable* var = getVectorVariable(index);
+	ID3DX11EffectVectorVariable* var = d->getVectorVariable(index);
 	GM_DX_HR(var->SetFloatVector(ValuePointer(vector)));
 }
 
@@ -93,7 +99,7 @@ void GMDx11EffectShaderProgram::setVec3(GMint32 index, const GMfloat value[3])
 	if (index < 0)
 		return;
 
-	ID3DX11EffectVectorVariable* var = getVectorVariable(index);
+	ID3DX11EffectVectorVariable* var = d->getVectorVariable(index);
 	GM_DX_HR(var->SetFloatVector(ValuePointer(GMVec4(value[0], value[1], value[2], 0))));
 }
 
@@ -103,7 +109,7 @@ void GMDx11EffectShaderProgram::setInt(GMint32 index, GMint32 value)
 	if (index < 0)
 		return;
 
-	ID3DX11EffectScalarVariable* var = getScalarVariable(index);
+	ID3DX11EffectScalarVariable* var = d->getScalarVariable(index);
 	GM_DX_HR(var->SetInt(value));
 }
 
@@ -113,7 +119,7 @@ void GMDx11EffectShaderProgram::setFloat(GMint32 index, GMfloat value)
 	if (index < 0)
 		return;
 
-	ID3DX11EffectScalarVariable* var = getScalarVariable(index);
+	ID3DX11EffectScalarVariable* var = d->getScalarVariable(index);
 	GM_DX_HR(var->SetFloat(value));
 }
 
@@ -123,15 +129,15 @@ void GMDx11EffectShaderProgram::setBool(GMint32 index, bool value)
 	if (index < 0)
 		return;
 
-	ID3DX11EffectScalarVariable* var = getScalarVariable(index);
+	ID3DX11EffectScalarVariable* var = d->getScalarVariable(index);
 	GM_DX_HR(var->SetBool(value));
 }
 
 bool GMDx11EffectShaderProgram::setInterfaceInstance(const GMString& interfaceName, const GMString& instanceName, GMShaderType type)
 {
 	D(d);
-	ID3DX11EffectInterfaceVariable* interfaceVariable = getInterfaceVariable(getIndex(interfaceName));
-	ID3DX11EffectClassInstanceVariable* instanceVariable = getInstanceVariable(getIndex(instanceName));
+	ID3DX11EffectInterfaceVariable* interfaceVariable = d->getInterfaceVariable(getIndex(interfaceName));
+	ID3DX11EffectClassInstanceVariable* instanceVariable = d->getInstanceVariable(getIndex(instanceName));
 	if (instanceVariable->IsValid())
 	{
 		GM_DX_HR_RET(interfaceVariable->SetClassInstance(instanceVariable));
@@ -163,42 +169,37 @@ bool GMDx11EffectShaderProgram::getInterface(GameMachineInterfaceID id, void** o
 	return false;
 }
 
-ID3DX11EffectVectorVariable* GMDx11EffectShaderProgram::getVectorVariable(GMint32 index)
+ID3DX11EffectVectorVariable* GMDx11EffectShaderProgramPrivate::getVectorVariable(GMint32 index)
 {
-	D(d);
-	ID3DX11EffectVectorVariable* var = d->variables[index]->AsVector();
+	ID3DX11EffectVectorVariable* var = variables[index]->AsVector();
 	GM_ASSERT(var->IsValid());
 	return var;
 }
 
-ID3DX11EffectMatrixVariable* GMDx11EffectShaderProgram::getMatrixVariable(GMint32 index)
+ID3DX11EffectMatrixVariable* GMDx11EffectShaderProgramPrivate::getMatrixVariable(GMint32 index)
 {
-	D(d);
-	ID3DX11EffectMatrixVariable* var = d->variables[index]->AsMatrix();
+	ID3DX11EffectMatrixVariable* var = variables[index]->AsMatrix();
 	GM_ASSERT(var->IsValid());
 	return var;
 }
 
-ID3DX11EffectScalarVariable* GMDx11EffectShaderProgram::getScalarVariable(GMint32 index)
+ID3DX11EffectScalarVariable* GMDx11EffectShaderProgramPrivate::getScalarVariable(GMint32 index)
 {
-	D(d);
-	ID3DX11EffectScalarVariable* var = d->variables[index]->AsScalar();
+	ID3DX11EffectScalarVariable* var = variables[index]->AsScalar();
 	GM_ASSERT(var->IsValid());
 	return var;
 }
 
-ID3DX11EffectInterfaceVariable* GMDx11EffectShaderProgram::getInterfaceVariable(GMint32 index)
+ID3DX11EffectInterfaceVariable* GMDx11EffectShaderProgramPrivate::getInterfaceVariable(GMint32 index)
 {
-	D(d);
-	ID3DX11EffectInterfaceVariable* var = d->variables[index]->AsInterface();
+	ID3DX11EffectInterfaceVariable* var = variables[index]->AsInterface();
 	GM_ASSERT(var->IsValid());
 	return var;
 }
 
-ID3DX11EffectClassInstanceVariable* GMDx11EffectShaderProgram::getInstanceVariable(GMint32 index)
+ID3DX11EffectClassInstanceVariable* GMDx11EffectShaderProgramPrivate::getInstanceVariable(GMint32 index)
 {
-	D(d);
-	ID3DX11EffectClassInstanceVariable* var = d->variables[index]->AsClassInstance();
+	ID3DX11EffectClassInstanceVariable* var = variables[index]->AsClassInstance();
 	GM_ASSERT(var->IsValid());
 	return var;
 }
@@ -218,6 +219,7 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMDx11ComputeShaderProgram)
 	GMDx11GraphicEngine* engine = nullptr;
 	GMComPtr<ID3D11ComputeShader> shader;
 	GMuint32 SRV_UAV_CB_count[3] = { 0 };
+	void cleanUp();
 };
 
 GMDx11ComputeShaderProgram::GMDx11ComputeShaderProgram(const IRenderContext* context)
@@ -243,7 +245,7 @@ void GMDx11ComputeShaderProgram::dispatch(GMint32 threadGroupCountX, GMint32 thr
 	dc->Dispatch(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
 
 	// 清理现场
-	cleanUp();
+	d->cleanUp();
 }
 
 void GMDx11ComputeShaderProgram::load(const GMString& path, const GMString& source, const GMString& entryPoint)
@@ -592,33 +594,6 @@ bool GMDx11ComputeShaderProgram::setInterface(GameMachineInterfaceID id, void* i
 	return false;
 }
 
-void GMDx11ComputeShaderProgram::cleanUp()
-{
-	D(d);
-	ID3D11DeviceContext* dc = d->engine->getDeviceContext();
-	dc->CSSetShader(NULL, NULL, 0);
-	nullptr_t* nullpointers = getNullPtr();
-	if (d->SRV_UAV_CB_count[0])
-	{
-		dc->CSSetShaderResources(0, d->SRV_UAV_CB_count[0], (ID3D11ShaderResourceView**)nullpointers);
-		d->SRV_UAV_CB_count[0] = 0;
-	}
-
-	if (d->SRV_UAV_CB_count[1])
-	{
-		dc->CSSetUnorderedAccessViews(0, d->SRV_UAV_CB_count[1], (ID3D11UnorderedAccessView**)nullpointers, NULL);
-		d->SRV_UAV_CB_count[1] = 0;
-	}
-
-	if (d->SRV_UAV_CB_count[2])
-	{
-		dc->CSSetConstantBuffers(0, d->SRV_UAV_CB_count[2], (ID3D11Buffer**)nullpointers);
-		d->SRV_UAV_CB_count[2] = 0;
-	}
-
-	GM_ZeroMemory(d->SRV_UAV_CB_count, sizeof(d->SRV_UAV_CB_count));
-}
-
 bool GMDx11ComputeShaderProgram::getInterface(GameMachineInterfaceID id, void** out)
 {
 	D(d);
@@ -637,6 +612,32 @@ bool GMDx11ComputeShaderProgram::getInterface(GameMachineInterfaceID id, void** 
 		break;
 	}
 	return false;
+}
+
+void GMDx11ComputeShaderProgramPrivate::cleanUp()
+{
+	ID3D11DeviceContext* dc = engine->getDeviceContext();
+	dc->CSSetShader(NULL, NULL, 0);
+	nullptr_t* nullpointers = getNullPtr();
+	if (SRV_UAV_CB_count[0])
+	{
+		dc->CSSetShaderResources(0, SRV_UAV_CB_count[0], (ID3D11ShaderResourceView**)nullpointers);
+		SRV_UAV_CB_count[0] = 0;
+	}
+
+	if (SRV_UAV_CB_count[1])
+	{
+		dc->CSSetUnorderedAccessViews(0, SRV_UAV_CB_count[1], (ID3D11UnorderedAccessView**)nullpointers, NULL);
+		SRV_UAV_CB_count[1] = 0;
+	}
+
+	if (SRV_UAV_CB_count[2])
+	{
+		dc->CSSetConstantBuffers(0, SRV_UAV_CB_count[2], (ID3D11Buffer**)nullpointers);
+		SRV_UAV_CB_count[2] = 0;
+	}
+
+	GM_ZeroMemory(SRV_UAV_CB_count, sizeof(SRV_UAV_CB_count));
 }
 
 END_NS

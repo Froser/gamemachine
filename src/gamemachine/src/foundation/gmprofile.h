@@ -46,10 +46,6 @@ public:
 	static void setHandler(IProfileHandler* handler);
 	static void clearHandler();
 	static void resetTimeline();
-
-private:
-	void startRecord(const GMString& name);
-	void stopRecord();
 };
 
 

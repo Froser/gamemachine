@@ -6,6 +6,20 @@
 
 BEGIN_NS
 
+namespace
+{
+	GMModelReader::EngineType test(const GMModelLoadSettings& settings, const GMBuffer& buffer)
+	{
+		GM_FOREACH_ENUM_CLASS(i, GMModelReader::ModelType_Begin, GMModelReader::ModelType_End)
+		{
+			GMOwnedPtr<IModelReader> reader(GMModelReader::createReader(i));
+			if (reader->test(settings, buffer))
+				return i;
+		}
+		return GMModelReader::ModelType_End;
+	}
+}
+
 class GMModelReaderContainer : public GMObject
 {
 public:
@@ -28,17 +42,6 @@ IModelReader* GMModelReader::createReader(EngineType type)
 {
 	static GMModelReaderContainer readers;
 	return readers.getReader(type);
-}
-
-GMModelReader::EngineType GMModelReader::test(const GMModelLoadSettings& settings, const GMBuffer& buffer)
-{
-	GM_FOREACH_ENUM_CLASS(i, ModelType_Begin, ModelType_End)
-	{
-		GMOwnedPtr<IModelReader> reader(createReader(i));
-		if (reader->test(settings, buffer))
-			return i;
-	}
-	return ModelType_End;
 }
 
 bool GMModelReader::load(const GMModelLoadSettings& settings, REF GMSceneAsset& asset)

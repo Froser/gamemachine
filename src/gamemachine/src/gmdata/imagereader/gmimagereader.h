@@ -37,9 +37,6 @@ public:
 	static bool load(const GMbyte* data, GMsize_t size, OUT GMImage** image);
 	static bool load(const GMbyte* data, GMsize_t size, ImageType type, OUT GMImage** image);
 	static IImageReader* getReader(ImageType type);
-
-private:
-	static ImageType test(const GMbyte* data, GMsize_t size);
 };
 
 END_NS

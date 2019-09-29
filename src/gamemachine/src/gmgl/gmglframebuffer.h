@@ -54,9 +54,6 @@ public:
 public:
 	const GMFramebufferDesc& getDesc();
 
-private:
-	void createFramebuffers();
-
 protected:
 	virtual void createDepthStencilBuffer(const GMFramebufferDesc& desc);
 	virtual void setViewport();

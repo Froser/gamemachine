@@ -33,16 +33,20 @@ GMProfileSessions::GMProfileSession& GMProfile::profileSession()
 
 GM_PRIVATE_OBJECT_UNALIGNED(GMProfile)
 {
+	GM_DECLARE_PUBLIC(GMProfile)
 	GMDebugConfig debugConfig;
 	GMStopwatch stopwatch;
 	GMfloat durationSinceLastProfile = 0; // 距离上一次Profile的时间
 	bool valid = false;
 	GMString name;
+	void startRecord(const GMString& name);
+	void stopRecord();
 };
 
 GMProfile::GMProfile(IGraphicEngine* engine)
 {
 	GM_CREATE_DATA();
+	GM_SET_PD();
 	D(d);
 	d->debugConfig = engine->getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
 }
@@ -51,7 +55,7 @@ GMProfile::GMProfile(IGraphicEngine* engine, const GMString& name)
 	: GMProfile(engine)
 {
 	D(d);
-	startRecord(name);
+	d->startRecord(name);
 }
 
 GMProfile::GMProfile(IGraphicEngine* engine, const GMwchar* name)
@@ -62,53 +66,54 @@ GMProfile::GMProfile(IGraphicEngine* engine, const GMwchar* name)
 	if (!d->debugConfig.get(GMDebugConfigs::RunProfile_Bool).toBool())
 		return;
 
-	startRecord(name);
+	d->startRecord(name);
 }
 
 GMProfile::~GMProfile()
 {
-	stopRecord();
+	D(d);
+	d->stopRecord();
 }
 
-void GMProfile::startRecord(const GMString& name)
+void GMProfilePrivate::startRecord(const GMString& name)
 {
-	D(d);
+	P_D(d);
 	static GMint64 frequency = GMClock::highResolutionTimerFrequency();
 	if (!g_handler)
 		return;
 
-	if (!d->debugConfig.get(GMDebugConfigs::RunProfile_Bool).toBool())
+	if (!debugConfig.get(GMDebugConfigs::RunProfile_Bool).toBool())
 		return;
 
-	GMProfileSessions::GMProfileSession& ps = profileSession();
+	GMProfileSessions::GMProfileSession& ps = d->profileSession();
 
-	d->valid = true;
-	d->name = name;
+	valid = true;
+	this->name = name;
 	GMint64 now = GMClock::highResolutionTimer();
 	if (ps.firstProfileTimeInCycle < 0)
 		ps.firstProfileTimeInCycle = now;
 	GM_ASSERT(now - ps.firstProfileTimeInCycle >= 0);
-	d->durationSinceLastProfile = (now - ps.firstProfileTimeInCycle) / (GMfloat) frequency;
-	g_handler->beginProfile(name, d->durationSinceLastProfile, GMThread::getCurrentThreadId(), ps.level);
+	durationSinceLastProfile = (now - ps.firstProfileTimeInCycle) / (GMfloat) frequency;
+	g_handler->beginProfile(name, durationSinceLastProfile, GMThread::getCurrentThreadId(), ps.level);
 
 	ps.level++;
-	d->stopwatch.start();
+	stopwatch.start();
 }
 
-void GMProfile::stopRecord()
+void GMProfilePrivate::stopRecord()
 {
-	D(d);
-	d->stopwatch.stop();
-	if (!d->valid)
+	P_D(pd);
+	stopwatch.stop();
+	if (!valid)
 		return;
 
 	if (!g_handler)
 		return;
 
-	GMProfileSessions::GMProfileSession& ps = profileSession();
+	GMProfileSessions::GMProfileSession& ps = pd->profileSession();
 	GMThreadId id = GMThread::getCurrentThreadId();
 	GMint32& level = ps.level;
-	g_handler->endProfile(d->name, d->stopwatch.timeInSecond(), id, --level);
+	g_handler->endProfile(name, stopwatch.timeInSecond(), id, --level);
 }
 
 END_NS

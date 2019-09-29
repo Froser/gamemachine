@@ -14,6 +14,7 @@ BEGIN_NS
 
 GM_PRIVATE_OBJECT_UNALIGNED(GMDx11GraphicEngine)
 {
+	GM_DECLARE_PUBLIC(GMDx11GraphicEngine)
 	GMComPtr<ID3D11Device> device;
 	GMComPtr<ID3D11DeviceContext> deviceContext;
 	GMComPtr<IDXGISwapChain> swapChain;
@@ -39,12 +40,14 @@ GM_PRIVATE_OBJECT_UNALIGNED(GMDx11GraphicEngine)
 	GMOwnedPtr<ITechnique> technique_custom;
 
 	GMint32 lightCountIndices = 0;
+	void initShaders(const IRenderContext* context);
 };
 
 GMDx11GraphicEngine::GMDx11GraphicEngine(const IRenderContext* context)
 	: GMGraphicEngine(context)
 {
 	GM_CREATE_DATA();
+	GM_SET_PD();
 }
 
 GMDx11GraphicEngine::~GMDx11GraphicEngine()
@@ -63,7 +66,7 @@ void GMDx11GraphicEngine::init()
 
 		if (d->ready)
 		{
-			initShaders(db->context);
+			d->initShaders(db->context);
 			db->renderTechniqueManager->init();
 		}
 		else
@@ -278,17 +281,17 @@ bool GMDx11GraphicEngine::msgProc(const GMMessage& e)
 	return Base::msgProc(e);
 }
 
-void GMDx11GraphicEngine::initShaders(const IRenderContext* context)
+void GMDx11GraphicEnginePrivate::initShaders(const IRenderContext* context)
 {
-	D(d);
+	P_D(pd);
 	// 读取着色器
-	if (!getShaderLoadCallback())
+	if (!pd->getShaderLoadCallback())
 	{
 		gm_error(gm_dbg_wrap("An IShaderLoadCallback is missing."));
 		return;
 	}
 
-	getShaderLoadCallback()->onLoadShaders(context);
+	pd->getShaderLoadCallback()->onLoadShaders(context);
 }
 
 ITechnique* GMDx11GraphicEngine::getTechnique(GMModelType objectType)

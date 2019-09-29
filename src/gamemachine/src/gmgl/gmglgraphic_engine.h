@@ -80,9 +80,6 @@ public:
 	void activateLights(ITechnique* technique);
 	void shaderProgramChanged(IShaderProgram* program);
 
-private:
-	void installShaders();
-
 public:
 	enum
 	{
