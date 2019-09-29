@@ -41,6 +41,7 @@ public:
 
 	GMReturnValues()
 		: m_size(0)
+		, m_L(nullptr)
 	{}
 
 	GMReturnValues(const GMReturnValues& rhs)
