@@ -13,9 +13,9 @@ private:
 
 GM_LUA_FUNC(add)
 {
-	GM_LUA_CHECK_ARG_COUNT(L, 2, "add");
-	GMfloat b = luaapi::GMArgumentHelper::popArgument(L, "add").toFloat();
-	GMfloat a = luaapi::GMArgumentHelper::popArgument(L, "add").toFloat();
+	GMLuaArguments args(L, "add");
+	int a = args.getArgument(0).toFloat();
+	int b = args.getArgument(1).toFloat();
 	return GMReturnValues(L, a + b);
 }
 
@@ -35,7 +35,7 @@ int GameMachineLua::regCallback(GMLuaCoreState *L)
 }
 
 int main(int argc, char* argv[])
-{	
+{
 	GMLua lua;
 	GameMachineLua().registerFunctions(&lua);
 	GMLuaResult result = lua.runString("print(GameMachine.add(1, 2))");
