@@ -144,7 +144,7 @@ public:
 class GMAnimationKeyframeLess
 {
 public:
-	bool operator ()(const GMAnimationKeyframe* lhs, const GMAnimationKeyframe* rhs)
+	bool operator ()(const GMAnimationKeyframe* lhs, const GMAnimationKeyframe* rhs) const
 	{
 		return *lhs < *rhs;
 	}

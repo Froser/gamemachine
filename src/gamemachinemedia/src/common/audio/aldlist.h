@@ -10,7 +10,7 @@ using namespace std;
 
 BEGIN_MEDIA_NS
 
-typedef struct
+typedef struct ALDEVICEINFO_
 {
 	string			strDeviceName;
 	int				iMajorVersion = 0;

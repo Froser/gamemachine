@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmstring.h"
 #include "foundation/debug.h"
+#include <stdexcept>
 
 #if GM_UNIX
 #include <wctype.h> //iswspace
