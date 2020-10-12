@@ -87,6 +87,16 @@ add_executable(${PROJECT_NAME}
 gm_gamemachine_project(${PROJECT_NAME} TRUE)
 gm_folder_with_name(${PROJECT_NAME} gamemachinedemo)
 
+gm_copy_resource(${PROJECT_NAME})
+add_custom_command(
+		TARGET ${PROJECT_NAME}
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+		"${CMAKE_SOURCE_DIR}/media/gm.demo.pk1"
+		"$<TARGET_FILE_DIR:${PROJECT_NAME}>/gm.pk1"
+		VERBATIM
+)
+
 if(MSVC)
 	set (gamemachine_dll ${PROJECT_NAME}_dll)
 	add_executable(${gamemachine_dll}
@@ -96,6 +106,16 @@ if(MSVC)
 	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
 	set_target_properties(${gamemachine_dll} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
 	gm_gamemachine_project(${gamemachine_dll} FALSE)
+	
+	gm_copy_resource(${gamemachine_dll})
+	add_custom_command(
+			TARGET ${gamemachine_dll}
+			POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${CMAKE_SOURCE_DIR}/media/gm.demo.pk1"
+			"$<TARGET_FILE_DIR:${gamemachine_dll}>/gm.pk1"
+			VERBATIM
+	)
 endif(MSVC)
 
 gm_end_project(${PROJECT_NAME})

@@ -52,15 +52,40 @@ add_executable(${PROJECT_NAME}
 gm_gamemachine_project(${PROJECT_NAME} TRUE)
 gm_folder_with_name(${PROJECT_NAME} gamemachinedemo)
 
+gm_copy_resource(${PROJECT_NAME})
+add_custom_command(
+		TARGET ${PROJECT_NAME}
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E tar cv
+		"$<TARGET_FILE_DIR:${PROJECT_NAME}>/gm.pk1"
+		--format=zip --
+		"."
+		WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/media/premiere"
+		VERBATIM
+)
+
 if(MSVC)
-	set (gamemachine_dll ${PROJECT_NAME}_dll)
-	add_executable(${gamemachine_dll}
+	set (premiere_dll ${PROJECT_NAME}_dll)
+	add_executable(${premiere_dll}
 		${SOURCES}
 	)
 	gm_folder_with_name(${PROJECT_NAME}_dll gamemachinedemo)
 	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
-	set_target_properties(${gamemachine_dll} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
-	gm_gamemachine_project(${gamemachine_dll} FALSE)
+	set_target_properties(${premiere_dll} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
+	gm_gamemachine_project(${premiere_dll} FALSE)
+
+	gm_copy_resource(${premiere_dll})
+	add_custom_command(
+			TARGET ${premiere_dll}
+			POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E tar cv
+			"$<TARGET_FILE_DIR:${premiere_dll}>/gm.pk1"
+			--format=zip --
+			"."
+			WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/media/premiere"
+			VERBATIM
+	)
+
 endif(MSVC)
 
 gm_end_project(${PROJECT_NAME})

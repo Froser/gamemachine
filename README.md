@@ -5,8 +5,7 @@ GameMachine是一款小巧的图形渲染引擎。
 安装3.9.0以上版本的CMake，并构建Coding下的CMakeLists.txt。
 
 ### Windows下的构建方法:
-* 直接构建release，并将media/gm.pk0、media/gm.pk1拷贝到release目录下，可以运行程序。
-* 如果运行debug，请将media/gm.pk0用WinRAR等压缩工具解压到D:/gmpk；将media/gm.pk1解压到D:/gmpk1
+* 直接进行编译，CMake将会将所有资源拷贝到二进制生成的目录下，运行即可。
 * 对于没有安装DirectX11的环境的机器，可以将CMake中的GM_USE_DX11开关关闭，这样将编译没有DirectX11的渲染环境。
 
 **由于用到了诸多C++11/14的特性，只能使用VS2015及以上的版本编译**
@@ -103,8 +102,7 @@ GameMachine Premiere的代码存放在src/demo/premiere中。
 
 ## GameMachine Premiere 运行方法：
 编译好GameMachine Premiere之后，同GameMachine Demo类似：
-* 直接构建release，并将media/gm.pk0拷贝到release目录下，将media/premiere中的所有文件打包zip格式，并改名为gm.pk1，放到release目录下，便可以运行程序。
-* 如果运行debug，请将media/gm.pk0用WinRAR等压缩工具解压到D:/gmpk；将media/premiere中的所有文件放到D:/gmpk1中，便可运行程序。
+* 直接进行编译，CMake将会将所有资源拷贝到二进制生成的目录下，运行即可。
 
 ## 效果预览：
 ![Particle And Models](https://github.com/Froser/gamemachine/blob/master/manual/pic/p1.png)

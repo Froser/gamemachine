@@ -140,7 +140,7 @@ macro(gm_begin_project)
 		add_definitions(-DGM_WINDOWS)
 	endif(WIN32)
 	if(GM_RASPBERRYPI)
-        message("GameMachine: RespberryPi detected.")
+		message("GameMachine: RespberryPi detected.")
 		add_definitions(-DGM_RASPBERRYPI)
 	endif(GM_RASPBERRYPI)
 	if(UNIX)
@@ -177,6 +177,19 @@ macro(gm_link_gamemachine_libraries libraryName ACCESS)
 	gm_link_pthread(${libraryName} ${ACCESS})
 	gm_link_libraries(${libraryName} ${ACCESS})
 endmacro(gm_link_gamemachine_libraries)
+
+macro(gm_copy_resource targetName)
+	add_custom_command(
+			TARGET ${targetName}
+			POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E tar cv
+			"$<TARGET_FILE_DIR:${targetName}>/gm.pk0"
+			--format=zip --
+			"."
+			WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/media/gmpk"
+			VERBATIM
+	)
+endmacro(gm_copy_resource)
 
 macro(gm_end_project libraryName)
 # do nothing

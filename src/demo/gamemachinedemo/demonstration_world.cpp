@@ -805,20 +805,7 @@ void DemostrationEntrance::init(const gm::IRenderContext* context)
 {
 	D(d);
 	gm::GMGamePackage* pk = GM.getGamePackageManager();
-
-#if GM_WINDOWS
-#	ifdef GM_DEBUG
-	pk->loadPackage("D:/gmpk");
-#	else
 	pk->loadPackage((gm::GMPath::getCurrentPath() + L"gm.pk0"));
-#	endif
-#else
-#	ifdef GM_DEBUG
-	pk->loadPackage("/home/pi/Documents/gmpk");
-#	else
-	pk->loadPackage((gm::GMPath::getCurrentPath() + L"gm.pk0"));
-#	endif
-#endif
 
 	{
 		gm::GMBuffer buf;

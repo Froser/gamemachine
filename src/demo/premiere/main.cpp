@@ -8,19 +8,7 @@ namespace
 	void loadPackage()
 	{
 		GMGamePackage* pk = GM.getGamePackageManager();
-#if GM_WINDOWS
-#	ifdef GM_DEBUG
-		pk->loadPackage("D:/gmpk");
-#	else
 		pk->loadPackage((GMPath::getCurrentPath() + L"gm.pk0"));
-#	endif
-#else
-#	ifdef GM_DEBUG
-		pk->loadPackage("/home/froser/Documents/gmpk");
-#	else
-		pk->loadPackage((GMPath::getCurrentPath() + L"gm.pk0"));
-#	endif
-#endif
 	}
 
 	Config setup()
