@@ -168,11 +168,7 @@ using GMAtomic = std::atomic<T>;
 #endif
 
 // 定义对齐结构体
-#if GM_WINDOWS
-#	define GM_ALIGNED_16(t) t __declspec(align(16))
-#else
-#	define GM_ALIGNED_16(t) t __attribute__((aligned(16)))
-#endif
+#define GM_ALIGNED_16(t) t alignas(16)
 
 #if GM_LIB
 #	define GM_API
