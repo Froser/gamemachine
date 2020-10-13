@@ -1,3 +1,0 @@
-void GM_Shadow()
-{
-}
