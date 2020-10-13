@@ -1,3 +1,4 @@
+#version 430
 layout(local_size_x = 1, local_size_y = 1) in;
 
 layout(std140, binding = 0) uniform Constant
@@ -139,7 +140,7 @@ void main(void)
         transformed[3].xyz,
     };
 
-    uint vertexOffset = gid * 6; // 每个particle用6个顶点
+    uint vertexOffset = gid * 6u; // 每个particle用6个顶点
 
     // vertex 0
     vertex[vertexOffset].positions[0] = vertices[0].x;

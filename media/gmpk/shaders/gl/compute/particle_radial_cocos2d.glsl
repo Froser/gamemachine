@@ -1,3 +1,4 @@
+#version 430
 const int GM_MOTION_MODE_FREE = 0;
 const int GM_MOTION_MODE_RELATIVE = 1;
 
