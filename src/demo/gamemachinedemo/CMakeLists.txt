@@ -88,14 +88,16 @@ gm_gamemachine_project(${PROJECT_NAME} TRUE)
 gm_folder_with_name(${PROJECT_NAME} gamemachinedemo)
 
 gm_copy_resource(${PROJECT_NAME})
-add_custom_command(
-		TARGET ${PROJECT_NAME}
-		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
-		"${CMAKE_SOURCE_DIR}/media/gm.demo.pk1"
-		"$<TARGET_FILE_DIR:${PROJECT_NAME}>/gm.pk1"
-		VERBATIM
-)
+	add_custom_command(
+			TARGET ${PROJECT_NAME}
+			POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E tar cv
+			"$<TARGET_FILE_DIR:${PROJECT_NAME}>/gm.pk1"
+			--format=zip --
+			"."
+			WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/media/gm.demo"
+			VERBATIM
+	)
 
 if(MSVC)
 	set (gamemachine_dll ${PROJECT_NAME}_dll)
@@ -111,9 +113,11 @@ if(MSVC)
 	add_custom_command(
 			TARGET ${gamemachine_dll}
 			POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			"${CMAKE_SOURCE_DIR}/media/gm.demo.pk1"
+			COMMAND ${CMAKE_COMMAND} -E tar cv
 			"$<TARGET_FILE_DIR:${gamemachine_dll}>/gm.pk1"
+			--format=zip --
+			"."
+			WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/media/gm.demo"
 			VERBATIM
 	)
 endif(MSVC)

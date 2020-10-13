@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<gmshader>
+	<item name="textures/sfx/flame1side">
+		<surfaceparm>nomarks</surfaceparm>
+		<surfaceparm>nolightmap</surfaceparm>
+		<cull>none</cull>
+		<blendFunc>GMS_ONE GMS_ONE</blendFunc>
+		<animMap ms="100">
+			<src>textures/sfx/flame1.jpg</src>
+			<src>textures/sfx/flame2.jpg</src>
+			<src>textures/sfx/flame3.jpg</src>
+			<src>textures/sfx/flame4.jpg</src>
+			<src>textures/sfx/flame5.jpg</src>
+			<src>textures/sfx/flame6.jpg</src>
+			<src>textures/sfx/flame7.jpg</src>
+			<src>textures/sfx/flame8.jpg</src>
+		</animMap>
+		<!--
+		<animMap ms="100">
+			<src>textures/sfx/flame2.jpg</src>
+			<src>textures/sfx/flame3.jpg</src>
+			<src>textures/sfx/flame4.jpg</src>
+			<src>textures/sfx/flame5.jpg</src>
+			<src>textures/sfx/flame6.jpg</src>
+			<src>textures/sfx/flame7.jpg</src>
+			<src>textures/sfx/flame8.jpg</src>
+			<src>textures/sfx/flame1.jpg</src>
+		</animMap>
+		<map>textures/sfx/flameball.jpg</map>
+		-->
+	</item>
+	<item name="textures/sfx/xflame2" ref="textures/sfx/flame1side" />
+	<item name="textures/sfx/flame1dark" ref="textures/sfx/flame1side" />
+	<item name="textures/sfx/flame1" ref="textures/sfx/flame1side" />
+	<item name="textures/sfx/flame2" ref="textures/sfx/flame1side" />
+	<item name="flareShader">
+		<cull>none</cull>
+		<blendFunc>GMS_ONE GMS_ONE</blendFunc>
+		<map>gfx/misc/flare.jpg</map>
+	</item>
+	<item name="textures/skies/killsky">
+		<surfaceparm>noimpact</surfaceparm>
+		<surfaceparm>nomarks</surfaceparm>
+		<surfaceparm>nolightmap</surfaceparm>
+		<surfaceparm>sky</surfaceparm>
+		<blendFunc>GMS_ONE GMS_ONE</blendFunc>
+		<map tcMod="scroll 0.05 .1 scale 2 2" >textures/skies/killsky_1.jpg</map>
+		<!--<map tcMod="scroll 0.05 .06 scale 3 2">textures/skies/killsky_2.jpg</map>-->
+	</item>
+	<item name="textures/skies/toxicskydim">
+		<surfaceparm>noimpact</surfaceparm>
+		<surfaceparm>nomarks</surfaceparm>
+		<surfaceparm>nolightmap</surfaceparm>
+		<surfaceparm>sky</surfaceparm>
+		<blendFunc>GMS_ONE GMS_ONE</blendFunc>
+		<map tcMod="scroll 0.05 .1 scale 2 2" >textures/skies/inteldimclouds.jpg</map>
+	</item>
+	<item name="models/mapobjects/baph/bapholamp_fx">
+		<surfaceparm>nonsolid</surfaceparm>
+		<surfaceparm>nolightmap</surfaceparm>
+		<cull>cull</cull>
+		<blendFunc>GMS_ONE GMS_ONE</blendFunc>
+		<clampmap>models/mapobjects/baph/bapholamp_fx.jpg</clampmap>
+	</item>
+	<item name="textures/gothic_light/pentagram_light1_1K">
+		<blendFunc>GMS_DST_COLOR GMS_ZERO</blendFunc>
+		<map from="lightmap" />
+		<map>textures/gothic_light/pentagram_light1.jpg</map>
+		<!--<map>textures/gothic_light/pentagram_light1_blend.jpg</map>-->
+	</item>
+	<item name="textures/liquids/lavahell">
+		<surfaceparm>noimpact</surfaceparm>
+		<surfaceparm>nolightmap</surfaceparm>
+		<cull>none</cull>
+		<map tcMod="scroll 0.1 0.1" >textures/liquids/lavahell.jpg</map>
+	</item>
+	<item name="textures/gothic_light/ironcrosslt2_5000">
+		<surfaceparm>nomarks</surfaceparm>
+		<map from="lightmap" />
+		<map>textures/gothic_light/ironcrosslt2.blend.jpg</map>
+		<blendFunc>GMS_ONE GMS_ONE</blendFunc>
+	</item>
+	<item name="textures/base_wall/atech2_c">
+		<map>textures/base_wall/atech2_c.jpg</map>
+		<lights>
+			<light type="specular" color=".6f .6f .6f" ks=".1 .1 .1" kd=".2 .2 .2" shininess="2" position="10 10 10" />
+		</lights>
+	</item>
+</gmshader>

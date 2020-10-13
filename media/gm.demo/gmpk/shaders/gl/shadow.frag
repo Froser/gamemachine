@@ -1,0 +1,3 @@
+void GM_Shadow()
+{
+}
