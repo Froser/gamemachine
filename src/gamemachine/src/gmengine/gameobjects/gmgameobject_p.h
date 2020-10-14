@@ -56,6 +56,7 @@ GM_PRIVATE_OBJECT_ALIGNED(GMGameObject)
 	void setAutoUpdateTransformMatrix(bool autoUpdateTransformMatrix) GM_NOEXCEPT;
 	void releaseAllBufferHandle();
 	void updateTransformMatrix();
+	void switchTechnique(ITechnique* technique);
 };
 
 END_NS

@@ -81,6 +81,13 @@ void GMGameObjectPrivate::updateTransformMatrix()
 	transforms.transformMatrix = transforms.scaling * QuatToMatrix(transforms.rotation) * transforms.translation;
 }
 
+void GMGameObjectPrivate::switchTechnique(ITechnique* technique)
+{
+	if (drawContext.currentTechnique)
+		drawContext.currentTechnique->endScene();
+	drawContext.currentTechnique = technique;
+}
+
 GM_DEFINE_PROPERTY(GMGameObject, GMGameObjectRenderPriority, RenderPriority, renderPriority)
 
 GMGameObject::GMGameObject()
@@ -471,11 +478,8 @@ void GMGameObject::drawModel(const IRenderContext* context, GMModel* model)
 	ITechnique* technique = engine->getTechnique(model->getType());
 	if (technique != d->drawContext.currentTechnique)
 	{
-		if (d->drawContext.currentTechnique)
-			d->drawContext.currentTechnique->endScene();
-
+		d->switchTechnique(technique);
 		technique->beginScene(getScene());
-		d->drawContext.currentTechnique = technique;
 	}
 
 	technique->beginModel(model, this);
@@ -486,10 +490,7 @@ void GMGameObject::drawModel(const IRenderContext* context, GMModel* model)
 void GMGameObject::endDraw()
 {
 	D(d);
-	if (d->drawContext.currentTechnique)
-		d->drawContext.currentTechnique->endScene();
-
-	d->drawContext.currentTechnique = nullptr;
+	d->switchTechnique(nullptr);
 }
 
 void GMGameObject::makeAABB()
